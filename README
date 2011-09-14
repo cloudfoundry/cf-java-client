@@ -1,0 +1,21 @@
+Copyright (c) 2009-2011 VMware, Inc.
+
+== What is Cloud Foundry?
+
+Cloud Foundry is an open platform-as-a-service (PaaS). The system support
+multiple frameworks, multiple application infrastructure services and
+deployment to multiple clouds.
+
+== What is this component
+
+The vmc-java repo contains a java client library for Cloud Foundry.
+The library provides a set of classes that ultimately call the core
+Cloud Foundry REST API.
+
+== License
+
+Cloud Foundry uses the Apache 2 license.  See LICENSE for details.
+
+== Installation Notes
+
+Complete installation notes are present in the README for vcap

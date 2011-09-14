@@ -1,0 +1,247 @@
+/*
+ * Copyright 2009-2011 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.cloudfoundry.client.lib;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CloudInfo {
+	private Limits limits;
+	private Usage usage;
+	private String name;
+	private String support;
+	private Integer build;
+	private String version;
+	private String user;
+	private String description;
+	private Collection<Framework> frameworks = new ArrayList<Framework>();
+	private Map<String, Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
+
+	@SuppressWarnings("unchecked")
+	public CloudInfo(Map<String, Object> infoMap) {
+		name = CloudUtil.parse(String.class, infoMap.get("name"));
+		support = CloudUtil.parse(String.class, infoMap.get("support"));
+		build = CloudUtil.parse(Integer.class, infoMap.get("build"));
+		version = CloudUtil.parse(String.class, infoMap.get("version"));
+		user = CloudUtil.parse(String.class, infoMap.get("user"));
+		description = CloudUtil.parse(String.class, infoMap.get("description"));
+
+		Map<String, Object> limitsMap = CloudUtil.parse(Map.class, infoMap.get("limits"));
+		if (limitsMap != null) {
+			limits = new Limits(limitsMap);
+		} else {
+			limits = new Limits();
+		}
+
+		Map<String, Object> usageMap = CloudUtil.parse(Map.class, infoMap.get("usage"));
+		if (usageMap != null) {
+			usage = new Usage(usageMap);
+		} else {
+			usage = new Usage();
+		}
+
+		Map<String, Object> frameworksMap = CloudUtil.parse(Map.class, infoMap.get("frameworks"));
+		if (frameworksMap != null) {
+			for (Map.Entry<String, Object> entry : frameworksMap.entrySet()) {
+				Framework framework = new Framework((Map<String, Object>)entry.getValue());
+				frameworks.add(framework);
+				for (Runtime runtime : framework.runtimes) {
+					if (!runtimes.containsKey(runtime.getName())) {
+						runtimes.put(runtime.getName(), runtime);
+					}
+				}
+			}
+		}
+	}
+
+	public CloudInfo(String name, String support, int build, String version,
+			String user, String description, Limits limits, Usage usage) {
+		this.name = name;
+		this.support = support;
+		this.build = build;
+		this.version = version;
+		this.user = user;
+		this.description = description;
+		this.limits = limits;
+		this.usage = usage;
+	}
+
+	public Limits getLimits() {
+		return limits;
+	}
+
+	public Usage getUsage() {
+		return usage;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getSupport() {
+		return support;
+	}
+
+	public Integer getBuild() {
+		return build;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public Collection<Framework> getFrameworks() {
+		return Collections.unmodifiableCollection(frameworks);
+	}
+
+	public Collection<Runtime> getRuntimes() {
+		return Collections.unmodifiableCollection(runtimes.values());
+	}
+
+	public static class Limits {
+		private int maxApps;
+		private int maxTotalMemory;
+		private int maxUrisPerApp;
+		private int maxServices;
+
+		public Limits(Map<String, Object> limitMap) {
+			maxApps = CloudUtil.parse(Integer.class, limitMap.get("apps"));
+			maxTotalMemory = CloudUtil.parse(Integer.class, limitMap.get("memory"));
+			maxUrisPerApp = CloudUtil.parse(Integer.class, limitMap.get("app_uris"));
+			maxServices = CloudUtil.parse(Integer.class, limitMap.get("services"));
+		}
+
+		Limits() {
+			maxApps = Integer.MAX_VALUE;
+			maxTotalMemory = Integer.MAX_VALUE;
+			maxUrisPerApp = Integer.MAX_VALUE;
+			maxServices = Integer.MAX_VALUE;
+		}
+
+		public int getMaxApps() {
+			return maxApps;
+		}
+
+		public int getMaxTotalMemory() {
+			return maxTotalMemory;
+		}
+
+		public int getMaxUrisPerApp() {
+			return maxUrisPerApp;
+		}
+
+		public int getMaxServices() {
+			return maxServices;
+		}
+	}
+
+	public static class Usage {
+		private int apps;
+		private int totalMemory;
+		private int urisPerApp;
+		private int services;
+
+		public Usage(Map<String, Object> data) {
+			apps = CloudUtil.parse(Integer.class, data.get("apps"));
+			totalMemory = CloudUtil.parse(Integer.class,  data.get("memory"));
+			urisPerApp = CloudUtil.parse(Integer.class,  data.get("app_uris"));
+			services = CloudUtil.parse(Integer.class,  data.get("services"));
+		}
+
+		Usage() {
+			apps = Integer.MAX_VALUE;
+			totalMemory = Integer.MAX_VALUE;
+			urisPerApp = Integer.MAX_VALUE;
+			services = Integer.MAX_VALUE;
+		}
+
+		public int getApps() {
+			return apps;
+		}
+
+		public int getTotalMemory() {
+			return totalMemory;
+		}
+
+		public int getUrisPerApp() {
+			return urisPerApp;
+		}
+
+		public int getServices() {
+			return services;
+		}
+	}
+
+	public static class Runtime {
+		private String name;
+		private String version;
+		private String description;
+
+		public Runtime(Map<String, Object> data) {
+			name = CloudUtil.parse(String.class,  data.get("name"));
+			description = CloudUtil.parse(String.class,  data.get("description"));
+			// The way Jackson will parse, the version will be a Double with simpler versions like "1.6" with one . but String otherwise
+			version = CloudUtil.parse(Object.class,  data.get("version")).toString();
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public String getVersion() {
+			return version;
+		}
+	}
+
+	public static class Framework {
+		private String name;
+		private List<Runtime> runtimes = new ArrayList<Runtime>();
+
+		@SuppressWarnings("unchecked")
+		public Framework(Map<String, Object> data) {
+			name = CloudUtil.parse(String.class,  data.get("name"));
+			List<Map<String, Object>> runtimeData = CloudUtil.parse(List.class,  data.get("runtimes"));
+			for (Map<String, Object> runtime : runtimeData) {
+				runtimes.add(new Runtime(runtime));
+			}
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public List<Runtime> getRuntimes() {
+			return Collections.unmodifiableList(runtimes);
+		}
+	}
+}
