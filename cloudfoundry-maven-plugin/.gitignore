@@ -5,3 +5,5 @@ log.roo
 .settings
 .springBeans
 .DS_Store
+release.properties
+pom.xml.releaseBackup
