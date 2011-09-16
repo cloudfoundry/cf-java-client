@@ -20,7 +20,7 @@ The Maven plugin also closely mimics the feature set provided by the [Grails Clo
 In order to get started you must as a minimum add the **cf-maven-plugin** to your project's pom.xml:
 
     <plugin>
-        <groupId>org.cloudfoundry.maven</groupId>
+        <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
         <version>1.0.0.M1-SNAPSHOT</version>
     </plugin>
@@ -40,7 +40,7 @@ While it is possible to configure Cloud Foundry security credentials within the 
 Plugin configuration in **pom.xml**:
 
     <plugin>
-      <groupId>org.cloudfoundry.maven</groupId>
+      <groupId>org.cloudfoundry</groupId>
       <artifactId>cf-maven-plugin</artifactId>
       <version>1.0.0.M1-SNAPSHOT</version>
       <configuration>
@@ -92,7 +92,7 @@ Following, a typical (expected) configuration example is shown, which uses sever
     <build>
         <plugins>
             <plugin>
-                <groupId>org.cloudfoundry.maven</groupId>
+                <groupId>org.cloudfoundry</groupId>
                 <artifactId>maven-cf-plugin</artifactId>
                 <version>1.0.0.M1-SNAPSHOT</version>
                 <configuration>

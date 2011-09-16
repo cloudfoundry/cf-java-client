@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.cloudfoundry.maven</groupId>
+	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cf-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
 	<version>1.0.0.M1-SNAPSHOT</version>
@@ -16,7 +16,7 @@
     </licenses>
     
     <properties>
-        <java-version>1.6</java-version>
+        <java-version>1.5</java-version>
         <slf4j.version>1.5.6</slf4j.version>
     </properties>
     
@@ -33,6 +33,19 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Framework Milestone Repository</name>
+            <url>http://maven.springframework.org/milestone</url>
+        </repository>
+        <snapshotRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Framework Snapshot Repository</name>
+            <url>http://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 	<dependencies>
 		<dependency>
