@@ -105,13 +105,13 @@
 	<distributionManagement>
 		<repository>
 			<id>spring-milestone</id>
-			<name>Spring Framework Milestone Repository</name>
-			<url>http://maven.springframework.org/milestone</url>
+			<name>Spring Milestone Repository</name>
+			<url>s3://maven.springframework.org/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
-			<name>Spring Framework Snapshot Repository</name>
-			<url>http://maven.springframework.org/snapshot</url>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 	
