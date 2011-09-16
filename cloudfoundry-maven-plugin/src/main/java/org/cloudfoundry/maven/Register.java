@@ -17,14 +17,14 @@ package org.cloudfoundry.maven;
 
 /**
  * Allows for registering a new user with Cloud Foundry
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal register
  * @phase process-sources
  */
 public class Register extends AddUser {
-	
+
 
 }

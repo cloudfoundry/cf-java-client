@@ -1,11 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.cloudfoundry</groupId>
-	<artifactId>cf-maven-plugin</artifactId>
-	<packaging>maven-plugin</packaging>
-	<version>1.0.0.M1-SNAPSHOT</version>
-	<name>Cloud Foundry Maven Plugin</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.cloudfoundry</groupId>
+    <artifactId>cf-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <version>1.0.0.BUILD-SNAPSHOT</version>
+    <name>Cloud Foundry Maven Plugin</name>
+
+    <description><![CDATA[The Cloud Foundry Maven Plugin makes it easy to deploy
+       Maven-based applications to Cloud Foundry instances.
+    ]]></description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java-version>1.5</java-version>
+        <slf4j-version>1.5.6</slf4j-version>
+    </properties>
 
     <licenses>
         <license>
@@ -14,94 +23,160 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
-    <properties>
-        <java-version>1.5</java-version>
-        <slf4j.version>1.5.6</slf4j.version>
-    </properties>
-    
+
+    <developers>
+        <developer>
+            <id>ghillert</id>
+            <name>Gunnar Hillert</name>
+            <email>ghillert at vmware.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>http://github.com/cloudfoundry/vcap-java-client</url>
+        <connection>scm:git:git@github.com/cloudfoundry/vcap-java-client</connection>
+        <developerConnection>scm:git:git@github.com/cloudfoundry/vcap-java-client</developerConnection>
+    </scm>
+
+    <profiles>
+        <profile>
+            <id>staging</id>
+            <distributionManagement>
+                <repository>
+                    <id>spring-milestone-staging</id>
+                    <url>file:///${java.io.tmpdir}/${project.artifactId}/milestone</url>
+                </repository>
+                <snapshotRepository>
+                    <id>spring-snapshot-staging</id>
+                    <url>file:///${java.io.tmpdir}/${project.artifactId}/snapshot</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>milestone</id>
+            <distributionManagement>
+              <repository>
+                <id>spring-milestone</id>
+                <name>Spring Milestone Repository</name>
+                <url>s3://maven.springframework.org/milestone</url>
+              </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+    <repositories>
+        <repository>
+            <id>repository.springframework.maven.release</id>
+            <name>Spring Framework Maven Release Repository</name>
+            <url>http://maven.springframework.org/release</url>
+        </repository>
+        <repository>
+            <id>repository.springframework.maven.milestone</id>
+            <name>Spring Framework Maven Milestone Repository</name>
+            <url>http://maven.springframework.org/milestone</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring Release Repository</name>
+            <url>s3://maven.springframework.org/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>s3://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.springframework.build.aws</groupId>
+                <artifactId>org.springframework.build.aws.maven</artifactId>
+                <version>3.0.0.RELEASE</version>
+            </extension>
+        </extensions>
         <plugins>
-           <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>${java-version}</source>
-                    <target>${java-version}</target>
-                </configuration>
-            </plugin>
+                     <source>${java-version}</source>
+                     <target>${java-version}</target>
+                     <compilerArgument>-Xlint:all</compilerArgument>
+                     <showWarnings>true</showWarnings>
+                     <showDeprecation>true</showDeprecation>
+                 </configuration>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-release-plugin</artifactId>
+                 <version>2.2.1</version>
+                 <configuration>
+                     <pushChanges>false</pushChanges>
+                 </configuration>
+             </plugin>
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>spring-milestone</id>
-            <name>Spring Framework Milestone Repository</name>
-            <url>http://maven.springframework.org/milestone</url>
-        </repository>
-        <snapshotRepository>
-            <id>spring-snapshot</id>
-            <name>Spring Framework Snapshot Repository</name>
-            <url>http://maven.springframework.org/snapshot</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cloudfoundry</groupId>
+            <artifactId>cloudfoundry-client-lib</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-provider-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>2.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-nop</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wagon-webdav-jackrabbit</artifactId>
+                    <groupId>org.apache.maven.wagon</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact-manager</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-plugin-testing-harness</artifactId>
+            <version>1.0-beta-1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.0-rc1</version>
+            <scope>test</scope>
+        </dependency>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.cloudfoundry</groupId>
-			<artifactId>cloudfoundry-client-lib</artifactId>
-			<version>0.7.0.BUILD-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.wagon</groupId>
-			<artifactId>wagon-provider-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<version>2.2.1</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-nop</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>wagon-webdav-jackrabbit</artifactId>
-					<groupId>org.apache.maven.wagon</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact-manager</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.shared</groupId>
-			<artifactId>maven-plugin-testing-harness</artifactId>
-			<version>1.0-beta-1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.0-rc1</version>
-			<scope>test</scope>
-		</dependency>
-		
         <!-- Logging (For testing only) -->
 
         <dependency>
@@ -113,20 +188,20 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <version>${slf4j-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
+            <version>${slf4j-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
+            <version>${slf4j-version}</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>

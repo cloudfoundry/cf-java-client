@@ -25,47 +25,47 @@ import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
  * Allows for registering a new user with Cloud Foundry
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal add-user
  * @phase process-sources
  */
 public class AddUser extends AbstractCloudFoundryMojo {
 
-	/**
-	 * Base execute method. Will perform the login and logout into Cloud Foundry.
-	 * Delegates to doExecute() for the actual business logic.
-	 */
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		
-    	Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
-    	Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
-    	Assert.configurationNotNull(getTarget(),   "target",   SystemProperties.TARGET);
-		
-    	try {
-    		client = new CloudFoundryClient(getTarget().toString());
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", getTarget()), e);
-		}
-		
-		try {
-			doExecute();
-			client.logout();
-			
-		} catch (RuntimeException e) {
-			throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
-		} 
-		
-	}
-	
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		super.getLog().info(String.format("Registering user...'%s'", this.getUsername()));
-		this.getClient().register(this.getUsername(), this.getPassword());
-	}
-	
+    /**
+     * Base execute method. Will perform the login and logout into Cloud Foundry.
+     * Delegates to doExecute() for the actual business logic.
+     */
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+
+        Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
+        Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
+        Assert.configurationNotNull(getTarget(),   "target",   SystemProperties.TARGET);
+
+        try {
+            client = new CloudFoundryClient(getTarget().toString());
+        } catch (MalformedURLException e) {
+            throw new MojoExecutionException(
+                    String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", getTarget()), e);
+        }
+
+        try {
+            doExecute();
+            client.logout();
+
+        } catch (RuntimeException e) {
+            throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
+        }
+
+    }
+
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        super.getLog().info(String.format("Registering user...'%s'", this.getUsername()));
+        this.getClient().register(this.getUsername(), this.getPassword());
+    }
+
 }

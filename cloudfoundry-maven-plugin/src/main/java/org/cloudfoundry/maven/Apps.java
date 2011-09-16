@@ -21,24 +21,24 @@ import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Lists your applications. Displays all deployed applications, along with 
+ * Lists your applications. Displays all deployed applications, along with
  * information about health, instance count, bound services, and associated URLs.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal apps
  * @phase process-sources
  */
 public class Apps extends AbstractCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		
-		final List<CloudApplication> applications = this.getClient().getApplications();
-		
-		super.getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
-		
-	}
-	
+    @Override
+    protected void doExecute() {
+
+        final List<CloudApplication> applications = this.getClient().getApplications();
+
+        super.getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
+
+    }
+
 }

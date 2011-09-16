@@ -31,145 +31,145 @@ import org.springframework.http.HttpStatus;
 
 /**
  * Push and optionally start an application.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal push
  * @execute phase="package"
  */
 public class Push extends AbstractApplicationAwareCloudFoundryMojo {
-	
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		
-		Assert.configurationNotNull(this.getUrl(), "url", SystemProperties.URL);
-		
-		final java.util.List<String> uris = new ArrayList<String>(1);
-		uris.add(this.getUrl());
 
-		final String appname        = this.getAppname();
-		final Integer instances     = this.getInstances();
-		final File warfile          = this.getWarfile();
-		final Integer memory        = this.getMemory();
-		final List<String> services = this.getServices();
-		
-		super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
-				appname, warfile, memory, uris, services));
-		
-		super.getLog().debug("Create Application...");
-		
-		validateMemoryChoice(this.getClient(), memory);
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		boolean found = true;
-		
-		try {
-			this.getClient().getApplication(appname);
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				found = false;
-			} else {
-				throw new MojoExecutionException(String.format("Error while checking for existing application '%s'. Error message: '%s'. Description: '%s'",
-						appname, e.getMessage(), e.getDescription()), e);
-			}
+        Assert.configurationNotNull(this.getUrl(), "url", SystemProperties.URL);
 
-		}
+        final java.util.List<String> uris = new ArrayList<String>(1);
+        uris.add(this.getUrl());
 
-		if (found) {
-			throw new MojoExecutionException(
-					String.format("The application '%s' is already deployed.", appname));
-		}
+        final String appname        = this.getAppname();
+        final Integer instances     = this.getInstances();
+        final File warfile          = this.getWarfile();
+        final Integer memory        = this.getMemory();
+        final List<String> services = this.getServices();
 
-		try {
-			this.getClient().createApplication(appname, CloudApplication.SPRING, memory, uris, services);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
-		}
-				
-		super.getLog().debug("Deploy Application...");
-		
+        super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
+                appname, warfile, memory, uris, services));
+
+        super.getLog().debug("Create Application...");
+
+        validateMemoryChoice(this.getClient(), memory);
+
+        boolean found = true;
+
+        try {
+            this.getClient().getApplication(appname);
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                found = false;
+            } else {
+                throw new MojoExecutionException(String.format("Error while checking for existing application '%s'. Error message: '%s'. Description: '%s'",
+                        appname, e.getMessage(), e.getDescription()), e);
+            }
+
+        }
+
+        if (found) {
+            throw new MojoExecutionException(
+                    String.format("The application '%s' is already deployed.", appname));
+        }
+
+        try {
+            this.getClient().createApplication(appname, CloudApplication.SPRING, memory, uris, services);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+                    this.getAppname(), e.getMessage(), e.getDescription()), e);
+        }
+
+        super.getLog().debug("Deploy Application...");
+
         validateWarFile(warfile);
-		
-		try {		
-			deployWar(this.getClient(), warfile, appname);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
-		}
-		
-		if (instances != null) {
-			super.getLog().debug("Set the number of instances to " + instances);
-			
-			try {
-				this.getClient().updateApplicationInstances(appname, instances);
-			} catch (CloudFoundryException e) {
-				throw new MojoExecutionException(String.format("Error while setting number of instances for application '%s'. Error message: '%s'. Description: '%s'",
-						this.getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-		}
 
-		if (!isNoStart()) {
-			
-			super.getLog().debug("Start Application..." + appname);
-			
-			try {
-				this.getClient().startApplication(appname);
-			} catch (CloudFoundryException e) {
-				throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-						this.getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-				
-		} else {
-			super.getLog().debug("Not Starting Application.");
-		}
-		
-		super.getLog().debug("Done pushing application.");
-	}
+        try {
+            deployWar(this.getClient(), warfile, appname);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+                    this.getAppname(), e.getMessage(), e.getDescription()), e);
+        }
 
-	/**
-	 * Helper method that validates that the memory size selected is valid and available. 
-	 * 
-	 * @param cloudFoundryClient
-	 * @param desiredMemory
-	 * 
-	 * @throws IllegalStateException if memory constraints are violated.
-	 */
-	protected void validateMemoryChoice(CloudFoundryClient cloudFoundryClient, Integer desiredMemory) {
+        if (instances != null) {
+            super.getLog().debug("Set the number of instances to " + instances);
+
+            try {
+                this.getClient().updateApplicationInstances(appname, instances);
+            } catch (CloudFoundryException e) {
+                throw new MojoExecutionException(String.format("Error while setting number of instances for application '%s'. Error message: '%s'. Description: '%s'",
+                        this.getAppname(), e.getMessage(), e.getDescription()), e);
+            }
+        }
+
+        if (!isNoStart()) {
+
+            super.getLog().debug("Start Application..." + appname);
+
+            try {
+                this.getClient().startApplication(appname);
+            } catch (CloudFoundryException e) {
+                throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+                        this.getAppname(), e.getMessage(), e.getDescription()), e);
+            }
+
+        } else {
+            super.getLog().debug("Not Starting Application.");
+        }
+
+        super.getLog().debug("Done pushing application.");
+    }
+
+    /**
+     * Helper method that validates that the memory size selected is valid and available.
+     *
+     * @param cloudFoundryClient
+     * @param desiredMemory
+     *
+     * @throws IllegalStateException if memory constraints are violated.
+     */
+    protected void validateMemoryChoice(CloudFoundryClient cloudFoundryClient, Integer desiredMemory) {
         int[] memoryChoices = cloudFoundryClient.getApplicationMemoryChoices();
         validateMemoryChoice(memoryChoices, desiredMemory);
-	}
-	
-	/**
-	 * Helper method that validates that the memory size selected is valid and available. 
-	 * 
-	 * @param cloudFoundryClient
-	 * @param desiredMemory
-	 * 
-	 * @throws IllegalStateException if memory constraints are violated.
-	 */
-	protected void validateMemoryChoice(int[] availableMemoryChoices, Integer desiredMemory) {
+    }
+
+    /**
+     * Helper method that validates that the memory size selected is valid and available.
+     *
+     * @param cloudFoundryClient
+     * @param desiredMemory
+     *
+     * @throws IllegalStateException if memory constraints are violated.
+     */
+    protected void validateMemoryChoice(int[] availableMemoryChoices, Integer desiredMemory) {
 
         boolean match = false;
         List<String> memoryChoicesAsString = new ArrayList<String>();
         for (int i : availableMemoryChoices) {
-        	if (Integer.valueOf(i).equals(desiredMemory)) {
-        		match = true;
-        	}
-        	memoryChoicesAsString.add(String.valueOf(i));
+            if (Integer.valueOf(i).equals(desiredMemory)) {
+                match = true;
+            }
+            memoryChoicesAsString.add(String.valueOf(i));
         }
-        
+
         if (!match) {
-        	throw new IllegalStateException("Memory must be one of the following values: " + 
+            throw new IllegalStateException("Memory must be one of the following values: " +
                       CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
         }
-        
-	}
 
-	
+    }
+
+
     /**
      * Executes the actual war deployment to Cloud Foundry.
-     * 
+     *
      * @param client The Cloud Foundry client to use
      * @param warFile The warfile to upload
      * @param appName The name of the application this warfile upload is for
@@ -181,9 +181,9 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         try {
             client.uploadApplication(appName, warFile);
         } catch (IOException e) {
-        	throw new IllegalStateException("Error while uploading application.", e);
+            throw new IllegalStateException("Error while uploading application.", e);
         }
 
     }
-	
+
 }

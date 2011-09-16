@@ -20,20 +20,20 @@ import java.io.File;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
 /**
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
  *
  */
 public class PushTest extends AbstractMojoTestCase {
-	
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
     }
-    
+
     /**
      * @throws Exception
      */
@@ -41,14 +41,14 @@ public class PushTest extends AbstractMojoTestCase {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
         Push mojo = (Push) lookupMojo ( "push", testPom );
-        
+
         final int[] availableMemoryChoices = new int[]{64, 128, 256, 512};
         final Integer desiredMemory = 128;
-        
+
         mojo.validateMemoryChoice(availableMemoryChoices, desiredMemory);
-        
+
         //This should succeed.
-        
+
     }
 
     /**
@@ -58,19 +58,19 @@ public class PushTest extends AbstractMojoTestCase {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
         Push mojo = (Push) lookupMojo ( "push", testPom );
-        
+
         final int[] availableMemoryChoices = new int[]{64, 128, 256};
         final Integer desiredMemory = 512;
-        
+
         try {
             mojo.validateMemoryChoice(availableMemoryChoices, desiredMemory);
         } catch (IllegalStateException e) {
-        	assertEquals("Memory must be one of the following values: 64, 128, 256", e.getMessage());
-        	return;
+            assertEquals("Memory must be one of the following values: 64, 128, 256", e.getMessage());
+            return;
         }
-       
+
         fail();
-        
+
     }
-    
+
 }

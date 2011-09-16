@@ -18,19 +18,19 @@ package org.cloudfoundry.maven;
 
 /**
  * Deletes the user with the provided login credentials.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal delete-user
  * @phase process-sources
  */
 public class DeleteUser extends AbstractCloudFoundryMojo {
-		
-	@Override
-	protected void doExecute() {
-		super.getLog().info(String.format("Deleting user...'%s'", this.getUsername()));
-		this.getClient().unregister();
-	}
+
+    @Override
+    protected void doExecute() {
+        super.getLog().info(String.format("Deleting user...'%s'", this.getUsername()));
+        this.getClient().unregister();
+    }
 
 }

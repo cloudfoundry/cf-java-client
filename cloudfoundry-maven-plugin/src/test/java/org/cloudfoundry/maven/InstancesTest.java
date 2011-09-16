@@ -27,20 +27,20 @@ import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
  *
  */
 public class InstancesTest extends AbstractMojoTestCase {
-	
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
     }
-    
+
     /**
      * @throws Exception
      */
@@ -51,26 +51,26 @@ public class InstancesTest extends AbstractMojoTestCase {
         Instances unspiedMojo = (Instances) lookupMojo ( "instances", testPom );
 
         Instances mojo = spy(unspiedMojo);
-        
+
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
         doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
         String expectedErrorMessage = null;
-        
+
         try {
-        	Assert.configurationNotNull(null, "instances", SystemProperties.INSTANCES);
+            Assert.configurationNotNull(null, "instances", SystemProperties.INSTANCES);
         } catch (MojoExecutionException e) {
-        	expectedErrorMessage = e.getMessage();
+            expectedErrorMessage = e.getMessage();
         }
 
         try {
             mojo.doExecute();
         } catch (MojoExecutionException e) {
-        	assertEquals(expectedErrorMessage, e.getMessage());
-        	return;
+            assertEquals(expectedErrorMessage, e.getMessage());
+            return;
         }
-        
+
         fail();
 
     }

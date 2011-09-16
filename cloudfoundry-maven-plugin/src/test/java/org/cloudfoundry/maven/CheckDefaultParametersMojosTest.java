@@ -25,14 +25,14 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
- * Test the existence of several default parameter values. 
- * 
+ * Test the existence of several default parameter values.
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
  *
  */
 public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
-	
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
@@ -50,13 +50,13 @@ public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
         setVariableValueToObject( mojo, "warfile", testPom);
-        
+
         doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
         assertEquals("cf-maven-tests", mojo.getAppname());
