@@ -33,6 +33,12 @@
         </developer>
     </developers>
 
+    <scm>
+        <url>http://github.com/SpringSource/vcap-java-client</url>
+        <connection>scm:git:git@github.com/SpringSource/vcap-java-client</connection>
+        <developerConnection>scm:git:git@github.com/SpringSource/vcap-java-client</developerConnection>
+    </scm>
+
     <profiles>
         <profile>
             <id>staging</id>
