@@ -17,21 +17,21 @@ package org.cloudfoundry.maven;
 
 /**
  * Restarts an application.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal restart
  * @phase process-sources
  */
 public class Restart extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		
-		super.getLog().info("Restarting application..." + this.getAppname());
-		this.getClient().restartApplication(this.getAppname());
-		
-	}
-	
+    @Override
+    protected void doExecute() {
+
+        super.getLog().info("Restarting application..." + this.getAppname());
+        this.getClient().restartApplication(this.getAppname());
+
+    }
+
 }

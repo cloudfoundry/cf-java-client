@@ -17,21 +17,21 @@ package org.cloudfoundry.maven;
 
 /**
  * Starts an application.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal start
  * @phase process-sources
  */
 public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-				
-		super.getLog().info("Starting application..." + this.getAppname());
-		this.getClient().startApplication(this.getAppname());
-		
-	}
-	
+    @Override
+    protected void doExecute() {
+
+        super.getLog().info("Starting application..." + this.getAppname());
+        this.getClient().startApplication(this.getAppname());
+
+    }
+
 }

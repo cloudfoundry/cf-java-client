@@ -24,13 +24,13 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
  *
  */
 public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTestCase {
-	
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
@@ -48,20 +48,20 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl()); 
-        
+        assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
+
     }
-    
+
     public void testGetUrl2() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -69,20 +69,20 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertEquals("myapp.cloudfoundry.com", mojo.getUrl()); 
-        
+        assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
+
     }
-    
+
     public void testGetUrl3() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -90,20 +90,20 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn("custom.expliciturl.com").when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertEquals("custom.expliciturl.com", mojo.getUrl()); 
-        
+        assertEquals("custom.expliciturl.com", mojo.getUrl());
+
     }
-    
+
     public void testGetUrlWithNullTarget() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -111,20 +111,20 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertEquals("myapp.<undefined target>", mojo.getUrl()); 
-        
+        assertEquals("myapp.<undefined target>", mojo.getUrl());
+
     }
-    
+
     public void testGetUrlWithBadTarget() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -132,20 +132,20 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertNull(mojo.getUrl()); 
-        
+        assertNull(mojo.getUrl());
+
     }
-    
+
     public void testGetServices() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -153,18 +153,18 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        
+
         doReturn("serviceA, mongo, mysql, rabbitmq").when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
 
-        assertTrue("Expecting 4 Services", mojo.getServices().size() == 4); 
-        
-    }    
-    
+        assertTrue("Expecting 4 Services", mojo.getServices().size() == 4);
+
+    }
+
     public void testGetServices2() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -172,19 +172,19 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
         setVariableValueToObject( mojo, "services", "service1, super service2  " );
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
 
-        assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2); 
-        
+        assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2);
+
         assertEquals("service1", mojo.getServices().get(0));
         assertEquals("super service2", mojo.getServices().get(1));
 
-    }   
+    }
 
     public void testGetNoStart() throws Exception {
 
@@ -193,7 +193,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
@@ -202,8 +202,8 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 
         assertEquals(Boolean.TRUE, mojo.isNoStart());
 
-    }   
-    
+    }
+
     public void testGetNoStartPrecedence() throws Exception {
 
         File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
@@ -211,7 +211,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
         Push mojo = spy(unspiedMojo);
-        
+
         /**
          * Injecting some test values as expressions are not evaluated.
          */
@@ -221,5 +221,5 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         assertEquals(Boolean.FALSE, mojo.isNoStart());
 
     }
-    
+
 }

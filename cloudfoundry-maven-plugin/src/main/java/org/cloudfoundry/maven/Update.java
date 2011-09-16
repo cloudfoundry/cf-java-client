@@ -23,37 +23,37 @@ import org.cloudfoundry.client.lib.CloudApplication.AppState;
 
 /**
  * Updates an application.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal update
  * @execute phase="package"
  */
 public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		
-		final File warFile = getWarfile();
-		final String appName = getAppname();
-		
+    @Override
+    protected void doExecute() {
+
+        final File warFile = getWarfile();
+        final String appName = getAppname();
+
         validateWarFile(warFile);
 
         CloudApplication aplication = this.getClient().getApplication(appName);
-        
+
         getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, warFile.getAbsolutePath()));
 
         try {
-        	this.getClient().uploadApplication(appName, warFile);
+            this.getClient().uploadApplication(appName, warFile);
         } catch (IOException e) {
-        	throw new IllegalStateException("Error while uploading application.", e);
+            throw new IllegalStateException("Error while uploading application.", e);
         }
 
-		if (AppState.STARTED.equals(aplication.getState())) {
-			this.getClient().restartApplication(appName);
-		}
-		
-	}
-	
+        if (AppState.STARTED.equals(aplication.getState())) {
+            this.getClient().restartApplication(appName);
+        }
+
+    }
+
 }

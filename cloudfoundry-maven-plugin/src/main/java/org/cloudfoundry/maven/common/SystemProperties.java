@@ -16,39 +16,39 @@
 package org.cloudfoundry.maven.common;
 
 /**
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
  *
  */
 public enum SystemProperties {
 
-	APP_NAME("cf.appname", "appname"),
-	INSTANCES("cf.instances", "instances"),
-	MEMORY("cf.memory", "memory"),
-	NO_START("cf.no-start", "no-start"),
-	PASSWORD("cf.password", "password"),
-	SERVICES("cf.services", "services"),
-	SETTINGS_SERVER("server", "server"),
-	TARGET("cf.target", "target"),
-	URL("cf.url", "url"),
-	USERNAME("cf.username", "username"),
-	WARFILE("cf.warfile", "warfile");
-	
-	private String property;
-	private String xmlElement;
+    APP_NAME("cf.appname", "appname"),
+    INSTANCES("cf.instances", "instances"),
+    MEMORY("cf.memory", "memory"),
+    NO_START("cf.no-start", "no-start"),
+    PASSWORD("cf.password", "password"),
+    SERVICES("cf.services", "services"),
+    SETTINGS_SERVER("server", "server"),
+    TARGET("cf.target", "target"),
+    URL("cf.url", "url"),
+    USERNAME("cf.username", "username"),
+    WARFILE("cf.warfile", "warfile");
 
-	private SystemProperties(String property, String xmlElement) {
-		this.property = property;
-		this.xmlElement = xmlElement;
-	}
+    private String property;
+    private String xmlElement;
 
-	public String getProperty() {
-		return property;
-	}
+    private SystemProperties(String property, String xmlElement) {
+        this.property = property;
+        this.xmlElement = xmlElement;
+    }
 
-	public String getXmlElement() {
-		return xmlElement;
-	}
-		
+    public String getProperty() {
+        return property;
+    }
+
+    public String getXmlElement() {
+        return xmlElement;
+    }
+
 }

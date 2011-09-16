@@ -21,9 +21,9 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
-	
-	private static final String testPomXmlPath = "src/test/resources/test-pom.xml";
-	
+
+    private static final String testPomXmlPath = "src/test/resources/test-pom.xml";
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
@@ -35,7 +35,7 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfAppsMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Apps mojo = (Apps) lookupMojo ( "apps", testPom );
 
@@ -46,7 +46,7 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfDeleteMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Delete mojo = (Delete) lookupMojo ( "delete", testPom );
 
@@ -57,18 +57,18 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfHelpMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Help mojo = (Help) lookupMojo ( "help", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testExistenceOfInfoMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Info mojo = (Info) lookupMojo ( "info", testPom );
 
@@ -80,7 +80,7 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfInstancesMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Instances mojo = (Instances) lookupMojo ( "instances", testPom );
 
@@ -91,51 +91,51 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfPushMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Push mojo = (Push) lookupMojo ( "push", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testExistenceOfRestartMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Restart mojo = (Restart) lookupMojo ( "restart", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testExistenceOfStartMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Start mojo = (Start) lookupMojo ( "start", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testExistenceOfStopMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Stop mojo = (Stop) lookupMojo ( "stop", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testExistenceOfUpdateMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Update mojo = (Update) lookupMojo ( "update", testPom );
 
@@ -146,7 +146,7 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfRegisterMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         Register mojo = (Register) lookupMojo ( "register", testPom );
 
@@ -157,7 +157,7 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfAddUserMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         AddUser mojo = (AddUser) lookupMojo ( "add-user", testPom );
 
@@ -168,26 +168,26 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
      * @throws Exception
      */
     public void testExistenceOfDeleteUserMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
         DeleteUser mojo = (DeleteUser) lookupMojo ( "delete-user", testPom );
 
         assertNotNull( mojo );
     }
-    
+
     /**
      * @throws Exception
      */
     public void testNonExistingMojo() throws Exception {
-    	
+
         File testPom = new File( getBasedir(), testPomXmlPath);
 
         try {
             lookupMojo ( "something", testPom );
         } catch (ComponentLookupException e) {
-        	return;
+            return;
         }
-        
+
         fail("A ComponentLookupException should have been thrown.");
     }
 }

@@ -22,35 +22,35 @@ import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
  * Scale the application instances up or down.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal instances
  * @phase process-sources
  */
 public class Instances extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		
-		final Integer instances     = this.getInstances();
-		final String  appname       = this.getAppname();
-		
-		Assert.configurationNotNull(instances, "instances", SystemProperties.INSTANCES);
-		
-		super.getLog().info(String.format("Setting number of instances for "
-		                                + "application '%s' to '%s'.", appname, instances));
-		
-		try {
-			this.getClient().updateApplicationInstances(appname, instances);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(
-					String.format("Error while setting  number of instances for " 
-			                    + "application '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
-		}
-		
-	}
-	
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+
+        final Integer instances     = this.getInstances();
+        final String  appname       = this.getAppname();
+
+        Assert.configurationNotNull(instances, "instances", SystemProperties.INSTANCES);
+
+        super.getLog().info(String.format("Setting number of instances for "
+                                        + "application '%s' to '%s'.", appname, instances));
+
+        try {
+            this.getClient().updateApplicationInstances(appname, instances);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(
+                    String.format("Error while setting  number of instances for "
+                                + "application '%s'. Error message: '%s'. Description: '%s'",
+                    this.getAppname(), e.getMessage(), e.getDescription()), e);
+        }
+
+    }
+
 }

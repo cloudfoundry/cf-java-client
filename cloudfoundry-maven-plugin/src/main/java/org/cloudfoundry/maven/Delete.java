@@ -21,28 +21,28 @@ import org.springframework.http.HttpStatus;
 
 /**
  * Deletes an application.
- * 
+ *
  * @author Gunnar Hillert
  * @since 1.0.0
- * 
+ *
  * @goal delete
  * @phase process-sources
  */
 public class Delete extends AbstractApplicationAwareCloudFoundryMojo {
-	
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {		
-		super.getLog().info("Deleting application..." + this.getAppname());
-		
-		try {
-		    this.getClient().deleteApplication(this.getAppname());
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
-						this.getAppname()), e);
-			}
-		}
-	}
-	
+
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        super.getLog().info("Deleting application..." + this.getAppname());
+
+        try {
+            this.getClient().deleteApplication(this.getAppname());
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
+                        this.getAppname()), e);
+            }
+        }
+    }
+
 }

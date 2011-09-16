@@ -38,4 +38,3 @@ Currently available Cloud Foundry Maven Plugin Goals are:
   Help
     help                                                                    Get general help
 
-    

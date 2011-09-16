@@ -31,45 +31,45 @@ import org.springframework.util.FileCopyUtils;
 
 public class UiUtilsTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UiUtilsTest.class);
-	
-	@Test
-	public void testRenderTextTable() {
-		
-		
-		final List<String> services = new ArrayList<String>();
-		
-		services.add("mysql");
-		services.add("MyMongoInstance");
-		
-		final List<String> uris = new ArrayList<String>();
-		
-		uris.add("cf-rocks.cloudfoundry.com");
-		uris.add("MyMongoInstance");
-		
-		String expectedTableAsString = null;
-		
-		try {
-			expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		
-		Assert.assertNotNull(expectedTableAsString);
-		
-		final CloudApplication app1 = new CloudApplication("Name", "stagingStack", 
-				         "StaginModel", 512, 1, uris, services, AppState.STARTED);
-		
-		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
-		applications.add(app1);
-		
-		final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
-		
-		LOGGER.info("\n" + renderedTableAsString);
-		
-		Assert.assertEquals(expectedTableAsString, renderedTableAsString);
-		
-	}
-	
+    private static final Logger LOGGER = LoggerFactory.getLogger(UiUtilsTest.class);
+
+    @Test
+    public void testRenderTextTable() {
+
+
+        final List<String> services = new ArrayList<String>();
+
+        services.add("mysql");
+        services.add("MyMongoInstance");
+
+        final List<String> uris = new ArrayList<String>();
+
+        uris.add("cf-rocks.cloudfoundry.com");
+        uris.add("MyMongoInstance");
+
+        String expectedTableAsString = null;
+
+        try {
+            expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+        Assert.assertNotNull(expectedTableAsString);
+
+        final CloudApplication app1 = new CloudApplication("Name", "stagingStack",
+                         "StaginModel", 512, 1, uris, services, AppState.STARTED);
+
+        final List<CloudApplication> applications = new ArrayList<CloudApplication>();
+        applications.add(app1);
+
+        final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
+
+        LOGGER.info("\n" + renderedTableAsString);
+
+        Assert.assertEquals(expectedTableAsString, renderedTableAsString);
+
+    }
+
 }
