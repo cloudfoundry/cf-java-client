@@ -61,7 +61,7 @@
                 <url>s3://maven.springframework.org/milestone</url>
               </repository>
             </distributionManagement>
-        </profile>     
+        </profile>
     </profiles>
 
     <repositories>
@@ -176,7 +176,7 @@
 			<version>1.9.0-rc1</version>
 			<scope>test</scope>
 		</dependency>
-		
+
         <!-- Logging (For testing only) -->
 
         <dependency>
