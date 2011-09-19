@@ -114,4 +114,22 @@ public final class CommonUtils {
 		}
 	}
 	
+	
+	/**
+	 * Simple method to replace characters in a String with Stars to mask the
+	 * password.
+	 * 
+	 * @param password The password to mask
+	 */
+	public static String maskPassword(String password) {
+		int lengthOfPassword = password.length();
+		StringBuilder stringBuilder = new StringBuilder(lengthOfPassword);
+		
+		for(int i = 0; i < lengthOfPassword; i++){
+			stringBuilder.append('*');
+		}
+		
+		return stringBuilder.toString();
+	}
+	
 }

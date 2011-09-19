@@ -62,6 +62,10 @@ public class Info extends AbstractCloudFoundryMojo {
 			}
 
 			try {
+				
+				super.getLog().warn("You did not provide a username and password. " 
+				                  + "Showing basic information only.");
+				
 				doExecute();
 				client.logout();
 				
@@ -69,6 +73,8 @@ public class Info extends AbstractCloudFoundryMojo {
 				throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
 			} 
 
+		} else {
+			super.execute();
 		}
 
 	}
@@ -93,10 +99,7 @@ public class Info extends AbstractCloudFoundryMojo {
 			throw new MojoExecutionException(
 					String.format("Cannot access hotst at '%s'.", localTarget), e);
     	}
-    	
-		super.getLog().warn("You did not provide a username and password. " +
-				  "Showing basic information only.");
-		
+    			
 		super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, localTarget));
 	}
 	
@@ -121,9 +124,10 @@ public class Info extends AbstractCloudFoundryMojo {
 		sb.append(String.format("Description: %s\n", cloudinfo.getDescription()));
 		sb.append(String.format("Name:        %s\n", cloudinfo.getName()));
 		sb.append(String.format("Support:     %s\n", cloudinfo.getSupport()));
-		sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
 		
 		if (cloudinfo.getUser() != null) {
+		    sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
+
 			sb.append("Usage: "       + "\n");
 			sb.append(String.format("    Memory:       %sM of %sM total \n", cloudinfo.getUsage().getTotalMemory()
 					                                                       , cloudinfo.getLimits().getMaxTotalMemory()));

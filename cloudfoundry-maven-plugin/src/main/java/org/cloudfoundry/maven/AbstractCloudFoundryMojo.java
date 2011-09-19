@@ -214,13 +214,17 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			
 			AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
 			
-			if (authenticationInfo != null) {
+			if (authenticationInfo == null) {
+				super.getLog().warn(String.format(
+						"In settings.xml server element '%s' was not defined.", this.getServer()));
+				return null;
+			}
+			
+			if (authenticationInfo.getPassword() != null) {
 				return authenticationInfo.getPassword();
 			} else {
-				
-				super.getLog().debug(String.format(
-						"In settings.xml server element '%s' does not exist.", this.getServer()));
-				
+				super.getLog().warn(String.format(
+						"In settings.xml no passwword was found for server element '%s'. Does the element exist?", this.getServer()));
 				return null;
 			}
 			
@@ -322,15 +326,19 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			
 			AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
 			
-			if (authenticationInfo != null) {
-				return authenticationInfo.getUserName();
-			} else {
-				
-				super.getLog().info(String.format(
-						"In settings.xml server element '%s' does not exist.", this.getServer()));
-				
+			if (authenticationInfo == null) {
+				super.getLog().warn(String.format(
+						"In settings.xml server element '%s' was not defined.", this.getServer()));
 				return null;
 			}
+			
+			if (authenticationInfo.getUserName() != null) {
+				return authenticationInfo.getUserName();
+			} else {
+				super.getLog().warn(String.format(
+						"In settings.xml no username was found for server element '%s'. Does the element exist?", this.getServer()));
+				return null;
+			}	
 
 		} else {
 			return username;

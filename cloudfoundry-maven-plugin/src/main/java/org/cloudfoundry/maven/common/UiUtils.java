@@ -172,6 +172,8 @@ public final class UiUtils {
 
 		textTable.append(headerBorder);
 
+		textTable.append("\n");
+		
 		return textTable.toString();
 	}
 
