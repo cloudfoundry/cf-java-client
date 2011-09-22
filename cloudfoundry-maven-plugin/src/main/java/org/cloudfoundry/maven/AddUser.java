@@ -21,6 +21,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
@@ -44,6 +45,10 @@ public class AddUser extends AbstractCloudFoundryMojo {
         Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
         Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
         Assert.configurationNotNull(getTarget(),   "target",   SystemProperties.TARGET);
+
+        if(!CommonUtils.isValidEmail(getUsername())) {
+            throw new MojoExecutionException(getUsername() + " is not a valid email address.");
+        }
 
         try {
             client = new CloudFoundryClient(getTarget().toString());

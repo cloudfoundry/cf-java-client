@@ -114,6 +114,16 @@ public final class CommonUtils {
         }
     }
 
+    /**
+    *
+    * @param reader
+    */
+    public static boolean isValidEmail(String emailAddress) {
+
+        final String regex = "^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        return emailAddress.matches(regex);
+
+    }
 
     /**
      * Simple method to replace characters in a String with Stars to mask the

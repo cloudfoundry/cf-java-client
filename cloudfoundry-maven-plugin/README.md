@@ -1,7 +1,10 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M1-SNAPSHOT, August 30, 2011 Draft
+Version 1.0.0.M1, September 22, 2011 Draft
 
-Source code: git@github.com:vmware-ac/vmc-java.git
+* Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
+* Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
+* Build Server:    [https://build.springsource.org/browse/VCAPJAVA](https://build.springsource.org/browse/VCAPJAVA)
+* Sonar:           [https://sonar.springsource.org/dashboard/index/org.cloudfoundry:cf-maven-plugin](https://sonar.springsource.org/dashboard/index/org.cloudfoundry:cf-maven-plugin)
 
 ## Introduction
 

@@ -124,7 +124,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
             super.getLog().debug("Not Starting Application.");
         }
 
-        super.getLog().debug("Done pushing application.");
+        super.getLog().info(String.format("'%s' was successfully deployed to: '%s'.", appname, this.getUrl()));
     }
 
     /**
