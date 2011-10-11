@@ -23,11 +23,15 @@ public class InstanceInfo {
 	private final Date since;
 	private final int index;
 	private final String state; // TODO make enum, need to know the valid values
+	private final String debugIp;
+	private final int debugPort;
 
 	public InstanceInfo(Map<String, Object> infoMap) {
 		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
 		index = CloudUtil.parse(Integer.class, infoMap.get("index"));
 		state = CloudUtil.parse(String.class, infoMap.get("state"));
+		debugIp = CloudUtil.parse(String.class, infoMap.get("debug_ip"));
+		debugPort = CloudUtil.parse(Integer.class, infoMap.get("debug_port"));
 	}
 
 	public Date getSince() {
@@ -40,5 +44,13 @@ public class InstanceInfo {
 
 	public String getState() {
 		return state;
+	}
+
+	public String getDebugIp() {
+		return debugIp;
+	}
+
+	public int getDebugPort() {
+		return debugPort;
 	}
 }

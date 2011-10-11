@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.CloudInfo.Framework;
 import org.cloudfoundry.client.lib.ServiceConfiguration.Tier;
 import org.junit.After;
@@ -49,7 +50,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 
 /**
- * Note that this test relies on deleteAllApplications() working correctly. If there is a temporary breaking of that API, 
+ * Note that this test relies on deleteAllApplications() working correctly. If there is a temporary breaking of that API,
  * use 'vmc delete --all" to reset.
  * Also each test relies on other methods working correctly, so these tests aren't as independent as they should be.
  *
@@ -216,6 +217,22 @@ public class CloudFoundryClientTest {
 	public void startApplication() throws IOException {
 		CloudApplication app = createAndUploadAndStart(namespacedAppName("travel_test3"));
 		assertEquals(AppState.STARTED, app.getState());
+	}
+
+	@Test
+	public void debugApplication() throws IOException {
+		assumeTrue(client.getCloudInfo().getAllowDebug());
+
+		String appName = namespacedAppName("travel_test3");
+		createAndUploadTestApp(appName);
+		client.debugApplication(appName, DebugMode.run);
+		CloudApplication app = client.getApplication(appName);
+		assertEquals(AppState.STARTED, app.getState());
+		InstancesInfo applicationInstances = client.getApplicationInstances(appName);
+		List<InstanceInfo> instances = applicationInstances.getInstances();
+		assertEquals(1, instances.size());
+		assertNotNull(instances.get(0).getDebugIp());
+		assertNotSame(0, instances.get(0).getDebugPort());
 	}
 
 	@Test
@@ -601,7 +618,7 @@ public class CloudFoundryClientTest {
 		assertEquals(3, app.getInstances());
 
 		boolean pass = false;
-		for (int i = 0; i < 240; i++) { 
+		for (int i = 0; i < 240; i++) {
 			instances = getInstancesWithTimeout(appName);
 			assertNotNull(instances);
 
@@ -610,7 +627,7 @@ public class CloudFoundryClientTest {
 
 			int passCount = 0;
 			for (InstanceInfo info : infos) {
-				if("RUNNING".equals(info.getState()) 
+				if("RUNNING".equals(info.getState())
 					|| "STARTING".equals(info.getState())) {
 					passCount++;
 				}
