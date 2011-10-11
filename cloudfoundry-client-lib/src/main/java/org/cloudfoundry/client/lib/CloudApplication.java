@@ -28,6 +28,7 @@ public class CloudApplication {
 	private List<String> uris;
 	private List<String> services;
 	private AppState state;
+	private DebugMode debug;
 	private Map<String, Object> meta = new HashMap<String, Object>();
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
@@ -70,10 +71,20 @@ public class CloudApplication {
 		meta = (Map<String, Object>) attributes.get("meta");
 		resources = (Map<String, Integer>) attributes.get("resources");
 		env = (List<String>) attributes.get("env");
+
+		String debugAttribute = (String) attributes.get("debug");
+		if (debugAttribute != null) {
+			debug = DebugMode.valueOf(debugAttribute);
+		}
 	}
 
 	public enum AppState {
 		UPDATING, STARTED, STOPPED
+	}
+
+	public enum DebugMode {
+		run,
+		suspend
 	}
 
 	public String getName() {
@@ -132,6 +143,14 @@ public class CloudApplication {
 		this.state = state;
 	}
 
+	public DebugMode getDebug() {
+		return debug;
+	}
+
+	public void setDebug(DebugMode debug) {
+		this.debug = debug;
+	}
+
 	public Map<String, Object> getMeta() {
 		return meta;
 	}
@@ -182,7 +201,7 @@ public class CloudApplication {
 		return "CloudApplication [stagingModel=" + staging.get(MODEL_KEY) + ", instances="
 				+ instances + ", name=" + name + ", stagingStack=" + staging.get(STACK_KEY)
 				+ ", memory=" + resources.get(MEMORY_KEY)
-				+ ", state=" + state + ", uris=" + uris + ",services=" + services
+				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ",services=" + services
 				+ ", env=" + env + "]";
 	}
 }
