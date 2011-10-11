@@ -41,6 +41,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.io.Resource;
@@ -365,6 +366,14 @@ public class CloudFoundryClient {
 	public void startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		app.setState(AppState.STARTED);
+		app.setDebug(null);
+		updateApplication(app);
+	}
+
+	public void debugApplication(String appName, DebugMode mode) {
+		CloudApplication app = getApplication(appName);
+		app.setState(AppState.STARTED);
+		app.setDebug(mode);
 		updateApplication(app);
 	}
 

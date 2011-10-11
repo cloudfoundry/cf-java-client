@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.CloudInfo.Framework;
 import org.cloudfoundry.client.lib.ServiceConfiguration.Tier;
 import org.junit.After;
@@ -216,6 +217,22 @@ public class CloudFoundryClientTest {
 	public void startApplication() throws IOException {
 		CloudApplication app = createAndUploadAndStart(namespacedAppName("travel_test3"));
 		assertEquals(AppState.STARTED, app.getState());
+	}
+	
+	@Test
+	public void debugApplication() throws IOException {
+		assumeTrue(client.getCloudInfo().getAllowDebug());
+
+		String appName = namespacedAppName("travel_test3");
+		createAndUploadTestApp(appName);
+		client.debugApplication(appName, DebugMode.run);
+		CloudApplication app = client.getApplication(appName);
+		assertEquals(AppState.STARTED, app.getState());
+		InstancesInfo applicationInstances = client.getApplicationInstances(appName);
+		List<InstanceInfo> instances = applicationInstances.getInstances();
+		assertEquals(1, instances.size());
+		assertNotNull(instances.get(0).getDebugIp());
+		assertNotSame(0, instances.get(0).getDebugPort());
 	}
 
 	@Test
