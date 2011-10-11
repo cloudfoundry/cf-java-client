@@ -32,6 +32,7 @@ public class CloudInfo {
 	private String version;
 	private String user;
 	private String description;
+	private boolean allowDebug;
 	private Collection<Framework> frameworks = new ArrayList<Framework>();
 	private Map<String, Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
 
@@ -43,6 +44,13 @@ public class CloudInfo {
 		version = CloudUtil.parse(String.class, infoMap.get("version"));
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
+
+		Object allowDebugValue = infoMap.get("allow_debug");
+		if (allowDebugValue != null) {
+			allowDebug = CloudUtil.parse(Boolean.class, allowDebugValue);
+		} else {
+			allowDebugValue = false; // default to false
+		}
 
 		Map<String, Object> limitsMap = CloudUtil.parse(Map.class, infoMap.get("limits"));
 		if (limitsMap != null) {
@@ -73,7 +81,7 @@ public class CloudInfo {
 	}
 
 	public CloudInfo(String name, String support, int build, String version,
-			String user, String description, Limits limits, Usage usage) {
+			String user, String description, Limits limits, Usage usage, boolean allowDebug) {
 		this.name = name;
 		this.support = support;
 		this.build = build;
@@ -82,6 +90,7 @@ public class CloudInfo {
 		this.description = description;
 		this.limits = limits;
 		this.usage = usage;
+		this.allowDebug = allowDebug;
 	}
 
 	public Limits getLimits() {
@@ -114,6 +123,10 @@ public class CloudInfo {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public boolean getAllowDebug() {
+		return allowDebug;
 	}
 
 	public Collection<Framework> getFrameworks() {
