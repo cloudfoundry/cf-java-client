@@ -72,9 +72,11 @@ public class CloudApplication {
 		resources = (Map<String, Integer>) attributes.get("resources");
 		env = (List<String>) attributes.get("env");
 
-		String debugAttribute = (String) attributes.get("debug");
-		if (debugAttribute != null) {
-			debug = DebugMode.valueOf(debugAttribute);
+		if (meta != null) {
+			String debugAttribute = (String) meta.get("debug");
+			if (debugAttribute != null) {
+				debug = DebugMode.valueOf(debugAttribute);
+			}
 		}
 	}
 

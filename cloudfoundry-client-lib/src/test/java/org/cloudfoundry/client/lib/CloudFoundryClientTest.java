@@ -238,6 +238,7 @@ public class CloudFoundryClientTest {
 		CloudApplication app = client.getApplication(appName);
 		assertEquals(AppState.STARTED, app.getState());
 
+		assertEquals(DebugMode.run, app.getDebug());
 		InstancesInfo applicationInstances = client.getApplicationInstances(appName);
 		List<InstanceInfo> instances = applicationInstances.getInstances();
 		assertEquals(1, instances.size());
