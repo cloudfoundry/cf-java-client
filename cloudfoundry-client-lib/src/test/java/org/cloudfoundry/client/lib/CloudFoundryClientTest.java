@@ -26,7 +26,10 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -37,7 +40,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.CloudInfo.Framework;
@@ -55,6 +61,7 @@ import org.springframework.web.client.HttpServerErrorException;
  * Also each test relies on other methods working correctly, so these tests aren't as independent as they should be.
  *
  * @author Ramnivas Laddad
+ * @author A.B.Srinivasan
  */
 public class CloudFoundryClientTest {
 
@@ -160,12 +167,12 @@ public class CloudFoundryClientTest {
 		client.updatePassword(newPassword);
 		CloudFoundryClient clientWithChangedPassword = new CloudFoundryClient(TEST_USER_EMAIL, newPassword, ccUrl);
 		clientWithChangedPassword.login();
-		
+
 		// Revert
 		client.updatePassword(TEST_USER_PASS);
 		client.login();
 	}
-	
+
 	@Test
 	public void loginWrongCredentials() throws IOException {
 		CloudFoundryClient client2 = new CloudFoundryClient(TEST_USER_EMAIL, "wrong_password", ccUrl);
@@ -254,6 +261,15 @@ public class CloudFoundryClientTest {
 		assertNotSame(0, instances.get(0).getDebugPort());
 	}
 
+    @Test
+    public void startExplodedApplication() throws IOException {
+        String appName = namespacedAppName("travel_test5");
+        CloudApplication app = createAndUploadExplodedSpringTestApp(appName, null);
+        client.startApplication(appName);
+        app = client.getApplication(appName);
+        assertEquals(AppState.STARTED, app.getState());
+    }
+
 	@Test
 	public void stopApplication() throws IOException {
 		String appName = namespacedAppName("travel_test3");
@@ -268,7 +284,6 @@ public class CloudFoundryClientTest {
 	public void getFile() throws Exception {
 		String appName = namespacedAppName("travel_getFile");
 		createAndUploadAndStart(appName);
-
 		String fileContent = null;
 		for (int i = 0; i < 20 && fileContent == null; i++) {
 			try {
@@ -751,6 +766,48 @@ public class CloudFoundryClientTest {
 		return client.getApplication(appName);
 	}
 
+   private void createApplication(String appName, List<String> serviceNames, String framework) {
+       List<String> uris = new ArrayList<String>();
+       uris.add(computeAppUrl(appName));
+       if (serviceNames != null) {
+           for (String serviceName : serviceNames) {
+               createDatabaseService(serviceName);
+           }
+       }
+       client.createApplication(appName, framework, client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+   }
+
+   private CloudApplication createAndUploadExplodedSpringTestApp(String appName, List<String> serviceNames) throws IOException {
+       String explodedDirPath = explodeTestApp(appName);
+       return createAndUploadExplodedTestApp(appName, explodedDirPath, CloudApplication.SPRING, serviceNames);
+   }
+
+   private String explodeTestApp(String appName) throws IOException {
+       File file = new File(testAppDir + "/travelapp/swf-booking-mvc.war");
+       assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+
+       String explodedDirPath = FileUtils.getTempDirectory().getCanonicalPath() +
+           "/.vmc_java_test" + appName ;
+       File explodeDir = new File(explodedDirPath);
+       if (explodeDir.exists()) {
+           FileUtils.forceDelete(explodeDir);
+       }
+
+       explodeDir.mkdir();
+       unpackWar(file.getCanonicalPath(), explodedDirPath);
+
+       return explodedDirPath;
+   }
+
+   private CloudApplication createAndUploadExplodedTestApp(String appName, String explodedDir, String framework,
+           List<String> serviceNames) throws IOException {
+        File file = new File(explodedDir);
+        assertTrue("Expected exploded test app at " + file.getCanonicalPath(), file.exists());
+        createApplication(appName, null, framework);
+        client.uploadApplication(appName, file.getCanonicalPath());
+        return client.getApplication(appName);
+    }
+
 	private CloudApplication createAndUploadTestApp(String appName) throws IOException {
 		return createAndUploadTestApp(appName, null);
 	}
@@ -788,8 +845,58 @@ public class CloudFoundryClientTest {
 		client.createService(service);
 		return service;
 	}
-	
+
 	private String namespacedAppName(String basename) {
 		return TEST_NAMESPACE + "-" + basename;
 	}
+
+	private static void unpackWar(String warFile, String destDir) throws IOException {
+	    ZipInputStream zis = new ZipInputStream(new FileInputStream(warFile));
+	    try {
+	        ZipEntry entry;
+	        while ((entry = zis.getNextEntry()) != null) {
+	            if (entry.isDirectory()) {
+	                unpackDir(destDir, entry);
+	            } else {
+	                unpackFile(destDir, entry, zis);
+	            }
+	        }
+	    } finally {
+	        if (zis != null) {
+	            zis.close();
+	        }
+	    }
+	}
+
+	private static void unpackDir(String destDir, ZipEntry entry) {
+	    File dir = new File(destDir, entry.getName());
+	    dir.mkdir();
+	    if (entry.getTime() != -1) {
+	        dir.setLastModified(entry.getTime());
+	    }
+	}
+
+	private static void unpackFile(String destDir, ZipEntry entry, ZipInputStream zis) throws IOException {
+	    BufferedOutputStream dest = null;
+	    int count;
+	    byte data[] = new byte[CloudUtil.BUFFER_SIZE];
+	    File destFile;
+	    try {
+	        destFile = new File(destDir, entry.getName());
+	        FileOutputStream fos = new FileOutputStream(destFile);
+	        dest = new BufferedOutputStream(fos, CloudUtil.BUFFER_SIZE);
+	        while ((count = zis.read(data, 0, CloudUtil.BUFFER_SIZE)) != -1) {
+	            dest.write(data, 0, count);
+	        }
+	        if (entry.getTime() != -1) {
+	            destFile.setLastModified(entry.getTime());
+	        }
+	    } finally {
+	        if (dest != null) {
+	            dest.flush();
+	            dest.close();
+	        }
+	    }
+	}
+
 }
