@@ -41,6 +41,7 @@ public class CloudApplication {
 	public static final String JAVA_WEB = "java_web/1.0";
 	public static final String SPRING = "spring_web/1.0";
 	public static final String GRAILS = "grails/1.0";
+    public static final String NODE = "nodejs/1.0";
 
 	public CloudApplication(String name, String stagingStack, String stagingModel,
 						int memory, int instances,

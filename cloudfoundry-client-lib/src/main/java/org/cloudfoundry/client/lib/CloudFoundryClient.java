@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -30,19 +31,20 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -67,6 +69,13 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+/**
+ * A Java client to exercise the Cloud Foundry API.
+ *
+ * @author Ramnivas Laddad
+ * @author A.B.Srinivasan
+ */
 
 public class CloudFoundryClient {
 
@@ -139,7 +148,7 @@ public class CloudFoundryClient {
 		//this.baseDeploymentUrl = baseDeploymentUrl;
 		restTemplate.setRequestFactory(new AppCloudClientHttpRequestFactory(requestFactory));
 		restTemplate.setErrorHandler(new ErrorHandler());
-		
+
 		// install custom HttpMessageConverters
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
 		List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
@@ -305,51 +314,14 @@ public class CloudFoundryClient {
 	}
 
 	public void uploadApplication(String appName, File warFile) throws IOException {
-		uploadApplication(appName, warFile, null);
+	    uploadApplicationBits(appName, warFile.getCanonicalPath(), null);
+
 	}
 
-	@SuppressWarnings("unchecked")
 	public void uploadApplication(String appName, File warFile, UploadStatusCallback callback) throws IOException {
-		String resources = null;
-		boolean incremental = true;
-		InputStream warFileStream = null;
-		long warFileLength;
-		if (incremental) {
-			ZipFile archive = new ZipFile(warFile);
-
-			List<Map<String, Object>> matchedResources = restTemplate.postForObject(
-					getUrl("resources"),
-					generateResourcePayload(archive),
-					List.class);
-			if (callback != null) callback.onCheckResources();
-
-			Set<String> matchedFileNames = new HashSet<String>();
-			for (Map<String, Object> entry : matchedResources) {
-				matchedFileNames.add((String) entry.get("fn"));
-			}
-			if (callback != null) callback.onMatchedFileNames(matchedFileNames);
-
-			byte[] incrementalUpload = processMatchedResources(archive, matchedFileNames);
-			if (callback != null) callback.onProcessMatchedResources(incrementalUpload.length);
-
-			ObjectMapper objectMapper = new ObjectMapper();
-			StringWriter writer = new StringWriter();
-			objectMapper.writeValue(writer, matchedResources);
-			resources = writer.toString();
-			warFileStream = new ByteArrayInputStream(incrementalUpload);
-			warFileLength = incrementalUpload.length;
-		} else {
-			warFileStream = new FileInputStream(warFile);
-			warFileLength = warFile.length();
-		}
-
-		restTemplate.put(
-					getUrl("apps/{appName}/application"),
-					generatePartialResourcePayload(new InputStreamResourceWithName(
-							warFileStream, warFileLength, warFile.getName()), resources),
- 					appName);
+	    uploadApplicationBits(appName, warFile.getCanonicalPath(), callback);
 	}
-	
+
 	private MultiValueMap<String, ?> generatePartialResourcePayload(Resource application, String resources) {
 		MultiValueMap<String, Object> payload = new LinkedMultiValueMap<String, Object>(2);
 		payload.add("application", application);
@@ -359,10 +331,9 @@ public class CloudFoundryClient {
 		return payload;
 	}
 
-	public void uploadApplication(String appName, String warFilePath) throws IOException {
-		uploadApplication(appName, new File(warFilePath));
+	public void uploadApplication(String appName, String warFile) throws IOException {
+	    uploadApplicationBits(appName, warFile, null);
 	}
-
 	public void startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		app.setState(AppState.STARTED);
@@ -630,51 +601,22 @@ public class CloudFoundryClient {
 		return hex.toString();
 	}
 
-	private byte[] processMatchedResources(ZipFile archive, Set<String> matchedFileNames)
-				throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ZipOutputStream zout = new ZipOutputStream(out);
-
-		Enumeration<? extends ZipEntry> entries = archive.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
-			if (!matchedFileNames.contains(entry.getName())) {
-				zout.putNextEntry(new ZipEntry(entry.getName()));
-				if (!entry.isDirectory()) {
-					InputStream in = archive.getInputStream(entry);
-					byte[] buffer = new byte[16 * 1024];
-					while(true) {
-						int read = in.read(buffer);
-						if (read == -1) {
-							break;
-						}
-						zout.write(buffer, 0, read);
-					}
-					in.close();
-				}
-				zout.closeEntry();
-			}
-		}
-		zout.close();
-
-		return out.toByteArray();
-	}
-
-	private List<Map<String, Object>> generateResourcePayload(ZipFile archive) throws IOException {
-		List<Map<String, Object>> payload = new ArrayList<Map<String, Object>>();
-		Enumeration<? extends ZipEntry> entries = archive.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry entry = entries.nextElement();
-			if (!entry.isDirectory()) {
-				String sha1sum = computeSha1Digest(archive.getInputStream(entry));
-				Map<String, Object> entryPayload = new HashMap<String, Object>();
-				entryPayload.put("size", entry.getSize());
-				entryPayload.put("sha1", sha1sum);
-				entryPayload.put("fn", entry.getName());
-				payload.add(entryPayload);
-			}
-		}
-		return payload;
+	private List<Map<String, Object>> generateResourcePayload(String root, String dir, List<Map<String, Object>> payload) throws IOException {
+	    File explodeDir = new File(dir);
+	    File[] entries = explodeDir.listFiles();
+	    for (File entry: entries) {
+	        if (!entry.isDirectory()) {
+	            String sha1sum = computeSha1Digest(new FileInputStream(entry));
+	            Map<String, Object> entryPayload = new HashMap<String, Object>();
+	            entryPayload.put("size", entry.length());
+	            entryPayload.put("sha1", sha1sum);
+	            entryPayload.put("fn", entry.getAbsolutePath().replaceFirst(root + File.separator, ""));
+	            payload.add(entryPayload);
+	        } else {
+	            payload = generateResourcePayload(root, entry.getAbsolutePath(), payload);
+	        }
+	    }
+	    return payload;
 	}
 
 	private String computeSha1Digest(InputStream in) throws IOException {
@@ -685,7 +627,7 @@ public class CloudFoundryClient {
 			throw new RuntimeException(e);
 		}
 
-		byte[] buffer = new byte[16 * 1024];
+		byte[] buffer = new byte[CloudUtil.BUFFER_SIZE];
 		while(true) {
 			int read = in.read(buffer);
 			if (read == -1) {
@@ -696,4 +638,237 @@ public class CloudFoundryClient {
 		in.close();
 		return bytesToHex(digest.digest());
 	}
+
+    private void uploadApplicationBits(String appName, String file,
+            UploadStatusCallback callback) throws IOException {
+        boolean incremental = true;
+
+        String explodedDirPath = prepExplodedDir(appName, file);
+
+        String resources = null;
+        if (incremental) {
+            resources = matchResources(callback, explodedDirPath);
+        }
+
+        byte[] appBytes = createZip(explodedDirPath);
+        if (incremental && callback != null) callback.onProcessMatchedResources(appBytes.length);
+
+        restTemplate.put(
+                    getUrl("apps/{appName}/application"),
+                    generatePartialResourcePayload(
+                            new InputStreamResourceWithName(new ByteArrayInputStream(appBytes), appBytes.length, file), resources),
+                    appName);
+    }
+
+    private String prepExplodedDir(String appName, String file) throws IOException {
+        String explodedDirPath = FileUtils.getTempDirectory().getCanonicalPath() +
+            "/.vmc_java_" + appName + "_files";
+        File explodedDir = new File(explodedDirPath);
+        if (explodedDir.exists()) {
+            FileUtils.forceDelete(explodedDir);
+        }
+        if (CloudUtil.isWar(file)) {
+            explodedDir.mkdir();
+            CloudUtil.unpackWar(file, explodedDirPath);
+        } else {
+            File path = new File(file);
+            if (path.getCanonicalFile().isDirectory()) {
+                copyDirToExplodedDir(path, explodedDirPath);
+            } else {
+                FileUtils.copyFileToDirectory(path, explodedDir);
+            }
+        }
+        return explodedDirPath;
+    }
+
+    private String matchResources(UploadStatusCallback callback,
+            String explodedDirPath) throws IOException,
+            JsonGenerationException, JsonMappingException {
+        List<Map<String, Object>> matchedResources = getMatchedResources(
+                explodedDirPath);
+        if (callback != null) callback.onCheckResources();
+        String resources = null;
+        if (matchedResources != null) {
+            Set<String> matchedFileNames = getMatchedFileNames(matchedResources);
+            if (callback != null) callback.onMatchedFileNames(matchedFileNames);
+            deleteMatchedFiles(explodedDirPath, explodedDirPath, matchedFileNames);
+            ObjectMapper objectMapper = new ObjectMapper();
+            StringWriter writer = new StringWriter();
+            objectMapper.writeValue(writer, matchedResources);
+            resources = writer.toString();
+        }
+        return resources;
+    }
+
+    private Set<String> getMatchedFileNames(
+            List<Map<String, Object>> matchedResources) {
+        Set<String> matchedFileNames = new HashSet<String>();
+        for (Map<String, Object> entry : matchedResources) {
+            matchedFileNames.add((String) entry.get("fn"));
+        }
+        return matchedFileNames;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> getMatchedResources(
+            String explodeDirPath) throws IOException {
+        List<Map<String, Object>> matchedResources = null;
+        List<Map<String, Object>> payload = new ArrayList<Map<String, Object>>();
+        payload = generateResourcePayload(explodeDirPath, explodeDirPath, payload);
+        matchedResources = restTemplate.postForObject(
+                getUrl("resources"),
+                payload,
+                List.class);
+        return matchedResources;
+    }
+
+    private void deleteMatchedFiles(String root, String explodeDirPath,
+            Set<String> matchedFileNames) throws IOException {
+        File explodeDir = new File(explodeDirPath);
+        File[] entries = explodeDir.listFiles();
+        Set<File> deletedFiles = new HashSet<File>();
+        for (File entry: entries) {
+            if (entry.isDirectory()) {
+                deleteMatchedFiles(root, entry.getCanonicalPath(), matchedFileNames);
+            } else {
+                if (entry.isFile() && matchedFileNames.contains(entry.getAbsolutePath().replaceFirst(root + File.separator, ""))) {
+                    deletedFiles.add(entry);
+                }
+            }
+        }
+        if (deletedFiles.size() > 0) {
+            for (File deletedFile:deletedFiles) {
+                FileUtils.forceDelete(deletedFile);
+            }
+        }
+    }
+
+    private void copyDirToExplodedDir(File path, String explodedDirPath) throws IOException {
+        File explodeDir = new File(explodedDirPath);
+        File[] fileList = path.getCanonicalFile().listFiles();
+        for (File fileToBeCopied: fileList) {
+            if (CloudUtil.isSymLink(fileToBeCopied.getAbsolutePath())) {
+                System.out.println("Detected a sym link for " +
+                        fileToBeCopied.getCanonicalPath());
+            }
+            if (fileToBeCopied.getCanonicalFile().isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(fileToBeCopied, explodeDir);
+            } else {
+                FileUtils.copyFileToDirectory(fileToBeCopied, explodeDir);
+            }
+        }
+        File gitDir = new File(explodedDirPath + "/.git");
+        if (gitDir.exists()) {
+            FileUtils.deleteDirectory(gitDir);
+        }
+    }
+
+    // A temporary workaround till we have better support for handling empty multi-part
+    // payloads on the server (or the nginx fronting the server) side.
+    private static final String EMPTY_FILE = ".__empty__";
+    private File ensureDirNotEmpty(String dirPath) throws IOException {
+        File dirToZip = new File(dirPath);
+        String[] dirList = dirToZip.list();
+        if (dirList.length == 0) {
+            File emptyFile = new File(dirToZip.getCanonicalPath() +
+                    File.separatorChar + EMPTY_FILE);
+            FileUtils.touch(emptyFile);
+        }
+        return dirToZip;
+    }
+
+    private void zipDir(File dirOrFileToZip, ZipOutputStream zos, String path) throws IOException {
+      if (dirOrFileToZip.isDirectory()) {
+        String subPath = createDirZipEntry(dirOrFileToZip, zos, path);
+        String[] dirList = dirOrFileToZip.list();
+        for (int i = 0; i < dirList.length; i++) {
+          File f = new File(dirOrFileToZip, dirList[i]);
+          zipDir(f, zos, subPath);
+        }
+      } else {
+          createZipFileEntry(dirOrFileToZip, zos, path);
+      }
+    }
+
+    private void createZipFileEntry(File dirOrFileToZip, ZipOutputStream zos,
+            String path) throws FileNotFoundException,
+            IOException {
+        int count;
+        byte[] buffer = new byte[CloudUtil.BUFFER_SIZE];
+
+        FileInputStream fis = new FileInputStream(dirOrFileToZip);
+          try {
+              ZipEntry entry = new ZipEntry(path + dirOrFileToZip.getName());
+              entry.setTime(dirOrFileToZip.lastModified());
+              zos.putNextEntry(entry);
+              while ((count = fis.read(buffer)) != -1) {
+                  zos.write(buffer, 0, count);
+              }
+              zos.flush();
+              zos.closeEntry();
+          } finally {
+              fis.close();
+          }
+    }
+
+    private String createDirZipEntry(File dirOrFileToZip, ZipOutputStream zos,
+            String path) throws IOException {
+        String subPath =
+            (path == null) ? "" : (path + dirOrFileToZip.getName() + '/');
+        if (path != null) {
+          ZipEntry ze = new ZipEntry(subPath);
+          ze.setTime(dirOrFileToZip.lastModified());
+          zos.putNextEntry(ze);
+          zos.flush();
+          zos.closeEntry();
+        }
+        return subPath;
+    }
+
+    private boolean trimEmptySubDirs(String dirPath) throws IOException {
+        boolean empty = true;
+        File dirToZip = new File(dirPath);
+        Set<File> dirsToDelete = new HashSet<File>();
+
+        File[] fileList = dirToZip.listFiles();
+        for (File file: fileList) {
+            if (file.isFile()) {
+                empty = false;
+                continue;
+            }
+            if (file.listFiles().length == 0) {
+                dirsToDelete.add(file);
+                empty = empty && true;
+            } else {
+                boolean subDirEmpty = trimEmptySubDirs(file.getCanonicalPath());
+                if (subDirEmpty) {
+                    dirsToDelete.add(file);
+                }
+                empty = empty && subDirEmpty;
+            }
+        }
+        if (dirsToDelete.size() > 0) {
+            for (File deletedDir:dirsToDelete) {
+               FileUtils.forceDelete(deletedDir);
+            }
+        }
+        return empty;
+    }
+
+    private byte[] createZip(String dirPath) throws IOException {
+        trimEmptySubDirs(dirPath);
+        File dirToZip = ensureDirNotEmpty(dirPath);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(out);
+        try {
+            zipDir(dirToZip, zos, null);
+        } finally {
+            if (zos != null) {
+                zos.flush();
+                zos.close();
+            }
+        }
+        return out.toByteArray();
+    }
+
 }
