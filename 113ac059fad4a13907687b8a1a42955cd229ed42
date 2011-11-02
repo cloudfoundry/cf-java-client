@@ -1,0 +1,8 @@
+Change-Id: I113ac059fad4a13907687b8a1a42955cd229ed42
+Verified+1: cftestbuild <cftestbuild@gmail.com>
+Code-Review+2: Jennifer Hickey <jhickey@vmware.com>
+Submitted-by: Ramnivas Laddad <ramnivas@ramnivas.com>
+Submitted-at: Wed, 02 Nov 2011 21:56:00 +0000
+Reviewed-on: http://cloudfoundry-codereview.qa.mozycloud.com/gerrit/1905
+Project: vcap-java-client
+Branch: refs/heads/master
