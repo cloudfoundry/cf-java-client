@@ -39,6 +39,12 @@ public class DirectoryBasedAppPackage implements ApplicationPackage {
         return createZip(matchedFileNames);
     }
 
+    private String getRelativePath(File file) throws IOException {
+        String rootCanonicalPath = new File(directoryPath).getAbsolutePath() + File.separator;
+        String fileCanonicalPath = file.getAbsolutePath();
+        return fileCanonicalPath.substring(rootCanonicalPath.length());
+    }
+
     private List<Map<String, Object>> generateResourcePayload(String dir, List<Map<String, Object>> payload) throws IOException {
         File explodeDir = new File(dir);
         File[] entries = explodeDir.listFiles();
@@ -48,7 +54,7 @@ public class DirectoryBasedAppPackage implements ApplicationPackage {
                 Map<String, Object> entryPayload = new HashMap<String, Object>();
                 entryPayload.put("size", entry.length());
                 entryPayload.put("sha1", sha1sum);
-                entryPayload.put("fn", entry.getAbsolutePath().replaceFirst(directoryPath + File.separator, ""));
+                entryPayload.put("fn", getRelativePath(entry));
                 payload.add(entryPayload);
             } else {
                 payload = generateResourcePayload(entry.getAbsolutePath(), payload);
@@ -79,7 +85,7 @@ public class DirectoryBasedAppPackage implements ApplicationPackage {
             zipDir(f, zos, subPath, matchedFileNames);
           }
         } else {
-            if (!matchedFileNames.contains(dirOrFileToZip.getAbsolutePath().replaceFirst(directoryPath + File.separator, ""))) {
+            if (!matchedFileNames.contains(getRelativePath(dirOrFileToZip))) {
                 createZipFileEntry(dirOrFileToZip, zos, path);
             }
         }
