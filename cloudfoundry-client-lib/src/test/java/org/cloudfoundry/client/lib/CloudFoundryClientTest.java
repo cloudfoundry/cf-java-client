@@ -348,8 +348,9 @@ public class CloudFoundryClientTest {
 			stats  = client.getApplicationStats(appName);
 			firstInstance = stats.getRecords().get(0);
 		}
-		// Allow more time deviations due to local clock being out of sync with cloud
-		int timeTolerance = 120 * 1000; // 2 minutes
+
+        // Allow more time deviations due to local clock being out of sync with cloud
+		int timeTolerance = 300 * 1000; // 5 minutes
 		assertTrue("Usage time should be very recent",
 				Math.abs(System.currentTimeMillis() - firstInstance.getUsage().getTime().getTime()) < timeTolerance);
 
@@ -440,7 +441,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(service);
 		assertEquals(serviceName, service.getName());
 		// Allow more time deviations due to local clock being out of sync with cloud
-		int timeTolerance = 120 * 1000; // 2 minutes
+        int timeTolerance = 300 * 1000; // 5 minutes
 		assertTrue("Creation time should be very recent",
 				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
 	}
