@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.cloudfoundry.client.SampleProjects;
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudInfo.Framework;
 import org.cloudfoundry.client.lib.ServiceConfiguration.Tier;
@@ -65,9 +66,7 @@ public class CloudFoundryClientTest {
 	private static final String TEST_USER_PASS = System.getProperty("vcap.passwd");
 	private static final String TEST_ADMIN_EMAIL = System.getProperty("vcap.admin.email");
 	private static final String TEST_ADMIN_PASS = System.getProperty("vcap.admin.passwd");
-	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", TEST_USER_EMAIL.substring(0, TEST_USER_EMAIL.indexOf('@')));
-
-	private final String testAppDir = "src/test/resources/apps";
+	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", TEST_USER_EMAIL.substring(0, TEST_USER_EMAIL.indexOf('@')).replaceAll("\\.", "_"));
 
 	private final boolean serviceSupported = !ccUrl.contains("vmforce");
 	private boolean multiUrlSupported = !ccUrl.contains("vmforce");
@@ -493,7 +492,7 @@ public class CloudFoundryClientTest {
 		int[] choices = client.getApplicationMemoryChoices();
 		assertNotNull(choices);
 		assertNotSame(0, choices.length);
-		assertTrue(client.info.getLimits().getMaxTotalMemory() >= choices[choices.length-1]);
+		assertTrue(client.getCloudInfo().getLimits().getMaxTotalMemory() >= choices[choices.length-1]);
 	}
 
 	@Test
@@ -701,9 +700,7 @@ public class CloudFoundryClientTest {
 		List<String> uris = new ArrayList<String>();
 		uris.add(computeAppUrl(appName));
 
-		File file = new File(testAppDir + "/travelapp/swf-booking-mvc.war");
-		assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
-
+		File file = SampleProjects.springTravel();
 		if (serviceNames != null) {
 			for (String serviceName : serviceNames) {
 				createDatabaseService(serviceName);

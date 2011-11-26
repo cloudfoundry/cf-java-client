@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.springframework.core.io.InputStreamResource;
+public class SampleProjects {
 
-@Deprecated
-public class InputStreamResourceWithName extends InputStreamResource {
-	
-	private long length;
-	private String filename;
-	
-	public InputStreamResourceWithName(InputStream in, long length, String filename) {
-		super(in);
-		this.length = length;
-		this.filename = filename;
-	}
+    private static final String TEST_APP_DIR = "src/test/resources/apps";
 
-	@Override
-	public long contentLength() throws IOException {
-		return length;
-	}
-	
-	@Override
-	public String getFilename() throws IllegalStateException {
-		return filename;
-	}
-	
+    public static File springTravel() throws IOException {
+        File file = new File(TEST_APP_DIR + "/travelapp/swf-booking-mvc.war");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
 }
