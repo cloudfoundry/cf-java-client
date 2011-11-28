@@ -21,7 +21,7 @@ import java.io.InputStream;
 
 import org.springframework.core.io.InputStreamResource;
 
-
+@Deprecated
 public class InputStreamResourceWithName extends InputStreamResource {
 	
 	private long length;

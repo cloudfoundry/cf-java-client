@@ -16,27 +16,27 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.zip.ZipFile;
 
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
+import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
+import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequest;
@@ -69,30 +69,6 @@ import org.springframework.web.client.RestTemplate;
 
 public class CloudFoundryClient {
 
-	private class ErrorHandler extends DefaultResponseErrorHandler {
-		@Override
-		public void handleError(ClientHttpResponse response) throws IOException {
-			HttpStatus statusCode = response.getStatusCode();
-			switch (statusCode.series()) {
-				case CLIENT_ERROR:
-					CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
-					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-					try {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-						exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
-					} catch (JsonParseException e) {
-						// ignore
-					}
-					throw exception;
-				case SERVER_ERROR:
-					throw new HttpServerErrorException(statusCode, response.getStatusText());
-				default:
-					throw new RestClientException("Unknown status code [" + statusCode + "]");
-			}
-		}
-	}
-
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
 
@@ -104,9 +80,7 @@ public class CloudFoundryClient {
 	private String password;
 	private String proxyUser;
 
-	/*package*/ CloudInfo info;
-
-	//private String baseDeploymentUrl;
+	private CloudInfo info;
 
 	/**
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
@@ -133,29 +107,48 @@ public class CloudFoundryClient {
 
 		this.cloudControllerUrl = cloudControllerUrl;
 		this.email = email;
-		this.password = password;
-		this.token = token;
-		//this.baseDeploymentUrl = baseDeploymentUrl;
-		restTemplate.setRequestFactory(new AppCloudClientHttpRequestFactory(requestFactory));
-		restTemplate.setErrorHandler(new ErrorHandler());
+        this.password = password;
+        this.token = token;
+        this.restTemplate.setRequestFactory(new CloudFoundryClientHttpRequestFactory(requestFactory));
+        this.restTemplate.setErrorHandler(new ErrorHandler());
+        this.restTemplate.setMessageConverters(getHttpMessageConverters());
+    }
 
-		// install custom HttpMessageConverters
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-		List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
-		FormHttpMessageConverter formPartsMessageConverter = new FormHttpMessageConverter();
-		StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverterWithoutMediaType();
-		stringHttpMessageConverter.setWriteAcceptCharset(false);
-		partConverters.add(stringHttpMessageConverter);
-		partConverters.add(new ResourceHttpMessageConverter());
-		formPartsMessageConverter.setPartConverters(partConverters);
-		messageConverters.add(new ByteArrayHttpMessageConverter());
-		messageConverters.add(new StringHttpMessageConverter());
-		messageConverters.add(new ResourceHttpMessageConverter());
-		messageConverters.add(formPartsMessageConverter);
-		messageConverters.add(new MappingJacksonHttpMessageConverter());
-		restTemplate.setMessageConverters(messageConverters);
-	}
+    private List<HttpMessageConverter<?>> getHttpMessageConverters() {
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        messageConverters.add(new StringHttpMessageConverter());
+        messageConverters.add(new ResourceHttpMessageConverter());
+        messageConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+        messageConverters.add(getFormHttpMessageConverter());
+        messageConverters.add(new MappingJacksonHttpMessageConverter());
+        return messageConverters;
+    }
+    
+    private FormHttpMessageConverter getFormHttpMessageConverter() {
+        FormHttpMessageConverter formPartsMessageConverter = new CloudFoundryFormHttpMessageConverter();
+        formPartsMessageConverter.setPartConverters(getFormPartsMessageConverters());
+        return formPartsMessageConverter;
+    }
+    
+    private List<HttpMessageConverter<?>> getFormPartsMessageConverters() {
+        List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
+        StringHttpMessageConverter stringConverter = new StringHttpMessageConverterWithoutMediaType();
+        stringConverter.setWriteAcceptCharset(false);
+        partConverters.add(stringConverter);
+        partConverters.add(new ResourceHttpMessageConverter());
+        partConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+        return partConverters;
+    }
 
+    /**
+     * Protected access to the rest templates for subclasses to use.
+     * @return the underling rest template
+     */
+    protected final RestTemplate getRestTemplate() {
+        return restTemplate;
+    }
+	
 	/**
 	 * Run commands as a different user.  The authenticated user must be
 	 * privileged to run as this user.
@@ -303,72 +296,104 @@ public class CloudFoundryClient {
 		restTemplate.postForLocation(getUrl("services"), service);
 	}
 
-	public void uploadApplication(String appName, File file) throws IOException {
+
+    /**
+     * Upload an application to cloud foundry.
+     * @param appName the application name
+     * @param file the path to the application archive or folder
+     * @throws IOException
+     */
+    public void uploadApplication(String appName, String file) throws IOException {
+        uploadApplication(appName, new File(file));
+    }
+    
+    /**
+     * Upload an application to cloud foundry.
+     * @param appName the application name
+     * @param file the application archive or folder
+     * @throws IOException
+     */
+    public void uploadApplication(String appName, File file) throws IOException {
         uploadApplication(appName, file, null);
-	}
-
-    @SuppressWarnings("unchecked")
-    public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
-
-        ApplicationPackage appWrapper = null;
-
-        if (CloudUtil.isWar(file.getCanonicalPath())) {
-            appWrapper = new JavaWebArchivePackage(file.getCanonicalPath());
-        } else {
-            appWrapper = new DirectoryBasedAppPackage(file.getCanonicalPath());
-        }
-
-        String resources = null;
-        boolean incremental = true;
-        InputStream appStream = null;
-        long appSize;
-        Set<String> matchedFileNames = new HashSet<String>();
-        List<Map<String, Object>> matchedResources = null;
-        if (incremental) {
-            matchedResources = restTemplate.postForObject(
-                    getUrl("resources"),
-                    appWrapper.generateFingerprint(),
-                    List.class);
-            if (callback != null) callback.onCheckResources();
-
-            for (Map<String, Object> entry : matchedResources) {
-                matchedFileNames.add((String) entry.get("fn"));
-            }
-            if (callback != null) callback.onMatchedFileNames(matchedFileNames);
-        }
-
-        byte[] appBytes = appWrapper.getContents(matchedFileNames);
-        if (callback != null) callback.onProcessMatchedResources(appBytes.length);
-
-        if (matchedResources != null) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            StringWriter writer = new StringWriter();
-            objectMapper.writeValue(writer, matchedResources);
-            resources = writer.toString();
-        }
-        appStream = new ByteArrayInputStream(appBytes);
-        appSize = appBytes.length;
-
-        restTemplate.put(
-                    getUrl("apps/{appName}/application"),
-                    generatePartialResourcePayload(
-                            new InputStreamResourceWithName(appStream, appSize, file.getName()), resources),
-                    appName);
     }
 
-	private MultiValueMap<String, ?> generatePartialResourcePayload(Resource application, String resources) {
-		MultiValueMap<String, Object> payload = new LinkedMultiValueMap<String, Object>(2);
-		payload.add("application", application);
-		if (resources != null) {
-			payload.add("resources", resources);
-		}
-		return payload;
-	}
+    /**
+     * Upload an application to cloud foundry.
+     * @param appName the application name
+     * @param file the application archive
+     * @param callback a callback interface used to provide progress information or <tt>null</tt>
+     * @throws IOException
+     */
+    public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
+        Assert.notNull(file,"File must not be null");
+        if(file.isDirectory()) {
+            uploadApplicationFolder(appName,file,callback);
+        }
+        else {
+            uploadApplicationZipFile(appName,file,callback);
+        }
+    }
+    
+    private void uploadApplicationFolder(String appName, File file, UploadStatusCallback callback) throws IOException {
+        ApplicationArchive archive = new DirectoryApplicationArchive(file);
+        uploadApplication(appName, archive, callback);
+    }
 
-	public void uploadApplication(String appName, String fileName) throws IOException {
-        uploadApplication(appName, new File(fileName), null);
-	}
+    private void uploadApplicationZipFile(String appName, File file, UploadStatusCallback callback) throws IOException {
+        ZipFile zipFile = new ZipFile(file);
+        try {
+            ApplicationArchive archive = new ZipApplicationArchive(zipFile);
+            uploadApplication(appName, archive, callback);
+        } finally {
+            zipFile.close();
+        }        
+    }
 
+    /**
+     * Upload an application to cloud foundry.
+     * @param appName the application name
+     * @param archive the application archive
+     * @throws IOException
+     */
+    public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
+        uploadApplication(appName, archive, null);
+    }
+
+    /**
+     * Upload an application to cloud foundry.
+     * @param appName the application name
+     * @param archive the application archive
+     * @param callback a callback interface used to provide progress information or <tt>null</tt>
+     * @throws IOException
+     */
+    public void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException {
+        Assert.notNull(appName, "AppName must not be null");
+        Assert.notNull(archive, "Archive must not be null");
+        if (callback == null) {
+            callback = UploadStatusCallback.NONE;
+        }
+        CloudResources knownRemoteResources = getKnownRemoteResources(archive);
+        callback.onCheckResources();
+        callback.onMatchedFileNames(knownRemoteResources.getFilenames());
+        UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
+        callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
+        restTemplate.put(getUrl("apps/{appName}/application"), generatePartialResourcePayload(payload, knownRemoteResources), appName);
+    }
+    
+    private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
+        CloudResources archiveResources = new CloudResources(archive);
+        return restTemplate.postForObject(getUrl("resources"), archiveResources, CloudResources.class);
+    }
+
+    private MultiValueMap<String, ?> generatePartialResourcePayload(UploadApplicationPayload application, CloudResources knownRemoteResources) throws JsonGenerationException, JsonMappingException, IOException {
+        MultiValueMap<String, Object> payload = new LinkedMultiValueMap<String, Object>(2);
+        payload.add("application", application);
+        ObjectMapper mapper = new ObjectMapper();
+        String knownRemoteResourcesPayload = mapper.writeValueAsString(knownRemoteResources);
+        payload.add("resources", knownRemoteResourcesPayload);
+        return payload;
+    }
+	
 	public void startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		app.setState(AppState.STARTED);
@@ -604,23 +629,56 @@ public class CloudFoundryClient {
 		return cloudControllerUrl + "/" + path;
 	}
 
-	private class AppCloudClientHttpRequestFactory implements ClientHttpRequestFactory {
-		private ClientHttpRequestFactory delegate;
+    private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
+        private ClientHttpRequestFactory delegate;
 
-		public AppCloudClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
-			this.delegate = delegate;
-		}
+        public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
+            this.delegate = delegate;
+        }
 
-		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
-			if (token != null) {
-				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, token);
-			}
-			if (proxyUser !=  null) {
-				request.getHeaders().add(PROXY_USER_HEADER_KEY, proxyUser);
-			}
-			return request;
-		}
-	}
-
+        public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+            ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
+            if (token != null) {
+                request.getHeaders().add(AUTHORIZATION_HEADER_KEY, token);
+            }
+            if (proxyUser !=  null) {
+                request.getHeaders().add(PROXY_USER_HEADER_KEY, proxyUser);
+            }
+            return request;
+        }
+    }
+    
+    private static class ErrorHandler extends DefaultResponseErrorHandler {
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+            HttpStatus statusCode = response.getStatusCode();
+            switch (statusCode.series()) {
+                case CLIENT_ERROR:
+                    CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
+                    ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+                    try {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
+                        exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
+                    } catch (JsonParseException e) {
+                        // ignore
+                    }
+                    throw exception;
+                case SERVER_ERROR:
+                    throw new HttpServerErrorException(statusCode, response.getStatusText());
+                default:
+                    throw new RestClientException("Unknown status code [" + statusCode + "]");
+            }
+        }
+    }
+    
+    private static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
+        @Override
+        protected String getFilename(Object part) {
+            if(part instanceof UploadApplicationPayload) {
+                return ((UploadApplicationPayload)part).getArchive().getFilename();
+            }
+            return super.getFilename(part);
+        }
+    }
 }
