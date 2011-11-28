@@ -21,12 +21,12 @@ import java.io.InputStream;
 
 import org.springframework.core.io.InputStreamResource;
 
-
+@Deprecated
 public class InputStreamResourceWithName extends InputStreamResource {
-	
+
 	private long length;
 	private String filename;
-	
+
 	public InputStreamResourceWithName(InputStream in, long length, String filename) {
 		super(in);
 		this.length = length;
@@ -37,10 +37,10 @@ public class InputStreamResourceWithName extends InputStreamResource {
 	public long contentLength() throws IOException {
 		return length;
 	}
-	
+
 	@Override
 	public String getFilename() throws IllegalStateException {
 		return filename;
 	}
-	
+
 }
