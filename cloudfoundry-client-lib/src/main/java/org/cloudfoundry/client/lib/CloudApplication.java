@@ -21,7 +21,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudApplication {
+    
+    private static final String MODEL_KEY = "model";
+    private static final String STACK_KEY = "stack";
+    private static final String MEMORY_KEY = "memory";
+
+    public static final String JAVA_WEB = "java_web/1.0";
+    public static final String SPRING = "spring_web/1.0";
+    public static final String GRAILS = "grails/1.0";
+    
 	private String name;
 	private Map<String,String> staging = new HashMap<String, String>();
 	private int instances;
@@ -33,14 +46,6 @@ public class CloudApplication {
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
-
-	private static final String MODEL_KEY = "model";
-	private static final String STACK_KEY = "stack";
-	private static final String MEMORY_KEY = "memory";
-
-	public static final String JAVA_WEB = "java_web/1.0";
-	public static final String SPRING = "spring_web/1.0";
-	public static final String GRAILS = "grails/1.0";
 
 	public CloudApplication(String name, String stagingStack, String stagingModel,
 						int memory, int instances,
