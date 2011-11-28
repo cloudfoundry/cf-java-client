@@ -34,12 +34,12 @@ public class StringHttpMessageConverterWithoutMediaType extends StringHttpMessag
 		this.writeAcceptCharset = writeAcceptCharset;
 		super.setWriteAcceptCharset(writeAcceptCharset);
 	}
-	
+
 	@Override
 	protected MediaType getDefaultContentType(String t) {
 		return null;
 	}
-	
+
 	/*
 	 * add extra null check for contentType
 	 */

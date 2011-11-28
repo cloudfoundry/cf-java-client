@@ -26,10 +26,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -40,10 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.CloudInfo.Framework;
@@ -51,7 +45,9 @@ import org.cloudfoundry.client.lib.ServiceConfiguration.Tier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -65,6 +61,9 @@ import org.springframework.web.client.HttpServerErrorException;
  */
 public class CloudFoundryClientTest {
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 	private CloudFoundryClient client;
 
 	// Pass -Dvcap.target=http://api.cloudfoundry.com, vcap.me, or your own cloud
@@ -73,9 +72,7 @@ public class CloudFoundryClientTest {
 	private static final String TEST_USER_PASS = System.getProperty("vcap.passwd");
 	private static final String TEST_ADMIN_EMAIL = System.getProperty("vcap.admin.email");
 	private static final String TEST_ADMIN_PASS = System.getProperty("vcap.admin.passwd");
-	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", TEST_USER_EMAIL.substring(0, TEST_USER_EMAIL.indexOf('@')));
-
-	private final String testAppDir = "src/test/resources/apps";
+	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", TEST_USER_EMAIL.substring(0, TEST_USER_EMAIL.indexOf('@')).replaceAll("\\.", "_"));
 
 	private final boolean serviceSupported = !ccUrl.contains("vmforce");
 	private boolean multiUrlSupported = !ccUrl.contains("vmforce");
@@ -546,7 +543,7 @@ public class CloudFoundryClientTest {
 		int[] choices = client.getApplicationMemoryChoices();
 		assertNotNull(choices);
 		assertNotSame(0, choices.length);
-		assertTrue(client.info.getLimits().getMaxTotalMemory() >= choices[choices.length-1]);
+		assertTrue(client.getCloudInfo().getLimits().getMaxTotalMemory() >= choices[choices.length-1]);
 	}
 
 	@Test
@@ -754,8 +751,7 @@ public class CloudFoundryClientTest {
 		List<String> uris = new ArrayList<String>();
 		uris.add(computeAppUrl(appName));
 
-		File file = new File(testAppDir + "/travelapp/swf-booking-mvc.war");
-		assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+		File file = SampleProjects.springTravel();
 
 		if (serviceNames != null) {
 			for (String serviceName : serviceNames) {
@@ -780,33 +776,15 @@ public class CloudFoundryClientTest {
    }
 
    private CloudApplication createAndUploadExplodedSpringTestApp(String appName, List<String> serviceNames) throws IOException {
-       String explodedDirPath = explodeTestApp(appName);
+       File explodedDirPath = SampleProjects.springTravelUnpacked(temporaryFolder);
        return createAndUploadExplodedTestApp(appName, explodedDirPath, CloudApplication.SPRING, serviceNames);
    }
 
-   private String explodeTestApp(String appName) throws IOException {
-       File file = new File(testAppDir + "/travelapp/swf-booking-mvc.war");
-       assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
-
-       String explodedDirPath = FileUtils.getTempDirectory().getCanonicalPath() +
-           "/.vmc_java_test" + appName ;
-       File explodeDir = new File(explodedDirPath);
-       if (explodeDir.exists()) {
-           FileUtils.forceDelete(explodeDir);
-       }
-
-       explodeDir.mkdir();
-       unpackWar(file.getCanonicalPath(), explodedDirPath);
-
-       return explodedDirPath;
-   }
-
-   private CloudApplication createAndUploadExplodedTestApp(String appName, String explodedDir, String framework,
+   private CloudApplication createAndUploadExplodedTestApp(String appName, File explodedDir, String framework,
            List<String> serviceNames) throws IOException {
-        File file = new File(explodedDir);
-        assertTrue("Expected exploded test app at " + file.getCanonicalPath(), file.exists());
+        assertTrue("Expected exploded test app at " + explodedDir.getCanonicalPath(), explodedDir.exists());
         createApplication(appName, null, framework);
-        client.uploadApplication(appName, file.getCanonicalPath());
+        client.uploadApplication(appName, explodedDir.getCanonicalPath());
         return client.getApplication(appName);
     }
 
@@ -851,54 +829,4 @@ public class CloudFoundryClientTest {
 	private String namespacedAppName(String basename) {
 		return TEST_NAMESPACE + "-" + basename;
 	}
-
-	private static void unpackWar(String warFile, String destDir) throws IOException {
-	    ZipInputStream zis = new ZipInputStream(new FileInputStream(warFile));
-	    try {
-	        ZipEntry entry;
-	        while ((entry = zis.getNextEntry()) != null) {
-	            if (entry.isDirectory()) {
-	                unpackDir(destDir, entry);
-	            } else {
-	                unpackFile(destDir, entry, zis);
-	            }
-	        }
-	    } finally {
-	        if (zis != null) {
-	            zis.close();
-	        }
-	    }
-	}
-
-	private static void unpackDir(String destDir, ZipEntry entry) {
-	    File dir = new File(destDir, entry.getName());
-	    dir.mkdir();
-	    if (entry.getTime() != -1) {
-	        dir.setLastModified(entry.getTime());
-	    }
-	}
-
-	private static void unpackFile(String destDir, ZipEntry entry, ZipInputStream zis) throws IOException {
-	    BufferedOutputStream dest = null;
-	    int count;
-	    byte data[] = new byte[CloudUtil.BUFFER_SIZE];
-	    File destFile;
-	    try {
-	        destFile = new File(destDir, entry.getName());
-	        FileOutputStream fos = new FileOutputStream(destFile);
-	        dest = new BufferedOutputStream(fos, CloudUtil.BUFFER_SIZE);
-	        while ((count = zis.read(data, 0, CloudUtil.BUFFER_SIZE)) != -1) {
-	            dest.write(data, 0, count);
-	        }
-	        if (entry.getTime() != -1) {
-	            destFile.setLastModified(entry.getTime());
-	        }
-	    } finally {
-	        if (dest != null) {
-	            dest.flush();
-	            dest.close();
-	        }
-	    }
-	}
-
 }

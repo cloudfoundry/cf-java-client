@@ -23,6 +23,20 @@ import java.util.Set;
  */
 public interface UploadStatusCallback {
 
+    /**
+     * Empty implementation
+     */
+    public static final UploadStatusCallback NONE = new UploadStatusCallback() {
+        public void onCheckResources() {
+        }
+
+        public void onMatchedFileNames(Set<String> matchedFileNames) {
+        }
+
+        public void onProcessMatchedResources(int length) {
+        }
+    };
+
 	/**
 	 * Called after the /resources call is made.
 	 */
@@ -36,7 +50,7 @@ public interface UploadStatusCallback {
 
 	/**
 	 * Called after the data to be uploaded has been processed
-	 * @param length the size of the upload data
+	 * @param length the size of the upload data (before compression)
 	 */
 	void onProcessMatchedResources(int length);
 }
