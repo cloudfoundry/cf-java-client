@@ -313,6 +313,32 @@ public class CloudFoundryClientTest {
 		assertEquals(1, app.getInstances());
 	}
 
+    // This is a test that exercises the handling of uploads of a zero byte payload. If the application ('node-chat')
+    // has already been deployed on the target, then the zero byte upload occurs during the 'createAndUploadExplodedTestApp()'
+    // call. If not, it occurs on the 'client.uploadApplication()' call.
+    @Test
+    public void updateUnchangedApplication() throws IOException {
+        String appName = namespacedAppName("node_chat");
+        String testAppPath = testAppDir + "/node_chat/";
+        CloudApplication app = createAndUploadExplodedTestApp(appName, testAppPath,
+                CloudApplication.NODE, null);
+        client.startApplication(appName);
+        app = client.getApplication(appName);
+        assertEquals(AppState.STARTED, app.getState());
+
+        client.stopApplication(appName);
+        app = client.getApplication(appName);
+        assertEquals(AppState.STOPPED, app.getState());
+
+        File file = new File(testAppPath);
+        client.uploadApplication(appName, file.getCanonicalPath());
+
+        client.startApplication(appName);
+        app = client.getApplication(appName);
+        assertEquals(AppState.STARTED, app.getState());
+
+    }
+
 	@Test
 	public void getApplicationRunningInstances() throws Exception {
 		String appName = namespacedAppName("travel_test");

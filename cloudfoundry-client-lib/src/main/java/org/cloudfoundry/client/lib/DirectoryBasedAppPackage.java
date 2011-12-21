@@ -71,7 +71,9 @@ public class DirectoryBasedAppPackage implements ApplicationPackage {
             zipDir(dirToZip, zos, null, matchedFileNames);
         } finally {
             zos.flush();
-            zos.close();
+            if (out.size() > 0) {
+                zos.close();
+            }
         }
         return out.toByteArray();
     }

@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
+import org.cloudfoundry.client.lib.CloudInfo.Framework;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.io.Resource;
@@ -97,6 +99,7 @@ public class CloudFoundryClient {
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
 
 	private RestTemplate restTemplate = new RestTemplate();
+	private RestTemplate uploadTemplate = new RestTemplate();
 	private URL cloudControllerUrl;
 
 	private String token;
@@ -138,6 +141,8 @@ public class CloudFoundryClient {
 		//this.baseDeploymentUrl = baseDeploymentUrl;
 		restTemplate.setRequestFactory(new AppCloudClientHttpRequestFactory(requestFactory));
 		restTemplate.setErrorHandler(new ErrorHandler());
+        uploadTemplate.setRequestFactory(new AppCloudClientUploadHttpRequestFactory(requestFactory));
+        uploadTemplate.setErrorHandler(new ErrorHandler());
 
 		// install custom HttpMessageConverters
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
@@ -154,6 +159,8 @@ public class CloudFoundryClient {
 		messageConverters.add(formPartsMessageConverter);
 		messageConverters.add(new MappingJacksonHttpMessageConverter());
 		restTemplate.setMessageConverters(messageConverters);
+	    uploadTemplate.setMessageConverters(messageConverters);
+
 	}
 
 	/**
@@ -291,6 +298,7 @@ public class CloudFoundryClient {
 			serviceNames = new ArrayList<String>();
 		}
 		CloudApplication payload = new CloudApplication(appName, null, framework, memory, 1, uris, serviceNames, AppState.STOPPED);
+		System.out.println("Creating app " + payload.toString());
 		restTemplate.postForLocation(getUrl("apps"), payload);
 		CloudApplication postedApp = getApplication(appName);
 		if (serviceNames != null && serviceNames.size() != 0) {
@@ -349,16 +357,18 @@ public class CloudFoundryClient {
         appStream = new ByteArrayInputStream(appBytes);
         appSize = appBytes.length;
 
-        restTemplate.put(
+        uploadTemplate.put(
                     getUrl("apps/{appName}/application"),
                     generatePartialResourcePayload(
                             new InputStreamResourceWithName(appStream, appSize, file.getName()), resources),
                     appName);
     }
 
-	private MultiValueMap<String, ?> generatePartialResourcePayload(Resource application, String resources) {
+	private MultiValueMap<String, ?> generatePartialResourcePayload(Resource application, String resources) throws IOException {
 		MultiValueMap<String, Object> payload = new LinkedMultiValueMap<String, Object>(2);
-		payload.add("application", application);
+		if (application.contentLength() > 0) {
+	        payload.add("application", application);
+        }
 		if (resources != null) {
 			payload.add("resources", resources);
 		}
@@ -621,6 +631,19 @@ public class CloudFoundryClient {
 			}
 			return request;
 		}
+	}
+
+	private class AppCloudClientUploadHttpRequestFactory extends AppCloudClientHttpRequestFactory {
+	    public AppCloudClientUploadHttpRequestFactory(ClientHttpRequestFactory delegate) {
+	        super(delegate);
+	    }
+
+	    public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+	        ClientHttpRequest request = super.createRequest(uri, httpMethod);
+	        String boundary = Long.toHexString(System.currentTimeMillis());
+	        request.getHeaders().add("Content-Type", "multipart/form-data; boundary=" + boundary);
+	        return request;
+	    }
 	}
 
 }

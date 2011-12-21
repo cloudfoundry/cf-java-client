@@ -38,11 +38,13 @@ public class CloudApplication {
 	private static final String STACK_KEY = "stack";
 	private static final String MEMORY_KEY = "memory";
 
-	public static final String JAVA_WEB = "java_web/1.0";
-	public static final String SPRING = "spring_web/1.0";
-	public static final String GRAILS = "grails/1.0";
+	public static final String JAVA_WEB = "java_web";
+	public static final String SPRING = "spring";
+	public static final String GRAILS = "grails";
+	public static final String NODE = "node";
 
-	public CloudApplication(String name, String stagingStack, String stagingModel,
+
+    public CloudApplication(String name, String stagingStack, String stagingModel,
 						int memory, int instances,
 						List<String> uris, List<String> serviceNames,
 						AppState state) {
