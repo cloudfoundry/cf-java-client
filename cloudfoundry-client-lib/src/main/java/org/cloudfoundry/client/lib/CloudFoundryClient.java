@@ -16,30 +16,6 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -66,6 +42,30 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class CloudFoundryClient {
 
@@ -168,14 +168,18 @@ public class CloudFoundryClient {
 		return cloudControllerUrl;
 	}
 
-	public CloudInfo getCloudInfo() {
-		if (info == null) { 
-			@SuppressWarnings("unchecked")
-			Map<String,Object> infoMap = restTemplate.getForObject(getUrl("info"), Map.class);
-			info = new CloudInfo(infoMap);
-		}
-		return info;
-	}
+    /**
+     * Returns the Cloud info.
+     * Removed the check for info==null, because after setting the proxyUser the CloudInfo changes.
+     *
+     * @return the CloudInfo for the (proxy)User.
+     */
+    public CloudInfo getCloudInfo() {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> infoMap = restTemplate.getForObject(getUrl("info"), Map.class);
+        info = new CloudInfo(infoMap);
+        return info;
+    }
 
 	public void register(String email, String password) {
 		Map<String, String> payload = new HashMap<String, String>();
@@ -191,6 +195,29 @@ public class CloudFoundryClient {
 		userInfo.put("password", newPassword);
 		restTemplate.put(getUrl("users/{id}"), userInfo, email);
 	}
+
+    /**
+     * Returns all user accounts.
+     *
+     * @return the users
+     */
+    public List<CloudUser> getUsers() {
+        List<Map<String, Object>> servicesAsMap = restTemplate.getForObject(getUrl("users"), List.class);
+        List<CloudUser> users = new ArrayList<CloudUser>();
+        for (Map<String, Object> serviceAsMap : servicesAsMap) {
+            users.add(new CloudUser(serviceAsMap));
+        }
+        return users;
+    }
+
+    /**
+     * Unregister the specified account.
+     *
+     * @param theEmail the user which should be unregistered.
+     */
+    public void unregister(String theEmail) {
+        restTemplate.delete(getUrl("users/{email}"), theEmail);
+    }
 
 	public void unregister() {
 		restTemplate.delete(getUrl("users/{email}"), email);
@@ -238,7 +265,6 @@ public class CloudFoundryClient {
 	/**
 	 * Get choices for application memory quota
 	 *
-	 * @param framework
 	 * @return memory choices in MB
 	 */
 	public int[] getApplicationMemoryChoices() {
