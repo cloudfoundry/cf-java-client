@@ -517,17 +517,18 @@ public class CloudFoundryClientTest {
 		List<ServiceConfiguration> configurations = client.getServiceConfigurations();
 		assertNotNull(configurations);
 		assertTrue(configurations.size() >= 2);
-		Collections.sort(configurations, new Comparator<ServiceConfiguration>() {
-			public int compare(ServiceConfiguration o1, ServiceConfiguration o2) {
-				return o1.getVendor().compareTo(o2.getVendor());
-			}
-		});
 
-		ServiceConfiguration configuration = configurations.get(1);
-		assertEquals("database", configuration.getType());
-		assertEquals("mysql", configuration.getVendor());
+		ServiceConfiguration configuration = null;
+		for (ServiceConfiguration sc : configurations) {
+			if (sc.getType().equals("key-value")) {
+				configuration = sc;
+				break;
+			}
+		}
+		assertNotNull(configuration);
+		assertEquals("key-value", configuration.getType());
+		assertEquals("redis", configuration.getVendor());
 		assertNotNull(configuration.getTiers());
-		// For vcloudlabs, we have only one tier
 		assertTrue(configuration.getTiers().size() > 0);
 
 		Collections.sort(configuration.getTiers(), new Comparator<Tier>() {
