@@ -1,0 +1,7 @@
+Verified+1: cftestbuild <cftestbuild@gmail.com>
+Code-Review+2: Jennifer Hickey <jhickey@vmware.com>
+Submitted-by: Ramnivas Laddad <ramnivas@ramnivas.com>
+Submitted-at: Thu, 12 Jan 2012 03:38:37 +0000
+Reviewed-on: http://cloudfoundry-codereview.qa.mozycloud.com/gerrit/2825
+Project: vcap-java-client
+Branch: refs/heads/master
