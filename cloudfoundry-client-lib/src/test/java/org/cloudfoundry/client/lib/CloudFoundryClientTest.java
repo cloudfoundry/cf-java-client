@@ -520,7 +520,7 @@ public class CloudFoundryClientTest {
 
 		ServiceConfiguration configuration = null;
 		for (ServiceConfiguration sc : configurations) {
-			if (sc.getType().equals("key-value")) {
+			if (sc.getVendor().equals("redis")) {
 				configuration = sc;
 				break;
 			}
