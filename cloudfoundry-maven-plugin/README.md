@@ -203,6 +203,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.memory]           Set the memory reservation for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.services]         Set the runtime to use for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.no-start]         Do not auto-start the application
+        push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.framework]        Set the framework for the application
 
       Application Operations
         start   -Dcf.username -Dcf.password [-Dcf.appname]                      Start the application
@@ -296,8 +297,9 @@ Additional certain configuration parameter will fall back to using default value
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
 + **url**: If no Url is specified, then the *appname* and the main domain from the *target* parameter are used to dynamically form the url
 + **warfile**: If not provided it defaults to: *${project.build.directory}/${project.build.finalName}.war*
++ **framework**: Defaults to *spring*
 
-> The parameters **username**, **password** and **target** don't have default values and you are required to provide them
+> The parameters **username**, **password** and **target** don't have default values and you are required to provide them.
 
 
 
