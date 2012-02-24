@@ -53,6 +53,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         final File warfile          = this.getWarfile();
         final Integer memory        = this.getMemory();
         final List<String> services = this.getServices();
+        final String framework      = this.getFramework();
 
         super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
                 appname, warfile, memory, uris, services));
@@ -81,7 +82,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         }
 
         try {
-            this.getClient().createApplication(appname, CloudApplication.SPRING, memory, uris, services);
+            this.getClient().createApplication(appname, framework, memory, uris, services);
         } catch (CloudFoundryException e) {
             throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
                     this.getAppname(), e.getMessage(), e.getDescription()), e);
@@ -143,9 +144,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
     /**
      * Helper method that validates that the memory size selected is valid and available.
      *
-     * @param cloudFoundryClient
      * @param desiredMemory
-     *
      * @throws IllegalStateException if memory constraints are violated.
      */
     protected void validateMemoryChoice(int[] availableMemoryChoices, Integer desiredMemory) {
