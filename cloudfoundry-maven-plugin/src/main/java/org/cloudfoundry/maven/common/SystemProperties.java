@@ -18,12 +18,15 @@ package org.cloudfoundry.maven.common;
 /**
  *
  * @author Gunnar Hillert
+ * @author Stephan Oudmaijer
+ *
  * @since 1.0.0
  *
  */
 public enum SystemProperties {
 
     APP_NAME("cf.appname", "appname"),
+    FRAMEWORK("cf.framework", "framework"),
     INSTANCES("cf.instances", "instances"),
     MEMORY("cf.memory", "memory"),
     NO_START("cf.no-start", "no-start"),
