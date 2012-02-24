@@ -16,6 +16,7 @@ Currently available Cloud Foundry Maven Plugin Goals are:
     push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.memory]           Set the memory reservation for the application
     push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.services]         Set the runtime to use for the application
     push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.no-start]         Do not auto-start the application
+    push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.framework]        Set the framework for the application
 
   Application Operations
     start   -Dcf.username -Dcf.password [-Dcf.appname]                      Start the application

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package org.cloudfoundry.maven;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -28,6 +30,8 @@ import org.cloudfoundry.maven.common.SystemProperties;
  * used plugin parameters.
  *
  * @author Gunnar Hillert
+ * @author Stephan Oudmaijer
+ *
  * @since 1.0.0
  *
  */
@@ -74,6 +78,20 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
     private String services;
 
     /**
+     * Framework type, defaults to CloudApplication.Spring
+     *
+     * @parameter expression="${cf.framework}" default-value="spring"
+     */
+    private String framework;
+
+    /**
+     * Environment variables
+     *
+     * @parameter expression="${cf.env}"
+     */
+    private Map<String, String> env = new HashMap<String, String>();
+
+    /**
      * Do not auto-start the application
      *
      * @parameter expression="${cf.no-start}"
@@ -103,6 +121,41 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
             return appname;
         }
 
+    }
+
+    /**
+     * If the framework was specified via the command line ({@link SystemProperties})
+     * then use that property. Otherwise return the framework as injected via Maven or
+     * if framework is Null return the default value (CloudApplication.Spring) instead.
+     *
+     * @return Returns the framework, will never return Null.
+     */
+    public String getFramework() {
+
+        final String frameworkProperty = getCommandlineProperty(SystemProperties.FRAMEWORK);
+
+        if (frameworkProperty != null) {
+            return frameworkProperty;
+        }
+
+        return this.framework;
+    }
+
+    /**
+     * Environment properties can only be specified from the maven pom.
+     *
+     * Example:
+     *
+     * {code}
+     * <env>
+     *     <JAVA_OPTS>-XX:MaxPermSize=256m</JAVA_OPTS>
+     * </env>
+     * {code}
+     *
+     * @return Returns the env, will never return Null.
+     */
+    public Map<String,String> getEnv() {
+        return this.env;
     }
 
     /**

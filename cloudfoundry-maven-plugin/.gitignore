@@ -5,6 +5,8 @@ log.roo
 .settings
 .springBeans
 .DS_Store
+*.iml
+*.iws
+*.ipr
 release.properties
-pom.xml.releaseBackup
-/*.iml
+pom.xml.releaseBackup/*.iml
