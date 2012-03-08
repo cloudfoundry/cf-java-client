@@ -137,7 +137,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
         } catch (ResourceAccessException e) {
             throw new MojoExecutionException(
-                    String.format("Cannot access hotst at '%s'.", target), e);
+                    String.format("Cannot access host at '%s'.", target), e);
         }
 
         return localClient;

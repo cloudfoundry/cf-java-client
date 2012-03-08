@@ -97,7 +97,7 @@ public class Info extends AbstractCloudFoundryMojo {
 
         } catch (ResourceAccessException e) {
             throw new MojoExecutionException(
-                    String.format("Cannot access hotst at '%s'.", localTarget), e);
+                    String.format("Cannot access host at '%s'.", localTarget), e);
         }
 
         super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, localTarget));
