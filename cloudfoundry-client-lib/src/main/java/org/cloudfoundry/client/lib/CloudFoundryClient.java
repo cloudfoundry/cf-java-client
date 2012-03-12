@@ -60,13 +60,6 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * A Java client to exercise the Cloud Foundry API.
- *
- * @author Ramnivas Laddad
- * @author A.B.Srinivasan
- */
-
 public class CloudFoundryClient {
 
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
@@ -161,14 +154,18 @@ public class CloudFoundryClient {
 		return cloudControllerUrl;
 	}
 
-	public CloudInfo getCloudInfo() {
-		if (info == null) {
-			@SuppressWarnings("unchecked")
-			Map<String,Object> infoMap = restTemplate.getForObject(getUrl("info"), Map.class);
-			info = new CloudInfo(infoMap);
-		}
-		return info;
-	}
+    /**
+     * Returns the Cloud info.
+     * Removed the check for info==null, because after setting the proxyUser the CloudInfo changes.
+     *
+     * @return the CloudInfo for the (proxy)User.
+     */
+    public CloudInfo getCloudInfo() {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> infoMap = restTemplate.getForObject(getUrl("info"), Map.class);
+        info = new CloudInfo(infoMap);
+        return info;
+    }
 
 	public void register(String email, String password) {
 		Map<String, String> payload = new HashMap<String, String>();
@@ -184,6 +181,29 @@ public class CloudFoundryClient {
 		userInfo.put("password", newPassword);
 		restTemplate.put(getUrl("users/{id}"), userInfo, email);
 	}
+
+    /**
+     * Returns all user accounts.
+     *
+     * @return the users
+     */
+    public List<CloudUser> getUsers() {
+        List<Map<String, Object>> servicesAsMap = restTemplate.getForObject(getUrl("users"), List.class);
+        List<CloudUser> users = new ArrayList<CloudUser>();
+        for (Map<String, Object> serviceAsMap : servicesAsMap) {
+            users.add(new CloudUser(serviceAsMap));
+        }
+        return users;
+    }
+
+    /**
+     * Unregister the specified account.
+     *
+     * @param theEmail the user which should be unregistered.
+     */
+    public void unregister(String theEmail) {
+        restTemplate.delete(getUrl("users/{email}"), theEmail);
+    }
 
 	public void unregister() {
 		restTemplate.delete(getUrl("users/{email}"), email);
@@ -231,7 +251,6 @@ public class CloudFoundryClient {
 	/**
 	 * Get choices for application memory quota
 	 *
-	 * @param framework
 	 * @return memory choices in MB
 	 */
 	public int[] getApplicationMemoryChoices() {
