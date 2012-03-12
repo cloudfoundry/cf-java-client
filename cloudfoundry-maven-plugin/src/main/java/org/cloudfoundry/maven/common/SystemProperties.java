@@ -24,6 +24,7 @@ package org.cloudfoundry.maven.common;
 public enum SystemProperties {
 
     APP_NAME("cf.appname", "appname"),
+    FRAMEWORK("cf.framework", "framework"),
     INSTANCES("cf.instances", "instances"),
     MEMORY("cf.memory", "memory"),
     NO_START("cf.no-start", "no-start"),

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
 
@@ -73,6 +74,14 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
      */
     private String services;
 
+
+    /**
+     * Framework type, defaults to CloudApplication.Spring
+     *
+     * @parameter expression="${cf.framework}"
+     */
+    private String framework = CloudApplication.SPRING;
+
     /**
      * Do not auto-start the application
      *
@@ -103,6 +112,24 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
             return appname;
         }
 
+    }
+
+    /**
+     * If the framework was specified via the command line ({@link SystemProperties})
+     * then use that property. Otherwise return the frameowork as injected via Maven or
+     * if framework is Null return the default value (CloudApplication.Spring) instead.
+     *
+     * @return Returns the framework, will never return Null.
+     */
+    public String getFramework() {
+
+        final String frameworkProperty = getCommandlineProperty(SystemProperties.FRAMEWORK);
+
+        if (frameworkProperty != null) {
+            return frameworkProperty;
+        }
+
+        return this.framework;
     }
 
     /**
