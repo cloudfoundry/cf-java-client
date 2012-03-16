@@ -18,7 +18,9 @@ package org.cloudfoundry.maven;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.maven.common.DefaultConstants;
@@ -83,6 +85,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
     private String framework = CloudApplication.SPRING;
 
     /**
+     * Environment variables
+     *
+     * @parameter expression="${cf.env}"
+     */
+    private Map<String, String> env = new HashMap<String, String>();
+
+    /**
      * Do not auto-start the application
      *
      * @parameter expression="${cf.no-start}"
@@ -131,6 +140,26 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 
         return this.framework;
     }
+
+
+    /**
+     * Environment properties can only be specified from the maven pom.
+     *
+     * Example:
+     *
+     * {code}
+     * <env>
+     *     <JAVA_OPTS>-XX:MaxPermSize=256m</JAVA_OPTS>
+     * </env>
+     * {code}
+     *
+     * @return Returns the env, will never return Null.
+     */
+    public Map<String,String> getEnv() {
+        return this.env;
+    }
+
+
 
     /**
      * If the application name was specified via the command line ({@link SystemProperties})

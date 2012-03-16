@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudApplication;
@@ -56,6 +57,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         final Integer memory        = this.getMemory();
         final List<String> services = this.getServices();
         final String framework      = this.getFramework();
+        final Map<String,String> env= this.getEnv();
 
         super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
                 appname, warfile, memory, uris, services));
@@ -88,6 +90,15 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
             this.getClient().createApplication(appname, framework, memory, uris, services);
         } catch (CloudFoundryException e) {
             throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+                    this.getAppname(), e.getMessage(), e.getDescription()), e);
+        }
+
+        super.getLog().debug("Updating Application env...");
+
+        try {
+            this.getClient().updateApplicationEnv(appname, env);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(String.format("Error while updating application env '%s'. Error message: '%s'. Description: '%s'",
                     this.getAppname(), e.getMessage(), e.getDescription()), e);
         }
 
