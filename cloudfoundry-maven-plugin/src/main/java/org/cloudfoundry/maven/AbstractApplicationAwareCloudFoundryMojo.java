@@ -116,7 +116,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 
     /**
      * If the framework was specified via the command line ({@link SystemProperties})
-     * then use that property. Otherwise return the frameowork as injected via Maven or
+     * then use that property. Otherwise return the framework as injected via Maven or
      * if framework is Null return the default value (CloudApplication.Spring) instead.
      *
      * @return Returns the framework, will never return Null.

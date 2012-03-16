@@ -18,12 +18,14 @@ package org.cloudfoundry.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.CloudInfo;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -61,6 +63,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         super.getLog().debug("Create Application...");
 
         validateMemoryChoice(this.getClient(), memory);
+        validateFrameworkChoice(this.getClient().getCloudInfo().getFrameworks(), framework);
 
         boolean found = true;
 
@@ -163,6 +166,24 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
                       CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
         }
 
+    }
+
+    /**
+     *
+     * @param frameworks
+     * @param desiredFramework
+     * @return true if valid
+     */
+    protected boolean validateFrameworkChoice(Collection<CloudInfo.Framework> frameworks, String desiredFramework) {
+        if( frameworks != null && !frameworks.isEmpty() && desiredFramework != null ) {
+            for(CloudInfo.Framework f : frameworks ) {
+                if(f.getName().equals(desiredFramework)) {
+                    return true;
+                }
+            }
+        }
+        throw new IllegalStateException("Framework must be one of the following values: " +
+                      CommonUtils.frameworksToCommaDelimitedString(frameworks));
     }
 
 

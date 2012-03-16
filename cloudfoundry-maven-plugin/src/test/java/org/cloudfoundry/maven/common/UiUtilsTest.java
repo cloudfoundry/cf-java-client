@@ -69,7 +69,6 @@ public class UiUtilsTest {
         LOGGER.info("\n" + renderedTableAsString);
 
         Assert.assertEquals(expectedTableAsString, renderedTableAsString);
-
     }
 
 }
