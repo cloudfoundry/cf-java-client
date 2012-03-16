@@ -16,8 +16,15 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import junit.framework.Assert;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.cloudfoundry.client.lib.CloudInfo;
+import org.cloudfoundry.maven.common.CommonUtils;
 
 /**
  *
@@ -71,6 +78,56 @@ public class PushTest extends AbstractMojoTestCase {
 
         fail();
 
+    }
+
+
+    /**
+     * Test for a custom framework choice if it is validated correctly.
+     */
+    public void testValidateFrameworkChoiceHappyPath() throws Exception {
+
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        Push mojo = (Push) lookupMojo ( "push", testPom );
+
+        List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("name", "custom");
+        data.put("runtimes", new ArrayList());
+
+        frameworks.add(new CloudInfo.Framework(data));
+        final String desiredFramework = "custom";
+
+        try {
+            Assert.assertTrue(mojo.validateFrameworkChoice(frameworks, desiredFramework));
+        } catch (IllegalStateException e) {
+            fail();
+        }
+    }
+
+    /**
+     * Test for a custom framework choice with invalid choice.
+     */
+    public void testValidateFrameworkChoiceNonExisting() throws Exception {
+
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        Push mojo = (Push) lookupMojo ( "push", testPom );
+
+        List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("name", "custom");
+        data.put("runtimes", new ArrayList());
+        frameworks.add(new CloudInfo.Framework(data));
+
+        final String desiredFramework = "spring";
+
+        try {
+            mojo.validateFrameworkChoice(frameworks, desiredFramework);
+            fail();
+        } catch (IllegalStateException e) {
+            Assert.assertEquals(e.getMessage(), "Framework must be one of the following values: custom");
+        }
     }
 
 }
