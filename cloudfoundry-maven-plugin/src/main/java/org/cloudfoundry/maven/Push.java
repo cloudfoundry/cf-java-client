@@ -59,8 +59,8 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         final String framework      = this.getFramework();
         final Map<String,String> env= this.getEnv();
 
-        super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
-                appname, warfile, memory, uris, services));
+        super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s, Framework: %s",
+                appname, warfile, memory, uris, services, framework));
 
         super.getLog().debug("Create Application...");
 
@@ -186,7 +186,8 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
      * @return true if valid
      */
     protected boolean validateFrameworkChoice(Collection<CloudInfo.Framework> frameworks, String desiredFramework) {
-        if( frameworks != null && !frameworks.isEmpty() && desiredFramework != null ) {
+
+        if( frameworks != null && !frameworks.isEmpty() ) {
             for(CloudInfo.Framework f : frameworks ) {
                 if(f.getName().equals(desiredFramework)) {
                     return true;

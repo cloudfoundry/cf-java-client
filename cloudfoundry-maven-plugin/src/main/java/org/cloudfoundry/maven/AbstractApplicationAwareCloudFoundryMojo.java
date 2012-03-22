@@ -80,9 +80,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
     /**
      * Framework type, defaults to CloudApplication.Spring
      *
-     * @parameter expression="${cf.framework}"
+     * @parameter expression="${cf.framework}" default-value="spring"
      */
-    private String framework = CloudApplication.SPRING;
+    private String framework;
 
     /**
      * Environment variables
