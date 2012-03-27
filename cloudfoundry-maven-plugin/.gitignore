@@ -7,3 +7,4 @@ log.roo
 .DS_Store
 release.properties
 pom.xml.releaseBackup
+/*.iml
