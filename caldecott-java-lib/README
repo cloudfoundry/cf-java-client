@@ -1,0 +1,16 @@
+Java client for Caldecott
+
+JavaTunnel.java shows how to setup and start a tunnel.
+
+How to run this tunnel test:
+
+You can either use the 'tunnel.sh' shell script or use the mvn exec target. Optionaly override the VCAP target with -Dvcap.target=http://api.vcap.me or some other cloud url to run against a local cloud.
+
+Maven:
+mvn clean package
+mvn exec:java -Dexec.mainClass="org.cloudfoundry.caldecott.JavaTunnel"
+
+Script:
+./tunnel.sh
+
+This implementation doesn't deploy the Cladecott app at this point so  you should test the tunnel with 'vmc tunnel' first.
