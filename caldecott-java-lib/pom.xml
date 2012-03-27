@@ -4,10 +4,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
-	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>0.7.2.BUILD-SNAPSHOT</version>
+	<artifactId>cloudfoundry-caldecott-lib</artifactId>
+	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Client library to be used from STS and other Java tools</name>
+	<name>Client library to be used for Caldecott access</name>
 
 	<licenses>
 		<license>
@@ -18,38 +18,18 @@
 	</licenses>
 
 	<properties>
-		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
+		<spring.framework.version>3.0.5.RELEASE</spring.framework.version>
+		<cf.client.lib.version>0.7.2.BUILD-SNAPSHOT</cf.client.lib.version>
+		<junit.version>4.8.2</junit.version>
+		<mockito.version>1.8.5</mockito.version>
 	</properties>
 
 	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>**/CloudFoundryClientTest.java</exclude>
-								<exclude>**/Abstract*.java</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<profile>
 			<id>fast</id>
 			<properties>
 				<maven.test.skip>true</maven.test.skip>
 			</properties>
-		</profile>
-		<profile>
-			<id>integration-test</id>
 		</profile>
 	</profiles>
 
@@ -58,6 +38,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.cloudfoundry</groupId>
+			<artifactId>cloudfoundry-client-lib</artifactId>
+			<version>${cf.client.lib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -73,19 +58,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.1</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.8.5</version>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -98,7 +77,6 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -123,18 +101,6 @@
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
