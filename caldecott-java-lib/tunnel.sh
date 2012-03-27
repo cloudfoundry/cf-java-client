@@ -1,0 +1,6 @@
+script=`which $0`
+script_path=`dirname $script`
+M2PATH=~/.m2/repository
+APPPATH="$script_path/target/classes"
+CLASSPATH=$APPPATH:$M2PATH/org/springframework/spring-web/3.0.5.RELEASE/spring-web-3.0.5.RELEASE.jar:$M2PATH/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:$M2PATH/org/springframework/spring-beans/3.0.5.RELEASE/spring-beans-3.0.5.RELEASE.jar:$M2PATH/org/springframework/spring-core/3.0.5.RELEASE/spring-core-3.0.5.RELEASE.jar:$M2PATH/org/springframework/spring-asm/3.0.5.RELEASE/spring-asm-3.0.5.RELEASE.jar:$M2PATH/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:$M2PATH/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE.jar:$M2PATH/org/springframework/spring-aop/3.0.5.RELEASE/spring-aop-3.0.5.RELEASE.jar:$M2PATH/org/springframework/spring-expression/3.0.5.RELEASE/spring-expression-3.0.5.RELEASE.jar:$M2PATH/org/cloudfoundry/cloudfoundry-client-lib/0.7.1.BUILD-SNAPSHOT/cloudfoundry-client-lib-0.7.1.BUILD-SNAPSHOT.jar:$M2PATH/org/codehaus/jackson/jackson-core-asl/1.6.2/jackson-core-asl-1.6.2.jar:$M2PATH/org/codehaus/jackson/jackson-mapper-asl/1.6.2/jackson-mapper-asl-1.6.2.jar:$M2PATH/commons-io/commons-io/2.1/commons-io-2.1.jar:$M2PATH/log4j/log4j/1.2.14/log4j-1.2.14.jar
+java -classpath $CLASSPATH $* org.cloudfoundry.caldecott.JavaTunnel
