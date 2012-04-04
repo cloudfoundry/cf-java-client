@@ -16,10 +16,7 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
@@ -178,13 +175,24 @@ public class CloudApplication {
 		return runningInstances;
 	}
 
+    /**
+     * Returns map of environment variables where key is variable name
+     * and value is corresponding variable value
+     *
+     * @return unmodifiable map of environment variables
+     */
 	public Map<String, String> getEnvAsMap() {
-		Map<String,String> envMap = new HashMap<String, String>();
-		for (String nameAndValue : env) {
-			String[] parts = nameAndValue.split("=");
-			envMap.put(parts[0], parts[1]);
-		}
-		return envMap;
+        if (env == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> envMap = new HashMap<String, String>();
+        for (String nameAndValue : env) {
+            String[] parts = nameAndValue.split("=", 2);
+            envMap.put(parts[0], "null".equals(parts[1]) ? null : parts[1]);
+        }
+
+        return Collections.unmodifiableMap(envMap);
 	}
 
 	public List<String> getEnv() {
