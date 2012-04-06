@@ -405,10 +405,13 @@ public class CloudFoundryClientTest {
 		Map<String,String> env2 = new HashMap<String,String>();
 		env2.put("foo", "baz");
 		env2.put("baz", "bong");
+        env2.put("empty_var", "");
+        env2.put("null_var", null);
 		client.updateApplicationEnv(appName, env2);
 		app = client.getApplication(app.getName());
 		assertEquals(env2, app.getEnvAsMap());
-		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong", "empty_var=", "null_var=null")),
+                new HashSet<String>(app.getEnv()));
 
 		client.updateApplicationEnv(appName, new HashMap<String,String>());
 		app = client.getApplication(app.getName());
