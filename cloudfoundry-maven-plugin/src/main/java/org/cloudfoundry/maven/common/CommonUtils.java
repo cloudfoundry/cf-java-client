@@ -20,13 +20,15 @@ import java.io.Reader;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.cloudfoundry.client.lib.CloudInfo;
+import org.cloudfoundry.client.lib.ServiceConfiguration;
+
 /**
  * Contains common non-ui related helper methods for the Cloud Foundry Maven
  * Plugin.
  *
  * @author Gunnar Hillert
  * @since 1.0.0
- *
  */
 public final class CommonUtils {
 
@@ -40,8 +42,8 @@ public final class CommonUtils {
     /**
      * Right-pad a String with a configurable padding character.
      *
-     * @param string The String to pad
-     * @param size Pad String by the number of characters.
+     * @param string      The String to pad
+     * @param size        Pad String by the number of characters.
      * @param paddingChar The character to pad the String with.
      * @return The padded String. If the provided String is null, an empty String is returned.
      */
@@ -62,7 +64,7 @@ public final class CommonUtils {
      * Right-pad the provided String with empty spaces.
      *
      * @param string The String to pad
-     * @param size Pad String by the number of characters.
+     * @param size   Pad String by the number of characters.
      * @return The padded String. If the provided String is null, an empty String is returned.
      */
     public static String padRight(String string, int size) {
@@ -83,7 +85,6 @@ public final class CommonUtils {
         }
 
         StringBuilder sb = new StringBuilder();
-
         final Iterator<String> it = list.iterator();
 
         while (it.hasNext()) {
@@ -93,15 +94,11 @@ public final class CommonUtils {
             if (it.hasNext()) {
                 sb.append(", ");
             }
-
         }
-
         return sb.toString();
-
     }
 
     /**
-     *
      * @param reader
      */
     public static void closeReader(Reader reader) {
@@ -115,14 +112,12 @@ public final class CommonUtils {
     }
 
     /**
-    *
-    * @param reader
-    */
+     * @param emailAddress
+     * @return
+     */
     public static boolean isValidEmail(String emailAddress) {
-
         final String regex = "^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         return emailAddress.matches(regex);
-
     }
 
     /**
@@ -135,11 +130,63 @@ public final class CommonUtils {
         int lengthOfPassword = password.length();
         StringBuilder stringBuilder = new StringBuilder(lengthOfPassword);
 
-        for(int i = 0; i < lengthOfPassword; i++){
+        for (int i = 0; i < lengthOfPassword; i++) {
             stringBuilder.append('*');
         }
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Formats the supported frameworks as a command separated list.
+     *
+     * @param list List of supported frameworks
+     * @return a String but never null.
+     */
+    public static String frameworksToCommaDelimitedString(final Collection<CloudInfo.Framework> list) {
+
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        final Iterator<CloudInfo.Framework> it = list.iterator();
+
+        while (it.hasNext()) {
+
+            sb.append(it.next().getName());
+
+            if (it.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Formats the supported frameworks as a command separated list.
+     *
+     * @param list List of supported frameworks
+     * @return a String but never null.
+     */
+    public static String serviceConfigurationsToCommaDelimitedString(final Collection<ServiceConfiguration> list) {
+
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        final Iterator<ServiceConfiguration> it = list.iterator();
+
+        while (it.hasNext()) {
+
+            sb.append(it.next().getVendor());
+
+            if (it.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
     }
 
 }

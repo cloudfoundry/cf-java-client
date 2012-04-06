@@ -62,8 +62,10 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
         final Map<String, String> parameterMap = new TreeMap<String, String>();
 
         parameterMap.put("Appname",  this.getAppname()  != null ? this.getAppname()                   : NOT_AVAILABLE);
+        parameterMap.put("Framework",this.getFramework()!= null ? this.getFramework()                 : NOT_AVAILABLE);
         parameterMap.put("Instances",this.getInstances()!= null ? String.valueOf(this.getInstances()) : NOT_AVAILABLE);
         parameterMap.put("Memory",   this.getMemory()   != null ? String.valueOf(this.getMemory())    : NOT_AVAILABLE);
+        parameterMap.put("Env",      this.getEnv()      != null ? String.valueOf(this.getEnv())       : NOT_AVAILABLE);
         parameterMap.put("No-start", this.isNoStart()   != null ? String.valueOf(this.isNoStart())    : NOT_AVAILABLE);
         parameterMap.put("Password", this.getPassword() != null ? CommonUtils.maskPassword(this.getPassword()) : NOT_AVAILABLE);
         parameterMap.put("Server",   this.getServer());

@@ -19,6 +19,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -220,6 +222,41 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 
         assertEquals(Boolean.FALSE, mojo.isNoStart());
 
+    }
+
+    public void testGetFramework() throws Exception {
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+
+        Push mojo = spy(unspiedMojo);
+
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "framework", "custom");
+        doReturn("custom").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
+
+        assertEquals("custom", mojo.getFramework());
+
+    }
+
+    public void testGetEnv() throws Exception {
+                File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+
+        Push mojo = spy(unspiedMojo);
+
+        Map<String,String> env = new HashMap<String, String>();
+        env.put("JAVA_OPTS", "-XX:MaxPermSize=256m");
+
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "env", env);
+
+        assertEquals("-XX:MaxPermSize=256m", mojo.getEnv().get("JAVA_OPTS"));
     }
 
 }

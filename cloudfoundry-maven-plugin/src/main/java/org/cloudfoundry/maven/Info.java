@@ -17,13 +17,18 @@ package org.cloudfoundry.maven;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.CloudInfo;
+import org.cloudfoundry.client.lib.ServiceConfiguration;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 import org.springframework.http.HttpStatus;
@@ -83,10 +88,12 @@ public class Info extends AbstractCloudFoundryMojo {
     protected void doExecute() throws MojoExecutionException {
 
         final CloudInfo cloudinfo;
+        final List<ServiceConfiguration> serviceConfigurations;
         final String localTarget =  getTarget().toString();
 
         try {
             cloudinfo = client.getCloudInfo();
+            serviceConfigurations = client.getServiceConfigurations();
         } catch (CloudFoundryException e) {
             if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
                 throw new MojoExecutionException(
@@ -100,7 +107,7 @@ public class Info extends AbstractCloudFoundryMojo {
                     String.format("Cannot access host at '%s'.", localTarget), e);
         }
 
-        super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, localTarget));
+        super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, serviceConfigurations, localTarget));
     }
 
     /**
@@ -113,17 +120,17 @@ public class Info extends AbstractCloudFoundryMojo {
      *
      * @return Returns a formatted String for console output
      */
-    private String getCloudInfoFormattedAsString(CloudInfo cloudinfo, String target) {
+    private String getCloudInfoFormattedAsString(CloudInfo cloudinfo, List<ServiceConfiguration> serviceConfigurations, String target) {
 
         StringBuilder sb = new StringBuilder("\n");
 
         sb.append(UiUtils.HORIZONTAL_LINE);
-        sb.append(String.format("Target:      %s (v%s build %s) \n", target,
-                                                                     cloudinfo.getVersion(),
-                                                                     cloudinfo.getBuild()));
-        sb.append(String.format("Description: %s\n", cloudinfo.getDescription()));
-        sb.append(String.format("Name:        %s\n", cloudinfo.getName()));
-        sb.append(String.format("Support:     %s\n", cloudinfo.getSupport()));
+        sb.append(String.format("%s (v%s build %s)\n", cloudinfo.getDescription(), cloudinfo.getVersion(), cloudinfo.getBuild()));
+        sb.append(String.format("For support visit %s\n\n", cloudinfo.getSupport()));
+
+        sb.append(String.format("Target:      %s  \n"   , target));
+        sb.append(String.format("Frameworks:  %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudinfo.getFrameworks())));
+        sb.append(String.format("Services:    %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
 
         if (cloudinfo.getUser() != null) {
             sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
@@ -140,9 +147,6 @@ public class Info extends AbstractCloudFoundryMojo {
         }
 
         sb.append(UiUtils.HORIZONTAL_LINE);
-
         return sb.toString();
-
     }
-
 }

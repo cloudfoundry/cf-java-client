@@ -18,12 +18,15 @@ package org.cloudfoundry.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.CloudInfo;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -53,13 +56,16 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         final File warfile          = this.getWarfile();
         final Integer memory        = this.getMemory();
         final List<String> services = this.getServices();
+        final String framework      = this.getFramework();
+        final Map<String,String> env= this.getEnv();
 
-        super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s.",
-                appname, warfile, memory, uris, services));
+        super.getLog().debug(String.format("Pushing App - Appname: %s, War: %s, Memory: %s, Uris: %s, Services: %s, Framework: %s",
+                appname, warfile, memory, uris, services, framework));
 
         super.getLog().debug("Create Application...");
 
         validateMemoryChoice(this.getClient(), memory);
+        validateFrameworkChoice(this.getClient().getCloudInfo().getFrameworks(), framework);
 
         boolean found = true;
 
@@ -81,9 +87,18 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
         }
 
         try {
-            this.getClient().createApplication(appname, CloudApplication.SPRING, memory, uris, services);
+            this.getClient().createApplication(appname, framework, memory, uris, services);
         } catch (CloudFoundryException e) {
             throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+                    this.getAppname(), e.getMessage(), e.getDescription()), e);
+        }
+
+        super.getLog().debug("Updating Application env...");
+
+        try {
+            this.getClient().updateApplicationEnv(appname, env);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(String.format("Error while updating application env '%s'. Error message: '%s'. Description: '%s'",
                     this.getAppname(), e.getMessage(), e.getDescription()), e);
         }
 
@@ -143,9 +158,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
     /**
      * Helper method that validates that the memory size selected is valid and available.
      *
-     * @param cloudFoundryClient
      * @param desiredMemory
-     *
      * @throws IllegalStateException if memory constraints are violated.
      */
     protected void validateMemoryChoice(int[] availableMemoryChoices, Integer desiredMemory) {
@@ -164,6 +177,25 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
                       CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
         }
 
+    }
+
+    /**
+     *
+     * @param frameworks
+     * @param desiredFramework
+     * @return true if valid
+     */
+    protected boolean validateFrameworkChoice(Collection<CloudInfo.Framework> frameworks, String desiredFramework) {
+
+        if( frameworks != null && !frameworks.isEmpty() ) {
+            for(CloudInfo.Framework f : frameworks ) {
+                if(f.getName().equals(desiredFramework)) {
+                    return true;
+                }
+            }
+        }
+        throw new IllegalStateException("Framework must be one of the following values: " +
+                      CommonUtils.frameworksToCommaDelimitedString(frameworks));
     }
 
 
