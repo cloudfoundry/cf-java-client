@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009-2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.cloudfoundry.client.lib.io;
 
@@ -48,6 +63,11 @@ public class DynamicZipInputStream extends DynamicInputStream {
     private byte[] buffer = new byte[BUFFER_SIZE];
 
     /**
+    * File counter used for detecting empty archives.
+    */
+    private long fileCount = 0;
+
+    /**
      * Create a new {@link DynamicZipInputStream} instance.
      *
      * @param entries the zip entries that should be written to the stream
@@ -77,6 +97,7 @@ public class DynamicZipInputStream extends DynamicInputStream {
 
         // Move to the next entry if there is one (no need to write data as returning true causes another call)
         if (entries.hasNext()) {
+            fileCount++;
             Entry entry = entries.next();
             zipStream.putNextEntry(new ZipEntry(entry.getName()));
             entryStream = entry.getInputStream();
@@ -85,6 +106,14 @@ public class DynamicZipInputStream extends DynamicInputStream {
             }
             return true;
         }
+
+        // If no files were added to the archive add an empty one
+        if (fileCount == 0) {
+            fileCount++;
+            zipStream.putNextEntry(new ZipEntry("__empty__"));
+            entryStream = EMPTY_STREAM;
+            return true;
+         }
 
         // No more entries, close and flush the stream
         zipStream.flush();

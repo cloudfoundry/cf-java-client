@@ -11,5 +11,3 @@ You can use the 'tunnel.sh' shell script that uses the mvn exec target. You can 
 To build and run using Maven simply use:
   mvn clean install
   mvn --quiet exec:java -Dexec.mainClass="org.cloudfoundry.caldecott.JavaTunnel" -Dexec.classpathScope="test"
-
-NOTE: This implementation doesn't deploy the server side Caldecott app at this point so you should test the tunnel with 'vmc tunnel' first.
