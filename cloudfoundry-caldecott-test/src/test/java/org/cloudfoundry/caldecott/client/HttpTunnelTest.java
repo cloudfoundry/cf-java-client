@@ -6,7 +6,11 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.client.lib.*;
+import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.CloudApplication;
+import org.cloudfoundry.client.lib.CloudService;
+import org.cloudfoundry.caldecott.TunnelException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
@@ -66,9 +70,9 @@ public class HttpTunnelTest {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private static final String VCAP_TARGET = System.getProperty("caldecott.target", "https://api.cloudfoundry.com");
-	private static final String VCAP_EMAIL = System.getProperty("caldecott.email", "caldecott@springdeveloper.com");
-	private static final String VCAP_PASSWD = System.getProperty("caldecott.passwd");
+	private static final String VCAP_TARGET = System.getProperty("vcap.target", "https://api.cloudfoundry.com");
+	private static final String VCAP_EMAIL = System.getProperty("vcap.email", "cloud@springdeveloper.com");
+	private static final String VCAP_PASSWD = System.getProperty("vcap.passwd");
 	private static final String VCAP_MYSQL_SERVICE = "mysql-caldecott-test";
 	private static final String VCAP_POSTGRES_SERVICE = "postgres-caldecott-test";
 	private static final String VCAP_MONGO_SERVICE = "mongo-caldecott-test";
@@ -90,7 +94,7 @@ public class HttpTunnelTest {
 	public static void printTargetInfo() {
 		System.out.println("Running tests on " + VCAP_TARGET + " on behalf of " + VCAP_EMAIL);
 		if (VCAP_PASSWD == null) {
-			Assert.fail("System property caldecott.passwd must be specified, supply -Dcaldecott.passwd=<password>");
+			Assert.fail("System property vcap.passwd must be specified, supply -Dvcap.passwd=<password>");
 		}
 	}
 
@@ -356,7 +360,18 @@ public class HttpTunnelTest {
 
 	@After
 	public void cleanup() {
+		deleteCaldecottServerApp();
 		finalize(this.client);
+	}
+
+	private void deleteCaldecottServerApp() {
+		CloudApplication app =  null;
+		try {
+			app = client.getApplication(TunnelHelper.getTunnelAppName());
+		} catch (CloudFoundryException ignore) {}
+		if (app != null) {
+			client.deleteApplication(TunnelHelper.getTunnelAppName());
+		}
 	}
 
 	private void checkForCaldecottServerApp() throws Exception {
@@ -366,11 +381,12 @@ public class HttpTunnelTest {
 				app = client.getApplication(TunnelHelper.getTunnelAppName());
 			} catch (CloudFoundryException ignore) {}
 			if (app == null) {
-				throw new RuntimeException("Caldecott app is not deployed to the test account " + VCAP_EMAIL);
+				TunnelHelper.deployTunnelApp(client);
+				app = client.getApplication(TunnelHelper.getTunnelAppName());
 			}
 		} catch (Exception e) {
 			logger.error("Error deploying Caldecott app", e);
-			throw e;
+			throw new TunnelException("Error deploying Caldecott app", e);
 		}
 	}
 

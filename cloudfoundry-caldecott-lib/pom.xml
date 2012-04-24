@@ -18,7 +18,7 @@
 	</licenses>
 
 	<properties>
-		<spring.framework.version>3.0.5.RELEASE</spring.framework.version>
+		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
 		<cf.client.lib.version>0.7.2.BUILD-SNAPSHOT</cf.client.lib.version>
 		<junit.version>4.8.2</junit.version>
 		<mockito.version>1.8.5</mockito.version>
@@ -115,6 +115,23 @@
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+							 <zip destfile="src/main/resources/caldecott_helper.zip" basedir="../vmc/caldecott_helper" update="true"/>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

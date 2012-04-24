@@ -19,7 +19,9 @@ package org.cloudfoundry.caldecott;
 import org.cloudfoundry.caldecott.client.HttpTunnelFactory;
 import org.cloudfoundry.caldecott.client.TunnelHelper;
 import org.cloudfoundry.caldecott.client.TunnelServer;
+import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.CloudService;
 
 import java.io.Console;
@@ -55,6 +57,27 @@ public class JavaTunnel {
         }
 
 		CloudFoundryClient client =  clientInit();
+
+		CloudApplication serverApp = null;
+		try {
+			serverApp = client.getApplication(TunnelHelper.getTunnelAppName());
+		}
+		catch (CloudFoundryException e) {}
+		if (serverApp == null) {
+			System.out.println("Deploying Caldecott server app");
+			TunnelHelper.deployTunnelApp(client);
+		}
+		try {
+			serverApp = client.getApplication(TunnelHelper.getTunnelAppName());
+		}
+		catch (CloudFoundryException e) {
+			System.err.println("Unable to deploy Caldecott server app: " + e.getMessage());
+			throw e;
+		}
+		if (!serverApp.getState().equals(CloudApplication.AppState.STARTED)) {
+			System.out.println("Starting Caldecott server app");
+			client.startApplication(serverApp.getName());
+		}
 
 		while (vcap_service == null) {
 			System.out.println("You have the following services defined:");
