@@ -16,21 +16,32 @@
 
 package org.cloudfoundry.caldecott.client;
 
+import org.cloudfoundry.caldecott.TunnelException;
+import org.cloudfoundry.client.lib.ApplicationInfo;
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -55,6 +66,23 @@ public class TunnelHelper {
 
 	public static CloudApplication getTunnelAppInfo(CloudFoundryClient client) {
 		return client.getApplication(TunnelHelper.getTunnelAppName());
+	}
+
+	public static void deployTunnelApp(CloudFoundryClient client) {
+		ClassPathResource cpr = new ClassPathResource("caldecott_helper.zip");
+		try {
+			File temp = copyCaldecottZipFile(cpr);
+			client.createApplication(TUNNEL_APP_NAME, "sinatra", 64,
+					Arrays.asList(new String[]{getRandomUrl(client, TUNNEL_APP_NAME)}),
+					Arrays.asList(new String[] {}), false);
+			client.uploadApplication(TUNNEL_APP_NAME, temp);
+			client.updateApplicationEnv(TUNNEL_APP_NAME,
+					Collections.singletonMap("CALDECOTT_AUTH", UUID.randomUUID().toString()));
+			client.startApplication(TUNNEL_APP_NAME);
+			temp.delete();
+		} catch (IOException e) {
+			throw new TunnelException("Unable to deploy the Caldecott server application", e);
+		}
 	}
 
 	public static void bindServiceToTunnelApp(CloudFoundryClient client, String serviceName) {
@@ -142,6 +170,39 @@ public class TunnelHelper {
 			}
 		}
 		return scheme;
+	}
+
+	private static File copyCaldecottZipFile(ClassPathResource cpr) throws IOException {
+		File temp = File.createTempFile("caldecott", "zip");
+		InputStream in = cpr.getInputStream();
+		OutputStream out = new FileOutputStream(temp);
+		int read = 0;
+		byte[] bytes = new byte[1024];
+		while ((read = in.read(bytes)) != -1) {
+			out.write(bytes, 0, read);
+		}
+		in.close();
+		out.flush();
+		out.close();
+		return temp;
+	}
+
+	public static String getRandomUrl(CloudFoundryClient client, String appname) {
+		int range = 0x01000000;
+		int r = new Random().nextInt(range - 1);
+		StringBuilder url = new StringBuilder();
+		url.append(appname);
+		url.append("-");
+		url.append(Integer.toHexString((r)));
+		String domain = client.getCloudControllerUrl().getHost();
+		if (domain.startsWith("api.")) {
+			domain = domain.substring(3);
+		}
+		else {
+			url.append("-");
+		}
+		url.append(domain);
+		return url.toString();
 	}
 
 	public static String getTunnelProtocolVersion(CloudFoundryClient client, String uri) {

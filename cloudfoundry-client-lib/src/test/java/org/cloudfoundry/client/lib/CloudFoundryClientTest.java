@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -498,7 +499,7 @@ public class CloudFoundryClientTest {
 		CloudApplication app = createAndUploadAndStart(appName);
 		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), app.getUris());
 
-		assumeTrue(multiUrlSupported );
+		assumeTrue(multiUrlSupported);
 
 		List<String> uris = new ArrayList<String>(app.getUris());
 		uris.add(computeAppUrlNoProtocol("travel_test3_b"));
@@ -717,6 +718,19 @@ public class CloudFoundryClientTest {
 		// apps proxied
 		adminClient.setProxyUser(TEST_USER_EMAIL);
 		assertTrue(hasApplication(adminClient.getApplications(), appName));
+	}
+
+	@Test
+	public void uploadSinatraApp() throws IOException {
+		String appName = namespacedAppName("env");
+		ClassPathResource cpr = new ClassPathResource("apps/env/");
+		File explodedDir = cpr.getFile();
+		String framework = "sinatra";
+		List<String> services = new ArrayList<String>();
+		CloudApplication env = createAndUploadExplodedTestApp(appName, explodedDir, framework, services);
+		client.startApplication(appName);
+		env = client.getApplication(appName);
+		assertEquals(AppState.STARTED, env.getState());
 	}
 
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {
