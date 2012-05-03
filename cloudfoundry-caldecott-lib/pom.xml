@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-caldecott-lib</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1.BUILD-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Client library to be used for Caldecott access</name>
 
@@ -19,7 +19,7 @@
 
 	<properties>
 		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
-		<cf.client.lib.version>0.7.2</cf.client.lib.version>
+		<cf.client.lib.version>0.7.3.BUILD-SNAPSHOT</cf.client.lib.version>
 		<junit.version>4.8.2</junit.version>
 		<mockito.version>1.8.5</mockito.version>
 	</properties>
@@ -101,6 +101,18 @@
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
