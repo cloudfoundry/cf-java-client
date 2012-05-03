@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-caldecott-lib</artifactId>
-	<version>0.1.0.BUILD-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 	<name>Client library to be used for Caldecott access</name>
 
