@@ -58,6 +58,7 @@ import org.springframework.web.client.HttpServerErrorException;
  *
  * @author Ramnivas Laddad
  * @author A.B.Srinivasan
+ * @author Jennifer Hickey
  */
 public class CloudFoundryClientTest {
 
@@ -202,6 +203,43 @@ public class CloudFoundryClientTest {
 
 		assertNotNull(app);
 		assertEquals(AppState.STOPPED, app.getState());
+	}
+
+	@Test
+	public void uploadStandaloneApplication() throws IOException {
+		List<String> uris = new ArrayList<String>();
+		List<String> services = new ArrayList<String>();
+		Staging staging = new Staging("standalone");
+		staging.setRuntime("ruby19");
+		staging.setCommand("ruby simple.rb");
+		String appName = namespacedAppName("standalone-ruby");
+		File file = SampleProjects.standaloneRuby();
+		client.createApplication(appName, staging, 128, uris, services);
+		client.uploadApplication(appName, file.getCanonicalPath());
+		client.startApplication(appName);
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+		assertEquals(uris,app.getUris());
+	}
+
+	@Test
+	public void uploadStandaloneApplicationWithURLs() throws IOException {
+		String appName = namespacedAppName("standalone-node");
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(appName));
+		List<String> services = new ArrayList<String>();
+		Staging staging = new Staging("standalone");
+		staging.setRuntime("node");
+		staging.setCommand("node app.js");
+		File file = SampleProjects.standaloneNode();
+		client.createApplication(appName, staging, 64, uris, services);
+		client.uploadApplication(appName, file.getCanonicalPath());
+		client.startApplication(appName);
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)),app.getUris());
 	}
 
 	@Test

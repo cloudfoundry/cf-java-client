@@ -37,8 +37,11 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
@@ -65,6 +68,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author Ramnivas Laddad
  * @author A.B.Srinivasan
+ * @author Jennifer Hickey
  */
 
 public class CloudFoundryClient {
@@ -261,12 +265,22 @@ public class CloudFoundryClient {
 		return 512;
 	}
 
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+			List<String> serviceNames) {
+		createApplication(appName, staging, memory, uris, serviceNames, false);
+	}
+
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
 			List<String> serviceNames) {
 		createApplication(appName, framework, memory, uris, serviceNames, false);
 	}
 
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
+			List<String> serviceNames, boolean checkExists) {
+		createApplication(appName, new Staging(framework), memory, uris, serviceNames, checkExists);
+	}
+
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 			List<String> serviceNames, boolean checkExists) {
 
 		if (checkExists) {
@@ -283,7 +297,9 @@ public class CloudFoundryClient {
 		if (serviceNames == null) {
 			serviceNames = new ArrayList<String>();
 		}
-		CloudApplication payload = new CloudApplication(appName, null, framework, memory, 1, uris, serviceNames, AppState.STOPPED);
+		CloudApplication payload = new CloudApplication(appName, staging.getRuntime(), staging.getFramework(),
+				memory, 1, uris, serviceNames, AppState.STOPPED);
+		payload.setCommand(staging.getCommand());
 		restTemplate.postForLocation(getUrl("apps"), payload);
 		CloudApplication postedApp = getApplication(appName);
 		if (serviceNames != null && serviceNames.size() != 0) {
@@ -377,7 +393,7 @@ public class CloudFoundryClient {
         callback.onMatchedFileNames(knownRemoteResources.getFilenames());
         UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
         callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
-        restTemplate.put(getUrl("apps/{appName}/application"), generatePartialResourcePayload(payload, knownRemoteResources), appName);
+        restTemplate.put(getUrl("apps/{appName}/application"), generatePartialResourceRequest(payload, knownRemoteResources), appName);
     }
 
     private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
@@ -385,13 +401,19 @@ public class CloudFoundryClient {
         return restTemplate.postForObject(getUrl("resources"), archiveResources, CloudResources.class);
     }
 
-    private MultiValueMap<String, ?> generatePartialResourcePayload(UploadApplicationPayload application, CloudResources knownRemoteResources) throws JsonGenerationException, JsonMappingException, IOException {
-        MultiValueMap<String, Object> payload = new LinkedMultiValueMap<String, Object>(2);
-        payload.add("application", application);
+    private HttpEntity<MultiValueMap<String, ?>> generatePartialResourceRequest(UploadApplicationPayload application,
+		CloudResources knownRemoteResources) throws JsonGenerationException, JsonMappingException, IOException {
+		MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>(2);
+        if(application.getNumEntries() > 0) {
+			//If the entire app contents are cached, send nothing
+			body.add("application", application);
+        }
         ObjectMapper mapper = new ObjectMapper();
         String knownRemoteResourcesPayload = mapper.writeValueAsString(knownRemoteResources);
-        payload.add("resources", knownRemoteResourcesPayload);
-        return payload;
+        body.add("resources", knownRemoteResourcesPayload);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
     }
 
 	public void startApplication(String appName) {
