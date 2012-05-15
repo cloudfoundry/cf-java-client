@@ -76,6 +76,14 @@ public class UploadApplicationPayload {
     }
 
     /**
+     *
+     * @return The total number of entries to upload
+     */
+    public int getNumEntries() {
+		return entriesToUpload.size();
+    }
+
+    /**
      * Returns the payload data as an input stream.
      * @return the payload data
      */

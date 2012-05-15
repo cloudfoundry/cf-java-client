@@ -36,6 +36,7 @@ import org.springframework.util.FileCopyUtils;
  * @author Ramnivas Laddad
  * @author A.B.Srinivasan
  * @author Phillip Webb
+ * @author Jennifer Hickey
  */
 public class SampleProjects {
 
@@ -49,6 +50,28 @@ public class SampleProjects {
      */
     public static File springTravel() throws IOException {
         File file = new File(TEST_APP_DIR + "/travelapp/swf-booking-mvc.war");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
+     *
+     * @return The directory containing a simple standalone Ruby script
+     * @throws IOException
+     */
+    public static File standaloneRuby() throws IOException {
+		File file = new File(TEST_APP_DIR + "/standalone-ruby-app");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
+     *
+     * @return The directory containign a simple standalone Node app
+     * @throws IOException
+     */
+    public static File standaloneNode() throws IOException {
+		File file = new File(TEST_APP_DIR + "/standalone-node-app");
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }
