@@ -85,6 +85,17 @@
 		</dependency>
 	</dependencies>
 
+	<repositories>
+		<repository>
+			<id>org.springframework.milestone</id>
+			<name>Spring Framework Milestone Repository</name>
+			<url>http://maven.springframework.org/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<build>
 		<extensions>
 			<extension>
