@@ -672,24 +672,20 @@ public class CloudFoundryClient {
     private static class ErrorHandler extends DefaultResponseErrorHandler {
         @Override
         public void handleError(ClientHttpResponse response) throws IOException {
-            HttpStatus statusCode = response.getStatusCode();
-            switch (statusCode.series()) {
-                case CLIENT_ERROR:
-                    CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
-                    ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-                    try {
-                        @SuppressWarnings("unchecked")
-                        Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-                        exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
-                    } catch (JsonParseException e) {
-                        // ignore
-                    }
-                    throw exception;
-                case SERVER_ERROR:
-                    throw new HttpServerErrorException(statusCode, response.getStatusText());
-                default:
-                    throw new RestClientException("Unknown status code [" + statusCode + "]");
-            }
+    		CloudFoundryException exception = new CloudFoundryException(response.getStatusCode(), response.getStatusText());
+        	try {
+        		ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+        		try {
+        			@SuppressWarnings("unchecked")
+        			Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
+        			exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
+                } catch (JsonParseException e) {
+                    // ignore
+                }
+        	} catch (Exception e) {
+        		throw new HttpServerErrorException(response.getStatusCode(), response.getStatusText());
+        	}
+            throw exception;
         }
     }
 
