@@ -33,42 +33,42 @@ import org.cloudfoundry.maven.common.SystemProperties;
  */
 public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
 
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+	/**
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    /**
-     * @throws Exception
-     */
-    public void testDefaultParametersOfPushMojoGoal() throws Exception {
+	/**
+	 * @throws Exception
+	 */
+	public void testDefaultParametersOfPushMojoGoal() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-        setVariableValueToObject( mojo, "warfile", testPom);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		setVariableValueToObject( mojo, "warfile", testPom);
 
-        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
-        assertEquals("cf-maven-tests", mojo.getAppname());
-        assertEquals(Integer.valueOf(512), mojo.getMemory());
-        assertNull("Password by default is null.", mojo.getPassword());
-        assertEquals("cloud-foundry-credentials", mojo.getServer());
-        assertTrue(mojo.getServices().isEmpty());
-        assertNull("Target Url is not backed by a default value.", mojo.getTarget());
-        assertEquals("cf-maven-tests.<undefined target>", mojo.getUrl());
-        assertNull("Username by default is null.", mojo.getUsername());
-        assertEquals(testPom.getName(), mojo.getWarfile().getName());
+		assertEquals("cf-maven-tests", mojo.getAppname());
+		assertEquals(Integer.valueOf(512), mojo.getMemory());
+		assertNull("Password by default is null.", mojo.getPassword());
+		assertEquals("cloud-foundry-credentials", mojo.getServer());
+		assertTrue(mojo.getServices().isEmpty());
+		assertNull("Target Url is not backed by a default value.", mojo.getTarget());
+		assertEquals("cf-maven-tests.<undefined target>", mojo.getUrl());
+		assertNull("Username by default is null.", mojo.getUsername());
+		assertEquals(testPom.getName(), mojo.getWarfile().getName());
 
-    }
+	}
 
 }

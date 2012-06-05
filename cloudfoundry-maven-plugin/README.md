@@ -1,10 +1,11 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M1, September 22, 2011 Draft
+Version 1.0.0.M2, June 5, 2012 Draft
 
 * Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
 * Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
 * Build Server:    [https://build.springsource.org/browse/VCAPJAVA](https://build.springsource.org/browse/VCAPJAVA)
 * Sonar:           [https://sonar.springsource.org/dashboard/index/org.cloudfoundry:cf-maven-plugin](https://sonar.springsource.org/dashboard/index/org.cloudfoundry:cf-maven-plugin)
+* Issue Tracker:   [https://cloudfoundry.atlassian.net/](https://cloudfoundry.atlassian.net/) - Component: *Frameworks and Runtime*
 
 ## Introduction
 
@@ -45,7 +46,7 @@ Plugin configuration in **pom.xml**:
     <plugin>
       <groupId>org.cloudfoundry</groupId>
       <artifactId>cf-maven-plugin</artifactId>
-      <version>1.0.0.M1-SNAPSHOT</version>
+      <version>1.0.0.BUILD-SNAPSHOT</version>
       <configuration>
           <server>mycloudfoundry-instance</server>
           <target>http://api.cloudfoundry.com</target>
@@ -70,7 +71,7 @@ Configuration of *mycloudfoundry-instance* in **settings.xml**:
       ...
     </settings>
 
-As mentioned previously, you can also provide the user credentials through following command line parameters instead:
+As mentioned previously, you can also provide the user credentials through the following command line parameters instead:
 
 * cf.username
 * cf.password
@@ -146,7 +147,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     <tr><th align="left">cf:update</th>     <td>Updates an application.</td></tr>
 </table>
 
-#### Usage Examples
+### Usage Examples
 
 **Add a User**
 
@@ -174,7 +175,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     | Parameter | Value (Configured or Default)                                                     |
     +-----------+-----------------------------------------------------------------------------------+
     | Appname   | hello-java                                                                        |
-    | Instances | N/A                                                                               |
+    | Instances | 1                                                                               |
     | Memory    | 512                                                                               |
     | No-start  | false                                                                             |
     | Password  | *****                                                                             |
@@ -231,10 +232,14 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     $ mvn cf:info
 
     --------------------------------------------------------
-    Target:      http://api.cloudfoundry.com (v0.999 build 2222)
-    Description: VMware's Cloud Application Platform
-    Name:        vcap
-    Support:     support@cloudfoundry.com
+    VMware's Cloud Application Platform (v0.999 build 2222)
+    For support visit http://support.cloudfoundry.com
+
+    Target:          http://api.cloudfoundry.com
+    Frameworks:      sinatra, spring, grails, standalone, node, java_web, rails3, rack, lift, play
+    Runtimes:        node, ruby19, java, ruby18, node06
+    System Services: mysql, postgresql, redis, mongodb, rabbitmq
+
     User:        yep-it-rocks@cloudfoundry.com
     Usage:
         Memory:       1536M of 2048M total
@@ -291,15 +296,152 @@ Additional certain configuration parameter will fall back to using default value
 ### Defaults
 
 + **appname**: If no app name is specified, the Maven artifact id is being used
++ **instances**: Defaults to *1*
 + **no-start**: Defaults to *false*
 + **memory**: Defaults to *512* (MB)
++ **path**: If not provided and if **framework** is not set to **standalone**, then this property defaults to: *${project.build.directory}/${project.build.finalName}.war*.
++ **runtime**: Defaults to *java*
 + **server**: Special parameter to tell **Maven** which server element in *settings.xml*
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
 + **url**: If no Url is specified, then the *appname* and the main domain from the *target* parameter are used to dynamically form the url
-+ **warfile**: If not provided it defaults to: *${project.build.directory}/${project.build.finalName}.war*
++ **warfile** (**deprecated** use **path** instead): Same functionality as **path**
 + **framework**: Defaults to *spring*
 
 > The parameters **username**, **password** and **target** don't have default values and you are required to provide them.
 
+# Samples
 
+## Prerequisite
 
+In order to deploy the following samples, please ensure that within your Cloud Foundry enivronment, you have setup a RabbitMQ service:
+
+	$ vmc create-service rabbitmq --name myRabbitService
+
+## Deploying a Stand-alone Spring Application
+
+The following sample is based on the blog posting:
+
+* [http://blog.cloudfoundry.com/2012/05/09/running-workers-on-cloud-foundry-with-spring/](http://blog.cloudfoundry.com/2012/05/09/running-workers-on-cloud-foundry-with-spring/)
+
+We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
+
+1. Checkout the sample using [GIT](http://git-scm.com/)
+
+		$ git clone git://github.com/ghillert/twitter-rabbit-socks-sample.git
+
+2. Go to the `twitter2rabbit` directory
+
+		$ cd twitter-rabbit-socks-sample/twitter2rabbit
+
+3. Add the [Maven Application Assembler Plugin](http://mojo.codehaus.org/appassembler/appassembler-maven-plugin) to the **pom.xml** file:
+
+		<build>
+			...
+		    <plugins>
+				...
+		        <plugin>
+		            <groupId>org.codehaus.mojo</groupId>
+		            <artifactId>appassembler-maven-plugin</artifactId>
+		            <version>1.2.2</version>
+		            <executions>
+		                <execution>
+		                    <phase>package</phase>
+		                    <goals>
+		                        <goal>assemble</goal>
+		                    </goals>
+		                    <configuration>
+		                        <assembledirectory>target</assembledirectory>
+		                        <programs>
+		                            <program>
+		                                <mainClass>org.springsource.samples.twitter.Demo</mainClass>
+		                            </program>
+		                        </programs>
+		                    </configuration>
+		                </execution>
+		            </executions>
+		        </plugin>
+				...
+		    </plugins>
+			...
+		</build>
+
+4. Add the Cloud Foundry Maven Plugin:
+
+		<build>
+			...
+		    <plugins>
+				...
+		        <plugin>
+					<groupId>org.cloudfoundry</groupId>
+					<artifactId>cf-maven-plugin</artifactId>
+					<version>1.0.0.M2</version>
+					<configuration>
+						<command>bin/demo</command>
+						<framework>standalone</framework>
+						<memory>256</memory>
+						<path>target/appassembler</path>
+						<services>myRabbitService</services>
+						<target>http://api.cloudfoundry.com</target>
+					</configuration>
+		        </plugin>
+				...
+		    </plugins>
+			...
+		</build>
+
+5. Deploy the application:
+
+		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
+
+## Deploying a Web Application
+
+1. Checkout the sample using [GIT](http://git-scm.com/), IF you have not checked it out per the previous example:
+
+		$ git clone git://github.com/ghillert/twitter-rabbit-socks-sample.git
+
+2. Go to the `twitter2rabbit` directory
+
+		$ cd twitter-rabbit-socks-sample/rabbit2spring
+
+3. Add the Cloud Foundry Maven Plugin:
+
+		<build>
+			...
+		    <plugins>
+				...
+		        <plugin>
+					<groupId>org.cloudfoundry</groupId>
+					<artifactId>cf-maven-plugin</artifactId>
+					<version>1.0.0.M2</version>
+					<configuration>
+						<target>http://api.cloudfoundry.com</target>
+						<url>spring-integration-twitter.cloudfoundry.com</url>
+						<memory>256</memory>
+						<services>myRabbitService</services>
+					</configuration>
+		        </plugin>
+				...
+		    </plugins>
+			...
+		</build>
+
+5. Deploy the application:
+
+		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
+
+# History
+
+## Changes from version **1.0.0.M1** to **1.0.0.M2**
+
+* Added **Framework** configuration parameter (-Dcf.framework) which allows to set the framework for the application. It defaults to *spring*.
+* Added ability to deploy not only war-files but also point to directories and deploy those
+* Add support for deployments of stand-alone applications by specifying **standalone** as the *framework*
+* Deprecated **warfile** as now you can deploy stand-alone applications as well. Behavior is equal to the **path** property.
+* Added **path** configuration property (-Dcf.path).
+* Added **Runtime** property (-Dcf.runtime). It defaults to 'java' but technically you could also use the Maven Plugin to deploy e.g. Node and Ruby applications.
+* Improved **cf:info** Maven goal. It will now show a list of available **frameworks** and **system services**, as well as a list of available **runtimes***
+* **instances** property now defaults to *1*.
+
+# Resources
+
+http://blog.springsource.com/2011/09/22/rapid-cloud-foundry-deployments-with-maven/

@@ -27,10 +27,10 @@ package org.cloudfoundry.maven;
  */
 public class DeleteUser extends AbstractCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() {
-        super.getLog().info(String.format("Deleting user...'%s'", this.getUsername()));
-        this.getClient().unregister();
-    }
+	@Override
+	protected void doExecute() {
+		super.getLog().info(String.format("Deleting user...'%s'", this.getUsername()));
+		this.getClient().unregister();
+	}
 
 }

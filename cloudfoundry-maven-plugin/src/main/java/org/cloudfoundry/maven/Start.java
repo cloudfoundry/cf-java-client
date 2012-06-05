@@ -26,12 +26,12 @@ package org.cloudfoundry.maven;
  */
 public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() {
+	@Override
+	protected void doExecute() {
 
-        super.getLog().info("Starting application..." + this.getAppname());
-        this.getClient().startApplication(this.getAppname());
+		super.getLog().info("Starting application..." + this.getAppname());
+		this.getClient().startApplication(this.getAppname());
 
-    }
+	}
 
 }

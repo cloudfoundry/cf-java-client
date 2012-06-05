@@ -42,308 +42,308 @@ import org.springframework.web.client.ResourceAccessException;
  */
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
-    /**
-     * @parameter expression="${project.artifactId}"
-     */
-    private String artifactId;
+	/**
+	 * @parameter expression="${project.artifactId}"
+	 */
+	private String artifactId;
 
-    protected CloudFoundryClient client;
+	protected CloudFoundryClient client;
 
-    /**
-     * @parameter expression="${cf.password}"
-     */
-    private String password;
+	/**
+	 * @parameter expression="${cf.password}"
+	 */
+	private String password;
 
-    /**
-     * @parameter expression="${cf.server}"
-     */
-    private String server;
+	/**
+	 * @parameter expression="${cf.server}"
+	 */
+	private String server;
 
-    /**
-     * @parameter expression="${session}"
-     */
-    private MavenSession session;
+	/**
+	 * @parameter expression="${session}"
+	 */
+	private MavenSession session;
 
-    /**
-     * @parameter expression="${cf.target}"
-     */
-    private String target;
+	/**
+	 * @parameter expression="${cf.target}"
+	 */
+	private String target;
 
-    /**
-     * @parameter expression="${cf.username}"
-     */
-    private String username;
+	/**
+	 * @parameter expression="${cf.username}"
+	 */
+	private String username;
 
-    /**
-     * The Maven Wagon manager to use when obtaining server authentication details.
-     *
-     * @component role="org.apache.maven.artifact.manager.WagonManager"
-     * @required
-     * @readonly
-     */
-    private WagonManager wagonManager;
+	/**
+	 * The Maven Wagon manager to use when obtaining server authentication details.
+	 *
+	 * @component role="org.apache.maven.artifact.manager.WagonManager"
+	 * @required
+	 * @readonly
+	 */
+	private WagonManager wagonManager;
 
-    /**
-     * Default Constructor.
-     */
-    public AbstractCloudFoundryMojo() {
-        super();
-    }
+	/**
+	 * Default Constructor.
+	 */
+	public AbstractCloudFoundryMojo() {
+		super();
+	}
 
-    /**
-     * All plugin goals connect (aka login) into the specified Cloud Foundry instance.
-     *
-     *
-     * @param username
-     * @param password
-     * @param target
-     * @return
-     * @throws MojoExecutionException
-     */
-    protected CloudFoundryClient connectToCloudFoundry(String username,
-                                                       String password,
-                                                       URI    target)
-                                                 throws MojoExecutionException {
+	/**
+	 * All plugin goals connect (aka login) into the specified Cloud Foundry instance.
+	 *
+	 *
+	 * @param username
+	 * @param password
+	 * @param target
+	 * @return
+	 * @throws MojoExecutionException
+	 */
+	protected CloudFoundryClient connectToCloudFoundry(String username,
+													   String password,
+													   URI    target)
+												 throws MojoExecutionException {
 
-        Assert.configurationNotNull(username, "username", SystemProperties.USERNAME);
-        Assert.configurationNotNull(password, "password", SystemProperties.PASSWORD);
-        Assert.configurationNotNull(target,   "target",   SystemProperties.TARGET);
+		Assert.configurationNotNull(username, "username", SystemProperties.USERNAME);
+		Assert.configurationNotNull(password, "password", SystemProperties.PASSWORD);
+		Assert.configurationNotNull(target,   "target",   SystemProperties.TARGET);
 
-        super.getLog().debug(String.format(
-                "Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
-                target, username));
+		super.getLog().debug(String.format(
+				"Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
+				target, username));
 
-        final CloudFoundryClient localClient;
+		final CloudFoundryClient localClient;
 
-        try {
-            localClient = new CloudFoundryClient(username, password, target.toString());
-        } catch (MalformedURLException e) {
-            throw new MojoExecutionException(
-                    String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
-        }
+		try {
+			localClient = new CloudFoundryClient(username, password, target.toString());
+		} catch (MalformedURLException e) {
+			throw new MojoExecutionException(
+					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
+		}
 
-        try {
-            localClient.login();
-        } catch (CloudFoundryException e) {
-            if (HttpStatus.FORBIDDEN.equals(e.getStatusCode())) {
-                throw new MojoExecutionException(
-                        String.format("Login failed to '%s' using username '%s'. Please verify your login credentials.", target, username), e);
-            } else if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-                throw new MojoExecutionException(
-                        String.format("The target host '%s' exists but it does not appear to be a valid Cloud Foundry target url.", target), e);
-            } else {
-                throw e;
-            }
+		try {
+			localClient.login();
+		} catch (CloudFoundryException e) {
+			if (HttpStatus.FORBIDDEN.equals(e.getStatusCode())) {
+				throw new MojoExecutionException(
+						String.format("Login failed to '%s' using username '%s'. Please verify your login credentials.", target, username), e);
+			} else if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+				throw new MojoExecutionException(
+						String.format("The target host '%s' exists but it does not appear to be a valid Cloud Foundry target url.", target), e);
+			} else {
+				throw e;
+			}
 
-        } catch (ResourceAccessException e) {
-            throw new MojoExecutionException(
-                    String.format("Cannot access host at '%s'.", target), e);
-        }
+		} catch (ResourceAccessException e) {
+			throw new MojoExecutionException(
+					String.format("Cannot access host at '%s'.", target), e);
+		}
 
-        return localClient;
-    }
+		return localClient;
+	}
 
-    /**
-     *  Goals will typically override this method.
-     */
-    protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
+	/**
+	 *  Goals will typically override this method.
+	 */
+	protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
-    /**
-     * Base execute method. Will perform the login and logout into Cloud Foundry.
-     * Delegates to doExecute() for the actual business logic.
-     */
-    public void execute() throws MojoExecutionException, MojoFailureException {
+	/**
+	 * Base execute method. Will perform the login and logout into Cloud Foundry.
+	 * Delegates to doExecute() for the actual business logic.
+	 */
+	public void execute() throws MojoExecutionException, MojoFailureException {
 
-        try {
+		try {
 
-            client = this.connectToCloudFoundry(getUsername(), getPassword(), getTarget());
-            doExecute();
-            client.logout();
+			client = this.connectToCloudFoundry(getUsername(), getPassword(), getTarget());
+			doExecute();
+			client.logout();
 
-        } catch (RuntimeException e) {
-            throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
-        }
+		} catch (RuntimeException e) {
+			throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
+		}
 
-    }
+	}
 
-    //~~~~Getters~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//~~~~Getters~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    /**
-     * @return Returns the Maven artifactId. Will never return null.
-     */
-    public String getArtifactId() {
-        Assert.notNull(artifactId, "The artifactId is not set.");
-        return artifactId;
-    }
+	/**
+	 * @return Returns the Maven artifactId. Will never return null.
+	 */
+	public String getArtifactId() {
+		Assert.notNull(artifactId, "The artifactId is not set.");
+		return artifactId;
+	}
 
-    /**
-     *
-     * @return
-     */
-    public CloudFoundryClient getClient() {
-        return client;
-    }
+	/**
+	 *
+	 * @return
+	 */
+	public CloudFoundryClient getClient() {
+		return client;
+	}
 
-    /**
-     * See {@link http://maven.apache.org/plugin-developers/common-bugs.html#Using_System_Properties}
-     *
-     * @param property Supported system properties
-     * @return Null if the property is not found, otherwise returns the property
-     */
-    public String getCommandlineProperty(SystemProperties property) {
-        return session.getExecutionProperties().getProperty(property.getProperty());
-    }
+	/**
+	 * See {@link http://maven.apache.org/plugin-developers/common-bugs.html#Using_System_Properties}
+	 *
+	 * @param property Supported system properties
+	 * @return Null if the property is not found, otherwise returns the property
+	 */
+	public String getCommandlineProperty(SystemProperties property) {
+		return session.getExecutionProperties().getProperty(property.getProperty());
+	}
 
-    /**
-     *
-     * @return
-     */
-    public String getPassword() {
+	/**
+	 *
+	 * @return
+	 */
+	public String getPassword() {
 
-        final String passwordProperty = getCommandlineProperty(SystemProperties.PASSWORD);
+		final String passwordProperty = getCommandlineProperty(SystemProperties.PASSWORD);
 
-        if (passwordProperty != null) {
-            return passwordProperty;
-        }
+		if (passwordProperty != null) {
+			return passwordProperty;
+		}
 
-        if (this.password == null) {
+		if (this.password == null) {
 
-            super.getLog().debug("No password defined in pom.xml and " +
-                    "no system property defined either. Trying to look up " +
-                    "password in settings.xml under server element " + this.getServer());
+			super.getLog().debug("No password defined in pom.xml and " +
+					"no system property defined either. Trying to look up " +
+					"password in settings.xml under server element " + this.getServer());
 
-            AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
+			AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
 
-            if (authenticationInfo == null) {
-                super.getLog().warn(String.format(
-                        "In settings.xml server element '%s' was not defined.", this.getServer()));
-                return null;
-            }
+			if (authenticationInfo == null) {
+				super.getLog().warn(String.format(
+						"In settings.xml server element '%s' was not defined.", this.getServer()));
+				return null;
+			}
 
-            if (authenticationInfo.getPassword() != null) {
-                return authenticationInfo.getPassword();
-            } else {
-                super.getLog().warn(String.format(
-                        "In settings.xml no passwword was found for server element '%s'. Does the element exist?", this.getServer()));
-                return null;
-            }
+			if (authenticationInfo.getPassword() != null) {
+				return authenticationInfo.getPassword();
+			} else {
+				super.getLog().warn(String.format(
+						"In settings.xml no passwword was found for server element '%s'. Does the element exist?", this.getServer()));
+				return null;
+			}
 
-        } else {
-            return this.password;
-        }
+		} else {
+			return this.password;
+		}
 
-    }
+	}
 
-    /**
-     * Maven allows for externalizing the credential for server connections to
-     * be externalized into settings.xml.
-     *
-     * If a property was provided on the command line, use that property. Otherwise
-     * use the property that was injected via Maven. If that is Null as well, default
-     * to the value specified in {@link DefaultConstants}
-     *
-     * @return The name of the Maven Server property used to resolved Cloud Foundry credentials. Never returns null.
-     *
-     */
-    public String getServer() {
+	/**
+	 * Maven allows for externalizing the credential for server connections to
+	 * be externalized into settings.xml.
+	 *
+	 * If a property was provided on the command line, use that property. Otherwise
+	 * use the property that was injected via Maven. If that is Null as well, default
+	 * to the value specified in {@link DefaultConstants}
+	 *
+	 * @return The name of the Maven Server property used to resolved Cloud Foundry credentials. Never returns null.
+	 *
+	 */
+	public String getServer() {
 
-        final String serverProperty = getCommandlineProperty(SystemProperties.SETTINGS_SERVER);
+		final String serverProperty = getCommandlineProperty(SystemProperties.SETTINGS_SERVER);
 
-        if (serverProperty != null) {
-            return serverProperty;
-        }
+		if (serverProperty != null) {
+			return serverProperty;
+		}
 
-        if (this.server == null) {
-            return DefaultConstants.MAVEN_DEFAULT_SERVER;
-        }
+		if (this.server == null) {
+			return DefaultConstants.MAVEN_DEFAULT_SERVER;
+		}
 
-        return this.server;
-    }
+		return this.server;
+	}
 
-    //~~~~Setters~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    /**
-     * If the target property was provided via the command line, use that property.
-     * Otherwise use the property that was injected via Maven. If that is Null
-     * as well, Null is returned.
-     *
-     * @return Returns the Cloud Foundry Target Url - Can return Null.
-     *
-     */
-    public URI getTarget() {
-
-        final String targetProperty = getCommandlineProperty(SystemProperties.TARGET);
-
-        if (targetProperty != null) {
-            try {
-
-                URI uri = new URI(targetProperty);
-
-                if (uri.isAbsolute()) {
-                    return  uri;
-                } else {
-                    throw new URISyntaxException(targetProperty, "URI is not opaque.");
-                }
-
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException(String.format("The Url parameter '%s' " +
-                        "which was passed in as system property is not valid.", targetProperty));
-            }
-        }
-
-        if (this.target == null) {
-            return null;
-        }
-
-        try {
-            return new URI(this.target);
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException(String.format("The Url parameter '%s' " +
-                    "which was passed in as pom.xml configiuration parameter is not valid.", this.target));
-        }
-
-    }
+	//~~~~Setters~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-    /**
-     *
-     * @return
-     */
-    public String getUsername() {
+	/**
+	 * If the target property was provided via the command line, use that property.
+	 * Otherwise use the property that was injected via Maven. If that is Null
+	 * as well, Null is returned.
+	 *
+	 * @return Returns the Cloud Foundry Target Url - Can return Null.
+	 *
+	 */
+	public URI getTarget() {
 
-        final String usernameProperty = getCommandlineProperty(SystemProperties.USERNAME);
+		final String targetProperty = getCommandlineProperty(SystemProperties.TARGET);
 
-        if (usernameProperty != null) {
-            return usernameProperty;
-        }
+		if (targetProperty != null) {
+			try {
 
-        if (this.username == null) {
+				URI uri = new URI(targetProperty);
 
-            super.getLog().debug("No username defined in pom.xml and " +
-                    "no system property defined either. Trying to look up " +
-                    "username in settings.xml under server element " + this.getServer());
+				if (uri.isAbsolute()) {
+					return  uri;
+				} else {
+					throw new URISyntaxException(targetProperty, "URI is not opaque.");
+				}
 
-            AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
+			} catch (URISyntaxException e) {
+				throw new IllegalStateException(String.format("The Url parameter '%s' " +
+						"which was passed in as system property is not valid.", targetProperty));
+			}
+		}
 
-            if (authenticationInfo == null) {
-                super.getLog().warn(String.format(
-                        "In settings.xml server element '%s' was not defined.", this.getServer()));
-                return null;
-            }
+		if (this.target == null) {
+			return null;
+		}
 
-            if (authenticationInfo.getUserName() != null) {
-                return authenticationInfo.getUserName();
-            } else {
-                super.getLog().warn(String.format(
-                        "In settings.xml no username was found for server element '%s'. Does the element exist?", this.getServer()));
-                return null;
-            }
+		try {
+			return new URI(this.target);
+		} catch (URISyntaxException e) {
+			throw new IllegalStateException(String.format("The Url parameter '%s' " +
+					"which was passed in as pom.xml configiuration parameter is not valid.", this.target));
+		}
 
-        } else {
-            return username;
-        }
+	}
 
-    }
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getUsername() {
+
+		final String usernameProperty = getCommandlineProperty(SystemProperties.USERNAME);
+
+		if (usernameProperty != null) {
+			return usernameProperty;
+		}
+
+		if (this.username == null) {
+
+			super.getLog().debug("No username defined in pom.xml and " +
+					"no system property defined either. Trying to look up " +
+					"username in settings.xml under server element " + this.getServer());
+
+			AuthenticationInfo authenticationInfo = this.wagonManager.getAuthenticationInfo(this.getServer());
+
+			if (authenticationInfo == null) {
+				super.getLog().warn(String.format(
+						"In settings.xml server element '%s' was not defined.", this.getServer()));
+				return null;
+			}
+
+			if (authenticationInfo.getUserName() != null) {
+				return authenticationInfo.getUserName();
+			} else {
+				super.getLog().warn(String.format(
+						"In settings.xml no username was found for server element '%s'. Does the element exist?", this.getServer()));
+				return null;
+			}
+
+		} else {
+			return username;
+		}
+
+	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,32 +29,32 @@ import java.util.Map;
  */
 public class TableRow {
 
-    /** Holds the data for the column */
-    private Map<Integer, String> data = new HashMap<Integer, String>();
+	/** Holds the data for the column */
+	private Map<Integer, String> data = new HashMap<Integer, String>();
 
-    public void setData(Map<Integer, String> data) {
-        this.data = data;
-    }
+	public void setData(Map<Integer, String> data) {
+		this.data = data;
+	}
 
-    /**
-     * Return a value from this row.
-     *
-     * @param key Column for which to return the value for
-     * @return Value of the specified column within this row
-     *
-     */
-    public String getValue(Integer key) {
-        return data.get(key);
-    }
+	/**
+	 * Return a value from this row.
+	 *
+	 * @param key Column for which to return the value for
+	 * @return Value of the specified column within this row
+	 *
+	 */
+	public String getValue(Integer key) {
+		return data.get(key);
+	}
 
-    /**
-     * Add a value to the to the specified column within this row.
-     *
-     * @param column
-     * @param value
-     */
-    public void addValue(Integer column, String value) {
-        this.data.put(column, value);
-    }
+	/**
+	 * Add a value to the to the specified column within this row.
+	 *
+	 * @param column
+	 * @param value
+	 */
+	public void addValue(Integer column, String value) {
+		this.data.put(column, value);
+	}
 
 }

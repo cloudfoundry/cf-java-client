@@ -16,7 +16,6 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudApplication.AppState;
@@ -32,28 +31,24 @@ import org.cloudfoundry.client.lib.CloudApplication.AppState;
  */
 public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() {
+	@Override
+	protected void doExecute() {
 
-        final File warFile = getWarfile();
-        final String appName = getAppname();
+		final File path = getPath();
+		final String appName = getAppname();
 
-        validateWarFile(warFile);
+		validatePath(path);
 
-        CloudApplication aplication = this.getClient().getApplication(appName);
+		CloudApplication aplication = this.getClient().getApplication(appName);
 
-        getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, warFile.getAbsolutePath()));
+		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
-        try {
-            this.getClient().uploadApplication(appName, warFile);
-        } catch (IOException e) {
-            throw new IllegalStateException("Error while uploading application.", e);
-        }
+		this.uploadApplication(this.getClient(), path, appName);
 
-        if (AppState.STARTED.equals(aplication.getState())) {
-            this.getClient().restartApplication(appName);
-        }
+		if (AppState.STARTED.equals(aplication.getState())) {
+			this.getClient().restartApplication(appName);
+		}
 
-    }
+	}
 
 }

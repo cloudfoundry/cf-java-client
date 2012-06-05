@@ -34,44 +34,44 @@ import org.springframework.util.FileCopyUtils;
  */
 public class UiUtilsTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UiUtilsTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UiUtilsTest.class);
 
-    @Test
-    public void testRenderTextTable() {
+	@Test
+	public void testRenderTextTable() {
 
 
-        final List<String> services = new ArrayList<String>();
+		final List<String> services = new ArrayList<String>();
 
-        services.add("mysql");
-        services.add("MyMongoInstance");
+		services.add("mysql");
+		services.add("MyMongoInstance");
 
-        final List<String> uris = new ArrayList<String>();
+		final List<String> uris = new ArrayList<String>();
 
-        uris.add("cf-rocks.cloudfoundry.com");
-        uris.add("MyMongoInstance");
+		uris.add("cf-rocks.cloudfoundry.com");
+		uris.add("MyMongoInstance");
 
-        String expectedTableAsString = null;
+		String expectedTableAsString = null;
 
-        try {
-            expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+		try {
+			expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
 
-        Assert.assertNotNull(expectedTableAsString);
+		Assert.assertNotNull(expectedTableAsString);
 
-        final CloudApplication app1 = new CloudApplication("Name", "stagingStack",
-                         "StaginModel", 512, 1, uris, services, AppState.STARTED);
+		final CloudApplication app1 = new CloudApplication("Name", "stagingStack",
+						 "StaginModel", 512, 1, uris, services, AppState.STARTED);
 
-        final List<CloudApplication> applications = new ArrayList<CloudApplication>();
-        applications.add(app1);
+		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
+		applications.add(app1);
 
-        final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
+		final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
 
-        LOGGER.info("\n" + renderedTableAsString);
+		LOGGER.info("\n" + renderedTableAsString);
 
-        Assert.assertEquals(expectedTableAsString, renderedTableAsString);
-    }
+		Assert.assertEquals(expectedTableAsString, renderedTableAsString);
+	}
 
 }

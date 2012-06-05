@@ -33,43 +33,43 @@ import org.junit.Test;
  */
 public class CommonUtilsTest {
 
-    @Test
-    public void testValidEmailAddress() {
-        Assert.assertTrue(CommonUtils.isValidEmail("test@cloudfoundry.com"));
-    }
+	@Test
+	public void testValidEmailAddress() {
+		Assert.assertTrue(CommonUtils.isValidEmail("test@cloudfoundry.com"));
+	}
 
-    @Test
-    public void testInValidEmailAddress() {
-        Assert.assertFalse(CommonUtils.isValidEmail("test123"));
-    }
+	@Test
+	public void testInValidEmailAddress() {
+		Assert.assertFalse(CommonUtils.isValidEmail("test123"));
+	}
 
-    @Test
-    public void testFrameworksToCommaDelimitedString() {
+	@Test
+	public void testFrameworksToCommaDelimitedString() {
 
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put("name", "custom");
-        data.put("runtimes", new ArrayList<Runtime>());
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("name", "custom");
+		data.put("runtimes", new ArrayList<Runtime>());
 
-        List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-        frameworks.add(new CloudInfo.Framework(data));
+		List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
+		frameworks.add(new CloudInfo.Framework(data));
 
-        Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom");
+		Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom");
 
-        frameworks.add(new CloudInfo.Framework(data));
-        Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom, custom");
-    }
+		frameworks.add(new CloudInfo.Framework(data));
+		Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom, custom");
+	}
 
-    @Test
-    public void testSserviceConfigurationsToCommaDelimitedString() {
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put("vendor", "mysql");
+	@Test
+	public void testSserviceConfigurationsToCommaDelimitedString() {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("vendor", "mysql");
 
-        List<ServiceConfiguration> list = new ArrayList<ServiceConfiguration>();
-        list.add(new ServiceConfiguration(data));
+		List<ServiceConfiguration> list = new ArrayList<ServiceConfiguration>();
+		list.add(new ServiceConfiguration(data));
 
-        Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql");
+		Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql");
 
-        list.add(new ServiceConfiguration(data));
-        Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql, mysql");
-    }
+		list.add(new ServiceConfiguration(data));
+		Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql, mysql");
+	}
 }

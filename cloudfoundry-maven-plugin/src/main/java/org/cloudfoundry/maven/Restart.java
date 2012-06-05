@@ -26,12 +26,12 @@ package org.cloudfoundry.maven;
  */
 public class Restart extends AbstractApplicationAwareCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() {
+	@Override
+	protected void doExecute() {
 
-        super.getLog().info("Restarting application..." + this.getAppname());
-        this.getClient().restartApplication(this.getAppname());
+		super.getLog().info("Restarting application..." + this.getAppname());
+		this.getClient().restartApplication(this.getAppname());
 
-    }
+	}
 
 }
