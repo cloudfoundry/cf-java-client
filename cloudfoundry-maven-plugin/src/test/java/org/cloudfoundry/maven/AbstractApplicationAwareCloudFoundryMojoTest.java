@@ -59,6 +59,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
         assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
 
@@ -80,6 +81,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
         assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
 
@@ -122,6 +124,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
         assertEquals("myapp.<undefined target>", mojo.getUrl());
 
@@ -143,6 +146,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
         doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
         doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
         doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+        doReturn("standalone").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
         assertNull(mojo.getUrl());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,33 +25,36 @@ package org.cloudfoundry.maven.common;
  */
 public enum SystemProperties {
 
-    APP_NAME("cf.appname", "appname"),
-    FRAMEWORK("cf.framework", "framework"),
-    INSTANCES("cf.instances", "instances"),
-    MEMORY("cf.memory", "memory"),
-    NO_START("cf.no-start", "no-start"),
-    PASSWORD("cf.password", "password"),
-    SERVICES("cf.services", "services"),
-    SETTINGS_SERVER("server", "server"),
-    TARGET("cf.target", "target"),
-    URL("cf.url", "url"),
-    USERNAME("cf.username", "username"),
-    WARFILE("cf.warfile", "warfile");
+	APP_NAME("cf.appname", "appname"),
+	COMMAND("cf.command", "command"),
+	FRAMEWORK("cf.framework", "framework"),
+	INSTANCES("cf.instances", "instances"),
+	MEMORY("cf.memory", "memory"),
+	NO_START("cf.no-start", "no-start"),
+	PASSWORD("cf.password", "password"),
+	PATH("cf.path", "path"),
+	RUNTIME("cf.runtime", "runtime"),
+	SERVICES("cf.services", "services"),
+	SETTINGS_SERVER("server", "server"),
+	TARGET("cf.target", "target"),
+	URL("cf.url", "url"),
+	USERNAME("cf.username", "username"),
+	WARFILE("cf.warfile", "warfile"); //deprecated use PATH instead
 
-    private String property;
-    private String xmlElement;
+	private String property;
+	private String xmlElement;
 
-    private SystemProperties(String property, String xmlElement) {
-        this.property = property;
-        this.xmlElement = xmlElement;
-    }
+	private SystemProperties(String property, String xmlElement) {
+		this.property = property;
+		this.xmlElement = xmlElement;
+	}
 
-    public String getProperty() {
-        return property;
-    }
+	public String getProperty() {
+		return property;
+	}
 
-    public String getXmlElement() {
-        return xmlElement;
-    }
+	public String getXmlElement() {
+		return xmlElement;
+	}
 
 }
