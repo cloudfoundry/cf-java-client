@@ -130,6 +130,7 @@ public class Info extends AbstractCloudFoundryMojo {
 
         sb.append(String.format("Target:          %s  \n"   , target));
         sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudinfo.getFrameworks())));
+        sb.append(String.format("Runtimes:        %s\n"     , CommonUtils.runtimesToCommaDelimitedString(cloudinfo.getRuntimes())));
         sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
 
         if (cloudinfo.getUser() != null) {

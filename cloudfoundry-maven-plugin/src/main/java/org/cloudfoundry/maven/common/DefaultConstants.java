@@ -32,6 +32,7 @@ public final class DefaultConstants {
 
     public static final String  MAVEN_DEFAULT_SERVER = "cloud-foundry-credentials";
     public static final Integer MEMORY               = 512;
+    public static final String  RUNTIME              = "java";
     public static final Boolean NO_START             = Boolean.FALSE;
     public static final Integer DEFAULT_INSTANCE     = 1;
 

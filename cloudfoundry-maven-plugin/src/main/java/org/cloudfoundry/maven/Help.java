@@ -41,89 +41,91 @@ import org.cloudfoundry.maven.common.UiUtils;
  */
 public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 
-    public static final String HELP_TEXT = "/help.txt";
-    public static final String NOT_AVAILABLE = "N/A";
+	public static final String HELP_TEXT = "/help.txt";
+	public static final String NOT_AVAILABLE = "N/A";
 
-    /**
-     * 	@FIXME Not sure whether one should be able to overwrite execute()
-     *
-     *  The help goal does not require an interaction with Cloud Foundry. A
-     *  login is not necessary. Therefore, this method is overwritten.
-     *
-     */
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        doExecute();
-    }
+	/**
+	 * 	@FIXME Not sure whether one should be able to overwrite execute()
+	 *
+	 *  The help goal does not require an interaction with Cloud Foundry. A
+	 *  login is not necessary. Therefore, this method is overwritten.
+	 *
+	 */
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		doExecute();
+	}
 
-    /**
-     *
-     * @return
-     */
-    private Map<String, String> getParameterMap() {
-        final Map<String, String> parameterMap = new TreeMap<String, String>();
+	/**
+	 *
+	 * @return
+	 */
+	private Map<String, String> getParameterMap() {
+		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
-        parameterMap.put("Appname",  this.getAppname()  != null ? this.getAppname()                   : NOT_AVAILABLE);
-        parameterMap.put("Framework",this.getFramework()!= null ? this.getFramework()                 : NOT_AVAILABLE);
-        parameterMap.put("Instances",this.getInstances()!= null ? String.valueOf(this.getInstances()) : NOT_AVAILABLE);
-        parameterMap.put("Memory",   this.getMemory()   != null ? String.valueOf(this.getMemory())    : NOT_AVAILABLE);
-        parameterMap.put("Env",      this.getEnv()      != null ? String.valueOf(this.getEnv())       : NOT_AVAILABLE);
-        parameterMap.put("No-start", this.isNoStart()   != null ? String.valueOf(this.isNoStart())    : NOT_AVAILABLE);
-        parameterMap.put("Password", this.getPassword() != null ? CommonUtils.maskPassword(this.getPassword()) : NOT_AVAILABLE);
-        parameterMap.put("Server",   this.getServer());
-        parameterMap.put("Services", this.getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(this.getServices()));
-        parameterMap.put("Target",   this.getTarget()   != null ? this.getTarget().toString()         : NOT_AVAILABLE);
-        parameterMap.put("Url",      this.getUrl()      != null ? this.getUrl()                       : NOT_AVAILABLE);
-        parameterMap.put("Username", this.getUsername() != null ? this.getUsername()                  : NOT_AVAILABLE);
-        parameterMap.put("Warfile",  this.getWarfile().getAbsolutePath());
+		parameterMap.put("Appname",        this.getAppname()  != null ? this.getAppname()                   : NOT_AVAILABLE);
+		parameterMap.put("Command",        this.getCommand()  != null ? this.getCommand()                   : NOT_AVAILABLE);
+		parameterMap.put("Framework",      this.getFramework()!= null ? this.getFramework()                 : NOT_AVAILABLE);
+		parameterMap.put("Instances",      this.getInstances()!= null ? String.valueOf(this.getInstances()) : NOT_AVAILABLE);
+		parameterMap.put("Memory (in MB)", this.getMemory()   != null ? String.valueOf(this.getMemory())    : NOT_AVAILABLE);
+		parameterMap.put("Env",            this.getEnv()      != null ? String.valueOf(this.getEnv())       : NOT_AVAILABLE);
+		parameterMap.put("No-start",       this.isNoStart()   != null ? String.valueOf(this.isNoStart())    : NOT_AVAILABLE);
+		parameterMap.put("Password",       this.getPassword() != null ? CommonUtils.maskPassword(this.getPassword()) : NOT_AVAILABLE);
+		parameterMap.put("Runtime",        this.getRuntime()  != null ? this.getRuntime()                   : NOT_AVAILABLE);
+		parameterMap.put("Server",         this.getServer());
+		parameterMap.put("Services",       this.getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(this.getServices()));
+		parameterMap.put("Target",         this.getTarget()   != null ? this.getTarget().toString()         : NOT_AVAILABLE);
+		parameterMap.put("Url",            this.getUrl()      != null ? this.getUrl()                       : NOT_AVAILABLE);
+		parameterMap.put("Username",       this.getUsername() != null ? this.getUsername()                  : NOT_AVAILABLE);
+		parameterMap.put("Path",           this.getPath()     != null ? this.getPath().getAbsolutePath()    : NOT_AVAILABLE);
 
-        return parameterMap;
-    }
+		return parameterMap;
+	}
 
-    @Override
-    protected void doExecute() {
+	@Override
+	protected void doExecute() {
 
-        final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-        sb.append("\n" + UiUtils.HORIZONTAL_LINE);
-        sb.append("\nCloud Foundry Maven Plugin detected Parameters and/or default values:\n\n");
+		sb.append("\n" + UiUtils.HORIZONTAL_LINE);
+		sb.append("\nCloud Foundry Maven Plugin detected Parameters and/or default values:\n\n");
 
-        sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap()));
+		sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap()));
 
-        Reader reader = null;
-        BufferedReader in = null;
+		Reader reader = null;
+		BufferedReader in = null;
 
-        try {
-            final InputStream is = Help.class.getResourceAsStream(HELP_TEXT);
-            reader = new InputStreamReader(is);
-            in = new BufferedReader(reader);
+		try {
+			final InputStream is = Help.class.getResourceAsStream(HELP_TEXT);
+			reader = new InputStreamReader(is);
+			in = new BufferedReader(reader);
 
-            final StringBuilder helpTextStringBuilder = new StringBuilder();
+			final StringBuilder helpTextStringBuilder = new StringBuilder();
 
-            String line = "";
+			String line = "";
 
-            while (line != null) {
+			while (line != null) {
 
-                try {
-                    line = in.readLine();
-                } catch (IOException e) {
-                    throw new IllegalStateException("Problem reading internal '" + HELP_TEXT + "' file. This is a bug.", e);
-                }
+				try {
+					line = in.readLine();
+				} catch (IOException e) {
+					throw new IllegalStateException("Problem reading internal '" + HELP_TEXT + "' file. This is a bug.", e);
+				}
 
-                if (line != null) {
-                    helpTextStringBuilder.append(line + "\n");
-                }
-            }
+				if (line != null) {
+					helpTextStringBuilder.append(line + "\n");
+				}
+			}
 
-            sb.append(helpTextStringBuilder);
+			sb.append(helpTextStringBuilder);
 
-        } finally {
-            CommonUtils.closeReader(in);
-            CommonUtils.closeReader(reader);
-        }
+		} finally {
+			CommonUtils.closeReader(in);
+			CommonUtils.closeReader(reader);
+		}
 
-        super.getLog().info(sb);
+		super.getLog().info(sb);
 
-    }
+	}
 
 }

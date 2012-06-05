@@ -166,6 +166,32 @@ public final class CommonUtils {
     }
 
     /**
+     * Formats the supported runtimes as a command separated list.
+     *
+     * @param list List of supported runtimes
+     * @return a String but never null.
+     */
+    public static String runtimesToCommaDelimitedString(final Collection<CloudInfo.Runtime> list) {
+
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        final Iterator<CloudInfo.Runtime> it = list.iterator();
+
+        while (it.hasNext()) {
+
+            sb.append(it.next().getName());
+
+            if (it.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Formats the supported frameworks as a command separated list.
      *
      * @param list List of supported frameworks
