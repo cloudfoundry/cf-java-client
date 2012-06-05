@@ -33,230 +33,234 @@ import org.cloudfoundry.maven.common.SystemProperties;
  */
 public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTestCase {
 
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+	/**
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    /**
-     * @throws Exception
-     */
-    public void testGetUrl() throws Exception {
+	/**
+	 * @throws Exception
+	 */
+	public void testGetUrl() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-        doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
+		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
-        assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
+		assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
 
-    }
+	}
 
-    public void testGetUrl2() throws Exception {
+	public void testGetUrl2() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-        doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-        doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
+		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
-        assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
+		assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
 
-    }
+	}
 
-    public void testGetUrl3() throws Exception {
+	public void testGetUrl3() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn("custom.expliciturl.com").when(mojo).getCommandlineProperty(SystemProperties.URL);
-        doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-        doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn("custom.expliciturl.com").when(mojo).getCommandlineProperty(SystemProperties.URL);
+		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-        assertEquals("custom.expliciturl.com", mojo.getUrl());
+		assertEquals("custom.expliciturl.com", mojo.getUrl());
 
-    }
+	}
 
-    public void testGetUrlWithNullTarget() throws Exception {
+	public void testGetUrlWithNullTarget() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-        doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
-        assertEquals("myapp.<undefined target>", mojo.getUrl());
+		assertEquals("myapp.<undefined target>", mojo.getUrl());
 
-    }
+	}
 
-    public void testGetUrlWithBadTarget() throws Exception {
+	public void testGetUrlWithBadTarget() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-        doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-        doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
+		doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		doReturn("standalone").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
-        assertNull(mojo.getUrl());
+		assertNull(mojo.getUrl());
 
-    }
+	}
 
-    public void testGetServices() throws Exception {
+	public void testGetServices() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-        doReturn("serviceA, mongo, mysql, rabbitmq").when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
+		doReturn("serviceA, mongo, mysql, rabbitmq").when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
 
-        assertTrue("Expecting 4 Services", mojo.getServices().size() == 4);
+		assertTrue("Expecting 4 Services", mojo.getServices().size() == 4);
 
-    }
+	}
 
-    public void testGetServices2() throws Exception {
+	public void testGetServices2() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "services", "service1, super service2  " );
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "services", "service1, super service2  " );
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
 
-        assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2);
+		assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2);
 
-        assertEquals("service1", mojo.getServices().get(0));
-        assertEquals("super service2", mojo.getServices().get(1));
+		assertEquals("service1", mojo.getServices().get(0));
+		assertEquals("super service2", mojo.getServices().get(1));
 
-    }
+	}
 
-    public void testGetNoStart() throws Exception {
+	public void testGetNoStart() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "noStart", Boolean.TRUE );
-        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.NO_START);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "noStart", Boolean.TRUE );
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.NO_START);
 
-        assertEquals(Boolean.TRUE, mojo.isNoStart());
+		assertEquals(Boolean.TRUE, mojo.isNoStart());
 
-    }
+	}
 
-    public void testGetNoStartPrecedence() throws Exception {
+	public void testGetNoStartPrecedence() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "noStart", Boolean.FALSE );
-        doReturn("false").when(mojo).getCommandlineProperty(SystemProperties.NO_START);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "noStart", Boolean.FALSE );
+		doReturn("false").when(mojo).getCommandlineProperty(SystemProperties.NO_START);
 
-        assertEquals(Boolean.FALSE, mojo.isNoStart());
+		assertEquals(Boolean.FALSE, mojo.isNoStart());
 
-    }
+	}
 
-    public void testGetFramework() throws Exception {
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+	public void testGetFramework() throws Exception {
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "framework", "custom");
-        doReturn("custom").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "framework", "custom");
+		doReturn("custom").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
-        assertEquals("custom", mojo.getFramework());
+		assertEquals("custom", mojo.getFramework());
 
-    }
+	}
 
-    public void testGetEnv() throws Exception {
-                File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+	public void testGetEnv() throws Exception {
+				File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-        Push mojo = spy(unspiedMojo);
+		Push mojo = spy(unspiedMojo);
 
-        Map<String,String> env = new HashMap<String, String>();
-        env.put("JAVA_OPTS", "-XX:MaxPermSize=256m");
+		Map<String,String> env = new HashMap<String, String>();
+		env.put("JAVA_OPTS", "-XX:MaxPermSize=256m");
 
-        /**
-         * Injecting some test values as expressions are not evaluated.
-         */
-        setVariableValueToObject( mojo, "env", env);
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "env", env);
 
-        assertEquals("-XX:MaxPermSize=256m", mojo.getEnv().get("JAVA_OPTS"));
-    }
+		assertEquals("-XX:MaxPermSize=256m", mojo.getEnv().get("JAVA_OPTS"));
+	}
 
 }

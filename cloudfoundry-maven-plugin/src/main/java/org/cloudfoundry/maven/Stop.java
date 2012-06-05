@@ -30,19 +30,19 @@ import org.springframework.http.HttpStatus;
  */
 public class Stop extends AbstractApplicationAwareCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() throws MojoExecutionException {
+	@Override
+	protected void doExecute() throws MojoExecutionException {
 
-        super.getLog().info("Stopping application..." + this.getAppname());
+		super.getLog().info("Stopping application..." + this.getAppname());
 
-        try {
-            this.getClient().stopApplication(this.getAppname());
-        } catch (CloudFoundryException e) {
-            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-                throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
-                        this.getAppname()), e);
-            }
-        }
-    }
+		try {
+			this.getClient().stopApplication(this.getAppname());
+		} catch (CloudFoundryException e) {
+			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+				throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
+						this.getAppname()), e);
+			}
+		}
+	}
 
 }

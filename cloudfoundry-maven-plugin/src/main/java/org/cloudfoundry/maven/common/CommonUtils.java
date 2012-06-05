@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,161 +34,187 @@ import org.cloudfoundry.client.lib.ServiceConfiguration;
  */
 public final class CommonUtils {
 
-    /**
-     * Prevent instantiation.
-     */
-    private CommonUtils() {
-        throw new AssertionError();
-    }
+	/**
+	 * Prevent instantiation.
+	 */
+	private CommonUtils() {
+		throw new AssertionError();
+	}
 
-    /**
-     * Right-pad a String with a configurable padding character.
-     *
-     * @param string      The String to pad
-     * @param size        Pad String by the number of characters.
-     * @param paddingChar The character to pad the String with.
-     * @return The padded String. If the provided String is null, an empty String is returned.
-     */
-    public static String padRight(String string, int size, char paddingChar) {
+	/**
+	 * Right-pad a String with a configurable padding character.
+	 *
+	 * @param string      The String to pad
+	 * @param size        Pad String by the number of characters.
+	 * @param paddingChar The character to pad the String with.
+	 * @return The padded String. If the provided String is null, an empty String is returned.
+	 */
+	public static String padRight(String string, int size, char paddingChar) {
 
-        if (string == null) {
-            return "";
-        }
+		if (string == null) {
+			return "";
+		}
 
-        StringBuilder padded = new StringBuilder(string);
-        while (padded.length() < size) {
-            padded.append(paddingChar);
-        }
-        return padded.toString();
-    }
+		StringBuilder padded = new StringBuilder(string);
+		while (padded.length() < size) {
+			padded.append(paddingChar);
+		}
+		return padded.toString();
+	}
 
-    /**
-     * Right-pad the provided String with empty spaces.
-     *
-     * @param string The String to pad
-     * @param size   Pad String by the number of characters.
-     * @return The padded String. If the provided String is null, an empty String is returned.
-     */
-    public static String padRight(String string, int size) {
-        return padRight(string, size, ' ');
-    }
+	/**
+	 * Right-pad the provided String with empty spaces.
+	 *
+	 * @param string The String to pad
+	 * @param size   Pad String by the number of characters.
+	 * @return The padded String. If the provided String is null, an empty String is returned.
+	 */
+	public static String padRight(String string, int size) {
+		return padRight(string, size, ' ');
+	}
 
-    /**
-     * Convert a List of Strings to a comma delimited String.
-     *
-     * @param list
-     * @return Returns the List as a comma delimited String. Returns an empty
-     *         String for a Null or empty list.
-     */
-    public static String collectionToCommaDelimitedString(Collection<String> list) {
+	/**
+	 * Convert a List of Strings to a comma delimited String.
+	 *
+	 * @param list
+	 * @return Returns the List as a comma delimited String. Returns an empty
+	 *         String for a Null or empty list.
+	 */
+	public static String collectionToCommaDelimitedString(Collection<String> list) {
 
-        if (list == null || list.isEmpty()) {
-            return "";
-        }
+		if (list == null || list.isEmpty()) {
+			return "";
+		}
 
-        StringBuilder sb = new StringBuilder();
-        final Iterator<String> it = list.iterator();
+		StringBuilder sb = new StringBuilder();
+		final Iterator<String> it = list.iterator();
 
-        while (it.hasNext()) {
+		while (it.hasNext()) {
 
-            sb.append(it.next());
+			sb.append(it.next());
 
-            if (it.hasNext()) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
-    }
+			if (it.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
 
-    /**
-     * @param reader
-     */
-    public static void closeReader(Reader reader) {
-        if (reader != null) {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Encountered problem closing Reader.", e);
-            }
-        }
-    }
+	/**
+	 * @param reader
+	 */
+	public static void closeReader(Reader reader) {
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				throw new IllegalStateException("Encountered problem closing Reader.", e);
+			}
+		}
+	}
 
-    /**
-     * @param emailAddress
-     * @return
-     */
-    public static boolean isValidEmail(String emailAddress) {
-        final String regex = "^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        return emailAddress.matches(regex);
-    }
+	/**
+	 * @param emailAddress
+	 * @return
+	 */
+	public static boolean isValidEmail(String emailAddress) {
+		final String regex = "^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+		return emailAddress.matches(regex);
+	}
 
-    /**
-     * Simple method to replace characters in a String with Stars to mask the
-     * password.
-     *
-     * @param password The password to mask
-     */
-    public static String maskPassword(String password) {
-        int lengthOfPassword = password.length();
-        StringBuilder stringBuilder = new StringBuilder(lengthOfPassword);
+	/**
+	 * Simple method to replace characters in a String with Stars to mask the
+	 * password.
+	 *
+	 * @param password The password to mask
+	 */
+	public static String maskPassword(String password) {
+		int lengthOfPassword = password.length();
+		StringBuilder stringBuilder = new StringBuilder(lengthOfPassword);
 
-        for (int i = 0; i < lengthOfPassword; i++) {
-            stringBuilder.append('*');
-        }
+		for (int i = 0; i < lengthOfPassword; i++) {
+			stringBuilder.append('*');
+		}
 
-        return stringBuilder.toString();
-    }
+		return stringBuilder.toString();
+	}
 
-    /**
-     * Formats the supported frameworks as a command separated list.
-     *
-     * @param list List of supported frameworks
-     * @return a String but never null.
-     */
-    public static String frameworksToCommaDelimitedString(final Collection<CloudInfo.Framework> list) {
+	/**
+	 * Formats the supported frameworks as a command separated list.
+	 *
+	 * @param list List of supported frameworks
+	 * @return a String but never null.
+	 */
+	public static String frameworksToCommaDelimitedString(final Collection<CloudInfo.Framework> list) {
 
-        if (list == null || list.isEmpty()) {
-            return "";
-        }
+		if (list == null || list.isEmpty()) {
+			return "";
+		}
 
-        StringBuilder sb = new StringBuilder();
-        final Iterator<CloudInfo.Framework> it = list.iterator();
+		StringBuilder sb = new StringBuilder();
+		final Iterator<CloudInfo.Framework> it = list.iterator();
 
-        while (it.hasNext()) {
+		while (it.hasNext()) {
 
-            sb.append(it.next().getName());
+			sb.append(it.next().getName());
 
-            if (it.hasNext()) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
-    }
+			if (it.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
 
-    /**
-     * Formats the supported frameworks as a command separated list.
-     *
-     * @param list List of supported frameworks
-     * @return a String but never null.
-     */
-    public static String serviceConfigurationsToCommaDelimitedString(final Collection<ServiceConfiguration> list) {
+	/**
+	 * Formats the supported runtimes as a command separated list.
+	 *
+	 * @param list List of supported runtimes
+	 * @return a String but never null.
+	 */
+	public static String runtimesToCommaDelimitedString(final Collection<CloudInfo.Runtime> list) {
 
-        if (list == null || list.isEmpty()) {
-            return "";
-        }
+		if (list == null || list.isEmpty()) {
+			return "";
+		}
 
-        StringBuilder sb = new StringBuilder();
-        final Iterator<ServiceConfiguration> it = list.iterator();
+		StringBuilder sb = new StringBuilder();
+		final Iterator<CloudInfo.Runtime> it = list.iterator();
 
-        while (it.hasNext()) {
+		while (it.hasNext()) {
 
-            sb.append(it.next().getVendor());
+			sb.append(it.next().getName());
 
-            if (it.hasNext()) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
-    }
+			if (it.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Formats the supported frameworks as a command separated list.
+	 *
+	 * @param list List of supported frameworks
+	 * @return a String but never null.
+	 */
+	public static String serviceConfigurationsToCommaDelimitedString(final Collection<ServiceConfiguration> list) {
+
+		if (list == null || list.isEmpty()) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		final Iterator<ServiceConfiguration> it = list.iterator();
+
+		while (it.hasNext()) {
+
+			sb.append(it.next().getVendor());
+
+			if (it.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
+	}
 
 }

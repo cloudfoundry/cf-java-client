@@ -32,13 +32,13 @@ import org.cloudfoundry.maven.common.UiUtils;
  */
 public class Apps extends AbstractCloudFoundryMojo {
 
-    @Override
-    protected void doExecute() {
+	@Override
+	protected void doExecute() {
 
-        final List<CloudApplication> applications = this.getClient().getApplications();
+		final List<CloudApplication> applications = this.getClient().getApplications();
 
-        super.getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
+		super.getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
 
-    }
+	}
 
 }

@@ -21,9 +21,7 @@ import static org.mockito.Mockito.spy;
 
 import java.io.File;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
@@ -34,45 +32,28 @@ import org.cloudfoundry.maven.common.SystemProperties;
  */
 public class InstancesTest extends AbstractMojoTestCase {
 
-    /**
-     * @see junit.framework.TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+	/**
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-    /**
-     * @throws Exception
-     */
-    public void testParameterValidation() throws Exception {
+	/**
+	 * @throws Exception
+	 */
+	public void testDefaultParameter() throws Exception {
 
-        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-        Instances unspiedMojo = (Instances) lookupMojo ( "instances", testPom );
+		Instances unspiedMojo = (Instances) lookupMojo ( "instances", testPom );
 
-        Instances mojo = spy(unspiedMojo);
+		Instances mojo = spy(unspiedMojo);
 
-        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
-        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+		junit.framework.Assert.assertEquals("Instances should default to 1.", Integer.valueOf(1), mojo.getInstances());
 
-        String expectedErrorMessage = null;
-
-        try {
-            Assert.configurationNotNull(null, "instances", SystemProperties.INSTANCES);
-        } catch (MojoExecutionException e) {
-            expectedErrorMessage = e.getMessage();
-        }
-
-        try {
-            mojo.doExecute();
-        } catch (MojoExecutionException e) {
-            assertEquals(expectedErrorMessage, e.getMessage());
-            return;
-        }
-
-        fail();
-
-    }
+	}
 
 }

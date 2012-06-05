@@ -45,108 +45,109 @@ import org.springframework.web.client.ResourceAccessException;
  */
 public class Info extends AbstractCloudFoundryMojo {
 
-    /**
-     * 	@FIXME Not sure whether one should be able to overwrite execute()
-     *
-     */
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+	/**
+	 * 	@FIXME Not sure whether one should be able to overwrite execute()
+	 *
+	 */
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
 
-        if (this.getPassword() == null && this.getUsername() == null) {
+		if (this.getPassword() == null && this.getUsername() == null) {
 
 
-            final URI target = this.getTarget();
+			final URI target = this.getTarget();
 
-            Assert.configurationNotNull(target,   "target",   SystemProperties.TARGET);
+			Assert.configurationNotNull(target,   "target",   SystemProperties.TARGET);
 
-            try {
-                client = new CloudFoundryClient(target.toString());
-            } catch (MalformedURLException e) {
-                throw new MojoExecutionException(
-                        String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
-            }
+			try {
+				client = new CloudFoundryClient(target.toString());
+			} catch (MalformedURLException e) {
+				throw new MojoExecutionException(
+						String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
+			}
 
-            try {
+			try {
 
-                super.getLog().warn("You did not provide a username and password. "
-                                  + "Showing basic information only.");
+				super.getLog().warn("You did not provide a username and password. "
+								  + "Showing basic information only.");
 
-                doExecute();
-                client.logout();
+				doExecute();
+				client.logout();
 
-            } catch (RuntimeException e) {
-                throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
-            }
+			} catch (RuntimeException e) {
+				throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
+			}
 
-        } else {
-            super.execute();
-        }
+		} else {
+			super.execute();
+		}
 
-    }
+	}
 
-    @Override
-    protected void doExecute() throws MojoExecutionException {
+	@Override
+	protected void doExecute() throws MojoExecutionException {
 
-        final CloudInfo cloudinfo;
-        final List<ServiceConfiguration> serviceConfigurations;
-        final String localTarget =  getTarget().toString();
+		final CloudInfo cloudinfo;
+		final List<ServiceConfiguration> serviceConfigurations;
+		final String localTarget =  getTarget().toString();
 
-        try {
-            cloudinfo = client.getCloudInfo();
-            serviceConfigurations = client.getServiceConfigurations();
-        } catch (CloudFoundryException e) {
-            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-                throw new MojoExecutionException(
-                        String.format("The target host '%s' exists but it does not appear to be a valid Cloud Foundry target url.", localTarget), e);
-            } else {
-                throw e;
-            }
+		try {
+			cloudinfo = client.getCloudInfo();
+			serviceConfigurations = client.getServiceConfigurations();
+		} catch (CloudFoundryException e) {
+			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+				throw new MojoExecutionException(
+						String.format("The target host '%s' exists but it does not appear to be a valid Cloud Foundry target url.", localTarget), e);
+			} else {
+				throw e;
+			}
 
-        } catch (ResourceAccessException e) {
-            throw new MojoExecutionException(
-                    String.format("Cannot access host at '%s'.", localTarget), e);
-        }
+		} catch (ResourceAccessException e) {
+			throw new MojoExecutionException(
+					String.format("Cannot access host at '%s'.", localTarget), e);
+		}
 
-        super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, serviceConfigurations, localTarget));
-    }
+		super.getLog().info(getCloudInfoFormattedAsString(cloudinfo, serviceConfigurations, localTarget));
+	}
 
-    /**
-     * Renders the help text. If the callers is logged in successfully the full
-     * information is rendered if not only basic Cloud Foundry information is
-     * rendered and returned as String.
-     *
-     * @param cloudinfo Contains the information about the Cloud Foundry environment
-     * @param target The target Url from which the information was obtained
-     *
-     * @return Returns a formatted String for console output
-     */
-    private String getCloudInfoFormattedAsString(CloudInfo cloudinfo, List<ServiceConfiguration> serviceConfigurations, String target) {
+	/**
+	 * Renders the help text. If the callers is logged in successfully the full
+	 * information is rendered if not only basic Cloud Foundry information is
+	 * rendered and returned as String.
+	 *
+	 * @param cloudinfo Contains the information about the Cloud Foundry environment
+	 * @param target The target Url from which the information was obtained
+	 *
+	 * @return Returns a formatted String for console output
+	 */
+	private String getCloudInfoFormattedAsString(CloudInfo cloudinfo, List<ServiceConfiguration> serviceConfigurations, String target) {
 
-        StringBuilder sb = new StringBuilder("\n");
+		StringBuilder sb = new StringBuilder("\n");
 
-        sb.append(UiUtils.HORIZONTAL_LINE);
-        sb.append(String.format("%s (v%s build %s)\n", cloudinfo.getDescription(), cloudinfo.getVersion(), cloudinfo.getBuild()));
-        sb.append(String.format("For support visit %s\n\n", cloudinfo.getSupport()));
+		sb.append(UiUtils.HORIZONTAL_LINE);
+		sb.append(String.format("%s (v%s build %s)\n", cloudinfo.getDescription(), cloudinfo.getVersion(), cloudinfo.getBuild()));
+		sb.append(String.format("For support visit %s\n\n", cloudinfo.getSupport()));
 
-        sb.append(String.format("Target:          %s  \n"   , target));
-        sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudinfo.getFrameworks())));
-        sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
+		sb.append(String.format("Target:          %s  \n"   , target));
+		sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudinfo.getFrameworks())));
+		sb.append(String.format("Runtimes:        %s\n"     , CommonUtils.runtimesToCommaDelimitedString(cloudinfo.getRuntimes())));
+		sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
 
-        if (cloudinfo.getUser() != null) {
-            sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
+		if (cloudinfo.getUser() != null) {
+			sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
 
-            sb.append("Usage: "       + "\n");
-            sb.append(String.format("    Memory:       %sM of %sM total \n", cloudinfo.getUsage().getTotalMemory()
-                                                                           , cloudinfo.getLimits().getMaxTotalMemory()));
-            sb.append(String.format("    Services:     %s of %s total \n"  , cloudinfo.getUsage().getServices()
-                                                                           , cloudinfo.getLimits().getMaxServices()));
-            sb.append(String.format("    Apps:         %s of %s total \n"  , cloudinfo.getUsage().getApps()
-                                                                           , cloudinfo.getLimits().getMaxApps()));
-            sb.append(String.format("    Uris Per App: %s of %s total \n"  , cloudinfo.getUsage().getUrisPerApp()
-                                                                           , cloudinfo.getLimits().getMaxUrisPerApp()));
-        }
+			sb.append("Usage: "       + "\n");
+			sb.append(String.format("    Memory:       %sM of %sM total \n", cloudinfo.getUsage().getTotalMemory()
+																		   , cloudinfo.getLimits().getMaxTotalMemory()));
+			sb.append(String.format("    Services:     %s of %s total \n"  , cloudinfo.getUsage().getServices()
+																		   , cloudinfo.getLimits().getMaxServices()));
+			sb.append(String.format("    Apps:         %s of %s total \n"  , cloudinfo.getUsage().getApps()
+																		   , cloudinfo.getLimits().getMaxApps()));
+			sb.append(String.format("    Uris Per App: %s of %s total \n"  , cloudinfo.getUsage().getUrisPerApp()
+																		   , cloudinfo.getLimits().getMaxUrisPerApp()));
+		}
 
-        sb.append(UiUtils.HORIZONTAL_LINE);
-        return sb.toString();
-    }
+		sb.append(UiUtils.HORIZONTAL_LINE);
+		return sb.toString();
+	}
 }
