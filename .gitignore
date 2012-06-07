@@ -7,5 +7,6 @@ build/
 .classpath
 .project
 .settings
+.gitreview
 /*.DS_Store
 /*.iml
