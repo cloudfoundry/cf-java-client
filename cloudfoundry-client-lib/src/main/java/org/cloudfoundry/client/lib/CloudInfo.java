@@ -23,6 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Ramnivas Laddad
+ * @author Dave Syer
+ *
+ */
 public class CloudInfo {
 	private Limits limits;
 	private Usage usage;
@@ -32,6 +37,7 @@ public class CloudInfo {
 	private String version;
 	private String user;
 	private String description;
+	private String authorizationEndpoint;
 	private boolean allowDebug;
 	private Collection<Framework> frameworks = new ArrayList<Framework>();
 	private Map<String, Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
@@ -44,6 +50,7 @@ public class CloudInfo {
 		version = CloudUtil.parse(String.class, infoMap.get("version"));
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
+		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
 
 		Object allowDebugValue = infoMap.get("allow_debug");
 		if (allowDebugValue != null) {
@@ -80,10 +87,11 @@ public class CloudInfo {
 		}
 	}
 
-	public CloudInfo(String name, String support, int build, String version,
+	public CloudInfo(String name, String support, String authorizationEndpoint, int build, String version,
 			String user, String description, Limits limits, Usage usage, boolean allowDebug) {
 		this.name = name;
 		this.support = support;
+		this.authorizationEndpoint = authorizationEndpoint;
 		this.build = build;
 		this.version = version;
 		this.user = user;
@@ -107,6 +115,10 @@ public class CloudInfo {
 
 	public String getSupport() {
 		return support;
+	}
+
+	public String getAuthorizationEndpoint() {
+		return authorizationEndpoint;
 	}
 
 	public Integer getBuild() {
