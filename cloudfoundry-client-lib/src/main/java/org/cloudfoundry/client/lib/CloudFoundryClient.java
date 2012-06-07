@@ -69,6 +69,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ramnivas Laddad
  * @author A.B.Srinivasan
  * @author Jennifer Hickey
+ * @author Dave Syer
  */
 
 public class CloudFoundryClient {
@@ -651,7 +652,11 @@ public class CloudFoundryClient {
 	}
 
     private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
-        private ClientHttpRequestFactory delegate;
+        /**
+		 * 
+		 */
+		private static final String LEGACY_TOKEN_PREFIX = "0408";
+		private ClientHttpRequestFactory delegate;
 
         public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
             this.delegate = delegate;
@@ -660,7 +665,11 @@ public class CloudFoundryClient {
         public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
             ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
             if (token != null) {
-                request.getHeaders().add(AUTHORIZATION_HEADER_KEY, token);
+                String header = token;
+                if (!header.startsWith(LEGACY_TOKEN_PREFIX) && !header.toLowerCase().startsWith("bearer")) {
+                	header = "Bearer " + header; // UAA token without OAuth prefix
+                }
+				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header );
             }
             if (proxyUser !=  null) {
                 request.getHeaders().add(PROXY_USER_HEADER_KEY, proxyUser);
