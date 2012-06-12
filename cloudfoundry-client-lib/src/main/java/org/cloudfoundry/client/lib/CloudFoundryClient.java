@@ -137,8 +137,7 @@ public class CloudFoundryClient {
 
     private List<HttpMessageConverter<?>> getFormPartsMessageConverters() {
         List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
-        StringHttpMessageConverter stringConverter = new StringHttpMessageConverterWithoutMediaType();
-        stringConverter.setWriteAcceptCharset(false);
+        StringHttpMessageConverter stringConverter = new JsonStringHttpMessageConverter();
         partConverters.add(stringConverter);
         partConverters.add(new ResourceHttpMessageConverter());
         partConverters.add(new UploadApplicationPayloadHttpMessageConverter());

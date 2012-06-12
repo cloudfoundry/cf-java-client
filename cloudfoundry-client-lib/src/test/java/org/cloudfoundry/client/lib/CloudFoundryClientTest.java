@@ -771,6 +771,32 @@ public class CloudFoundryClientTest {
 		assertEquals(AppState.STARTED, env.getState());
 	}
 
+	@Test
+	public void uploadAppWithNonAsciiFileName() throws IOException {
+		String appName = namespacedAppName("non-ascii-file-name");
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(appName));
+
+		ClassPathResource cpr = new ClassPathResource("apps/non-ascii-file-name/non-ascii-file-name.war");
+		File war = cpr.getFile();
+		List<String> serviceNames = new ArrayList<String>();
+
+		client.createApplication(appName, CloudApplication.SPRING, client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+		client.uploadApplication(appName, war.getCanonicalPath());
+
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STOPPED, app.getState());
+
+		client.startApplication(appName);
+
+		app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+
+		client.deleteApplication(appName);
+	}
+
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {
 		for (CloudApplication application : applications) {
 			if (application.getName().equals(targetName)) {
