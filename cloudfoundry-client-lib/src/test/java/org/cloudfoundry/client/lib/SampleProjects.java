@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -50,6 +51,19 @@ public class SampleProjects {
      */
     public static File springTravel() throws IOException {
         File file = new File(TEST_APP_DIR + "/travelapp/swf-booking-mvc.war");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
+     * Returns a spring application using a file with a non-ascii name.
+     *
+     * @return the non-ascii-file-name WAR file
+     * @throws IOException
+     */
+    public static File nonAsciFileName() throws IOException {
+		ClassPathResource cpr = new ClassPathResource("non-ascii-file-name.war");
+		File file = cpr.getFile();
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }

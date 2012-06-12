@@ -640,9 +640,9 @@ public class CloudFoundryClientTest {
 
 		assumeTrue(token.toLowerCase().startsWith("bearer"));
 		String rawToken = token.substring("bearer ".length());
-		client = new CloudFoundryClient(rawToken, client.getCloudControllerUrl().toString());
+		CloudFoundryClient bearerTokenClient = new CloudFoundryClient(rawToken, client.getCloudControllerUrl().toString());
 
-		CloudInfo info = client.getCloudInfo();
+		CloudInfo info = bearerTokenClient.getCloudInfo();
 
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
@@ -809,6 +809,32 @@ public class CloudFoundryClientTest {
 		client.startApplication(appName);
 		env = client.getApplication(appName);
 		assertEquals(AppState.STARTED, env.getState());
+	}
+
+	@Test
+	public void uploadAppWithNonAsciiFileName() throws IOException {
+		String appName = namespacedAppName("non-ascii-file-name");
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(appName));
+
+		File war = SampleProjects.nonAsciFileName();
+		List<String> serviceNames = new ArrayList<String>();
+
+		client.createApplication(appName, CloudApplication.SPRING,
+				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+		client.uploadApplication(appName, war.getCanonicalPath());
+
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STOPPED, app.getState());
+
+		client.startApplication(appName);
+
+		app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+
+		client.deleteApplication(appName);
 	}
 
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {
