@@ -15,6 +15,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+				<module>vcap-java-client-test-apps</module>
 				<module>cloudfoundry-client-lib</module>
 				<module>cloudfoundry-maven-plugin</module>
 				<module>cloudfoundry-caldecott-lib</module>
@@ -23,6 +24,7 @@
 		<profile>
 			<id>integration-test</id>
 			<modules>
+				<module>vcap-java-client-test-apps</module>
 				<module>cloudfoundry-client-lib</module>
 				<module>cloudfoundry-maven-plugin</module>
 				<module>cloudfoundry-caldecott-lib</module>

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,6 +77,11 @@ public class CloudFoundryClient {
 
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
+
+	private static final MediaType JSON_MEDIA_TYPE = new MediaType(
+			MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(),
+			Charset.forName("UTF-8"));
 
 	private RestTemplate restTemplate = new RestTemplate();
 	private URL cloudControllerUrl;
@@ -138,7 +144,8 @@ public class CloudFoundryClient {
 
     private List<HttpMessageConverter<?>> getFormPartsMessageConverters() {
         List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
-        StringHttpMessageConverter stringConverter = new StringHttpMessageConverterWithoutMediaType();
+        StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+        stringConverter.setSupportedMediaTypes(Collections.singletonList(JSON_MEDIA_TYPE));
         stringConverter.setWriteAcceptCharset(false);
         partConverters.add(stringConverter);
         partConverters.add(new ResourceHttpMessageConverter());
