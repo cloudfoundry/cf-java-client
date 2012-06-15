@@ -1,0 +1,8 @@
+Code-Review+2: Ramnivas Laddad <ramnivas@ramnivas.com>
+Code-Review+1: <phil.webb@orbweaver.co.uk>
+Verified+1: CI Master <cf-ci@rbcon.com>
+Submitted-by: Thomas Risberg <trisberg@vmware.com>
+Submitted-at: Fri, 15 Jun 2012 18:02:01 +0000
+Reviewed-on: http://reviews.cloudfoundry.org/6341
+Project: vcap-java-client
+Branch: refs/heads/master
