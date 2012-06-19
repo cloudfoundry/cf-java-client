@@ -19,7 +19,7 @@
 
 	<properties>
 		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
-		<cf.client.lib.version>0.7.3</cf.client.lib.version>
+		<cf.client.lib.version>0.7.4</cf.client.lib.version>
 		<junit.version>4.8.2</junit.version>
 		<mockito.version>1.8.5</mockito.version>
 	</properties>
