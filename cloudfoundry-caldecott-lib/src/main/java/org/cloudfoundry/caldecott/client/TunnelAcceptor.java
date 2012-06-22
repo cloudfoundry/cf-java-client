@@ -49,7 +49,7 @@ public class TunnelAcceptor implements Runnable {
 
 	private volatile boolean keepGoing = true;
 
-	private volatile HashSet<Observable> handlers = new HashSet<Observable>();
+	private volatile HashSet<TunnelHandler> handlers = new HashSet<TunnelHandler>();
 
 	public TunnelAcceptor(ServerSocket serverSocket, TunnelFactory tunnelFactory, TaskExecutor taskExecutor) {
 		this.serverSocket = serverSocket;
@@ -100,14 +100,20 @@ public class TunnelAcceptor implements Runnable {
 			}
 			catch (SocketTimeoutException ste) {}
 			catch (IOException e) {
-				throw new TunnelException("Error while accepting connections", e);
+				if (!e.getMessage().startsWith("Socket closed")) {
+					throw new TunnelException("Error while accepting connections", e);
+				}
 			}
 		}
 		if (!handlers.isEmpty()) {
-			logger.debug("Waiting for clients to close");
 			while (!handlers.isEmpty()) {
+				logger.debug("Waiting for " + handlers.size() + " client connections to close");
+				for (TunnelHandler handler : handlers) {
+					logger.debug("Poking " + handler);
+					handler.poke();
+				}
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(10000);
 				} catch (InterruptedException ignore) {}
 			}
 		}

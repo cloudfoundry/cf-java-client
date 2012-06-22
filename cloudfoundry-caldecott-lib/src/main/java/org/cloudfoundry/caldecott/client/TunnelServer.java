@@ -89,8 +89,13 @@ public class TunnelServer {
 							Thread.sleep(1000);
 						} catch (InterruptedException ignore) {}
 					}
-					logger.info("Server on " + local + " is now stopped");
 				}
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					logger.warn("Error while closing server socket" + e.getMessage());
+				}
+				logger.info("Server on " + local + " is now stopped");
 			}
 			else {
 				throw new TunnelException("Server is not running.");

@@ -25,11 +25,13 @@ import java.io.IOException;
  */
 public interface Client {
 
-
 	byte[] read() throws IOException;
 
 	void write(byte[] data) throws IOException;
 
-	boolean isActive();
+	void forceClose();
 
+	boolean isOpen();
+
+	boolean isIdle();
 }
