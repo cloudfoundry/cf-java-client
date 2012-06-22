@@ -48,6 +48,9 @@ public class TunnelHandler extends Observable {
 	private Client client;
 	private Tunnel tunnel;
 
+	// variable to keep handler active
+	private volatile boolean shutdown = false;
+
 
 	public TunnelHandler(Socket socket, TunnelFactory tunnelFactory, TaskExecutor taskExecutor) {
 		this.socket = socket;
@@ -68,6 +71,12 @@ public class TunnelHandler extends Observable {
 		}
 	}
 
+	public void poke() {
+		if (client.isIdle()) {
+			shutdown = true;
+		}
+	}
+
 	public void stop() {
 		try {
 			InputStream is = socket.getInputStream();
@@ -81,11 +90,6 @@ public class TunnelHandler extends Observable {
 				os.close();
 			}
 		} catch (IOException ignore) {}
-		try {
-			socket.close();
-		} catch (IOException e) {
-			logger.warn("Error while closing client socket" + e.getMessage());
-		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("Closing tunnel: " + tunnel.toString());
 		}
@@ -105,16 +109,25 @@ public class TunnelHandler extends Observable {
 				logger.debug("Starting new writer thread: " + this);
 			}
 			try {
-				while (client.isActive()) {
+				while (client.isOpen()) {
 					byte[] in = client.read();
 					if (in.length > 0) {
 						tunnel.write(in);
+					}
+					if (shutdown && client.isIdle()) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Shutdown requested and idle connection thread will be closed: " + this);
+						}
+						client.forceClose();
+						stop();
 					}
 				}
 			} catch (IOException e) {
 				throw new TunnelException("Error while processing streams", e);
 			}
-			stop();
+			if (!shutdown) {
+				stop();
+			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("Completed writer thread for: " + this);
 			}
@@ -129,7 +142,7 @@ public class TunnelHandler extends Observable {
 			}
 			boolean retry = false;
 			try {
-				while (client.isActive()) {
+				while (client.isOpen()) {
 					try {
 						byte[] out = tunnel.read(retry);
 						retry = false;

@@ -134,10 +134,15 @@ public class JavaTunnel {
 			System.out.println("Connect client with username=" + svc_username +" password=" + svc_passwd + " " + txt_dbname + "=" + svc_dbname);
 		}
 		while (true) {
-			String command = console.readLine("Enter exit to stop: ");
-			if (command.toLowerCase().equals("exit")) {
-				break;
+			if (console != null) {
+				String command = console.readLine("Enter exit to stop: ");
+				if (command.toLowerCase().equals("exit")) {
+					break;
+				}
 			}
+			try {
+				Thread.sleep(1000L);
+			} catch (InterruptedException e) {}
 		}
 		server.stop();
 

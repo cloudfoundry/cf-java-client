@@ -76,10 +76,10 @@ public class SocketClientTest {
 		});
 		byte[] answer = client.read();
 		assertEquals(new String(data), new String(answer));
-		assertTrue(client.isActive());
+		assertTrue(client.isOpen());
 		when(inputStream.read(isA(byte[].class))).thenReturn(-1);
 		client.read();
-		assertFalse(client.isActive());
+		assertFalse(client.isOpen());
 	}
 
 	@Test
