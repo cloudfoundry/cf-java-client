@@ -18,10 +18,13 @@ package org.cloudfoundry.caldecott.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.caldecott.TunnelException;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 /**
@@ -31,33 +34,57 @@ import java.util.Arrays;
  */
 public class SocketClient implements Client {
 
+	private static final int SOCKET_TIMEOUT = 30000;
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	// configuration options for the socket
 	private final Socket socket;
 
 	// variables to keep track of communication state with the client
-	private boolean active = true;
+	// these are volatile since they will we checked by other threads
+	// and open could be altered by another thread via forceCLose()
+	private volatile boolean open = true;
+	private volatile boolean idle = false;
+
 
 	public SocketClient(Socket socket) {
 		this.socket = socket;
+		try {
+			this.socket.setSoTimeout(SOCKET_TIMEOUT);
+		} catch (SocketException e) {
+			throw new TunnelException("Unable to set timeout on socket " + e.getMessage());
+		}
 	}
 
 	public byte[] read() throws IOException {
+		if (!open) {
+			return null;
+		}
 		byte[] bytes = new byte[1024];
 		int len;
-		len = socket.getInputStream().read(bytes);
+		try {
+			len = socket.getInputStream().read(bytes);
+			idle = false;
+		}
+		catch (SocketTimeoutException e) {
+			len = 0;
+			if (logger.isTraceEnabled()) {
+				logger.trace("Timeout on read " + e);
+			}
+			idle = true;
+		}
 		if (len < 0) {
 			if (len < 0) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("[" + len + "] detected closed stream");
 				}
-				active = false;
+				open = false;
 			}
 			len = 0;
 		}
 		else {
-			if (logger.isTraceEnabled()) {
+			if (logger.isTraceEnabled() && len > 0) {
 				logger.trace("[" + len + " bytes] read from stream");
 			}
 		}
@@ -65,6 +92,10 @@ public class SocketClient implements Client {
 	}
 
 	public void write(byte[] data) throws IOException {
+		if (!open) {
+			return;
+		}
+		idle = false;
 		OutputStream s = socket.getOutputStream();
 		s.write(data);
 		s.flush();
@@ -73,8 +104,17 @@ public class SocketClient implements Client {
 		}
 	}
 
-	public boolean isActive() {
-		return active;
+	public boolean isOpen() {
+		return open;
+	}
+
+	public boolean isIdle() {
+		return idle;
+	}
+
+	public void forceClose() {
+		logger.debug("Force close requested for " + this);
+		open = false;
 	}
 
 }

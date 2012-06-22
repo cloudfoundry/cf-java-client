@@ -100,6 +100,7 @@ public class HttpTunnel implements Tunnel {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void close() {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Deleting tunnel " + this.tunnelInfo.get("path"));

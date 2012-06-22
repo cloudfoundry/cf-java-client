@@ -26,9 +26,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The class responsible for listening for client connection attempts and handing off to
@@ -47,9 +47,12 @@ public class TunnelAcceptor implements Runnable {
 	private final ServerSocket serverSocket;
 	private final TaskExecutor taskExecutor;
 
+	// variable to keep acceptor active
+	// this is volatile since it can we altered by another thread via stop()
 	private volatile boolean keepGoing = true;
 
-	private volatile HashSet<Observable> handlers = new HashSet<Observable>();
+	// concurrent map to keep track of handlers, will be modified from handler threads
+	private ConcurrentHashMap<TunnelHandler, Boolean> handlers = new ConcurrentHashMap<TunnelHandler, Boolean>();
 
 	public TunnelAcceptor(ServerSocket serverSocket, TunnelFactory tunnelFactory, TaskExecutor taskExecutor) {
 		this.serverSocket = serverSocket;
@@ -95,19 +98,28 @@ public class TunnelAcceptor implements Runnable {
 						handlers.remove(observable);
 					}
 				});
-				handlers.add(handler);
+				handlers.put(handler, true);
 				handler.start();
 			}
 			catch (SocketTimeoutException ste) {}
 			catch (IOException e) {
-				throw new TunnelException("Error while accepting connections", e);
+				if (!keepGoing && serverSocket.isClosed()) {
+					// time to quit so we can ignore this exception
+				}
+				else {
+					throw new TunnelException("Error while accepting connections", e);
+				}
 			}
 		}
 		if (!handlers.isEmpty()) {
-			logger.debug("Waiting for clients to close");
 			while (!handlers.isEmpty()) {
+				logger.debug("Waiting for " + handlers.size() + " client connections to close");
+				for (TunnelHandler handler : handlers.keySet()) {
+					logger.debug("Poking " + handler);
+					handler.poke();
+				}
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(10000);
 				} catch (InterruptedException ignore) {}
 			}
 		}
