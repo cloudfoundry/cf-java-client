@@ -26,9 +26,17 @@ import java.util.Map;
 /**
  * @author Ramnivas Laddad
  * @author Dave Syer
- *
+ * @author Thomas Risberg
  */
+@SuppressWarnings("unused")
 public class CloudInfo {
+
+	public enum CC_MAJOR_VERSION {
+		UNKNOWN,
+		V1,
+		V2
+	}
+
 	private Limits limits;
 	private Usage usage;
 	private String name;
@@ -48,6 +56,10 @@ public class CloudInfo {
 		support = CloudUtil.parse(String.class, infoMap.get("support"));
 		build = CloudUtil.parse(Integer.class, infoMap.get("build"));
 		version = CloudUtil.parse(String.class, infoMap.get("version"));
+		if (version == null) {
+			// could this be V2?
+			version = "" + CloudUtil.parse(Integer.class, infoMap.get("version"));
+		}
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
 		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
@@ -131,6 +143,25 @@ public class CloudInfo {
 
 	public String getUser() {
 		return user;
+	}
+
+	/**
+	 * Get Cloud Controller major version (V1, V2) for the current cloud.
+	 *
+	 * @return CloudInfo.CC_MAJOR_VERSION generation enum
+	 */
+	public CloudInfo.CC_MAJOR_VERSION getCloudControllerMajorVersion() {
+		int version = 0;
+		try {
+			version = Integer.valueOf(getVersion());
+		} catch (NumberFormatException ignore) {}
+		if (version == 0) {
+			return CC_MAJOR_VERSION.UNKNOWN;
+		}
+		if (version < 2) {
+			return CC_MAJOR_VERSION.V1;
+		}
+		return CC_MAJOR_VERSION.V2;
 	}
 
 	public String getVersion() {
