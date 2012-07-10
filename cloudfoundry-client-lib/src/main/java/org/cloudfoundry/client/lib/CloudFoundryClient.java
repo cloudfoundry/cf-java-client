@@ -400,7 +400,62 @@ public class CloudFoundryClient {
         callback.onMatchedFileNames(knownRemoteResources.getFilenames());
         UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
         callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
-        restTemplate.put(getUrl("apps/{appName}/application"), generatePartialResourceRequest(payload, knownRemoteResources), appName);
+        HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
+        String url = getUrl("apps/{appName}/application");
+        try {
+            restTemplate.put(url, entity, appName);
+        }
+        catch (HttpServerErrorException hsee) {
+            if (HttpStatus.INTERNAL_SERVER_ERROR.equals(hsee.getStatusCode())) {
+				// this is for supporting legacy Micro Cloud Foundry 1.1 and older
+                uploadAppUsingLegacyApi(url, entity, appName);
+            }
+            else {
+                throw hsee;
+            }
+        }
+    }
+
+	/**
+	 * Upload an app using the legacy API used for older vcap versions like Micro Cloud Foundry 1.1 and older
+	 * As of Micro Cloud Foundry 1.2 and for any recent CloudFoundry.com deployment the current method of setting
+	 * the content type as JSON works fine.
+	 *
+	 * @param path app path
+	 * @param entity HttpEntity for the payload
+	 * @param appName name of app
+	 * @throws HttpServerErrorException
+	 */
+	private void uploadAppUsingLegacyApi(String path, HttpEntity<?> entity, String appName) throws HttpServerErrorException {
+        RestTemplate legacyRestTemplate = new RestTemplate();
+        legacyRestTemplate.setRequestFactory(this.restTemplate.getRequestFactory());
+        legacyRestTemplate.setErrorHandler(new ErrorHandler());
+        legacyRestTemplate.setMessageConverters(getLegacyMessageConverters());
+        legacyRestTemplate.put(path, entity, appName);
+    }
+
+	/**
+	 * Get message converters to use for supporting legacy Micro Cloud Foundry 1.1 and older
+	 *
+	 * @return List of message converters
+	 */
+    private List<HttpMessageConverter<?>> getLegacyMessageConverters() {
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        messageConverters.add(new StringHttpMessageConverter());
+        messageConverters.add(new ResourceHttpMessageConverter());
+        messageConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+        FormHttpMessageConverter formPartsMessageConverter = new CloudFoundryFormHttpMessageConverter();
+        List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
+        StringHttpMessageConverter stringConverter = new StringHttpMessageConverterWithoutMediaType();
+        stringConverter.setWriteAcceptCharset(false);
+        partConverters.add(stringConverter);
+        partConverters.add(new ResourceHttpMessageConverter());
+        partConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+        formPartsMessageConverter.setPartConverters(partConverters);
+        messageConverters.add(formPartsMessageConverter);
+        messageConverters.add(new MappingJacksonHttpMessageConverter());
+        return messageConverters;
     }
 
     private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
