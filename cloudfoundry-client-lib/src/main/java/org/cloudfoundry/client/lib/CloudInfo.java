@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,9 +27,17 @@ import java.util.Map;
 /**
  * @author Ramnivas Laddad
  * @author Dave Syer
- *
+ * @author Thomas Risberg
  */
+@SuppressWarnings("unused")
 public class CloudInfo {
+
+	public enum CC_MAJOR_VERSION {
+		UNKNOWN,
+		V1,
+		V2
+	}
+
 	private Limits limits;
 	private Usage usage;
 	private String name;
@@ -48,6 +57,13 @@ public class CloudInfo {
 		support = CloudUtil.parse(String.class, infoMap.get("support"));
 		build = CloudUtil.parse(Integer.class, infoMap.get("build"));
 		version = CloudUtil.parse(String.class, infoMap.get("version"));
+		if (version == null) {
+			// could this be V2?
+			Number iVersion = CloudUtil.parse(Number.class, infoMap.get("version"));
+			if (iVersion != null) {
+				version = iVersion.toString();
+			}
+		}
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
 		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
@@ -131,6 +147,31 @@ public class CloudInfo {
 
 	public String getUser() {
 		return user;
+	}
+
+	/**
+	 * Get Cloud Controller major version (V1, V2) for the current cloud.
+	 *
+	 * @return CloudInfo.CC_MAJOR_VERSION generation enum
+	 */
+	public CloudInfo.CC_MAJOR_VERSION getCloudControllerMajorVersion() {
+		int majorVersion = 0;
+		try {
+			Number decVersion = new BigDecimal(getVersion());
+			if (decVersion.doubleValue() > 0 && decVersion.doubleValue() < 2) {
+				majorVersion = 1;
+			}
+			else {
+				majorVersion = decVersion.intValue();
+			}
+		} catch (NumberFormatException ignore) {}
+		if (majorVersion == 0) {
+			return CC_MAJOR_VERSION.UNKNOWN;
+		}
+		if (majorVersion < 2) {
+			return CC_MAJOR_VERSION.V1;
+		}
+		return CC_MAJOR_VERSION.V2;
 	}
 
 	public String getVersion() {
