@@ -34,9 +34,7 @@ import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -59,8 +57,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -71,9 +67,10 @@ import org.springframework.web.client.RestTemplate;
  * @author A.B.Srinivasan
  * @author Jennifer Hickey
  * @author Dave Syer
+ * @author Thomas Risberg
  */
-
-public class CloudFoundryClient {
+@SuppressWarnings("unused")
+public class CloudFoundryClient implements CloudFoundryOperations {
 
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
@@ -155,16 +152,13 @@ public class CloudFoundryClient {
 
     /**
      * Protected access to the rest templates for subclasses to use.
+	 *
      * @return the underling rest template
      */
     protected final RestTemplate getRestTemplate() {
         return restTemplate;
     }
 
-	/**
-	 * Run commands as a different user.  The authenticated user must be
-	 * privileged to run as this user.
-	 */
 	public void setProxyUser(String proxyUser) {
 		this.proxyUser = proxyUser;
 	}
@@ -202,11 +196,17 @@ public class CloudFoundryClient {
 		token = null;
 	}
 
+	public String login(String email, String password) {
+		this.email = email;
+		this.password = password;
+		this.info = null;
+		return login();
+	}
+
 	@SuppressWarnings("unchecked")
 	public String login() {
 		Map<String, String> payload = new HashMap<String, String>();
 		payload.put("password", password);
-
 		Map<String, String> response = restTemplate.postForObject(getUrl("users/{id}/tokens"), payload, Map.class, email);
 		token = response.get("token");
 
@@ -240,11 +240,6 @@ public class CloudFoundryClient {
 		return new ApplicationStats(statsAsMap);
 	}
 
-	/**
-	 * Get choices for application memory quota
-	 *
-	 * @return memory choices in MB
-	 */
 	public int[] getApplicationMemoryChoices() {
 		// TODO: Get it from cloudcontroller's 'info/resources' end point
 		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
@@ -262,33 +257,28 @@ public class CloudFoundryClient {
 		return result;
 	}
 
-	/**
-	 * Get default memory quota for the given framework
-	 * @param framework
-	 * @return default memory quota in MB
-	 */
 	public int getDefaultApplicationMemory(String framework) {
-		// Currently, we don't use framework as the only one supported is the Spring Framework
+		// TODO: Currently, we don't use framework as the only one supported is the Spring Framework
 		return 512;
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-			List<String> serviceNames) {
+								  List<String> serviceNames) {
 		createApplication(appName, staging, memory, uris, serviceNames, false);
 	}
 
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
-			List<String> serviceNames) {
+								  List<String> serviceNames) {
 		createApplication(appName, framework, memory, uris, serviceNames, false);
 	}
 
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
-			List<String> serviceNames, boolean checkExists) {
+								  List<String> serviceNames, boolean checkExists) {
 		createApplication(appName, new Staging(framework), memory, uris, serviceNames, checkExists);
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-			List<String> serviceNames, boolean checkExists) {
+								  List<String> serviceNames, boolean checkExists) {
 
 		if (checkExists) {
 			try {
@@ -320,33 +310,14 @@ public class CloudFoundryClient {
 	}
 
 
-    /**
-     * Upload an application to cloud foundry.
-     * @param appName the application name
-     * @param file the path to the application archive or folder
-     * @throws IOException
-     */
     public void uploadApplication(String appName, String file) throws IOException {
         uploadApplication(appName, new File(file));
     }
 
-    /**
-     * Upload an application to cloud foundry.
-     * @param appName the application name
-     * @param file the application archive or folder
-     * @throws IOException
-     */
     public void uploadApplication(String appName, File file) throws IOException {
         uploadApplication(appName, file, null);
     }
 
-    /**
-     * Upload an application to cloud foundry.
-     * @param appName the application name
-     * @param file the application archive
-     * @param callback a callback interface used to provide progress information or <tt>null</tt>
-     * @throws IOException
-     */
     public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
         Assert.notNull(file,"File must not be null");
         if(file.isDirectory()) {
@@ -372,23 +343,10 @@ public class CloudFoundryClient {
         }
     }
 
-    /**
-     * Upload an application to cloud foundry.
-     * @param appName the application name
-     * @param archive the application archive
-     * @throws IOException
-     */
     public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
         uploadApplication(appName, archive, null);
     }
 
-    /**
-     * Upload an application to cloud foundry.
-     * @param appName the application name
-     * @param archive the application archive
-     * @param callback a callback interface used to provide progress information or <tt>null</tt>
-     * @throws IOException
-     */
     public void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException {
         Assert.notNull(appName, "AppName must not be null");
         Assert.notNull(archive, "Archive must not be null");
@@ -409,7 +367,7 @@ public class CloudFoundryClient {
     }
 
     private HttpEntity<MultiValueMap<String, ?>> generatePartialResourceRequest(UploadApplicationPayload application,
-		CloudResources knownRemoteResources) throws JsonGenerationException, JsonMappingException, IOException {
+		CloudResources knownRemoteResources) throws IOException {
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>(2);
         if(application.getNumEntries() > 0) {
 			//If the entire app contents are cached, send nothing
@@ -522,11 +480,6 @@ public class CloudFoundryClient {
 		updateApplication(app);
 	}
 
-	public <T> T getFile(String appName, int instanceIndex, String filePath, RequestCallback requestCallback, ResponseExtractor<T> responseHandler) {
-		return restTemplate.execute(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"), HttpMethod.GET, requestCallback, responseHandler,
-				appName, instanceIndex, filePath);
-	}
-
 	public String getFile(String appName, int instanceIndex, String filePath) {
 		return restTemplate.getForObject(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"),
 				String.class,
@@ -590,11 +543,6 @@ public class CloudFoundryClient {
 		return configurations;
 	}
 
-	/**
-	 * Associate (provision) a service with an application.
-	 * @param appName the application name
-	 * @param serviceName the service name
-	 */
 	public void bindService(String appName, String serviceName) {
 		CloudApplication application = getApplication(appName);
 		if (application.getServices() == null) {
@@ -606,11 +554,6 @@ public class CloudFoundryClient {
 		updateApplication(application);
 	}
 
-	/**
-	 * Un-associate (unprovision) a service from an application.
-	 * @param appName the application name
-	 * @param serviceName the service name
-	 */
 	public void unbindService(String appName, String serviceName) {
 		CloudApplication application = getApplication(appName);
 		if (application.getServices() != null) {
@@ -635,11 +578,6 @@ public class CloudFoundryClient {
 		return new CrashesInfo(crashData);
 	}
 
-	/**
-	 * Rename an application.
-	 * @param appName the current name
-	 * @param newName the new name
-	 */
 	public void rename(String appName, String newName) {
 		CloudApplication app = getApplication(appName);
 		if (app == null) {
@@ -650,6 +588,11 @@ public class CloudFoundryClient {
 		restTemplate.put(getUrl("apps/{appName}"), app, appName);
 	}
 
+	/**
+	 * Update application.
+	 *
+	 * @param app the appplication info
+	 */
 	private void updateApplication(CloudApplication app) {
 		restTemplate.put(getUrl("apps/{appName}"), app, app.getName());
 	}
