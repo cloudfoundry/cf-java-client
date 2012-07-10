@@ -681,7 +681,7 @@ public class CloudFoundryClientTest {
 		Framework springFramework = frameworksByName.get("spring");
 		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
 		assertNotNull(springRuntimes);
-		assertEquals(1, springRuntimes.size());
+		assertTrue(springRuntimes.size() > 0);
 	}
 
 	@Test

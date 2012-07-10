@@ -26,9 +26,16 @@ import java.util.Map;
 /**
  * @author Ramnivas Laddad
  * @author Dave Syer
- *
+ * @author Thomas Risberg
  */
+@SuppressWarnings("unused")
 public class CloudInfo {
+
+	public enum CC_GENERATION {
+		V1,
+		V2
+	}
+
 	private Limits limits;
 	private Usage usage;
 	private String name;
@@ -48,6 +55,10 @@ public class CloudInfo {
 		support = CloudUtil.parse(String.class, infoMap.get("support"));
 		build = CloudUtil.parse(Integer.class, infoMap.get("build"));
 		version = CloudUtil.parse(String.class, infoMap.get("version"));
+		if (version == null) {
+			// could this be V2?
+			version = "" + CloudUtil.parse(Integer.class, infoMap.get("version"));
+		}
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
 		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
