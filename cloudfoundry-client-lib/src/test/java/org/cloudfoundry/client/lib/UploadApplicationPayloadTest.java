@@ -26,11 +26,14 @@ import java.util.zip.ZipFile;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudResource;
+import org.cloudfoundry.client.lib.domain.CloudResources;
+import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
 /**
- * Tests for {@link UploadApplicationPayload}.
+ * Tests for {@link org.cloudfoundry.client.lib.domain.UploadApplicationPayload}.
  *
  * @author Phillip Webb
  */

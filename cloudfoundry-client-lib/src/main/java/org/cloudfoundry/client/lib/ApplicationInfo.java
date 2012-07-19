@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+
 import java.io.File;
 
 public class ApplicationInfo {

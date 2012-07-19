@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.util;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -30,7 +31,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.FileCopyUtils;
 
 /**
- * Implementation of {@link HttpMessageConverter} that can write {@link UploadApplicationPayload}s. The {@code Content-Type}
+ * Implementation of {@link HttpMessageConverter} that can write {@link org.cloudfoundry.client.lib.domain.UploadApplicationPayload}s. The {@code Content-Type}
  * of written resources is {@code application/octet-stream}.
  *
  * @author Phillip Webb

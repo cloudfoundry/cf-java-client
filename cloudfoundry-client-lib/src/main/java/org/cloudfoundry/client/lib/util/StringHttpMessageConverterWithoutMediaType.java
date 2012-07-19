@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.util;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
