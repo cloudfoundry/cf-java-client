@@ -80,7 +80,7 @@ public abstract class DynamicInputStream extends InputStream {
     protected abstract boolean writeMoreData() throws IOException;
 
     /**
-     * Internal buffered {@link OutputStream}Êimplementation.
+     * Internal buffered {@link OutputStream} implementation.
      */
     private static class BufferedOutputStream extends ByteArrayOutputStream {
 
