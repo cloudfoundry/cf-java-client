@@ -16,13 +16,15 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ApplicationStats {
+public class ApplicationStats implements Serializable{
 
+	private static final long serialVersionUID = 8207319694608868685L;
 	private final List<InstanceStats> records;
 
 	public ApplicationStats(Map<String, Object> attributes) {

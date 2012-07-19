@@ -16,10 +16,12 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public class CrashInfo {
+public class CrashInfo  implements Serializable{
+	private static final long serialVersionUID = -4737016293030220722L;
 	private final Date since;
 	private final String instance;
 

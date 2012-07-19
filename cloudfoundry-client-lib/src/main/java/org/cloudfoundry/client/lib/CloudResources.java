@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,9 +46,11 @@ import org.springframework.util.Assert;
  */
 @JsonSerialize(using = CloudResources.Serializer.class)
 @JsonDeserialize(using = CloudResources.Deserializer.class)
-public class CloudResources {
+public class CloudResources  implements Serializable{
 
-    private static final String HEX_CHARS = "0123456789ABCDEF";
+	private static final long serialVersionUID = 3078125443425060694L;
+
+	private static final String HEX_CHARS = "0123456789ABCDEF";
 
     private List<CloudResource> resources;
 

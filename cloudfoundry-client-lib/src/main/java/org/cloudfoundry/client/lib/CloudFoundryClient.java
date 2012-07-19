@@ -69,7 +69,6 @@ import org.springframework.web.client.RestTemplate;
  * @author Dave Syer
  * @author Thomas Risberg
  */
-@SuppressWarnings("unused")
 public class CloudFoundryClient implements CloudFoundryOperations {
 
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";

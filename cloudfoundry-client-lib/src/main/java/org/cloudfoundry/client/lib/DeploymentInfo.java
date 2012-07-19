@@ -16,10 +16,12 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DeploymentInfo {
+public class DeploymentInfo  implements Serializable{
 
+	private static final long serialVersionUID = -4102632436340513798L;
 	private String name;
 	private List<String> uris;
 	private List<String> services;

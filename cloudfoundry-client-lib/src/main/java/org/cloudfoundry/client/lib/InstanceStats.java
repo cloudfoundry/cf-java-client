@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib;
 
 import static org.cloudfoundry.client.lib.CloudUtil.parse;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -25,10 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class InstanceStats {
+public class InstanceStats implements Serializable {
 
-	public static class Usage {
+	private static final long serialVersionUID = 3873102725722595590L;
 
+	public static class Usage implements Serializable {
+
+		private static final long serialVersionUID = 2825371507107274178L;
 		private double cpu;
 		private int disk;
 		private double mem;

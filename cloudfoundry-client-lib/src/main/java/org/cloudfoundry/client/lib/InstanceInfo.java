@@ -16,10 +16,12 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public class InstanceInfo {
+public class InstanceInfo implements Serializable{
+	private static final long serialVersionUID = -3516099743867354960L;
 	private final Date since;
 	private final int index;
 	private final String state; // TODO make enum, need to know the valid values

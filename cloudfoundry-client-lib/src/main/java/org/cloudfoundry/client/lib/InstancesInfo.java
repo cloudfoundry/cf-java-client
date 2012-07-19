@@ -16,13 +16,15 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class InstancesInfo {
+public class InstancesInfo implements Serializable{
 
+	private static final long serialVersionUID = -158657446009063135L;
 	private final List<InstanceInfo> instances;
 
 	public InstancesInfo(List<Map<String, Object>> attributes) {

@@ -1,5 +1,8 @@
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * The staging information related to an application. Used for creating the
  * application
@@ -7,7 +10,9 @@ package org.cloudfoundry.client.lib;
  * @author Jennifer Hickey
  *
  */
-public class Staging {
+public class Staging implements Serializable {
+
+	private static final long serialVersionUID = 5484882808921748989L;
 
 	private String runtime;
 

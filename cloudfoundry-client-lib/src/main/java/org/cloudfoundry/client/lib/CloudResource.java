@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
+
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -26,9 +28,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * @author Phillip Webb
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
-public class CloudResource {
+public class CloudResource  implements Serializable{
 
-    @JsonProperty("fn")
+	private static final long serialVersionUID = -8201018100931094764L;
+
+	@JsonProperty("fn")
     private String filename;
 
     private long size;

@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.lib;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class ApplicationInfo {
+public class ApplicationInfo implements Serializable {
+	private static final long serialVersionUID = 6017697152697323190L;
 	private String appName;
 	private File warFile;
 	private String framework;

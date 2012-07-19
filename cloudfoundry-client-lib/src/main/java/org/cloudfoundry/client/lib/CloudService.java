@@ -16,16 +16,20 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.cloudfoundry.client.lib.CloudUtil.parse;
 
-public class CloudService {
+public class CloudService  implements Serializable{
 
-	public static class Meta {
+	private static final long serialVersionUID = -555898172416871854L;
 
+	public static class Meta  implements Serializable{
+
+		private static final long serialVersionUID = 559587878720388995L;
 		private Date created;
 		private int version;
 

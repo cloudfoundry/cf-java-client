@@ -16,15 +16,19 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceConfiguration {
+public class ServiceConfiguration implements Serializable {
 
-	public static class Option {
+	private static final long serialVersionUID = 4037902001408281134L;
 
+	public static class Option implements Serializable {
+
+		private static final long serialVersionUID = -6265911364946111845L;
 		private String description;
 		private final String name;
 		private Map<String, Integer> priceByValue = new LinkedHashMap<String, Integer>();
@@ -61,8 +65,9 @@ public class ServiceConfiguration {
 		}
 	}
 
-	public static class Tier {
+	public static class Tier implements Serializable {
 
+		private static final long serialVersionUID = -2709323881963482685L;
 		private String description;
 		private List<Option> options = new ArrayList<ServiceConfiguration.Option>();
 		private int order;

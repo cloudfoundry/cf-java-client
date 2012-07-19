@@ -16,13 +16,15 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CrashesInfo {
+public class CrashesInfo  implements Serializable{
 
+	private static final long serialVersionUID = 2080673379195217248L;
 	private final List<CrashInfo> crashes;
 
 	public CrashesInfo(List<Map<String, Object>> attributes) {

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +30,9 @@ import java.util.Map;
  * @author Dave Syer
  * @author Thomas Risberg
  */
-@SuppressWarnings("unused")
-public class CloudInfo {
+public class CloudInfo  implements Serializable{
+
+	private static final long serialVersionUID = -2716854228048556854L;
 
 	public enum CC_MAJOR_VERSION {
 		UNKNOWN,
@@ -190,7 +192,8 @@ public class CloudInfo {
 		return Collections.unmodifiableCollection(runtimes.values());
 	}
 
-	public static class Limits {
+	public static class Limits  implements Serializable{
+		private static final long serialVersionUID = 1284571107561205359L;
 		private int maxApps;
 		private int maxTotalMemory;
 		private int maxUrisPerApp;
@@ -227,7 +230,8 @@ public class CloudInfo {
 		}
 	}
 
-	public static class Usage {
+	public static class Usage  implements Serializable{
+		private static final long serialVersionUID = -1915830736122853584L;
 		private int apps;
 		private int totalMemory;
 		private int urisPerApp;
@@ -264,7 +268,8 @@ public class CloudInfo {
 		}
 	}
 
-	public static class Runtime {
+	public static class Runtime  implements Serializable{
+		private static final long serialVersionUID = 8439753748311937093L;
 		private String name;
 		private String version;
 		private String description;
@@ -289,7 +294,8 @@ public class CloudInfo {
 		}
 	}
 
-	public static class Framework {
+	public static class Framework  implements Serializable{
+		private static final long serialVersionUID = -3750102889294367801L;
 		private String name;
 		private List<Runtime> runtimes = new ArrayList<Runtime>();
 

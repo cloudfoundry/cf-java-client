@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +26,10 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
-public class CloudApplication {
+public class CloudApplication  implements Serializable{
 
-    private static final String MODEL_KEY = "model";
+	private static final long serialVersionUID = 5479675961860368427L;
+	private static final String MODEL_KEY = "model";
     private static final String STACK_KEY = "stack";
     private static final String COMMAND_KEY = "command";
     private static final String MEMORY_KEY = "memory";
