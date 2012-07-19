@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.cloud.SpaceInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +58,23 @@ public interface CloudFoundryOperations {
 	 * @return CloudInfo object containing the cloud info
 	 */
 	CloudInfo getCloudInfo();
+
+	/**
+	 * Does the currently targeted cloud controller support orgs and spaces?
+	 */
+	boolean supportsSpaces();
+
+	/**
+	 * Get list of CloudSpaces for the current cloud.
+	 *
+	 * @return List of CloudSpace objects containing the space info
+	 */
+	List<CloudSpace> getSpaces();
+
+	/**
+	 * Set the CloudSpace to use for the current session.
+	 */
+	void setCurrentSpace(CloudSpace space);
 
 	/**
 	 * Register new user account with the provided credentials.
