@@ -17,6 +17,15 @@
 package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CrashesInfo;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.Staging;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,18 +54,35 @@ public interface CloudFoundryOperations {
 	void setProxyUser(String proxyUser);
 
 	/**
-	 * Get the URL used for the cloud controller.
+	 * Get the URL used for the transfer controller.
 	 *
-	 * @return the cloud controller URL
+	 * @return the transfer controller URL
 	 */
 	URL getCloudControllerUrl();
 
 	/**
-	 * Get CloudInfo for the current cloud.
+	 * Get CloudInfo for the current transfer.
 	 *
-	 * @return CloudInfo object containing the cloud info
+	 * @return CloudInfo object containing the transfer info
 	 */
 	CloudInfo getCloudInfo();
+
+	/**
+	 * Does the currently targeted transfer controller support orgs and spaces?
+	 */
+	boolean supportsSpaces();
+
+	/**
+	 * Get list of CloudSpaces for the current transfer.
+	 *
+	 * @return List of CloudSpace objects containing the space info
+	 */
+	List<CloudSpace> getSpaces();
+
+	/**
+	 * Set the CloudSpace to use for the current session.
+	 */
+	void setCurrentSpace(CloudSpace space);
 
 	/**
 	 * Register new user account with the provided credentials.
@@ -100,17 +126,17 @@ public interface CloudFoundryOperations {
 	void logout();
 
 	/**
-	 * Get all cloud applications.
+	 * Get all transfer applications.
 	 *
-	 * @return list of cloud applications
+	 * @return list of transfer applications
 	 */
 	List<CloudApplication> getApplications();
 
 	/**
-	 * Get cloud application with the specified name.
+	 * Get transfer application with the specified name.
 	 *
 	 * @param appName name of the app
-	 * @return the cloud application
+	 * @return the transfer application
 	 */
 	CloudApplication getApplication(String appName);
 
@@ -118,7 +144,7 @@ public interface CloudFoundryOperations {
 	 * Get application stats for the app with the specified name.
 	 *
 	 * @param appName name of the app
-	 * @return the cloud application stats
+	 * @return the transfer application stats
 	 */
 	ApplicationStats getApplicationStats(String appName);
 
@@ -190,7 +216,7 @@ public interface CloudFoundryOperations {
 	/**
 	 * Create a service.
 	 *
-	 * @param service cloud service info
+	 * @param service transfer service info
 	 */
 	void createService(CloudService service);
 
@@ -204,7 +230,7 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, String file) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to transfer foundry.
 	 * @param appName the application name
 	 * @param file the application archive or folder
 	 * @throws java.io.IOException
@@ -212,7 +238,7 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, File file) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to transfer foundry.
 	 * @param appName the application name
 	 * @param file the application archive
 	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
@@ -221,7 +247,7 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to transfer foundry.
 	 * @param appName the application name
 	 * @param archive the application archive
 	 * @throws java.io.IOException
@@ -229,7 +255,7 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, ApplicationArchive archive) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to transfer foundry.
 	 * @param appName the application name
 	 * @param archive the application archive
 	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
@@ -343,22 +369,22 @@ public interface CloudFoundryOperations {
 	String getFile(String appName, int instanceIndex, String filePath);
 
 	/**
-	 * Get list of cloud services.
+	 * Get list of transfer services.
 	 *
-	 * @return list of cloud services
+	 * @return list of transfer services
 	 */
 	List<CloudService> getServices();
 
 	/**
-	 * Get cloud service.
+	 * Get transfer service.
 	 *
 	 * @param service name of service
-	 * @return the cloud service info
+	 * @return the transfer service info
 	 */
 	CloudService getService(String service);
 
 	/**
-	 * Delete cloud service.
+	 * Delete transfer service.
 	 *
 	 * @param service name of service
 	 */

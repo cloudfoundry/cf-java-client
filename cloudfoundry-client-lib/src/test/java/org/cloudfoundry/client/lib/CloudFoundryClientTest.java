@@ -38,10 +38,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.cloudfoundry.client.lib.CloudApplication.AppState;
-import org.cloudfoundry.client.lib.CloudApplication.DebugMode;
-import org.cloudfoundry.client.lib.CloudInfo.Framework;
-import org.cloudfoundry.client.lib.ServiceConfiguration.Tier;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudInfo.Framework;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration.Tier;
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CrashesInfo;
+import org.cloudfoundry.client.lib.domain.InstanceInfo;
+import org.cloudfoundry.client.lib.domain.InstanceStats;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.Staging;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -68,7 +78,7 @@ public class CloudFoundryClientTest {
 
 	private CloudFoundryClient client;
 
-	// Pass -Dvcap.target=http://api.cloudfoundry.com, vcap.me, or your own cloud
+	// Pass -Dvcap.target=http://api.cloudfoundry.com, vcap.me, or your own transfer
 	private static final String ccUrl = System.getProperty("vcap.target", "https://api.cloudfoundry.com");
 
 	private static final String TEST_USER_EMAIL = System.getProperty("vcap.email", "java-client-test-user@vmware.com");
@@ -402,7 +412,7 @@ public class CloudFoundryClientTest {
 			firstInstance = stats.getRecords().get(0);
 		}
 
-		// Allow more time deviations due to local clock being out of sync with cloud
+		// Allow more time deviations due to local clock being out of sync with transfer
 		int timeTolerance = 300 * 1000; // 5 minutes
 		assertTrue("Usage time should be very recent",
 				Math.abs(System.currentTimeMillis() - firstInstance.getUsage().getTime().getTime()) < timeTolerance);
@@ -493,7 +503,7 @@ public class CloudFoundryClientTest {
 		CloudService service = client.getService(serviceName);
 		assertNotNull(service);
 		assertEquals(serviceName, service.getName());
-		// Allow more time deviations due to local clock being out of sync with cloud
+		// Allow more time deviations due to local clock being out of sync with transfer
 		int timeTolerance = 300 * 1000; // 5 minutes
 		assertTrue("Creation time should be very recent",
 				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
