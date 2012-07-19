@@ -27,6 +27,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
+import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,7 +39,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 
 /**
- * Tests for {@link UploadApplicationPayloadHttpMessageConverter}.
+ * Tests for {@link org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter}.
  *
  * @author Phillip Webb
  */

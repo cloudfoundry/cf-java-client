@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
-import static org.cloudfoundry.client.lib.CloudUtil.parse;
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

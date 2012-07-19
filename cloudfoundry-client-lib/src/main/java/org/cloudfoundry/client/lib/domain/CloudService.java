@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.cloudfoundry.client.lib.CloudUtil.parse;
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
 public class CloudService {
 

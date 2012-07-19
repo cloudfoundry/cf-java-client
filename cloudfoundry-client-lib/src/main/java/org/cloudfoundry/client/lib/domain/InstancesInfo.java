@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
-import java.util.Date;
+import org.cloudfoundry.client.lib.domain.InstanceInfo;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-public class CrashInfo {
-	private final Date since;
-	private final String instance;
+public class InstancesInfo {
 
-	public CrashInfo(Map<String, Object> infoMap) {
-		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
-		instance = CloudUtil.parse(String.class, infoMap.get("instance"));
+	private final List<InstanceInfo> instances;
+
+	public InstancesInfo(List<Map<String, Object>> attributes) {
+		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
+		for (Map<String, Object> data : attributes) {
+			instances.add(new InstanceInfo(data));
+		}
+		this.instances = Collections.unmodifiableList(instances);
 	}
 
-	public Date getSince() {
-		return since;
-	}
-
-	public String getInstance() {
-		return instance;
+	public List<InstanceInfo> getInstances() {
+		return instances;
 	}
 }

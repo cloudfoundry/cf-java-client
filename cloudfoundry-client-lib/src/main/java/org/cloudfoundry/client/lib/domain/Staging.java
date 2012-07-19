@@ -1,4 +1,4 @@
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
 /**
  * The staging information related to an application. Used for creating the

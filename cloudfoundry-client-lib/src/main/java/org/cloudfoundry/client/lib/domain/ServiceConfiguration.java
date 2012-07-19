@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
+
+import org.cloudfoundry.client.lib.util.CloudUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
