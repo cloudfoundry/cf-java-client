@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.cloudfoundry.client.lib.domain.CloudEntity;
 
-public class InstancesInfo {
+import java.util.UUID;
 
-	private final List<InstanceInfo> instances;
+/**
+ * @author Thomas Risberg
+ */
+public class CloudSpace extends CloudEntity {
 
-	public InstancesInfo(List<Map<String, Object>> attributes) {
-		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
-		for (Map<String, Object> data : attributes) {
-			instances.add(new InstanceInfo(data));
-		}
-		this.instances = Collections.unmodifiableList(instances);
+	public CloudSpace(UUID guid, String name) {
+		super(guid, name);
 	}
 
-	public List<InstanceInfo> getInstances() {
-		return instances;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ": (" + getGuid() + ") " + getName();
 	}
 }

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
+
+import org.cloudfoundry.client.lib.util.CloudUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -150,7 +152,7 @@ public class CloudInfo {
 	}
 
 	/**
-	 * Get Cloud Controller major version (V1, V2) for the current cloud.
+	 * Get Cloud Controller major version (V1, V2) for the current transfer.
 	 *
 	 * @return CloudInfo.CC_MAJOR_VERSION generation enum
 	 */
