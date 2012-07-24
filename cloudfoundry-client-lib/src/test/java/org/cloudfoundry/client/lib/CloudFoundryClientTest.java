@@ -29,6 +29,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudInfo.Framework;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration.Tier;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -136,7 +138,7 @@ public class CloudFoundryClientTest {
 	public void accessThroughJustToken() throws MalformedURLException {
 		String token = client.login();
 		// Use the token to create a new client based on that token
-		CloudFoundryClient tokenBasedClient = new CloudFoundryClient(token, ccUrl);
+		CloudFoundryClient tokenBasedClient = new CloudFoundryClient(null, null, token, null, new URL(ccUrl));
 		// Now try some operation that requires authenticated access
 		assertEquals(0, tokenBasedClient.getApplications().size());
 	}
@@ -650,7 +652,7 @@ public class CloudFoundryClientTest {
 
 		assumeTrue(token.toLowerCase().startsWith("bearer"));
 		String rawToken = token.substring("bearer ".length());
-		CloudFoundryClient bearerTokenClient = new CloudFoundryClient(rawToken, client.getCloudControllerUrl().toString());
+		CloudFoundryClient bearerTokenClient = new CloudFoundryClient(null, null, rawToken, null, client.getCloudControllerUrl());
 
 		CloudInfo info = bearerTokenClient.getCloudInfo();
 
@@ -845,6 +847,18 @@ public class CloudFoundryClientTest {
 		assertEquals(AppState.STARTED, app.getState());
 
 		client.deleteApplication(appName);
+	}
+
+	@Test
+	public void setSpaceIsNotSupportedForV1() throws IOException {
+		try {
+			CloudFoundryClient spaceClient =
+					new CloudFoundryClient(TEST_USER_EMAIL, TEST_USER_PASS, null,
+							new CloudSpace(null, "test", null), new URL(ccUrl));
+			fail("Expected UnsupportedOperationException");
+		}
+		catch (UnsupportedOperationException expected) {
+		}
 	}
 
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {

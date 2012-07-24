@@ -22,6 +22,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
@@ -45,6 +46,10 @@ public interface CloudControllerClient {
 	URL getCloudControllerUrl();
 
 	CloudInfo getInfo();
+
+	boolean supportsSpaces();
+
+	List<CloudSpace> getSpaces();
 
 	void setProxyUser(String proxyUser);
 
