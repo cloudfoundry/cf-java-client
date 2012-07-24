@@ -21,6 +21,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
@@ -65,6 +66,18 @@ public interface CloudFoundryOperations {
 	 * @return CloudInfo object containing the cloud info
 	 */
 	CloudInfo getCloudInfo();
+
+	/**
+	 * Does the currently targeted cloud controller support orgs and spaces?
+	 */
+	boolean supportsSpaces();
+
+	/**
+	 * Get list of CloudSpaces for the current cloud.
+	 *
+	 * @return List of CloudSpace objects containing the space info
+	 */
+	List<CloudSpace> getSpaces();
 
 	/**
 	 * Register new user account with the provided credentials.
