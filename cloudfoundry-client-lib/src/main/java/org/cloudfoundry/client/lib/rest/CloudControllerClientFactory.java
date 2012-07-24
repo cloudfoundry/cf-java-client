@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.web.client.RestTemplate;
@@ -45,35 +47,26 @@ public class CloudControllerClientFactory {
 		objectMapper = new ObjectMapper();
 	}
 
-	public CloudControllerClient newCloudController(URL cloudControllerUrl) {
-		CloudAuthenticationConfiguration authenticationConfiguration = new CloudAuthenticationConfiguration();
-		return createCloudControllerClient(cloudControllerUrl, authenticationConfiguration, null);
+	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
+													CloudSpace sessionSpace) {
+		return createCloudControllerClient(cloudControllerUrl, cloudCredentials, sessionSpace);
 	}
 
-	public CloudControllerClient newCloudController(URL cloudControllerUrl, String email, String password) {
-		CloudAuthenticationConfiguration authenticationConfiguration =
-				new CloudAuthenticationConfiguration(email, password,
-						getAuthorizationEndpoint(getInfoMap(cloudControllerUrl)));
-		return createCloudControllerClient(cloudControllerUrl, authenticationConfiguration, null);
-	}
-
-	public CloudControllerClient newCloudController(URL cloudControllerUrl, String email, String password, String token) {
-		CloudAuthenticationConfiguration authenticationConfiguration =
-				new CloudAuthenticationConfiguration(email, password,
-						getAuthorizationEndpoint(getInfoMap(cloudControllerUrl)));
-		return createCloudControllerClient(cloudControllerUrl, authenticationConfiguration, token);
-	}
-
-	private CloudControllerClient createCloudControllerClient(URL cloudControllerUrl,
-			CloudAuthenticationConfiguration authenticationConfiguration,
-			String token) {
+	private CloudControllerClient createCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials,
+															  CloudSpace sessionSpace) {
 		CloudControllerClient cc = null;
-		boolean v2 = isV2(getInfoMap(cloudControllerUrl));
+		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
+		boolean v2 = isV2(infoMap);
+		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap);
 		if (v2) {
-			cc = new CloudControllerClientV2(cloudControllerUrl, authenticationConfiguration, token);
+			cc = new CloudControllerClientV2(cloudControllerUrl, cloudCredentials, authorizationEndpoint, sessionSpace);
 		}
 		else {
-			cc = new CloudControllerClientV1(cloudControllerUrl, authenticationConfiguration, token);
+			if (sessionSpace != null) {
+				throw new UnsupportedOperationException(
+						"Spaces are not supported for the version of Cloud Controller you are accessing");
+			}
+			cc = new CloudControllerClientV1(cloudControllerUrl, cloudCredentials, authorizationEndpoint);
 		}
 		return cc;
 	}

@@ -16,8 +16,10 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.StringHttpMessageConverterWithoutMediaType;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
@@ -34,7 +36,6 @@ import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -77,36 +78,34 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	private OauthClient oauthClient;
 
-	public CloudControllerClientV1(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
-								   String token) {
-		super(cloudControllerUrl, authenticationConfiguration, token);
+	public CloudControllerClientV1(URL cloudControllerUrl, CloudCredentials cloudCredentials, URL authorizationUrl) {
+		super(cloudControllerUrl, cloudCredentials, authorizationUrl);
 		initializeOauthClient();
 	}
 
-	public CloudControllerClientV1(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
-								   String token, ClientHttpRequestFactory requestFactory) {
-		super(cloudControllerUrl, authenticationConfiguration, token, requestFactory);
-		initializeOauthClient();
+	public boolean supportsSpaces() {
+		return false;
 	}
 
 	public String login() {
-		if (authenticationConfiguration.getEmail() == null) {
-			Assert.hasLength(token, "No authentication details provided");
+		if (cloudCredentials.getEmail() == null) {
+			Assert.hasLength(cloudCredentials.getToken(), "No authentication details provided");
+			token = cloudCredentials.getToken();
 			return token;
 		}
-		Assert.hasLength(authenticationConfiguration.getEmail(), "Email cannot be null or empty");
-		Assert.hasLength(authenticationConfiguration.getPassword(), "Password cannot be null or empty");
+		Assert.hasLength(cloudCredentials.getEmail(), "Email cannot be null or empty");
+		Assert.hasLength(cloudCredentials.getPassword(), "Password cannot be null or empty");
 		if (oauthClient != null) {
-			OAuth2AccessToken token = oauthClient.getToken(authenticationConfiguration.getEmail(),
-					authenticationConfiguration.getPassword());
+			OAuth2AccessToken token = oauthClient.getToken(cloudCredentials.getEmail(),
+					cloudCredentials.getPassword());
 			this.token = token.getTokenType() + " " + token.getValue();
 			return this.token;
 		}
 		else {
 			Map<String, String> payload = new HashMap<String, String>();
-			payload.put("password", authenticationConfiguration.getPassword());
+			payload.put("password", cloudCredentials.getPassword());
 			Map<String, String> response = getRestTemplate().postForObject(
-					getUrl("users/{id}/tokens"), payload, Map.class, authenticationConfiguration.getEmail());
+					getUrl("users/{id}/tokens"), payload, Map.class, cloudCredentials.getEmail());
 			token = response.get("token");
 			return token;
 		}
@@ -114,9 +113,6 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public void logout() {
 		token = null;
-		if (authenticationConfiguration != null) {
-			authenticationConfiguration.setProxyUser(null);
-		}
 	}
 
 	public void register(String email, String password) {
@@ -128,18 +124,20 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public void updatePassword(String newPassword) {
 		Map<String, String> userInfo = getRestTemplate().getForObject(getUrl("users/{id}"), Map.class,
-				authenticationConfiguration.getEmail());
+			cloudCredentials.getEmail());
 		userInfo.put("password", newPassword);
-		getRestTemplate().put(getUrl("users/{id}"), userInfo, authenticationConfiguration.getEmail());
-		authenticationConfiguration = new CloudAuthenticationConfiguration(
-				authenticationConfiguration.getEmail(),
-				newPassword,
-				authenticationConfiguration.getAuthorizationUrl(),
-				authenticationConfiguration.getProxyUser());
+		getRestTemplate().put(getUrl("users/{id}"), userInfo, cloudCredentials.getEmail());
+		CloudCredentials newCloudCredentials = new CloudCredentials(cloudCredentials.getEmail(), newPassword);
+		if (cloudCredentials.getProxyUser() != null) {
+			cloudCredentials = newCloudCredentials.proxyForUser(cloudCredentials.getProxyUser());
+		}
+		else {
+			cloudCredentials = newCloudCredentials;
+		}
 	}
 
 	public void unregister() {
-		getRestTemplate().delete(getUrl("users/{email}"), authenticationConfiguration.getEmail());
+		getRestTemplate().delete(getUrl("users/{email}"), cloudCredentials.getEmail());
 		token = null;
 	}
 
@@ -455,20 +453,15 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	@Override
 	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
-		Map<String, Object> infoMap = new HashMap<String, Object>();
 		@SuppressWarnings("unchecked")
-		String s = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		try {
-			infoMap = mapper.readValue(s, new TypeReference<Map<String, Object>>() {});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
+		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(resp);
 		return infoMap;
 	}
 
 	private void initializeOauthClient() {
-		if (authenticationConfiguration.getAuthorizationUrl() != null) {
-			this.oauthClient = new OauthClient(authenticationConfiguration.getAuthorizationUrl());
+		if (authorizationEndpoint != null) {
+			this.oauthClient = new OauthClient(authorizationEndpoint);
 		}
 	}
 

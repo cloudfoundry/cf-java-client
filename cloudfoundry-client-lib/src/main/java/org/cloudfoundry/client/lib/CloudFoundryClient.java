@@ -26,6 +26,7 @@ import java.util.Map;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -58,42 +59,19 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	/**
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
 	 */
-	public CloudFoundryClient(String cloudControllerUrl) throws MalformedURLException {
-		this(null, null, null, new URL(cloudControllerUrl));
+	public CloudFoundryClient(URL cloudControllerUrl) throws MalformedURLException {
+		this(null, cloudControllerUrl, null);
 	}
 
-	public CloudFoundryClient(String email, String password, String cloudControllerUrl) throws MalformedURLException {
-		this(email, password, null, new URL(cloudControllerUrl));
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl) throws MalformedURLException {
+		this(credentials, cloudControllerUrl, null);
 	}
 
-	public CloudFoundryClient(String token, String cloudControllerUrl) throws MalformedURLException {
-		this((String)null, (String)null, token, new URL(cloudControllerUrl));
-	}
-
-	public CloudFoundryClient(String email, String password, String token, URL cloudControllerUrl) {
-		this(email, password, token, cloudControllerUrl, new SimpleClientHttpRequestFactory());
-	}
-
-	public CloudFoundryClient(String email, String password, String token, URL cloudControllerUrl, ClientHttpRequestFactory requestFactory) {
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, CloudSpace sessionSpace) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
-		Assert.notNull(requestFactory, "RequestFactory for cloud controller cannot be null");
 		CloudControllerClientFactory cloudControllerClientFactory = new CloudControllerClientFactory();
-		if (token != null) {
-			this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, email, password, token);
-
-		}
-		else if (email != null) {
-			this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, email, password);
-
-		}
-		else {
-			this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl);
-		}
+		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
     }
-
-	public void setProxyUser(String proxyUser) {
-		cc.setProxyUser(proxyUser);
-	}
 
 	public URL getCloudControllerUrl() {
 		return cc.getCloudControllerUrl();
@@ -104,6 +82,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 			info = cc.getInfo();
 		}
 		return info;
+	}
+
+	public boolean supportsSpaces() {
+		return cc.supportsSpaces();
+	}
+
+	public List<CloudSpace> getSpaces() {
+		return cc.getSpaces();
 	}
 
 	public void register(String email, String password) {

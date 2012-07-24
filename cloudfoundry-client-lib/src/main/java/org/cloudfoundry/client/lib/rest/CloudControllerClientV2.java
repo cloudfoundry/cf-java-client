@@ -16,20 +16,27 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.oauth2.OauthClient;
+import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,22 +47,45 @@ import java.util.Map;
  */
 public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
-	public CloudControllerClientV2(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
-								   String token) {
-		super(cloudControllerUrl, authenticationConfiguration, token);
+	OauthClient oauthClient;
+
+	CloudSpace sessionSpace;
+
+	CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
+
+	public CloudControllerClientV2(URL cloudControllerUrl, CloudCredentials cloudCredentials,
+								   URL authorizationEndpoint, CloudSpace sessionSpace) {
+		super(cloudControllerUrl, cloudCredentials, authorizationEndpoint);
+		this.oauthClient = new OauthClient(authorizationEndpoint);
+		this.sessionSpace = sessionSpace;
 	}
 
-	public CloudControllerClientV2(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
-								   String token, ClientHttpRequestFactory requestFactory) {
-		super(cloudControllerUrl, authenticationConfiguration, token, requestFactory);
+	public boolean supportsSpaces() {
+		return true;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CloudSpace> getSpaces() {
+		String resp = getRestTemplate().getForObject(getUrl("v2/spaces?inline-relations-depth=1"), String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<CloudSpace> spaces = new ArrayList<CloudSpace>();
+		for (Map<String, Object> resource : resourceList) {
+			spaces.add(resourceMapper.mapJsonResource(resource, CloudSpace.class));
+		}
+		return spaces;
 	}
 
 	public String login() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		OAuth2AccessToken token = oauthClient.getToken(cloudCredentials.getEmail(),
+				cloudCredentials.getPassword());
+		this.token = token.getTokenType() + " " + token.getValue();
+		return this.token;
 	}
 
 	public void logout() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		token = null;
 	}
 
 	public void register(String email, String password) {

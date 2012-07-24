@@ -29,6 +29,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudInfo.Framework;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration.Tier;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -108,7 +110,7 @@ public class CloudFoundryClientTest {
 
 	@Before
 	public void setUp() throws MalformedURLException {
-		client = new CloudFoundryClient(TEST_USER_EMAIL, TEST_USER_PASS, ccUrl);
+		client = new CloudFoundryClient(new CloudCredentials(TEST_USER_EMAIL, TEST_USER_PASS), new URL(ccUrl));
 		try {
 			client.register(TEST_USER_EMAIL, TEST_USER_PASS);
 		}
@@ -136,7 +138,7 @@ public class CloudFoundryClientTest {
 	public void accessThroughJustToken() throws MalformedURLException {
 		String token = client.login();
 		// Use the token to create a new client based on that token
-		CloudFoundryClient tokenBasedClient = new CloudFoundryClient(token, ccUrl);
+		CloudFoundryClient tokenBasedClient = new CloudFoundryClient(new CloudCredentials(token), new URL(ccUrl));
 		// Now try some operation that requires authenticated access
 		assertEquals(0, tokenBasedClient.getApplications().size());
 	}
@@ -188,7 +190,8 @@ public class CloudFoundryClientTest {
 	public void updatePassword() throws MalformedURLException {
 		String newPassword = "newPass123";
 		client.updatePassword(newPassword);
-		CloudFoundryClient clientWithChangedPassword = new CloudFoundryClient(TEST_USER_EMAIL, newPassword, ccUrl);
+		CloudFoundryClient clientWithChangedPassword =
+				new CloudFoundryClient(new CloudCredentials(TEST_USER_EMAIL, newPassword), new URL(ccUrl));
 		clientWithChangedPassword.login();
 
 		// Revert
@@ -198,7 +201,8 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void loginWrongCredentials() throws IOException {
-		CloudFoundryClient client2 = new CloudFoundryClient(TEST_USER_EMAIL, "wrong_password", ccUrl);
+		CloudFoundryClient client2 = new CloudFoundryClient(
+				new CloudCredentials(TEST_USER_EMAIL, "wrong_password"), new URL(ccUrl));
 		try {
 			client2.login();
 			fail("Expected CloudFoundryException");
@@ -614,7 +618,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void infoAnonymouslyAvailable() throws Exception {
-		CloudFoundryClient anonymousClient = new CloudFoundryClient(ccUrl);
+		CloudFoundryClient anonymousClient = new CloudFoundryClient(new URL(ccUrl));
 		CloudInfo info = anonymousClient.getCloudInfo();
 
 		assertNotNull(info.getName());
@@ -650,7 +654,8 @@ public class CloudFoundryClientTest {
 
 		assumeTrue(token.toLowerCase().startsWith("bearer"));
 		String rawToken = token.substring("bearer ".length());
-		CloudFoundryClient bearerTokenClient = new CloudFoundryClient(rawToken, client.getCloudControllerUrl().toString());
+		CloudFoundryClient bearerTokenClient =
+				new CloudFoundryClient(new CloudCredentials(rawToken), client.getCloudControllerUrl());
 
 		CloudInfo info = bearerTokenClient.getCloudInfo();
 
@@ -794,7 +799,8 @@ public class CloudFoundryClientTest {
 	public void proxyUser() throws IOException {
 		assumeNotNull(TEST_ADMIN_EMAIL, TEST_ADMIN_PASS);
 		String appName = namespacedAppName("admin-test");
-		CloudFoundryClient adminClient = new CloudFoundryClient(TEST_ADMIN_EMAIL, TEST_ADMIN_PASS, ccUrl);
+		CloudCredentials adminCredentials = new CloudCredentials(TEST_ADMIN_EMAIL, TEST_ADMIN_PASS);
+		CloudFoundryClient adminClient = new CloudFoundryClient(adminCredentials, new URL(ccUrl));
 
 		assertFalse(hasApplication(client.getApplications(), appName));
 		createAndUploadTestApp(appName);
@@ -804,8 +810,9 @@ public class CloudFoundryClientTest {
 		assertFalse(hasApplication(adminClient.getApplications(), appName));
 
 		// apps proxied
-		adminClient.setProxyUser(TEST_USER_EMAIL);
-		assertTrue(hasApplication(adminClient.getApplications(), appName));
+		CloudFoundryClient proxyClient =
+				new CloudFoundryClient(adminCredentials.proxyForUser(TEST_USER_EMAIL), new URL(ccUrl));
+		assertTrue(hasApplication(proxyClient.getApplications(), appName));
 	}
 
 	@Test
@@ -845,6 +852,15 @@ public class CloudFoundryClientTest {
 		assertEquals(AppState.STARTED, app.getState());
 
 		client.deleteApplication(appName);
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void setSpaceIsNotSupportedForV1() throws IOException {
+		CloudFoundryClient spaceClient =
+				new CloudFoundryClient(
+						new CloudCredentials(TEST_USER_EMAIL, TEST_USER_PASS),
+						new URL(ccUrl),
+						new CloudSpace(null, "test", null));
 	}
 
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {

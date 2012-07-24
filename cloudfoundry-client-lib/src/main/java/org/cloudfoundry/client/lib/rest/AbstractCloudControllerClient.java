@@ -16,14 +16,16 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +51,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,27 +74,30 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			Charset.forName("UTF-8"));
 
 	private RestTemplate restTemplate = new RestTemplate();
+
 	private URL cloudControllerUrl;
+
+	protected CloudCredentials cloudCredentials;
+
+	protected URL authorizationEndpoint;
 
 	protected String token;
 
-	protected CloudAuthenticationConfiguration authenticationConfiguration;
-
-	protected final ObjectMapper mapper = new ObjectMapper();
-
-	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration, String token) {
-		this(cloudControllerUrl, authenticationConfiguration, token, new SimpleClientHttpRequestFactory());
+	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials) {
+		this(cloudControllerUrl, cloudCredentials, null);
 	}
 
-	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration, String token, ClientHttpRequestFactory requestFactory) {
+	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials,
+										 URL authorizationEndpoint) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
-		Assert.notNull(authenticationConfiguration, "CloudAuthenticationConfiguration cannot be null");
-		this.authenticationConfiguration = authenticationConfiguration;
+		this.cloudCredentials = cloudCredentials;
+		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
+			this.token = cloudCredentials.getToken();
+		}
 		this.cloudControllerUrl = cloudControllerUrl;
-		this.token = token;
+		this.authorizationEndpoint = authorizationEndpoint;
 		this.restTemplate.setRequestFactory(
-				new CloudFoundryClientHttpRequestFactory(
-						requestFactory == null ? new SimpleClientHttpRequestFactory(): requestFactory));
+				new CloudFoundryClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
 	}
@@ -106,10 +110,9 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return new CloudInfo(getInfoMap(cloudControllerUrl));
 	}
 
-	public void setProxyUser(String proxyUser) {
-		if (this.authenticationConfiguration != null) {
-			this.authenticationConfiguration.setProxyUser(proxyUser);
-		}
+	public List<CloudSpace> getSpaces() {
+		ArrayList<CloudSpace> list = new ArrayList<CloudSpace>();
+		return list;
 	}
 
 	protected RestTemplate getRestTemplate() {
@@ -123,12 +126,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		@SuppressWarnings("unchecked")
 		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		Map<String, Object> respMap = new HashMap<String, Object>();
-		try {
-			respMap = mapper.readValue(resp, new TypeReference<Map<String, Object>>() {});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		return respMap;
 	}
 
@@ -178,8 +176,8 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 				}
 				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
 			}
-			if (authenticationConfiguration != null && authenticationConfiguration.getProxyUser() != null) {
-				request.getHeaders().add(PROXY_USER_HEADER_KEY, authenticationConfiguration.getProxyUser());
+			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
+				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
 			}
 			return request;
 		}

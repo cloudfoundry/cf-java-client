@@ -57,7 +57,7 @@ public class CloudEntity {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": (" + meta.getGuid() + ") " + getName();
+		return this.getClass().getSimpleName() + ": (" + (meta == null ? "v1" : meta.getGuid()) + ") " + getName();
 	}
 
 	public static class Meta {
