@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.cloudfoundry.client.lib.CloudUtil.parse;
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
-public class CloudService {
+public class CloudService extends CloudEntity {
 
-	public static class Meta {
-
-		private Date created;
-		private int version;
-
-		public Date getCreated() {
-			return created;
-		}
-
-		public int getVersion() {
-			return version;
-		}
-	}
-
-	private Meta meta;
-	private String name;
 	private Map<String, String> options = new HashMap<String, String>();
 	private String tier;
 	private String type;
 	private String vendor;
 	private String version;
 
+	public CloudService() {
+	}
+
+	public CloudService(Meta meta, String name) {
+		super(meta, name);
+	}
+
 	public CloudService(Map<String, Object> servicesAsMap) {
+		setName(parse(servicesAsMap.get("name")));
 		type = parse(servicesAsMap.get("type"));
 		vendor = parse(servicesAsMap.get("vendor"));
 		version = parse(servicesAsMap.get("version"));
@@ -62,29 +54,21 @@ public class CloudService {
 			}
 		}
 		tier = parse(servicesAsMap.get("tier"));
-		name = parse(servicesAsMap.get("name"));
 		@SuppressWarnings("unchecked")
 		Map<String, Object> metaValue = parse(Map.class,
 				servicesAsMap.get("meta"));
 		if (metaValue != null) {
-			meta = new Meta();
-			meta.version = parse(Integer.class, metaValue.get("version"));
 			long created = parse(Long.class, metaValue.get("created"));
+			int version = parse(Integer.class, metaValue.get("version"));
+			Meta meta = null;
 			if (created != 0) {
-				meta.created = new Date(created * 1000);
+				meta = new Meta(null, new Date(created * 1000), null, version);
 			}
+			else {
+				meta = new Meta(null, null, null, version);
+			}
+			setMeta(meta);
 		}
-	}
-
-	public CloudService() {
-	}
-
-	public Meta getMeta() {
-		return meta;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public Map<String, String> getOptions() {
@@ -105,10 +89,6 @@ public class CloudService {
 
 	public String getVersion() {
 		return version;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public void setTier(String tier) {
