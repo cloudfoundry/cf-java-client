@@ -19,6 +19,7 @@
 
 	<properties>
 		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
+		<spring.security.oauth.version>1.0.0.M6d</spring.security.oauth.version>
 	</properties>
 
 	<profiles>
@@ -53,12 +54,25 @@
 		</profile>
 	</profiles>
 
+	<repositories>
+		<repository>
+			<id>spring-libs-milestone</id>
+			<url>http://repo.springsource.org/libs-milestone</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring.framework.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>${spring.security.oauth.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
@@ -105,13 +119,13 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.1</version>
 		</dependency>
-        <dependency>
-            <groupId>org.cloudfoundry.test</groupId>
-            <artifactId>non-ascii-file-name</artifactId>
-            <version>0.1.0.BUILD-SNAPSHOT</version>
-            <type>war</type>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.cloudfoundry.test</groupId>
+			<artifactId>non-ascii-file-name</artifactId>
+			<version>0.1.0.BUILD-SNAPSHOT</version>
+			<type>war</type>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -157,40 +171,40 @@
 					</excludes>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-app</id>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.cloudfoundry.test</groupId>
-                                    <artifactId>non-ascii-file-name</artifactId>
-                                    <version>0.1.0.BUILD-SNAPSHOT</version>
-                                    <type>war</type>
-                                    <outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-test-app</id>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<phase>generate-test-resources</phase>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.cloudfoundry.test</groupId>
+									<artifactId>non-ascii-file-name</artifactId>
+									<version>0.1.0.BUILD-SNAPSHOT</version>
+									<type>war</type>
+									<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>${project.build.directory}/generated-test-resources</directory>
-            </testResource>
-        </testResources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+			<testResource>
+				<directory>${project.build.directory}/generated-test-resources</directory>
+			</testResource>
+		</testResources>
 	</build>
 
 	<distributionManagement>

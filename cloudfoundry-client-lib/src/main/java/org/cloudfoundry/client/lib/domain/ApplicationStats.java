@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CrashesInfo {
+public class ApplicationStats {
 
-	private final List<CrashInfo> crashes;
+	private final List<InstanceStats> records;
 
-	public CrashesInfo(List<Map<String, Object>> attributes) {
-		List<CrashInfo> crashes = new ArrayList<CrashInfo>(attributes.size());
-		for (Map<String, Object> data : attributes) {
-			crashes.add(new CrashInfo(data));
+	public ApplicationStats(Map<String, Object> attributes) {
+		List<InstanceStats> records = new ArrayList<InstanceStats>(attributes.size());
+		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+			@SuppressWarnings("unchecked")
+			InstanceStats record = new InstanceStats(entry.getKey(), (Map<String, Object>)entry.getValue());
+			records.add(record);
 		}
-		this.crashes = Collections.unmodifiableList(crashes);
+		this.records = Collections.unmodifiableList(records);
 	}
 
-	public List<CrashInfo> getCrashes() {
-		return crashes;
+	public List<InstanceStats> getRecords() {
+		return records;
 	}
 }
