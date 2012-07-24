@@ -17,6 +17,14 @@
 package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CrashesInfo;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.Staging;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,15 +85,6 @@ public interface CloudFoundryOperations {
 	 * Unregister and log out the currently logged in user
 	 */
 	void unregister();
-
-	/**
-	 * Log in using the provided credentials.
-	 *
-	 * @param email email
-	 * @param password password
-	 * @return authentication token
-	 */
-	String login(String email, String password);
 
 	/**
 	 * Login using the credentials already set for the client.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-public class CrashInfo {
-	private final Date since;
-	private final String instance;
+public class CrashesInfo {
 
-	public CrashInfo(Map<String, Object> infoMap) {
-		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
-		instance = CloudUtil.parse(String.class, infoMap.get("instance"));
+	private final List<CrashInfo> crashes;
+
+	public CrashesInfo(List<Map<String, Object>> attributes) {
+		List<CrashInfo> crashes = new ArrayList<CrashInfo>(attributes.size());
+		for (Map<String, Object> data : attributes) {
+			crashes.add(new CrashInfo(data));
+		}
+		this.crashes = Collections.unmodifiableList(crashes);
 	}
 
-	public Date getSince() {
-		return since;
-	}
-
-	public String getInstance() {
-		return instance;
+	public List<CrashInfo> getCrashes() {
+		return crashes;
 	}
 }

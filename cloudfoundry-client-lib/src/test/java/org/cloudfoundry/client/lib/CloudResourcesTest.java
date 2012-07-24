@@ -32,13 +32,15 @@ import java.util.zip.ZipFile;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudResource;
+import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 /**
- * Tests for {@link CloudResources}.
+ * Tests for {@link org.cloudfoundry.client.lib.domain.CloudResources}.
  *
  * @author Phillip Webb
  */
