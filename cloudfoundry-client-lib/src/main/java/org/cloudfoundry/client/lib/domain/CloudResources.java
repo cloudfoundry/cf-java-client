@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.domain;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.springframework.util.Assert;
 
 /**
- * JSON Object that contains details of a list of {@link CloudResource}s.
+ * JSON Object that contains details of a list of {@link org.cloudfoundry.client.lib.domain.CloudResource}s.
  *
  * @author Phillip Webb
  */

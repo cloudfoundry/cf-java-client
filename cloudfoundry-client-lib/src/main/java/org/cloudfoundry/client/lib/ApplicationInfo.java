@@ -16,8 +16,14 @@
 
 package org.cloudfoundry.client.lib;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+
 import java.io.File;
 
+@Deprecated
+/**
+ * @deprecated This class is not used and will be removed in a future release.
+ */
 public class ApplicationInfo {
 	private String appName;
 	private File warFile;
