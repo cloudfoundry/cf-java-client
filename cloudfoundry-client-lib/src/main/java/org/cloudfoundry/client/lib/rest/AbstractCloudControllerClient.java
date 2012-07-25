@@ -108,7 +108,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	public void setProxyUser(String proxyUser) {
 		if (this.authenticationConfiguration != null) {
-		this.authenticationConfiguration.setProxyUser(proxyUser);
+			this.authenticationConfiguration.setProxyUser(proxyUser);
 		}
 	}
 

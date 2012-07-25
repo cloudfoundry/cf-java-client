@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.StringHttpMessageConverterWithoutMediaType;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
@@ -45,6 +46,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -73,14 +75,18 @@ import java.util.zip.ZipFile;
  */
 public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
+	private OauthClient oauthClient;
+
 	public CloudControllerClientV1(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
 								   String token) {
 		super(cloudControllerUrl, authenticationConfiguration, token);
+		initializeOauthClient();
 	}
 
 	public CloudControllerClientV1(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration,
 								   String token, ClientHttpRequestFactory requestFactory) {
 		super(cloudControllerUrl, authenticationConfiguration, token, requestFactory);
+		initializeOauthClient();
 	}
 
 	public String login() {
@@ -88,14 +94,22 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			Assert.hasLength(token, "No authentication details provided");
 			return token;
 		}
-		Assert.hasLength(authenticationConfiguration.getEmail(), "Email cannot be null");
-		Assert.hasLength(authenticationConfiguration.getPassword(), "Password cannot be null");
-		Map<String, String> payload = new HashMap<String, String>();
-		payload.put("password", authenticationConfiguration.getPassword());
-		Map<String, String> response = getRestTemplate().postForObject(
-				getUrl("users/{id}/tokens"), payload, Map.class, authenticationConfiguration.getEmail());
-		token = response.get("token");
-		return token;
+		Assert.hasLength(authenticationConfiguration.getEmail(), "Email cannot be null or empty");
+		Assert.hasLength(authenticationConfiguration.getPassword(), "Password cannot be null empty");
+		if (oauthClient != null) {
+			OAuth2AccessToken token = oauthClient.getToken(authenticationConfiguration.getEmail(),
+					authenticationConfiguration.getPassword());
+			this.token = token.getTokenType() + " " + token.getValue();
+			return this.token;
+		}
+		else {
+			Map<String, String> payload = new HashMap<String, String>();
+			payload.put("password", authenticationConfiguration.getPassword());
+			Map<String, String> response = getRestTemplate().postForObject(
+					getUrl("users/{id}/tokens"), payload, Map.class, authenticationConfiguration.getEmail());
+			token = response.get("token");
+			return token;
+		}
 	}
 
 	public void logout() {
@@ -450,6 +464,12 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			e.printStackTrace();
 		}
 		return infoMap;
+	}
+
+	private void initializeOauthClient() {
+		if (authenticationConfiguration.getAuthorizationUrl() != null) {
+			this.oauthClient = new OauthClient(authenticationConfiguration.getAuthorizationUrl());
+		}
 	}
 
 	/**
