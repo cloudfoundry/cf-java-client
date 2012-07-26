@@ -17,13 +17,14 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +50,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,8 +79,6 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected CloudAuthenticationConfiguration authenticationConfiguration;
 
-	protected final ObjectMapper mapper = new ObjectMapper();
-
 	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudAuthenticationConfiguration authenticationConfiguration, String token) {
 		this(cloudControllerUrl, authenticationConfiguration, token, new SimpleClientHttpRequestFactory());
 	}
@@ -106,6 +104,16 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return new CloudInfo(getInfoMap(cloudControllerUrl));
 	}
 
+	public List<CloudSpace> getSpaces() {
+		ArrayList<CloudSpace> list = new ArrayList<CloudSpace>();
+		return list;
+	}
+
+	public void setSessionSpace(CloudSpace space) {
+		throw new UnsupportedOperationException(
+				"This feature is not supported for the version of Cloud Controller you are accessing");
+	}
+
 	public void setProxyUser(String proxyUser) {
 		if (this.authenticationConfiguration != null) {
 			this.authenticationConfiguration.setProxyUser(proxyUser);
@@ -123,12 +131,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		@SuppressWarnings("unchecked")
 		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		Map<String, Object> respMap = new HashMap<String, Object>();
-		try {
-			respMap = mapper.readValue(resp, new TypeReference<Map<String, Object>>() {});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		return respMap;
 	}
 

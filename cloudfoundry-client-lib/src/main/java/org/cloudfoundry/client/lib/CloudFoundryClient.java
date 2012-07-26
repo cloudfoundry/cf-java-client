@@ -26,6 +26,7 @@ import java.util.Map;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -104,6 +105,18 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 			info = cc.getInfo();
 		}
 		return info;
+	}
+
+	public boolean supportsSpaces() {
+		return cc.supportsSpaces();
+	}
+
+	public List<CloudSpace> getSpaces() {
+		return cc.getSpaces();
+	}
+
+	public void setCurrentSpace(CloudSpace space) {
+		cc.setSessionSpace(space);
 	}
 
 	public void register(String email, String password) {
