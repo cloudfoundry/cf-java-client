@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.StringHttpMessageConverterWithoutMediaType;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
@@ -34,7 +35,6 @@ import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -87,6 +87,10 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 								   String token, ClientHttpRequestFactory requestFactory) {
 		super(cloudControllerUrl, authenticationConfiguration, token, requestFactory);
 		initializeOauthClient();
+	}
+
+	public boolean supportsSpaces() {
+		return false;
 	}
 
 	public String login() {
@@ -455,14 +459,9 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	@Override
 	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
-		Map<String, Object> infoMap = new HashMap<String, Object>();
 		@SuppressWarnings("unchecked")
-		String s = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		try {
-			infoMap = mapper.readValue(s, new TypeReference<Map<String, Object>>() {});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
+		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(resp);
 		return infoMap;
 	}
 
