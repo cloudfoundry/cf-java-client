@@ -91,17 +91,13 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		this.token = token;
 		this.restTemplate.setRequestFactory(
 				new CloudFoundryClientHttpRequestFactory(
-						requestFactory == null ? new SimpleClientHttpRequestFactory(): requestFactory));
+						requestFactory == null ? new SimpleClientHttpRequestFactory() : requestFactory));
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
 	}
 
 	public URL getCloudControllerUrl() {
 		return this.cloudControllerUrl;
-	}
-
-	public CloudInfo getInfo() {
-		return new CloudInfo(getInfoMap(cloudControllerUrl));
 	}
 
 	public List<CloudSpace> getSpaces() {
@@ -126,13 +122,6 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String getUrl(String path) {
 		return cloudControllerUrl + "/" + path;
-	}
-
-	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
-		@SuppressWarnings("unchecked")
-		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		return respMap;
 	}
 
 	private List<HttpMessageConverter<?>> getHttpMessageConverters() {

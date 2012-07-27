@@ -43,6 +43,8 @@ public class CloudUtil {
 
 	private static Long DEFAULT_LONG = new Long(0);
 
+	private static Boolean DEFAULT_BOOLEAN = Boolean.FALSE;
+
 	private static final String HEX_CHARS = "0123456789ABCDEF";
 
 	private static final char EXTENSION_SEPARATOR = '.';
@@ -67,6 +69,8 @@ public class CloudUtil {
 				defaultValue = (T) DEFAULT_LONG;
 			} else if (clazz == Double.class) {
 				defaultValue = (T) DEFAULT_DOUBLE;
+			} else if (clazz == Boolean.class) {
+				defaultValue = (T) DEFAULT_BOOLEAN;
 			}
 
 			if (object == null) {
@@ -80,6 +84,9 @@ public class CloudUtil {
 			}
 			if (clazz == Long.class) {
 				return clazz.cast(Long.valueOf(((Number)object).longValue()));
+			}
+			if (clazz == Boolean.class) {
+				return clazz.cast(Boolean.valueOf(object.toString()));
 			}
 
 			return clazz.cast(object);

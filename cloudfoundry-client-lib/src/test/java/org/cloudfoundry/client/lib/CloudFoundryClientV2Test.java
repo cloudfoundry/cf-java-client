@@ -27,12 +27,16 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Evolving test class for V2 cloud controller.
@@ -76,7 +80,6 @@ public class CloudFoundryClientV2Test {
 		client = new CloudFoundryClient(CCNG_USER_EMAIL, CCNG_USER_PASS, CCNG_URL);
 		this.token = client.login();
 		System.out.println("Using token: " + this.token);
-
 //		List<CloudApplication> apps = client.getApplications();
 //		assertEquals(0, apps.size());
 	}
@@ -109,6 +112,96 @@ public class CloudFoundryClientV2Test {
 		setTestSpaceAsDefault();
 	}
 
+	@Test
+	public void infoForUserAvailable() throws Exception {
+		CloudInfo info = client.getCloudInfo();
+
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getSupport());
+
+		assertEquals(CCNG_USER_EMAIL, info.getUser());
+		assertNotNull(info.getLimits());
+		// Just ensure that we got back some sensible values
+		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
+		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
+		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
+		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
+	}
+
+	@Test
+	public void infoForUserAvailableWithBearerToken() throws Exception {
+
+		assumeTrue(token.toLowerCase().startsWith("bearer"));
+		String rawToken = token.substring("bearer ".length());
+		CloudFoundryClient bearerTokenClient = new CloudFoundryClient(rawToken, client.getCloudControllerUrl().toString());
+
+		CloudInfo info = bearerTokenClient.getCloudInfo();
+
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getSupport());
+
+		assertEquals(CCNG_USER_EMAIL, info.getUser());
+		assertNotNull(info.getLimits());
+		// Just ensure that we got back some sensible values
+		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
+		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
+		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
+		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
+	}
+
+	@Test
+	public void frameworksInfoAvailable() {
+		CloudInfo info = client.getCloudInfo();
+
+		Collection<CloudInfo.Framework> frameworks = info.getFrameworks();
+		assertNotNull(frameworks);
+		Map<String, CloudInfo.Framework> frameworksByName = new HashMap<String, CloudInfo.Framework>();
+		for (CloudInfo.Framework framework : frameworks) {
+			frameworksByName.put(framework.getName(), framework);
+		}
+
+		assertTrue(frameworksByName.containsKey("spring"));
+		assertTrue(frameworksByName.containsKey("grails"));
+		assertTrue(frameworksByName.containsKey("rails3"));
+		assertTrue(frameworksByName.containsKey("sinatra"));
+		assertTrue(frameworksByName.containsKey("node"));
+		assertTrue(frameworksByName.containsKey("lift"));
+
+		// a basic check that runtime info is correct
+		CloudInfo.Framework springFramework = frameworksByName.get("spring");
+		//TODO: this is no longer availabe in v2
+//		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
+//		assertNotNull(springRuntimes);
+//		assertTrue(springRuntimes.size() > 0);
+	}
+
+	@Test
+	public void runtimeInfoAvailable() {
+		CloudInfo info = client.getCloudInfo();
+
+		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
+		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
+		for (CloudInfo.Runtime runtime : runtimes) {
+			runtimesByName.put(runtime.getName(), runtime);
+		}
+
+		assertTrue(runtimesByName.containsKey("java"));
+		assertTrue(runtimesByName.containsKey("ruby19"));
+		assertTrue(runtimesByName.containsKey("ruby18"));
+		assertTrue(runtimesByName.containsKey("node"));
+
+		// a basic check that versions are right
+		//TODO: this is no longer availabe in v2
+//		assertEquals("1.6", runtimesByName.get("java").getVersion());
+	}
+
+
 	private void setTestSpaceAsDefault() {
 		List<CloudSpace> spaces = client.getSpaces();
 		CloudSpace testSpace = null;
@@ -125,6 +218,6 @@ public class CloudFoundryClientV2Test {
 		assertNotNull("Space to use for testing (" + CCNG_USER_SPACE + ") not found for organization (" +
 				CCNG_USER_ORG + ") - check your account or system properties", testSpace);
 		client.setCurrentSpace(testSpace);
-		System.out.println("Using space " + testSpace.getName() + " of organization " + CCNG_USER_ORG );
+		System.out.println("Using space " + testSpace.getName() + " of organization " + CCNG_USER_ORG);
 	}
 }

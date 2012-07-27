@@ -30,7 +30,7 @@ import java.util.Map;
  * Factory used to create cloud controller client implementations suitable for use against v1 or v2 cloud controller.
  * The factory should determine the type of client to create.
  *
- * @author Thgomas Risberg
+ * @author Thomas Risberg
  */
 public class CloudControllerClientFactory {
 

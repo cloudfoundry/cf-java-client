@@ -20,6 +20,7 @@ import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
@@ -28,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
+import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -36,6 +38,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +100,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	public void logout() {
 		token = null;
 		authenticationConfiguration.setProxyUser(null);
+	}
+
+	public CloudInfo getInfo() {
+		return doGetInfo();
 	}
 
 	public void register(String email, String password) {
@@ -240,5 +248,66 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	private CloudInfo doGetInfo() {
+		String infoJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/info", String.class);
+		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(infoJson);
 
+		String frameworksJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/frameworks", String.class);
+		List<Map<String, Object>> frameworkList =
+				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(frameworksJson).get("resources");
+
+		String runtimesJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/runtimes", String.class);
+		List<Map<String, Object>> runtimesList =
+				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(runtimesJson).get("resources");
+
+		Map<String, Object> userMap = getUserInfo(getCloudControllerUrl(), (String) infoMap.get("user"));
+
+		//TODO: replace with v2 api call once, or if, they become available
+		String infoV1Json = getRestTemplate().getForObject(getCloudControllerUrl() + "/info", String.class);
+		Map<String, Object> infoV1Map = (Map<String, Object>) JsonUtil.convertJsonToMap(infoV1Json);
+		Map<String, Object> limitMap = (Map<String, Object>) infoV1Map.get("limits");
+		Map<String, Object> usageMap = (Map<String, Object>) infoV1Map.get("usage");
+
+		// construct the CloudInfo object
+		String name = CloudUtil.parse(String.class, infoMap.get("name"));
+		String support = CloudUtil.parse(String.class, infoMap.get("support"));
+		String authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
+		int build = CloudUtil.parse(Integer.class, infoMap.get("build"));
+		String version = "" + CloudUtil.parse(Number.class, infoMap.get("version"));
+		String description = CloudUtil.parse(String.class, infoMap.get("description"));
+		CloudInfo.Limits limits = new CloudInfo.Limits(limitMap);
+		CloudInfo.Usage usage = new CloudInfo.Usage(usageMap);
+		boolean debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
+		Collection<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
+		for (Map<String, Object> frameworkMap : frameworkList) {
+			Map<String, Object> frameworkEntity = (Map<String, Object>) frameworkMap.get("entity");
+			CloudInfo.Framework framework = new CloudInfo.Framework(frameworkEntity);
+			frameworks.add(framework);
+		}
+		Map<String, CloudInfo.Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
+		for (Map<String, Object> runtimeMap : runtimesList) {
+			Map<String, Object> runtimeEntity = (Map<String, Object>) runtimeMap.get("entity");
+			CloudInfo.Runtime runtime = new CloudInfo.Runtime(runtimeEntity);
+			runtimes.put(runtime.getName(), runtime);
+		}
+
+		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
+				description, limits, usage, debug, frameworks, runtimes);
+	}
+
+	private Map<String, Object> getUserInfo(URL cloudControllerUrl, String user) {
+//		String userJson = getRestTemplate().getForObject(cloudControllerUrl + "/v2/users/{guid}", String.class, user);
+//		Map<String, Object> userInfo = (Map<String, Object>) JsonUtil.convertJsonToMap(userJson);
+//		return userInfo();
+		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
+		String userJson = "{}";
+		int x = token.indexOf('.');
+		int y = token.indexOf('.', x + 1);
+		String encodedString = token.substring(x + 1, y);
+		try {
+			byte[] decodedBytes = new sun.misc.BASE64Decoder().decodeBuffer(encodedString);
+			userJson = new String(decodedBytes, 0, decodedBytes.length, "UTF-8");
+		} catch (IOException e) {}
+		return(JsonUtil.convertJsonToMap(userJson));
+	}
 }
