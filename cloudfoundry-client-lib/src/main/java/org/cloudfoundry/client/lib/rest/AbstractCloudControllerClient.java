@@ -106,10 +106,6 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return this.cloudControllerUrl;
 	}
 
-	public CloudInfo getInfo() {
-		return new CloudInfo(getInfoMap(cloudControllerUrl));
-	}
-
 	public List<CloudSpace> getSpaces() {
 		ArrayList<CloudSpace> list = new ArrayList<CloudSpace>();
 		return list;
@@ -121,13 +117,6 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String getUrl(String path) {
 		return cloudControllerUrl + "/" + path;
-	}
-
-	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
-		@SuppressWarnings("unchecked")
-		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		return respMap;
 	}
 
 	private List<HttpMessageConverter<?>> getHttpMessageConverters() {
