@@ -107,6 +107,13 @@ public class CloudInfo {
 
 	public CloudInfo(String name, String support, String authorizationEndpoint, int build, String version,
 			String user, String description, Limits limits, Usage usage, boolean allowDebug) {
+		this(name, support, authorizationEndpoint, build, version,
+				user, description, limits, usage, allowDebug, null, null);
+	}
+
+	public CloudInfo(String name, String support, String authorizationEndpoint, int build, String version,
+			String user, String description, Limits limits, Usage usage, boolean allowDebug,
+			Collection<Framework> frameworks, Map<String, Runtime> runtimes) {
 		this.name = name;
 		this.support = support;
 		this.authorizationEndpoint = authorizationEndpoint;
@@ -117,6 +124,12 @@ public class CloudInfo {
 		this.limits = limits;
 		this.usage = usage;
 		this.allowDebug = allowDebug;
+		if(frameworks != null) {
+			this.frameworks.addAll(frameworks);
+		}
+		if (runtimes != null) {
+			this.runtimes.putAll(runtimes);
+		}
 	}
 
 	public Limits getLimits() {
@@ -275,7 +288,12 @@ public class CloudInfo {
 			name = CloudUtil.parse(String.class,  data.get("name"));
 			description = CloudUtil.parse(String.class,  data.get("description"));
 			// The way Jackson will parse, the version will be a Double with simpler versions like "1.6" with one . but String otherwise
-			version = CloudUtil.parse(Object.class,  data.get("version")).toString();
+			if (data.containsKey("version")) {
+				version = CloudUtil.parse(Object.class,  data.get("version")).toString();
+			}
+			else {
+				version = "?";
+			}
 		}
 
 		public String getName() {
@@ -299,8 +317,10 @@ public class CloudInfo {
 		public Framework(Map<String, Object> data) {
 			name = CloudUtil.parse(String.class,  data.get("name"));
 			List<Map<String, Object>> runtimeData = CloudUtil.parse(List.class,  data.get("runtimes"));
-			for (Map<String, Object> runtime : runtimeData) {
-				runtimes.add(new Runtime(runtime));
+			if (runtimeData != null) {
+				for (Map<String, Object> runtime : runtimeData) {
+					runtimes.add(new Runtime(runtime));
+				}
 			}
 		}
 

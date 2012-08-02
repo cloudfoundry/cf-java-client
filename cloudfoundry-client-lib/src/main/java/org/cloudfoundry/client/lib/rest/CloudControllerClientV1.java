@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
@@ -81,6 +82,12 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	public CloudControllerClientV1(URL cloudControllerUrl, CloudCredentials cloudCredentials, URL authorizationUrl) {
 		super(cloudControllerUrl, cloudCredentials, authorizationUrl);
 		initializeOauthClient();
+	}
+
+	public CloudInfo getInfo() {
+		String resp = getRestTemplate().getForObject(getCloudControllerUrl() + "/info", String.class);
+		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(resp);
+		return new CloudInfo(infoMap);
 	}
 
 	public boolean supportsSpaces() {
@@ -450,14 +457,6 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		getRestTemplate().put(getUrl("apps/{appName}"), app, appName);
 	}
 
-
-	@Override
-	protected Map<String, Object> getInfoMap(URL cloudControllerUrl) {
-		@SuppressWarnings("unchecked")
-		String resp = getRestTemplate().getForObject(cloudControllerUrl + "/info", String.class);
-		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(resp);
-		return infoMap;
-	}
 
 	private void initializeOauthClient() {
 		if (authorizationEndpoint != null) {

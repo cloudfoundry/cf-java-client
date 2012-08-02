@@ -28,11 +28,15 @@ import org.junit.rules.TemporaryFolder;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -111,6 +115,96 @@ public class CloudFoundryClientV2Test {
 	@Test
 	public void canSetDefaultSpace() throws Exception {
 		setTestSpaceAsDefault();
+	}
+
+	@Test
+	public void infoForUserAvailable() throws Exception {
+		CloudInfo info = client.getCloudInfo();
+
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getSupport());
+
+		assertEquals(CCNG_USER_EMAIL, info.getUser());
+		assertNotNull(info.getLimits());
+		// Just ensure that we got back some sensible values
+		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
+		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
+		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
+		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
+	}
+
+	@Test
+	public void infoForUserAvailableWithBearerToken() throws Exception {
+
+		assumeTrue(token.toLowerCase().startsWith("bearer"));
+		String rawToken = token.substring("bearer ".length());
+		CloudFoundryClient bearerTokenClient =
+				new CloudFoundryClient(new CloudCredentials(rawToken), client.getCloudControllerUrl());
+
+		CloudInfo info = bearerTokenClient.getCloudInfo();
+
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getSupport());
+
+		assertEquals(CCNG_USER_EMAIL, info.getUser());
+		assertNotNull(info.getLimits());
+		// Just ensure that we got back some sensible values
+		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
+		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
+		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
+		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
+	}
+
+	@Test
+	public void frameworksInfoAvailable() {
+		CloudInfo info = client.getCloudInfo();
+
+		Collection<CloudInfo.Framework> frameworks = info.getFrameworks();
+		assertNotNull(frameworks);
+		Map<String, CloudInfo.Framework> frameworksByName = new HashMap<String, CloudInfo.Framework>();
+		for (CloudInfo.Framework framework : frameworks) {
+			frameworksByName.put(framework.getName(), framework);
+		}
+
+		assertTrue(frameworksByName.containsKey("spring"));
+		assertTrue(frameworksByName.containsKey("grails"));
+		assertTrue(frameworksByName.containsKey("rails3"));
+		assertTrue(frameworksByName.containsKey("sinatra"));
+		assertTrue(frameworksByName.containsKey("node"));
+		assertTrue(frameworksByName.containsKey("lift"));
+
+		// a basic check that runtime info is correct
+		CloudInfo.Framework springFramework = frameworksByName.get("spring");
+		//TODO: this is no longer availabe in v2
+//		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
+//		assertNotNull(springRuntimes);
+//		assertTrue(springRuntimes.size() > 0);
+	}
+
+	@Test
+	public void runtimeInfoAvailable() {
+		CloudInfo info = client.getCloudInfo();
+
+		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
+		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
+		for (CloudInfo.Runtime runtime : runtimes) {
+			runtimesByName.put(runtime.getName(), runtime);
+		}
+
+		assertTrue(runtimesByName.containsKey("java"));
+		assertTrue(runtimesByName.containsKey("ruby19"));
+		assertTrue(runtimesByName.containsKey("ruby18"));
+		assertTrue(runtimesByName.containsKey("node"));
+
+		// a basic check that versions are right
+		//TODO: this is no longer availabe in v2
+//		assertEquals("1.6", runtimesByName.get("java").getVersion());
 	}
 
 	private void setTestSpaceAsDefault() {
