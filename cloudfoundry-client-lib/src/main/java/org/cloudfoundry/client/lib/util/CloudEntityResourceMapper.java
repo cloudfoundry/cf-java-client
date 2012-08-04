@@ -19,11 +19,14 @@ package org.cloudfoundry.client.lib.util;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,6 +52,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudService.class) {
 			return (T) mapServiceInstanceResource(resource);
+		}
+		if (targetClass == CloudServiceOffering.class) {
+			return (T) mapServiceResource(resource);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
@@ -80,15 +86,34 @@ public class CloudEntityResourceMapper {
 			serviceResource = getEmbeddedResource(servicePlanResource, "service");
 		}
 		if (servicePlanResource != null && serviceResource != null) {
-			cloudService.setType(getEntityAttribute(serviceResource, "label", String.class));
 			//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
-			cloudService.setVendor(getEntityAttribute(serviceResource, "provider", String.class));
+			cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
+			cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
 			cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
 		}
 		if (servicePlanResource != null) {
-			cloudService.setTier(getEntityAttribute(servicePlanResource, "name", String.class));
+			cloudService.setPlan(getEntityAttribute(servicePlanResource, "name", String.class));
 		}
 		return cloudService;
+	}
+
+	private CloudServiceOffering mapServiceResource(Map<String, Object> resource) {
+		CloudServiceOffering cloudServiceOffering = new CloudServiceOffering(
+				getMeta(resource),
+				getEntityAttribute(resource, "label", String.class));
+		cloudServiceOffering.setDescription(getEntityAttribute(resource, "description", String.class));
+		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
+		if (servicePlanList != null) {
+			for (Map<String, Object> servicePlanResource : servicePlanList) {
+				CloudServicePlan servicePlan =
+						new CloudServicePlan(
+								getMeta(servicePlanResource),
+								getEntityAttribute(servicePlanResource, "name", String.class),
+								cloudServiceOffering);
+				cloudServiceOffering.addCloudServicePlan(servicePlan);
+			}
+		}
+		return cloudServiceOffering;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -115,6 +140,11 @@ public class CloudEntityResourceMapper {
 	}
 
 	@SuppressWarnings("unchecked")
+	private Map<String, Object> getEntity(Map<String, Object> resource) {
+		return (Map<String, Object>) resource.get("entity");
+	}
+
+	@SuppressWarnings("unchecked")
 	private <T> T getEntityAttribute(Map<String, Object> resource, String attributeName, Class<T> targetClass) {
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		if (targetClass == String.class) {
@@ -128,5 +158,10 @@ public class CloudEntityResourceMapper {
 	private Map<String, Object> getEmbeddedResource(Map<String, Object> resource, String embeddedResourceName) {
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		return (Map<String, Object>) entity.get(embeddedResourceName);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<Map<String, Object>> getEmbeddedResourceList(Map<String, Object> resource, String embeddedResourceName) {
+		return (List<Map<String, Object>>) resource.get(embeddedResourceName);
 	}
 }

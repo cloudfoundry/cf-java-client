@@ -22,13 +22,36 @@ import java.util.Map;
 
 import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
+/**
+ * Class representing an instance of a service created for a user (v1) or a space (v2).
+ *
+ * There are some differences between the v1 and v2 information and to determine the
+ * version (v1 or v2) use getMeta().getVersion()
+ *
+ * v1 only attributes: tier, type, vendor, options
+ *
+ * v2 only attributes: label, plan
+ *
+ * similar properties:
+ *  - tier and plan
+ *  - vendor and label
+ *
+ * @author: Thomas Risberg
+ */
 public class CloudService extends CloudEntity {
 
-	private Map<String, String> options = new HashMap<String, String>();
+	private String version;
+	private String provider;
+
+	// v1 only attributes
 	private String tier;
 	private String type;
 	private String vendor;
-	private String version;
+	private Map<String, String> options = new HashMap<String, String>();
+
+	// v2 only attributes
+	private String label;
+	private String plan;
 
 	public CloudService() {
 	}
@@ -37,11 +60,17 @@ public class CloudService extends CloudEntity {
 		super(meta, name);
 	}
 
+	/**
+	 * Constructor used by v1 services
+	 *
+	 * @param servicesAsMap
+	 */
 	public CloudService(Map<String, Object> servicesAsMap) {
 		setName(parse(servicesAsMap.get("name")));
 		type = parse(servicesAsMap.get("type"));
 		vendor = parse(servicesAsMap.get("vendor"));
 		version = parse(servicesAsMap.get("version"));
+		provider = parse(servicesAsMap.get("provider"));
 		@SuppressWarnings("unchecked")
 		Map<String, Object> optionsValue = parse(Map.class,
 				servicesAsMap.get("options"));
@@ -91,6 +120,18 @@ public class CloudService extends CloudEntity {
 		return version;
 	}
 
+	public String getLabel() {
+		return label;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public String getPlan() {
+		return plan;
+	}
+
 	public void setTier(String tier) {
 		this.tier = tier;
 	}
@@ -105,5 +146,17 @@ public class CloudService extends CloudEntity {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+
+	public void setPlan(String plan) {
+		this.plan = plan;
 	}
 }

@@ -18,7 +18,9 @@ package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,6 +74,7 @@ public class CloudFoundryClientV2Test {
 	@BeforeClass
 	public static void printTargetInfo() {
 		System.out.println("Running tests on " + CCNG_URL + " on behalf of " + CCNG_USER_EMAIL);
+		System.out.println("Using space " + CCNG_USER_SPACE + " of organization " + CCNG_USER_ORG );
 		if (CCNG_USER_PASS == null) {
 			fail("System property ccng.passwd must be specified, supply -Dccng.passwd=<password>");
 		}
@@ -82,10 +85,11 @@ public class CloudFoundryClientV2Test {
 	public void setUp() throws MalformedURLException {
 		client = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_URL));
 		this.token = client.login();
-		System.out.println("Using token: " + this.token);
+		spaceClient = setTestSpaceAsDefault(client);
 //		TODO: verify clean account
 //		List<CloudApplication> apps = client.getApplications();
 //		assertEquals(0, apps.size());
+		spaceClient.deleteAllServices();
 	}
 
 	@After
@@ -93,7 +97,7 @@ public class CloudFoundryClientV2Test {
 		client.login(); // in case a test logged out (currently logout())
 //		TODO: clean out account
 //		client.deleteAllApplications();
-//		client.deleteAllServices();
+		spaceClient.deleteAllServices();
 	}
 
 	@Test
@@ -114,7 +118,7 @@ public class CloudFoundryClientV2Test {
 
 	@Test
 	public void canSetDefaultSpace() throws Exception {
-		setTestSpaceAsDefault();
+		setTestSpaceAsDefault(client);
 	}
 
 	@Test
@@ -207,7 +211,68 @@ public class CloudFoundryClientV2Test {
 //		assertEquals("1.6", runtimesByName.get("java").getVersion());
 	}
 
-	private void setTestSpaceAsDefault() {
+	@Test
+	public void getServices() {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+		createMySqlService("another-name");
+
+		List<CloudService> services = client.getServices();
+		assertNotNull(services);
+		assertEquals(2, services.size());
+		CloudService service = null;
+		for (CloudService cs : services) {
+			if (cs.getName().equals(serviceName)) {
+				service = cs;
+			}
+		}
+		assertNotNull(service);
+		assertEquals(serviceName, service.getName());
+		assertEquals("mysql", service.getLabel());
+		assertEquals("core", service.getProvider());
+		assertEquals("5.1", service.getVersion());
+		assertEquals("D100", service.getPlan());
+	}
+
+	@Test
+	public void getService() throws MalformedURLException {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+
+		spaceClient = setTestSpaceAsDefault(client);
+		CloudService service = spaceClient.getService(serviceName);
+		assertNotNull(service);
+		assertEquals(serviceName, service.getName());
+		// Allow more time deviations due to local clock being out of sync with cloud
+		int timeTolerance = 300 * 1000; // 5 minutes
+		assertTrue("Creation time should be very recent",
+				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
+	}
+
+	@Test
+	public void createService() throws MalformedURLException {
+		createMySqlService("mysql-test");
+	}
+
+	private void createMySqlService(String serviceName) {
+		CloudService service = new CloudService();
+		service.setType("database");
+		service.setVersion("5.1");
+		service.setName(serviceName);
+		service.setProvider("core");
+		service.setLabel("mysql");
+		service.setPlan("D100");
+		spaceClient.createService(service);
+	}
+
+	@Test
+	public void deleteService() throws MalformedURLException {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+		spaceClient.deleteService(serviceName);
+	}
+
+	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {
 		List<CloudSpace> spaces = client.getSpaces();
 		CloudSpace testSpace = null;
 		for (CloudSpace space : spaces) {
@@ -222,11 +287,9 @@ public class CloudFoundryClientV2Test {
 		}
 		assertNotNull("Space to use for testing (" + CCNG_USER_SPACE + ") not found for organization (" +
 				CCNG_USER_ORG + ") - check your account or system properties", testSpace);
-		URL ccUrl = null;
-		try {
-			ccUrl = new URL(CCNG_URL);
-		} catch (MalformedURLException e) {}
-		spaceClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), ccUrl, testSpace);
-		System.out.println("Using space " + testSpace.getName() + " of organization " + CCNG_USER_ORG );
+		spaceClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_URL), testSpace);
+		spaceClient.login();
+		return spaceClient;
 	}
+
 }

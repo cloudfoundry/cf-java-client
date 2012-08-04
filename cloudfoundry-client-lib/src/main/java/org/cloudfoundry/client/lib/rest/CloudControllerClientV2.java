@@ -23,6 +23,8 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
@@ -66,7 +68,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	public CloudInfo getInfo() {
 		String infoJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/info", String.class);
 		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(infoJson);
-
 
 		Map<String, Object> userMap = getUserInfo(getCloudControllerUrl(), (String) infoMap.get("user"));
 
@@ -131,23 +132,71 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public List<CloudService> getServices() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2";
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlPath = urlPath + "/service_instances?inline-relations-depth={depth}";
+		urlVars.put("depth", 2);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<CloudService> services = new ArrayList<CloudService>();
+		for (Map<String, Object> resource : resourceList) {
+			services.add(resourceMapper.mapJsonResource(resource, CloudService.class));
+		}
+		return services;
 	}
 
 	public void createService(CloudService service) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		List<CloudServiceOffering> offerings = getServiceOfferings(service.getLabel());
+		CloudServicePlan cloudServicePlan = null;
+		for (CloudServiceOffering offering : offerings) {
+			for (CloudServicePlan plan : offering.getCloudServicePlans())
+			if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
+				cloudServicePlan = plan;
+				break;
+			}
+		}
+		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
+		serviceRequest.put("name", service.getName());
+		serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
+		serviceRequest.put("credentials", new HashMap());
+		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
 	}
 
 	public CloudService getService(String serviceName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		String urlPath = "v2";
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlVars.put("q", "name:" + serviceName);
+		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
+		String respJson = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		CloudService cloudService = null;
+		if (resourceList.size() > 0) {
+			cloudService = resourceMapper.mapJsonResource(resourceList.get(0), CloudService.class);
+		}
+		return cloudService;
 	}
 
-	public void deleteService(String service) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+	public void deleteService(String serviceName) {
+		CloudService cloudService = getService(serviceName);
+		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
 	}
 
 	public void deleteAllServices() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		List<CloudService> services = getServices();
+		for (CloudService service : services) {
+			deleteService(service.getName());
+		}
 	}
 
 	public List<ServiceConfiguration> getServiceConfigurations() {
@@ -261,7 +310,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private Collection<CloudInfo.Framework> getInfoForFrameworks() {
-		// FRAMEWORKS
 		String frameworksJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/frameworks", String.class);
 		List<Map<String, Object>> frameworkList =
 				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(frameworksJson).get("resources");
@@ -275,7 +323,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private Map<String, CloudInfo.Runtime> getInfoForRuntimes() {
-		// RUNTIMES
 		String runtimesJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/runtimes", String.class);
 		List<Map<String, Object>> runtimesList =
 				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(runtimesJson).get("resources");
@@ -286,6 +333,22 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			runtimes.put(runtime.getName(), runtime);
 		}
 		return runtimes;
+	}
+
+	private List<CloudServiceOffering> getServiceOfferings(String label) {
+		String respJson = getRestTemplate().getForObject(getCloudControllerUrl() +
+				"/v2/services?inline-relations-depth=2", String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<CloudServiceOffering> results = new ArrayList<CloudServiceOffering>();
+		for (Map<String, Object> resource : resourceList) {
+			CloudServiceOffering cloudServiceOffering =
+					resourceMapper.mapJsonResource(resource, CloudServiceOffering.class);
+			if (label.equals(cloudServiceOffering.getLabel())) {
+				results.add(cloudServiceOffering);
+			}
+		}
+		return results;
 	}
 
 	private Map<String, Object> getUserInfo(URL cloudControllerUrl, String user) {
