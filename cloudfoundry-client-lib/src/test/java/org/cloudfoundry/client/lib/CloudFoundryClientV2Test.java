@@ -242,6 +242,7 @@ public class CloudFoundryClientV2Test {
 		spaceClient = setTestSpaceAsDefault(client);
 		CloudService service = spaceClient.getService(serviceName);
 		assertNotNull(service);
+		assertEquals(2, service.getMeta().getVersion());
 		assertEquals(serviceName, service.getName());
 		// Allow more time deviations due to local clock being out of sync with cloud
 		int timeTolerance = 300 * 1000; // 5 minutes
@@ -270,6 +271,29 @@ public class CloudFoundryClientV2Test {
 		String serviceName = "mysql-test";
 		createMySqlService(serviceName);
 		spaceClient.deleteService(serviceName);
+	}
+
+	@Test
+	public void getServiceConfigurations() {
+		List<ServiceConfiguration> configurations = spaceClient.getServiceConfigurations();
+
+		assertNotNull(configurations);
+		assertTrue(configurations.size() >= 2);
+
+		ServiceConfiguration configuration = null;
+		for (ServiceConfiguration sc : configurations) {
+			if (sc.getCloudServiceOffering().getLabel().equals("redis")) {
+				configuration = sc;
+				break;
+			}
+		}
+		assertNotNull(configuration);
+		assertEquals(2, configuration.getMeta().getVersion());
+//		TODO: type is not currently part of the service definitions in v2
+//		assertEquals("key-value", configuration.getType());
+		assertEquals("redis", configuration.getCloudServiceOffering().getLabel());
+		assertNotNull(configuration.getCloudServiceOffering().getCloudServicePlans());
+		assertTrue(configuration.getCloudServiceOffering().getCloudServicePlans().size() > 0);
 	}
 
 	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {

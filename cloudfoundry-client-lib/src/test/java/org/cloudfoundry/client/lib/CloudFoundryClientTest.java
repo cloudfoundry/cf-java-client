@@ -506,6 +506,7 @@ public class CloudFoundryClientTest {
 
 		CloudService service = client.getService(serviceName);
 		assertNotNull(service);
+		assertEquals(1, service.getMeta().getVersion());
 		assertEquals(serviceName, service.getName());
 		// Allow more time deviations due to local clock being out of sync with cloud
 		int timeTolerance = 300 * 1000; // 5 minutes
@@ -593,6 +594,7 @@ public class CloudFoundryClientTest {
 			}
 		}
 		assertNotNull(configuration);
+		assertEquals(1, configuration.getMeta().getVersion());
 		assertEquals("key-value", configuration.getType());
 		assertEquals("redis", configuration.getVendor());
 		assertNotNull(configuration.getTiers());

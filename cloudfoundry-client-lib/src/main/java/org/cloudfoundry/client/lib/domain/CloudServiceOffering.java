@@ -21,6 +21,9 @@ import java.util.List;
 
 public class CloudServiceOffering extends CloudEntity {
 
+	//Note name is used for label
+	private String provider;
+	private String version;
 	private String description;
 
 	private List<CloudServicePlan> cloudServicePlans = new ArrayList<CloudServicePlan>();
@@ -30,6 +33,12 @@ public class CloudServiceOffering extends CloudEntity {
 
 	public CloudServiceOffering(Meta meta, String name) {
 		super(meta, name);
+	}
+
+	public CloudServiceOffering(Meta meta, String name, String provider, String version) {
+		super(meta, name);
+		this.provider = provider;
+		this.version = version;
 	}
 
 	public String getLabel() {
@@ -46,6 +55,22 @@ public class CloudServiceOffering extends CloudEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	public List<CloudServicePlan> getCloudServicePlans() {

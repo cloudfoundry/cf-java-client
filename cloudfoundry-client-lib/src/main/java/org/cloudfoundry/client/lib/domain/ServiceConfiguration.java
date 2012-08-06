@@ -139,12 +139,24 @@ public class ServiceConfiguration {
 	}
 
 	private String description;
+	private String version;
+	private CloudEntity.Meta meta;
+
+	// v1 only attributes
 	private List<Tier> tiers = new ArrayList<ServiceConfiguration.Tier>();
 	private String type;
 	private String vendor;
-	private String version;
 
+	// v2 only attributes
+	private CloudServiceOffering cloudServiceOffering;
+
+	/**
+	 * Constructor used by v1 services
+	 *
+	 * @param attributes
+	 */
 	public ServiceConfiguration(Map<String, Object> attributes) {
+		this.meta = new CloudEntity.Meta(null, null, null, 1);
 		type = CloudUtil.parse(attributes.get("type"));
 		version = CloudUtil.parse(attributes.get("version"));
 		vendor = CloudUtil.parse(attributes.get("vendor"));
@@ -162,6 +174,13 @@ public class ServiceConfiguration {
 				}
 			}
 		}
+	}
+
+	public ServiceConfiguration(CloudServiceOffering cloudServiceOffering) {
+		this.cloudServiceOffering = cloudServiceOffering;
+		this.meta = cloudServiceOffering.getMeta();
+		this.version = cloudServiceOffering.getVersion();
+		this.description = cloudServiceOffering.getDescription();
 	}
 
 	public String getDescription() {
@@ -182,5 +201,13 @@ public class ServiceConfiguration {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public CloudServiceOffering getCloudServiceOffering() {
+		return cloudServiceOffering;
+	}
+
+	public CloudEntity.Meta getMeta() {
+		return meta;
 	}
 }

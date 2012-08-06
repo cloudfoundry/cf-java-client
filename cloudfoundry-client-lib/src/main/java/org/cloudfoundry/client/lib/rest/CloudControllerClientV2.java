@@ -200,7 +200,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public List<ServiceConfiguration> getServiceConfigurations() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		String urlPath = "/v2/services?inline-relations-depth=1";
+		String respJson = getRestTemplate().getForObject(getUrl(urlPath), String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<ServiceConfiguration> serviceConfigurations = new ArrayList<ServiceConfiguration>();
+		for (Map<String, Object> resource : resourceList) {
+			CloudServiceOffering serviceOffering = resourceMapper.mapJsonResource(resource, CloudServiceOffering.class);
+			serviceConfigurations.add(new ServiceConfiguration(serviceOffering));
+		}
+		return serviceConfigurations;
 	}
 
 	public List<CloudApplication> getApplications() {

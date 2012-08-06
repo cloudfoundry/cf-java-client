@@ -100,7 +100,9 @@ public class CloudEntityResourceMapper {
 	private CloudServiceOffering mapServiceResource(Map<String, Object> resource) {
 		CloudServiceOffering cloudServiceOffering = new CloudServiceOffering(
 				getMeta(resource),
-				getEntityAttribute(resource, "label", String.class));
+				getEntityAttribute(resource, "label", String.class),
+				getEntityAttribute(resource, "provider", String.class),
+				getEntityAttribute(resource, "version", String.class));
 		cloudServiceOffering.setDescription(getEntityAttribute(resource, "description", String.class));
 		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
 		if (servicePlanList != null) {
