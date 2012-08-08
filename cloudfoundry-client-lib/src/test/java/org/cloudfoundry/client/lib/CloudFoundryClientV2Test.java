@@ -31,10 +31,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -318,27 +320,6 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		createMySqlService("mysql-test");
 	}
 
-	private String createSpringTravelApp(int index) {
-		List<String> uris = new ArrayList<String>();
-		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test" + index);
-		uris.add(computeAppUrl(CCNG_URL, appName));
-		Staging staging =  new Staging("spring");
-		staging.setRuntime("java");
-		spaceClient.createApplication(appName, staging,
-				spaceClient.getDefaultApplicationMemory("spring"), uris, null);
-		return appName;
-	}
-
-	private void createMySqlService(String serviceName) {
-		CloudService service = new CloudService(CloudEntity.Meta.defaultV2Meta(), serviceName);
-		service.setType("database");
-		service.setVersion("5.1");
-		service.setProvider("core");
-		service.setLabel("mysql");
-		service.setPlan("D100");
-		spaceClient.createService(service);
-	}
-
 	@Test
 	public void deleteService() throws MalformedURLException {
 		String serviceName = "mysql-test";
@@ -367,6 +348,46 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertEquals("redis", configuration.getCloudServiceOffering().getLabel());
 		assertNotNull(configuration.getCloudServiceOffering().getCloudServicePlans());
 		assertTrue(configuration.getCloudServiceOffering().getCloudServicePlans().size() > 0);
+	}
+
+	@Test
+	public void updateApplicationService() throws IOException {
+		String serviceName = "test_database";
+		createMySqlService(serviceName);
+		String appName = createSpringTravelApp(7);
+
+		spaceClient.updateApplicationServices(appName, Collections.singletonList(serviceName));
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().size() > 0);
+		assertEquals(serviceName, app.getServices().get(0));
+
+		List<String> emptyList = Collections.emptyList();
+		spaceClient.updateApplicationServices(appName, emptyList);
+		app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(emptyList, app.getServices());
+	}
+
+	private String createSpringTravelApp(int index) {
+		List<String> uris = new ArrayList<String>();
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test" + index);
+		uris.add(computeAppUrl(CCNG_URL, appName));
+		Staging staging =  new Staging("spring");
+		staging.setRuntime("java");
+		spaceClient.createApplication(appName, staging,
+				spaceClient.getDefaultApplicationMemory("spring"), uris, null);
+		return appName;
+	}
+
+	private void createMySqlService(String serviceName) {
+		CloudService service = new CloudService(CloudEntity.Meta.defaultV2Meta(), serviceName);
+		service.setType("database");
+		service.setVersion("5.1");
+		service.setProvider("core");
+		service.setLabel("mysql");
+		service.setPlan("D100");
+		spaceClient.createService(service);
 	}
 
 	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {

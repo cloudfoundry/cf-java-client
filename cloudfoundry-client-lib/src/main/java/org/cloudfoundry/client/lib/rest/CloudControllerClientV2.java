@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -358,7 +359,42 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void updateApplicationServices(String appName, List<String> services) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		CloudApplication app = getApplication(appName);
+		List<UUID> addServices = new ArrayList<UUID>();
+		List<UUID> deleteServices = new ArrayList<UUID>();
+		// services to add
+		for (String serviceName : services) {
+			if (!app.getServices().contains(serviceName)) {
+				CloudService cloudService = getService(serviceName);
+				if (cloudService != null) {
+					addServices.add(cloudService.getMeta().getGuid());
+				}
+				else {
+					throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Service with name " + serviceName +
+							" not found in current space " + sessionSpace.getName());
+				}
+			}
+		}
+		// services to delete
+		for (String serviceName : app.getServices()) {
+			if (!services.contains(serviceName)) {
+				CloudService cloudService = getService(serviceName);
+				if (cloudService != null) {
+					deleteServices.add(cloudService.getMeta().getGuid());
+				}
+			}
+		}
+		for (UUID serviceId : addServices) {
+			HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+			serviceRequest.put("service_instance_guid", serviceId);
+			serviceRequest.put("app_guid", app.getMeta().getGuid());
+			serviceRequest.put("credentials", new HashMap());
+			getRestTemplate().postForObject(getUrl("v2/service_bindings"), serviceRequest, String.class);
+		}
+		for (UUID serviceId : deleteServices) {
+			UUID serviceBindingId = getServiceBindingId(app.getMeta().getGuid(), serviceId);
+			getRestTemplate().delete(getUrl("v2/service_bindings/{guid}"), serviceBindingId);
+		}
 	}
 
 	public void updateApplicationUris(String appName, List<String> uris) {
@@ -451,6 +487,27 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			}
 		}
 		return results;
+	}
+
+	@SuppressWarnings("unchecked")
+	private UUID getServiceBindingId(UUID appId, UUID serviceId ) {
+		String resp = getRestTemplate().getForObject(getUrl("v2/apps/{guid}/service_bindings"), String.class, appId);
+		UUID serviceBindingId = null;
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		if (resourceList != null && resourceList.size() > 0) {
+			for (Map<String, Object> resource : resourceList) {
+				Map<String, Object> bindingMeta = (Map<String, Object>) resource.get("metadata");
+				Map<String, Object> bindingEntity = (Map<String, Object>) resource.get("entity");
+				String serviceInstanceGuid = (String) bindingEntity.get("service_instance_guid");
+				if (serviceInstanceGuid != null && serviceInstanceGuid.equals(serviceId.toString())) {
+					String bindingGuid = (String) bindingMeta.get("guid");
+					serviceBindingId = UUID.fromString(bindingGuid);
+					break;
+				}
+			}
+		}
+		return serviceBindingId;
 	}
 
 	@SuppressWarnings("unchecked")
