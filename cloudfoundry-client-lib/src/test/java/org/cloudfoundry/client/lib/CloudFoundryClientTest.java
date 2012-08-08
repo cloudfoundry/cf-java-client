@@ -73,7 +73,7 @@ import org.springframework.web.client.HttpServerErrorException;
  * @author A.B.Srinivasan
  * @author Jennifer Hickey
  */
-public class CloudFoundryClientTest {
+public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -92,7 +92,7 @@ public class CloudFoundryClientTest {
 	private static final String TEST_ADMIN_PASS = System.getProperty("vcap.admin.passwd");
 
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
-			TEST_USER_EMAIL.substring(0, TEST_USER_EMAIL.indexOf('@')).replaceAll("\\.", "_"));
+			defaultNamespace(TEST_USER_EMAIL));
 
 	private final boolean serviceSupported = !ccUrl.contains("vmforce");
 
@@ -146,16 +146,16 @@ public class CloudFoundryClientTest {
 	@Test
 	public void getApplications() {
 		List<String> uris1 = new ArrayList<String>();
-		String appName1 = namespacedAppName("travel_test1");
-		uris1.add(computeAppUrl(appName1));
+		String appName1 = namespacedAppName(TEST_NAMESPACE, "travel_test1");
+		uris1.add(computeAppUrl(ccUrl, appName1));
 		client.createApplication(appName1, CloudApplication.SPRING,
 				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris1, null);
 		List<CloudApplication> apps = client.getApplications();
 		assertEquals(1, apps.size());
 
 		List<String> uris2 = new ArrayList<String>();
-		String appName2 = namespacedAppName("travel_test2");
-		uris2.add(computeAppUrl(appName2));
+		String appName2 = namespacedAppName(TEST_NAMESPACE, "travel_test2");
+		uris2.add(computeAppUrl(ccUrl, appName2));
 		client.createApplication(appName2, CloudApplication.SPRING,
 				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris2, null);
 		apps = client.getApplications();
@@ -165,8 +165,8 @@ public class CloudFoundryClientTest {
 	@Test
 	public void getApplication() {
 		List<String> uris = new ArrayList<String>();
-		String appName = namespacedAppName("travel_test3");
-		uris.add(computeAppUrl(appName));
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
+		uris.add(computeAppUrl(ccUrl, appName));
 		client.createApplication(appName, CloudApplication.SPRING,
 				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, null);
 		CloudApplication app = client.getApplication(appName);
@@ -176,7 +176,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationNonExistent() {
-		String appName = namespacedAppName("non_existent");
+		String appName = namespacedAppName(TEST_NAMESPACE, "non_existent");
 		try {
 			client.getApplication(appName);
 			fail("Expected CloudFoundryException");
@@ -230,7 +230,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadApplication() throws IOException {
-		CloudApplication app = createAndUploadTestApp(namespacedAppName("travel_test3"));
+		CloudApplication app = createAndUploadTestApp(namespacedAppName(TEST_NAMESPACE, "travel_test3"));
 
 		assertNotNull(app);
 		assertEquals(AppState.STOPPED, app.getState());
@@ -243,7 +243,7 @@ public class CloudFoundryClientTest {
 		Staging staging = new Staging("standalone");
 		staging.setRuntime("ruby19");
 		staging.setCommand("ruby simple.rb");
-		String appName = namespacedAppName("standalone-ruby");
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-ruby");
 		File file = SampleProjects.standaloneRuby();
 		client.createApplication(appName, staging, 128, uris, services);
 		client.uploadApplication(appName, file.getCanonicalPath());
@@ -256,9 +256,9 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadStandaloneApplicationWithURLs() throws IOException {
-		String appName = namespacedAppName("standalone-node");
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-node");
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(appName));
+		uris.add(computeAppUrl(ccUrl, appName));
 		List<String> services = new ArrayList<String>();
 		Staging staging = new Staging("standalone");
 		staging.setRuntime("node");
@@ -280,7 +280,7 @@ public class CloudFoundryClientTest {
 		String serviceName = "test_database";
 		List<String> serviceNames = new ArrayList<String>();
 		serviceNames.add(serviceName);
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadTestApp(appName, serviceNames);
 		assertEquals(1, app.getServices().size());
 		assertEquals(serviceName, app.getServices().get(0));
@@ -288,7 +288,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void startApplication() throws IOException {
-		CloudApplication app = createAndUploadAndStart(namespacedAppName("travel_test3"));
+		CloudApplication app = createAndUploadAndStart(namespacedAppName(TEST_NAMESPACE, "travel_test3"));
 		assertEquals(AppState.STARTED, app.getState());
 	}
 
@@ -296,7 +296,7 @@ public class CloudFoundryClientTest {
 	public void debugApplicationThrowsExceptionWhenDebuggingIsNotSupported() throws IOException, InterruptedException {
 		assumeTrue(!client.getCloudInfo().getAllowDebug());
 
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		createAndUploadTestApp(appName);
 		client.debugApplication(appName, DebugMode.run);
 	}
@@ -305,7 +305,7 @@ public class CloudFoundryClientTest {
 	public void debugApplicationWhenDebuggingIsSupported() throws IOException, InterruptedException {
 		assumeTrue(client.getCloudInfo().getAllowDebug());
 
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		createAndUploadTestApp(appName);
 		client.debugApplication(appName, DebugMode.run);
 		CloudApplication app = client.getApplication(appName);
@@ -329,7 +329,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void startExplodedApplication() throws IOException {
-		String appName = namespacedAppName("travel_test5");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test5");
 		CloudApplication app = createAndUploadExplodedSpringTestApp(appName, null);
 		client.startApplication(appName);
 		app = client.getApplication(appName);
@@ -338,7 +338,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void stopApplication() throws IOException {
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadAndStart(appName);
 		assertEquals(AppState.STARTED, app.getState());
 		client.stopApplication(appName);
@@ -348,7 +348,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getFile() throws Exception {
-		String appName = namespacedAppName("travel_getFile");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_getFile");
 		createAndUploadAndStart(appName);
 		String fileContent = null;
 		for (int i = 0; i < 20 && fileContent == null; i++) {
@@ -364,7 +364,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplictionInstances() throws IOException {
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadAndStart(appName);
 
 		client.updateApplicationInstances(appName, 2);
@@ -382,7 +382,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationRunningInstances() throws Exception {
-		String appName = namespacedAppName("travel_test");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test");
 		CloudApplication app = createAndUploadAndStart(appName);
 		client.updateApplicationInstances(appName, 2);
 		app = client.getApplication(appName);
@@ -396,7 +396,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationStats() throws Exception {
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		createAndUploadAndStart(appName);
 
 		ApplicationStats stats = client.getApplicationStats(appName);
@@ -430,7 +430,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationStatsStoppedApp() throws IOException {
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		createAndUploadTestApp(appName);
 
 		ApplicationStats stats = client.getApplicationStats(appName);
@@ -439,7 +439,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void setEnvironment() throws IOException {
-		String appName = namespacedAppName("add-env-test");
+		String appName = namespacedAppName(TEST_NAMESPACE, "add-env-test");
 		assertFalse(hasApplication(client.getApplications(), appName));
 		CloudApplication app = createAndUploadTestApp(appName);
 		assertTrue(app.getEnv().isEmpty());
@@ -459,7 +459,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void setEnvironmentThoughMap() throws IOException {
-		String appName = namespacedAppName("add-env-test");
+		String appName = namespacedAppName(TEST_NAMESPACE, "add-env-test");
 		assertFalse(hasApplication(client.getApplications(), appName));
 		CloudApplication app = createAndUploadTestApp(appName);
 		assertTrue(app.getEnv().isEmpty());
@@ -532,7 +532,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationMemory() throws IOException {
-		String appName = namespacedAppName("travel_memory_test");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_memory_test");
 		CloudApplication app = createAndUploadTestApp(appName);
 
 		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
@@ -548,7 +548,7 @@ public class CloudFoundryClientTest {
 
 		String serviceName = "test_database";
 		createDatabaseService(serviceName);
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		createAndUploadTestApp(appName);
 
 		client.updateApplicationServices(appName, Collections.singletonList(serviceName));
@@ -565,7 +565,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationUris() throws IOException {
-		String appName = namespacedAppName("travel_test3");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadAndStart(appName);
 		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), app.getUris());
 
@@ -722,7 +722,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getCrashes() throws IOException {
-		String appName = namespacedAppName("travel_test42");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test42");
 		createAndUploadTestApp(appName);
 
 		CrashesInfo crashes = client.getCrashes(appName);
@@ -733,7 +733,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationInstances() throws Exception {
-		String appName = namespacedAppName("travel_test42");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test42");
 		createAndUploadAndStart(appName);
 
 		CloudApplication app = client.getApplication(appName);
@@ -776,7 +776,7 @@ public class CloudFoundryClientTest {
 
 		String serviceName = "test_database";
 		createDatabaseService(serviceName);
-		String appName = namespacedAppName("travel_test42");
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test42");
 		createAndUploadTestApp(appName);
 
 		CloudApplication app = client.getApplication(appName);
@@ -800,7 +800,7 @@ public class CloudFoundryClientTest {
 	@Test
 	public void proxyUser() throws IOException {
 		assumeNotNull(TEST_ADMIN_EMAIL, TEST_ADMIN_PASS);
-		String appName = namespacedAppName("admin-test");
+		String appName = namespacedAppName(TEST_NAMESPACE, "admin-test");
 		CloudCredentials adminCredentials = new CloudCredentials(TEST_ADMIN_EMAIL, TEST_ADMIN_PASS);
 		CloudFoundryClient adminClient = new CloudFoundryClient(adminCredentials, new URL(ccUrl));
 
@@ -819,7 +819,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadSinatraApp() throws IOException {
-		String appName = namespacedAppName("env");
+		String appName = namespacedAppName(TEST_NAMESPACE, "env");
 		ClassPathResource cpr = new ClassPathResource("apps/env/");
 		File explodedDir = cpr.getFile();
 		String framework = "sinatra";
@@ -832,9 +832,9 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadAppWithNonAsciiFileName() throws IOException {
-		String appName = namespacedAppName("non-ascii-file-name");
+		String appName = namespacedAppName(TEST_NAMESPACE, "non-ascii-file-name");
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(appName));
+		uris.add(computeAppUrl(ccUrl, appName));
 
 		File war = SampleProjects.nonAsciFileName();
 		List<String> serviceNames = new ArrayList<String>();
@@ -895,7 +895,7 @@ public class CloudFoundryClientTest {
 
 	private CloudApplication createAndUploadTestApp(String appName, List<String> serviceNames) throws IOException {
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(appName));
+		uris.add(computeAppUrl(ccUrl, appName));
 
 		File file = SampleProjects.springTravel();
 
@@ -913,7 +913,7 @@ public class CloudFoundryClientTest {
 
 	private void createApplication(String appName, List<String> serviceNames, String framework) {
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(appName));
+		uris.add(computeAppUrl(ccUrl, appName));
 		if (serviceNames != null) {
 			for (String serviceName : serviceNames) {
 				createDatabaseService(serviceName);
@@ -947,10 +947,6 @@ public class CloudFoundryClientTest {
 		return client.getApplication(appName);
 	}
 
-	private String computeAppUrl(String appName) {
-		return ccUrl.replace("api", appName);
-	}
-
 	private String computeAppUrlNoProtocol(String appName) {
 		return ccUrl.replace("api", appName).replace("http://", "").replace("https://", "");
 	}
@@ -975,7 +971,4 @@ public class CloudFoundryClientTest {
 		return service;
 	}
 
-	private String namespacedAppName(String basename) {
-		return TEST_NAMESPACE + "-" + basename;
-	}
 }

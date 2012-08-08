@@ -16,11 +16,14 @@
 
 package org.cloudfoundry.client.lib;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.Staging;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,6 +33,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +51,9 @@ import static org.junit.Assert.fail;
  * You need to create organization, space and user account via the portal and set these values using
  * system properties.
  *
- * @author: trisberg
+ * @author Thomas Risberg
  */
-public class CloudFoundryClientV2Test {
+public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -69,6 +73,9 @@ public class CloudFoundryClientV2Test {
 
 	private static final String CCNG_USER_SPACE = System.getProperty("ccng.space", "test");
 
+	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
+			defaultNamespace(CCNG_USER_EMAIL));
+
 	private String token;
 
 	@BeforeClass
@@ -86,17 +93,13 @@ public class CloudFoundryClientV2Test {
 		client = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_URL));
 		this.token = client.login();
 		spaceClient = setTestSpaceAsDefault(client);
-//		TODO: verify clean account
-//		List<CloudApplication> apps = client.getApplications();
-//		assertEquals(0, apps.size());
+		spaceClient.deleteAllApplications();
 		spaceClient.deleteAllServices();
 	}
 
 	@After
 	public void tearDown() {
-		client.login(); // in case a test logged out (currently logout())
-//		TODO: clean out account
-//		client.deleteAllApplications();
+		spaceClient.deleteAllApplications();
 		spaceClient.deleteAllServices();
 	}
 
@@ -185,6 +188,7 @@ public class CloudFoundryClientV2Test {
 
 		// a basic check that runtime info is correct
 		CloudInfo.Framework springFramework = frameworksByName.get("spring");
+		assertNotNull(springFramework);
 		//TODO: this is no longer availabe in v2
 //		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
 //		assertNotNull(springRuntimes);
@@ -209,6 +213,65 @@ public class CloudFoundryClientV2Test {
 		// a basic check that versions are right
 		//TODO: this is no longer availabe in v2
 //		assertEquals("1.6", runtimesByName.get("java").getVersion());
+	}
+
+	@Test
+	public void createApplication() {
+		List<String> uris = new ArrayList<String>();
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test0");
+		uris.add(computeAppUrl(CCNG_URL, appName));
+		Staging staging =  new Staging("spring");
+		staging.setRuntime("java");
+		spaceClient.createApplication(appName, staging,
+				spaceClient.getDefaultApplicationMemory("spring"), uris, null);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+	}
+
+	@Test
+	public void getApplications() {
+		String appName = createSpringTravelApp(1);
+		List<CloudApplication> apps = spaceClient.getApplications();
+		assertEquals(1, apps.size());
+		assertEquals(appName, apps.get(0).getName());
+		assertNotNull(apps.get(0));
+		assertNotNull(apps.get(0).getMeta());
+		assertNotNull(apps.get(0).getMeta().getGuid());
+		assertEquals(2, apps.get(0).getMeta().getVersion());
+
+		createSpringTravelApp(2);
+		apps = spaceClient.getApplications();
+		assertEquals(2, apps.size());
+	}
+
+	@Test
+	public void getApplication() {
+		String appName = createSpringTravelApp(3);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+	}
+
+	@Test
+	public void deleteApplication() {
+		String appName = createSpringTravelApp(4);
+		assertEquals(1, spaceClient.getApplications().size());
+		spaceClient.deleteApplication(appName);
+		assertEquals(0, spaceClient.getApplications().size());
+	}
+
+	@Test
+	public void renameApplication() {
+		String appName = createSpringTravelApp(5);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+		String newName = namespacedAppName(TEST_NAMESPACE, "travel_test" + 6);
+		spaceClient.rename(appName, newName);
+		CloudApplication newApp = spaceClient.getApplication(newName);
+		assertNotNull(newApp);
+		assertEquals(newName, newApp.getName());
 	}
 
 	@Test
@@ -255,11 +318,21 @@ public class CloudFoundryClientV2Test {
 		createMySqlService("mysql-test");
 	}
 
+	private String createSpringTravelApp(int index) {
+		List<String> uris = new ArrayList<String>();
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test" + index);
+		uris.add(computeAppUrl(CCNG_URL, appName));
+		Staging staging =  new Staging("spring");
+		staging.setRuntime("java");
+		spaceClient.createApplication(appName, staging,
+				spaceClient.getDefaultApplicationMemory("spring"), uris, null);
+		return appName;
+	}
+
 	private void createMySqlService(String serviceName) {
-		CloudService service = new CloudService();
+		CloudService service = new CloudService(CloudEntity.Meta.defaultV2Meta(), serviceName);
 		service.setType("database");
 		service.setVersion("5.1");
-		service.setName(serviceName);
 		service.setProvider("core");
 		service.setLabel("mysql");
 		service.setPlan("D100");

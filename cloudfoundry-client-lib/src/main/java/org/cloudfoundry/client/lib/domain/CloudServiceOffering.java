@@ -28,9 +28,6 @@ public class CloudServiceOffering extends CloudEntity {
 
 	private List<CloudServicePlan> cloudServicePlans = new ArrayList<CloudServicePlan>();
 
-	public CloudServiceOffering() {
-	}
-
 	public CloudServiceOffering(Meta meta, String name) {
 		super(meta, name);
 	}

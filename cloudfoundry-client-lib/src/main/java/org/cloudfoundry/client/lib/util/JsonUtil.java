@@ -23,7 +23,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,14 +40,28 @@ public class JsonUtil {
 
 	private final static ObjectMapper mapper = new ObjectMapper();
 
-	public static Map<String, Object> convertJsonToMap(String resp) {
-		Map<String, Object> respMap = new HashMap<String, Object>();
-		try {
-			respMap = mapper.readValue(resp, new TypeReference<Map<String, Object>>() {});
-		} catch (IOException e) {
-			logger.warn("Error while reading Java Map from JSON response: " + resp, e);
+	public static Map<String, Object> convertJsonToMap(String json) {
+		Map<String, Object> retMap = new HashMap<String, Object>();
+		if (json != null) {
+			try {
+				retMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+			} catch (IOException e) {
+				logger.warn("Error while reading Java Map from JSON response: " + json, e);
+			}
 		}
-		return respMap;
+		return retMap;
+	}
+
+	public static List<String> convertJsonToList(String json) {
+		List<String> retList = new ArrayList<String>();
+		if (json != null) {
+			try {
+				retList = mapper.readValue(json, new TypeReference<List<String>>() {});
+			} catch (IOException e) {
+				logger.warn("Error while reading Java List from JSON response: " + json, e);
+			}
+		}
+		return retList;
 	}
 
 }
