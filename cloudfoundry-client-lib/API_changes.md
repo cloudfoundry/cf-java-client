@@ -38,9 +38,28 @@ You will need to adjust the import statements for these classes
 
 The _org.cloudfoundry.client.lib.CloudFoundryOperations_ interface defines the public API. You can use this interface or continue using the _org.cloudfoundry.client.lib.CloudFoundryClient_ class.
 
+All entity classes in the _org.cloudfoundry.client.lib.domain_ package have a CloudEntity.Meta property that hold the following attributes:
+
+  * UUID guid;
+  * Date created;
+  * Date updated;
+  * int version;
+
+This allows you to determine the version of any entity using getMeta().getVersion() which should return 1 or 2 depending on the cloud controller version currently connected to.
+
 The following method has been removed from _CloudFoundryClient_:
 
     public <T> T getFile(String appName, int instanceIndex, String filePath, RequestCallback requestCallback, ResponseExtractor<T> responseHandler)
+
+The following methods have been removed from _CloudApplication_:
+
+    public Map<String, Object> getMeta()
+    public void setMeta(Map<String, Object> meta)
+
+They are replaced with the following methods that are now available for all cloud entity classes:
+
+    public CloudEntity.Meta getMeta()
+    public void setMeta(CloudEntity.Meta meta)
 
 
 ### Deprecations:

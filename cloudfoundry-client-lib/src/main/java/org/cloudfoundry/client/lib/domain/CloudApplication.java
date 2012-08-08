@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,10 @@ import java.util.Map;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
+
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
-public class CloudApplication {
+public class CloudApplication extends CloudEntity {
 
     private static final String MODEL_KEY = "model";
     private static final String STACK_KEY = "stack";
@@ -37,23 +40,26 @@ public class CloudApplication {
     public static final String GRAILS = "grails/1.0";
     public static final String STANDALONE = "standalone";
 
-	private String name;
 	private Map<String,String> staging = new HashMap<String, String>();
 	private int instances;
 	private List<String> uris;
 	private List<String> services;
 	private AppState state;
 	private DebugMode debug;
-	private Map<String, Object> meta = new HashMap<String, Object>();
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
+
+	// Constructor for V2 entities
+	public CloudApplication(Meta meta, String name) {
+		super(meta, name);
+	}
 
 	public CloudApplication(String name, String stagingStack, String stagingModel,
 						int memory, int instances,
 						List<String> uris, List<String> serviceNames,
 						AppState state) {
-		this.name = name;
+		super(CloudEntity.Meta.defaultV1Meta(), name);
 		this.staging.put(STACK_KEY, stagingStack);
 		this.staging.put(MODEL_KEY, stagingModel);
 		this.resources.put(MEMORY_KEY, memory);
@@ -65,7 +71,7 @@ public class CloudApplication {
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication(Map<String, Object> attributes) {
-		name = (String) attributes.get("name");
+		super(CloudEntity.Meta.defaultV1Meta(), parse(attributes.get("name")));
 		setStaging((Map<String,String>) attributes.get("staging"));
 		instances = (Integer)attributes.get("instances");
 		Integer runningInstancesAttribute = (Integer) attributes.get("runningInstances");
@@ -75,15 +81,26 @@ public class CloudApplication {
 		uris = (List<String>)attributes.get("uris");
 		services = (List<String>)attributes.get("services");
 		state = AppState.valueOf((String) attributes.get("state"));
-		meta = (Map<String, Object>) attributes.get("meta");
 		resources = (Map<String, Integer>) attributes.get("resources");
 		env = (List<String>) attributes.get("env");
 
-		if (meta != null) {
-			String debugAttribute = (String) meta.get("debug");
+		Map<String, Object> metaValue = parse(Map.class,
+				attributes.get("meta"));
+		if (metaValue != null) {
+			String debugAttribute = (String) metaValue.get("debug");
 			if (debugAttribute != null) {
 				debug = DebugMode.valueOf(debugAttribute);
 			}
+			long created = parse(Long.class, metaValue.get("created"));
+			int version = parse(Integer.class, metaValue.get("version"));
+			Meta meta = null;
+			if (created != 0) {
+				meta = new Meta(null, new Date(created * 1000), null, version);
+			}
+			else {
+				meta = new Meta(null, null, null, version);
+			}
+			setMeta(meta);
 		}
 	}
 
@@ -94,14 +111,6 @@ public class CloudApplication {
 	public enum DebugMode {
 		run,
 		suspend
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public Map<String,String> getStaging() {
@@ -160,14 +169,6 @@ public class CloudApplication {
 		this.debug = debug;
 	}
 
-	public Map<String, Object> getMeta() {
-		return meta;
-	}
-
-	public void setMeta(Map<String, Object> meta) {
-		this.meta = meta;
-	}
-
 	public List<String> getServices() {
 		return services;
 	}
@@ -212,7 +213,7 @@ public class CloudApplication {
 	@Override
 	public String toString() {
 		return "CloudApplication [stagingModel=" + staging.get(MODEL_KEY) + ", instances="
-				+ instances + ", name=" + name + ", stagingStack=" + staging.get(STACK_KEY)
+				+ instances + ", name=" + getName() + ", stagingStack=" + staging.get(STACK_KEY)
 				+ ", memory=" + resources.get(MEMORY_KEY)
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ",services=" + services
 				+ ", env=" + env + "]";
