@@ -87,6 +87,7 @@ public class CloudEntityResourceMapper {
 		return org;
 	}
 
+	@SuppressWarnings("unchecked")
 	private CloudApplication mapApplicationResource(Map<String, Object> resource) {
 		CloudApplication app = new CloudApplication(
 				getMeta(resource),
@@ -97,7 +98,11 @@ public class CloudEntityResourceMapper {
 		app.setServices(new ArrayList<String>());
 		app.setState(CloudApplication.AppState.valueOf(getEntityAttribute(resource, "state", String.class)));
 		app.setDebug(null);
-		app.setEnv(getEntityAttribute(resource, "environment_json", Map.class));
+		String envJson = getEntityAttribute(resource, "environment_json",String.class);
+		Map envMap = JsonUtil.convertJsonToMap(envJson);
+		if (envMap.size() > 0) {
+			app.setEnv(envMap);
+		}
 		Map<String, Integer> resources = app.getResources();
 		resources.put("memory", getEntityAttribute(resource, "memory", Integer.class));
 		resources.put("file_descriptors", getEntityAttribute(resource, "file_descriptors", Integer.class));
@@ -106,6 +111,13 @@ public class CloudEntityResourceMapper {
 		resources.put("fds", getEntityAttribute(resource, "file_descriptors", Integer.class));
 		resources.put("disk", getEntityAttribute(resource, "disk_quota", Integer.class));
 		app.setResources(resources);
+		List<Map<String, Object>> serviceBindings = getEntityAttribute(resource, "service_bindings", List.class);
+		List<String> serviceList = new ArrayList<String>();
+		for (Map<String, Object> binding : serviceBindings) {
+			Map<String, Object> service = getEntityAttribute(binding, "service_instance", Map.class);
+			serviceList.add(getNameOfResource(service));
+		}
+		app.setServices(serviceList);
 		return app;
 	}
 
@@ -189,12 +201,10 @@ public class CloudEntityResourceMapper {
 			return (T) entity.get(attributeName);
 		}
 		if (targetClass == Map.class) {
-			String value = String.valueOf(entity.get(attributeName));
-			return (T) JsonUtil.convertJsonToMap(value);
+			return (T) entity.get(attributeName);
 		}
 		if (targetClass == List.class) {
-			String value = String.valueOf(entity.get(attributeName));
-			return (T) JsonUtil.convertJsonToList(value);
+			return (T) entity.get(attributeName);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for attribute mapping " + targetClass.getName());
