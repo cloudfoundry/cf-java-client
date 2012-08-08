@@ -169,14 +169,6 @@ public class CloudApplication extends CloudEntity {
 		this.debug = debug;
 	}
 
-//	public Map<String, Object> getMeta() {
-//		return meta;
-//	}
-
-//	public void setMeta(Map<String, Object> meta) {
-//		this.meta = meta;
-//	}
-
 	public List<String> getServices() {
 		return services;
 	}
