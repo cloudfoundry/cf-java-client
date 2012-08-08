@@ -34,7 +34,9 @@ import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +46,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Empty implementation for cloud controller v2 REST API
@@ -58,6 +61,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
 
+	Map<String, UUID> runtimeIdCache = new HashMap<String, UUID>();
+
+	Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
+
 	public CloudControllerClientV2(URL cloudControllerUrl, CloudCredentials cloudCredentials,
 								   URL authorizationEndpoint, CloudSpace sessionSpace) {
 		super(cloudControllerUrl, cloudCredentials, authorizationEndpoint);
@@ -65,6 +72,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		this.sessionSpace = sessionSpace;
 	}
 
+	@SuppressWarnings("unchecked")
 	public CloudInfo getInfo() {
 		String infoJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/info", String.class);
 		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(infoJson);
@@ -103,7 +111,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		List<CloudSpace> spaces = new ArrayList<CloudSpace>();
 		for (Map<String, Object> resource : resourceList) {
-			spaces.add(resourceMapper.mapJsonResource(resource, CloudSpace.class));
+			spaces.add(resourceMapper.mapResource(resource, CloudSpace.class));
 		}
 		return spaces;
 	}
@@ -131,6 +139,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<CloudService> getServices() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "v2";
@@ -145,7 +154,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
-			services.add(resourceMapper.mapJsonResource(resource, CloudService.class));
+			services.add(resourceMapper.mapResource(resource, CloudService.class));
 		}
 		return services;
 	}
@@ -168,6 +177,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public CloudService getService(String serviceName) {
 		String urlPath = "v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
@@ -177,47 +187,81 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 		urlVars.put("q", "name:" + serviceName);
 		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
-		String respJson = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
-			cloudService = resourceMapper.mapJsonResource(resourceList.get(0), CloudService.class);
+			cloudService = resourceMapper.mapResource(resourceList.get(0), CloudService.class);
 		}
 		return cloudService;
 	}
 
 	public void deleteService(String serviceName) {
 		CloudService cloudService = getService(serviceName);
-		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
+		doDeleteService(cloudService);
 	}
 
 	public void deleteAllServices() {
-		List<CloudService> services = getServices();
-		for (CloudService service : services) {
-			deleteService(service.getName());
+		List<CloudService> cloudServices = getServices();
+		for (CloudService cloudService : cloudServices) {
+			doDeleteService(cloudService);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ServiceConfiguration> getServiceConfigurations() {
 		String urlPath = "/v2/services?inline-relations-depth=1";
-		String respJson = getRestTemplate().getForObject(getUrl(urlPath), String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		List<ServiceConfiguration> serviceConfigurations = new ArrayList<ServiceConfiguration>();
 		for (Map<String, Object> resource : resourceList) {
-			CloudServiceOffering serviceOffering = resourceMapper.mapJsonResource(resource, CloudServiceOffering.class);
+			CloudServiceOffering serviceOffering = resourceMapper.mapResource(resource, CloudServiceOffering.class);
 			serviceConfigurations.add(new ServiceConfiguration(serviceOffering));
 		}
 		return serviceConfigurations;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<CloudApplication> getApplications() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2";
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlPath = urlPath + "/apps?inline-relations-depth={depth}";
+		urlVars.put("depth", 2);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<CloudApplication> apps = new ArrayList<CloudApplication>();
+		for (Map<String, Object> resource : resourceList) {
+			apps.add(resourceMapper.mapResource(resource, CloudApplication.class));
+		}
+		return apps;
 	}
 
+	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2";
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlVars.put("q", "name:" + appName);
+		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
+		urlVars.put("depth", 2);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		CloudApplication cloudApp = null;
+		if (resourceList.size() > 0) {
+			cloudApp = resourceMapper.mapResource(resourceList.get(0), CloudApplication.class);
+		}
+		return cloudApp;
 	}
 
 	public ApplicationStats getApplicationStats(String appName) {
@@ -229,12 +273,43 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public int getDefaultApplicationMemory(String framework) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		//TODO: implement this method
+		return 512;
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		if (checkExists) {
+			try {
+				getApplication(appName);
+				return;
+			} catch (HttpClientErrorException e) {
+				if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
+					throw e;
+				}
+			}
+		}
+
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
+		appRequest.put("name", appName);
+		appRequest.put("framework_guid", getFrameworkId(staging.getFramework()));
+		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
+		appRequest.put("memory", memory);
+		appRequest.put("instances", 1);
+		//TODO: these need to be added?
+//		appRequest.put("uris", ?);
+//		appRequest.put("command", staging.getCommand());
+		appRequest.put("state", CloudApplication.AppState.STOPPED);
+		String postResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
+
+		//TODO: this is not implemented yet
+		@SuppressWarnings("unused")
+		CloudApplication postedApp = getApplication(appName);
+//		if (serviceNames != null && serviceNames.size() != 0) {
+//			postedApp.setServices(serviceNames);
+//			updateApplication(postedApp);
+//		}
 	}
 
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
@@ -263,11 +338,15 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void deleteApplication(String appName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		CloudApplication cloudApp = getApplication(appName);
+		doDeleteApplication(cloudApp);
 	}
 
 	public void deleteAllApplications() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		List<CloudApplication> cloudApps = getApplications();
+		for (CloudApplication cloudApp : cloudApps) {
+			doDeleteApplication(cloudApp);
+		}
 	}
 
 	public void updateApplicationMemory(String appName, int memory) {
@@ -318,6 +397,15 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	private void doDeleteService(CloudService cloudService) {
+		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
+	}
+
+	private void doDeleteApplication(CloudApplication cloudApp) {
+		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), cloudApp.getMeta().getGuid());
+	}
+
+	@SuppressWarnings("unchecked")
 	private Collection<CloudInfo.Framework> getInfoForFrameworks() {
 		String frameworksJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/frameworks", String.class);
 		List<Map<String, Object>> frameworkList =
@@ -331,6 +419,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return frameworks;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String, CloudInfo.Runtime> getInfoForRuntimes() {
 		String runtimesJson = getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/runtimes", String.class);
 		List<Map<String, Object>> runtimesList =
@@ -344,15 +433,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return runtimes;
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
-		String respJson = getRestTemplate().getForObject(getCloudControllerUrl() +
+		String resp = getRestTemplate().getForObject(getCloudControllerUrl() +
 				"/v2/services?inline-relations-depth=2", String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(respJson);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		List<CloudServiceOffering> results = new ArrayList<CloudServiceOffering>();
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering cloudServiceOffering =
-					resourceMapper.mapJsonResource(resource, CloudServiceOffering.class);
+					resourceMapper.mapResource(resource, CloudServiceOffering.class);
 			if (label.equals(cloudServiceOffering.getLabel())) {
 				results.add(cloudServiceOffering);
 			}
@@ -360,6 +450,39 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return results;
 	}
 
+	@SuppressWarnings("unchecked")
+	private UUID getFrameworkId(String framework) {
+		if (!frameworkIdCache.containsKey(framework)) {
+			String resp =
+					getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/frameworks", String.class);
+			List<Map<String, Object>> resourceList =
+					(List<Map<String, Object>>) JsonUtil.convertJsonToMap(resp).get("resources");
+			for (Map<String, Object> resource : resourceList) {
+				String name = resourceMapper.getNameOfResource(resource);
+				UUID guid = resourceMapper.getGuidOfResource(resource);
+				frameworkIdCache.put(name, guid);
+			}
+		}
+		return frameworkIdCache.get(framework);
+	}
+
+	@SuppressWarnings("unchecked")
+	private UUID getRuntimeId(String runtime) {
+		if (!runtimeIdCache.containsKey(runtime)) {
+			String resp =
+					getRestTemplate().getForObject(getCloudControllerUrl() + "/v2/runtimes", String.class);
+			List<Map<String, Object>> resourceList =
+					(List<Map<String, Object>>) JsonUtil.convertJsonToMap(resp).get("resources");
+			for (Map<String, Object> resource : resourceList) {
+				String name = resourceMapper.getNameOfResource(resource);
+				UUID guid = resourceMapper.getGuidOfResource(resource);
+				runtimeIdCache.put(name, guid);
+			}
+		}
+		return runtimeIdCache.get(runtime);
+	}
+
+	@SuppressWarnings("unused")
 	private Map<String, Object> getUserInfo(URL cloudControllerUrl, String user) {
 //		String userJson = getRestTemplate().getForObject(cloudControllerUrl + "/v2/users/{guid}", String.class, user);
 //		Map<String, Object> userInfo = (Map<String, Object>) JsonUtil.convertJsonToMap(userJson);

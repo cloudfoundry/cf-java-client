@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,18 +26,24 @@ import java.util.UUID;
  */
 public class CloudEntity {
 
+	@JsonIgnore
 	private Meta meta;
 
 	private String name;
 
 	public CloudEntity() {
-		// this constructor is invoked by default for any V1 entities
-		this.meta = Meta.defaultV1Meta();
 	}
 
 	public CloudEntity(Meta meta, String name) {
-		// this constructor should be used by any V2 entities
-		this.meta = meta;
+		// This constructor should be used by any V2 entities.
+		// For V1 entities pass in a null meta parameter and it will be set
+		// to V1 default value.
+		if (meta != null) {
+			this.meta = meta;
+		}
+		else {
+			this.meta = Meta.defaultV1Meta();
+		}
 		this.name = name;
 	}
 
@@ -92,6 +100,10 @@ public class CloudEntity {
 
 		public static Meta defaultV1Meta() {
 			return new Meta(null, null, null, 1);
+		}
+
+		public static Meta defaultV2Meta() {
+			return new Meta(null, null, null, 2);
 		}
 	}
 }
