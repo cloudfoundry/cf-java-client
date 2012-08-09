@@ -38,10 +38,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -233,7 +236,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void getApplications() {
-		String appName = createSpringTravelApp(1);
+		String appName = createSpringTravelApp("1");
 		List<CloudApplication> apps = spaceClient.getApplications();
 		assertEquals(1, apps.size());
 		assertEquals(appName, apps.get(0).getName());
@@ -242,14 +245,14 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertNotNull(apps.get(0).getMeta().getGuid());
 		assertEquals(2, apps.get(0).getMeta().getVersion());
 
-		createSpringTravelApp(2);
+		createSpringTravelApp("2");
 		apps = spaceClient.getApplications();
 		assertEquals(2, apps.size());
 	}
 
 	@Test
 	public void getApplication() {
-		String appName = createSpringTravelApp(3);
+		String appName = createSpringTravelApp("3");
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -257,7 +260,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void deleteApplication() {
-		String appName = createSpringTravelApp(4);
+		String appName = createSpringTravelApp("4");
 		assertEquals(1, spaceClient.getApplications().size());
 		spaceClient.deleteApplication(appName);
 		assertEquals(0, spaceClient.getApplications().size());
@@ -265,11 +268,11 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void renameApplication() {
-		String appName = createSpringTravelApp(5);
+		String appName = createSpringTravelApp("5");
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
-		String newName = namespacedAppName(TEST_NAMESPACE, "travel_test" + 6);
+		String newName = namespacedAppName(TEST_NAMESPACE, "travel_test" + "6");
 		spaceClient.rename(appName, newName);
 		CloudApplication newApp = spaceClient.getApplication(newName);
 		assertNotNull(newApp);
@@ -354,7 +357,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	public void updateApplicationService() throws IOException {
 		String serviceName = "test_database";
 		createMySqlService(serviceName);
-		String appName = createSpringTravelApp(7);
+		String appName = createSpringTravelApp("7");
 
 		spaceClient.updateApplicationServices(appName, Collections.singletonList(serviceName));
 		CloudApplication app = spaceClient.getApplication(appName);
@@ -389,9 +392,64 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertEquals(serviceName, app.getServices().get(0));
 	}
 
-	private String createSpringTravelApp(int index) {
+	@Test
+	public void setEnvironmentThroughList() throws IOException {
+		String appName = createSpringTravelApp("env1");
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertTrue(app.getEnv().isEmpty());
+
+		spaceClient.updateApplicationEnv(appName, asList("foo=bar", "bar=baz"));
+		app = spaceClient.getApplication(app.getName());
+		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+
+		spaceClient.updateApplicationEnv(appName, asList("foo=baz", "baz=bong"));
+		app = spaceClient.getApplication(app.getName());
+		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+
+		spaceClient.updateApplicationEnv(appName, new ArrayList<String>());
+		app = spaceClient.getApplication(app.getName());
+		assertTrue(app.getEnv().isEmpty());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void setEnvironmentWithoutEquals() throws IOException {
+		String appName = createSpringTravelApp("env2");
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertTrue(app.getEnv().isEmpty());
+		spaceClient.updateApplicationEnv(appName, asList("foo:bar", "bar=baz"));
+	}
+
+	@Test
+	public void setEnvironmentThroughMap() throws IOException {
+		String appName = createSpringTravelApp("env3");
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertTrue(app.getEnv().isEmpty());
+
+		Map<String, String> env1 = new HashMap<String, String>();
+		env1.put("foo", "bar");
+		env1.put("bar", "baz");
+		spaceClient.updateApplicationEnv(appName, env1);
+		app = spaceClient.getApplication(app.getName());
+		assertEquals(env1, app.getEnvAsMap());
+		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+
+		Map<String, String> env2 = new HashMap<String, String>();
+		env2.put("foo", "baz");
+		env2.put("baz", "bong");
+		spaceClient.updateApplicationEnv(appName, env2);
+		app = spaceClient.getApplication(app.getName());
+		assertEquals(env2, app.getEnvAsMap());
+		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+
+		spaceClient.updateApplicationEnv(appName, new HashMap<String, String>());
+		app = spaceClient.getApplication(app.getName());
+		assertTrue(app.getEnv().isEmpty());
+		assertTrue(app.getEnvAsMap().isEmpty());
+	}
+
+	private String createSpringTravelApp(String suffix) {
 		List<String> uris = new ArrayList<String>();
-		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test" + index);
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test-" + suffix);
 		uris.add(computeAppUrl(CCNG_URL, appName));
 		Staging staging =  new Staging("spring");
 		staging.setRuntime("java");
