@@ -1,5 +1,5 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M2, June 5, 2012 Draft
+Version 1.0.0.M2, August 10, 2012
 
 * Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
 * Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
@@ -63,7 +63,7 @@ Configuration of *mycloudfoundry-instance* in **settings.xml**:
         ...
         <server>
           <id>mycloudfoundry-instance</id>
-          <username>myusername</username>
+          <username>myname@email.com</username>
           <password>s3cr3t</password>
         </server>
         ...
@@ -87,7 +87,7 @@ Finally, describing probably a rather rare use-case: If you have multiple Cloud 
 
 * cf.server (e.g. *mvn push -Dcf.server=mycloudfoundry-instance*)
 
-### A complete configuration example
+### A complete configuration example for a web application
 
 Following, a typical (expected) configuration example is shown, which uses several of the available configuration parameters. However for a complete listing of proposed configuration options, please have a look under section *Command Line Usage*".
 
@@ -116,14 +116,17 @@ Following, a typical (expected) configuration example is shown, which uses sever
 > The **url** element is optional. If not specified, it defaults to *appname*.<main *target* domain> (using the *appname* element)
 > e.g. if your **appname** is *spring-integration-rocks* and the **target** is defined as *api.cloudfoundry.com* then the url will default to: **spring-integration-rocks.cloudfoundry.com**
 
+in **settings.xml**:
+
     <settings>
       <servers>
         <server>
           <id>mycloudfoundry-instance</id>
-          <username>gunnar@hillert.com</username>
+          <username>myname@email.com</username>
           <password>s3cr3t</password>
         </server>
       </servers>
+      ...
     </settings>
 
 ## Command Line Usage
@@ -202,7 +205,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.url]              Set the url for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.instances]        Set the expected number of instances
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.memory]           Set the memory reservation for the application
-        push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.services]         Set the runtime to use for the application
+        push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.services]         Set the services to use for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.no-start]         Do not auto-start the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.framework]        Set the framework for the application
 
