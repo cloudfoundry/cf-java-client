@@ -246,21 +246,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
-		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2";
-		if (sessionSpace != null) {
-			urlVars.put("space", sessionSpace.getMeta().getGuid());
-			urlPath = urlPath + "/spaces/{space}";
-		}
-		urlVars.put("q", "name:" + appName);
-		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
-		urlVars.put("depth", 2);
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		Map<String, Object> resource = findApplicationResource(appName, 2);
 		CloudApplication cloudApp = null;
-		if (resourceList.size() > 0) {
-			cloudApp = resourceMapper.mapResource(resourceList.get(0), CloudApplication.class);
+		if (resource != null) {
+			cloudApp = resourceMapper.mapResource(resource, CloudApplication.class);
 		}
 		return cloudApp;
 	}
@@ -282,7 +271,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 								  List<String> serviceNames, boolean checkExists) {
 		if (checkExists) {
 			try {
-				getApplication(appName);
+				getAppId(appName);
 				return;
 			} catch (HttpClientErrorException e) {
 				if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
@@ -335,14 +324,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void deleteApplication(String appName) {
-		CloudApplication cloudApp = getApplication(appName);
-		doDeleteApplication(cloudApp);
+		UUID appId = getAppId(appName);
+		doDeleteApplication(appId);
 	}
 
 	public void deleteAllApplications() {
 		List<CloudApplication> cloudApps = getApplications();
 		for (CloudApplication cloudApp : cloudApps) {
-			doDeleteApplication(cloudApp);
+			doDeleteApplication(cloudApp.getMeta().getGuid());
 		}
 	}
 
@@ -398,11 +387,23 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void updateApplicationEnv(String appName, Map<String, String> env) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		appRequest.put("environment_json", env);
+		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationEnv(String appName, List<String> env) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		Map<String, String> envHash = new HashMap<String, String>();
+		for (String s : env) {
+			if (!s.contains("=")) {
+				throw new IllegalArgumentException("Environment setting without an '=' sign encountered: " + s);
+			}
+			String key = s.substring(0, s.indexOf('=')).trim();
+			String value = s.substring(s.indexOf('=') + 1).trim();
+			envHash.put(key, value);
+		}
+		updateApplicationEnv(appName, envHash);
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath) {
@@ -426,18 +427,18 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void rename(String appName, String newName) {
-		CloudApplication app = getApplication(appName);
+		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("name", newName);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
 	}
 
 	private void doDeleteService(CloudService cloudService) {
 		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
 	}
 
-	private void doDeleteApplication(CloudApplication cloudApp) {
-		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), cloudApp.getMeta().getGuid());
+	private void doDeleteApplication(UUID appId) {
+		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), appId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -504,6 +505,38 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			}
 		}
 		return serviceBindingId;
+	}
+
+	@SuppressWarnings("unchecked")
+	private UUID getAppId(String appName) {
+		Map<String, Object> resource = findApplicationResource(appName, 1);
+		UUID guid = null;
+		if (resource != null) {
+			Map<String, Object> appMeta = (Map<String, Object>) resource.get("metadata");
+			guid = UUID.fromString(String.valueOf(appMeta.get("guid")));
+		}
+		return guid;
+	}
+
+	private Map<String, Object> findApplicationResource(String appName, int depth) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2";
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlVars.put("q", "name:" + appName);
+		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
+		urlVars.put("depth", depth);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		if (resourceList.size() > 0) {
+			return resourceList.get(0);
+		}
+		else {
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
