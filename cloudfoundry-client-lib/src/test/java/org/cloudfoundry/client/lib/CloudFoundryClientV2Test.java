@@ -447,6 +447,30 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertTrue(app.getEnvAsMap().isEmpty());
 	}
 
+	@Test
+	public void updateApplicationMemory() throws IOException {
+		String appName = createSpringTravelApp("mem1");
+		CloudApplication app = spaceClient.getApplication(appName);
+
+		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
+
+		client.updateApplicationMemory(appName, 256);
+		app = client.getApplication(appName);
+		assertEquals(256, app.getMemory());
+	}
+
+	@Test
+	public void updateApplicationInstances() throws Exception {
+		String appName = createSpringTravelApp("inst1");
+		CloudApplication app = spaceClient.getApplication(appName);
+
+		assertEquals(1, app.getInstances());
+
+		client.updateApplicationInstances(appName, 3);
+		app = client.getApplication(appName);
+		assertEquals(3, app.getInstances());
+	}
+
 	private String createSpringTravelApp(String suffix) {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test-" + suffix);

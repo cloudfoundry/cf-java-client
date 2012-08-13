@@ -336,11 +336,17 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void updateApplicationMemory(String appName, int memory) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		appRequest.put("memory", memory);
+		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationInstances(String appName, int instances) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		appRequest.put("instances", instances);
+		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationServices(String appName, List<String> services) {
