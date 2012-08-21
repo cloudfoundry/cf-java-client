@@ -30,7 +30,9 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -236,7 +238,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void getApplications() {
-		String appName = createSpringTravelApp("1");
+		String appName = createSpringTravelApp("1", null);
 		List<CloudApplication> apps = spaceClient.getApplications();
 		assertEquals(1, apps.size());
 		assertEquals(appName, apps.get(0).getName());
@@ -245,14 +247,14 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertNotNull(apps.get(0).getMeta().getGuid());
 		assertEquals(2, apps.get(0).getMeta().getVersion());
 
-		createSpringTravelApp("2");
+		createSpringTravelApp("2", null);
 		apps = spaceClient.getApplications();
 		assertEquals(2, apps.size());
 	}
 
 	@Test
 	public void getApplication() {
-		String appName = createSpringTravelApp("3");
+		String appName = createSpringTravelApp("3", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -260,7 +262,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void deleteApplication() {
-		String appName = createSpringTravelApp("4");
+		String appName = createSpringTravelApp("4", null);
 		assertEquals(1, spaceClient.getApplications().size());
 		spaceClient.deleteApplication(appName);
 		assertEquals(0, spaceClient.getApplications().size());
@@ -268,7 +270,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void renameApplication() {
-		String appName = createSpringTravelApp("5");
+		String appName = createSpringTravelApp("5", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -357,7 +359,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	public void updateApplicationService() throws IOException {
 		String serviceName = "test_database";
 		createMySqlService(serviceName);
-		String appName = createSpringTravelApp("7");
+		String appName = createSpringTravelApp("7", null);
 
 		spaceClient.updateApplicationServices(appName, Collections.singletonList(serviceName));
 		CloudApplication app = spaceClient.getApplication(appName);
@@ -394,7 +396,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void setEnvironmentThroughList() throws IOException {
-		String appName = createSpringTravelApp("env1");
+		String appName = createSpringTravelApp("env1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertTrue(app.getEnv().isEmpty());
 
@@ -413,7 +415,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void setEnvironmentWithoutEquals() throws IOException {
-		String appName = createSpringTravelApp("env2");
+		String appName = createSpringTravelApp("env2", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertTrue(app.getEnv().isEmpty());
 		spaceClient.updateApplicationEnv(appName, asList("foo:bar", "bar=baz"));
@@ -421,7 +423,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void setEnvironmentThroughMap() throws IOException {
-		String appName = createSpringTravelApp("env3");
+		String appName = createSpringTravelApp("env3", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertTrue(app.getEnv().isEmpty());
 
@@ -449,7 +451,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationMemory() throws IOException {
-		String appName = createSpringTravelApp("mem1");
+		String appName = createSpringTravelApp("mem1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 
 		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
@@ -461,7 +463,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationInstances() throws Exception {
-		String appName = createSpringTravelApp("inst1");
+		String appName = createSpringTravelApp("inst1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 
 		assertEquals(1, app.getInstances());
@@ -471,15 +473,180 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertEquals(3, app.getInstances());
 	}
 
-	private String createSpringTravelApp(String suffix) {
+	@Test
+	public void uploadApplication() throws IOException {
+		String appName = createSpringTravelApp("upload1", null);
+		CloudApplication app = spaceClient.getApplication(appName);
+
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+
+		File file = SampleProjects.springTravel();
+		spaceClient.uploadApplication(appName, file.getCanonicalPath());
+
+	}
+
+	@Test
+	public void uploadStandaloneApplication() throws IOException {
+		List<String> uris = new ArrayList<String>();
+		List<String> services = new ArrayList<String>();
+		Staging staging = new Staging("standalone");
+		staging.setRuntime("ruby19");
+		staging.setCommand("ruby simple.rb");
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-ruby");
+		File file = SampleProjects.standaloneRuby();
+		spaceClient.createApplication(appName, staging, 128, uris, services);
+		spaceClient.uploadApplication(appName, file.getCanonicalPath());
+		spaceClient.startApplication(appName);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+//		TODO: uris is not currently part of v2 implementation
+//		assertEquals(uris, app.getUris());
+	}
+
+	@Test
+	public void uploadStandaloneApplicationWithURLs() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-node");
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(CCNG_URL, appName));
+		List<String> services = new ArrayList<String>();
+		Staging staging = new Staging("standalone");
+		staging.setRuntime("node");
+		staging.setCommand("node app.js");
+		File file = SampleProjects.standaloneNode();
+		spaceClient.createApplication(appName, staging, 64, uris, services);
+		spaceClient.uploadApplication(appName, file.getCanonicalPath());
+		spaceClient.startApplication(appName);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+//		TODO: uris is not currently part of v2 implementation
+//		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(CCNG_URL, appName)), app.getUris());
+	}
+
+	@Test
+	public void uploadApplicationWithServices() throws IOException {
+		String serviceName = "test_database";
+		List<String> serviceNames = new ArrayList<String>();
+		serviceNames.add(serviceName);
+		String appName = createSpringTravelApp("upload2", serviceNames);
+		CloudApplication app = uploadSpringTravelApp(appName);
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+	}
+
+	@Test
+	public void startApplication() throws IOException {
+		String appName = createSpringTravelApp("start", null);
+		uploadSpringTravelApp(appName);
+		spaceClient.startApplication(appName);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+	}
+
+	@Test
+	public void stopApplication() throws IOException {
+		String appName = createSpringTravelApp("stop", null);
+		uploadSpringTravelApp(appName);
+		spaceClient.startApplication(appName);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+		spaceClient.stopApplication(appName);
+		app = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+	}
+
+	@Test
+	public void reStartApplication() throws IOException {
+		String appName = createSpringTravelApp("restart", null);
+		uploadSpringTravelApp(appName);
+		spaceClient.startApplication(appName);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+		spaceClient.restartApplication(appName);
+		app = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+	}
+
+	@Test
+	public void uploadSinatraApp() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "env");
+		ClassPathResource cpr = new ClassPathResource("apps/env/");
+		File explodedDir = cpr.getFile();
+		Staging staging = new Staging("ruby19", "sinatra");
+		createAndUploadExplodedTestApp(appName, explodedDir, staging);
+		spaceClient.startApplication(appName);
+		CloudApplication env = spaceClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, env.getState());
+	}
+
+	@Test
+	public void uploadAppWithNonAsciiFileName() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "non-ascii-file-name");
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(CCNG_URL, appName));
+
+		File war = SampleProjects.nonAsciFileName();
+		List<String> serviceNames = new ArrayList<String>();
+
+		spaceClient.createApplication(appName, new Staging("java", "spring"),
+				spaceClient.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+		spaceClient.uploadApplication(appName, war.getCanonicalPath());
+
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+
+		spaceClient.startApplication(appName);
+
+		app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+
+		spaceClient.deleteApplication(appName);
+	}
+
+	private String createSpringTravelApp(String suffix, List<String> serviceNames) {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test-" + suffix);
+		if (serviceNames != null) {
+			for (String serviceName : serviceNames) {
+				createMySqlService(serviceName);
+			}
+		}
 		uris.add(computeAppUrl(CCNG_URL, appName));
 		Staging staging =  new Staging("spring");
 		staging.setRuntime("java");
 		spaceClient.createApplication(appName, staging,
-				spaceClient.getDefaultApplicationMemory("spring"), uris, null);
+				spaceClient.getDefaultApplicationMemory("spring"), uris, serviceNames);
 		return appName;
+	}
+
+	private void createApplication(String appName, List<String> serviceNames, Staging staging) {
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(CCNG_URL, appName));
+		if (serviceNames != null) {
+			for (String serviceName : serviceNames) {
+				createMySqlService(serviceName);
+			}
+		}
+		spaceClient.createApplication(appName, staging, spaceClient.getDefaultApplicationMemory(staging.getFramework()),
+				uris, serviceNames);
+	}
+
+	private CloudApplication uploadSpringTravelApp(String appName) throws IOException {
+		File file = SampleProjects.springTravel();
+		client.uploadApplication(appName, file.getCanonicalPath());
+		return client.getApplication(appName);
+	}
+
+	private CloudApplication createAndUploadExplodedTestApp(String appName, File explodedDir, Staging staging)
+			throws IOException {
+		assertTrue("Expected exploded test app at " + explodedDir.getCanonicalPath(), explodedDir.exists());
+		createApplication(appName, null, staging);
+		client.uploadApplication(appName, explodedDir.getCanonicalPath());
+		return client.getApplication(appName);
 	}
 
 	private void createMySqlService(String serviceName) {

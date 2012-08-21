@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -95,7 +96,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		this.cloudControllerUrl = cloudControllerUrl;
 		this.authorizationEndpoint = authorizationEndpoint;
 		this.restTemplate.setRequestFactory(
-				new CloudFoundryClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
+				new CloudFoundryClientHttpRequestFactory(new CommonsClientHttpRequestFactory()));
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
 	}

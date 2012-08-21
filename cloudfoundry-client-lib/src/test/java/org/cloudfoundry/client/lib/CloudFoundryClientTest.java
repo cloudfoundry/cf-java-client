@@ -270,7 +270,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		CloudApplication app = client.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(AppState.STARTED, app.getState());
-		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), app.getUris());
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(ccUrl, appName)), app.getUris());
 	}
 
 	@Test
@@ -567,12 +567,12 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 	public void updateApplicationUris() throws IOException {
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadAndStart(appName);
-		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), app.getUris());
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(ccUrl, appName)), app.getUris());
 
 		assumeTrue(multiUrlSupported);
 
 		List<String> uris = new ArrayList<String>(app.getUris());
-		uris.add(computeAppUrlNoProtocol("travel_test3_b"));
+		uris.add(computeAppUrlNoProtocol(ccUrl, "travel_test3_b"));
 		client.updateApplicationUris(appName, uris);
 		app = client.getApplication(appName);
 		assertEquals(uris, app.getUris());
@@ -945,10 +945,6 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		createAndUploadTestApp(appName);
 		client.startApplication(appName);
 		return client.getApplication(appName);
-	}
-
-	private String computeAppUrlNoProtocol(String appName) {
-		return ccUrl.replace("api", appName).replace("http://", "").replace("https://", "");
 	}
 
 	private CloudService createDatabaseService(String serviceName) {

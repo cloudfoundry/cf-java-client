@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -62,6 +63,33 @@ public class JsonUtil {
 			}
 		}
 		return retList;
+	}
+
+	public static List<CloudResource> convertJsonToCloudResourceList(String json) {
+		List<CloudResource> retList = new ArrayList<CloudResource>();
+		if (json != null) {
+			try {
+				retList = mapper.readValue(json, new TypeReference<List<CloudResource>>() {});
+			} catch (IOException e) {
+				logger.warn("Error while reading Java List from JSON response: " + json, e);
+			}
+		}
+		return retList;
+	}
+
+	public static String convertToJson(Object value) {
+		if (mapper.canSerialize(value.getClass())) {
+			try {
+				return mapper.writeValueAsString(value);
+			} catch (IOException e) {
+				logger.warn("Error while serializing " + value + " to JSON", e);
+				return null;
+			}
+		}
+		else {
+			throw new IllegalArgumentException("Value of type " + value.getClass().getName() +
+					" can not be serialized to JSON.");
+		}
 	}
 
 }

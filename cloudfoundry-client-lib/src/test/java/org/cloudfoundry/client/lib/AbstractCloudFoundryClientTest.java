@@ -11,6 +11,11 @@ public class AbstractCloudFoundryClientTest {
 		return ccUrl.substring(0, ix1) + appName + ccUrl.substring(ix2);
 	}
 
+	protected String computeAppUrlNoProtocol(String ccUrl, String appName) {
+		//TODO: remove ccng at some point?
+		return ccUrl.replace("api", appName).replace("ccng", appName).replace("http://", "").replace("https://", "");
+	}
+
 	protected String namespacedAppName(String namespace, String basename) {
 		return namespace + "-" + basename;
 	}

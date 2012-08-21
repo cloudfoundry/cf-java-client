@@ -20,6 +20,7 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -43,8 +44,9 @@ public class CloudControllerClientFactory {
 	private final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
 
 	public CloudControllerClientFactory() {
-		restTemplate = new RestTemplate();
-		objectMapper = new ObjectMapper();
+		this.restTemplate = new RestTemplate();
+		this.restTemplate.setRequestFactory(new CommonsClientHttpRequestFactory());
+		this.objectMapper = new ObjectMapper();
 	}
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,

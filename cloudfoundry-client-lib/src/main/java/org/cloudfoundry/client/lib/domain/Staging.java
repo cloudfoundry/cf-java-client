@@ -33,10 +33,19 @@ public class Staging {
 
 	/**
 	 *
-	 * @param framework
-	 *            The application framework
+	 * @param framework the application framework
 	 */
 	public Staging(String framework) {
+		this.framework = framework;
+	}
+
+	/**
+	 *
+	 * @param runtime the runtime name (java, ruby18, ruby19 etc.)
+	 * @param framework the application framework
+	 */
+	public Staging(String runtime, String framework) {
+		this.runtime = runtime;
 		this.framework = framework;
 	}
 
