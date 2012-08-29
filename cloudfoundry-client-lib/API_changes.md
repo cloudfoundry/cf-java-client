@@ -65,3 +65,5 @@ They are replaced with the following methods that are now available for all clou
 ### Deprecations:
 
 The _org.cloudfoundry.client.lib.domain.CloudApplication_ class has been deprecated since it's not used anywhere in the library. You will have to replace this with your own implementation.
+
+The _org.cloudfoundry.client.lib.ApplicationInfo_ class has been removed. Please replace with your own implementation.
