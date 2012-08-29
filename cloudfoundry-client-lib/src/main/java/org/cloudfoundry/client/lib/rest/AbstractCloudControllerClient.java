@@ -110,6 +110,10 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return list;
 	}
 
+	public void updatePassword(String newPassword) {
+		updatePassword(cloudCredentials, newPassword);
+	}
+
 	protected RestTemplate getRestTemplate() {
 		return this.restTemplate;
 	}

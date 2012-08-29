@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib.oauth2;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
@@ -47,10 +48,13 @@ public class OauthClient {
 
 	private RestTemplate restTemplate;
 
+	private String uaaVersion;
+
 	public OauthClient(URL authorizationUrl) {
 		this.authorizationUrl = authorizationUrl;
 		this.restTemplate = new RestTemplate();
 		this.restTemplate.setRequestFactory(new CommonsClientHttpRequestFactory());
+		this.uaaVersion = lookupVersion(authorizationUrl);
 	}
 
 	public OAuth2AccessToken getToken(String username, String password) {
@@ -81,10 +85,29 @@ public class OauthClient {
 		resource.setId(clientId);
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
 		resource.setAccessTokenUri(authorizationUrl + "/oauth/authorize");
+		if (uaaVersion.startsWith("1.0")) {
+			resource.setScope(Arrays.asList("read"));
+		}
 		String redirectUri = "http://uaa.cloudfoundry.com/redirect/vmc";
 		resource.setPreEstablishedRedirectUri(redirectUri);
 		resource.setUseCurrentUri(false);
 		return resource;
+	}
+
+	private String lookupVersion(URL authorizationUrl) {
+		String resp = restTemplate.getForObject(authorizationUrl + "/login", String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		if (respMap == null) {
+			return "1.0";
+		}
+		Map<String, Object> appMap = (Map<String, Object>) respMap.get("app");
+		if (appMap != null) {
+			String version = String.valueOf(appMap.get("version"));
+			if (version != null) {
+				return version;
+			}
+		}
+		return "1.0";
 	}
 
 }

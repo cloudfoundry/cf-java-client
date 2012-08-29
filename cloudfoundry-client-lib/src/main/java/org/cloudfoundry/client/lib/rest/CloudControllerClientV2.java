@@ -147,7 +147,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
-	public void updatePassword(String newPassword) {
+	public void updatePassword(CloudCredentials credentials, String newPassword) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 

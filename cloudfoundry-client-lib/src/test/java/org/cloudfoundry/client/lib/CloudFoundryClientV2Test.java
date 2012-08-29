@@ -607,6 +607,19 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		spaceClient.deleteApplication(appName);
 	}
 
+	@Test
+	public void updatePassword() throws MalformedURLException {
+		String newPassword = "newPass123";
+		client.updatePassword(newPassword);
+		CloudFoundryClient clientWithChangedPassword =
+				new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, newPassword), new URL(CCNG_URL));
+		clientWithChangedPassword.login();
+
+		// Revert
+		client.updatePassword(CCNG_USER_PASS);
+		client.login();
+	}
+
 	private String createSpringTravelApp(String suffix, List<String> serviceNames) {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test-" + suffix);

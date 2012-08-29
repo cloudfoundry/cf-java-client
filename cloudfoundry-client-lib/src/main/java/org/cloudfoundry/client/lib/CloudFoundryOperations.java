@@ -87,6 +87,15 @@ public interface CloudFoundryOperations {
 	void updatePassword(String newPassword);
 
 	/**
+	 * Update the password for the logged in user using
+	 * the username/old_password provided in the credentials.
+	 *
+	 * @param credentials current credentials
+	 * @param newPassword the new password
+	 */
+	void updatePassword(CloudCredentials credentials, String newPassword);
+
+	/**
 	 * Unregister and log out the currently logged in user
 	 */
 	void unregister();

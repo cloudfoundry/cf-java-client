@@ -101,6 +101,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updatePassword(newPassword);
 	}
 
+	public void updatePassword(CloudCredentials credentials, String newPassword) {
+		cc.updatePassword(credentials, newPassword);
+	}
+
 	public void unregister() {
 		cc.unregister();
 	}
