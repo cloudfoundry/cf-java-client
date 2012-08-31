@@ -94,6 +94,8 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
 			defaultNamespace(TEST_USER_EMAIL));
 
+	private static final int TEST_APP_MEMORY = Integer.valueOf(System.getProperty("test.app.memory", "512"));
+
 	private final boolean serviceSupported = !ccUrl.contains("vmforce");
 
 	private boolean multiUrlSupported = !ccUrl.contains("vmforce");
@@ -149,7 +151,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		String appName1 = namespacedAppName(TEST_NAMESPACE, "travel_test1");
 		uris1.add(computeAppUrl(ccUrl, appName1));
 		client.createApplication(appName1, CloudApplication.SPRING,
-				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris1, null);
+				TEST_APP_MEMORY, uris1, null);
 		List<CloudApplication> apps = client.getApplications();
 		assertEquals(1, apps.size());
 
@@ -157,7 +159,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		String appName2 = namespacedAppName(TEST_NAMESPACE, "travel_test2");
 		uris2.add(computeAppUrl(ccUrl, appName2));
 		client.createApplication(appName2, CloudApplication.SPRING,
-				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris2, null);
+				TEST_APP_MEMORY, uris2, null);
 		apps = client.getApplications();
 		assertEquals(2, apps.size());
 	}
@@ -168,7 +170,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		uris.add(computeAppUrl(ccUrl, appName));
 		client.createApplication(appName, CloudApplication.SPRING,
-				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, null);
+				TEST_APP_MEMORY, uris, null);
 		CloudApplication app = client.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -292,13 +294,17 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		assertEquals(AppState.STARTED, app.getState());
 	}
 
-	@Test(expected = CloudFoundryException.class)
+	@Test
 	public void debugApplicationThrowsExceptionWhenDebuggingIsNotSupported() throws IOException, InterruptedException {
 		assumeTrue(!client.getCloudInfo().getAllowDebug());
 
-		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
-		createAndUploadTestApp(appName);
-		client.debugApplication(appName, DebugMode.run);
+		try {
+			String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
+			createAndUploadTestApp(appName);
+			client.debugApplication(appName, DebugMode.run);
+			fail("Should have caught a CloudFoundryException");
+		}
+		catch (CloudFoundryException e) {}
 	}
 
 	@Test
@@ -535,7 +541,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_memory_test");
 		CloudApplication app = createAndUploadTestApp(appName);
 
-		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
+		assertEquals(TEST_APP_MEMORY, app.getMemory());
 
 		client.updateApplicationMemory(appName, 256);
 		app = client.getApplication(appName);
@@ -824,7 +830,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		File explodedDir = cpr.getFile();
 		String framework = "sinatra";
 		List<String> services = new ArrayList<String>();
-		CloudApplication env = createAndUploadExplodedTestApp(appName, explodedDir, framework, services);
+		CloudApplication env = createAndUploadExplodedTestApp(appName, explodedDir, framework, 128, services);
 		client.startApplication(appName);
 		env = client.getApplication(appName);
 		assertEquals(AppState.STARTED, env.getState());
@@ -840,7 +846,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		List<String> serviceNames = new ArrayList<String>();
 
 		client.createApplication(appName, CloudApplication.SPRING,
-				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+				TEST_APP_MEMORY, uris, serviceNames);
 		client.uploadApplication(appName, war.getCanonicalPath());
 
 		CloudApplication app = client.getApplication(appName);
@@ -906,12 +912,12 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		}
 
 		client.createApplication(appName, CloudApplication.SPRING,
-				client.getDefaultApplicationMemory(CloudApplication.SPRING), uris, serviceNames);
+				TEST_APP_MEMORY, uris, serviceNames);
 		client.uploadApplication(appName, file.getCanonicalPath());
 		return client.getApplication(appName);
 	}
 
-	private void createApplication(String appName, List<String> serviceNames, String framework) {
+	private void createApplication(String appName, List<String> serviceNames, String framework, int memory) {
 		List<String> uris = new ArrayList<String>();
 		uris.add(computeAppUrl(ccUrl, appName));
 		if (serviceNames != null) {
@@ -919,20 +925,20 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 				createDatabaseService(serviceName);
 			}
 		}
-		client.createApplication(appName, framework, client.getDefaultApplicationMemory(CloudApplication.SPRING), uris,
+		client.createApplication(appName, framework, memory, uris,
 				serviceNames);
 	}
 
 	private CloudApplication createAndUploadExplodedSpringTestApp(String appName, List<String> serviceNames)
 			throws IOException {
 		File explodedDirPath = SampleProjects.springTravelUnpacked(temporaryFolder);
-		return createAndUploadExplodedTestApp(appName, explodedDirPath, CloudApplication.SPRING, serviceNames);
+		return createAndUploadExplodedTestApp(appName, explodedDirPath, CloudApplication.SPRING, TEST_APP_MEMORY, serviceNames);
 	}
 
 	private CloudApplication createAndUploadExplodedTestApp(String appName, File explodedDir, String framework,
-			List<String> serviceNames) throws IOException {
+			int memory, List<String> serviceNames) throws IOException {
 		assertTrue("Expected exploded test app at " + explodedDir.getCanonicalPath(), explodedDir.exists());
-		createApplication(appName, null, framework);
+		createApplication(appName, null, framework, memory);
 		client.uploadApplication(appName, explodedDir.getCanonicalPath());
 		return client.getApplication(appName);
 	}
