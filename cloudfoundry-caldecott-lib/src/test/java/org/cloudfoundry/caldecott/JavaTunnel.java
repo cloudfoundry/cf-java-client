@@ -19,14 +19,16 @@ package org.cloudfoundry.caldecott;
 import org.cloudfoundry.caldecott.client.HttpTunnelFactory;
 import org.cloudfoundry.caldecott.client.TunnelHelper;
 import org.cloudfoundry.caldecott.client.TunnelServer;
-import org.cloudfoundry.client.lib.CloudApplication;
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudService;
 
 import java.io.Console;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -153,7 +155,7 @@ public class JavaTunnel {
 	public static CloudFoundryClient clientInit() {
 		CloudFoundryClient client = null;
 		try {
-			client = new CloudFoundryClient(vcap_email, vcap_passwd, CC_URL);
+			client = new CloudFoundryClient(new CloudCredentials(vcap_email, vcap_passwd), new URL(CC_URL));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
