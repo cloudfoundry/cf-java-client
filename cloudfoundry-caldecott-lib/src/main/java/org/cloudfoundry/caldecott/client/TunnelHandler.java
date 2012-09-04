@@ -149,7 +149,7 @@ public class TunnelHandler extends Observable {
 						retry = false;
 						client.write(out);
 					} catch (HttpStatusCodeException hsce) {
-						if (hsce.getStatusCode().value() == 504) {
+						if (hsce.getStatusCode().value() == 504 || hsce.getStatusCode().value() == 502) {
 							retry = true;
 							if (logger.isTraceEnabled()) {
 								logger.trace("Retrying tunnel read after receiving " + hsce.getStatusCode().value());
