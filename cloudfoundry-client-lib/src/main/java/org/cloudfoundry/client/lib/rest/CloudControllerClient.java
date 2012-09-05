@@ -121,7 +121,7 @@ public interface CloudControllerClient {
 
 	void updateApplicationEnv(String appName, List<String> env);
 
-	String getFile(String appName, int instanceIndex, String filePath);
+	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
 
 	void bindService(String appName, String serviceName);
 

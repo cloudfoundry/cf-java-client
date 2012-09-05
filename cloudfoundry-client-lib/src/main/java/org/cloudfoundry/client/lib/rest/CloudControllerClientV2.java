@@ -489,7 +489,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	public String getFile(String appName, int instanceIndex, String filePath) {
+	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
