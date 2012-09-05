@@ -59,6 +59,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,9 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	private CloudFoundryClient client;
 
@@ -356,16 +360,119 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 	public void getFile() throws Exception {
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_getFile");
 		createAndUploadAndStart(appName);
+		String fileName = "tomcat/webapps/ROOT/WEB-INF/web.xml";
+
+		// Test downloading full file
 		String fileContent = null;
-		for (int i = 0; i < 20 && fileContent == null; i++) {
+		for (int i = 0; i < 20 && (fileContent == null || fileContent.length() == 0); i++) {
 			try {
-				fileContent = client.getFile(appName, 0, "logs/stderr.log");
+				fileContent = client.getFile(appName, 0, fileName);
 			}
 			catch (Exception ex) {
 				Thread.sleep(1000);
 			}
 		}
 		assertNotNull(fileContent);
+		assertTrue(fileContent.length() > 5);
+
+		// Test downloading range of file with start and end position
+		int end = fileContent.length() - 3;
+		int start = end/2;
+		String fileContent2 = null;
+		for (int i = 0; i < 20 && (fileContent2 == null || fileContent2.length() == 0); i++) {
+			try {
+				fileContent2 = client.getFile(appName, 0, fileName, start, end);
+			}
+			catch (Exception ex) {
+				Thread.sleep(1000);
+			}
+		}
+		assertEquals(fileContent.substring(start, end + 1), fileContent2);
+
+		// Test downloading range of file with just start position
+		String fileContent3 = null;
+		for (int i = 0; i < 20 && (fileContent3 == null || fileContent3.length() == 0); i++) {
+			try {
+				fileContent3 = client.getFile(appName, 0, fileName, start);
+			}
+			catch (Exception ex) {
+				Thread.sleep(1000);
+			}
+		}
+		assertEquals(fileContent.substring(start), fileContent3);
+
+		// Test downloading range of file with start position and end position exceeding the length
+		String fileContent4 = null;
+		int positionPastEndPosition = fileContent.length() + 999;
+		for (int i = 0; i < 20 && (fileContent4 == null || fileContent4.length() == 0); i++) {
+			try {
+				fileContent4 = client.getFile(appName, 0, fileName, start, positionPastEndPosition);
+			}
+			catch (Exception ex) {
+				Thread.sleep(1000);
+			}
+		}
+		assertEquals(fileContent.substring(start), fileContent4);
+
+		// Test downloading end portion of file with length
+		String fileContent5 = null;
+		int length = fileContent.length() / 2;
+		for (int i = 0; i < 20 && (fileContent5 == null || fileContent5.length() == 0); i++) {
+			try {
+				fileContent5 = client.getFileTail(appName, 0, fileName, length);
+			}
+			catch (Exception ex) {
+				Thread.sleep(1000);
+			}
+		}
+		assertEquals(fileContent.substring(fileContent.length() - length), fileContent5);
+
+		// Test downloading one byte of file with start and end position
+		String fileContent6 = null;
+		for (int i = 0; i < 20 && (fileContent6 == null || fileContent6.length() == 0); i++) {
+			try {
+				fileContent6 = client.getFile(appName, 0, fileName, start, start);
+			}
+			catch (Exception ex) {
+				Thread.sleep(1000);
+			}
+		}
+		assertEquals(fileContent.substring(start, start + 1), fileContent6);
+
+		// Test downloading range of file with invalid start position
+		int invalidStartPosition = fileContent.length() + 999;
+		try {
+			client.getFile(appName, 0, fileName, invalidStartPosition);
+			fail("should have thrown exception");
+		} catch (CloudFoundryException e) {
+			assertTrue(e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE));
+		}
+
+		// Test downloading with invalid parameters - should all throw exceptions
+		try {
+			client.getFile(appName, 0, fileName, -2);
+			fail("should have thrown exception");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().contains("start position"));
+		}
+		try {
+			client.getFile(appName, 0, fileName, 10, -2);
+			fail("should have thrown exception");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().contains("end position"));
+		}
+		try {
+			client.getFile(appName, 0, fileName, 30, 29);
+			fail("should have thrown exception");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().contains("start position") && e.getMessage().contains("end position"));
+		}
+		try {
+			client.getFileTail(appName, 0, fileName, 0);
+			fail("should have thrown exception");
+		} catch (IllegalArgumentException e) {
+			assertTrue(e.getMessage().contains("length"));
+		}
 	}
 
 	@Test
