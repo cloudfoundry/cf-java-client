@@ -347,6 +347,40 @@ public interface CloudFoundryOperations {
 	String getFile(String appName, int instanceIndex, String filePath);
 
 	/**
+	 * Get a the content, starting at a specific position, of a file from the deployed application.
+	 *
+	 * @param appName name of the application
+	 * @param instanceIndex instance index
+	 * @param filePath path to the file
+	 * @param startPosition the starting position of the file contents
+	 * @return the contents of the file
+	 */
+	String getFile(String appName, int instanceIndex, String filePath, int startPosition);
+
+	/**
+	 * Get a range of content of a file from the deployed application.
+	 *
+	 * @param appName name of the application
+	 * @param instanceIndex instance index
+	 * @param filePath path to the file
+	 * @param startPosition the starting position of the file contents
+	 * @param endPosition the ending position of the file contents
+	 * @return the contents of the file
+	 */
+	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
+
+	/**
+	 * Get a the last bytes, with length as specified, of content of a file from the deployed application.
+	 *
+	 * @param appName name of the application
+	 * @param instanceIndex instance index
+	 * @param filePath path to the file
+	 * @param length the length of the file contents to retrieve
+	 * @return the contents of the file
+	 */
+	String getFileTail(String appName, int instanceIndex, String filePath, int length);
+
+	/**
 	 * Get list of cloud services.
 	 *
 	 * @return list of cloud services

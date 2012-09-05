@@ -180,12 +180,16 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 				case CLIENT_ERROR:
 					CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
 					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-					try {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-						exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
-					} catch (JsonParseException e) {
-						// ignore
+					if (response.getBody() != null) {
+						try {
+								@SuppressWarnings("unchecked")
+								Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
+								exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
+						} catch (JsonParseException e) {
+							exception.setDescription("Client error");
+						}
+					} else {
+						exception.setDescription("Client error");
 					}
 					throw exception;
 				case SERVER_ERROR:

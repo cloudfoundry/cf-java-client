@@ -251,7 +251,28 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath) {
-		return cc.getFile(appName, instanceIndex, filePath);
+		return cc.getFile(appName, instanceIndex, filePath, 0, -1);
+	}
+
+	public String getFile(String appName, int instanceIndex, String filePath, int startPosition) {
+		Assert.isTrue(startPosition >= 0,
+				startPosition + " is not a valid value for start position, it should be 0 or greater.");
+		return cc.getFile(appName, instanceIndex, filePath, startPosition, -1);
+	}
+
+	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
+		Assert.isTrue(startPosition >= 0,
+				startPosition + " is not a valid value for start position, it should be 0 or greater.");
+		Assert.isTrue(endPosition >= 0,
+				endPosition + " is not a valid value for end position, it should be 0 or greater.");
+		Assert.isTrue(endPosition >= startPosition,
+				"The end position (" + endPosition + ") can't be less than the start position (" + startPosition + ")");
+		return cc.getFile(appName, instanceIndex, filePath, startPosition, endPosition);
+	}
+
+	public String getFileTail(String appName, int instanceIndex, String filePath, int length) {
+		Assert.isTrue(length > 0, length + " is not a valid value for length, it should be 1 or greater.");
+		return cc.getFile(appName, instanceIndex, filePath, -1, length);
 	}
 
 	// list services, un/provision services, modify instance
