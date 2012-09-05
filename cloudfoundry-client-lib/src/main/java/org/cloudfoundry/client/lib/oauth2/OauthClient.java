@@ -17,7 +17,9 @@
 package org.cloudfoundry.client.lib.oauth2;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
@@ -47,10 +49,9 @@ public class OauthClient {
 
 	private RestTemplate restTemplate;
 
-	public OauthClient(URL authorizationUrl) {
+	public OauthClient(URL authorizationUrl, HttpProxyConfiguration httpProxyConfiguration) {
 		this.authorizationUrl = authorizationUrl;
-		this.restTemplate = new RestTemplate();
-		this.restTemplate.setRequestFactory(new CommonsClientHttpRequestFactory());
+		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
 	}
 
 	public OAuth2AccessToken getToken(String username, String password) {

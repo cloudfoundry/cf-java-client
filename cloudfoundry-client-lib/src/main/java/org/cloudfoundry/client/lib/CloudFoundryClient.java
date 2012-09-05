@@ -18,7 +18,6 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +35,6 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -59,19 +56,38 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	/**
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
 	 */
-	public CloudFoundryClient(URL cloudControllerUrl) throws MalformedURLException {
-		this(null, cloudControllerUrl, null);
+	public CloudFoundryClient(URL cloudControllerUrl) {
+		this(null, cloudControllerUrl, null, null);
 	}
 
-	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl) throws MalformedURLException {
-		this(credentials, cloudControllerUrl, null);
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl) {
+		this(credentials, cloudControllerUrl, null, null);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, CloudSpace sessionSpace) {
+		this(credentials, cloudControllerUrl, null, sessionSpace);
+    }
+
+	/**
+	 * Constructors to use with an http proxy configuration.
+	 */
+	public CloudFoundryClient(URL cloudControllerUrl, HttpProxyConfiguration httpProxyConfiguration) {
+		this(null, cloudControllerUrl, httpProxyConfiguration, null);
+	}
+
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
+							  HttpProxyConfiguration httpProxyConfiguration) {
+		this(credentials, cloudControllerUrl, httpProxyConfiguration, null);
+	}
+
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
+							  HttpProxyConfiguration httpProxyConfiguration, CloudSpace sessionSpace) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
-		CloudControllerClientFactory cloudControllerClientFactory = new CloudControllerClientFactory();
+		CloudControllerClientFactory cloudControllerClientFactory =
+				new CloudControllerClientFactory(httpProxyConfiguration);
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
     }
+
 
 	public URL getCloudControllerUrl() {
 		return cc.getCloudControllerUrl();

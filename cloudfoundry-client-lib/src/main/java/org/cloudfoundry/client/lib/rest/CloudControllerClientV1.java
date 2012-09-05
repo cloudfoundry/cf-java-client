@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
@@ -79,9 +80,12 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	private OauthClient oauthClient;
 
-	public CloudControllerClientV1(URL cloudControllerUrl, CloudCredentials cloudCredentials, URL authorizationUrl) {
-		super(cloudControllerUrl, cloudCredentials, authorizationUrl);
-		initializeOauthClient();
+	public CloudControllerClientV1(URL cloudControllerUrl,
+								   HttpProxyConfiguration httpProxyConfiguration,
+								   CloudCredentials cloudCredentials,
+								   URL authorizationUrl) {
+		super(cloudControllerUrl, httpProxyConfiguration, cloudCredentials, authorizationUrl);
+		initializeOauthClient(httpProxyConfiguration);
 	}
 
 	public CloudInfo getInfo() {
@@ -458,9 +462,9 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 
-	private void initializeOauthClient() {
+	private void initializeOauthClient(HttpProxyConfiguration httpProxyConfiguration) {
 		if (authorizationEndpoint != null) {
-			this.oauthClient = new OauthClient(authorizationEndpoint);
+			this.oauthClient = new OauthClient(authorizationEndpoint, httpProxyConfiguration);
 		}
 	}
 

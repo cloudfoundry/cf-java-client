@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
@@ -81,10 +82,13 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
 
-	public CloudControllerClientV2(URL cloudControllerUrl, CloudCredentials cloudCredentials,
-								   URL authorizationEndpoint, CloudSpace sessionSpace) {
-		super(cloudControllerUrl, cloudCredentials, authorizationEndpoint);
-		this.oauthClient = new OauthClient(authorizationEndpoint);
+	public CloudControllerClientV2(URL cloudControllerUrl,
+								   HttpProxyConfiguration httpProxyConfiguration,
+								   CloudCredentials cloudCredentials,
+								   URL authorizationEndpoint,
+								   CloudSpace sessionSpace) {
+		super(cloudControllerUrl, httpProxyConfiguration, cloudCredentials, authorizationEndpoint);
+		this.oauthClient = new OauthClient(authorizationEndpoint, httpProxyConfiguration);
 		this.sessionSpace = sessionSpace;
 	}
 

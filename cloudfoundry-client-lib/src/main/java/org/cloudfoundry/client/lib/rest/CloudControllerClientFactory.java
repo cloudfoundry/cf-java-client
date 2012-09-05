@@ -17,7 +17,9 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
@@ -37,15 +39,17 @@ import java.util.Map;
  */
 public class CloudControllerClientFactory {
 
+	protected HttpProxyConfiguration httpProxyConfiguration;
+
 	protected RestTemplate restTemplate;
 
 	protected ObjectMapper objectMapper;
 
 	private final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
 
-	public CloudControllerClientFactory() {
-		this.restTemplate = new RestTemplate();
-		this.restTemplate.setRequestFactory(new CommonsClientHttpRequestFactory());
+	public CloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration) {
+		this.httpProxyConfiguration = httpProxyConfiguration;
+		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
 		this.objectMapper = new ObjectMapper();
 	}
 
@@ -61,14 +65,16 @@ public class CloudControllerClientFactory {
 		boolean v2 = isV2(infoMap);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap);
 		if (v2) {
-			cc = new CloudControllerClientV2(cloudControllerUrl, cloudCredentials, authorizationEndpoint, sessionSpace);
+			cc = new CloudControllerClientV2(cloudControllerUrl, httpProxyConfiguration, cloudCredentials,
+					authorizationEndpoint, sessionSpace);
 		}
 		else {
 			if (sessionSpace != null) {
 				throw new UnsupportedOperationException(
 						"Spaces are not supported for the version of Cloud Controller you are accessing");
 			}
-			cc = new CloudControllerClientV1(cloudControllerUrl, cloudCredentials, authorizationEndpoint);
+			cc = new CloudControllerClientV1(cloudControllerUrl, httpProxyConfiguration, cloudCredentials,
+					authorizationEndpoint);
 		}
 		return cc;
 	}

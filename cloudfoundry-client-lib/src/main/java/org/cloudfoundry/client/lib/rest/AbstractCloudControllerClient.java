@@ -18,8 +18,10 @@ package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.JsonParseException;
@@ -72,7 +74,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private RestTemplate restTemplate;
 
 	private URL cloudControllerUrl;
 
@@ -82,12 +84,8 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String token;
 
-	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials) {
-		this(cloudControllerUrl, cloudCredentials, null);
-	}
-
-	public AbstractCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials,
-										 URL authorizationEndpoint) {
+	public AbstractCloudControllerClient(URL cloudControllerUrl, HttpProxyConfiguration httpProxyConfiguration,
+										 CloudCredentials cloudCredentials, URL authorizationEndpoint) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		this.cloudCredentials = cloudCredentials;
 		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
@@ -95,8 +93,11 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		}
 		this.cloudControllerUrl = cloudControllerUrl;
 		this.authorizationEndpoint = authorizationEndpoint;
+		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
+		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
 		this.restTemplate.setRequestFactory(
-				new CloudFoundryClientHttpRequestFactory(new CommonsClientHttpRequestFactory()));
+				new CloudFoundryClientHttpRequestFactory(requestFactory));
+
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
 	}
