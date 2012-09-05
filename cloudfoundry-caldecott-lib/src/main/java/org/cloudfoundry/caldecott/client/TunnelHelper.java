@@ -17,8 +17,7 @@
 package org.cloudfoundry.caldecott.client;
 
 import org.cloudfoundry.caldecott.TunnelException;
-import org.cloudfoundry.client.lib.ApplicationInfo;
-import org.cloudfoundry.client.lib.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;

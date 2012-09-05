@@ -6,10 +6,11 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudApplication;
-import org.cloudfoundry.client.lib.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.caldecott.TunnelException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.dbunit.DatabaseUnitException;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.lang.System;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -439,7 +441,7 @@ public class HttpTunnelTest {
 	private static CloudFoundryClient clientInit() {
 		CloudFoundryClient client;
 		try {
-			client = new CloudFoundryClient(VCAP_EMAIL, VCAP_PASSWD, VCAP_TARGET);
+			client = new CloudFoundryClient(new CloudCredentials(VCAP_EMAIL, VCAP_PASSWD), new URL(VCAP_TARGET));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
