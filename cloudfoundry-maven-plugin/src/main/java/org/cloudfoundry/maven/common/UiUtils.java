@@ -15,6 +15,8 @@
  */
 package org.cloudfoundry.maven.common;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,6 +81,14 @@ public final class UiUtils {
 		table.getHeaders().put(COLUMN_5, new TableHeader("URLS"));
 		table.getHeaders().put(COLUMN_6, new TableHeader("Services"));
 
+		Comparator<CloudApplication> nameComparator = new Comparator<CloudApplication>() {
+			public int compare(CloudApplication a, CloudApplication b) {
+				return a.getName().compareTo(b.getName());
+			}
+		};
+
+		Collections.sort(applications, nameComparator);
+
 		for (CloudApplication application : applications) {
 
 			TableRow tableRow = new TableRow();
@@ -113,7 +123,7 @@ public final class UiUtils {
 	}
 
 	/**
-	 * Renders a textual representation of the list of provided {@link ServiceConfigurations}
+	 * Renders a sorted textual representation of the list of provided {@link ServiceConfigurations}
 	 *
 	 * The following information is shown:
 	 *
@@ -135,6 +145,14 @@ public final class UiUtils {
 		table.getHeaders().put(COLUMN_2, new TableHeader("Version"));
 		table.getHeaders().put(COLUMN_3, new TableHeader("Description"));
 
+		Comparator<ServiceConfiguration> vendorComparator = new Comparator<ServiceConfiguration>() {
+			public int compare(ServiceConfiguration a, ServiceConfiguration b) {
+				return a.getVendor().compareTo(b.getVendor());
+			}
+		};
+
+		Collections.sort(serviceConfigurations, vendorComparator);
+
 		for (ServiceConfiguration serviceConfiguration : serviceConfigurations) {
 
 			TableRow tableRow = new TableRow();
@@ -155,7 +173,7 @@ public final class UiUtils {
 	}
 
 	/**
-	 * Renders a textual representation of the list of provided {@link CloudService}
+	 * Renders a sorted textual representation of the list of provided {@link CloudService}
 	 *
 	 * The following information is shown:
 	 *
@@ -174,6 +192,14 @@ public final class UiUtils {
 
 		table.getHeaders().put(COLUMN_1, new TableHeader("Name"));
 		table.getHeaders().put(COLUMN_2, new TableHeader("Service"));
+
+		Comparator<CloudService> nameComparator = new Comparator<CloudService>() {
+			public int compare(CloudService a, CloudService b) {
+				return a.getName().compareTo(b.getName());
+			}
+		};
+
+		Collections.sort(services, nameComparator);
 
 		for (CloudService service : services) {
 
