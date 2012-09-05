@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.cloudfoundry.client.lib.CloudApplication;
+import org.cloudfoundry.client.lib.CloudService;
+import org.cloudfoundry.client.lib.ServiceConfiguration;
 
 /**
  * Contains utility methods for rendering data to a formatted console output.
@@ -111,6 +113,85 @@ public final class UiUtils {
 	}
 
 	/**
+	 * Renders a textual representation of the list of provided {@link ServiceConfigurations}
+	 *
+	 * The following information is shown:
+	 *
+	 * <ul>
+	 *	<li>Service Vendor</li>
+	 *	<li>Service Version</li>
+	 *	<li>Service Description</li>
+	 * <ul>
+	 *
+	 * @param table List of {@ServiceConfigurations}
+	 * @return The rendered table representation as String
+	 *
+	 */
+	public static String renderServiceConfigurationDataAsTable(List<ServiceConfiguration> serviceConfigurations) {
+
+		Table table = new Table();
+
+		table.getHeaders().put(COLUMN_1, new TableHeader("Service"));
+		table.getHeaders().put(COLUMN_2, new TableHeader("Version"));
+		table.getHeaders().put(COLUMN_3, new TableHeader("Description"));
+
+		for (ServiceConfiguration serviceConfiguration : serviceConfigurations) {
+
+			TableRow tableRow = new TableRow();
+
+			table.getHeaders().get(COLUMN_1).updateWidth(serviceConfiguration.getVendor().length());
+			tableRow.addValue(COLUMN_1, serviceConfiguration.getVendor());
+
+			table.getHeaders().get(COLUMN_2).updateWidth(serviceConfiguration.getVersion().length());
+			tableRow.addValue(COLUMN_2, serviceConfiguration.getVersion());
+
+			table.getHeaders().get(COLUMN_3).updateWidth(serviceConfiguration.getDescription().length());
+			tableRow.addValue(COLUMN_3, serviceConfiguration.getDescription());
+
+			table.getRows().add(tableRow);
+		}
+
+		return renderTextTable(table);
+	}
+
+	/**
+	 * Renders a textual representation of the list of provided {@link CloudService}
+	 *
+	 * The following information is shown:
+	 *
+	 * <ul>
+	 *	<li>Service Name</li>
+	 *	<li>Service Vendor</li>
+	 * <ul>
+	 *
+	 * @param table List of {@CloudService}
+	 * @return The rendered table representation as String
+	 *
+	 */
+	public static String renderServiceDataAsTable(List<CloudService> services) {
+
+		Table table = new Table();
+
+		table.getHeaders().put(COLUMN_1, new TableHeader("Name"));
+		table.getHeaders().put(COLUMN_2, new TableHeader("Service"));
+
+		for (CloudService service : services) {
+
+			TableRow tableRow = new TableRow();
+
+			table.getHeaders().get(COLUMN_1).updateWidth(service.getName().length());
+			tableRow.addValue(COLUMN_1, service.getName());
+
+			table.getHeaders().get(COLUMN_2).updateWidth(service.getVendor().length());
+			tableRow.addValue(COLUMN_2, service.getVendor());
+
+			table.getRows().add(tableRow);
+		}
+
+		return renderTextTable(table);
+	}
+
+	/**
 	 * Renders a textual representation of provided parameter map.
 	 *
 	 * @param table Map of parameters (key, value)
@@ -194,5 +275,4 @@ public final class UiUtils {
 
 		return headerBorder.toString();
 	}
-
 }
