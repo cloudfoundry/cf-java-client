@@ -178,6 +178,28 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
+	public void testExistenceOfServicesMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		Services mojo = (Services) lookupMojo ( "services", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public void testExistenceOfLogsMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		Logs mojo = (Logs) lookupMojo ( "logs", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public void testNonExistingMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
