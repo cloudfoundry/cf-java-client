@@ -133,16 +133,21 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		getRestTemplate().postForLocation(getUrl("users"), payload);
 	}
 
-	public void updatePassword(String newPassword) {
-		Map<String, String> userInfo = getRestTemplate().getForObject(getUrl("users/{id}"), Map.class,
-			cloudCredentials.getEmail());
-		userInfo.put("password", newPassword);
-		getRestTemplate().put(getUrl("users/{id}"), userInfo, cloudCredentials.getEmail());
-		CloudCredentials newCloudCredentials = new CloudCredentials(cloudCredentials.getEmail(), newPassword);
+	public void updatePassword(CloudCredentials credentials, String newPassword) {
+
+		if (oauthClient != null) {
+			oauthClient.changePassword(token, credentials.getPassword(), newPassword);
+		} else {
+			Map<String, String> userInfo = getRestTemplate().getForObject(getUrl("users/{id}"), Map.class,
+				credentials.getEmail());
+			userInfo.put("password", newPassword);
+			getRestTemplate().put(getUrl("users/{id}"), userInfo, credentials.getEmail());
+		}
+
+		CloudCredentials newCloudCredentials = new CloudCredentials(credentials.getEmail(), newPassword);
 		if (cloudCredentials.getProxyUser() != null) {
 			cloudCredentials = newCloudCredentials.proxyForUser(cloudCredentials.getProxyUser());
-		}
-		else {
+		} else {
 			cloudCredentials = newCloudCredentials;
 		}
 	}

@@ -112,16 +112,18 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.register(email, password);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void updatePassword(String newPassword) {
 		cc.updatePassword(newPassword);
+	}
+
+	public void updatePassword(CloudCredentials credentials, String newPassword) {
+		cc.updatePassword(credentials, newPassword);
 	}
 
 	public void unregister() {
 		cc.unregister();
 	}
 
-	@SuppressWarnings("unchecked")
 	public String login() {
 		return cc.login();
 	}
@@ -130,12 +132,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.logout();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<CloudApplication> getApplications() {
 		return cc.getApplications();
 	}
 
-	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
 		return cc.getApplication(appName);
 	}
@@ -268,7 +268,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteService(service);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<ServiceConfiguration> getServiceConfigurations() {
 		return cc.getServiceConfigurations();
 	}
