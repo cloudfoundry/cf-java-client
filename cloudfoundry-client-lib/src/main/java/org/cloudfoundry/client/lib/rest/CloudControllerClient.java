@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -58,6 +59,8 @@ public interface CloudControllerClient {
 	void register(String email, String password);
 
 	void updatePassword(String newPassword);
+
+	void updatePassword(CloudCredentials credentials, String newPassword);
 
 	void unregister();
 

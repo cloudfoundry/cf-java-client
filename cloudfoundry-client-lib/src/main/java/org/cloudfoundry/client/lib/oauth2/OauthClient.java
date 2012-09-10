@@ -18,10 +18,13 @@ package org.cloudfoundry.client.lib.oauth2;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
-import org.cloudfoundry.client.lib.util.CloudUtil;
+import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
@@ -33,7 +36,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -44,6 +47,8 @@ import java.util.Map;
  * @author: Thomas Risberg
  */
 public class OauthClient {
+
+	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 
 	private URL authorizationUrl;
 
@@ -73,6 +78,21 @@ public class OauthClient {
 			throw cfEx;
 		}
 		return token;
+	}
+
+	public void changePassword(String token, String oldPassword, String newPassword) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(AUTHORIZATION_HEADER_KEY, token);
+		HttpEntity info = new HttpEntity(headers);
+		ResponseEntity<String> response = restTemplate.exchange(authorizationUrl + "/userinfo", HttpMethod.GET, info, String.class);
+		Map<String, Object> responseMap = JsonUtil.convertJsonToMap(response.getBody());
+		String userId = (String) responseMap.get("user_id");
+		Map<String, Object> body = new HashMap<String, Object>();
+		body.put("schemas", new String[] {"urn:scim:schemas:core:1.0"});
+		body.put("password", newPassword);
+		body.put("oldPassword", oldPassword);
+		HttpEntity<Map> httpEntity = new HttpEntity<Map>(body, headers);
+		restTemplate.put(authorizationUrl + "/User/{id}/password", httpEntity, userId);
 	}
 
 	private ImplicitResourceDetails getImplicitResource() {
