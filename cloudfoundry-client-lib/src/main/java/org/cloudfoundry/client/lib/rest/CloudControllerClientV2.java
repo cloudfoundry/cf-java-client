@@ -101,7 +101,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 		//TODO: replace with v2 api call once, or if, they become available
 		String infoV1Json = getRestTemplate().getForObject(getUrl("info"), String.class);
-		Map<String, Object> infoV1Map = (Map<String, Object>) JsonUtil.convertJsonToMap(infoV1Json);
+		Map<String, Object> infoV1Map = JsonUtil.convertJsonToMap(infoV1Json);
 		Map<String, Object> limitMap = (Map<String, Object>) infoV1Map.get("limits");
 		Map<String, Object> usageMap = (Map<String, Object>) infoV1Map.get("usage");
 
@@ -280,15 +280,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public ApplicationStats getApplicationStats(String appName) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
-	}
-
-	public int[] getApplicationMemoryChoices() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
-	}
-
-	public int getDefaultApplicationMemory(String framework) {
-		//TODO: implement this method
-		return 512;
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,

@@ -247,28 +247,6 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		return new ApplicationStats(statsAsMap);
 	}
 
-	public int[] getApplicationMemoryChoices() {
-		// TODO: Get it from cloudcontroller's 'info/resources' end point
-		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
-		int maxMemory = getInfo().getLimits().getMaxTotalMemory();
-
-		int length = 0;
-		for (int generalChoice : generalChoices) {
-			if (generalChoice <= maxMemory) {
-				length++;
-			}
-		}
-
-		int[] result = new int[length];
-		System.arraycopy(generalChoices, 0, result, 0, length);
-		return result;
-	}
-
-	public int getDefaultApplicationMemory(String framework) {
-		// TODO: Currently, we don't use framework as the only one supported is the Spring Framework
-		return 512;
-	}
-
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris, List<String> serviceNames, boolean checkExists) {
 		if (checkExists) {
 			try {

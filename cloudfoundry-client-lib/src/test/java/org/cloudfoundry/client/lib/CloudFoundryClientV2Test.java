@@ -48,6 +48,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.fail;
@@ -209,6 +210,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
 		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
 		for (CloudInfo.Runtime runtime : runtimes) {
+			System.out.println(">" + runtime.getName() + " " + runtime.getDescription());
 			runtimesByName.put(runtime.getName(), runtime);
 		}
 
@@ -220,6 +222,14 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		// a basic check that versions are right
 		//TODO: this is no longer availabe in v2
 //		assertEquals("1.6", runtimesByName.get("java").getVersion());
+	}
+
+	@Test
+	public void getApplicationMemoryChoices() {
+		int[] choices = client.getApplicationMemoryChoices();
+		assertNotNull(choices);
+		assertNotSame(0, choices.length);
+		assertTrue(client.getCloudInfo().getLimits().getMaxTotalMemory() >= choices[choices.length - 1]);
 	}
 
 	@Test
@@ -610,7 +620,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	@Test
 	public void updatePassword() throws MalformedURLException {
 
-		assumeTrue(false); //disabled until new accounts created have scope=password.write
+		assumeTrue(false); //disabled until vmc client has scope=password.write
 
 		String newPassword = "newPass123";
 		spaceClient.updatePassword(newPassword);
