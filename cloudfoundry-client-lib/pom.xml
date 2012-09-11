@@ -204,6 +204,13 @@
 									<type>war</type>
 									<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
 								</artifactItem>
+								<artifactItem>
+									<groupId>org.cloudfoundry.test</groupId>
+									<artifactId>simple-spring-app</artifactId>
+									<version>0.1.0.BUILD-SNAPSHOT</version>
+									<type>war</type>
+									<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 							<stripVersion>true</stripVersion>
 						</configuration>

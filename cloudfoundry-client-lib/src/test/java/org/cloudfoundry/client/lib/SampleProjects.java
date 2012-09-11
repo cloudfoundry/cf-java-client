@@ -56,6 +56,19 @@ public class SampleProjects {
     }
 
     /**
+     * Returns a simple spring application including an empty properties file.
+     *
+     * @return the non-ascii-file-name WAR file
+     * @throws IOException
+     */
+    public static File simpleSpringApp() throws IOException {
+		ClassPathResource cpr = new ClassPathResource("simple-spring-app.war");
+		File file = cpr.getFile();
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
      * Returns a spring application using a file with a non-ascii name.
      *
      * @return the non-ascii-file-name WAR file
