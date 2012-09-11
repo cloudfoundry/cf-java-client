@@ -439,22 +439,32 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		final String range =
 				"bytes=" + (start == -1 ? "" : start) + "-" + (end == -1 ? "" : end);
 
-		boolean supportsRanges = getRestTemplate().execute(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"),
-				HttpMethod.HEAD,
-				new RequestCallback() {
-					public void doWithRequest(ClientHttpRequest request) throws IOException {
-						request.getHeaders().set("Range", "bytes=0-");
-					}
-				},
-				new ResponseExtractor<Boolean>() {
-					public Boolean extractData(ClientHttpResponse response) throws IOException {
-						if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
-							return true;
+		boolean supportsRanges = false;
+		try {
+			supportsRanges = getRestTemplate().execute(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"),
+					HttpMethod.HEAD,
+					new RequestCallback() {
+						public void doWithRequest(ClientHttpRequest request) throws IOException {
+							request.getHeaders().set("Range", "bytes=0-");
 						}
-						return false;
-					}
-				},
-				appName, instanceIndex, filePath);
+					},
+					new ResponseExtractor<Boolean>() {
+						public Boolean extractData(ClientHttpResponse response) throws IOException {
+							if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
+								return true;
+							}
+							return false;
+						}
+					},
+					appName, instanceIndex, filePath);
+		} catch (CloudFoundryException e) {
+			if (e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)) {
+				// must be a 0 byte file
+				return "";
+			} else {
+				throw e;
+			}
+		}
 		HttpHeaders headers = new HttpHeaders();
 		if (supportsRanges) {
 			headers.set("Range", range);
@@ -473,8 +483,11 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 				return response.substring(response.length() - end);
 			} else {
 				if (start >= response.length()) {
+					if (response.length() == 0) {
+						return "";
+					}
 					throw new CloudFoundryException(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE,
-							"The starting position " + start + " is past the end of the content.");
+							"The starting position " + start + " is past the end of the file content.");
 				}
 				if (end != -1) {
 					if (end >= response.length()) {

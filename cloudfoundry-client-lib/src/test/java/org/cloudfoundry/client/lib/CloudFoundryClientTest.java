@@ -358,85 +358,38 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void getFile() throws Exception {
-		String appName = namespacedAppName(TEST_NAMESPACE, "travel_getFile");
-		createAndUploadAndStart(appName);
+		String appName = namespacedAppName(TEST_NAMESPACE, "simple_getFile");
+		createAndUploadAndStartSimpleSpringApp(appName);
 		String fileName = "tomcat/webapps/ROOT/WEB-INF/web.xml";
+		String emptyPropertiesfileName = "tomcat/webapps/ROOT/WEB-INF/classes/empty.properties";
 
 		// Test downloading full file
-		String fileContent = null;
-		for (int i = 0; i < 20 && (fileContent == null || fileContent.length() == 0); i++) {
-			try {
-				fileContent = client.getFile(appName, 0, fileName);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent = client.getFile(appName, 0, fileName);
 		assertNotNull(fileContent);
 		assertTrue(fileContent.length() > 5);
 
 		// Test downloading range of file with start and end position
 		int end = fileContent.length() - 3;
 		int start = end/2;
-		String fileContent2 = null;
-		for (int i = 0; i < 20 && (fileContent2 == null || fileContent2.length() == 0); i++) {
-			try {
-				fileContent2 = client.getFile(appName, 0, fileName, start, end);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent2 = client.getFile(appName, 0, fileName, start, end);
 		assertEquals(fileContent.substring(start, end), fileContent2);
 
 		// Test downloading range of file with just start position
-		String fileContent3 = null;
-		for (int i = 0; i < 20 && (fileContent3 == null || fileContent3.length() == 0); i++) {
-			try {
-				fileContent3 = client.getFile(appName, 0, fileName, start);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent3 = client.getFile(appName, 0, fileName, start);
 		assertEquals(fileContent.substring(start), fileContent3);
 
 		// Test downloading range of file with start position and end position exceeding the length
-		String fileContent4 = null;
 		int positionPastEndPosition = fileContent.length() + 999;
-		for (int i = 0; i < 20 && (fileContent4 == null || fileContent4.length() == 0); i++) {
-			try {
-				fileContent4 = client.getFile(appName, 0, fileName, start, positionPastEndPosition);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent4 = client.getFile(appName, 0, fileName, start, positionPastEndPosition);
 		assertEquals(fileContent.substring(start), fileContent4);
 
 		// Test downloading end portion of file with length
-		String fileContent5 = null;
 		int length = fileContent.length() / 2;
-		for (int i = 0; i < 20 && (fileContent5 == null || fileContent5.length() == 0); i++) {
-			try {
-				fileContent5 = client.getFileTail(appName, 0, fileName, length);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent5 = client.getFileTail(appName, 0, fileName, length);
 		assertEquals(fileContent.substring(fileContent.length() - length), fileContent5);
 
 		// Test downloading one byte of file with start and end position
-		String fileContent6 = null;
-		for (int i = 0; i < 20 && (fileContent6 == null || fileContent6.length() == 0); i++) {
-			try {
-				fileContent6 = client.getFile(appName, 0, fileName, start, start + 1);
-			}
-			catch (Exception ex) {
-				Thread.sleep(1000);
-			}
-		}
+		String fileContent6 = client.getFile(appName, 0, fileName, start, start + 1);
 		assertEquals(fileContent.substring(start, start + 1), fileContent6);
 		assertEquals(1, fileContent6.length());
 
@@ -448,6 +401,11 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		} catch (CloudFoundryException e) {
 			assertTrue(e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE));
 		}
+
+		// Test downloading empty file
+		String fileContent7 = client.getFile(appName, 0, emptyPropertiesfileName);
+		assertNotNull(fileContent7);
+		assertTrue(fileContent7.length() == 0);
 
 		// Test downloading with invalid parameters - should all throw exceptions
 		try {
@@ -1028,6 +986,20 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		client.createApplication(appName, CloudApplication.SPRING,
 				TEST_APP_MEMORY, uris, serviceNames);
 		client.uploadApplication(appName, file.getCanonicalPath());
+		return client.getApplication(appName);
+	}
+
+	private CloudApplication createAndUploadAndStartSimpleSpringApp(String appName) throws IOException {
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(ccUrl, appName));
+
+		File war = SampleProjects.simpleSpringApp();
+		List<String> serviceNames = new ArrayList<String>();
+
+		client.createApplication(appName, CloudApplication.SPRING,
+				TEST_APP_MEMORY, uris, serviceNames);
+		client.uploadApplication(appName, war.getCanonicalPath());
+		client.startApplication(appName);
 		return client.getApplication(appName);
 	}
 

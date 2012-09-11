@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>non-ascii-file-name</module>
+		<module>simple-spring-app</module>
 	</modules>
 
 	<build>
