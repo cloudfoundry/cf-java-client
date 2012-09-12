@@ -24,6 +24,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RequestCallback;
@@ -60,7 +61,7 @@ public class HttpTunnel implements Tunnel {
 	private long lastRead = 0;
 
 	public HttpTunnel(String url, String host, int port, String auth) {
-		this(url, host, port, auth, new RestTemplate());
+		this(url, host, port, auth, createRestTemplate());
 	}
 
 	public HttpTunnel(String url, String host, int port, String auth, RestOperations restOperations) {
@@ -92,7 +93,14 @@ public class HttpTunnel implements Tunnel {
 		requestHeaders.set("Auth-Token", auth);
 		requestHeaders.set("Content-Length", initMsg.length()+"");
 		HttpEntity<String> requestEntity = new HttpEntity<String>(initMsg, requestHeaders);
-		String jsonResponse = restOperations.postForObject(url + "/tunnels", requestEntity, String.class);
+		String jsonResponse;
+		try {
+			jsonResponse = restOperations.postForObject(url + "/tunnels", requestEntity, String.class);
+		} catch (RuntimeException e) {
+			logger.error("Fatal error while opening tunnel: " + e.getMessage());
+			close();
+			throw e;
+		}
 		try {
 			this.tunnelInfo = TunnelHelper.convertJsonToMap(jsonResponse);
 		} catch (IOException ignore) {
@@ -128,8 +136,9 @@ public class HttpTunnel implements Tunnel {
 		requestHeaders.set("Content-Length", bytes.length+"");
 		String dataUrl = url + this.tunnelInfo.get("path_in") + "/" + page;
 		HttpEntity<byte[]> requestEntity = new HttpEntity<byte[]>(bytes, requestHeaders);
-		if (logger.isTraceEnabled())
+		if (logger.isTraceEnabled()) {
 			logger.trace("SENDING: " + printBytes(bytes));
+		}
 		ResponseEntity<?> response = restOperations.exchange(dataUrl, HttpMethod.PUT, requestEntity, null);
 		if (logger.isDebugEnabled()) {
 			logger.debug("[" + bytes.length + " bytes] PUT to " + dataUrl +" resulted in: " + response.getStatusCode());
@@ -138,8 +147,9 @@ public class HttpTunnel implements Tunnel {
 
 	private byte[] receiveBytes(long page) {
 		byte[] response = receiveDataBuffered(page);
-		if (logger.isTraceEnabled())
+		if (logger.isTraceEnabled()) {
 			logger.trace("RECEIVED: " + printBytes(response));
+		}
 		return response;
 	}
 
@@ -157,8 +167,9 @@ public class HttpTunnel implements Tunnel {
 					},
 					new ResponseExtractor<byte[]>() {
 						public byte[] extractData(ClientHttpResponse clientHttpResponse) throws IOException {
-							if (logger.isDebugEnabled())
+							if (logger.isDebugEnabled()) {
 								logger.debug("HEADER: " + clientHttpResponse.getHeaders().toString());
+							}
 							int length = (int)clientHttpResponse.getHeaders().getContentLength();
 							InputStream stream = clientHttpResponse.getBody();
 							byte[] bytes = new byte[length];
@@ -170,8 +181,9 @@ public class HttpTunnel implements Tunnel {
 									break;
 								}
 								bytesRead = bytesRead + r;
-								if (logger.isTraceEnabled())
-									logger.trace("Have read " + r  + " bytes which makes " + bytesRead + " of " + length + " completed");
+								if (logger.isTraceEnabled()) {
+									logger.trace("Have read " + r + " bytes which makes " + bytesRead + " of " + length + " completed");
+								}
 							}
 							if (logger.isDebugEnabled()) {
 								logger.debug("[" + length + " bytes] GET from " + dataUrl + " resulted in: " + clientHttpResponse.getStatusCode());
@@ -192,6 +204,15 @@ public class HttpTunnel implements Tunnel {
 	@Override
 	public String toString() {
 		return "HttpTunnel for " + url + " on " + host + ":" + port;
+	}
+
+	private static RestTemplate createRestTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+		requestFactory.setConnectTimeout(20000);
+		requestFactory.setReadTimeout(20000);
+		restTemplate.setRequestFactory(requestFactory);
+		return restTemplate;
 	}
 
 	private static String printBytes(byte[] array) {

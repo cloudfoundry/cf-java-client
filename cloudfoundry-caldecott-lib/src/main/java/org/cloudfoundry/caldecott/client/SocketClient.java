@@ -61,7 +61,7 @@ public class SocketClient implements Client {
 		if (!open) {
 			return null;
 		}
-		byte[] bytes = new byte[1024];
+		byte[] bytes = new byte[1048576];
 		int len;
 		try {
 			len = socket.getInputStream().read(bytes);
