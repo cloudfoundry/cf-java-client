@@ -36,6 +36,8 @@ public class SocketClient implements Client {
 
 	private static final int SOCKET_TIMEOUT = 30000;
 
+	private static final int BUFFER_SIZE = 1024 * 1024;
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	// configuration options for the socket
@@ -61,7 +63,7 @@ public class SocketClient implements Client {
 		if (!open) {
 			return null;
 		}
-		byte[] bytes = new byte[1024];
+		byte[] bytes = new byte[BUFFER_SIZE];
 		int len;
 		try {
 			len = socket.getInputStream().read(bytes);

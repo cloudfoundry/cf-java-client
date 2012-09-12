@@ -86,7 +86,7 @@ public class TunnelAcceptor implements Runnable {
 	public void run() {
 		while (keepGoing) {
 			try {
-				logger.debug("Waiting for client connection");
+				logger.trace("Waiting for client connection");
 				Socket sourceSocket = serverSocket.accept();
 				logger.debug("Accepted client connection");
 				TunnelHandler handler = new TunnelHandler(sourceSocket, tunnelFactory, taskExecutor);

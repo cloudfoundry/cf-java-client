@@ -25,6 +25,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -150,6 +152,7 @@ public class TunnelHelper {
 
 	private static String testUriSchemes(CloudFoundryClient client, String[] uriSchemes, String uriAuthority) {
 		int i = 0;
+		int retries = 0;
 		String scheme = null;
 		while (i < uriSchemes.length) {
 			scheme = uriSchemes[i];
@@ -157,6 +160,16 @@ public class TunnelHelper {
 			try {
 				getTunnelProtocolVersion(client, uriToUse);
 				break;
+			} catch (HttpClientErrorException e) {
+				if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+					if (retries < 10) {
+						retries++;
+					} else {
+						throw new TunnelException("Not able to locate tunnel server at: " + uriToUse, e);
+					}
+				} else {
+					throw new TunnelException("Error accessing tunnel server at: " + uriToUse, e);
+				}
 			} catch (ResourceAccessException e) {
 				if (e.getMessage().contains("refused")) {
 					i++;
