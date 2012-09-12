@@ -21,12 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.caldecott.TunnelException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Observable;
 
 /**
@@ -123,8 +125,27 @@ public class TunnelHandler extends Observable {
 						stop();
 					}
 				}
-			} catch (IOException e) {
-				throw new TunnelException("Error while processing streams", e);
+			} catch (SocketTimeoutException e) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Retrying tunnel write after receiving " + e.getClass().getName() + ": " + e.getMessage());
+				}
+			} catch (ResourceAccessException e) {
+				Throwable t = e.getCause();
+				if (t != null && t instanceof SocketTimeoutException) {
+					if (logger.isTraceEnabled()) {
+						logger.trace("Retrying tunnel write after receiving " + e.getClass().getName() + ": " + e.getMessage());
+					}
+				} else {
+					logger.error("Caught exception: "  + e.getClass().getName() + ": " + e.getMessage());
+					logger.error("Closing tunnel " + this);
+					stop();
+					throw e;
+				}
+			} catch (Exception e) {
+				logger.error("Caught exception: "  + e.getClass().getName() + ": " + e.getMessage());
+				logger.error("Closing tunnel " + this);
+				stop();
+				throw new TunnelException("Fatal exception during tunnel write", e);
 			}
 			if (!shutdown) {
 				stop();
@@ -171,6 +192,29 @@ public class TunnelHandler extends Observable {
 							logger.warn("Received HTTP Error: [" + hsce.getStatusCode().value() + "] " + hsce.getStatusText());
 							throw new TunnelException("Error while reading from tunnel", hsce);
 						}
+					} catch (SocketTimeoutException e) {
+						retry = true;
+						if (logger.isTraceEnabled()) {
+							logger.trace("Retrying tunnel read after receiving " + e.getClass().getName() + ": " + e.getMessage());
+						}
+					} catch (ResourceAccessException e) {
+						Throwable t = e.getCause();
+						if (t != null && t instanceof SocketTimeoutException) {
+							retry = true;
+							if (logger.isTraceEnabled()) {
+								logger.trace("Retrying tunnel read after receiving " + e.getClass().getName() + ": " + e.getMessage());
+							}
+						} else {
+							logger.error("Caught exception: "  + e.getClass().getName() + ": " + e.getMessage());
+							logger.error("Closing tunnel " + this);
+							stop();
+							throw e;
+						}
+					} catch (RuntimeException e) {
+						logger.error("Caught exception: "  + e.getClass().getName() + ": " + e.getMessage());
+						logger.error("Closing tunnel " + this);
+						stop();
+						throw e;
 					}
 				}
 			} catch (IOException ioe) {
