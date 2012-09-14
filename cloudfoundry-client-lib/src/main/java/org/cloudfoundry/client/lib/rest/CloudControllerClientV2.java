@@ -63,6 +63,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
 /**
@@ -72,15 +74,23 @@ import java.util.zip.ZipFile;
  */
 public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
-	OauthClient oauthClient;
+	// This map only contains framework/runtime mapping for frameworks that we actively support
+	private static Map<String, String[]> FRAMEWORK_RUNTIME_PATTERNS = new HashMap<String, String[]>() {{
+		put("spring", new String[] {"java.*"});
+		put("lift", new String[] {"java.*"});
+		put("grails", new String[] {"java.*"});
+		put("java_web", new String[] {"java.*"});
+	}};
 
-	CloudSpace sessionSpace;
+	private OauthClient oauthClient;
 
-	CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
+	private CloudSpace sessionSpace;
 
-	Map<String, UUID> runtimeIdCache = new HashMap<String, UUID>();
+	private CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
 
-	Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
+	private Map<String, UUID> runtimeIdCache = new HashMap<String, UUID>();
+
+	private Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
 
 	public CloudControllerClientV2(URL cloudControllerUrl,
 								   HttpProxyConfiguration httpProxyConfiguration,
@@ -101,7 +111,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 		//TODO: replace with v2 api call once, or if, they become available
 		String infoV1Json = getRestTemplate().getForObject(getUrl("info"), String.class);
-		Map<String, Object> infoV1Map = (Map<String, Object>) JsonUtil.convertJsonToMap(infoV1Json);
+		Map<String, Object> infoV1Map = JsonUtil.convertJsonToMap(infoV1Json);
 		Map<String, Object> limitMap = (Map<String, Object>) infoV1Map.get("limits");
 		Map<String, Object> usageMap = (Map<String, Object>) infoV1Map.get("usage");
 
@@ -114,9 +124,11 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		CloudInfo.Limits limits = new CloudInfo.Limits(limitMap);
 		CloudInfo.Usage usage = new CloudInfo.Usage(usageMap);
 		boolean debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
+		Map<String, CloudInfo.Runtime> runtimes = getInfoForRuntimes();
+		Collection<CloudInfo.Framework> frameworks = getInfoForFrameworks(runtimes);
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
-				description, limits, usage, debug, getInfoForFrameworks(), getInfoForRuntimes());
+				description, limits, usage, debug, frameworks, runtimes);
 	}
 
 	public boolean supportsSpaces() {
@@ -280,15 +292,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public ApplicationStats getApplicationStats(String appName) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
-	}
-
-	public int[] getApplicationMemoryChoices() {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
-	}
-
-	public int getDefaultApplicationMemory(String framework) {
-		//TODO: implement this method
-		return 512;
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
@@ -525,7 +528,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<CloudInfo.Framework> getInfoForFrameworks() {
+	private Collection<CloudInfo.Framework> getInfoForFrameworks(Map<String, CloudInfo.Runtime> runtimes) {
 		String frameworksJson = getRestTemplate().getForObject(getUrl("v2/frameworks"), String.class);
 		List<Map<String, Object>> frameworkList =
 				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(frameworksJson).get("resources");
@@ -533,6 +536,22 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		for (Map<String, Object> frameworkMap : frameworkList) {
 			Map<String, Object> frameworkEntity = (Map<String, Object>) frameworkMap.get("entity");
 			CloudInfo.Framework framework = new CloudInfo.Framework(frameworkEntity);
+			String[] runtimePatterns = FRAMEWORK_RUNTIME_PATTERNS.get(framework.getName());
+			if (runtimePatterns != null) {
+				List<CloudInfo.Runtime> runtimeList = new ArrayList<CloudInfo.Runtime>();
+				for (String runtimePattern : runtimePatterns) {
+					Pattern pattern = Pattern.compile(runtimePattern);
+					for (String runtimeName : runtimes.keySet()) {
+						Matcher matcher = pattern.matcher(runtimeName);
+						if (matcher.find()) {
+							runtimeList.add(runtimes.get(runtimeName));
+						}
+					}
+				}
+				if (runtimeList.size() > 0) {
+					framework.setRuntimes(runtimeList);
+				}
+			}
 			frameworks.add(framework);
 		}
 		return frameworks;
