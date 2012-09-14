@@ -181,6 +181,10 @@ public class CloudApplication extends CloudEntity {
 		return runningInstances;
 	}
 
+	public void setRunningInstances(int runningInstances) {
+		this.runningInstances = runningInstances;
+	}
+
 	public Map<String, String> getEnvAsMap() {
 		Map<String,String> envMap = new HashMap<String, String>();
 		for (String nameAndValue : env) {
