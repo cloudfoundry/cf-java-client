@@ -69,7 +69,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
 
-	private static final MediaType JSON_MEDIA_TYPE = new MediaType(
+	protected static final MediaType JSON_MEDIA_TYPE = new MediaType(
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));

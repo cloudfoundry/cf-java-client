@@ -359,7 +359,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
 		CloudResources archiveResources = new CloudResources(archive);
-		HttpEntity<String> requestEntity = new HttpEntity<String>(JsonUtil.convertToJson(archiveResources));
+		String json = JsonUtil.convertToJson(archiveResources);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(JSON_MEDIA_TYPE);
+		HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
 		ResponseEntity<String> responseEntity =
 			getRestTemplate().exchange(getUrl("v2/resource_match"), HttpMethod.PUT, requestEntity, String.class);
 		List<CloudResource> cloudResources = JsonUtil.convertJsonToCloudResourceList(responseEntity.getBody());
