@@ -35,6 +35,10 @@ public class ApplicationStats {
 		this.records = Collections.unmodifiableList(records);
 	}
 
+	public ApplicationStats(List<InstanceStats> instanceStats) {
+		this.records = Collections.unmodifiableList(instanceStats);
+	}
+
 	public List<InstanceStats> getRecords() {
 		return records;
 	}

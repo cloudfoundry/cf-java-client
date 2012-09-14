@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.client.lib;
 
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.junit.After;
@@ -484,6 +486,72 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		client.updateApplicationInstances(appName, 3);
 		app = client.getApplication(appName);
 		assertEquals(3, app.getInstances());
+
+		client.updateApplicationInstances(appName, 1);
+		app = client.getApplication(appName);
+		assertEquals(1, app.getInstances());
+	}
+
+	@Test
+	public void getApplicationRunningInstances() throws Exception {
+		String appName = namespacedAppName(TEST_NAMESPACE, "inst2");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		client.updateApplicationInstances(appName, 2);
+		CloudApplication app = spaceClient.getApplication(appName);
+		client.startApplication(appName);
+		assertEquals(2, app.getInstances());
+		for (int i = 0; i < 10 && client.getApplication(appName).getRunningInstances() < 2; i++) {
+			Thread.sleep(1000);
+		}
+		assertEquals(2, client.getApplication(appName).getRunningInstances());
+	}
+
+	@Test
+	public void getApplicationStats() throws Exception {
+		String appName = namespacedAppName(TEST_NAMESPACE, "stats2");
+		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+
+		ApplicationStats stats = client.getApplicationStats(appName);
+
+		assertNotNull(stats);
+		assertNotNull(stats.getRecords());
+		// TODO: Make this pattern reusable
+		for (int i = 0; i < 10 && stats.getRecords().size() < 1; i++) {
+			Thread.sleep(1000);
+			stats = client.getApplicationStats(appName);
+		}
+		assertEquals(1, stats.getRecords().size());
+		InstanceStats firstInstance = stats.getRecords().get(0);
+		assertEquals("0", firstInstance.getId());
+		for (int i = 0; i < 10 && firstInstance.getUsage() == null; i++) {
+			Thread.sleep(1000);
+			stats = client.getApplicationStats(appName);
+			firstInstance = stats.getRecords().get(0);
+		}
+		assertNotNull(firstInstance.getUsage());
+
+		// Allow more time deviations due to local clock being out of sync with cloud
+		int timeTolerance = 300 * 1000; // 5 minutes
+		assertTrue("Usage time should be very recent",
+				Math.abs(System.currentTimeMillis() - firstInstance.getUsage().getTime().getTime()) < timeTolerance);
+
+		client.updateApplicationInstances(appName, 3);
+		stats = client.getApplicationStats(appName);
+		assertNotNull(stats);
+		assertNotNull(stats.getRecords());
+		assertEquals(3, stats.getRecords().size());
+	}
+
+	@Test
+	public void getApplicationStatsStoppedApp() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "stats2");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		client.stopApplication(appName);
+
+		ApplicationStats stats = client.getApplicationStats(appName);
+		assertEquals(Collections.emptyList(), stats.getRecords());
 	}
 
 	@Test
@@ -514,8 +582,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
-//		TODO: uris is not currently part of v2 implementation
-//		assertEquals(uris, app.getUris());
+		assertEquals(uris, app.getUris());
 	}
 
 	@Test
@@ -534,8 +601,30 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		CloudApplication app = spaceClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
-//		TODO: uris is not currently part of v2 implementation
-//		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(CCNG_URL, appName)), app.getUris());
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(CCNG_URL, appName)), app.getUris());
+	}
+
+	@Test
+	public void updateApplicationUris() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "url1");
+		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+
+		List<String> originalUris = app.getUris();
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(CCNG_URL, appName)), originalUris);
+
+		List<String> uris = new ArrayList<String>(app.getUris());
+		uris.add(computeAppUrlNoProtocol(CCNG_URL, namespacedAppName(TEST_NAMESPACE, "url2")));
+		spaceClient.updateApplicationUris(appName, uris);
+		app = spaceClient.getApplication(appName);
+		List<String> newUris = app.getUris();
+		assertNotNull(newUris);
+		assertEquals(uris.size(), newUris.size());
+		for (String uri : uris) {
+			assertTrue(newUris.contains(uri));
+		}
+		spaceClient.updateApplicationUris(appName, originalUris);
+		app = spaceClient.getApplication(appName);
+		assertEquals(originalUris, app.getUris());
 	}
 
 	@Test
@@ -665,6 +754,24 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		File file = SampleProjects.springTravel();
 		client.uploadApplication(appName, file.getCanonicalPath());
 		return client.getApplication(appName);
+	}
+
+	private CloudApplication createAndUploadAndStartSimpleSpringApp(String appName) throws IOException {
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(CCNG_URL, appName));
+
+		File war = SampleProjects.simpleSpringApp();
+		List<String> serviceNames = new ArrayList<String>();
+
+		Staging staging =  new Staging("spring");
+		staging.setRuntime("java");
+
+		spaceClient.createApplication(appName, staging,
+				spaceClient.getDefaultApplicationMemory("spring"),
+				uris, serviceNames);
+		spaceClient.uploadApplication(appName, war.getCanonicalPath());
+		spaceClient.startApplication(appName);
+		return spaceClient.getApplication(appName);
 	}
 
 	private CloudApplication createAndUploadExplodedTestApp(String appName, File explodedDir, Staging staging)
