@@ -48,6 +48,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.fail;
@@ -196,10 +197,10 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		// a basic check that runtime info is correct
 		CloudInfo.Framework springFramework = frameworksByName.get("spring");
 		assertNotNull(springFramework);
-		//TODO: this is no longer availabe in v2
-//		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
-//		assertNotNull(springRuntimes);
-//		assertTrue(springRuntimes.size() > 0);
+
+		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
+		assertNotNull(springRuntimes);
+		assertTrue(springRuntimes.size() > 0);
 	}
 
 	@Test
@@ -220,6 +221,18 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		// a basic check that versions are right
 		//TODO: this is no longer availabe in v2
 //		assertEquals("1.6", runtimesByName.get("java").getVersion());
+	}
+
+	@Test
+	public void getApplicationMemoryChoices() {
+		int springMemory = client.getDefaultApplicationMemory("spring");
+		assertEquals(512, springMemory);
+		int railsMemory = client.getDefaultApplicationMemory("rails");
+		assertEquals(256, railsMemory);
+		int[] choices = client.getApplicationMemoryChoices();
+		assertNotNull(choices);
+		assertNotSame(0, choices.length);
+		assertTrue(client.getCloudInfo().getLimits().getMaxTotalMemory() >= choices[choices.length - 1]);
 	}
 
 	@Test
@@ -454,7 +467,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		String appName = createSpringTravelApp("mem1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 
-		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
+		assertEquals(client.getDefaultApplicationMemory("spring"), app.getMemory());
 
 		client.updateApplicationMemory(appName, 256);
 		app = client.getApplication(appName);
@@ -609,9 +622,6 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void updatePassword() throws MalformedURLException {
-
-		assumeTrue(false); //disabled until new accounts created have scope=password.write
-
 		String newPassword = "newPass123";
 		spaceClient.updatePassword(newPassword);
 		CloudFoundryClient clientWithChangedPassword =
