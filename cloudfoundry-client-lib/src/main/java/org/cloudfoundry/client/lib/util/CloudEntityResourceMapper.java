@@ -98,8 +98,7 @@ public class CloudEntityResourceMapper {
 		app.setServices(new ArrayList<String>());
 		app.setState(CloudApplication.AppState.valueOf(getEntityAttribute(resource, "state", String.class)));
 		app.setDebug(null);
-		String envJson = getEntityAttribute(resource, "environment_json",String.class);
-		Map envMap = JsonUtil.convertJsonToMap(envJson);
+		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
 		if (envMap.size() > 0) {
 			app.setEnv(envMap);
 		}

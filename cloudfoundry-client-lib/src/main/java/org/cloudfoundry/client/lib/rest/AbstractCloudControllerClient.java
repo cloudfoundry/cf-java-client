@@ -52,6 +52,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,16 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
+
+	// This map only contains framework/runtime mapping for frameworks that we actively support
+	private static Map<String, Integer> FRAMEWORK_DEFAULT_MEMORY = new HashMap<String, Integer>() {{
+		put("spring", 512);
+		put("lift", 512);
+		put("grails", 512);
+		put("java_web", 512);
+	}};
+
+	private static int DEFAULT_MEMORY = 256;
 
 	private RestTemplate restTemplate;
 
@@ -109,6 +120,31 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	public List<CloudSpace> getSpaces() {
 		ArrayList<CloudSpace> list = new ArrayList<CloudSpace>();
 		return list;
+	}
+
+	public int[] getApplicationMemoryChoices() {
+		// TODO: Get it from cloudcontroller's 'info/resources' end point
+		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
+		int maxMemory = getInfo().getLimits().getMaxTotalMemory();
+
+		int length = 0;
+		for (int generalChoice : generalChoices) {
+			if (generalChoice <= maxMemory) {
+				length++;
+			}
+		}
+
+		int[] result = new int[length];
+		System.arraycopy(generalChoices, 0, result, 0, length);
+		return result;
+	}
+
+	public int getDefaultApplicationMemory(String framework) {
+		Integer memory = FRAMEWORK_DEFAULT_MEMORY.get(framework);
+		if (memory == null) {
+			return DEFAULT_MEMORY;
+		}
+		return memory;
 	}
 
 	public void updatePassword(String newPassword) {

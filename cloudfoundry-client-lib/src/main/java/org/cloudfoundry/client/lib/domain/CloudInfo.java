@@ -315,12 +315,19 @@ public class CloudInfo {
 
 		@SuppressWarnings("unchecked")
 		public Framework(Map<String, Object> data) {
-			name = CloudUtil.parse(String.class,  data.get("name"));
-			List<Map<String, Object>> runtimeData = CloudUtil.parse(List.class,  data.get("runtimes"));
+			name = CloudUtil.parse(String.class, data.get("name"));
+			List<Map<String, Object>> runtimeData = CloudUtil.parse(List.class, data.get("runtimes"));
 			if (runtimeData != null) {
 				for (Map<String, Object> runtime : runtimeData) {
 					runtimes.add(new Runtime(runtime));
 				}
+			}
+		}
+
+		public Framework(Map<String, Object> data, List<Runtime> runtimes) {
+			name = CloudUtil.parse(String.class, data.get("name"));
+			if (runtimes != null) {
+				this.runtimes.addAll(runtimes);
 			}
 		}
 

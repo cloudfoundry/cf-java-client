@@ -690,6 +690,10 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void getApplicationMemoryChoices() {
+		int springMemory = client.getDefaultApplicationMemory("spring");
+		assertEquals(512, springMemory);
+		int railsMemory = client.getDefaultApplicationMemory("rails");
+		assertEquals(256, railsMemory);
 		int[] choices = client.getApplicationMemoryChoices();
 		assertNotNull(choices);
 		assertNotSame(0, choices.length);
