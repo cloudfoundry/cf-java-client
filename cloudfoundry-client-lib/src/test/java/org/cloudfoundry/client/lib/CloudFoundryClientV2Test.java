@@ -197,10 +197,10 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		// a basic check that runtime info is correct
 		CloudInfo.Framework springFramework = frameworksByName.get("spring");
 		assertNotNull(springFramework);
-		//TODO: this is no longer availabe in v2
-//		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
-//		assertNotNull(springRuntimes);
-//		assertTrue(springRuntimes.size() > 0);
+
+		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
+		assertNotNull(springRuntimes);
+		assertTrue(springRuntimes.size() > 0);
 	}
 
 	@Test
@@ -210,7 +210,6 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
 		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
 		for (CloudInfo.Runtime runtime : runtimes) {
-			System.out.println(">" + runtime.getName() + " " + runtime.getDescription());
 			runtimesByName.put(runtime.getName(), runtime);
 		}
 
@@ -226,6 +225,10 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void getApplicationMemoryChoices() {
+		int springMemory = client.getDefaultApplicationMemory("spring");
+		assertEquals(512, springMemory);
+		int railsMemory = client.getDefaultApplicationMemory("rails");
+		assertEquals(256, railsMemory);
 		int[] choices = client.getApplicationMemoryChoices();
 		assertNotNull(choices);
 		assertNotSame(0, choices.length);
@@ -464,7 +467,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		String appName = createSpringTravelApp("mem1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
 
-		assertEquals(client.getDefaultApplicationMemory(CloudApplication.SPRING), app.getMemory());
+		assertEquals(client.getDefaultApplicationMemory("spring"), app.getMemory());
 
 		client.updateApplicationMemory(appName, 256);
 		app = client.getApplication(appName);

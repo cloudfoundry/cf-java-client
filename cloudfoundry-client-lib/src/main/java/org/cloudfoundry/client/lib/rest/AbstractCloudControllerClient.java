@@ -52,6 +52,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,16 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
+
+	// This map only contains framework/runtime mapping for frameworks that we actively support
+	private static Map<String, Integer> FRAMEWORK_DEFAULT_MEMORY = new HashMap<String, Integer>() {{
+		put("spring", 512);
+		put("lift", 512);
+		put("grails", 512);
+		put("java_web", 512);
+	}};
+
+	private static int DEFAULT_MEMORY = 256;
 
 	private RestTemplate restTemplate;
 
@@ -129,8 +140,11 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	}
 
 	public int getDefaultApplicationMemory(String framework) {
-		// TODO: Currently, we don't use framework as the only one supported is the Spring Framework
-		return 512;
+		Integer memory = FRAMEWORK_DEFAULT_MEMORY.get(framework);
+		if (memory == null) {
+			return DEFAULT_MEMORY;
+		}
+		return memory;
 	}
 
 	public void updatePassword(String newPassword) {

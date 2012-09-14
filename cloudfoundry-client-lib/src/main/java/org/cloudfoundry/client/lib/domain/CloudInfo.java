@@ -331,5 +331,9 @@ public class CloudInfo {
 		public List<Runtime> getRuntimes() {
 			return Collections.unmodifiableList(runtimes);
 		}
+
+		public void setRuntimes(List<Runtime> runtimes) {
+			this.runtimes = runtimes;
+		}
 	}
 }
