@@ -633,15 +633,23 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			}
 		}
 		for (UUID serviceId : addServices) {
-			HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
-			serviceRequest.put("service_instance_guid", serviceId);
-			serviceRequest.put("app_guid", app.getMeta().getGuid());
-			getRestTemplate().postForObject(getUrl("v2/service_bindings"), serviceRequest, String.class);
+			doBindService(app.getMeta().getGuid(), serviceId);
 		}
 		for (UUID serviceId : deleteServices) {
-			UUID serviceBindingId = getServiceBindingId(app.getMeta().getGuid(), serviceId);
-			getRestTemplate().delete(getUrl("v2/service_bindings/{guid}"), serviceBindingId);
+			doUnbindService(app.getMeta().getGuid(), serviceId);
 		}
+	}
+
+	private void doBindService(UUID appId, UUID serviceId) {
+		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+		serviceRequest.put("service_instance_guid", serviceId);
+		serviceRequest.put("app_guid", appId);
+		getRestTemplate().postForObject(getUrl("v2/service_bindings"), serviceRequest, String.class);
+	}
+
+	private void doUnbindService(UUID appId, UUID serviceId) {
+		UUID serviceBindingId = getServiceBindingId(appId, serviceId);
+		getRestTemplate().delete(getUrl("v2/service_bindings/{guid}"), serviceBindingId);
 	}
 
 	public void updateApplicationUris(String appName, List<String> uris) {
@@ -679,11 +687,15 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void bindService(String appName, String serviceName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		CloudService cloudService = getService(serviceName);
+		UUID appId = getAppId(appName);
+		doBindService(appId, cloudService.getMeta().getGuid());
 	}
 
 	public void unbindService(String appName, String serviceName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		CloudService cloudService = getService(serviceName);
+		UUID appId = getAppId(appName);
+		doUnbindService(appId, cloudService.getMeta().getGuid());
 	}
 
 	public InstancesInfo getApplicationInstances(String appName) {
