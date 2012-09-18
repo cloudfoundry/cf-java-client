@@ -408,6 +408,31 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	}
 
 	@Test
+	public void bindAndUnbindService() throws IOException {
+		String serviceName = "test_database";
+		createMySqlService(serviceName);
+
+		String appName = createSpringTravelApp("bind1", null);
+
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().isEmpty());
+
+		spaceClient.bindService(appName, serviceName);
+
+		app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+
+		spaceClient.unbindService(appName, serviceName);
+
+		app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().isEmpty());
+	}
+
+	@Test
 	public void setEnvironmentThroughList() throws IOException {
 		String appName = createSpringTravelApp("env1", null);
 		CloudApplication app = spaceClient.getApplication(appName);
