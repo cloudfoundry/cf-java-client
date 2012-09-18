@@ -41,7 +41,7 @@ import java.util.UUID;
 //TODO: use some more advanced JSON mapping framework?
 public class CloudEntityResourceMapper {
 
-	SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
 	@SuppressWarnings("unchecked")
 	public String getNameOfResource(Map<String, Object> resource) {
@@ -92,11 +92,10 @@ public class CloudEntityResourceMapper {
 		CloudApplication app = new CloudApplication(
 				getMeta(resource),
 				getNameOfResource(resource));
-		//TODO: real URLs, activeInstances, resources, debug
 		app.setInstances(getEntityAttribute(resource, "instances", Integer.class));
-		app.setUris(Collections.singletonList(app.getName() + ".fakeurl.com"));
 		app.setServices(new ArrayList<String>());
 		app.setState(CloudApplication.AppState.valueOf(getEntityAttribute(resource, "state", String.class)));
+		//TODO: debug
 		app.setDebug(null);
 		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
 		if (envMap.size() > 0) {
@@ -163,7 +162,7 @@ public class CloudEntityResourceMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private CloudEntity.Meta getMeta(Map<String, Object> resource) {
+	public static CloudEntity.Meta getMeta(Map<String, Object> resource) {
 		Map<String, Object> metadata = (Map<String, Object>) resource.get("metadata");
 		UUID guid = UUID.fromString(String.valueOf(metadata.get("guid")));
 		Date createdDate = null;
@@ -186,12 +185,12 @@ public class CloudEntityResourceMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> getEntity(Map<String, Object> resource) {
+	public static Map<String, Object> getEntity(Map<String, Object> resource) {
 		return (Map<String, Object>) resource.get("entity");
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T getEntityAttribute(Map<String, Object> resource, String attributeName, Class<T> targetClass) {
+	public static <T> T getEntityAttribute(Map<String, Object> resource, String attributeName, Class<T> targetClass) {
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		if (targetClass == String.class) {
 			return (T) String.valueOf(entity.get(attributeName));
@@ -210,13 +209,13 @@ public class CloudEntityResourceMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> getEmbeddedResource(Map<String, Object> resource, String embeddedResourceName) {
+	public static Map<String, Object> getEmbeddedResource(Map<String, Object> resource, String embeddedResourceName) {
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		return (Map<String, Object>) entity.get(embeddedResourceName);
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, Object>> getEmbeddedResourceList(Map<String, Object> resource, String embeddedResourceName) {
+	public static List<Map<String, Object>> getEmbeddedResourceList(Map<String, Object> resource, String embeddedResourceName) {
 		return (List<Map<String, Object>>) resource.get(embeddedResourceName);
 	}
 }

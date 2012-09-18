@@ -33,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
+import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -56,6 +57,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -282,16 +284,57 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
+		UUID appId = getAppId(appName);
 		Map<String, Object> resource = findApplicationResource(appName, 2);
 		CloudApplication cloudApp = null;
 		if (resource != null) {
+			int running = getRunningInstances(appId,
+					CloudApplication.AppState.valueOf(
+							CloudEntityResourceMapper.getEntityAttribute(resource, "state", String.class)));
+			((Map<String, Object>)resource.get("entity")).put("runningInstances", running);
 			cloudApp = resourceMapper.mapResource(resource, CloudApplication.class);
+			cloudApp.setUris(findApplicationUris(cloudApp.getMeta().getGuid()));
 		}
 		return cloudApp;
 	}
 
+	private int getRunningInstances(UUID appId, CloudApplication.AppState appState) {
+		int running = 0;
+		ApplicationStats appStats = doGetApplicationStats(appId, appState);
+		if (appStats != null && appStats.getRecords() != null) {
+			for (InstanceStats inst : appStats.getRecords()) {
+				if ("RUNNING".equals(inst.getState())){
+					running++;
+				}
+			}
+		}
+		return running;
+	}
+
 	public ApplicationStats getApplicationStats(String appName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		CloudApplication app = getApplication(appName);
+		return doGetApplicationStats(appId, app.getState());
+
+	}
+
+	private ApplicationStats doGetApplicationStats(UUID appId, CloudApplication.AppState appState) {
+		if (appState.equals(CloudApplication.AppState.STARTED)) {
+			String url = getUrl("v2/apps/{guid}/stats");
+			Map<String, Object> urlVars = new HashMap<String, Object>();
+			urlVars.put("guid", appId);
+			String resp = getRestTemplate().getForObject(url, String.class, urlVars);
+			Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+			List<InstanceStats> instanceList = new ArrayList<InstanceStats>();
+			for (String instanceId : respMap.keySet()) {
+				Map<String, Object> statsMap = (Map<String, Object>) respMap.get(instanceId);
+				InstanceStats instanceStats = new InstanceStats(instanceId, statsMap);
+				instanceList.add(instanceStats);
+			}
+			return new ApplicationStats(instanceList);
+		} else {
+			return new ApplicationStats(new ArrayList<InstanceStats>());
+		}
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
@@ -314,15 +357,145 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
 		appRequest.put("memory", memory);
 		appRequest.put("instances", 1);
-		//TODO: these need to be added?
-//		appRequest.put("uris", ?);
+//		TODO: command needs to be added?
 //		appRequest.put("command", staging.getCommand());
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
-		String postResp = getRestTemplate().postForObject(getUrl("v2/apps"), appRequest, String.class);
+		String appResp = getRestTemplate().postForObject(getUrl("v2/apps"), appRequest, String.class);
+		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
+		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
 
-		if (serviceNames != null && serviceNames.size() != 0) {
+		if (serviceNames != null && serviceNames.size() > 0) {
 			updateApplicationServices(appName, serviceNames);
 		}
+
+		if (uris != null && uris.size() > 0) {
+			addUris(uris, newAppGuid);
+		}
+
+	}
+
+	private void addUris(List<String> uris, UUID appGuid) {
+		Map<String, UUID> domains = getDomains();
+		for (String uri : uris) {
+			UUID domainGuid = null;
+			Map<String, String> uriInfo = new HashMap<String, String>(2);
+			extractUriInfo(domains, uri, uriInfo);
+			domainGuid = domains.get(uriInfo.get("domainName"));
+			bindRoute(uriInfo.get("host"), domainGuid, appGuid);
+		}
+	}
+
+	private void removeUris(List<String> uris, UUID appGuid) {
+		Map<String, UUID> domains = getDomains();
+		for (String uri : uris) {
+			UUID domainGuid = null;
+			Map<String, String> uriInfo = new HashMap<String, String>(2);
+			extractUriInfo(domains, uri, uriInfo);
+			domainGuid = domains.get(uriInfo.get("domainName"));
+			unbindRoute(uriInfo.get("host"), domainGuid, appGuid);
+		}
+	}
+
+	private void extractUriInfo(Map<String, UUID> domains, String uri, Map<String, String> uriInfo) {
+		URI newUri = URI.create(uri);
+		String authority = newUri.getScheme() != null ? newUri.getAuthority(): newUri.getPath();
+		for (String domain : domains.keySet()) {
+			if (authority != null && authority.endsWith(domain)) {
+				uriInfo.put("domainName", domain);
+				if (domain.length() < authority.length()) {
+					uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
+				}
+				break;
+			}
+		}
+		if (uriInfo.get("domainName") == null) {
+			throw new IllegalArgumentException("Domain not found for URI " + uri);
+		}
+		if (uriInfo.get("host") == null) {
+			throw new IllegalArgumentException("Invalid URI " + uri +
+					" -- host not specified for domain " + uriInfo.get("domainName"));
+		}
+	}
+
+	private Map<String, UUID> getDomains() {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2";
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		String domainPath = urlPath + "/domains?inline-relations-depth={depth}";
+		urlVars.put("depth", 1);
+		String domainResp = getRestTemplate().getForObject(getUrl(domainPath), String.class, urlVars);
+		List<Map<String, Object>> domainList =
+				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(domainResp).get("resources");
+		Map<String, UUID> domains = new HashMap<String, UUID>(domainList.size());
+		for (Map<String, Object> d : domainList) {
+			domains.put(
+					CloudEntityResourceMapper.getEntityAttribute(d, "name", String.class),
+					CloudEntityResourceMapper.getMeta(d).getGuid());
+		}
+		return domains;
+	}
+
+	private void bindRoute(String host, UUID domainGuid, UUID appGuid) {
+		UUID routeGuid = getRouteGuid(host);
+		if (routeGuid == null) {
+			routeGuid = addRoute(host, domainGuid);
+		}
+		String bindPath = "v2/apps/{app}/routes/{route}";
+		Map<String, Object> bindVars = new HashMap<String, Object>();
+		bindVars.put("app", appGuid);
+		bindVars.put("route", routeGuid);
+		HashMap<String, Object> bindRequest = new HashMap<String, Object>();
+		getRestTemplate().put(getUrl(bindPath), bindRequest, bindVars);
+	}
+
+	private void unbindRoute(String host, UUID domainGuid, UUID appGuid) {
+		UUID routeGuid = getRouteGuid(host);
+		if (routeGuid != null) {
+			String bindPath = "v2/apps/{app}/routes/{route}";
+			Map<String, Object> bindVars = new HashMap<String, Object>();
+			bindVars.put("app", appGuid);
+			bindVars.put("route", routeGuid);
+			getRestTemplate().delete(getUrl(bindPath), bindVars);
+		}
+	}
+
+	private UUID getRouteGuid(String host) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String routePath = getUrl("v2/routes?inline-relations-depth={depth}");
+		urlVars.put("depth", 1);
+		String routeResp = getRestTemplate().getForObject(routePath, String.class, urlVars);
+		List<Map<String, Object>> routeList =
+				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(routeResp).get("resources");
+		Map<String, UUID> routes = new HashMap<String, UUID>(routeList.size());
+		for (Map<String, Object> r  : routeList) {
+			routes.put(
+					CloudEntityResourceMapper.getEntityAttribute(r, "host", String.class),
+					CloudEntityResourceMapper.getMeta(r).getGuid());
+		}
+		UUID routeGuid = null;
+		for (String routeHost : routes.keySet()) {
+			if (host.equals(routeHost)) {
+				routeGuid = routes.get(routeHost);
+				break;
+			}
+		}
+		return routeGuid;
+	}
+
+	private UUID addRoute(String host, UUID domainGuid) {
+		Assert.notNull(sessionSpace, "Unable to add route without specifying space to use.");
+
+		HashMap<String, Object> routeRequest = new HashMap<String, Object>();
+		routeRequest.put("host", host);
+		routeRequest.put("domain_guid", domainGuid);
+		routeRequest.put("organization_guid", sessionSpace.getOrganization().getMeta().getGuid());
+		String routeResp = getRestTemplate().postForObject(getUrl("v2/routes"), routeRequest, String.class);
+		Map<String, Object> routeEntity = JsonUtil.convertJsonToMap(routeResp);
+		UUID newRouteGuid = CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
+		return newRouteGuid;
 	}
 
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
@@ -472,7 +645,13 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void updateApplicationUris(String appName, List<String> uris) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		CloudApplication app = getApplication(appName);
+		List<String> newUris = new ArrayList<String>(uris);
+		newUris.removeAll(app.getUris());
+		List<String> removeUris = app.getUris();
+		removeUris.removeAll(uris);
+		addUris(newUris, app.getMeta().getGuid());
+		removeUris(removeUris, app.getMeta().getGuid());
 	}
 
 	public void updateApplicationEnv(String appName, Map<String, String> env) {
@@ -640,6 +819,24 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		else {
 			return null;
 		}
+	}
+
+	private List<String> findApplicationUris(UUID appGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "v2/apps/{app}/routes?inline-relations-depth={depth}";
+		urlVars.put("app", appGuid);
+		urlVars.put("depth", 2);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<String> uris =  new ArrayList<String>();
+		for (Map<String, Object> resource : resourceList) {
+			Map<String, Object> domainResource = CloudEntityResourceMapper.getEmbeddedResource(resource, "domain");
+			String uri = CloudEntityResourceMapper.getEntityAttribute(resource, "host", String.class) + "." +
+					CloudEntityResourceMapper.getEntityAttribute(domainResource, "name", String.class);
+			uris.add(uri);
+		}
+		return uris;
 	}
 
 	@SuppressWarnings("unchecked")
