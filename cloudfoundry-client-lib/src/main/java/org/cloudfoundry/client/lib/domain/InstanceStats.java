@@ -66,7 +66,7 @@ public class InstanceStats {
 	private long memQuota;
 	private String name;
 	private int port;
-	private String state;
+	private InstanceState state;
 	private double uptime;
 	private List<String> uris;
 	private Usage usage;
@@ -74,7 +74,8 @@ public class InstanceStats {
 	@SuppressWarnings("unchecked")
 	public InstanceStats(String id, Map<String, Object> attributes) {
 		this.id = id;
-		this.state = parse(String.class, attributes.get("state"));
+		String instanceState = parse(String.class, attributes.get("state"));
+		this.state = InstanceState.valueOfWithDefault(instanceState);
 		Map<String, Object> stats = parse(Map.class, attributes.get("stats"));
 		if (stats != null) {
 			this.cores = parse(Integer.class, stats.get("cores"));
@@ -140,7 +141,7 @@ public class InstanceStats {
 		return port;
 	}
 
-	public String getState() {
+	public InstanceState getState() {
 		return state;
 	}
 

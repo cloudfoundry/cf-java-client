@@ -1,6 +1,8 @@
 package org.cloudfoundry.client.lib;
 
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -110,5 +112,24 @@ public class AbstractCloudFoundryClientTest {
 		} catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().contains("length"));
 		}
+	}
+
+	protected InstancesInfo getInstancesWithTimeout(CloudFoundryClient client, String appName) throws InterruptedException {
+		long start = System.currentTimeMillis();
+		while (true) {
+			Thread.sleep(2000);
+			try {
+				return client.getApplicationInstances(appName);
+			}
+			catch (HttpServerErrorException e) {
+				// error 500, keep waiting
+			}
+			if (System.currentTimeMillis() - start > 30000) {
+				fail("Timed out waiting for startup");
+				break; // for the compiler
+			}
+		}
+
+		return null; // for the compiler
 	}
 }

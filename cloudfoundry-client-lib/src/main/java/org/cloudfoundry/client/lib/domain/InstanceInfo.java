@@ -24,14 +24,15 @@ import java.util.Map;
 public class InstanceInfo {
 	private final Date since;
 	private final int index;
-	private final String state; // TODO make enum, need to know the valid values
+	private final InstanceState state;
 	private final String debugIp;
 	private final int debugPort;
 
 	public InstanceInfo(Map<String, Object> infoMap) {
 		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
 		index = CloudUtil.parse(Integer.class, infoMap.get("index"));
-		state = CloudUtil.parse(String.class, infoMap.get("state"));
+		String instanceState = CloudUtil.parse(String.class, infoMap.get("state"));
+		state = InstanceState.valueOfWithDefault(instanceState);
 		debugIp = CloudUtil.parse(String.class, infoMap.get("debug_ip"));
 		debugPort = CloudUtil.parse(Integer.class, infoMap.get("debug_port"));
 	}
@@ -44,7 +45,7 @@ public class InstanceInfo {
 		return index;
 	}
 
-	public String getState() {
+	public InstanceState getState() {
 		return state;
 	}
 

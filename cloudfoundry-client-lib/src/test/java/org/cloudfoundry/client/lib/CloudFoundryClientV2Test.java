@@ -23,7 +23,10 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.InstanceInfo;
+import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.junit.After;
@@ -33,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -293,6 +297,45 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		CloudApplication newApp = spaceClient.getApplication(newName);
 		assertNotNull(newApp);
 		assertEquals(newName, newApp.getName());
+	}
+
+	@Test
+	public void getApplicationInstances() throws Exception {
+		String appName = namespacedAppName(TEST_NAMESPACE, "instance1");
+		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+
+		assertEquals(1, app.getInstances());
+
+		InstancesInfo instances = getInstancesWithTimeout(spaceClient, appName);
+		assertNotNull(instances);
+		assertEquals(1, instances.getInstances().size());
+
+		spaceClient.updateApplicationInstances(appName, 3);
+		app = spaceClient.getApplication(appName);
+		assertEquals(3, app.getInstances());
+
+		boolean pass = false;
+		for (int i = 0; i < 240; i++) {
+			instances = getInstancesWithTimeout(spaceClient, appName);
+			assertNotNull(instances);
+
+			List<InstanceInfo> infos = instances.getInstances();
+			assertEquals(3, infos.size());
+
+			int passCount = 0;
+			for (InstanceInfo info : infos) {
+				if (InstanceState.RUNNING.equals(info.getState()) ||
+						InstanceState.STARTING.equals(info.getState())) {
+					passCount++;
+				}
+			}
+			if (passCount == infos.size()) {
+				pass = true;
+				break;
+			}
+			Thread.sleep(500);
+		}
+		assertTrue("Couldn't get the right application state in 2 minutes", pass);
 	}
 
 	@Test

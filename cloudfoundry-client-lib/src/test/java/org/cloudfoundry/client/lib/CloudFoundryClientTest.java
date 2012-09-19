@@ -45,6 +45,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudInfo.Framework;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration.Tier;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -744,7 +745,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		CloudApplication app = client.getApplication(appName);
 		assertEquals(1, app.getInstances());
 
-		InstancesInfo instances = getInstancesWithTimeout(appName);
+		InstancesInfo instances = getInstancesWithTimeout(client, appName);
 		assertNotNull(instances);
 		assertEquals(1, instances.getInstances().size());
 
@@ -754,7 +755,7 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 		boolean pass = false;
 		for (int i = 0; i < 240; i++) {
-			instances = getInstancesWithTimeout(appName);
+			instances = getInstancesWithTimeout(client, appName);
 			assertNotNull(instances);
 
 			List<InstanceInfo> infos = instances.getInstances();
@@ -762,7 +763,8 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 			int passCount = 0;
 			for (InstanceInfo info : infos) {
-				if ("RUNNING".equals(info.getState()) || "STARTING".equals(info.getState())) {
+				if (InstanceState.RUNNING.equals(info.getState()) ||
+						InstanceState.STARTING.equals(info.getState())) {
 					passCount++;
 				}
 			}
@@ -877,25 +879,6 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 			}
 		}
 		return false;
-	}
-
-	private InstancesInfo getInstancesWithTimeout(String appName) throws InterruptedException {
-		long start = System.currentTimeMillis();
-		while (true) {
-			Thread.sleep(2000);
-			try {
-				return client.getApplicationInstances(appName);
-			}
-			catch (HttpServerErrorException e) {
-				// error 500, keep waiting
-			}
-			if (System.currentTimeMillis() - start > 30000) {
-				fail("Timed out waiting for startup");
-				break; // for the compiler
-			}
-		}
-
-		return null; // for the compiler
 	}
 
 	private CloudApplication createAndUploadTestApp(String appName, List<String> serviceNames) throws IOException {

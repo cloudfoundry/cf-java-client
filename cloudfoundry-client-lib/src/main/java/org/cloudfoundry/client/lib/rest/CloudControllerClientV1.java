@@ -258,11 +258,6 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		return result;
 	}
 
-	public int getDefaultApplicationMemory(String framework) {
-		// TODO: Currently, we don't use framework as the only one supported is the Spring Framework
-		return 512;
-	}
-
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris, List<String> serviceNames, boolean checkExists) {
 		if (checkExists) {
 			try {
