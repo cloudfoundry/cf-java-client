@@ -41,12 +41,8 @@ import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -59,8 +55,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -422,84 +416,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
-		Assert.isTrue(startPosition >= -1, "Invalid start position value: " + startPosition);
-		Assert.isTrue(endPosition >= -1, "Invalid end position value: " + endPosition);
-		Assert.isTrue(startPosition < 0 || endPosition < 0 || endPosition >= startPosition,
-				"The end position (" + endPosition + ") can't be less than the start position (" + startPosition + ")");
-
-		int start, end;
-		if (startPosition == -1 && endPosition == -1) {
-			start = 0;
-			end = -1;
-		} else {
-			start = startPosition;
-			end = endPosition;
-		}
-
-		final String range =
-				"bytes=" + (start == -1 ? "" : start) + "-" + (end == -1 ? "" : end);
-
-		boolean supportsRanges = false;
-		try {
-			supportsRanges = getRestTemplate().execute(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"),
-					HttpMethod.HEAD,
-					new RequestCallback() {
-						public void doWithRequest(ClientHttpRequest request) throws IOException {
-							request.getHeaders().set("Range", "bytes=0-");
-						}
-					},
-					new ResponseExtractor<Boolean>() {
-						public Boolean extractData(ClientHttpResponse response) throws IOException {
-							if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
-								return true;
-							}
-							return false;
-						}
-					},
-					appName, instanceIndex, filePath);
-		} catch (CloudFoundryException e) {
-			if (e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)) {
-				// must be a 0 byte file
-				return "";
-			} else {
-				throw e;
-			}
-		}
-		HttpHeaders headers = new HttpHeaders();
-		if (supportsRanges) {
-			headers.set("Range", range);
-		}
-		HttpEntity<Object> requestEntity = new HttpEntity<Object>(headers);
-		ResponseEntity<String> responseEntity =
-				getRestTemplate().exchange(getUrl("apps/{appName}/instances/{instanceIndex}/files/{filePath}"),
-						HttpMethod.GET, requestEntity, String.class, appName, instanceIndex, filePath);
-		String response = responseEntity.getBody();
-		boolean partialFile = false;
-		if (responseEntity.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
-			partialFile = true;
-		}
-		if (!partialFile) {
-			if (start == -1) {
-				return response.substring(response.length() - end);
-			} else {
-				if (start >= response.length()) {
-					if (response.length() == 0) {
-						return "";
-					}
-					throw new CloudFoundryException(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE,
-							"The starting position " + start + " is past the end of the file content.");
-				}
-				if (end != -1) {
-					if (end >= response.length()) {
-						end = response.length() - 1;
-					}
-					return response.substring(start, end + 1);
-				} else {
-					return response.substring(start);
-				}
-			}
-		}
-		return response;
+		String urlPath = "apps/{app}/instances/{instanceIndex}/files/{filePath}";
+		return doGetFile(urlPath, appName, instanceIndex, filePath, startPosition, endPosition);
 	}
 
 	public void bindService(String appName, String serviceName) {

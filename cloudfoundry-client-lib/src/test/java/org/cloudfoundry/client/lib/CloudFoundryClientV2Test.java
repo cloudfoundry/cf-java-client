@@ -48,7 +48,6 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -745,6 +744,13 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		// Revert
 		spaceClient.updatePassword(CCNG_USER_PASS);
 		spaceClient.login();
+	}
+
+	@Test
+	public void getFile() throws Exception {
+		String appName = namespacedAppName(TEST_NAMESPACE, "simple_getFile");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		doGetFile(client, appName);
 	}
 
 	private String createSpringTravelApp(String suffix, List<String> serviceNames) {

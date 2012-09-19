@@ -683,7 +683,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		String urlPath = "v2/apps/{appId}/instances/{instanceIndex}/files/{filePath}";
+		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
 	}
 
 	public void bindService(String appName, String serviceName) {
