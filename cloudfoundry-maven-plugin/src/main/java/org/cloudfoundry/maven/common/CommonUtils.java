@@ -17,10 +17,13 @@ package org.cloudfoundry.maven.common;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.cloudfoundry.client.lib.CloudInfo;
+import org.cloudfoundry.client.lib.CloudService;
 import org.cloudfoundry.client.lib.ServiceConfiguration;
 
 /**
@@ -81,7 +84,6 @@ public final class CommonUtils {
 	 *         String for a Null or empty list.
 	 */
 	public static String collectionToCommaDelimitedString(Collection<String> list) {
-
 		if (list == null || list.isEmpty()) {
 			return "";
 		}
@@ -97,6 +99,27 @@ public final class CommonUtils {
 				sb.append(", ");
 			}
 		}
+		return sb.toString();
+	}
+
+	/**
+	 * Convert a List of CloudServices to a comma delimited String using their names.
+	 *
+	 * @param list
+	 * @return Returns the List as a comma delimited String. Returns an empty
+	 *         String for a Null or empty list.
+	 */
+	public static String collectionServicesToCommaDelimitedString(Collection<CloudService> list) {
+		if (list == null || list.isEmpty()) {
+			return "";
+		}
+
+		List<String> sb = new ArrayList<String>();
+
+		for (CloudService service : list) {
+			sb.add(service.getName());
+		}
+
 		return sb.toString();
 	}
 

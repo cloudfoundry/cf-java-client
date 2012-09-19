@@ -152,45 +152,45 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 
 	}
 
-	public void testGetServices() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-
-		doReturn("serviceA, mongo, mysql, rabbitmq").when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
-
-		assertTrue("Expecting 4 Services", mojo.getServices().size() == 4);
-
-	}
-
-	public void testGetServices2() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "services", "service1, super service2  " );
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
-
-		assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2);
-
-		assertEquals("service1", mojo.getServices().get(0));
-		assertEquals("super service2", mojo.getServices().get(1));
-
-	}
+//	public void testGetServices() throws Exception {
+//
+//		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+//
+//		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+//
+//		Push mojo = spy(unspiedMojo);
+//
+//		/**
+//		 * Injecting some test values as expressions are not evaluated.
+//		 */
+//		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+//
+//		doReturn("serviceA, mongo, mysql, rabbitmq").when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
+//
+//		assertTrue("Expecting 4 Services", mojo.getServices().size() == 4);
+//
+//	}
+//
+//	public void testGetServices2() throws Exception {
+//
+//		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+//
+//		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+//
+//		Push mojo = spy(unspiedMojo);
+//
+//		/**
+//		 * Injecting some test values as expressions are not evaluated.
+//		 */
+//		setVariableValueToObject( mojo, "services", "service1, super service2  " );
+//		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.SERVICES);
+//
+//		assertTrue("Expecting 2 Services but got " + mojo.getServices().size(), mojo.getServices().size() == 2);
+//
+//		assertEquals("service1", mojo.getServices().get(0));
+//		assertEquals("super service2", mojo.getServices().get(1));
+//
+//	}
 
 	public void testGetNoStart() throws Exception {
 

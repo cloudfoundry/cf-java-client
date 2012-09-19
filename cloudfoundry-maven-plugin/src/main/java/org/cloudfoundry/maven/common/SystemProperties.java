@@ -34,7 +34,7 @@ public enum SystemProperties {
 	PASSWORD("cf.password", "password"),
 	PATH("cf.path", "path"),
 	RUNTIME("cf.runtime", "runtime"),
-	SERVICES("cf.services", "services"),
+	SERVICES("", "services"),
 	SETTINGS_SERVER("server", "server"),
 	TARGET("cf.target", "target"),
 	URL("cf.url", "url"),
