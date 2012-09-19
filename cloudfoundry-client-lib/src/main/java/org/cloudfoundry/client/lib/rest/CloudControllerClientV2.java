@@ -315,26 +315,28 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		UUID appId = getAppId(appName);
 		CloudApplication app = getApplication(appName);
 		return doGetApplicationStats(appId, app.getState());
-
 	}
 
 	private ApplicationStats doGetApplicationStats(UUID appId, CloudApplication.AppState appState) {
+		List<InstanceStats> instanceList = new ArrayList<InstanceStats>();
 		if (appState.equals(CloudApplication.AppState.STARTED)) {
-			String url = getUrl("v2/apps/{guid}/stats");
-			Map<String, Object> urlVars = new HashMap<String, Object>();
-			urlVars.put("guid", appId);
-			String resp = getRestTemplate().getForObject(url, String.class, urlVars);
-			Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-			List<InstanceStats> instanceList = new ArrayList<InstanceStats>();
+			Map<String, Object> respMap = getInstanceInfoForApp(appId, "stats");
 			for (String instanceId : respMap.keySet()) {
-				Map<String, Object> statsMap = (Map<String, Object>) respMap.get(instanceId);
-				InstanceStats instanceStats = new InstanceStats(instanceId, statsMap);
+				InstanceStats instanceStats =
+						new InstanceStats(instanceId, (Map<String, Object>) respMap.get(instanceId));
 				instanceList.add(instanceStats);
 			}
-			return new ApplicationStats(instanceList);
-		} else {
-			return new ApplicationStats(new ArrayList<InstanceStats>());
 		}
+		return new ApplicationStats(instanceList);
+	}
+
+	private Map<String, Object> getInstanceInfoForApp(UUID appId, String path) {
+		String url = getUrl("v2/apps/{guid}/" + path);
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", appId);
+		String resp = getRestTemplate().getForObject(url, String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		return respMap;
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
@@ -699,7 +701,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public InstancesInfo getApplicationInstances(String appName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		CloudApplication app = getApplication(appName);
+		Map<String, Object> respMap = getInstanceInfoForApp(appId, "instances");
+		List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
+		if (app.getState().equals(CloudApplication.AppState.STARTED)) {
+			for (String instanceId : respMap.keySet()) {
+				instanceList.add((Map<String, Object>) respMap.get(instanceId));
+			}
+		}
+		return new InstancesInfo(instanceList);
 	}
 
 	public CrashesInfo getCrashes(String appName) {

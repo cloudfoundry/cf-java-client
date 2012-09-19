@@ -23,7 +23,9 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.junit.After;
@@ -33,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -295,6 +298,64 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertNotNull(newApp);
 		assertEquals(newName, newApp.getName());
 	}
+
+	@Test
+	public void getApplicationInstances() throws Exception {
+		String appName = namespacedAppName(TEST_NAMESPACE, "instance1");
+		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+
+		assertEquals(1, app.getInstances());
+
+		InstancesInfo instances = getInstancesWithTimeout(appName);
+		assertNotNull(instances);
+		assertEquals(1, instances.getInstances().size());
+
+		spaceClient.updateApplicationInstances(appName, 3);
+		app = spaceClient.getApplication(appName);
+		assertEquals(3, app.getInstances());
+
+		boolean pass = false;
+		for (int i = 0; i < 240; i++) {
+			instances = getInstancesWithTimeout(appName);
+			assertNotNull(instances);
+
+			List<InstanceInfo> infos = instances.getInstances();
+			assertEquals(3, infos.size());
+
+			int passCount = 0;
+			for (InstanceInfo info : infos) {
+				if ("RUNNING".equals(info.getState()) || "STARTING".equals(info.getState())) {
+					passCount++;
+				}
+			}
+			if (passCount == infos.size()) {
+				pass = true;
+				break;
+			}
+			Thread.sleep(500);
+		}
+		assertTrue("Couldn't get the right application state in 2 minutes", pass);
+	}
+
+	private InstancesInfo getInstancesWithTimeout(String appName) throws InterruptedException {
+		long start = System.currentTimeMillis();
+		while (true) {
+			Thread.sleep(2000);
+			try {
+				return spaceClient.getApplicationInstances(appName);
+			}
+			catch (HttpServerErrorException e) {
+				// error 500, keep waiting
+			}
+			if (System.currentTimeMillis() - start > 30000) {
+				fail("Timed out waiting for startup");
+				break; // for the compiler
+			}
+		}
+
+		return null; // for the compiler
+	}
+
 
 	@Test
 	public void getServices() {
