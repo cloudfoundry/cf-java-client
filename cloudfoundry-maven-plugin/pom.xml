@@ -35,6 +35,11 @@ Maven-based applications to Cloud Foundry instances.
 			<name>Gunnar Hillert</name>
 			<email>ghillert at vmware.com</email>
 		</developer>
+		<developer>
+			<id>amoghadam</id>
+			<name>Ali Moghadam</name>
+			<email>amoghadam at rbcon.com</email>
+		</developer>
 	</developers>
 
 	<scm>
