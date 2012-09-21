@@ -624,14 +624,16 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	@Test
 	public void uploadApplication() throws IOException {
 		String appName = createSpringTravelApp("upload1", null);
-		CloudApplication app = spaceClient.getApplication(appName);
-
-		assertNotNull(app);
-		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
 		File file = SampleProjects.springTravel();
 		spaceClient.uploadApplication(appName, file.getCanonicalPath());
 
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+
+		String url = computeAppUrlNoProtocol(CCNG_URL, appName);
+		assertEquals(url, app.getUris().get(0));
 	}
 
 	@Test
