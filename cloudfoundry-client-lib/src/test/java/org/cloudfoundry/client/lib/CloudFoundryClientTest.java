@@ -237,10 +237,14 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void uploadApplication() throws IOException {
-		CloudApplication app = createAndUploadTestApp(namespacedAppName(TEST_NAMESPACE, "travel_test3"));
+		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
+		CloudApplication app = createAndUploadTestApp(appName);
 
 		assertNotNull(app);
 		assertEquals(AppState.STOPPED, app.getState());
+
+		String url = computeAppUrlNoProtocol(ccUrl, appName);
+		assertEquals(url, app.getUris().get(0));
 	}
 
 	@Test
@@ -775,6 +779,10 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 			Thread.sleep(500);
 		}
 		assertTrue("Couldn't get the right application state in 2 minutes", pass);
+
+		client.stopApplication(appName);
+		InstancesInfo instInfo = client.getApplicationInstances(appName);
+		assertEquals(0, instInfo.getInstances().size());
 	}
 
 	@Test

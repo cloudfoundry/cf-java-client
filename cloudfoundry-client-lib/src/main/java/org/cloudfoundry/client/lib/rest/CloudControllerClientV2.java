@@ -706,9 +706,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	public InstancesInfo getApplicationInstances(String appName) {
 		UUID appId = getAppId(appName);
 		CloudApplication app = getApplication(appName);
-		Map<String, Object> respMap = getInstanceInfoForApp(appId, "instances");
 		List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
 		if (app.getState().equals(CloudApplication.AppState.STARTED)) {
+			Map<String, Object> respMap = getInstanceInfoForApp(appId, "instances");
 			List<String> keys = new ArrayList<String>(respMap.keySet());
 			java.util.Collections.sort(keys);
 			for (String instanceId : keys) {
