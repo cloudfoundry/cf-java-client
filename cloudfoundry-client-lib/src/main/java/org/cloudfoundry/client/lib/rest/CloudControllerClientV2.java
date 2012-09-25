@@ -200,15 +200,31 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void createService(CloudService service) {
+		Assert.notNull(sessionSpace, "Unable to create service without specifying space to use.");
+		Assert.notNull(service, "Service must not be null");
+		Assert.notNull(service.getName(), "Service name must not be null");
+		Assert.notNull(service.getLabel(), "Service label must not be null");
+
+		// until we have defaults - the version and plan are required
+		Assert.notNull(service.getVersion(), "Service version must not be null");
+		Assert.notNull(service.getPlan(), "Service plan must not be null");
+
 		List<CloudServiceOffering> offerings = getServiceOfferings(service.getLabel());
 		CloudServicePlan cloudServicePlan = null;
 		for (CloudServiceOffering offering : offerings) {
-			for (CloudServicePlan plan : offering.getCloudServicePlans())
-			if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
-				cloudServicePlan = plan;
+			if (service.getVersion() != null || service.getVersion().equals(offering.getVersion())) {
+				for (CloudServicePlan plan : offering.getCloudServicePlans()) {
+					if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
+						cloudServicePlan = plan;
+						break;
+					}
+				}
+			}
+			if (cloudServicePlan != null) {
 				break;
 			}
 		}
+		Assert.notNull(cloudServicePlan, "Service Plan not found.");
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
@@ -781,6 +797,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
+		Assert.notNull(label, "Service label must not be null");
 		String resp = getRestTemplate().getForObject(
 				getUrl("v2/services?inline-relations-depth=2"), String.class);
 		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
@@ -789,7 +806,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering cloudServiceOffering =
 					resourceMapper.mapResource(resource, CloudServiceOffering.class);
-			if (label.equals(cloudServiceOffering.getLabel())) {
+			if (cloudServiceOffering.getLabel() != null && label.equals(cloudServiceOffering.getLabel())) {
 				results.add(cloudServiceOffering);
 			}
 		}
