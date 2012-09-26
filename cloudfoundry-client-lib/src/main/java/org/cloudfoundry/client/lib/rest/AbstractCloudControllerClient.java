@@ -310,7 +310,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		if (responseEntity.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
 			partialFile = true;
 		}
-		if (!partialFile) {
+		if (!partialFile && response != null) {
 			if (start == -1) {
 				return response.substring(response.length() - end);
 			} else {

@@ -123,11 +123,19 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		int build = CloudUtil.parse(Integer.class, infoMap.get("build"));
 		String version = "" + CloudUtil.parse(Number.class, infoMap.get("version"));
 		String description = CloudUtil.parse(String.class, infoMap.get("description"));
-		CloudInfo.Limits limits = new CloudInfo.Limits(limitMap);
-		CloudInfo.Usage usage = new CloudInfo.Usage(usageMap);
-		boolean debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
-		Map<String, CloudInfo.Runtime> runtimes = getInfoForRuntimes();
-		Collection<CloudInfo.Framework> frameworks = getInfoForFrameworks(runtimes);
+
+		CloudInfo.Limits limits = null;
+		CloudInfo.Usage usage = null;
+		boolean debug = false;
+		Map<String, CloudInfo.Runtime> runtimes = null;
+		Collection<CloudInfo.Framework> frameworks = null;
+		if (token != null) {
+			limits = new CloudInfo.Limits(limitMap);
+			usage = new CloudInfo.Usage(usageMap);
+			debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
+			runtimes = getInfoForRuntimes();
+			frameworks = getInfoForFrameworks(runtimes);
+		}
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
 				description, limits, usage, debug, frameworks, runtimes);
@@ -923,13 +931,15 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 //		return userInfo();
 		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
 		String userJson = "{}";
-		int x = token.indexOf('.');
-		int y = token.indexOf('.', x + 1);
-		String encodedString = token.substring(x + 1, y);
-		try {
-			byte[] decodedBytes = new sun.misc.BASE64Decoder().decodeBuffer(encodedString);
-			userJson = new String(decodedBytes, 0, decodedBytes.length, "UTF-8");
-		} catch (IOException e) {}
+		if (token != null) {
+			int x = token.indexOf('.');
+			int y = token.indexOf('.', x + 1);
+			String encodedString = token.substring(x + 1, y);
+			try {
+				byte[] decodedBytes = new sun.misc.BASE64Decoder().decodeBuffer(encodedString);
+				userJson = new String(decodedBytes, 0, decodedBytes.length, "UTF-8");
+			} catch (IOException e) {}
+		}
 		return(JsonUtil.convertJsonToMap(userJson));
 	}
 
