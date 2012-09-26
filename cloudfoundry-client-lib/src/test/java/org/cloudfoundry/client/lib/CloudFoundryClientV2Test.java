@@ -126,6 +126,16 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	}
 
 	@Test
+	public void infoAvailableWithoutLoggingIn() throws Exception {
+		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_URL));
+		CloudInfo info = infoClient.getCloudInfo();
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertEquals(CloudInfo.CC_MAJOR_VERSION.V2, info.getCloudControllerMajorVersion());
+	}
+
+	@Test
 	public void spacesAvailable() throws Exception {
 		List<CloudSpace> spaces = client.getSpaces();
 		assertNotNull(spaces);
