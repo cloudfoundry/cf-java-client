@@ -12,6 +12,7 @@ import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.caldecott.TunnelException;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
@@ -75,6 +76,8 @@ public class HttpTunnelTest {
 	private static final String VCAP_TARGET = System.getProperty("vcap.target", "https://api.cloudfoundry.com");
 	private static final String VCAP_EMAIL = System.getProperty("vcap.email", "cloud@springdeveloper.com");
 	private static final String VCAP_PASSWD = System.getProperty("vcap.passwd");
+	private static final String VCAP_ORG = System.getProperty("vcap.org", "springdeveloper.com");
+	private static final String VCAP_SPACE = System.getProperty("vcap.space", "test");
 	private static final String VCAP_MYSQL_SERVICE = "mysql-caldecott-test";
 	private static final String VCAP_POSTGRES_SERVICE = "postgres-caldecott-test";
 	private static final String VCAP_MONGO_SERVICE = "mongo-caldecott-test";
@@ -102,7 +105,7 @@ public class HttpTunnelTest {
 
 	@Before
 	public void setUp() throws Exception {
-		client =  clientInit();
+		client = clientInit();
 		checkForCaldecottServerApp();
 	}
 
@@ -400,9 +403,15 @@ public class HttpTunnelTest {
 		client.stopApplication(TunnelHelper.getTunnelAppName());
 		CloudService cloudSvc = new CloudService();
 		cloudSvc.setName(dbSvcName);
-		cloudSvc.setTier("free");
-		cloudSvc.setVendor(dbType);
 		cloudSvc.setVersion(dbVersion);
+		// for v1
+		cloudSvc.setVendor(dbType);
+		cloudSvc.setTier("free");
+		// for v2
+		cloudSvc.setLabel(dbType);
+		cloudSvc.setPlan("D100");
+		cloudSvc.setProvider("core");
+		// create service
 		client.createService(cloudSvc);
 		client.bindService(TunnelHelper.getTunnelAppName(), dbSvcName);
 		client.startApplication(TunnelHelper.getTunnelAppName());
@@ -439,14 +448,32 @@ public class HttpTunnelTest {
 	}
 
 	private static CloudFoundryClient clientInit() {
-		CloudFoundryClient client;
+		URL vcapUrl = null;
 		try {
-			client = new CloudFoundryClient(new CloudCredentials(VCAP_EMAIL, VCAP_PASSWD), new URL(VCAP_TARGET));
+			vcapUrl = new URL(VCAP_TARGET);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
+		CloudFoundryClient client = new CloudFoundryClient(new CloudCredentials(VCAP_EMAIL, VCAP_PASSWD), vcapUrl);
 		client.login();
+		String version = client.getCloudInfo().getVersion();
+		if (Float.valueOf(version) >= 2.0) {
+			client = new CloudFoundryClient(new CloudCredentials(VCAP_EMAIL, VCAP_PASSWD), vcapUrl, getSpace(client));
+			client.login();
+		}
 		return client;
+	}
+
+	private static CloudSpace getSpace(CloudFoundryClient client) {
+		List<CloudSpace> spaces = client.getSpaces();
+		CloudSpace useSpace = null;
+		for (CloudSpace space : spaces) {
+			if (space.getOrganization().getName().equals(VCAP_ORG) && space.getName().equals(VCAP_SPACE)) {
+				useSpace = space;
+				break;
+			}
+		}
+		return useSpace;
 	}
 
 	private static void finalize(CloudFoundryClient client) {

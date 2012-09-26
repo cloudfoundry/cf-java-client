@@ -24,8 +24,10 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 
 import java.io.Console;
+import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +45,8 @@ public class JavaTunnel {
 	private static String vcap_email = System.getProperty("vcap.email");
 	private static String vcap_passwd = System.getProperty("vcap.passwd");
 	private static String vcap_service = System.getProperty("vcap.service");
+	private static String vcap_org = System.getProperty("vcap.org");
+	private static String vcap_space = System.getProperty("vcap.space");
 	public static final int LOCAL_PORT = 10000;
 	public static final String LOCAL_HOST = "localhost";
 
@@ -59,6 +63,20 @@ public class JavaTunnel {
         }
 
 		CloudFoundryClient client =  clientInit();
+
+		String version = client.getCloudInfo().getVersion();
+		if (Float.valueOf(version) >= 2.0) {
+			//read org, using java.util.Formatter syntax :
+			if (vcap_org == null) {
+				vcap_org = console.readLine("Org to use? ");
+			}
+			//read space, using java.util.Formatter syntax :
+			if (vcap_space == null) {
+				vcap_space = console.readLine("Space to use? ");
+			}
+
+			client =  clientOrgSpace(client);
+		}
 
 		CloudApplication serverApp = null;
 		try {
@@ -156,6 +174,29 @@ public class JavaTunnel {
 		CloudFoundryClient client = null;
 		try {
 			client = new CloudFoundryClient(new CloudCredentials(vcap_email, vcap_passwd), new URL(CC_URL));
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+		client.login();
+		return client;
+	}
+
+	public static CloudFoundryClient clientOrgSpace(CloudFoundryClient client) {
+		List<CloudSpace> spaces = client.getSpaces();
+		CloudSpace useSpace = null;
+		for (CloudSpace space : spaces) {
+			if (space.getOrganization().getName().equals(vcap_org) && space.getName().equals(vcap_space)) {
+				useSpace = space;
+				break;
+			}
+		}
+		if (useSpace == null) {
+			System.err.println("The specified org '" + vcap_org + "' and space '" + vcap_space + "' not found!");
+			System.exit(1);
+		}
+		CloudFoundryClient spaceClient = null;
+		try {
+			client = new CloudFoundryClient(new CloudCredentials(vcap_email, vcap_passwd), new URL(CC_URL), useSpace);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}

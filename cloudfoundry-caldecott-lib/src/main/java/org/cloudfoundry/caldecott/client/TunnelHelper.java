@@ -19,6 +19,7 @@ package org.cloudfoundry.caldecott.client;
 import org.cloudfoundry.caldecott.TunnelException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.Staging;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -73,7 +74,7 @@ public class TunnelHelper {
 		ClassPathResource cpr = new ClassPathResource("caldecott_helper.zip");
 		try {
 			File temp = copyCaldecottZipFile(cpr);
-			client.createApplication(TUNNEL_APP_NAME, "sinatra", 64,
+			client.createApplication(TUNNEL_APP_NAME, new Staging("ruby19", "sinatra"), 64,
 					Arrays.asList(new String[]{getRandomUrl(client, TUNNEL_APP_NAME)}),
 					Arrays.asList(new String[] {}), false);
 			client.uploadApplication(TUNNEL_APP_NAME, temp);
@@ -171,7 +172,7 @@ public class TunnelHelper {
 					throw new TunnelException("Error accessing tunnel server at: " + uriToUse, e);
 				}
 			} catch (ResourceAccessException e) {
-				if (e.getMessage().contains("refused")) {
+				if (e.getMessage().contains("refused") || e.getMessage().contains("unable")) {
 					i++;
 				}
 				else {

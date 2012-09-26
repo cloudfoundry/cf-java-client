@@ -32,6 +32,7 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -170,25 +171,12 @@ public class HttpTunnel implements Tunnel {
 							if (logger.isDebugEnabled()) {
 								logger.debug("HEADER: " + clientHttpResponse.getHeaders().toString());
 							}
-							int length = (int)clientHttpResponse.getHeaders().getContentLength();
 							InputStream stream = clientHttpResponse.getBody();
-							byte[] bytes = new byte[length];
-							int bytesRead = 0;
-							while (bytesRead < length) {
-								int r = stream.read(bytes, bytesRead, length - bytesRead);
-								if (r < 0) {
-									logger.warn("End of stream received from GET from " + dataUrl + " - we have read " + bytesRead + " bytes of " + length + " total");
-									break;
-								}
-								bytesRead = bytesRead + r;
-								if (logger.isTraceEnabled()) {
-									logger.trace("Have read " + r + " bytes which makes " + bytesRead + " of " + length + " completed");
-								}
-							}
+							byte[] data = readContentData(stream);
 							if (logger.isDebugEnabled()) {
-								logger.debug("[" + length + " bytes] GET from " + dataUrl + " resulted in: " + clientHttpResponse.getStatusCode());
+								logger.debug("[" + data.length + " bytes] GET from " + dataUrl + " resulted in: " + clientHttpResponse.getStatusCode());
 							}
-							return bytes;
+							return data;
 						}
 					}
 			);
@@ -204,6 +192,19 @@ public class HttpTunnel implements Tunnel {
 	@Override
 	public String toString() {
 		return "HttpTunnel for " + url + " on " + host + ":" + port;
+	}
+
+	private byte[] readContentData(InputStream stream) throws IOException {
+		ByteArrayOutputStream data = new ByteArrayOutputStream();
+		while (true) {
+			byte[] buffer = new byte[1024];
+			int len = stream.read(buffer);
+			if (len < 0) {
+				break;
+			}
+			data.write(buffer, 0, len);
+		}
+		return data.toByteArray();
 	}
 
 	private static RestTemplate createRestTemplate() {
