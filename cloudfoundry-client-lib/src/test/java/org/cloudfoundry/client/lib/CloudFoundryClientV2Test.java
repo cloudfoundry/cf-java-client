@@ -289,6 +289,23 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	}
 
 	@Test
+	public void getApplicationsMatchGetApplication() {
+		String appName = createSpringTravelApp("1", null);
+		List<CloudApplication> apps = spaceClient.getApplications();
+		assertEquals(1, apps.size());
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertEquals(app.getName(), apps.get(0).getName());
+		assertEquals(app.getState(), apps.get(0).getState());
+		assertEquals(app.getInstances(), apps.get(0).getInstances());
+		assertEquals(app.getMemory(), apps.get(0).getMemory());
+		assertEquals(app.getMeta().getGuid(), apps.get(0).getMeta().getGuid());
+		assertEquals(app.getMeta().getVersion(), apps.get(0).getMeta().getVersion());
+		assertEquals(app.getMeta().getCreated(), apps.get(0).getMeta().getCreated());
+		assertEquals(app.getMeta().getUpdated(), apps.get(0).getMeta().getUpdated());
+		assertEquals(app.getUris(), apps.get(0).getUris());
+	}
+
+	@Test
 	public void deleteApplication() {
 		String appName = createSpringTravelApp("4", null);
 		assertEquals(1, spaceClient.getApplications().size());

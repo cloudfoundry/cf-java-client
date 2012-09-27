@@ -301,15 +301,20 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> resource : resourceList) {
-			apps.add(resourceMapper.mapResource(resource, CloudApplication.class));
+			apps.add(mapCloudApplication(resource));
 		}
 		return apps;
 	}
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
-		UUID appId = getAppId(appName);
 		Map<String, Object> resource = findApplicationResource(appName, 2);
+		CloudApplication cloudApp = mapCloudApplication(resource);
+		return cloudApp;
+	}
+
+	private CloudApplication mapCloudApplication(Map<String, Object> resource) {
+		UUID appId = resourceMapper.getGuidOfResource(resource);
 		CloudApplication cloudApp = null;
 		if (resource != null) {
 			int running = getRunningInstances(appId,
