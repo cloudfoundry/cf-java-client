@@ -1,4 +1,5 @@
 /*
+
  * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudApplication;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.CloudService;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.springframework.util.Assert;
@@ -105,9 +107,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	/**
 	 * Comma separated list of services to use by the application.
 	 *
-	 * @parameter expression="${cf.services}"
+	 * @parameter expression="${services}"
 	 */
-	private String services;
+	private List<CloudService> services;
 
 	/**
 	 * Framework type, defaults to CloudApplication.Spring
@@ -440,33 +442,37 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 *
 	 * @return Never null
 	 */
-	public List<String> getServices() {
+	public List<CloudService> getServices() {
+		final List<CloudService> servicesList = new ArrayList<CloudService>(0);
 
-		final List<String> servicesList = new ArrayList<String>(0);
-
-		final String urlProperty = getCommandlineProperty(SystemProperties.SERVICES);
-
-		if (urlProperty != null) {
-
-			for (String fragment : urlProperty.split(",")) {
-				servicesList.add(fragment.trim());
-			}
-
-			return servicesList;
-
-		}
-
-		if (this.services == null) {
+		if (this.services == null ) {
 			return servicesList;
 		} else {
+			return this.services;
+		}
+	}
 
-			for (String fragment : this.services.split(",")) {
-				servicesList.add(fragment.trim());
-			}
+	/**
+	 * Returns a list of services which have not yet been created
+	 *
+	 * @return List of non created services
+	 */
+	public List<CloudService> getNonCreatedServices() {
+		List<CloudService> currentServices = super.getClient().getServices();
+		List<String>currentServicesNames = new ArrayList<String>();
+		List<CloudService> returnServices = new ArrayList<CloudService>(0);
 
-			return servicesList;
+		for (CloudService currentService : currentServices) {
+			currentServicesNames.add(currentService.getName());
 		}
 
+		for (CloudService service: this.getServices()) {
+			if (!currentServicesNames.contains(service.getName())) {
+				returnServices.add(service);
+			}
+		}
+
+		return returnServices;
 	}
 
 	/**

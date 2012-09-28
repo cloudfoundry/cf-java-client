@@ -1,0 +1,30 @@
+package org.cloudfoundry.maven;
+
+import java.util.List;
+
+import org.apache.maven.plugin.MojoExecutionException;
+
+/**
+ * Create Services
+ *
+ * @author Ali Moghadam
+ * @since 1.0.0
+ *
+ * @goal create-services
+ * @phase process-sources
+ */
+
+public class CreateServices extends AbstractApplicationAwareCloudFoundryMojo {
+
+	@Override
+	protected void doExecute() throws MojoExecutionException {
+
+		ServiceCreation serviceCreation = new ServiceCreation(super.getClient(), super.getNonCreatedServices());
+
+		List<String> serviceNames = serviceCreation.createServices();
+
+		for (String serviceName : serviceNames) {
+			super.getLog().info(String.format("Creating Service '%s': OK", serviceName));
+		}
+	}
+}

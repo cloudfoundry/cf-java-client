@@ -16,17 +16,22 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
+
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.CloudInfo;
+import org.cloudfoundry.client.lib.CloudService;
 import org.cloudfoundry.client.lib.Staging;
+
 import org.cloudfoundry.maven.common.CommonUtils;
+
 import org.springframework.http.HttpStatus;
 
 /**
@@ -38,7 +43,9 @@ import org.springframework.http.HttpStatus;
  * @since 1.0.0
  *
  * @goal push
+ *
  * @execute phase="package"
+ *
  */
 public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 
@@ -53,15 +60,29 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			uris.add(this.getUrl());
 		}
 
-		final String appname        = this.getAppname();
-		final String command        = this.getCommand();
-		final Map<String,String> env= this.getEnv();
-		final String framework      = this.getFramework();
-		final Integer instances     = this.getInstances();
-		final Integer memory        = this.getMemory();
-		final File path             = this.getPath();
-		final String runtime        = this.getRuntime();
-		final List<String> services = this.getServices();
+		final String appname = this.getAppname();
+		final String command = this.getCommand();
+		final Map<String,String> env = this.getEnv();
+		final String framework = this.getFramework();
+		final Integer instances = this.getInstances();
+		final Integer memory = this.getMemory();
+		final File path = this.getPath();
+		final String runtime = this.getRuntime();
+
+		ServiceCreation serviceCreation = new ServiceCreation(this.getClient(), this.getNonCreatedServices());
+
+		List<String> newCreatedServiceNames = serviceCreation.createServices();
+
+		for (String serviceName : newCreatedServiceNames) {
+			super.getLog().info(String.format("Creating Service '%s': OK", serviceName));
+		}
+
+		final List<CloudService> services = this.getServices();
+		List<String> serviceNames = new ArrayList<String>();
+
+		for (CloudService service : services) {
+			serviceNames.add(service.getName());
+		}
 
 		super.getLog().debug(String.format(
 				"Pushing App - Appname: %s," +
@@ -75,7 +96,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 				            " Services: %s," +
 				                " Uris: %s,",
 
-			appname, command, env, framework, instances, memory, path, runtime, services, uris));
+			appname, command, env, framework, instances, memory, path, runtime, serviceNames, uris));
 
 		super.getLog().debug("Create Application...");
 
@@ -107,7 +128,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			staging.setCommand(command);
 			staging.setRuntime(runtime);
 
-			this.getClient().createApplication(appname, staging, memory, uris, services);
+			this.getClient().createApplication(appname, staging, memory, uris, serviceNames);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 					this.getAppname(), e.getMessage(), e.getDescription()), e);
