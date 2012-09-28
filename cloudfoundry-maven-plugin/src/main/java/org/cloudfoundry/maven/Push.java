@@ -39,6 +39,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Ali Moghadam
  *
  * @since 1.0.0
  *
@@ -52,39 +53,39 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
-		//Assert.configurationNotNull(this.getUrl(), "url", SystemProperties.URL);
+		//Assert.configurationNotNull(getUrl(), "url", SystemProperties.URL);
 
 		final java.util.List<String> uris = new ArrayList<String>(1);
 
-		if (this.getUrl() != null) {
-			uris.add(this.getUrl());
+		if (getUrl() != null) {
+			uris.add(getUrl());
 		}
 
-		final String appname = this.getAppname();
-		final String command = this.getCommand();
-		final Map<String,String> env = this.getEnv();
-		final String framework = this.getFramework();
-		final Integer instances = this.getInstances();
-		final Integer memory = this.getMemory();
-		final File path = this.getPath();
-		final String runtime = this.getRuntime();
+		final String appname = getAppname();
+		final String command = getCommand();
+		final Map<String,String> env = getEnv();
+		final String framework = getFramework();
+		final Integer instances = getInstances();
+		final Integer memory = getMemory();
+		final File path = getPath();
+		final String runtime = getRuntime();
 
-		ServiceCreation serviceCreation = new ServiceCreation(this.getClient(), this.getNonCreatedServices());
+		ServiceCreation serviceCreation = new ServiceCreation(getClient(), getNonCreatedServices());
 
 		List<String> newCreatedServiceNames = serviceCreation.createServices();
 
 		for (String serviceName : newCreatedServiceNames) {
-			super.getLog().info(String.format("Creating Service '%s': OK", serviceName));
+			getLog().info(String.format("Creating Service '%s': OK", serviceName));
 		}
 
-		final List<CloudService> services = this.getServices();
+		final List<CloudService> services = getServices();
 		List<String> serviceNames = new ArrayList<String>();
 
 		for (CloudService service : services) {
 			serviceNames.add(service.getName());
 		}
 
-		super.getLog().debug(String.format(
+		getLog().debug(String.format(
 				"Pushing App - Appname: %s," +
 				             " Command: %s," +
 				                 " Env: %s," +
@@ -98,15 +99,15 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 
 			appname, command, env, framework, instances, memory, path, runtime, serviceNames, uris));
 
-		super.getLog().debug("Create Application...");
+		getLog().debug("Create Application...");
 
-		validateMemoryChoice(this.getClient(), memory);
-		validateFrameworkChoice(this.getClient().getCloudInfo().getFrameworks(), framework);
+		validateMemoryChoice(getClient(), memory);
+		validateFrameworkChoice(getClient().getCloudInfo().getFrameworks(), framework);
 
 		boolean found = true;
 
 		try {
-			this.getClient().getApplication(appname);
+			getClient().getApplication(appname);
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
 				found = false;
@@ -128,62 +129,62 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			staging.setCommand(command);
 			staging.setRuntime(runtime);
 
-			this.getClient().createApplication(appname, staging, memory, uris, serviceNames);
+			getClient().createApplication(appname, staging, memory, uris, serviceNames);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
+					getAppname(), e.getMessage(), e.getDescription()), e);
 		}
 
-		super.getLog().debug("Updating Application env...");
+		getLog().debug("Updating Application env...");
 
 		try {
-			this.getClient().updateApplicationEnv(appname, env);
+			getClient().updateApplicationEnv(appname, env);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while updating application env '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
+					getAppname(), e.getMessage(), e.getDescription()), e);
 		}
 
-		super.getLog().debug("Deploy Application...");
+		getLog().debug("Deploy Application...");
 
 		validatePath(path);
 
 		try {
-			uploadApplication(this.getClient(), path, appname);
+			uploadApplication(getClient(), path, appname);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-					this.getAppname(), e.getMessage(), e.getDescription()), e);
+					getAppname(), e.getMessage(), e.getDescription()), e);
 		}
 
 		if (instances != null) {
-			super.getLog().debug("Set the number of instances to " + instances);
+			getLog().debug("Set the number of instances to " + instances);
 
 			try {
-				this.getClient().updateApplicationInstances(appname, instances);
+				getClient().updateApplicationInstances(appname, instances);
 			} catch (CloudFoundryException e) {
 				throw new MojoExecutionException(String.format("Error while setting number of instances for application '%s'. Error message: '%s'. Description: '%s'",
-						this.getAppname(), e.getMessage(), e.getDescription()), e);
+						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
 		}
 
 		if (!isNoStart()) {
 
-			super.getLog().debug("Start Application..." + appname);
+			getLog().debug("Start Application..." + appname);
 
 			try {
-				this.getClient().startApplication(appname);
+				getClient().startApplication(appname);
 			} catch (CloudFoundryException e) {
 				throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-						this.getAppname(), e.getMessage(), e.getDescription()), e);
+						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
 
 		} else {
-			super.getLog().debug("Not Starting Application.");
+			getLog().debug("Not Starting Application.");
 		}
 
-		if (this.getUrl() != null) {
-			super.getLog().info(String.format("'%s' was successfully deployed to: '%s'.", appname, this.getUrl()));
+		if (getUrl() != null) {
+			getLog().info(String.format("'%s' was successfully deployed to: '%s'.", appname, getUrl()));
 		} else {
-			super.getLog().info(String.format("'%s' was successfully deployed.", appname, this.getUrl()));
+			getLog().info(String.format("'%s' was successfully deployed.", appname, getUrl()));
 		}
 
 	}
@@ -220,7 +221,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 
 		if (!match) {
 			throw new IllegalStateException("Memory must be one of the following values: " +
-					  CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
+					CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
 		}
 
 	}
@@ -241,7 +242,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			}
 		}
 		throw new IllegalStateException("Framework must be one of the following values: " +
-					  CommonUtils.frameworksToCommaDelimitedString(frameworks));
+					CommonUtils.frameworksToCommaDelimitedString(frameworks));
 	}
 
 }

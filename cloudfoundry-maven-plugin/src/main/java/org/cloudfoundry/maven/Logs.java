@@ -20,27 +20,27 @@ public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() throws MojoExecutionException {
 
 		try {
-			super.getClient().getApplication(this.getAppname());
+			getClient().getApplication(getAppname());
 		} catch (CloudFoundryException e) {
-			super.getLog().info("Application Not Found");
+			getLog().info("Application Not Found");
 			return;
 		}
 
-		super.getLog().info("============== /logs/stderr.log ==============" + "\n");
+		getLog().info("============== /logs/stderr.log ==============" + "\n");
 		try {
-			super.getLog().info(super.getClient().getFile(this.getAppname(), 0, "logs/stderr.log"));
+			getLog().info(getClient().getFile(getAppname(), 0, "logs/stderr.log"));
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				super.getLog().info("File Doesn't Exist");
+				getLog().info("File Doesn't Exist");
 			}
 		}
 
-		super.getLog().info("============== /logs/stdout.log ==============" + "\n");
+		getLog().info("============== /logs/stdout.log ==============" + "\n");
 		try {
-			super.getLog().info(super.getClient().getFile(this.getAppname(), 0, "logs/stdout.log"));
+			getLog().info(getClient().getFile(getAppname(), 0, "logs/stdout.log"));
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				super.getLog().info("File Doesn't Exist");
+				getLog().info("File Doesn't Exist");
 			}
 		}
 	}

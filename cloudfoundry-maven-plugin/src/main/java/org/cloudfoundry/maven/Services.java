@@ -20,12 +20,12 @@ public class Services extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-		final List<ServiceConfiguration> serviceConfigurations = super.getClient().getServiceConfigurations();
-		List<CloudService> services = super.getClient().getServices();
+		final List<ServiceConfiguration> serviceConfigurations = getClient().getServiceConfigurations();
+		List<CloudService> services = getClient().getServices();
 
-		super.getLog().info("============== System Services ==============");
-		super.getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(serviceConfigurations));
-		super.getLog().info("============== Provisioned Services ==============");
-		super.getLog().info("\n" + UiUtils.renderServiceDataAsTable(services));
+		getLog().info("============== System Services ==============");
+		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(serviceConfigurations));
+		getLog().info("============== Provisioned Services ==============");
+		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services));
 	}
 }

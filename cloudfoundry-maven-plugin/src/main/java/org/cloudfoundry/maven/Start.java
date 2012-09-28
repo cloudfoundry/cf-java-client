@@ -28,10 +28,7 @@ public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-
-		super.getLog().info("Starting application..." + this.getAppname());
-		this.getClient().startApplication(this.getAppname());
-
+		getLog().info("Starting application..." + getAppname());
+		getClient().startApplication(getAppname());
 	}
-
 }
