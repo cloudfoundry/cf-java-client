@@ -96,6 +96,10 @@ public class CloudEntityResourceMapper {
 		app.setServices(new ArrayList<String>());
 		app.setState(CloudApplication.AppState.valueOf(getEntityAttribute(resource, "state", String.class)));
 		//TODO: debug
+		Integer runningInstancesAttribute = getEntityAttribute(resource, "running_instances", Integer.class);
+		if (runningInstancesAttribute != null) {
+			app.setRunningInstances(runningInstancesAttribute);
+		}
 		app.setDebug(null);
 		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
 		if (envMap.size() > 0) {

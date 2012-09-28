@@ -33,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
+import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
@@ -320,7 +321,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			int running = getRunningInstances(appId,
 					CloudApplication.AppState.valueOf(
 							CloudEntityResourceMapper.getEntityAttribute(resource, "state", String.class)));
-			((Map<String, Object>)resource.get("entity")).put("runningInstances", running);
+			((Map<String, Object>)resource.get("entity")).put("running_instances", running);
 			cloudApp = resourceMapper.mapResource(resource, CloudApplication.class);
 			cloudApp.setUris(findApplicationUris(cloudApp.getMeta().getGuid()));
 		}
@@ -332,7 +333,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		ApplicationStats appStats = doGetApplicationStats(appId, appState);
 		if (appStats != null && appStats.getRecords() != null) {
 			for (InstanceStats inst : appStats.getRecords()) {
-				if ("RUNNING".equals(inst.getState())){
+				if (InstanceState.RUNNING == inst.getState()){
 					running++;
 				}
 			}

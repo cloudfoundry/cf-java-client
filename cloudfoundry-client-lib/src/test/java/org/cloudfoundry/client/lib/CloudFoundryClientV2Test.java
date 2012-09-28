@@ -596,12 +596,13 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		createAndUploadAndStartSimpleSpringApp(appName);
 		client.updateApplicationInstances(appName, 2);
 		CloudApplication app = spaceClient.getApplication(appName);
-		client.startApplication(appName);
+		spaceClient.startApplication(appName);
 		assertEquals(2, app.getInstances());
-		for (int i = 0; i < 10 && client.getApplication(appName).getRunningInstances() < 2; i++) {
+		for (int i = 0; i < 10 && app.getRunningInstances() < 2; i++) {
 			Thread.sleep(1000);
+			app = spaceClient.getApplication(appName);
 		}
-		assertEquals(2, client.getApplication(appName).getRunningInstances());
+		assertEquals(2, app.getRunningInstances());
 	}
 
 	@Test
