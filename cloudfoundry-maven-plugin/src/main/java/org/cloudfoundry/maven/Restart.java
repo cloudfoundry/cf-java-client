@@ -28,10 +28,7 @@ public class Restart extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-
-		super.getLog().info("Restarting application..." + this.getAppname());
-		this.getClient().restartApplication(this.getAppname());
-
+		getLog().info("Restarting application..." + getAppname());
+		getClient().restartApplication(getAppname());
 	}
-
 }

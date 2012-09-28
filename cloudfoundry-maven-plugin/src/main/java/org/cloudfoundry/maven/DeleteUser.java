@@ -29,8 +29,8 @@ public class DeleteUser extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-		super.getLog().info(String.format("Deleting user...'%s'", this.getUsername()));
-		this.getClient().unregister();
+		getLog().info(String.format("Deleting user...'%s'", getUsername()));
+		getClient().unregister();
 	}
 
 }

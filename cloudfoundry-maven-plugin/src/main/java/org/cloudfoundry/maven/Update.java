@@ -39,16 +39,14 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 
 		validatePath(path);
 
-		CloudApplication aplication = this.getClient().getApplication(appName);
+		CloudApplication aplication = getClient().getApplication(appName);
 
 		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
-		this.uploadApplication(this.getClient(), path, appName);
+		uploadApplication(getClient(), path, appName);
 
 		if (AppState.STARTED.equals(aplication.getState())) {
-			this.getClient().restartApplication(appName);
+			getClient().restartApplication(appName);
 		}
-
 	}
-
 }
