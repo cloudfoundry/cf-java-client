@@ -458,7 +458,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @return List of non created services
 	 */
 	public List<CloudService> getNonCreatedServices() {
-		List<CloudService> currentServices = super.getClient().getServices();
+		List<CloudService> currentServices = getClient().getServices();
 		List<String>currentServicesNames = new ArrayList<String>();
 		List<CloudService> returnServices = new ArrayList<CloudService>(0);
 
@@ -466,7 +466,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			currentServicesNames.add(currentService.getName());
 		}
 
-		for (CloudService service: this.getServices()) {
+		for (CloudService service: getServices()) {
 			if (!currentServicesNames.contains(service.getName())) {
 				returnServices.add(service);
 			}
