@@ -27,4 +27,7 @@ public class RestUtil {
 		return requestFactory;
 	}
 
+	public static void updateHttpProxyConfiguration(RestTemplate restTemplate, HttpProxyConfiguration httpProxyConfiguration) {
+		restTemplate.setRequestFactory(createRequestFactory(httpProxyConfiguration));
+	}
 }

@@ -154,6 +154,10 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		updatePassword(cloudCredentials, newPassword);
 	}
 
+	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
+		RestUtil.updateHttpProxyConfiguration(this.restTemplate, httpProxyConfiguration);
+	}
+
 	protected RestTemplate getRestTemplate() {
 		return this.restTemplate;
 	}

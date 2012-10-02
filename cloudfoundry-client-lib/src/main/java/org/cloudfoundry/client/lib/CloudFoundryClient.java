@@ -312,4 +312,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.rename(appName, newName);
 	}
 
+	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
+		cc.updateHttpProxyConfiguration(httpProxyConfiguration);
+	}
+
 }
