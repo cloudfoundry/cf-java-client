@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-caldecott-test</artifactId>
-	<version>0.1.2.BUILD-SNAPSHOT</version>
+	<version>0.1.2</version>
 	<packaging>jar</packaging>
 	<name>Tests for Java Client for Caldecott access</name>
 
