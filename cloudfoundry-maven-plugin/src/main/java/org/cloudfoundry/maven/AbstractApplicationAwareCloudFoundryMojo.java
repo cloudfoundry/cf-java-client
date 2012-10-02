@@ -150,7 +150,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 		}
 
 		if (this.appname == null) {
-			return this.getArtifactId();
+			return getArtifactId();
 		} else {
 			return appname;
 		}
@@ -212,11 +212,11 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return urlProperty;
 		}
 
-		if (this.url == null && !CloudApplication.STANDALONE.equals(this.getFramework())) {
+		if (this.url == null && !CloudApplication.STANDALONE.equals(getFramework())) {
 
-			if (this.getTarget() != null) {
+			if (getTarget() != null) {
 
-				final URI targetUri = this.getTarget();
+				final URI targetUri = getTarget();
 				final String[] tokenizedTarget = targetUri.getSchemeSpecificPart().split("\\.");
 
 				if (tokenizedTarget.length >=2) {
@@ -227,16 +227,16 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 						domain = domain.substring(2);
 					}
 
-					return this.getAppname() + "." + domain
+					return getAppname() + "." + domain
 											 + "." + tokenizedTarget[tokenizedTarget.length-1];
 				} else {
-					this.getLog().warn(String.format("Unable to derive a suitable " +
+					getLog().warn(String.format("Unable to derive a suitable " +
 													 "Url from the provided Target Url '%s'", targetUri.toString()));
 					return null;
 				}
 
 			} else {
-				return this.getAppname() + "." + "<undefined target>";
+				return getAppname() + "." + "<undefined target>";
 			}
 
 		} else {
@@ -283,7 +283,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 */
 	@Deprecated
 	public File getWarfile() {
-		return this.getPath();
+		return getPath();
 	}
 
 	/**
@@ -339,7 +339,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 
 		if (this.path == null) {
 
-			if (CloudApplication.STANDALONE.equals(this.getFramework())) {
+			if (CloudApplication.STANDALONE.equals(getFramework())) {
 				throw new IllegalStateException(
 						String.format("The selected framework is '%s'. Please specify the 'path' property.",
 								CloudApplication.STANDALONE));
@@ -397,7 +397,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 
 		if (this.command == null) {
 
-			if (CloudApplication.STANDALONE.equals(this.getFramework())) {
+			if (CloudApplication.STANDALONE.equals(getFramework())) {
 				throw new IllegalStateException(
 						String.format("The selected framework is '%s'. Please specify the 'command' property.",
 								CloudApplication.STANDALONE));
@@ -458,7 +458,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @return List of non created services
 	 */
 	public List<CloudService> getNonCreatedServices() {
-		List<CloudService> currentServices = super.getClient().getServices();
+		List<CloudService> currentServices = getClient().getServices();
 		List<String>currentServicesNames = new ArrayList<String>();
 		List<CloudService> returnServices = new ArrayList<CloudService>(0);
 
@@ -466,7 +466,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			currentServicesNames.add(currentService.getName());
 		}
 
-		for (CloudService service: this.getServices()) {
+		for (CloudService service: getServices()) {
 			if (!currentServicesNames.contains(service.getName())) {
 				returnServices.add(service);
 			}
