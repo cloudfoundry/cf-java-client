@@ -1,0 +1,7 @@
+Code-Review+2: Thomas Risberg <trisberg@vmware.com>
+Verified+1: CI Master <cf-ci@rbcon.com>
+Submitted-by: Thomas Risberg <trisberg@vmware.com>
+Submitted-at: Tue, 02 Oct 2012 18:55:02 +0000
+Reviewed-on: http://reviews.cloudfoundry.org/9947
+Project: vcap-java-client
+Branch: refs/heads/master
