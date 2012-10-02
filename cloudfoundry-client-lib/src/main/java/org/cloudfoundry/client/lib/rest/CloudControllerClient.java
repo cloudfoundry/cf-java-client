@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.rest;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -133,5 +134,5 @@ public interface CloudControllerClient {
 
 	void rename(String appName, String newName);
 
-
+	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
 }

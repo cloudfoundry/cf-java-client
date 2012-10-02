@@ -456,4 +456,11 @@ public interface CloudFoundryOperations {
 	 * @param newName the new name
 	 */
 	void rename(String appName, String newName);
+
+	/**
+	 * Update http proxy configuration settings.
+	 *
+	 * @param httpProxyConfiguration the new configuration settings
+	 */
+	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
 }
