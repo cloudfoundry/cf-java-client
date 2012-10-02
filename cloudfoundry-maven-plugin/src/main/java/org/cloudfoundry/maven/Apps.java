@@ -35,9 +35,9 @@ public class Apps extends AbstractCloudFoundryMojo {
 	@Override
 	protected void doExecute() {
 
-		final List<CloudApplication> applications = this.getClient().getApplications();
+		final List<CloudApplication> applications = getClient().getApplications();
 
-		super.getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
+		getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(applications));
 
 	}
 

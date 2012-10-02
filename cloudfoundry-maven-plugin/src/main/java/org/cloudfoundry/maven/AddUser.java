@@ -64,13 +64,11 @@ public class AddUser extends AbstractCloudFoundryMojo {
 		} catch (RuntimeException e) {
 			throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
 		}
-
 	}
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		super.getLog().info(String.format("Registering user...'%s'", this.getUsername()));
-		this.getClient().register(this.getUsername(), this.getPassword());
+		getLog().info(String.format("Registering user...'%s'", getUsername()));
+		getClient().register(getUsername(), getPassword());
 	}
-
 }

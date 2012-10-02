@@ -63,21 +63,21 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	private Map<String, String> getParameterMap() {
 		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
-		parameterMap.put("Appname",        this.getAppname()  != null ? this.getAppname()                   : NOT_AVAILABLE);
-		parameterMap.put("Command",        this.getCommand()  != null ? this.getCommand()                   : NOT_AVAILABLE);
-		parameterMap.put("Framework",      this.getFramework()!= null ? this.getFramework()                 : NOT_AVAILABLE);
-		parameterMap.put("Instances",      this.getInstances()!= null ? String.valueOf(this.getInstances()) : NOT_AVAILABLE);
-		parameterMap.put("Memory (in MB)", this.getMemory()   != null ? String.valueOf(this.getMemory())    : NOT_AVAILABLE);
-		parameterMap.put("Env",            this.getEnv()      != null ? String.valueOf(this.getEnv())       : NOT_AVAILABLE);
-		parameterMap.put("No-start",       this.isNoStart()   != null ? String.valueOf(this.isNoStart())    : NOT_AVAILABLE);
-		parameterMap.put("Password",       this.getPassword() != null ? CommonUtils.maskPassword(this.getPassword()) : NOT_AVAILABLE);
-		parameterMap.put("Runtime",        this.getRuntime()  != null ? this.getRuntime()                   : NOT_AVAILABLE);
-		parameterMap.put("Server",         this.getServer());
-		parameterMap.put("Services",       this.getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(this.getServices()));
-		parameterMap.put("Target",         this.getTarget()   != null ? this.getTarget().toString()         : NOT_AVAILABLE);
-		parameterMap.put("Url",            this.getUrl()      != null ? this.getUrl()                       : NOT_AVAILABLE);
-		parameterMap.put("Username",       this.getUsername() != null ? this.getUsername()                  : NOT_AVAILABLE);
-		parameterMap.put("Path",           this.getPath()     != null ? this.getPath().getAbsolutePath()    : NOT_AVAILABLE);
+		parameterMap.put("Appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
+		parameterMap.put("Command", getCommand() != null ? getCommand() : NOT_AVAILABLE);
+		parameterMap.put("Framework", getFramework() != null ? getFramework() : NOT_AVAILABLE);
+		parameterMap.put("Instances", getInstances() != null ? String.valueOf(getInstances()) : NOT_AVAILABLE);
+		parameterMap.put("Memory (in MB)", getMemory() != null ? String.valueOf(getMemory()) : NOT_AVAILABLE);
+		parameterMap.put("Env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
+		parameterMap.put("No-start", isNoStart() != null ? String.valueOf(isNoStart()) : NOT_AVAILABLE);
+		parameterMap.put("Password", getPassword() != null ? CommonUtils.maskPassword(getPassword()) : NOT_AVAILABLE);
+		parameterMap.put("Runtime", getRuntime() != null ? getRuntime() : NOT_AVAILABLE);
+		parameterMap.put("Server", getServer());
+		parameterMap.put("Services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
+		parameterMap.put("Target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);
+		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
+		parameterMap.put("Username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
+		parameterMap.put("Path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
 
 		return parameterMap;
 	}
@@ -105,7 +105,6 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 			String line = "";
 
 			while (line != null) {
-
 				try {
 					line = in.readLine();
 				} catch (IOException e) {
@@ -116,16 +115,11 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 					helpTextStringBuilder.append(line + "\n");
 				}
 			}
-
 			sb.append(helpTextStringBuilder);
-
 		} finally {
 			CommonUtils.closeReader(in);
 			CommonUtils.closeReader(reader);
 		}
-
-		super.getLog().info(sb);
-
+		getLog().info(sb);
 	}
-
 }

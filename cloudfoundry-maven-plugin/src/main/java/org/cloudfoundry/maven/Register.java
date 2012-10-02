@@ -24,7 +24,4 @@ package org.cloudfoundry.maven;
  * @goal register
  * @phase process-sources
  */
-public class Register extends AddUser {
-
-
-}
+public class Register extends AddUser {}

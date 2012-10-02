@@ -19,12 +19,12 @@ public class CreateServices extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
-		ServiceCreation serviceCreation = new ServiceCreation(super.getClient(), super.getNonCreatedServices());
+		ServiceCreation serviceCreation = new ServiceCreation(getClient(), getNonCreatedServices());
 
 		List<String> serviceNames = serviceCreation.createServices();
 
 		for (String serviceName : serviceNames) {
-			super.getLog().info(String.format("Creating Service '%s': OK", serviceName));
+			getLog().info(String.format("Creating Service '%s': OK", serviceName));
 		}
 	}
 }
