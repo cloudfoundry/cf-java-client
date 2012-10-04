@@ -200,6 +200,17 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
+	public void testExistenceOfDeleteServicesMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		DeleteServices mojo = (DeleteServices) lookupMojo ( "delete-services", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public void testExistenceOfLogsMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
