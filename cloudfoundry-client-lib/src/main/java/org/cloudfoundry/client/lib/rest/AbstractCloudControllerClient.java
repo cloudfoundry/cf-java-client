@@ -108,9 +108,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		this.cloudControllerUrl = cloudControllerUrl;
 		this.authorizationEndpoint = authorizationEndpoint;
 		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
-		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-		this.restTemplate.setRequestFactory(
-				new CloudFoundryClientHttpRequestFactory(requestFactory));
+		configureCloudFoundryRequestFactory(restTemplate);
 
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
@@ -155,7 +153,9 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	}
 
 	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
-		RestUtil.updateHttpProxyConfiguration(this.restTemplate, httpProxyConfiguration);
+		ClientHttpRequestFactory requestFactory = RestUtil.createRequestFactory(httpProxyConfiguration);
+		restTemplate.setRequestFactory(requestFactory);
+		configureCloudFoundryRequestFactory(restTemplate);
 	}
 
 	protected RestTemplate getRestTemplate() {
@@ -164,6 +164,12 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String getUrl(String path) {
 		return cloudControllerUrl + "/" + path;
+	}
+
+	private void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
+		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
+		restTemplate.setRequestFactory(
+				new CloudFoundryClientHttpRequestFactory(requestFactory));
 	}
 
 	private List<HttpMessageConverter<?>> getHttpMessageConverters() {
