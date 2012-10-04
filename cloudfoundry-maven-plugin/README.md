@@ -1,5 +1,5 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M2, August 10, 2012
+Version 1.0.0.M3, October 8, 2012
 
 * Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
 * Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
@@ -105,7 +105,16 @@ Following, a typical (expected) configuration example is shown, which uses sever
                     <appname>spring-integration-rocks</appname>
                     <url>spring-integration-rocks.cloudfoundry.com</url>
                     <memory>1024</memory>
-                    <services>mongo-instance, my-sql-instance</services>
+                    <services>
+                        <service>
+                            <name>mysql-test</name>
+                            <vendor>mysql</vendor>
+                        </service>
+                        <service>
+                            <name>mongodb-test</name>
+                            <vendor>mongodb</vendor>
+                        </service>
+                    </services>
                 </configuration>
             </plugin>
         </plugins>
@@ -148,6 +157,10 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     <tr><th align="left">cf:start</th>      <td>Starts an application.</td></tr>
     <tr><th align="left">cf:stop</th>       <td>Stops an application.</td></tr>
     <tr><th align="left">cf:update</th>     <td>Updates an application.</td></tr>
+    <tr><th align="left">cf:logs</th>     <td>Shows log files (stdout and stderr).</td></tr>
+    <tr><th align="left">cf:services</th>     <td>Shows a list of available services along with provisioned</td></tr>
+    <tr><th align="left">cf:create-services</th>     <td>Creates services listed in the pom</td></tr>
+    <tr><th align="left">cf:delete-services</th>     <td>Deletes services listed in the pom=</td></tr>
 </table>
 
 ### Usage Examples
@@ -205,7 +218,6 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.url]              Set the url for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.instances]        Set the expected number of instances
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.memory]           Set the memory reservation for the application
-        push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.services]         Set the services to use for the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.no-start]         Do not auto-start the application
         push -Dcf.username -Dcf.password [-Dcf.appname] [-Dcf.framework]        Set the framework for the application
 
@@ -227,8 +239,16 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
       Application Information
         instances -Dcf.username -Dcf.password [-Dcf.appname]                    List application instances
 
+      Services
+        services                                                                List the available services along with provisioned.
+        create-services                                                         Create services listed in the pom file.
+        delete-services                                                         Delete services listed in the pom file.
+
       Help
         help                                                                    Get general help
+
+      Logs
+        logs                                                                    Get the log files (stdout and stderr)
 
 **Show usage information**
 
@@ -257,7 +277,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
 
 **Push and optionally start an application**
 
-    $ mvn cf:push [-Dcf.appname] [-Dcf.warfile] [-Dcf.url] [-Dcf.instances] [-Dcf.memory] [-Dcf.services] [-Dcf.no-start]
+    $ mvn cf:push [-Dcf.appname] [-Dcf.warfile] [-Dcf.url] [-Dcf.instances] [-Dcf.memory] [-Dcf.no-start]
 
 **Restart the application**
 
@@ -313,12 +333,6 @@ Additional certain configuration parameter will fall back to using default value
 > The parameters **username**, **password** and **target** don't have default values and you are required to provide them.
 
 # Samples
-
-## Prerequisite
-
-In order to deploy the following samples, please ensure that within your Cloud Foundry enivronment, you have setup a RabbitMQ service:
-
-	$ vmc create-service rabbitmq --name myRabbitService
 
 ## Deploying a Stand-alone Spring Application
 
@@ -383,7 +397,12 @@ We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
 						<framework>standalone</framework>
 						<memory>256</memory>
 						<path>target/appassembler</path>
-						<services>myRabbitService</services>
+						<services>
+							<service>
+								<name>myRabbitService</name>
+								<vendor>rabbitmq</service>
+							</service>
+						</services>
 						<target>http://api.cloudfoundry.com</target>
 					</configuration>
 		        </plugin>
@@ -420,7 +439,12 @@ We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
 						<target>http://api.cloudfoundry.com</target>
 						<url>spring-integration-twitter.cloudfoundry.com</url>
 						<memory>256</memory>
-						<services>myRabbitService</services>
+						<services>
+							<service>
+								<name>myRabbitService</name>
+								<vendor>rabbitmq</vendor>
+							</service>
+						</services>
 					</configuration>
 		        </plugin>
 				...
@@ -433,6 +457,16 @@ We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
 		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
 
 # History
+
+## Changes from version **1.0.0.M2** to **1.0.0.M3**
+
+* Added **Services** configuration parameter which allows to add services. The default values are name and vendor.
+* Modified the **cf:push** goal to take the services configuration and create the services if not created and bind them to the application.
+* Added **cf:logs** goal which shows the log files of the application listed in either the configuration parameter.
+* Added **cf:services** goal which shows the list of available services along with provisioned ones.
+* Added **cf:create-services** goal which creates services listed in the configuration parameter in the pom file.
+* Added **cf:delete-services** goal which deletes the services created using the services configuration parameter in the pom file.
+
 
 ## Changes from version **1.0.0.M1** to **1.0.0.M2**
 
