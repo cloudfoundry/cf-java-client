@@ -463,4 +463,25 @@ public interface CloudFoundryOperations {
 	 * @param httpProxyConfiguration the new configuration settings
 	 */
 	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
+
+	/**
+	 * Get the most recent log entries of any REST calls made
+	 *
+	 * @param clearLog clear the log after retrieving the content
+	 */
+	List<String> getLogForMostRecentRestCalls(boolean clearLog);
+
+	/**
+	 * Register a new RestLogCallback
+	 *
+	 * @param callBack the callback to be registered
+	 */
+	void registerRestLogListener(RestLogCallback callBack);
+
+	/**
+	 * Un-register a RestLogCallback
+	 *
+	 * @param callBack the callback to be un-registered
+	 */
+	void unRegisterRestLogListener(RestLogCallback callBack);
 }

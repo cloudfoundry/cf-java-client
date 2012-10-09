@@ -316,4 +316,16 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateHttpProxyConfiguration(httpProxyConfiguration);
 	}
 
+	public List<String> getLogForMostRecentRestCalls(boolean clearLog) {
+		return cc.getLogForMostRecentRestCalls(clearLog);
+	}
+
+	public void registerRestLogListener(RestLogCallback callBack) {
+		cc.registerRestLogListener(callBack);
+	}
+
+	public void unRegisterRestLogListener(RestLogCallback callBack) {
+		cc.unRegisterRestLogListener(callBack);
+	}
+
 }

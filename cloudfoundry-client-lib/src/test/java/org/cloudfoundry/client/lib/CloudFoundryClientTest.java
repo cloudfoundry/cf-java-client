@@ -64,7 +64,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpServerErrorException;
 
 /**
  * Note that this test relies on deleteAllApplications() working correctly. If there is a temporary breaking of that
@@ -878,6 +877,36 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 						new CloudCredentials(TEST_USER_EMAIL, TEST_USER_PASS),
 						new URL(ccUrl),
 						new CloudSpace(null, "test", null));
+	}
+
+	@Test
+	public void getRestLog() throws IOException {
+		getApplications();
+		client.deleteAllApplications();
+		assertTrue(client.getLogForMostRecentRestCalls(false).size() > 5);
+		assertTrue(client.getLogForMostRecentRestCalls(true).size() > 5);
+		assertTrue(client.getLogForMostRecentRestCalls(true).size() == 0);
+		final List<String> log1 = new ArrayList<String>();
+		final List<String> log2 = new ArrayList<String>();
+		client.registerRestLogListener(new RestLogCallback() {
+			public void onNewLogEntry(String logEntry) {
+				log1.add(logEntry);
+			}
+		});
+		RestLogCallback callback2 = new RestLogCallback() {
+			public void onNewLogEntry(String logEntry) {
+				log2.add(logEntry);
+			}
+		};
+		client.registerRestLogListener(callback2);
+		getApplications();
+		client.deleteAllApplications();
+		assertTrue(log1.size() > 0);
+		assertEquals(log1, log2);
+		client.unRegisterRestLogListener(callback2);
+		getApplications();
+		client.deleteAllApplications();
+		assertTrue(log1.size() > log2.size());
 	}
 
 	private boolean hasApplication(List<CloudApplication> applications, String targetName) {
