@@ -463,4 +463,18 @@ public interface CloudFoundryOperations {
 	 * @param httpProxyConfiguration the new configuration settings
 	 */
 	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
+
+	/**
+	 * Register a new RestLogCallback
+	 *
+	 * @param callBack the callback to be registered
+	 */
+	void registerRestLogListener(RestLogCallback callBack);
+
+	/**
+	 * Un-register a RestLogCallback
+	 *
+	 * @param callBack the callback to be un-registered
+	 */
+	void unRegisterRestLogListener(RestLogCallback callBack);
 }

@@ -36,7 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -854,6 +853,31 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		String appName = namespacedAppName(TEST_NAMESPACE, "simple_getFile");
 		createAndUploadAndStartSimpleSpringApp(appName);
 		doGetFile(client, appName);
+	}
+
+	@Test
+	public void getRestLog() throws IOException {
+		final List<RestLogEntry> log1 = new ArrayList<RestLogEntry>();
+		final List<RestLogEntry> log2 = new ArrayList<RestLogEntry>();
+		spaceClient.registerRestLogListener(new RestLogCallback() {
+			public void onNewLogEntry(RestLogEntry logEntry) {
+				log1.add(logEntry);
+			}
+		});
+		RestLogCallback callback2 = new RestLogCallback() {
+			public void onNewLogEntry(RestLogEntry logEntry) {
+				log2.add(logEntry);
+			}
+		};
+		spaceClient.registerRestLogListener(callback2);
+		getApplications();
+		spaceClient.deleteAllApplications();
+		assertTrue(log1.size() > 0);
+		assertEquals(log1, log2);
+		spaceClient.unRegisterRestLogListener(callback2);
+		getApplications();
+		spaceClient.deleteAllApplications();
+		assertTrue(log1.size() > log2.size());
 	}
 
 	private String createSpringTravelApp(String suffix, List<String> serviceNames) {

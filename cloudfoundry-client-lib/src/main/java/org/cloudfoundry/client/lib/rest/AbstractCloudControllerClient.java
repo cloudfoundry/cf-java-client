@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.rest;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
@@ -164,6 +165,18 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String getUrl(String path) {
 		return cloudControllerUrl + "/" + path;
+	}
+
+	public void registerRestLogListener(RestLogCallback callBack) {
+		if (getRestTemplate() instanceof LoggingRestTemplate) {
+			((LoggingRestTemplate)getRestTemplate()).registerRestLogListener(callBack);
+		}
+	}
+
+	public void unRegisterRestLogListener(RestLogCallback callBack) {
+		if (getRestTemplate() instanceof LoggingRestTemplate) {
+			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
+		}
 	}
 
 	private void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {

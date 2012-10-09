@@ -1,6 +1,7 @@
 package org.cloudfoundry.client.lib.util;
 
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.rest.LoggingRestTemplate;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -13,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestUtil {
 
 	public static RestTemplate createRestTemplate(HttpProxyConfiguration httpProxyConfiguration) {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new LoggingRestTemplate();
 		restTemplate.setRequestFactory(createRequestFactory(httpProxyConfiguration));
 		return restTemplate;
 	}
