@@ -265,6 +265,16 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	}
 
 	@Test
+	public void createAndReCreateApplication() {
+		String appName = createSpringTravelApp("A", null);
+		assertEquals(1, spaceClient.getApplications().size());
+		spaceClient.deleteApplication(appName);
+		appName = createSpringTravelApp("A", null);
+		assertEquals(1, spaceClient.getApplications().size());
+		spaceClient.deleteApplication(appName);
+	}
+
+	@Test
 	public void getApplications() {
 		String appName = createSpringTravelApp("1", null);
 		List<CloudApplication> apps = spaceClient.getApplications();
@@ -417,6 +427,22 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	public void deleteService() throws MalformedURLException {
 		String serviceName = "mysql-test";
 		createMySqlService(serviceName);
+		spaceClient.deleteService(serviceName);
+	}
+
+	@Test
+	public void deleteServiceThatIsBoundToApp() throws MalformedURLException {
+
+		String serviceName = "mysql-del-svc";
+		List<String> serviceNames = new ArrayList<String>();
+		serviceNames.add(serviceName);
+		String appName = createSpringTravelApp("del-svc", serviceNames);
+
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+
 		spaceClient.deleteService(serviceName);
 	}
 

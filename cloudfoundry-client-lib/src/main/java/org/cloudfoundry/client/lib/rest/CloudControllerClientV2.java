@@ -497,23 +497,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private UUID getRouteGuid(String host) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String routePath = getUrl("v2/routes?inline-relations-depth={depth}");
-		urlVars.put("depth", 1);
+		String routePath = getUrl("v2/routes?inline-relations-depth={depth}&q=host:{host}");
+		urlVars.put("depth", 0);
+		urlVars.put("host", host);
 		String routeResp = getRestTemplate().getForObject(routePath, String.class, urlVars);
-		List<Map<String, Object>> routeList =
+		List<Map<String, Object>> routes =
 				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(routeResp).get("resources");
-		Map<String, UUID> routes = new HashMap<String, UUID>(routeList.size());
-		for (Map<String, Object> r  : routeList) {
-			routes.put(
-					CloudEntityResourceMapper.getEntityAttribute(r, "host", String.class),
-					CloudEntityResourceMapper.getMeta(r).getGuid());
-		}
 		UUID routeGuid = null;
-		for (String routeHost : routes.keySet()) {
-			if (host.equals(routeHost)) {
-				routeGuid = routes.get(routeHost);
-				break;
-			}
+		if (routes.size() > 0) {
+			Map<String, Object> r  = routes.get(0);
+			routeGuid = CloudEntityResourceMapper.getMeta(r).getGuid();
 		}
 		return routeGuid;
 	}
@@ -591,10 +584,12 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void startApplication(String appName) {
-		UUID appId = getAppId(appName);
-		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		appRequest.put("state", CloudApplication.AppState.STARTED);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		CloudApplication app = getApplication(appName);
+		if (app.getState() != CloudApplication.AppState.STARTED) {
+			HashMap<String, Object> appRequest = new HashMap<String, Object>();
+			appRequest.put("state", CloudApplication.AppState.STARTED);
+			getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+		}
 	}
 
 	public void debugApplication(String appName, CloudApplication.DebugMode mode) {
@@ -602,10 +597,12 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public void stopApplication(String appName) {
-		UUID appId = getAppId(appName);
-		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		appRequest.put("state", CloudApplication.AppState.STOPPED);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		CloudApplication app = getApplication(appName);
+		if (app.getState() != CloudApplication.AppState.STOPPED) {
+			HashMap<String, Object> appRequest = new HashMap<String, Object>();
+			appRequest.put("state", CloudApplication.AppState.STOPPED);
+			getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+		}
 	}
 
 	public void restartApplication(String appName) {
@@ -760,7 +757,39 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void doDeleteService(CloudService cloudService) {
+		List<UUID> appIds = getAppsBoundToService(cloudService);
+		if (appIds.size() > 0) {
+			for (UUID appId : appIds) {
+				doUnbindService(appId, cloudService.getMeta().getGuid());
+			}
+		}
 		getRestTemplate().delete(getUrl("v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
+	}
+
+	private List<UUID> getAppsBoundToService(CloudService cloudService) {
+		List<UUID> appGuids = new ArrayList<UUID>();
+		String urlPath = "v2";
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		if (sessionSpace != null) {
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlVars.put("q", "name:" + cloudService.getName());
+		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		for (Map<String, Object> resource : resourceList) {
+			List<Map<String, Object>> bindings =
+					CloudEntityResourceMapper.getEntityAttribute(resource, "service_bindings", List.class);
+			for (Map<String, Object> binding : bindings) {
+				String appId = CloudEntityResourceMapper.getEntityAttribute(binding, "app_guid", String.class);
+				if (appId != null) {
+					appGuids.add(UUID.fromString(appId));
+				}
+			}
+		}
+		return appGuids;
 	}
 
 	private void doDeleteApplication(UUID appId) {

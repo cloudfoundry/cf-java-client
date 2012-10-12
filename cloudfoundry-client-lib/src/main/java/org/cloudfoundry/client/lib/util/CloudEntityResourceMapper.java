@@ -174,14 +174,14 @@ public class CloudEntityResourceMapper {
 		if (created != null) {
 			try {
 				createdDate = dateFormatter.parse(created);
-			} catch (ParseException ignore) {}
+			} catch (Exception ignore) {}
 		}
 		Date updatedDate = null;
 		String updated = String.valueOf(metadata.get("updated_at"));
 		if (updated != null) {
 			try {
 				updatedDate = dateFormatter.parse(updated);
-			} catch (ParseException ignore) {}
+			} catch (Exception ignore) {}
 		}
 		int version = 2; // this is always 2 for v2
 		CloudEntity.Meta meta = new CloudEntity.Meta(guid, createdDate, updatedDate, version);
