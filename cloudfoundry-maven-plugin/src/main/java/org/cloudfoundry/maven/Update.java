@@ -17,8 +17,8 @@ package org.cloudfoundry.maven;
 
 import java.io.File;
 
-import org.cloudfoundry.client.lib.CloudApplication;
-import org.cloudfoundry.client.lib.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 
 /**
  * Updates an application.

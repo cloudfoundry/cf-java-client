@@ -44,14 +44,14 @@ public class AddUser extends AbstractCloudFoundryMojo {
 
 		Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
 		Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
-		Assert.configurationNotNull(getTarget(),   "target",   SystemProperties.TARGET);
+		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
 
 		if(!CommonUtils.isValidEmail(getUsername())) {
 			throw new MojoExecutionException(getUsername() + " is not a valid email address.");
 		}
 
 		try {
-			client = new CloudFoundryClient(getTarget().toString());
+			client = new CloudFoundryClient(getTarget().toURL());
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", getTarget()), e);

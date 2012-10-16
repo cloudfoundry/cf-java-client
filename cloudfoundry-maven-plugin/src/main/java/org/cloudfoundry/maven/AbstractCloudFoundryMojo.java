@@ -25,6 +25,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.maven.common.Assert;
@@ -116,7 +117,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		final CloudFoundryClient localClient;
 
 		try {
-			localClient = new CloudFoundryClient(username, password, target.toString());
+			localClient = new CloudFoundryClient(new CloudCredentials(username, password), target.toURL());
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
