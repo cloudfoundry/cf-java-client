@@ -17,7 +17,7 @@ package org.cloudfoundry.maven;
 
 import java.util.List;
 
-import org.cloudfoundry.client.lib.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**

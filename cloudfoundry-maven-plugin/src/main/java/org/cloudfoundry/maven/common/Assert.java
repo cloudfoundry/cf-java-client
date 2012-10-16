@@ -16,7 +16,8 @@
 package org.cloudfoundry.maven.common;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.cloudfoundry.client.lib.CloudService;
+
+import org.cloudfoundry.client.lib.domain.CloudService;
 
 /**
  * Various helper methods that help with the validation of parameters.

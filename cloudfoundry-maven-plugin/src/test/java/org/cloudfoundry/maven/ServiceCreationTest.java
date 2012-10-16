@@ -11,8 +11,10 @@ import static org.junit.Assert.*;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
-import org.cloudfoundry.client.lib.CloudService;
-import org.cloudfoundry.client.lib.ServiceConfiguration;
+
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

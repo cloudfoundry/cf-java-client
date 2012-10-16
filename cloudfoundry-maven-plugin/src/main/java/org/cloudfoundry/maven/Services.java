@@ -2,8 +2,9 @@ package org.cloudfoundry.maven;
 
 import java.util.List;
 
-import org.cloudfoundry.client.lib.CloudService;
-import org.cloudfoundry.client.lib.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**

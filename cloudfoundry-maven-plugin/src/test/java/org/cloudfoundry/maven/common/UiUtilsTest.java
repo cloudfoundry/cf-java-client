@@ -22,8 +22,9 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.cloudfoundry.client.lib.CloudApplication;
-import org.cloudfoundry.client.lib.CloudApplication.AppState;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

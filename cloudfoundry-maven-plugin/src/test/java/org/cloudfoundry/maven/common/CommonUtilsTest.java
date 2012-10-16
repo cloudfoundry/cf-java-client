@@ -22,8 +22,9 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.cloudfoundry.client.lib.CloudInfo;
-import org.cloudfoundry.client.lib.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+
 import org.junit.Test;
 
 /**

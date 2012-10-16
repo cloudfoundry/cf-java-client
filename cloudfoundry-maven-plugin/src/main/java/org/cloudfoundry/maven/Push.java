@@ -26,9 +26,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudInfo;
-import org.cloudfoundry.client.lib.CloudService;
-import org.cloudfoundry.client.lib.Staging;
+
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.Staging;
 
 import org.cloudfoundry.maven.common.CommonUtils;
 

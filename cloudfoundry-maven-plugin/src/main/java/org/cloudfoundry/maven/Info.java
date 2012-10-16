@@ -21,14 +21,18 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudInfo;
-import org.cloudfoundry.client.lib.ServiceConfiguration;
+
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -58,7 +62,7 @@ public class Info extends AbstractCloudFoundryMojo {
 			Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 			try {
-				client = new CloudFoundryClient(target.toString());
+				client = new CloudFoundryClient(target.toURL());
 			} catch (MalformedURLException e) {
 				throw new MojoExecutionException(
 						String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
