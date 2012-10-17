@@ -309,9 +309,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		try {
 			getRestTemplate().postForLocation(url, entity, appName);
 		} catch (HttpServerErrorException hsee) {
-			if (HttpStatus.INTERNAL_SERVER_ERROR.equals(hsee.getStatusCode()) || HttpStatus.UNSUPPORTED_MEDIA_TYPE.equals(hsee.getStatusCode())) {
+			if (HttpStatus.INTERNAL_SERVER_ERROR.equals(hsee.getStatusCode())) {
 				// this is for supporting legacy Micro Cloud Foundry 1.1 and older
-        System.out.println("Hmm... Appfog?  Retrying with the legacy version!");
 				uploadAppUsingLegacyApi(url, entity, appName);
 			} else {
 				throw hsee;
