@@ -307,7 +307,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
 		String url = getUrl("apps/{appName}/application");
 		try {
-			getRestTemplate().put(url, entity, appName);
+			getRestTemplate().postForLocation(url, entity, appName);
 		} catch (HttpServerErrorException hsee) {
 			if (HttpStatus.INTERNAL_SERVER_ERROR.equals(hsee.getStatusCode())) {
 				// this is for supporting legacy Micro Cloud Foundry 1.1 and older
@@ -506,7 +506,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
         legacyRestTemplate.setRequestFactory(this.getRestTemplate().getRequestFactory());
         legacyRestTemplate.setErrorHandler(new ErrorHandler());
         legacyRestTemplate.setMessageConverters(getLegacyMessageConverters());
-        legacyRestTemplate.put(path, entity, appName);
+        legacyRestTemplate.postForLocation(path, entity, appName);
     }
 
 	/**
@@ -545,10 +545,13 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			//If the entire app contents are cached, send nothing
 			body.add("application", application);
 		}
+    body.add("_method", "put");
 		ObjectMapper mapper = new ObjectMapper();
 		String knownRemoteResourcesPayload = mapper.writeValueAsString(knownRemoteResources);
 		body.add("resources", knownRemoteResourcesPayload);
 		HttpHeaders headers = new HttpHeaders();
+    headers.add("Accept", "*/*; q=0.5, application/xml");
+    headers.add("Accept-Encoding", "gzip, deflate");
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
 	}
