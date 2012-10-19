@@ -116,7 +116,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			Map<String, String> payload = new HashMap<String, String>();
 			payload.put("password", cloudCredentials.getPassword());
 			Map<String, String> response = getRestTemplate().postForObject(
-					getUrl("users/{id}/tokens"), payload, Map.class, cloudCredentials.getEmail());
+					getUrl("/users/{id}/tokens"), payload, Map.class, cloudCredentials.getEmail());
 			token = response.get("token");
 			return token;
 		}
@@ -130,7 +130,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		Map<String, String> payload = new HashMap<String, String>();
 		payload.put("email", email);
 		payload.put("password", password);
-		getRestTemplate().postForLocation(getUrl("users"), payload);
+		getRestTemplate().postForLocation(getUrl("/users"), payload);
 	}
 
 	public void updatePassword(CloudCredentials credentials, String newPassword) {
@@ -138,10 +138,10 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		if (oauthClient != null) {
 			oauthClient.changePassword(token, credentials.getPassword(), newPassword);
 		} else {
-			Map<String, String> userInfo = getRestTemplate().getForObject(getUrl("users/{id}"), Map.class,
+			Map<String, String> userInfo = getRestTemplate().getForObject(getUrl("/users/{id}"), Map.class,
 				credentials.getEmail());
 			userInfo.put("password", newPassword);
-			getRestTemplate().put(getUrl("users/{id}"), userInfo, credentials.getEmail());
+			getRestTemplate().put(getUrl("/users/{id}"), userInfo, credentials.getEmail());
 		}
 
 		CloudCredentials newCloudCredentials = new CloudCredentials(credentials.getEmail(), newPassword);
@@ -153,13 +153,13 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public void unregister() {
-		getRestTemplate().delete(getUrl("users/{email}"), cloudCredentials.getEmail());
+		getRestTemplate().delete(getUrl("/users/{email}"), cloudCredentials.getEmail());
 		token = null;
 	}
 
 	public List<CloudService> getServices() {
 		@SuppressWarnings("unchecked")
-		List<Map<String, Object>> servicesAsMap = getRestTemplate().getForObject(getUrl("services"), List.class);
+		List<Map<String, Object>> servicesAsMap = getRestTemplate().getForObject(getUrl("/services"), List.class);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> serviceAsMap : servicesAsMap) {
 			services.add(new CloudService(serviceAsMap));
@@ -168,18 +168,18 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public void createService(CloudService service) {
-		getRestTemplate().postForLocation(getUrl("services"), service);
+		getRestTemplate().postForLocation(getUrl("/services"), service);
 	}
 
 	public CloudService getService(String service) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> serviceAsMap = getRestTemplate().getForObject(
-				getUrl("services/{service}"), Map.class, service);
+				getUrl("/services/{service}"), Map.class, service);
 		return new CloudService(serviceAsMap);
 	}
 
 	public void deleteService(String service) {
-		getRestTemplate().delete(getUrl("services/{service}"), service);
+		getRestTemplate().delete(getUrl("/services/{service}"), service);
 	}
 
 	public void deleteAllServices() {
@@ -191,7 +191,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public List<ServiceConfiguration> getServiceConfigurations() {
 		Map<String, Object> configurationAsMap = getRestTemplate().getForObject(
-				getUrl("info/services"), Map.class);
+				getUrl("/info/services"), Map.class);
 		if (configurationAsMap == null) {
 			return Collections.emptyList();
 		}
@@ -222,7 +222,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public List<CloudApplication> getApplications() {
-		List<Map<String, Object>> appsAsMap = getRestTemplate().getForObject(getUrl("apps"), List.class);
+		List<Map<String, Object>> appsAsMap = getRestTemplate().getForObject(getUrl("/apps"), List.class);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> appAsMap : appsAsMap) {
 			apps.add(new CloudApplication(appAsMap));
@@ -231,13 +231,13 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public CloudApplication getApplication(String appName) {
-		Map<String, Object> appAsMap = getRestTemplate().getForObject(getUrl("apps/{appName}"), Map.class, appName);
+		Map<String, Object> appAsMap = getRestTemplate().getForObject(getUrl("/apps/{appName}"), Map.class, appName);
 		return new CloudApplication(appAsMap);
 	}
 
 	public ApplicationStats getApplicationStats(String appName) {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> statsAsMap = getRestTemplate().getForObject(getUrl("apps/{appName}/stats"), Map.class, appName);
+		Map<String, Object> statsAsMap = getRestTemplate().getForObject(getUrl("/apps/{appName}/stats"), Map.class, appName);
 		return new ApplicationStats(statsAsMap);
 	}
 
@@ -276,7 +276,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		CloudApplication payload = new CloudApplication(appName, staging.getRuntime(), staging.getFramework(),
 				memory, 1, uris, serviceNames, CloudApplication.AppState.STOPPED);
 		payload.setCommand(staging.getCommand());
-		getRestTemplate().postForLocation(getUrl("apps"), payload);
+		getRestTemplate().postForLocation(getUrl("/apps"), payload);
 		CloudApplication postedApp = getApplication(appName);
 		if (serviceNames != null && serviceNames.size() != 0) {
 			postedApp.setServices(serviceNames);
@@ -353,7 +353,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public void deleteApplication(String appName) {
-		getRestTemplate().delete(getUrl("apps/{appName}"), appName);
+		getRestTemplate().delete(getUrl("/apps/{appName}"), appName);
 	}
 
 	public void deleteAllApplications() {
@@ -418,7 +418,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
-		String urlPath = "apps/{app}/instances/{instanceIndex}/files/{filePath}";
+		String urlPath = "/apps/{app}/instances/{instanceIndex}/files/{filePath}";
 		return doGetFile(urlPath, appName, instanceIndex, filePath, startPosition, endPosition);
 	}
 
@@ -443,7 +443,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public InstancesInfo getApplicationInstances(String appName) {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = getRestTemplate().getForObject(getUrl("apps/{appName}/instances"), Map.class, appName);
+		Map<String, Object> map = getRestTemplate().getForObject(getUrl("/apps/{appName}/instances"), Map.class, appName);
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> instanceData = (List<Map<String, Object>>)map.get("instances");
 		return new InstancesInfo(instanceData);
@@ -451,7 +451,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public CrashesInfo getCrashes(String appName) {
 		@SuppressWarnings("unchecked")
-		Map<String, Object> map = getRestTemplate().getForObject(getUrl("apps/{appName}/crashes"), Map.class, appName);
+		Map<String, Object> map = getRestTemplate().getForObject(getUrl("/apps/{appName}/crashes"), Map.class, appName);
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> crashData = (List<Map<String, Object>>)map.get("crashes");
 		return new CrashesInfo(crashData);
@@ -464,7 +464,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		}
 
 		app.setName(newName);
-		getRestTemplate().put(getUrl("apps/{appName}"), app, appName);
+		getRestTemplate().put(getUrl("/apps/{appName}"), app, appName);
 	}
 
 
@@ -480,7 +480,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	 * @param app the appplication info
 	 */
 	private void updateApplication(CloudApplication app) {
-		getRestTemplate().put(getUrl("apps/{appName}"), app, app.getName());
+		getRestTemplate().put(getUrl("/apps/{appName}"), app, app.getName());
 	}
 
 	private void doUploadApplicationFolder(String appName, File file, UploadStatusCallback callback) throws IOException {
@@ -547,7 +547,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
 		CloudResources archiveResources = new CloudResources(archive);
-		return getRestTemplate().postForObject(getUrl("resources"), archiveResources, CloudResources.class);
+		return getRestTemplate().postForObject(getUrl("/resources"), archiveResources, CloudResources.class);
 	}
 
 	private HttpEntity<MultiValueMap<String, ?>> generatePartialResourceRequest(UploadApplicationPayload application,
@@ -575,7 +575,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	 * @param app the appplication info
 	 */
 	private void doUpdateApplication(CloudApplication app) {
-		getRestTemplate().put(getUrl("apps/{appName}"), app, app.getName());
+		getRestTemplate().put(getUrl("/apps/{appName}"), app, app.getName());
 	}
 
 }
