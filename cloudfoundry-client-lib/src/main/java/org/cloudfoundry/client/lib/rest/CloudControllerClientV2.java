@@ -107,13 +107,13 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	public CloudInfo getInfo() {
-		String infoJson = getRestTemplate().getForObject(getUrl("v2/info"), String.class);
+		String infoJson = getRestTemplate().getForObject(getUrl("/v2/info"), String.class);
 		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(infoJson);
 
 		Map<String, Object> userMap = getUserInfo((String) infoMap.get("user"));
 
 		//TODO: replace with v2 api call once, or if, they become available
-		String infoV1Json = getRestTemplate().getForObject(getUrl("info"), String.class);
+		String infoV1Json = getRestTemplate().getForObject(getUrl("/info"), String.class);
 		Map<String, Object> infoV1Map = JsonUtil.convertJsonToMap(infoV1Json);
 		Map<String, Object> limitMap = (Map<String, Object>) infoV1Map.get("limits");
 		Map<String, Object> usageMap = (Map<String, Object>) infoV1Map.get("usage");
@@ -149,9 +149,8 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<CloudSpace> getSpaces() {
-		String resp = getRestTemplate().getForObject(getUrl("v2/spaces?inline-relations-depth=1"), String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		String urlPath = "/v2/spaces?inline-relations-depth=1";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
 		List<CloudSpace> spaces = new ArrayList<CloudSpace>();
 		for (Map<String, Object> resource : resourceList) {
 			spaces.add(resourceMapper.mapResource(resource, CloudSpace.class));
@@ -191,16 +190,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	public List<CloudService> getServices() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlPath = urlPath + "/service_instances?inline-relations-depth={depth}";
 		urlVars.put("depth", 2);
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
 			services.add(resourceMapper.mapResource(resource, CloudService.class));
@@ -238,12 +235,12 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
 		serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
-		getRestTemplate().postForObject(getUrl("v2/service_instances"), serviceRequest, String.class);
+		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
 	}
 
 	@SuppressWarnings("unchecked")
 	public CloudService getService(String serviceName) {
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
@@ -251,9 +248,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 		urlVars.put("q", "name:" + serviceName);
 		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
 			cloudService = resourceMapper.mapResource(resourceList.get(0), CloudService.class);
@@ -275,10 +270,8 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	public List<ServiceConfiguration> getServiceConfigurations() {
-		String urlPath = "v2/services?inline-relations-depth=1";
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		String urlPath = "/v2/services?inline-relations-depth=1";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
 		List<ServiceConfiguration> serviceConfigurations = new ArrayList<ServiceConfiguration>();
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering serviceOffering = resourceMapper.mapResource(resource, CloudServiceOffering.class);
@@ -290,16 +283,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlPath = urlPath + "/apps?inline-relations-depth={depth}";
 		urlVars.put("depth", 2);
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> resource : resourceList) {
 			apps.add(mapCloudApplication(resource));
@@ -362,7 +353,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private Map<String, Object> getInstanceInfoForApp(UUID appId, String path) {
-		String url = getUrl("v2/apps/{guid}/" + path);
+		String url = getUrl("/v2/apps/{guid}/" + path);
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		urlVars.put("guid", appId);
 		String resp = getRestTemplate().getForObject(url, String.class, urlVars);
@@ -393,7 +384,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 //		TODO: command needs to be added?
 //		appRequest.put("command", staging.getCommand());
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
-		String appResp = getRestTemplate().postForObject(getUrl("v2/apps"), appRequest, String.class);
+		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
 		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
 		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
 
@@ -405,6 +396,49 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			addUris(uris, newAppGuid);
 		}
 
+	}
+
+	private List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
+		List<Map<String, Object>> allResources = new ArrayList<Map<String, Object>>();
+		String resp;
+		if (urlVars != null) {
+			resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		} else {
+			resp = getRestTemplate().getForObject(getUrl(urlPath), String.class);
+		}
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		String nextUrl = (String) respMap.get("next_url");
+		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
+		if (newResources != null && newResources.size() > 0) {
+			allResources.addAll(newResources);
+			for (Map<String, Object> res : newResources) {
+				Map<String, Object> ent = (Map<String, Object>) res.get("entity");
+			}
+		}
+		while (nextUrl != null && nextUrl.length() > 0) {
+			//Hack to add back the inline-relations-depth parameter
+			String url = nextUrl;
+			if (urlPath.contains("inline-relations-depth=") && urlVars.containsKey("depth")) {
+				if (!url.contains("inline-relations-depth=")) {
+					url = url + "&inline-relations-depth=" + urlVars.get("depth");
+				}
+			}
+			nextUrl = addPageOfResources(url, allResources);
+		}
+		return allResources;
+	}
+
+	private String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
+		String resp = getRestTemplate().getForObject(getUrl(nextUrl), String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
+		if (newResources != null && newResources.size() > 0) {
+			allResources.addAll(newResources);
+			for (Map<String, Object> res : newResources) {
+				Map<String, Object> ent = (Map<String, Object>) res.get("entity");
+			}
+		}
+		return (String) respMap.get("next_url");
 	}
 
 	private void addUris(List<String> uris, UUID appGuid) {
@@ -452,18 +486,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private Map<String, UUID> getDomains() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		String domainPath = urlPath + "/domains?inline-relations-depth={depth}";
 		urlVars.put("depth", 1);
-		String domainResp = getRestTemplate().getForObject(getUrl(domainPath), String.class, urlVars);
-		List<Map<String, Object>> domainList =
-				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(domainResp).get("resources");
-		Map<String, UUID> domains = new HashMap<String, UUID>(domainList.size());
-		for (Map<String, Object> d : domainList) {
+		List<Map<String, Object>> resourceList = getAllResources(domainPath, urlVars);
+		Map<String, UUID> domains = new HashMap<String, UUID>(resourceList.size());
+		for (Map<String, Object> d : resourceList) {
 			domains.put(
 					CloudEntityResourceMapper.getEntityAttribute(d, "name", String.class),
 					CloudEntityResourceMapper.getMeta(d).getGuid());
@@ -476,7 +508,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (routeGuid == null) {
 			routeGuid = addRoute(host, domainGuid);
 		}
-		String bindPath = "v2/apps/{app}/routes/{route}";
+		String bindPath = "/v2/apps/{app}/routes/{route}";
 		Map<String, Object> bindVars = new HashMap<String, Object>();
 		bindVars.put("app", appGuid);
 		bindVars.put("route", routeGuid);
@@ -487,7 +519,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private void unbindRoute(String host, UUID domainGuid, UUID appGuid) {
 		UUID routeGuid = getRouteGuid(host);
 		if (routeGuid != null) {
-			String bindPath = "v2/apps/{app}/routes/{route}";
+			String bindPath = "/v2/apps/{app}/routes/{route}";
 			Map<String, Object> bindVars = new HashMap<String, Object>();
 			bindVars.put("app", appGuid);
 			bindVars.put("route", routeGuid);
@@ -497,12 +529,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private UUID getRouteGuid(String host) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String routePath = getUrl("v2/routes?inline-relations-depth={depth}&q=host:{host}");
+		String routePath = "/v2/routes?inline-relations-depth={depth}&q=host:{host}";
 		urlVars.put("depth", 0);
 		urlVars.put("host", host);
-		String routeResp = getRestTemplate().getForObject(routePath, String.class, urlVars);
-		List<Map<String, Object>> routes =
-				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(routeResp).get("resources");
+		List<Map<String, Object>> routes = getAllResources(routePath, urlVars);
 		UUID routeGuid = null;
 		if (routes.size() > 0) {
 			Map<String, Object> r  = routes.get(0);
@@ -518,7 +548,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		routeRequest.put("host", host);
 		routeRequest.put("domain_guid", domainGuid);
 		routeRequest.put("organization_guid", sessionSpace.getOrganization().getMeta().getGuid());
-		String routeResp = getRestTemplate().postForObject(getUrl("v2/routes"), routeRequest, String.class);
+		String routeResp = getRestTemplate().postForObject(getUrl("/v2/routes"), routeRequest, String.class);
 		Map<String, Object> routeEntity = JsonUtil.convertJsonToMap(routeResp);
 		UUID newRouteGuid = CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
 		return newRouteGuid;
@@ -555,7 +585,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
 		callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
 		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
-		String url = getUrl("v2/apps/{guid}/bits");
+		String url = getUrl("/v2/apps/{guid}/bits");
 		getRestTemplate().put(url, entity, appId);
 	}
 
@@ -566,7 +596,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		headers.setContentType(JSON_MEDIA_TYPE);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
 		ResponseEntity<String> responseEntity =
-			getRestTemplate().exchange(getUrl("v2/resource_match"), HttpMethod.PUT, requestEntity, String.class);
+			getRestTemplate().exchange(getUrl("/v2/resource_match"), HttpMethod.PUT, requestEntity, String.class);
 		List<CloudResource> cloudResources = JsonUtil.convertJsonToCloudResourceList(responseEntity.getBody());
 		return new CloudResources(cloudResources);
 	}
@@ -588,7 +618,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (app.getState() != CloudApplication.AppState.STARTED) {
 			HashMap<String, Object> appRequest = new HashMap<String, Object>();
 			appRequest.put("state", CloudApplication.AppState.STARTED);
-			getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+			getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
 		}
 	}
 
@@ -601,7 +631,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (app.getState() != CloudApplication.AppState.STOPPED) {
 			HashMap<String, Object> appRequest = new HashMap<String, Object>();
 			appRequest.put("state", CloudApplication.AppState.STOPPED);
-			getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+			getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
 		}
 	}
 
@@ -626,14 +656,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("memory", memory);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationInstances(String appName, int instances) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("instances", instances);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationServices(String appName, List<String> services) {
@@ -674,12 +704,12 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
 		serviceRequest.put("service_instance_guid", serviceId);
 		serviceRequest.put("app_guid", appId);
-		getRestTemplate().postForObject(getUrl("v2/service_bindings"), serviceRequest, String.class);
+		getRestTemplate().postForObject(getUrl("/v2/service_bindings"), serviceRequest, String.class);
 	}
 
 	private void doUnbindService(UUID appId, UUID serviceId) {
 		UUID serviceBindingId = getServiceBindingId(appId, serviceId);
-		getRestTemplate().delete(getUrl("v2/service_bindings/{guid}"), serviceBindingId);
+		getRestTemplate().delete(getUrl("/v2/service_bindings/{guid}"), serviceBindingId);
 	}
 
 	public void updateApplicationUris(String appName, List<String> uris) {
@@ -696,7 +726,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("environment_json", env);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationEnv(String appName, List<String> env) {
@@ -714,7 +744,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
 		UUID appId = getAppId(appName);
-		String urlPath = "v2/apps/{appId}/instances/{instanceIndex}/files/{filePath}";
+		String urlPath = "/v2/apps/{appId}/instances/{instanceIndex}/files/{filePath}";
 		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
 	}
 
@@ -753,7 +783,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("name", newName);
-		getRestTemplate().put(getUrl("v2/apps/{guid}"), appRequest, appId);
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	private void doDeleteService(CloudService cloudService) {
@@ -763,12 +793,12 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 				doUnbindService(appId, cloudService.getMeta().getGuid());
 			}
 		}
-		getRestTemplate().delete(getUrl("v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
+		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
 	}
 
 	private List<UUID> getAppsBoundToService(CloudService cloudService) {
 		List<UUID> appGuids = new ArrayList<UUID>();
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
@@ -776,9 +806,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 		urlVars.put("q", "name:" + cloudService.getName());
 		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		for (Map<String, Object> resource : resourceList) {
 			List<Map<String, Object>> bindings =
 					CloudEntityResourceMapper.getEntityAttribute(resource, "service_bindings", List.class);
@@ -793,16 +821,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void doDeleteApplication(UUID appId) {
-		getRestTemplate().delete(getUrl("v2/apps/{guid}"), appId);
+		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), appId);
 	}
 
 	@SuppressWarnings("unchecked")
 	private Collection<CloudInfo.Framework> getInfoForFrameworks(Map<String, CloudInfo.Runtime> runtimes) {
-		String frameworksJson = getRestTemplate().getForObject(getUrl("v2/frameworks"), String.class);
-		List<Map<String, Object>> frameworkList =
-				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(frameworksJson).get("resources");
+		List<Map<String, Object>> resourceList = getAllResources("/v2/frameworks", null);
 		Collection<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-		for (Map<String, Object> frameworkMap : frameworkList) {
+		for (Map<String, Object> frameworkMap : resourceList) {
 			Map<String, Object> frameworkEntity = (Map<String, Object>) frameworkMap.get("entity");
 			String frameworkName = String.valueOf(frameworkEntity.get("name"));
 			String[] runtimePatterns = FRAMEWORK_RUNTIME_PATTERNS.get(frameworkName);
@@ -826,9 +852,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	private Map<String, CloudInfo.Runtime> getInfoForRuntimes() {
-		String runtimesJson = getRestTemplate().getForObject(getUrl("v2/runtimes"), String.class);
-		List<Map<String, Object>> runtimesList =
-				(List<Map<String, Object>>) JsonUtil.convertJsonToMap(runtimesJson).get("resources");
+		List<Map<String, Object>> runtimesList = getAllResources("/v2/runtimes", null);
 		Map<String, CloudInfo.Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
 		for (Map<String, Object> runtimeMap : runtimesList) {
 			Map<String, Object> runtimeEntity = (Map<String, Object>) runtimeMap.get("entity");
@@ -841,10 +865,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
 		Assert.notNull(label, "Service label must not be null");
-		String resp = getRestTemplate().getForObject(
-				getUrl("v2/services?inline-relations-depth=2"), String.class);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources("/v2/services?inline-relations-depth=2", null);
 		List<CloudServiceOffering> results = new ArrayList<CloudServiceOffering>();
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering cloudServiceOffering =
@@ -858,10 +879,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	private UUID getServiceBindingId(UUID appId, UUID serviceId ) {
-		String resp = getRestTemplate().getForObject(getUrl("v2/apps/{guid}/service_bindings"), String.class, appId);
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", appId);
+		List<Map<String, Object>> resourceList = getAllResources("/v2/apps/{guid}/service_bindings", urlVars);
 		UUID serviceBindingId = null;
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
 		if (resourceList != null && resourceList.size() > 0) {
 			for (Map<String, Object> resource : resourceList) {
 				Map<String, Object> bindingMeta = (Map<String, Object>) resource.get("metadata");
@@ -890,7 +911,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private Map<String, Object> findApplicationResource(String appName, int depth) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2";
+		String urlPath = "/v2";
 		if (sessionSpace != null) {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
@@ -898,9 +919,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		urlVars.put("q", "name:" + appName);
 		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
 		urlVars.put("depth", depth);
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		if (resourceList.size() > 0) {
 			return resourceList.get(0);
 		}
@@ -911,12 +930,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private List<String> findApplicationUris(UUID appGuid) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "v2/apps/{app}/routes?inline-relations-depth={depth}";
+		String urlPath = "/v2/apps/{app}/routes?inline-relations-depth={depth}";
 		urlVars.put("app", appGuid);
 		urlVars.put("depth", 2);
-		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		List<Map<String, Object>> resourceList = (List<Map<String, Object>>) respMap.get("resources");
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<String> uris =  new ArrayList<String>();
 		for (Map<String, Object> resource : resourceList) {
 			Map<String, Object> domainResource = CloudEntityResourceMapper.getEmbeddedResource(resource, "domain");
@@ -930,10 +947,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	private UUID getFrameworkId(String framework) {
 		if (!frameworkIdCache.containsKey(framework)) {
-			String resp =
-					getRestTemplate().getForObject(getUrl("v2/frameworks"), String.class);
-			List<Map<String, Object>> resourceList =
-					(List<Map<String, Object>>) JsonUtil.convertJsonToMap(resp).get("resources");
+			List<Map<String, Object>> resourceList = getAllResources("/v2/frameworks", null);
 			for (Map<String, Object> resource : resourceList) {
 				String name = resourceMapper.getNameOfResource(resource);
 				UUID guid = resourceMapper.getGuidOfResource(resource);
@@ -946,10 +960,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	private UUID getRuntimeId(String runtime) {
 		if (!runtimeIdCache.containsKey(runtime)) {
-			String resp =
-					getRestTemplate().getForObject(getUrl("v2/runtimes"), String.class);
-			List<Map<String, Object>> resourceList =
-					(List<Map<String, Object>>) JsonUtil.convertJsonToMap(resp).get("resources");
+			List<Map<String, Object>> resourceList = getAllResources("/v2/runtimes", null);
 			for (Map<String, Object> resource : resourceList) {
 				String name = resourceMapper.getNameOfResource(resource);
 				UUID guid = resourceMapper.getGuidOfResource(resource);
@@ -961,7 +972,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unused")
 	private Map<String, Object> getUserInfo(String user) {
-//		String userJson = getRestTemplate().getForObject(getUrl("v2/users/{guid}"), String.class, user);
+//		String userJson = getRestTemplate().getForObject(getUrl("/v2/users/{guid}"), String.class, user);
 //		Map<String, Object> userInfo = (Map<String, Object>) JsonUtil.convertJsonToMap(userJson);
 //		return userInfo();
 		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
