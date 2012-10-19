@@ -164,7 +164,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	}
 
 	protected String getUrl(String path) {
-		return cloudControllerUrl + "/" + path;
+		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
 	}
 
 	public void registerRestLogListener(RestLogCallback callBack) {
