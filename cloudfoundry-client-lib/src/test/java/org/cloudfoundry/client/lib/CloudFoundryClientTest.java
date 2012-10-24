@@ -238,12 +238,20 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 	public void uploadApplication() throws IOException {
 		String appName = namespacedAppName(TEST_NAMESPACE, "travel_test3");
 		CloudApplication app = createAndUploadTestApp(appName);
+		String serviceName = "test_database";
+		createDatabaseService(serviceName);
+		client.updateApplicationServices(appName, Collections.singletonList(serviceName));
 
 		assertNotNull(app);
 		assertEquals(AppState.STOPPED, app.getState());
 
 		String url = computeAppUrlNoProtocol(ccUrl, appName);
 		assertEquals(url, app.getUris().get(0));
+
+		client.startApplication(appName);
+		app = client.getApplication(appName);
+		assertEquals(AppState.STARTED, app.getState());
+
 	}
 
 	@Test

@@ -248,10 +248,12 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
 					if (response.getBody() != null) {
 						try {
-								@SuppressWarnings("unchecked")
-								Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-								exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
+							exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
 						} catch (JsonParseException e) {
+							exception.setDescription("Client error");
+						} catch (IOException e) {
 							exception.setDescription("Client error");
 						}
 					} else {

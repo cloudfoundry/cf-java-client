@@ -40,6 +40,7 @@ import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -303,16 +304,23 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		callback.onMatchedFileNames(knownRemoteResources.getFilenames());
 		UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
 		callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
-		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
+		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources, HttpMethod.POST);
 		String url = getUrl("apps/{appName}/application");
 		try {
-			getRestTemplate().put(url, entity, appName);
+			getRestTemplate().postForLocation(url, entity, appName);
 		} catch (HttpServerErrorException hsee) {
 			if (HttpStatus.INTERNAL_SERVER_ERROR.equals(hsee.getStatusCode())) {
 				// this is for supporting legacy Micro Cloud Foundry 1.1 and older
-				uploadAppUsingLegacyApi(url, entity, appName);
+				uploadAppUsingLegacyApi(url, payload, knownRemoteResources, appName);
 			} else {
 				throw hsee;
+			}
+		} catch (HttpClientErrorException hcee) {
+			if (HttpStatus.NOT_FOUND.equals(hcee.getStatusCode())) {
+				// this is for supporting legacy Micro Cloud Foundry 1.2
+				uploadAppUsingLegacyApi(url, payload, knownRemoteResources, appName);
+			} else {
+				throw hcee;
 			}
 		}
 	}
@@ -496,16 +504,21 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	 * the content type as JSON works fine.
 	 *
 	 * @param path app path
-	 * @param entity HttpEntity for the payload
+	 * @param payload the application payload
+	 * @param knownRemoteResources known remote resources
 	 * @param appName name of app
 	 * @throws HttpServerErrorException
 	 */
-	private void uploadAppUsingLegacyApi(String path, HttpEntity<?> entity, String appName) throws HttpServerErrorException {
+	private void uploadAppUsingLegacyApi(String path,
+										 UploadApplicationPayload payload,
+										 CloudResources knownRemoteResources,
+										 String appName) throws HttpServerErrorException, IOException {
         RestTemplate legacyRestTemplate = new RestTemplate();
         legacyRestTemplate.setRequestFactory(this.getRestTemplate().getRequestFactory());
         legacyRestTemplate.setErrorHandler(new ErrorHandler());
         legacyRestTemplate.setMessageConverters(getLegacyMessageConverters());
-        legacyRestTemplate.put(path, entity, appName);
+		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources, HttpMethod.PUT);
+		legacyRestTemplate.put(path, entity, appName);
     }
 
 	/**
@@ -538,8 +551,11 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	}
 
 	private HttpEntity<MultiValueMap<String, ?>> generatePartialResourceRequest(UploadApplicationPayload application,
-																				CloudResources knownRemoteResources) throws IOException {
+				CloudResources knownRemoteResources, HttpMethod method) throws IOException {
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>(2);
+		if (method == HttpMethod.POST) {
+			body.add("_method", "put");
+		}
 		if (application.getNumEntries() > 0) {
 			//If the entire app contents are cached, send nothing
 			body.add("application", application);
@@ -548,6 +564,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		String knownRemoteResourcesPayload = mapper.writeValueAsString(knownRemoteResources);
 		body.add("resources", knownRemoteResourcesPayload);
 		HttpHeaders headers = new HttpHeaders();
+		headers.add("Accept", "text/html, application/xml");
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
 	}
