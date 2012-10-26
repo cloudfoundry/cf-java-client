@@ -381,8 +381,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
 		appRequest.put("memory", memory);
 		appRequest.put("instances", 1);
-//		TODO: command needs to be added?
-//		appRequest.put("command", staging.getCommand());
+		if (staging.getCommand() != null) {
+			appRequest.put("command", staging.getCommand());
+		}
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
 		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
 		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
@@ -703,6 +704,17 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private void doUnbindService(UUID appId, UUID serviceId) {
 		UUID serviceBindingId = getServiceBindingId(appId, serviceId);
 		getRestTemplate().delete(getUrl("/v2/service_bindings/{guid}"), serviceBindingId);
+	}
+
+	public void updateApplicationStaging(String appName, Staging staging) {
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		if (staging.getCommand() != null) {
+			appRequest.put("command", staging.getCommand());
+		}
+		appRequest.put("framework_guid", getFrameworkId(staging.getFramework()));
+		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationUris(String appName, List<String> uris) {

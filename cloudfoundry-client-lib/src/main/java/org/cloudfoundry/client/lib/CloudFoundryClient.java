@@ -238,6 +238,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateApplicationServices(appName, services);
 	}
 
+	public void updateApplicationStaging(String appName, Staging staging) {
+		cc.updateApplicationStaging(appName, staging);
+	}
+
 	public void updateApplicationUris(String appName, List<String> uris) {
 		cc.updateApplicationUris(appName, uris);
 	}
