@@ -256,15 +256,10 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 
 	@Test
 	public void uploadStandaloneApplication() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-ruby");
 		List<String> uris = new ArrayList<String>();
 		List<String> services = new ArrayList<String>();
-		Staging staging = new Staging("standalone");
-		staging.setRuntime("ruby19");
-		staging.setCommand("ruby simple.rb");
-		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-ruby");
-		File file = SampleProjects.standaloneRuby();
-		client.createApplication(appName, staging, 128, uris, services);
-		client.uploadApplication(appName, file.getCanonicalPath());
+		createStandaloneRubyTestApp(appName, uris, services);
 		client.startApplication(appName);
 		CloudApplication app = client.getApplication(appName);
 		assertNotNull(app);
@@ -289,6 +284,42 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(AppState.STARTED, app.getState());
 		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(ccUrl, appName)), app.getUris());
+	}
+
+	@Test
+	public void updateStandaloneApplicationCommand() throws IOException {
+		String appName = namespacedAppName(TEST_NAMESPACE, "standalone-ruby");
+		List<String> uris = new ArrayList<String>();
+		List<String> services = new ArrayList<String>();
+		createStandaloneRubyTestApp(appName, uris, services);
+		client.startApplication(appName);
+		CloudApplication app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+		assertEquals(uris, app.getUris());
+		assertEquals("ruby19", app.getStaging().getRuntime());
+		assertEquals("ruby simple.rb", app.getStaging().getCommand());
+		Staging newStaging = app.getStaging();
+		newStaging.setCommand("ruby simple.rb test");
+		newStaging.setRuntime("ruby18");
+		client.stopApplication(appName);
+		client.updateApplicationStaging(appName, newStaging);
+		client.startApplication(appName);
+		app = client.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(AppState.STARTED, app.getState());
+		assertEquals(uris, app.getUris());
+		assertEquals("ruby18", app.getStaging().getRuntime());
+		assertEquals("ruby simple.rb test", app.getStaging().getCommand());
+	}
+
+	private void createStandaloneRubyTestApp(String appName, List<String> uris, List<String> services) throws IOException {
+		Staging staging = new Staging("standalone");
+		staging.setRuntime("ruby19");
+		staging.setCommand("ruby simple.rb");
+		File file = SampleProjects.standaloneRuby();
+		client.createApplication(appName, staging, 128, uris, services);
+		client.uploadApplication(appName, file.getCanonicalPath());
 	}
 
 	@Test

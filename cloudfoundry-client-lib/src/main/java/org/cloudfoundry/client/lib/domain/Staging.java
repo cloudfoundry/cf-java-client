@@ -95,4 +95,9 @@ public class Staging {
 		this.command = command;
 	}
 
+	@Override
+	public String toString() {
+		return "Staging [runtime=" + getRuntime() + " framework=" + getFramework() + " command=" + getCommand() + "]";
+	}
+
 }

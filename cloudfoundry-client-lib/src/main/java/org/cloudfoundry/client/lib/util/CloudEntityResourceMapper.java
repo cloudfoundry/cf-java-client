@@ -23,11 +23,10 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.Staging;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +100,22 @@ public class CloudEntityResourceMapper {
 			app.setRunningInstances(runningInstancesAttribute);
 		}
 		app.setDebug(null);
+		String runtime = null;
+		Map<String, Object> runtimeResource = getEmbeddedResource(resource, "runtime");
+		if (runtimeResource != null) {
+			runtime = getEntityAttribute(runtimeResource, "name", String.class);
+		}
+		String framework = null;
+		Map<String, Object> frameworkResource = getEmbeddedResource(resource, "framework");
+		if (frameworkResource != null) {
+			framework = getEntityAttribute(frameworkResource, "name", String.class);
+		}
+		Staging staging = new Staging(runtime, framework);
+		String command = getEntityAttribute(resource, "command", String.class);
+		if (command != null) {
+			staging.setCommand(command);
+		}
+		app.setStaging(staging);
 		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
 		if (envMap.size() > 0) {
 			app.setEnv(envMap);

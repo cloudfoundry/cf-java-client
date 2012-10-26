@@ -258,7 +258,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		return result;
 	}
 
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris, List<String> serviceNames, boolean checkExists) {
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, boolean checkExists) {
 		if (checkExists) {
 			try {
 				getApplication(appName);
@@ -276,7 +277,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		CloudApplication payload = new CloudApplication(appName, staging.getRuntime(), staging.getFramework(),
 				memory, 1, uris, serviceNames, CloudApplication.AppState.STOPPED);
 		payload.setCommand(staging.getCommand());
-		getRestTemplate().postForLocation(getUrl("/apps"), payload);
+		Map<String, Object> appMap = createAppMap(payload);
+		getRestTemplate().postForLocation(getUrl("/apps"), appMap);
 		CloudApplication postedApp = getApplication(appName);
 		if (serviceNames != null && serviceNames.size() != 0) {
 			postedApp.setServices(serviceNames);
@@ -318,7 +320,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		} catch (HttpClientErrorException hcee) {
 			if (HttpStatus.NOT_FOUND.equals(hcee.getStatusCode())) {
 				// this is for supporting legacy Micro Cloud Foundry 1.2
-				uploadAppUsingLegacyApi(url, payload, knownRemoteResources, appName);
+				HttpEntity<?> entity12 = generatePartialResourceRequest(payload, knownRemoteResources, HttpMethod.PUT);
+				getRestTemplate().put(url, entity12, appName);
 			} else {
 				throw hcee;
 			}
@@ -387,6 +390,15 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			throw new IllegalArgumentException("Application " + appName + " does not exist");
 		}
 		app.setServices(services);
+		doUpdateApplication(app);
+	}
+
+	public void updateApplicationStaging(String appName, Staging staging) {
+		CloudApplication app = getApplication(appName);
+		if (app == null) {
+			throw new IllegalArgumentException("Application " + appName + " does not exist");
+		}
+		app.setStaging(staging);
 		doUpdateApplication(app);
 	}
 
@@ -472,6 +484,18 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		if (authorizationEndpoint != null) {
 			this.oauthClient = new OauthClient(authorizationEndpoint, httpProxyConfiguration);
 		}
+	}
+
+	private Map<String, Object> createAppMap(CloudApplication payload) {
+		Map<String, Object> appMap = JsonUtil.convertJsonToMap(JsonUtil.convertToJson(payload));
+		Map<String, String> stagingMap = (Map<String, String>) appMap.get("staging");
+		if (stagingMap.containsKey("runtime")) {
+			stagingMap.put("stack", stagingMap.remove("runtime"));
+		}
+		if (stagingMap.containsKey("framework")) {
+			stagingMap.put("model", stagingMap.remove("framework"));
+		}
+		return appMap;
 	}
 
 	/**
@@ -575,7 +599,8 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	 * @param app the appplication info
 	 */
 	private void doUpdateApplication(CloudApplication app) {
-		getRestTemplate().put(getUrl("/apps/{appName}"), app, app.getName());
+		Map<String, Object> appMap = createAppMap(app);
+		getRestTemplate().put(getUrl("/apps/{appName}"), appMap, app.getName());
 	}
 
 }

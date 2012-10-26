@@ -321,6 +321,14 @@ public interface CloudFoundryOperations {
 	void updateApplicationServices(String appName, List<String> services);
 
 	/**
+	 * Update application staging information.
+	 *
+	 * @param appName name of appplication
+	 * @param staging staging information for the app
+	 */
+	void updateApplicationStaging(String appName, Staging staging);
+
+	/**
 	 * Update application URIs.
 	 *
 	 * @param appName name of application

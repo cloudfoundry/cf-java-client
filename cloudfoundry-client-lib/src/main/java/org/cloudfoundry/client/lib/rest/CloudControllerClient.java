@@ -117,6 +117,8 @@ public interface CloudControllerClient {
 
 	void updateApplicationServices(String appName, List<String> services);
 
+	void updateApplicationStaging(String appName, Staging staging);
+
 	void updateApplicationUris(String appName, List<String> uris);
 
 	void updateApplicationEnv(String appName, Map<String, String> env);
