@@ -16,24 +16,24 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.InstanceState;
+import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.Staging;
-
 import org.cloudfoundry.maven.common.CommonUtils;
-
 import org.springframework.http.HttpStatus;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 /**
  * Push and optionally start an application.
@@ -177,6 +177,10 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 				throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
+			if(isWait()){
+				getLog().info("wait for application start " + appname);
+				validateApplicationStart(getClient(), appname);
+			}
 
 		} else {
 			getLog().debug("Not Starting Application.");
@@ -188,6 +192,46 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			getLog().info(String.format("'%s' was successfully deployed.", appname, getUrl()));
 		}
 
+	}
+
+	/**
+	 * Helper method that validates that the application instances standing ip.
+	 *
+	 * @param cloudFoundryClient
+	 * @param appname
+	 *
+	 * @throws IllegalStateException if the application does not start in 5 seconds.
+	 */
+
+	protected void validateApplicationStart(CloudFoundryClient cloudFoundryClient, String appname) {
+		//Retry 5 times
+		boolean applicationUp = false;
+		int retryTimes = 0;
+		do{
+			//Ping the server to see whether all the app instances started.
+			List<InstanceStats> instanceStats = cloudFoundryClient.getApplicationStats(appname).getRecords();
+			if(Iterables.all(instanceStats, new Predicate<InstanceStats>() {
+
+				public boolean apply(InstanceStats stat) {
+					return stat.getState() == InstanceState.RUNNING;
+				}
+			}))
+			{
+				applicationUp = true;
+				break;
+			}
+			else{
+				retryTimes++;
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		while(retryTimes < 5);
+		getLog().debug("Ping the server " + retryTimes + " times to validate the app starting up");
+		if(!applicationUp)
+			throw new IllegalStateException("The application instances did not start in 5 secs");
 	}
 
 	/**

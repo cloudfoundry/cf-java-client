@@ -169,6 +169,11 @@ Maven-based applications to Cloud Foundry instances.
 			<version>2.2.1</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>

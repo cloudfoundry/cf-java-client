@@ -35,6 +35,7 @@ public final class DefaultConstants {
 	public static final String RUNTIME = "java";
 	public static final Boolean NO_START = Boolean.FALSE;
 	public static final Integer DEFAULT_INSTANCE = 1;
+	public static final Boolean WAIT = Boolean.FALSE;
 
 	/**
 	 * Prevent instantiation.

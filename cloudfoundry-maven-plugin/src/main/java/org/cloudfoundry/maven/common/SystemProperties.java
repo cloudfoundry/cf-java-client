@@ -38,7 +38,8 @@ public enum SystemProperties {
 	TARGET("cf.target", "target"),
 	URL("cf.url", "url"),
 	USERNAME("cf.username", "username"),
-	WARFILE("cf.warfile", "warfile"); //deprecated use PATH instead
+	WARFILE("cf.warfile", "warfile"), //deprecated use PATH instead
+	WAIT("cf.wait", "wait");
 
 	private String property;
 	private String xmlElement;

@@ -134,6 +134,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 */
 	private Boolean noStart;
 
+	/**
+	 * Wait for the instance of the application to start
+	 *
+	 * @parameter expression="${cf.wait}"
+	 */
+	private Boolean wait;
+
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	/**
@@ -494,6 +501,27 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return DefaultConstants.NO_START;
 		} else {
 			return this.noStart;
+		}
+	}
+
+	/**
+	 * If true, this property specifies that the execution process will block
+	 * until application instance finish ramping up. If not set, this property
+	 * defaults to <code>false</code>
+	 *
+	 * @return Never null
+	 */
+	public Boolean isWait() {
+		final String urlProperty = getCommandlineProperty(SystemProperties.WAIT);
+
+		if (urlProperty != null) {
+			return Boolean.valueOf(urlProperty);
+		}
+
+		if (this.wait == null) {
+			return DefaultConstants.WAIT;
+		} else {
+			return this.wait;
 		}
 	}
 
