@@ -22,6 +22,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.cloudfoundry.client.lib.util.StringHttpMessageConverterWithoutMediaType;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
@@ -81,10 +82,11 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 	private OauthClient oauthClient;
 
 	public CloudControllerClientV1(URL cloudControllerUrl,
-								   HttpProxyConfiguration httpProxyConfiguration,
+								   RestUtil restUtil,
 								   CloudCredentials cloudCredentials,
-								   URL authorizationUrl) {
-		super(cloudControllerUrl, httpProxyConfiguration, cloudCredentials, authorizationUrl);
+								   URL authorizationEndpoint,
+								   HttpProxyConfiguration httpProxyConfiguration) {
+		super(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, httpProxyConfiguration);
 		initializeOauthClient(httpProxyConfiguration);
 	}
 
@@ -482,7 +484,7 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	private void initializeOauthClient(HttpProxyConfiguration httpProxyConfiguration) {
 		if (authorizationEndpoint != null) {
-			this.oauthClient = new OauthClient(authorizationEndpoint, httpProxyConfiguration);
+			this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
 		}
 	}
 

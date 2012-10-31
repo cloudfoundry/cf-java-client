@@ -210,6 +210,9 @@ public class CloudEntityResourceMapper {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getEntityAttribute(Map<String, Object> resource, String attributeName, Class<T> targetClass) {
+		if (resource == null) {
+			return null;
+		}
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		if (targetClass == String.class) {
 			return (T) String.valueOf(entity.get(attributeName));

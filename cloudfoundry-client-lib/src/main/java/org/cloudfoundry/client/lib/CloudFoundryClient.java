@@ -35,6 +35,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.util.Assert;
 
 /**
@@ -84,7 +85,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 							  HttpProxyConfiguration httpProxyConfiguration, CloudSpace sessionSpace) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
 		CloudControllerClientFactory cloudControllerClientFactory =
-				new CloudControllerClientFactory(httpProxyConfiguration);
+				new CloudControllerClientFactory(new RestUtil(), httpProxyConfiguration);
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
     }
 

@@ -43,6 +43,7 @@ import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -96,12 +97,13 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
 
 	public CloudControllerClientV2(URL cloudControllerUrl,
-								   HttpProxyConfiguration httpProxyConfiguration,
+								   RestUtil restUtil,
 								   CloudCredentials cloudCredentials,
 								   URL authorizationEndpoint,
-								   CloudSpace sessionSpace) {
-		super(cloudControllerUrl, httpProxyConfiguration, cloudCredentials, authorizationEndpoint);
-		this.oauthClient = new OauthClient(authorizationEndpoint, httpProxyConfiguration);
+								   CloudSpace sessionSpace,
+								   HttpProxyConfiguration httpProxyConfiguration) {
+		super(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, httpProxyConfiguration);
+		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
 		this.sessionSpace = sessionSpace;
 	}
 

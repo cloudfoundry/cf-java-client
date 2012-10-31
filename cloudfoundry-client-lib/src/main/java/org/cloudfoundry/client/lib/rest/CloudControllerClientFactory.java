@@ -22,7 +22,6 @@ import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -39,6 +38,8 @@ import java.util.Map;
  */
 public class CloudControllerClientFactory {
 
+	protected RestUtil restUtil;
+
 	protected HttpProxyConfiguration httpProxyConfiguration;
 
 	protected RestTemplate restTemplate;
@@ -47,9 +48,15 @@ public class CloudControllerClientFactory {
 
 	private final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
 
-	public CloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration) {
+	public CloudControllerClientFactory(RestUtil restUtil, HttpProxyConfiguration httpProxyConfiguration) {
+		if (restUtil == null) {
+			this.restUtil = new RestUtil();
+		} else {
+			this.restUtil = restUtil;
+		}
+		this.restUtil = restUtil;
 		this.httpProxyConfiguration = httpProxyConfiguration;
-		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
+		this.restTemplate = restUtil.createRestTemplate(httpProxyConfiguration);
 		this.objectMapper = new ObjectMapper();
 	}
 
@@ -64,17 +71,18 @@ public class CloudControllerClientFactory {
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
 		boolean v2 = isV2(infoMap);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap);
+
 		if (v2) {
-			cc = new CloudControllerClientV2(cloudControllerUrl, httpProxyConfiguration, cloudCredentials,
-					authorizationEndpoint, sessionSpace);
+			cc = new CloudControllerClientV2(cloudControllerUrl, restUtil, cloudCredentials,
+					authorizationEndpoint, sessionSpace, httpProxyConfiguration);
 		}
 		else {
 			if (sessionSpace != null) {
 				throw new UnsupportedOperationException(
 						"Spaces are not supported for the version of Cloud Controller you are accessing");
 			}
-			cc = new CloudControllerClientV1(cloudControllerUrl, httpProxyConfiguration, cloudCredentials,
-					authorizationEndpoint);
+			cc = new CloudControllerClientV1(cloudControllerUrl, restUtil, cloudCredentials,
+					authorizationEndpoint, httpProxyConfiguration);
 		}
 		return cc;
 	}

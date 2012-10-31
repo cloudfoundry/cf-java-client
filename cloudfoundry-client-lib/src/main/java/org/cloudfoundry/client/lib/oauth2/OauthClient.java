@@ -54,9 +54,9 @@ public class OauthClient {
 
 	private RestTemplate restTemplate;
 
-	public OauthClient(URL authorizationUrl, HttpProxyConfiguration httpProxyConfiguration) {
+	public OauthClient(URL authorizationUrl, RestTemplate restTemplate) {
 		this.authorizationUrl = authorizationUrl;
-		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
+		this.restTemplate = restTemplate;
 	}
 
 	public OAuth2AccessToken getToken(String username, String password) {

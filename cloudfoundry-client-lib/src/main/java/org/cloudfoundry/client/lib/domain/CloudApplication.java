@@ -61,7 +61,7 @@ public class CloudApplication extends CloudEntity {
 						int memory, int instances,
 						List<String> uris, List<String> serviceNames,
 						AppState state) {
-		super(CloudEntity.Meta.defaultV1Meta(), name);
+		super(CloudEntity.Meta.defaultMeta(), name);
 		this.staging = new Staging(stagingStack, stagingModel);
 		this.resources.put(MEMORY_KEY, memory);
 		this.instances = instances;
@@ -72,7 +72,7 @@ public class CloudApplication extends CloudEntity {
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication(Map<String, Object> attributes) {
-		super(CloudEntity.Meta.defaultV1Meta(), parse(attributes.get("name")));
+		super(CloudEntity.Meta.defaultMeta(), parse(attributes.get("name")));
 		Map<String, String> stagingMap = (Map<String, String>) attributes.get("staging");
 		if (stagingMap != null) {
 			if (stagingMap.containsKey(V1_RUNTIME_KEY) && stagingMap.containsKey(V1_FRAMEWORK_KEY)) {

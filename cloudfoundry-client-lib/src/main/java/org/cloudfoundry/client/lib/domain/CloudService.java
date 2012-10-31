@@ -67,7 +67,7 @@ public class CloudService extends CloudEntity {
 	 * @param servicesAsMap
 	 */
 	public CloudService(Map<String, Object> servicesAsMap) {
-		super(CloudEntity.Meta.defaultV1Meta(), parse(servicesAsMap.get("name")));
+		super(CloudEntity.Meta.defaultMeta(), parse(servicesAsMap.get("name")));
 		type = parse(servicesAsMap.get("type"));
 		vendor = parse(servicesAsMap.get("vendor"));
 		version = parse(servicesAsMap.get("version"));

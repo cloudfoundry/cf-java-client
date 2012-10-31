@@ -51,6 +51,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -93,26 +94,48 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	private URL cloudControllerUrl;
 
+	protected RestUtil restUtil;
+
 	protected CloudCredentials cloudCredentials;
 
 	protected URL authorizationEndpoint;
 
 	protected String token;
 
-	public AbstractCloudControllerClient(URL cloudControllerUrl, HttpProxyConfiguration httpProxyConfiguration,
-										 CloudCredentials cloudCredentials, URL authorizationEndpoint) {
+	public AbstractCloudControllerClient(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
+										 URL authorizationEndpoint, HttpProxyConfiguration httpProxyConfiguration) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
+		Assert.notNull(restUtil, "RestUtil cannot be null");
+		this.restUtil = restUtil;
 		this.cloudCredentials = cloudCredentials;
 		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
 			this.token = cloudCredentials.getToken();
 		}
 		this.cloudControllerUrl = cloudControllerUrl;
-		this.authorizationEndpoint = authorizationEndpoint;
-		this.restTemplate = RestUtil.createRestTemplate(httpProxyConfiguration);
+		if (authorizationEndpoint != null) {
+			this.authorizationEndpoint = determineAuthorizationEndPointToUse(authorizationEndpoint, cloudControllerUrl);
+		} else {
+			this.authorizationEndpoint = null;
+		}
+		this.restTemplate = restUtil.createRestTemplate(httpProxyConfiguration);
 		configureCloudFoundryRequestFactory(restTemplate);
 
 		this.restTemplate.setErrorHandler(new ErrorHandler());
 		this.restTemplate.setMessageConverters(getHttpMessageConverters());
+	}
+
+	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
+		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
+			try {
+				URL newUrl = new URL("http", authorizationEndpoint.getHost(), authorizationEndpoint.getPort(),
+						authorizationEndpoint.getFile());
+				return newUrl;
+			} catch (MalformedURLException e) {
+				// this shouldn't happen
+				return authorizationEndpoint;
+			}
+		}
+		return authorizationEndpoint;
 	}
 
 	public URL getCloudControllerUrl() {
@@ -154,7 +177,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	}
 
 	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
-		ClientHttpRequestFactory requestFactory = RestUtil.createRequestFactory(httpProxyConfiguration);
+		ClientHttpRequestFactory requestFactory = restUtil.createRequestFactory(httpProxyConfiguration);
 		restTemplate.setRequestFactory(requestFactory);
 		configureCloudFoundryRequestFactory(restTemplate);
 	}

@@ -935,7 +935,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertNotNull(appUris);
 		assertEquals(uris.size(), appUris.size());
 		for (String uri : uris) {
-			assertTrue(appUris.contains(uri));
+			assertTrue("Missing URI: " + uri, appUris.contains(uri));
 		}
 		spaceClient.deleteApplication(appName);
 	}
@@ -1001,7 +1001,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	}
 
 	private void createMySqlService(String serviceName) {
-		CloudService service = new CloudService(CloudEntity.Meta.defaultV2Meta(), serviceName);
+		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
 		service.setType("database");
 		service.setVersion("5.1");
 		service.setProvider("core");

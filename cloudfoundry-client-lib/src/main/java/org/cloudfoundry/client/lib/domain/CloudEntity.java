@@ -35,14 +35,11 @@ public class CloudEntity {
 	}
 
 	public CloudEntity(Meta meta, String name) {
-		// This constructor should be used by any V2 entities.
-		// For V1 entities pass in a null meta parameter and it will be set
-		// to V1 default value.
 		if (meta != null) {
 			this.meta = meta;
 		}
 		else {
-			this.meta = Meta.defaultV1Meta();
+			this.meta = Meta.defaultMeta();
 		}
 		this.name = name;
 	}
@@ -98,12 +95,8 @@ public class CloudEntity {
 			return version;
 		}
 
-		public static Meta defaultV1Meta() {
-			return new Meta(null, null, null, 1);
-		}
-
-		public static Meta defaultV2Meta() {
-			return new Meta(null, null, null, 2);
+		public static Meta defaultMeta() {
+			return new Meta(null, null, null, 0);
 		}
 	}
 }
