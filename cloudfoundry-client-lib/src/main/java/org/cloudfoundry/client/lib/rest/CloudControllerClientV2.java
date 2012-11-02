@@ -303,6 +303,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
 		Map<String, Object> resource = findApplicationResource(appName, 2);
+		if (resource == null) {
+			throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Not Found", "Application not found");
+		}
 		CloudApplication cloudApp = mapCloudApplication(resource);
 		return cloudApp;
 	}
@@ -740,7 +743,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		Map<String, String> envHash = new HashMap<String, String>();
 		for (String s : env) {
 			if (!s.contains("=")) {
-				throw new IllegalArgumentException("Environment setting without an '=' sign encountered: " + s);
+				throw new IllegalArgumentException("Environment setting without '=' is invalid: " + s);
 			}
 			String key = s.substring(0, s.indexOf('=')).trim();
 			String value = s.substring(s.indexOf('=') + 1).trim();

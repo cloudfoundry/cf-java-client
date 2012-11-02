@@ -33,6 +33,17 @@ public class CloudFoundryException extends HttpClientErrorException {
 		super(statusCode, statusText);
 	}
 
+	/**
+	 * Construct a new instance of {@code CloudFoundryException} based on a {@link HttpStatus}, status text and description.
+	 * @param statusCode the status code
+	 * @param statusText the status text
+	 * @param description the description
+	 */
+	public CloudFoundryException(HttpStatus statusCode, String statusText, String description) {
+		super(statusCode, statusText);
+		this.description = description;
+	}
+
 	public String getDescription() {
 		return description;
 	}

@@ -198,8 +198,7 @@ public class CloudEntityResourceMapper {
 				updatedDate = dateFormatter.parse(updated);
 			} catch (Exception ignore) {}
 		}
-		int version = 2; // this is always 2 for v2
-		CloudEntity.Meta meta = new CloudEntity.Meta(guid, createdDate, updatedDate, version);
+		CloudEntity.Meta meta = new CloudEntity.Meta(guid, createdDate, updatedDate);
 		return meta;
 	}
 

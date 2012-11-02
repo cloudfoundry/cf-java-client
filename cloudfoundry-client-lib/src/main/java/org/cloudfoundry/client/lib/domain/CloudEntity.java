@@ -62,7 +62,9 @@ public class CloudEntity {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": (" + (meta == null ? "v1" : meta.getGuid()) + ") " + getName();
+		return this.getClass().getSimpleName() + ": (" +
+				(meta == null || meta.getGuid() == null ? "v1" : meta.getGuid()) + ") " +
+				getName();
 	}
 
 	public static class Meta {
@@ -70,13 +72,11 @@ public class CloudEntity {
 		private UUID guid;
 		private Date created;
 		private Date updated;
-		private int version;
 
-		public Meta(UUID guid, Date created, Date updated, int version) {
+		public Meta(UUID guid, Date created, Date updated) {
 			this.guid = guid;
 			this.created = created;
 			this.updated = updated;
-			this.version = version;
 		}
 
 		public UUID getGuid() {
@@ -91,12 +91,8 @@ public class CloudEntity {
 			return updated;
 		}
 
-		public int getVersion() {
-			return version;
-		}
-
 		public static Meta defaultMeta() {
-			return new Meta(null, null, null, 0);
+			return new Meta(null, null, null);
 		}
 	}
 }

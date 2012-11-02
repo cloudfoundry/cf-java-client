@@ -156,7 +156,7 @@ public class ServiceConfiguration {
 	 * @param attributes
 	 */
 	public ServiceConfiguration(Map<String, Object> attributes) {
-		this.meta = new CloudEntity.Meta(null, null, null, 1);
+		this.meta = new CloudEntity.Meta(null, null, null);
 		type = CloudUtil.parse(attributes.get("type"));
 		version = CloudUtil.parse(attributes.get("version"));
 		vendor = CloudUtil.parse(attributes.get("vendor"));

@@ -102,13 +102,12 @@ public class CloudApplication extends CloudEntity {
 				debug = DebugMode.valueOf(debugAttribute);
 			}
 			long created = parse(Long.class, metaValue.get("created"));
-			int version = parse(Integer.class, metaValue.get("version"));
 			Meta meta = null;
 			if (created != 0) {
-				meta = new Meta(null, new Date(created * 1000), null, version);
+				meta = new Meta(null, new Date(created * 1000), null);
 			}
 			else {
-				meta = new Meta(null, null, null, version);
+				meta = new Meta(null, null, null);
 			}
 			setMeta(meta);
 			if (metaValue.containsKey(COMMAND_KEY)) {
@@ -220,6 +219,11 @@ public class CloudApplication extends CloudEntity {
 	}
 
 	public void setEnv(List<String> env) {
+		for (String s : env) {
+			if (!s.contains("=")) {
+				throw new IllegalArgumentException("Environment setting without '=' is invalid: " + s);
+			}
+		}
 		this.env = env;
 	}
 

@@ -89,13 +89,12 @@ public class CloudService extends CloudEntity {
 				servicesAsMap.get("meta"));
 		if (metaValue != null) {
 			long created = parse(Long.class, metaValue.get("created"));
-			int version = parse(Integer.class, metaValue.get("version"));
 			Meta meta = null;
 			if (created != 0) {
-				meta = new Meta(null, new Date(created * 1000), null, version);
+				meta = new Meta(null, new Date(created * 1000), null);
 			}
 			else {
-				meta = new Meta(null, null, null, version);
+				meta = new Meta(null, null, null);
 			}
 			setMeta(meta);
 		}
