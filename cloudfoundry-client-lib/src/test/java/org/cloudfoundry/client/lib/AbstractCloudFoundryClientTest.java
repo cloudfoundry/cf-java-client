@@ -11,6 +11,7 @@ import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.util.RestUtil;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
@@ -621,6 +624,25 @@ public abstract class AbstractCloudFoundryClientTest {
 		}
 		app = getConnectedClient().getApplication(appName);
 		assertEquals(2, app.getRunningInstances());
+	}
+
+	@Test
+	public void accessRandomApplicationUrl() throws Exception {
+		String appName = UUID.randomUUID().toString();
+		createAndUploadAndStartSimpleSpringApp(appName);
+		CloudApplication app = getConnectedClient().getApplication(appName);
+		getConnectedClient().startApplication(appName);
+		assertEquals(1, app.getInstances());
+		for (int i = 0; i < 10 && app.getRunningInstances() < 1; i++) {
+			Thread.sleep(1000);
+			app = getConnectedClient().getApplication(appName);
+		}
+		app = getConnectedClient().getApplication(appName);
+		assertEquals(1, app.getRunningInstances());
+		RestUtil restUtil = new RestUtil();
+		RestTemplate rest = restUtil.createRestTemplate(null);
+		String results = rest.getForObject("http://" + app.getUris().get(0), String.class);
+		assertTrue(results.contains("Hello world!"));
 	}
 
 	@Test

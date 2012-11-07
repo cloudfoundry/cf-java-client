@@ -546,7 +546,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		HashMap<String, Object> routeRequest = new HashMap<String, Object>();
 		routeRequest.put("host", host);
 		routeRequest.put("domain_guid", domainGuid);
-		routeRequest.put("organization_guid", sessionSpace.getOrganization().getMeta().getGuid());
+		routeRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		String routeResp = getRestTemplate().postForObject(getUrl("/v2/routes"), routeRequest, String.class);
 		Map<String, Object> routeEntity = JsonUtil.convertJsonToMap(routeResp);
 		UUID newRouteGuid = CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
