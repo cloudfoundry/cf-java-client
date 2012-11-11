@@ -23,7 +23,9 @@ import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
@@ -136,6 +138,26 @@ public interface CloudControllerClient {
 	CrashesInfo getCrashes(String appName);
 
 	void rename(String appName, String newName);
+
+	// Domains and routes management
+
+	List<CloudDomain> getDomainsForOrg();
+
+	List<CloudDomain> getDomains();
+
+	void addDomain(String domainName);
+
+	void deleteDomain(String domainName);
+
+	void removeDomain(String domainName);
+
+	List<CloudRoute> getRoutes(String domainName);
+
+	void addRoute(String host, String domainName);
+
+	void deleteRoute(String host, String domainName);
+
+	// Misc. utility methods
 
 	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
 

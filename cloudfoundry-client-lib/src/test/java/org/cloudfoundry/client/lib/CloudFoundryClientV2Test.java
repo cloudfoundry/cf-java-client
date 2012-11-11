@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.junit.After;
@@ -34,7 +36,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.fail;
@@ -70,6 +74,8 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
 			defaultNamespace(CCNG_USER_EMAIL));
 
+	private static final  String TEST_DOMAIN = "mytest.springdeveloper.com";
+
 	@BeforeClass
 	public static void printTargetInfo() {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
@@ -88,12 +94,14 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		connectedClient = setTestSpaceAsDefault(authenticatedClient);
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
+		clearTestDomainAndRoutes();
 	}
 
 	@After
 	public void tearDown() {
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
+		clearTestDomainAndRoutes();
 	}
 
 	@Test
@@ -178,6 +186,111 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 			assertTrue("Missing URI: " + uri, appUris.contains(uri));
 		}
 		connectedClient.deleteApplication(appName);
+	}
+
+	@Test
+	public void manageDomainsAndRoutes() throws IOException {
+		// Test that default domain is found
+		List<CloudDomain> allDomains = getConnectedClient().getDomainsForOrg();
+		CloudDomain defaultDomain = getDefaultDomain(allDomains);
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNull(getDomainNamed(TEST_DOMAIN, allDomains));
+
+		// Test adding test domain - should be there for org and space
+		getConnectedClient().addDomain(TEST_DOMAIN);
+		allDomains = getConnectedClient().getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
+		List<CloudDomain> spaceDomains = getConnectedClient().getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
+
+		// Test removing test domain from space
+		getConnectedClient().removeDomain(TEST_DOMAIN);
+		allDomains = getConnectedClient().getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
+		spaceDomains = getConnectedClient().getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
+
+		// Test accessing/adding/deleting routes
+		getConnectedClient().addDomain(TEST_DOMAIN);
+		getConnectedClient().addRoute("my_route1", TEST_DOMAIN);
+		getConnectedClient().addRoute("my_route2", TEST_DOMAIN);
+		List<CloudRoute> routes = getConnectedClient().getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route2", routes));
+		getConnectedClient().deleteRoute("my_route2", TEST_DOMAIN);
+		routes = getConnectedClient().getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNull(getRouteWithHost("my_route2", routes));
+
+		// Test that apps with route are counted
+		String appName = namespacedAppName("my_route3");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		List<String> uris = app.getUris();
+		uris.add("my_route3." + TEST_DOMAIN);
+		getConnectedClient().updateApplicationUris(appName, uris);
+		routes = getConnectedClient().getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route3", routes));
+		assertEquals(0, getRouteWithHost("my_route1", routes).getAppsUsingRoute());
+		assertFalse(getRouteWithHost("my_route1", routes).inUse());
+		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost("my_route3", routes).inUse());
+		List<CloudRoute> defaultDomainRoutes = getConnectedClient().getRoutes(defaultDomain.getName());
+		assertNotNull(getRouteWithHost(appName, defaultDomainRoutes));
+		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
+
+		// test that removing domain that has routes throws exception
+		try {
+			getConnectedClient().deleteDomain(TEST_DOMAIN);
+			fail("should have thrown exception");
+		}
+		catch (IllegalStateException ex) {
+			assertTrue(ex.getMessage().contains("in use"));
+		}
+	}
+
+	private void clearTestDomainAndRoutes() {
+		for (CloudDomain domain : getConnectedClient().getDomainsForOrg()) {
+			if (domain.getName().equals(TEST_DOMAIN)) {
+				List<CloudRoute> routes = getConnectedClient().getRoutes(TEST_DOMAIN);
+				for (CloudRoute route : routes) {
+					connectedClient.deleteRoute(route.getHost(), route.getDomain().getName());
+				}
+				getConnectedClient().deleteDomain(TEST_DOMAIN);
+			}
+		}
+	}
+
+	private CloudRoute getRouteWithHost(String hostName, List<CloudRoute> routes) {
+		for (CloudRoute route : routes) {
+			if (route.getHost().equals(hostName)) {
+				return route;
+			}
+		}
+		return null;
+	}
+
+	private CloudDomain getDomainNamed(String domainName, List<CloudDomain> domains) {
+		for (CloudDomain domain : domains) {
+			if (domain.getName().equals(domainName)) {
+				return domain;
+			}
+		}
+		return null;
+	}
+
+	private CloudDomain getDefaultDomain(List<CloudDomain> domains) {
+		for (CloudDomain domain : domains) {
+			if (domain.getOwner().getName().equals("none")) {
+				return domain;
+			}
+		}
+		return null;
 	}
 
 	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {

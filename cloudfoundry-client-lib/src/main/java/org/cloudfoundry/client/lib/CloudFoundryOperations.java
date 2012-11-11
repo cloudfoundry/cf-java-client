@@ -19,7 +19,9 @@ package org.cloudfoundry.client.lib;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
@@ -464,6 +466,68 @@ public interface CloudFoundryOperations {
 	 * @param newName the new name
 	 */
 	void rename(String appName, String newName);
+
+	/**
+	 * Get list of all domain registered for the current organization
+	 * of this session.
+	 *
+	 * @return list of domains
+	 */
+	List<CloudDomain> getDomainsForOrg();
+
+	/**
+	 * Get list of all domain registered for the given space.
+	 *
+	 * @return list of domains
+	 */
+	List<CloudDomain> getDomains();
+
+	/**
+	 * Add domain to the current space of this session. If the domain
+	 * doesn't exist for the organization it will be created.
+	 *
+	 * @param domainName the domain to add
+	 */
+	void addDomain(String domainName);
+
+	/**
+	 * Remove a domain from the space of the current session.
+	 *
+	 * @param domainName the domain to delete
+	 */
+	void removeDomain(String domainName);
+
+	/**
+	 * Delete a domain registered to the current organization of this session.
+	 *
+	 * @param domainName the domain to delete
+	 */
+	void deleteDomain(String domainName);
+
+	/**
+	 * Get the info for all routes for a domain belonging to the current space
+	 * of this session.
+	 *
+	 * @param domainName the domain the routes belong to
+	 * @return list of routes
+	 */
+	List<CloudRoute> getRoutes(String domainName);
+
+	/**
+	 * Register a new route to the space of the current session.
+	 *
+	 * @param host the host of the route to register
+	 * @param domainName the domain of the route to register
+	 */
+	void addRoute(String host, String domainName);
+
+	/**
+	 * Delete a registered route from the space of the current session.
+	 *
+	 * @param host the host of the route to delete
+	 * @param domainName the domain of the route to delete
+	 */
+	void deleteRoute(String host, String domainName);
 
 	/**
 	 * Update http proxy configuration settings.
