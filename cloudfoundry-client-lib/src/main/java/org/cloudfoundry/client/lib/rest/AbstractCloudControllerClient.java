@@ -20,6 +20,8 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
@@ -188,6 +190,45 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String getUrl(String path) {
 		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
+	}
+
+	public List<CloudDomain> getDomainsForOrg() {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public List<CloudDomain> getDomains() {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public void addDomain(String domainName) {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public void deleteDomain(String domainName) {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public void removeDomain(String domainName) {
+		// subclasses that support this feature must override this
+	}
+
+	public List<CloudRoute> getRoutes(String domainName) {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public void addRoute(String host, String domainName) {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
+	}
+
+	public void deleteRoute(String host, String domainName) {
+		// subclasses that support this feature must override this
+		throw new UnsupportedOperationException("Feature is not implemented for this version.");
 	}
 
 	public void registerRestLogListener(RestLogCallback callBack) {

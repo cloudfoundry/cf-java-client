@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.lib;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.junit.After;
@@ -34,7 +36,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.fail;
@@ -178,6 +182,120 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 			assertTrue("Missing URI: " + uri, appUris.contains(uri));
 		}
 		connectedClient.deleteApplication(appName);
+	}
+
+	@Test
+	public void manageDomainsAndRoutes() throws IOException {
+
+		String testDomain = "mytest.springdeveloper.com";
+
+		// clean slate
+		for (CloudDomain domain : getConnectedClient().getDomainsForOrg()) {
+			if (domain.getName().equals(testDomain)) {
+				List<CloudRoute> routes = getConnectedClient().getRoutes(testDomain);
+				for (CloudRoute route : routes) {
+					connectedClient.deleteRoute(route.getHost(), route.getDomain().getName());
+				}
+				getConnectedClient().deleteDomain(testDomain);
+			}
+		}
+
+		// Test that default domain is found
+		List<CloudDomain> allDomains = getConnectedClient().getDomainsForOrg();
+		CloudDomain defaultDomain = getDefaultDomain(allDomains);
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNull(getDomainNamed(testDomain, allDomains));
+
+		// Test adding test domain - should be ther for org and space
+		getConnectedClient().addDomain(testDomain);
+		allDomains = getConnectedClient().getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(testDomain, allDomains));
+		List<CloudDomain> spaceDomains = getConnectedClient().getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNotNull(getDomainNamed(testDomain, spaceDomains));
+
+		// Test removing test domain from space
+		getConnectedClient().removeDomain(testDomain);
+		allDomains = getConnectedClient().getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(testDomain, allDomains));
+		spaceDomains = getConnectedClient().getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNull(getDomainNamed(testDomain, spaceDomains));
+
+		// Test accessing/adding/deleting routes
+		getConnectedClient().addDomain(testDomain);
+		getConnectedClient().addRoute("my_route1", testDomain);
+		getConnectedClient().addRoute("my_route2", testDomain);
+		List<CloudRoute> routes = getConnectedClient().getRoutes(testDomain);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route2", routes));
+		getConnectedClient().deleteRoute("my_route2", testDomain);
+		routes = getConnectedClient().getRoutes(testDomain);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNull(getRouteWithHost("my_route2", routes));
+
+		// Test that apps with route are counted
+		String appName = namespacedAppName("my_route3");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		List<String> uris = app.getUris();
+		uris.add("my_route3." + testDomain);
+		getConnectedClient().updateApplicationUris(appName, uris);
+		routes = getConnectedClient().getRoutes(testDomain);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route3", routes));
+		assertEquals(0, getRouteWithHost("my_route1", routes).getAppsUsingRoute());
+		assertFalse(getRouteWithHost("my_route1", routes).inUse());
+		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost("my_route3", routes).inUse());
+		List<CloudRoute> defaultDomainRoutes = getConnectedClient().getRoutes(defaultDomain.getName());
+		assertNotNull(getRouteWithHost(appName, defaultDomainRoutes));
+		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
+
+		// test that removing domain that has routes throws exception
+		try {
+			getConnectedClient().deleteDomain(testDomain);
+			fail("should have thrown exception");
+		}
+		catch (IllegalStateException ex) {
+			assertTrue(ex.getMessage().contains("in use"));
+		}
+
+		// remove all test domains/routes
+		getConnectedClient().deleteApplication(appName);
+		getConnectedClient().deleteRoute(appName, defaultDomain.getName());
+		getConnectedClient().deleteRoute("my_route1", testDomain);
+		getConnectedClient().deleteRoute("my_route3", testDomain);
+		getConnectedClient().deleteDomain(testDomain);
+	}
+
+	private CloudRoute getRouteWithHost(String hostName, List<CloudRoute> routes) {
+		for (CloudRoute route : routes) {
+			if (route.getHost().equals(hostName)) {
+				return route;
+			}
+		}
+		return null;
+	}
+
+	private CloudDomain getDomainNamed(String domainName, List<CloudDomain> domains) {
+		for (CloudDomain domain : domains) {
+			if (domain.getName().equals(domainName)) {
+				return domain;
+			}
+		}
+		return null;
+	}
+
+	private CloudDomain getDefaultDomain(List<CloudDomain> domains) {
+		for (CloudDomain domain : domains) {
+			if (domain.getOwner().getName().equals("none")) {
+				return domain;
+			}
+		}
+		return null;
 	}
 
 	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {
