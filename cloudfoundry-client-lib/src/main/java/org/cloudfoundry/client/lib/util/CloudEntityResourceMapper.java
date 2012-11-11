@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.lib.util;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
@@ -57,6 +59,15 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudSpace.class) {
 			return (T) mapSpaceResource(resource);
 		}
+		if (targetClass == CloudOrganization.class) {
+			return (T) mapOrganizationResource(resource);
+		}
+		if (targetClass == CloudDomain.class) {
+			return (T) mapDomainResource(resource);
+		}
+		if (targetClass == CloudRoute.class) {
+			return (T) mapRouteResource(resource);
+		}
 		if (targetClass == CloudApplication.class) {
 			return (T) mapApplicationResource(resource);
 		}
@@ -84,6 +95,27 @@ public class CloudEntityResourceMapper {
 	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {
 		CloudOrganization org = new CloudOrganization(getMeta(resource), getNameOfResource(resource));
 		return org;
+	}
+
+	private CloudDomain mapDomainResource(Map<String, Object> resource) {
+		Map<String, Object> ownerResource = getEntityAttribute(resource, "owning_organization", Map.class);
+		CloudOrganization owner;
+		if (ownerResource == null) {
+			owner = new CloudOrganization(CloudEntity.Meta.defaultMeta(), "none");
+		} else {
+			owner = mapOrganizationResource(ownerResource);
+		}
+		CloudDomain domain = new CloudDomain(getMeta(resource), getNameOfResource(resource), owner);
+		return domain;
+	}
+
+	private CloudRoute mapRouteResource(Map<String, Object> resource) {
+		List<Object> apps = getEntityAttribute(resource, "apps", List.class);
+		String host = getEntityAttribute(resource, "host", String.class);
+		CloudDomain domain = mapDomainResource(getEmbeddedResource(resource, "domain"));
+		CloudRoute route = new CloudRoute(getMeta(resource), host, domain, apps.size());
+		return route;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -224,6 +256,14 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == List.class) {
 			return (T) entity.get(attributeName);
+		}
+		if (targetClass == UUID.class) {
+			Object value = entity.get(attributeName);
+			if (value != null && value instanceof String) {
+				return (T) UUID.fromString((String)value);
+			} else {
+				return null;
+			}
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for attribute mapping " + targetClass.getName());

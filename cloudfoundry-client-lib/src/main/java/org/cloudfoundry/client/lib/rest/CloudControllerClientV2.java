@@ -25,9 +25,11 @@ import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
@@ -441,7 +443,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void addUris(List<String> uris, UUID appGuid) {
-		Map<String, UUID> domains = getDomains();
+		Map<String, UUID> domains = getDomainGuids();
 		for (String uri : uris) {
 			UUID domainGuid = null;
 			Map<String, String> uriInfo = new HashMap<String, String>(2);
@@ -452,7 +454,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void removeUris(List<String> uris, UUID appGuid) {
-		Map<String, UUID> domains = getDomains();
+		Map<String, UUID> domains = getDomainGuids();
 		for (String uri : uris) {
 			UUID domainGuid = null;
 			Map<String, String> uriInfo = new HashMap<String, String>(2);
@@ -483,7 +485,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 	}
 
-	private Map<String, UUID> getDomains() {
+	private Map<String, UUID> getDomainGuids() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
 		if (sessionSpace != null) {
@@ -502,10 +504,28 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return domains;
 	}
 
+	private UUID getDomainGuid(String domainName, boolean required) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+		String domainPath = urlPath + "/domains?inline-relations-depth={depth}&q=name:{name}";
+		urlVars.put("depth", 1);
+		urlVars.put("name", domainName);
+		List<Map<String, Object>> resourceList = getAllResources(domainPath, urlVars);
+		UUID domainGuid = null;
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			domainGuid = resourceMapper.getGuidOfResource(resource);
+		}
+		if (domainGuid == null && required) {
+			throw new IllegalArgumentException("Domain '" + domainName + "' not found.");
+		}
+		return domainGuid;
+	}
+
 	private void bindRoute(String host, UUID domainGuid, UUID appGuid) {
-		UUID routeGuid = getRouteGuid(host);
+		UUID routeGuid = getRouteGuid(host, domainGuid);
 		if (routeGuid == null) {
-			routeGuid = addRoute(host, domainGuid);
+			routeGuid = doAddRoute(host, domainGuid);
 		}
 		String bindPath = "/v2/apps/{app}/routes/{route}";
 		Map<String, Object> bindVars = new HashMap<String, Object>();
@@ -516,7 +536,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void unbindRoute(String host, UUID domainGuid, UUID appGuid) {
-		UUID routeGuid = getRouteGuid(host);
+		UUID routeGuid = getRouteGuid(host, domainGuid);
 		if (routeGuid != null) {
 			String bindPath = "/v2/apps/{app}/routes/{route}";
 			Map<String, Object> bindVars = new HashMap<String, Object>();
@@ -526,21 +546,26 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 	}
 
-	private UUID getRouteGuid(String host) {
+	private UUID getRouteGuid(String host, UUID domainGuid) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String routePath = "/v2/routes?inline-relations-depth={depth}&q=host:{host}";
+		String urlPath = "/v2";
+		urlPath = urlPath + "/routes?inline-relations-depth={depth}&q=host:{host}";
 		urlVars.put("depth", 0);
 		urlVars.put("host", host);
-		List<Map<String, Object>> routes = getAllResources(routePath, urlVars);
+		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
 		UUID routeGuid = null;
-		if (routes.size() > 0) {
-			Map<String, Object> r  = routes.get(0);
-			routeGuid = CloudEntityResourceMapper.getMeta(r).getGuid();
+		for (Map<String, Object> route : allRoutes) {
+			UUID routeSpace = CloudEntityResourceMapper.getEntityAttribute(route, "space_guid", UUID.class);
+			UUID routeDomain = CloudEntityResourceMapper.getEntityAttribute(route, "domain_guid", UUID.class);
+			if (sessionSpace.getMeta().getGuid().equals(routeSpace) &&
+					domainGuid.equals(routeDomain)) {
+				routeGuid = CloudEntityResourceMapper.getMeta(route).getGuid();
+			}
 		}
 		return routeGuid;
 	}
 
-	private UUID addRoute(String host, UUID domainGuid) {
+	private UUID doAddRoute(String host, UUID domainGuid) {
 		Assert.notNull(sessionSpace, "Unable to add route without specifying space to use.");
 
 		HashMap<String, Object> routeRequest = new HashMap<String, Object>();
@@ -802,6 +827,165 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("name", newName);
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
+	}
+
+	@Override
+	public List<CloudDomain> getDomainsForOrg() {
+		Assert.notNull(sessionSpace, "Unable to access organization domains without specifying organization and space to use.");
+		return doGetDomains(null);
+	}
+
+	@Override
+	public List<CloudDomain> getDomains() {
+		Assert.notNull(sessionSpace, "Unable to access domains for space without specifying organization and space to use.");
+		return doGetDomains(sessionSpace);
+	}
+
+	@Override
+	public void addDomain(String domainName) {
+		Assert.notNull(sessionSpace, "Unable to add domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, false);
+		if (domainGuid == null) {
+			domainGuid = doCreateDomain(domainName);
+		}
+		doAddDomain(domainGuid);
+	}
+
+	@Override
+	public void deleteDomain(String domainName) {
+		Assert.notNull(sessionSpace, "Unable to delete domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, true);
+		List<CloudRoute> routes = getRoutes(domainName);
+		if (routes.size() > 0) {
+			throw new IllegalStateException("Unable to remove domain that is in use --" +
+					" it has " + routes.size() + " routes.");
+		}
+		doDeleteDomain(domainGuid);
+	}
+
+	@Override
+	public void removeDomain(String domainName) {
+		Assert.notNull(sessionSpace, "Unable to remove domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, true);
+		doRemoveDomain(domainGuid);
+	}
+
+	@Override
+	public List<CloudRoute> getRoutes(String domainName) {
+		Assert.notNull(sessionSpace, "Unable to get routes for domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, true);
+		return doGetRoutes(domainGuid);
+	}
+
+	@Override
+	public void addRoute(String host, String domainName) {
+		Assert.notNull(sessionSpace, "Unable to add route for domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, true);
+		doAddRoute(host, domainGuid);
+	}
+
+	@Override
+	public void deleteRoute(String host, String domainName) {
+		Assert.notNull(sessionSpace, "Unable to delete route for domain without specifying organization and space to use.");
+		UUID domainGuid = getDomainGuid(domainName, true);
+		UUID routeGuid = getRouteGuid(host, domainGuid);
+		if (routeGuid == null) {
+			throw new IllegalArgumentException("Host '" + host + "' not found for domain '" + domainName + "'.");
+		}
+		doDeleteRoute(routeGuid);
+	}
+
+	private void doDeleteRoute(UUID routeGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/routes/{route}";
+		urlVars.put("route", routeGuid);
+		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	private List<CloudDomain> doGetDomains(CloudSpace space) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+		if (space != null) {
+			urlVars.put("space", space.getMeta().getGuid());
+			urlPath = urlPath + "/spaces/{space}";
+		}
+		urlPath = urlPath + "/domains?inline-relations-depth={depth}";
+		urlVars.put("depth", 2);
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		List<CloudDomain> domains = new ArrayList<CloudDomain>();
+		for (Map<String, Object> resource : resourceList) {
+			domains.add(resourceMapper.mapResource(resource, CloudDomain.class));
+		}
+		return domains;
+	}
+
+	private void doAddDomain(UUID domainGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+		if (sessionSpace != null) {
+			urlPath = urlPath + "/spaces/{space}";
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlVars.put("domain", domainGuid);
+		}
+		urlPath = urlPath + "/domains/{domain}";
+		HashMap<String, Object> request = new HashMap<String, Object>();
+		getRestTemplate().put(getUrl(urlPath), request, urlVars);
+	}
+
+	private UUID doCreateDomain(String domainName) {
+		String urlPath = "/v2/domains";
+		HashMap<String, Object> domainRequest = new HashMap<String, Object>();
+		domainRequest.put("owning_organization_guid", sessionSpace.getOrganization().getMeta().getGuid());
+		domainRequest.put("name", domainName);
+		domainRequest.put("wildcard", true);
+		String resp = getRestTemplate().postForObject(getUrl(urlPath), domainRequest, String.class);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
+		UUID domainGuid = resourceMapper.getGuidOfResource(respMap);
+		return domainGuid;
+	}
+
+	private void doDeleteDomain(UUID domainGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/domains/{domain}";
+		urlVars.put("domain", domainGuid);
+		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	private void doRemoveDomain(UUID domainGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+		if (sessionSpace != null) {
+			urlPath = urlPath + "/spaces/{space}";
+			urlVars.put("space", sessionSpace.getMeta().getGuid());
+			urlVars.put("domain", domainGuid);
+		}
+		urlPath = urlPath + "/domains/{domain}";
+		urlVars.put("domain", domainGuid);
+		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	private List<CloudRoute> doGetRoutes(UUID domainGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+//		TODO: NOT implemented ATM:
+//		if (sessionSpace != null) {
+//			urlVars.put("space", sessionSpace.getMeta().getGuid());
+//			urlPath = urlPath + "/spaces/{space}";
+//		}
+		urlPath = urlPath + "/routes?inline-relations-depth={depth}";
+		urlVars.put("depth", 1);
+		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
+		List<CloudRoute> routes = new ArrayList<CloudRoute>();
+		for (Map<String, Object> route : allRoutes) {
+//			TODO: move space_guid to path once implemented (see above):
+			UUID space = CloudEntityResourceMapper.getEntityAttribute(route, "space_guid", UUID.class);
+			UUID domain = CloudEntityResourceMapper.getEntityAttribute(route, "domain_guid", UUID.class);
+			if (sessionSpace.getMeta().getGuid().equals(space) && domainGuid.equals(domain)) {
+				//routes.add(CloudEntityResourceMapper.getEntityAttribute(route, "host", String.class));
+				routes.add(resourceMapper.mapResource(route, CloudRoute.class));
+			}
+		}
+		return routes;
 	}
 
 	private void doDeleteService(CloudService cloudService) {

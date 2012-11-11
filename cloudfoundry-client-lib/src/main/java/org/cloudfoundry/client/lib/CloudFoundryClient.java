@@ -25,6 +25,8 @@ import java.util.Map;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
@@ -315,6 +317,38 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void rename(String appName, String newName) {
 		cc.rename(appName, newName);
+	}
+
+	public List<CloudDomain> getDomainsForOrg() {
+		return cc.getDomainsForOrg();
+	}
+
+	public List<CloudDomain> getDomains() {
+		return cc.getDomains();
+	}
+
+	public void addDomain(String domainName) {
+		cc.addDomain(domainName);
+	}
+
+	public void deleteDomain(String domainName) {
+		cc.deleteDomain(domainName);
+	}
+
+	public void removeDomain(String domainName) {
+		cc.removeDomain(domainName);
+	}
+
+	public List<CloudRoute> getRoutes(String domainName) {
+		return cc.getRoutes(domainName);
+	}
+
+	public void addRoute(String host, String domainName) {
+		cc.addRoute(host, domainName);
+	}
+
+	public void deleteRoute(String host, String domainName) {
+		cc.deleteRoute(host, domainName);
 	}
 
 	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
