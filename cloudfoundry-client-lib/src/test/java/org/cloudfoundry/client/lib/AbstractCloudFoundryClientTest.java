@@ -5,6 +5,8 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CrashInfo;
+import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
@@ -574,13 +576,24 @@ public abstract class AbstractCloudFoundryClientTest {
 
 		assertEquals(1, app.getInstances());
 
+		boolean pass = getInstanceInfosWithTimeout(appName, 3, true);
+		assertTrue("Couldn't get the right application state in 50 tries", pass);
+
+		getConnectedClient().stopApplication(appName);
+		InstancesInfo instInfo = getConnectedClient().getApplicationInstances(appName);
+		assertEquals(0, instInfo.getInstances().size());
+	}
+
+	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) throws InterruptedException {
 		InstancesInfo instances = getInstancesWithTimeout(getConnectedClient(), appName);
 		assertNotNull(instances);
 		assertEquals(1, instances.getInstances().size());
 
-		getConnectedClient().updateApplicationInstances(appName, 3);
-		app = getConnectedClient().getApplication(appName);
-		assertEquals(3, app.getInstances());
+		if (count > 1) {
+		getConnectedClient().updateApplicationInstances(appName, count);
+			CloudApplication app = getConnectedClient().getApplication(appName);
+			assertEquals(count, app.getInstances());
+		}
 
 		boolean pass = false;
 		for (int i = 0; i < 50; i++) {
@@ -588,13 +601,20 @@ public abstract class AbstractCloudFoundryClientTest {
 			assertNotNull(instances);
 
 			List<InstanceInfo> infos = instances.getInstances();
-			assertEquals(3, infos.size());
+			assertEquals(count, infos.size());
 
 			int passCount = 0;
 			for (InstanceInfo info : infos) {
-				if (InstanceState.RUNNING.equals(info.getState()) ||
-						InstanceState.STARTING.equals(info.getState())) {
-					passCount++;
+				if (shouldBeRunning) {
+					if (InstanceState.RUNNING.equals(info.getState()) ||
+							InstanceState.STARTING.equals(info.getState())) {
+						passCount++;
+					}
+				} else {
+					if (InstanceState.CRASHED.equals(info.getState()) ||
+							InstanceState.FLAPPING.equals(info.getState())) {
+						passCount++;
+					}
 				}
 			}
 			if (passCount == infos.size()) {
@@ -603,11 +623,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			}
 			Thread.sleep(1000);
 		}
-		assertTrue("Couldn't get the right application state in 50 tries", pass);
-
-		getConnectedClient().stopApplication(appName);
-		InstancesInfo instInfo = getConnectedClient().getApplicationInstances(appName);
-		assertEquals(0, instInfo.getInstances().size());
+		return pass;
 	}
 
 	@Test
@@ -624,6 +640,24 @@ public abstract class AbstractCloudFoundryClientTest {
 		}
 		app = getConnectedClient().getApplication(appName);
 		assertEquals(2, app.getRunningInstances());
+	}
+
+	@Test
+	public void getCrashes() throws IOException, InterruptedException {
+		String appName = namespacedAppName("crashes1");
+		createAndUploadBadSpringApp(appName);
+		getConnectedClient().startApplication(appName);
+
+		boolean pass = getInstanceInfosWithTimeout(appName, 1, false);
+		assertTrue("Couldn't get the right application state in 50 tries", pass);
+
+		CrashesInfo crashes = getConnectedClient().getCrashes(appName);
+		assertNotNull(crashes);
+		assertTrue(!crashes.getCrashes().isEmpty());
+		for (CrashInfo info : crashes.getCrashes()) {
+			assertNotNull(info.getInstance());
+			assertNotNull(info.getSince());
+		}
 	}
 
 	@Test
@@ -1037,6 +1071,13 @@ public abstract class AbstractCloudFoundryClientTest {
 	private CloudApplication createAndUploadSimpleSpringApp(String appName) throws IOException {
 		createSpringApplication(appName, null);
 		File war = SampleProjects.simpleSpringApp();
+		getConnectedClient().uploadApplication(appName, war.getCanonicalPath());
+		return getConnectedClient().getApplication(appName);
+	}
+
+	private CloudApplication createAndUploadBadSpringApp(String appName) throws IOException {
+		createSpringApplication(appName, null);
+		File war = SampleProjects.badSpringApp();
 		getConnectedClient().uploadApplication(appName, war.getCanonicalPath());
 		return getConnectedClient().getApplication(appName);
 	}

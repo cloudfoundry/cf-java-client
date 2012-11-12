@@ -56,13 +56,26 @@ public class SampleProjects {
     }
 
     /**
-     * Returns a simple spring application including an empty properties file.
+     * Returns a simple spring application.
      *
-     * @return the non-ascii-file-name WAR file
+     * @return the simple-spring-app WAR file
      * @throws IOException
      */
     public static File simpleSpringApp() throws IOException {
 		ClassPathResource cpr = new ClassPathResource("simple-spring-app.war");
+		File file = cpr.getFile();
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
+     * Returns a bad spring application that will cause crashes.
+     *
+     * @return the bad-spring-app WAR file
+     * @throws IOException
+     */
+    public static File badSpringApp() throws IOException {
+		ClassPathResource cpr = new ClassPathResource("bad-spring-app.war");
 		File file = cpr.getFile();
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;

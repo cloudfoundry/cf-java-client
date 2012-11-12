@@ -140,6 +140,13 @@
 			<type>war</type>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.cloudfoundry.test</groupId>
+			<artifactId>bad-spring-app</artifactId>
+			<version>0.1.0.BUILD-SNAPSHOT</version>
+			<type>war</type>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -207,6 +214,13 @@
 								<artifactItem>
 									<groupId>org.cloudfoundry.test</groupId>
 									<artifactId>simple-spring-app</artifactId>
+									<version>0.1.0.BUILD-SNAPSHOT</version>
+									<type>war</type>
+									<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.cloudfoundry.test</groupId>
+									<artifactId>bad-spring-app</artifactId>
 									<version>0.1.0.BUILD-SNAPSHOT</version>
 									<type>war</type>
 									<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
