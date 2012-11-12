@@ -818,7 +818,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		// a basic check that versions are right
 		//TODO: this is no longer availabe in v2
 		if (getInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V1) {
-			assertEquals("1.6", runtimesByName.get("java").getVersion());
+			assertTrue(runtimesByName.get("java").getVersion().startsWith("1.6"));
 		}
 	}
 
