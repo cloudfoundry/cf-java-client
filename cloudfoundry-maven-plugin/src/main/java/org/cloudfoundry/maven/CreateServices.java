@@ -23,8 +23,12 @@ public class CreateServices extends AbstractApplicationAwareCloudFoundryMojo {
 
 		List<String> serviceNames = serviceCreation.createServices();
 
-		for (String serviceName : serviceNames) {
-			getLog().info(String.format("Creating Service '%s': OK", serviceName));
+		if (serviceNames.isEmpty()) {
+			getLog().info(String.format("Service(s) have been already created"));
+		} else {
+			for (String serviceName : serviceNames) {
+				getLog().info(String.format("Creating Service '%s': OK", serviceName));
+			}
 		}
 	}
 }

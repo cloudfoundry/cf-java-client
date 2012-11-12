@@ -185,6 +185,8 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 
 		Push mojo = spy(unspiedMojo);
 
+		setVariableValueToObject( mojo, "target", "https://api.cloudfoundry.com" );
+
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
 		//TODO May need to think about handling parameter validation more intelligently
@@ -214,10 +216,11 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 
 		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-
 		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
 		Push mojo = spy(unspiedMojo);
+
+		setVariableValueToObject( mojo, "target", "https://api.cloudfoundry.com" );
 
 		setVariableValueToObject( mojo, "username", "tester@test.com" );
 
@@ -249,7 +252,6 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 	public void testParameterValidationWhenConnctingtoCF3() throws Exception {
 
 		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
 
 		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
