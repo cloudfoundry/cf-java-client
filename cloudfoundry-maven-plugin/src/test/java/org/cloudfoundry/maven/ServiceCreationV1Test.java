@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
@@ -20,7 +21,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class ServiceCreationTest {
+public class ServiceCreationV1Test {
 
 	//Subject under test
 	private ServiceCreation serviceCreation;
@@ -30,6 +31,9 @@ public class ServiceCreationTest {
 
 	@Mock
 	private CloudFoundryClient client;
+
+	@Mock
+	private CloudInfo cloudInfo;
 
 	@Mock
 	private CloudService service;
@@ -54,6 +58,8 @@ public class ServiceCreationTest {
 
 		serviceConfigurations.add(new ServiceConfiguration(attributes));
 
+		when(cloudInfo.getCloudControllerMajorVersion()).thenReturn(CloudInfo.CC_MAJOR_VERSION.V1);
+		when(client.getCloudInfo()).thenReturn(cloudInfo);
 		when(client.getServiceConfigurations()).thenReturn(serviceConfigurations);
 	}
 

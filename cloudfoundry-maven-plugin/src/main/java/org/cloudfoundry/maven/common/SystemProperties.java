@@ -38,6 +38,8 @@ public enum SystemProperties {
 	TARGET("cf.target", "target"),
 	URL("cf.url", "url"),
 	USERNAME("cf.username", "username"),
+	ORG("cf.org", "org"),
+	SPACE("cf.space", "space"),
 	WARFILE("cf.warfile", "warfile"); //deprecated use PATH instead
 
 	private String property;

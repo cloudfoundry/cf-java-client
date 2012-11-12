@@ -54,7 +54,8 @@ public class UiUtilsTest {
 		String expectedTableAsString = null;
 
 		try {
-			expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
+			expectedTableAsString = FileCopyUtils.copyToString(new InputStreamReader(
+					UiUtilsTest.class.getResourceAsStream("testRenderTextTable-expected-output.txt")));
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail();

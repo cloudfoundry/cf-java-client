@@ -78,6 +78,8 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
 		parameterMap.put("Username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
 		parameterMap.put("Path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
+		parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
+		parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
 
 		return parameterMap;
 	}

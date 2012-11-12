@@ -230,8 +230,12 @@ public final class CommonUtils {
 		final Iterator<ServiceConfiguration> it = list.iterator();
 
 		while (it.hasNext()) {
-
-			sb.append(it.next().getVendor());
+			ServiceConfiguration serviceConfig = it.next();
+			if (serviceConfig.getCloudServiceOffering() != null) {
+				sb.append(serviceConfig.getCloudServiceOffering().getLabel());
+			} else {
+				sb.append(serviceConfig.getVendor());
+			}
 
 			if (it.hasNext()) {
 				sb.append(", ");
