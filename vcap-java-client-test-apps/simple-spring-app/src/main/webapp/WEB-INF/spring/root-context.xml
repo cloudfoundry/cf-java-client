@@ -13,4 +13,6 @@
 		<property name="message" value="${message}"/>
 	</bean>
 
+    <bean class="com.springdeveloper.test.CrashBean"/>
+
 </beans>

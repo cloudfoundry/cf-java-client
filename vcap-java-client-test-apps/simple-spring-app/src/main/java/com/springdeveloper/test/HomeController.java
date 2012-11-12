@@ -3,7 +3,9 @@ package com.springdeveloper.test;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,7 @@ public class HomeController {
 		String formattedDate = dateFormat.format(date);
 
 		model.addAttribute("serverTime", formattedDate );
-		model.addAttribute("message", messageBean.getMessage() );
+		model.addAttribute("message", messageBean.getMessage());
 
 		return "home";
 	}

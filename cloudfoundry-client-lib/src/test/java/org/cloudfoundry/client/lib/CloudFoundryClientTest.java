@@ -39,7 +39,6 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration.Tier;
-import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.junit.After;
@@ -257,17 +256,6 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
 		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
 		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
-	}
-
-	@Test
-	public void getCrashes() throws IOException {
-		String appName = namespacedAppName("crashes1");
-		createAndUploadTravelTestApp(appName);
-
-		CrashesInfo crashes = connectedClient.getCrashes(appName);
-		assertNotNull(crashes);
-		assertTrue(crashes.getCrashes().isEmpty());
-		// TODO very simplistic test - should trigger a crash and inspect results
 	}
 
 	@Test

@@ -794,7 +794,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	public CrashesInfo getCrashes(String appName) {
-		throw new UnsupportedOperationException("Feature is not yet implemented.");
+		UUID appId = getAppId(appName);
+		if (appId == null) {
+			throw new IllegalArgumentException("Application '" + appName + "' not found.");
+		}
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", appId);
+		String resp = getRestTemplate().getForObject(getUrl("/v2/apps/{guid}/crashes"), String.class, urlVars);
+		Map<String, Object> respMap = JsonUtil.convertJsonToMap("{ \"crashes\" : " + resp + " }");
+		List<Map<String, Object>> attributes = (List<Map<String, Object>>) respMap.get("crashes");
+		return new CrashesInfo(attributes);
 	}
 
 	public void rename(String appName, String newName) {
