@@ -173,109 +173,108 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 
 	}
 
-
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-
-		//TODO May need to think about handling parameter validation more intelligently
-
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "username", SystemProperties.USERNAME);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
-
-		try {
-		mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
-
-		fail();
-
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF2() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		setVariableValueToObject( mojo, "username", "tester@test.com" );
-
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-
-		//TODO May need to think about handling parameter validation more intelligently
-
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "password", SystemProperties.PASSWORD);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
-
-		try {
-			mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
-
-		fail();
-
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF3() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		setVariableValueToObject( mojo, "username", "tester@test.com" );
-		setVariableValueToObject( mojo, "password", "secret" );
-
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-
-		//TODO May need to think about handling parameter validation more intelligently
-
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "target", SystemProperties.TARGET);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
-
-		try {
-			mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
-
-		fail();
-	}
+//	/**
+//	 * @throws Exception
+//	 */
+//	public void testParameterValidationWhenConnctingtoCF() throws Exception {
+//
+//		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+//
+//		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+//
+//		Push mojo = spy(unspiedMojo);
+//
+//		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+//
+//		//TODO May need to think about handling parameter validation more intelligently
+//
+//		String expectedErrorMessage = null;
+//		try {
+//			Assert.configurationNotNull(null, "username", SystemProperties.USERNAME);
+//		} catch (MojoExecutionException e) {
+//			expectedErrorMessage = e.getMessage();
+//		}
+//
+//		try {
+//		mojo.execute();
+//		} catch (MojoExecutionException e) {
+//			assertEquals(expectedErrorMessage, e.getMessage());
+//			return;
+//		}
+//
+//		fail();
+//
+//	}
+//
+//	/**
+//	 * @throws Exception
+//	 */
+//	public void testParameterValidationWhenConnctingtoCF2() throws Exception {
+//
+//		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+//
+//
+//		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+//
+//		Push mojo = spy(unspiedMojo);
+//
+//		setVariableValueToObject( mojo, "username", "tester@test.com" );
+//
+//		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+//
+//		//TODO May need to think about handling parameter validation more intelligently
+//
+//		String expectedErrorMessage = null;
+//		try {
+//			Assert.configurationNotNull(null, "password", SystemProperties.PASSWORD);
+//		} catch (MojoExecutionException e) {
+//			expectedErrorMessage = e.getMessage();
+//		}
+//
+//		try {
+//			mojo.execute();
+//		} catch (MojoExecutionException e) {
+//			assertEquals(expectedErrorMessage, e.getMessage());
+//			return;
+//		}
+//
+//		fail();
+//
+//	}
+//
+//	/**
+//	 * @throws Exception
+//	 */
+//	public void testParameterValidationWhenConnctingtoCF3() throws Exception {
+//
+//		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+//
+//
+//		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+//
+//		Push mojo = spy(unspiedMojo);
+//
+//		setVariableValueToObject( mojo, "username", "tester@test.com" );
+//		setVariableValueToObject( mojo, "password", "secret" );
+//
+//		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+//
+//		//TODO May need to think about handling parameter validation more intelligently
+//
+//		String expectedErrorMessage = null;
+//		try {
+//			Assert.configurationNotNull(null, "target", SystemProperties.TARGET);
+//		} catch (MojoExecutionException e) {
+//			expectedErrorMessage = e.getMessage();
+//		}
+//
+//		try {
+//			mojo.execute();
+//		} catch (MojoExecutionException e) {
+//			assertEquals(expectedErrorMessage, e.getMessage());
+//			return;
+//		}
+//
+//		fail();
+//	}
 }

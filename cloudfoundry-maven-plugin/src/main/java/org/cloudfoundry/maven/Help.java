@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.UiUtils;
 
@@ -78,6 +79,8 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
 		parameterMap.put("Username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
 		parameterMap.put("Path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
+		parameterMap.put("Org", getOrgName() != null ? getOrgName() : NOT_AVAILABLE);
+		parameterMap.put("Space", getSpaceName() != null ? getSpaceName() : NOT_AVAILABLE);
 
 		return parameterMap;
 	}

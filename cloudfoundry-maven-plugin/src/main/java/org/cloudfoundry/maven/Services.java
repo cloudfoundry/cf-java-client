@@ -24,9 +24,9 @@ public class Services extends AbstractCloudFoundryMojo {
 		final List<ServiceConfiguration> serviceConfigurations = getClient().getServiceConfigurations();
 		List<CloudService> services = getClient().getServices();
 
-		getLog().info("============== System Services ==============");
-		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(serviceConfigurations));
-		getLog().info("============== Provisioned Services ==============");
-		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services));
+		getLog().info("System Services");
+		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(getClient(), serviceConfigurations));
+		getLog().info("Provisioned Services");
+		getLog().info("\n" + UiUtils.renderServiceDataAsTable(getClient(), services));
 	}
 }
