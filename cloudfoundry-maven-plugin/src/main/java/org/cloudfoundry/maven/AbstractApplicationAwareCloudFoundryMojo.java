@@ -107,7 +107,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private Integer instances;
 
 	/**
-	 * Comma separated list of services to use by the application.
+	 * list of services to use by the application.
 	 *
 	 * @parameter expression="${services}"
 	 */

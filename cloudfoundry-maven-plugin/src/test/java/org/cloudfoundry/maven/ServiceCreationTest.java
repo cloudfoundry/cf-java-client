@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
@@ -30,6 +31,9 @@ public class ServiceCreationTest {
 
 	@Mock
 	private CloudFoundryClient client;
+
+	@Mock
+	private CloudInfo cloudInfo;
 
 	@Mock
 	private CloudService service;
@@ -54,11 +58,13 @@ public class ServiceCreationTest {
 
 		serviceConfigurations.add(new ServiceConfiguration(attributes));
 
+		when(cloudInfo.getCloudControllerMajorVersion()).thenReturn(CloudInfo.CC_MAJOR_VERSION.V1);
+		when(client.getCloudInfo()).thenReturn(cloudInfo);
 		when(client.getServiceConfigurations()).thenReturn(serviceConfigurations);
 	}
 
 	@Test
-	public void createServicesTest() throws MojoExecutionException {
+	public void createServicesTestV1() throws MojoExecutionException {
 		List<String> names = new ArrayList<String>();
 
 		for (int i = 0; i < 4; i++) {
@@ -80,7 +86,7 @@ public class ServiceCreationTest {
 	}
 
 	@Test
-	public void createServicesWithoutVersionAndTierTest() throws MojoExecutionException {
+	public void createServicesWithoutVersionAndTierTestV1() throws MojoExecutionException {
 		List<String> names = new ArrayList<String>();
 
 		for (int i = 0; i < 4; i++) {
@@ -100,7 +106,7 @@ public class ServiceCreationTest {
 	}
 
 	@Test
-	public void createServicesWithoutVersionAndTierAndInvalidVendorTest() throws MojoExecutionException {
+	public void createServicesWithoutVersionAndTierAndInvalidVendorTestV1() throws MojoExecutionException {
 		List<String> names = new ArrayList<String>();
 
 		for (int i = 0; i < 4; i++) {
