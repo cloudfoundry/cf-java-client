@@ -24,13 +24,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,10 +58,6 @@ public class HttpTunnel implements Tunnel {
 	private Map<String, String> tunnelInfo;
 	private long lastWrite = 0;
 	private long lastRead = 0;
-
-	public HttpTunnel(String url, String host, int port, String auth) {
-		this(url, host, port, auth, createRestTemplate());
-	}
 
 	public HttpTunnel(String url, String host, int port, String auth, RestOperations restOperations) {
 		this.url = url;
@@ -205,15 +199,6 @@ public class HttpTunnel implements Tunnel {
 			data.write(buffer, 0, len);
 		}
 		return data.toByteArray();
-	}
-
-	private static RestTemplate createRestTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
-		CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
-		requestFactory.setConnectTimeout(20000);
-		requestFactory.setReadTimeout(20000);
-		restTemplate.setRequestFactory(requestFactory);
-		return restTemplate;
 	}
 
 	private static String printBytes(byte[] array) {

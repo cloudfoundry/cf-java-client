@@ -18,7 +18,10 @@ package org.cloudfoundry.caldecott.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * The factory class used to create an HttpTunnel instance.
@@ -27,6 +30,8 @@ import org.springframework.web.client.RestOperations;
  */
 public class HttpTunnelFactory implements TunnelFactory {
 
+	private static final int TIMEOUT = 20000;
+
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private final String url;
@@ -34,16 +39,22 @@ public class HttpTunnelFactory implements TunnelFactory {
 	private final int port;
 	private final String auth;
 	private RestOperations restOperations;
+	private HttpProxyConfiguration httpProxyConfiguration;
 
 	public HttpTunnelFactory(String url, String host, int port, String auth) {
-		this(url, host, port, auth, null);
-	}
-
-	public HttpTunnelFactory(String url, String host, int port, String auth, RestOperations restOperations) {
 		this.url = url;
 		this.host = host;
 		this.port = port;
 		this.auth = auth;
+	}
+
+	public HttpTunnelFactory(String url, String host, int port, String auth, HttpProxyConfiguration httpProxyConfiguration) {
+		this(url, host, port, auth);
+		this.httpProxyConfiguration = httpProxyConfiguration;
+	}
+
+	public HttpTunnelFactory(String url, String host, int port, String auth, RestOperations restOperations) {
+		this(url, host, port, auth);
 		this.restOperations = restOperations;
 	}
 
@@ -55,7 +66,21 @@ public class HttpTunnelFactory implements TunnelFactory {
 			return new HttpTunnel(url, host, port, auth, restOperations);
 		}
 		else {
-			return new HttpTunnel(url, host, port, auth);
+			return new HttpTunnel(url, host, port, auth, createRestTemplate());
 		}
 	}
+
+	private RestTemplate createRestTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+		requestFactory.setConnectTimeout(TIMEOUT);
+		requestFactory.setReadTimeout(TIMEOUT);
+		if (httpProxyConfiguration != null) {
+			requestFactory.getHttpClient().getHostConfiguration().setProxy(httpProxyConfiguration.getProxyHost(),
+					httpProxyConfiguration.getProxyPort());
+		}
+		restTemplate.setRequestFactory(requestFactory);
+		return restTemplate;
+	}
+
 }
