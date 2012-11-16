@@ -20,12 +20,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
+import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
@@ -60,7 +65,7 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	 *
 	 * @return
 	 */
-	private Map<String, String> getParameterMap() {
+	private Map<String, String> getParameterMap(CloudFoundryClient client) {
 		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
 		parameterMap.put("Appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
@@ -78,50 +83,61 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
 		parameterMap.put("Username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
 		parameterMap.put("Path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
-		parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
-		parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
+
+		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
+			parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
+		}
 
 		return parameterMap;
 	}
 
 	@Override
-	protected void doExecute() {
-
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append("\n" + UiUtils.HORIZONTAL_LINE);
-		sb.append("\nCloud Foundry Maven Plugin detected Parameters and/or default values:\n\n");
-
-		sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap()));
-
-		Reader reader = null;
-		BufferedReader in = null;
+	protected void doExecute() throws MojoExecutionException {
+		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
 
 		try {
-			final InputStream is = Help.class.getResourceAsStream(HELP_TEXT);
-			reader = new InputStreamReader(is);
-			in = new BufferedReader(reader);
+			final CloudFoundryClient client = new CloudFoundryClient(getTarget().toURL());
+			final StringBuilder sb = new StringBuilder();
 
-			final StringBuilder helpTextStringBuilder = new StringBuilder();
+			sb.append("\n" + UiUtils.HORIZONTAL_LINE);
+			sb.append("\nCloud Foundry Maven Plugin detected Parameters and/or default values:\n\n");
 
-			String line = "";
+			sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap(client)));
 
-			while (line != null) {
-				try {
-					line = in.readLine();
-				} catch (IOException e) {
-					throw new IllegalStateException("Problem reading internal '" + HELP_TEXT + "' file. This is a bug.", e);
+			Reader reader = null;
+			BufferedReader in = null;
+
+			try {
+				final InputStream is = Help.class.getResourceAsStream(HELP_TEXT);
+				reader = new InputStreamReader(is);
+				in = new BufferedReader(reader);
+
+				final StringBuilder helpTextStringBuilder = new StringBuilder();
+
+				String line = "";
+
+				while (line != null) {
+					try {
+						line = in.readLine();
+					} catch (IOException e) {
+						throw new IllegalStateException("Problem reading internal '" + HELP_TEXT + "' file. This is a bug.", e);
+					}
+
+					if (line != null) {
+						helpTextStringBuilder.append(line + "\n");
+					}
 				}
-
-				if (line != null) {
-					helpTextStringBuilder.append(line + "\n");
-				}
+				sb.append(helpTextStringBuilder);
+			} finally {
+				CommonUtils.closeReader(in);
+				CommonUtils.closeReader(reader);
 			}
-			sb.append(helpTextStringBuilder);
-		} finally {
-			CommonUtils.closeReader(in);
-			CommonUtils.closeReader(reader);
+			getLog().info(sb);
+		} catch (MalformedURLException e) {
+			throw new MojoExecutionException(
+					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", getTarget()), e);
 		}
-		getLog().info(sb);
+
 	}
 }

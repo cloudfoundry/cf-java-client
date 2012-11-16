@@ -1,3 +1,5 @@
+  --------------  -----------------------------------------------------------------------------------------------
+
 Usage: mvn cf:command [command_options]
 
 Currently available Cloud Foundry Maven Plugin Goals are:
