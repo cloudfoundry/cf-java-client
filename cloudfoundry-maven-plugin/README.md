@@ -1,5 +1,5 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M3, October 8, 2012
+Version 1.0.0.M4, November 16, 2012
 
 * Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
 * Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
@@ -187,21 +187,20 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
 
     Cloud Foundry Maven Plugin detected Parameters and/or default values:
 
-    +-----------+-----------------------------------------------------------------------------------+
-    | Parameter | Value (Configured or Default)                                                     |
-    +-----------+-----------------------------------------------------------------------------------+
-    | Appname   | hello-java                                                                        |
-    | Instances | 1                                                                               |
-    | Memory    | 512                                                                               |
-    | No-start  | false                                                                             |
-    | Password  | *****                                                                             |
-    | Server    | cloud-foundry-credentials                                                         |
-    | Services  |                                                                                   |
-    | Target    | N/A                                                                               |
-    | Url       | hello-java.cloudfoundry.com                                                       |
-    | Username  | demouser@cloudfoundry.com                                                         |
-    | Warfile   | /Users/demouser/dev/git/cloudfoundry-samples/hello-java/target/hello-java-1.0.war |
-    +-----------+-----------------------------------------------------------------------------------+
+      Parameter  Value (Configured or Default)
+      ---------- -----------------------------------------------------------------------------------
+       Appname     hello-java
+       Instances   1
+       Memory      512
+       No-start    false
+       Password    *****
+       Server      cloud-foundry-credentials
+       Services
+       Target      N/A
+       Url         hello-java.cloudfoundry.com
+       Username    demouser@cloudfoundry.com
+       Warfile     /Users/demouser/dev/git/cloudfoundry-samples/hello-java/target/hello-java-1.0.war
+
     Usage: mvn cf:command [command_options]
 
     Currently available Cloud Foundry Maven Plugin Goals are:
@@ -457,6 +456,16 @@ We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
 		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
 
 # History
+
+## Changes from version 1.0.0.M3 to 1.0.0.M4
+
+* Upgraded to cloudfoundry-client-lib 0.8.2
+* Modified the output from older grid style to cleaner column style
+* Add Cloud Controller v1 / v2 (cloud\_controller\_ng) detection
+* Add support for org & space in v2 (cloud\_controller\_ng)
+* Add support for push & delete app to v2 (cloud\_controller\_ng)
+* Add show log for v2 (cloud\_controller\_ng)
+* Add support for create-services for v2 (cloud\_controller\_ng)
 
 ## Changes from version **1.0.0.M2** to **1.0.0.M3**
 
