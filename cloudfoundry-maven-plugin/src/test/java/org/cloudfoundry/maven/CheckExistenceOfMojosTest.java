@@ -222,6 +222,28 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
+	public void testExistenceOfBindServicesMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		BindServices mojo = (BindServices) lookupMojo ( "bind-services", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public void testExistenceOfUnbindServicesMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		UnbindServices mojo = (UnbindServices) lookupMojo ( "unbind-services", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public void testNonExistingMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
