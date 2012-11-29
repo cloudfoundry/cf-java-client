@@ -18,8 +18,10 @@ package org.cloudfoundry.maven;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
@@ -188,6 +190,7 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 		setVariableValueToObject( mojo, "target", "https://api.cloudfoundry.com" );
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+		when(mojo.retrieveToken()).thenThrow(new IOException());
 
 		//TODO May need to think about handling parameter validation more intelligently
 
@@ -225,6 +228,7 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 		setVariableValueToObject( mojo, "username", "tester@test.com" );
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+		when(mojo.retrieveToken()).thenThrow(new IOException());
 
 		//TODO May need to think about handling parameter validation more intelligently
 

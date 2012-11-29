@@ -67,8 +67,5 @@ public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
 		assertNull("Target Url is not backed by a default value.", mojo.getTarget());
 		assertEquals("cf-maven-tests.<undefined target>", mojo.getUrl());
 		assertNull("Username by default is null.", mojo.getUsername());
-		assertEquals(testPom.getName(), mojo.getWarfile().getName());
-
 	}
-
 }
