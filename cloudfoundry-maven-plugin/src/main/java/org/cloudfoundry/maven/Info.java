@@ -70,7 +70,6 @@ public class Info extends AbstractCloudFoundryMojo {
 			try {
 				getLog().warn("You did not provide a username and password."+ "Showing basic information only.");
 				doExecute();
-				client.logout();
 			} catch (RuntimeException e) {
 				throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
 			}
