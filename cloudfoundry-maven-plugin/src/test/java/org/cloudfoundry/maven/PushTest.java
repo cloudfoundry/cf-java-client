@@ -94,7 +94,7 @@ public class PushTest extends AbstractMojoTestCase {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "custom");
-		data.put("runtimes", new ArrayList());
+		data.put("runtimes", new ArrayList<Object>());
 
 		frameworks.add(new CloudInfo.Framework(data));
 		final String desiredFramework = "custom";
@@ -118,7 +118,7 @@ public class PushTest extends AbstractMojoTestCase {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("name", "custom");
-		data.put("runtimes", new ArrayList());
+		data.put("runtimes", new ArrayList<Object>());
 		frameworks.add(new CloudInfo.Framework(data));
 
 		final String desiredFramework = "spring";
@@ -130,5 +130,4 @@ public class PushTest extends AbstractMojoTestCase {
 			Assert.assertEquals(e.getMessage(), "Framework must be one of the following values: custom");
 		}
 	}
-
 }

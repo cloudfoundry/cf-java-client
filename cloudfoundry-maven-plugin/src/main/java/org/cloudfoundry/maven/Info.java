@@ -15,6 +15,7 @@
  */
 package org.cloudfoundry.maven;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
@@ -23,18 +24,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import org.cloudfoundry.client.lib.CloudFoundryClient;
-import org.cloudfoundry.client.lib.CloudFoundryException;
 
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.ResourceAccessException;
 
 /**
  * Provide general usage information about the used Cloud Foundry environment.
@@ -55,89 +51,43 @@ public class Info extends AbstractCloudFoundryMojo {
 	 */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		final URI target = getTarget();
+		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
-		if (getPassword() == null && getUsername() == null) {
-			final URI target = getTarget();
-
-			Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
-
-			try {
-				client = new CloudFoundryClient(target.toURL());
-			} catch (MalformedURLException e) {
-				throw new MojoExecutionException(
-						String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
-			}
-			try {
-				getLog().warn("You did not provide a username and password."+ "Showing basic information only.");
-				doExecute();
-				client.logout();
-			} catch (RuntimeException e) {
-				throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
-			}
-		} else {
-			super.execute();
+		try {
+			client = new CloudFoundryClient(getTarget().toURL());
+			doExecute();
+		} catch (MalformedURLException e) {
+			throw new MojoExecutionException(
+					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
 		}
 	}
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		final CloudInfo cloudinfo;
+		final CloudInfo cloudInfo;
 		final List<ServiceConfiguration> serviceConfigurations;
-		final String localTarget =  getTarget().toString();
 
-		try {
-			cloudinfo = client.getCloudInfo();
-			serviceConfigurations = client.getServiceConfigurations();
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(
-						String.format("The target host '%s' exists but it does not appear to be a valid Cloud Foundry target url.", localTarget), e);
+		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			CloudFoundryClient newClient = null;
+
+			if (getUsername() != null && getPassword() != null) {
+				newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 			} else {
-				throw e;
+				try {
+					String token = retrieveToken();
+					newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
+				} catch (IOException e) {
+					newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
+				}
 			}
-
-		} catch (ResourceAccessException e) {
-			throw new MojoExecutionException(
-					String.format("Cannot access host at '%s'.", localTarget), e);
+			cloudInfo = newClient.getCloudInfo();
+			serviceConfigurations = newClient.getServiceConfigurations();
+		} else {
+			cloudInfo = client.getCloudInfo();
+			serviceConfigurations = client.getServiceConfigurations();
 		}
 
-		getLog().info(getCloudInfoFormattedAsString(cloudinfo, serviceConfigurations, localTarget));
-	}
-
-	/**
-	 * Renders the help text. If the callers is logged in successfully the full
-	 * information is rendered if not only basic Cloud Foundry information is
-	 * rendered and returned as String.
-	 *
-	 * @param cloudinfo Contains the information about the Cloud Foundry environment
-	 * @param target The target Url from which the information was obtained
-	 *
-	 * @return Returns a formatted String for console output
-	 */
-	private String getCloudInfoFormattedAsString(CloudInfo cloudinfo, List<ServiceConfiguration> serviceConfigurations, String target) {
-
-		StringBuilder sb = new StringBuilder("\n");
-
-		sb.append(UiUtils.HORIZONTAL_LINE);
-		sb.append(String.format("%s (v%s build %s)\n", cloudinfo.getDescription(), cloudinfo.getVersion(), cloudinfo.getBuild()));
-		sb.append(String.format("For support visit %s\n\n", cloudinfo.getSupport()));
-
-		sb.append(String.format("Target:          %s  \n"   , target));
-		sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudinfo.getFrameworks())));
-		sb.append(String.format("Runtimes:        %s\n"     , CommonUtils.runtimesToCommaDelimitedString(cloudinfo.getRuntimes())));
-		sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
-
-		if (cloudinfo.getUser() != null) {
-			sb.append(String.format("User:        %s\n", cloudinfo.getUser()));
-
-			sb.append("Usage: " + "\n");
-			sb.append(String.format("    Memory:       %sM of %sM total \n", cloudinfo.getUsage().getTotalMemory(), cloudinfo.getLimits().getMaxTotalMemory()));
-			sb.append(String.format("    Services:     %s of %s total \n" , cloudinfo.getUsage().getServices(), cloudinfo.getLimits().getMaxServices()));
-			sb.append(String.format("    Apps:         %s of %s total \n" , cloudinfo.getUsage().getApps(), cloudinfo.getLimits().getMaxApps()));
-			sb.append(String.format("    Uris Per App: %s of %s total \n" , cloudinfo.getUsage().getUrisPerApp(), cloudinfo.getLimits().getMaxUrisPerApp()));
-		}
-
-		sb.append(UiUtils.HORIZONTAL_LINE);
-		return sb.toString();
+		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, serviceConfigurations, getTarget().toString()));
 	}
 }

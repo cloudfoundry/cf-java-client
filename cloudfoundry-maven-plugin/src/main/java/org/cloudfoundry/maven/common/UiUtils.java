@@ -348,6 +348,43 @@ public final class UiUtils {
 	}
 
 	/**
+	 * Renders the help text. If the callers is logged in successfully the full
+	 * information is rendered if not only basic Cloud Foundry information is
+	 * rendered and returned as String.
+	 *
+	 * @param cloudinfo Contains the information about the Cloud Foundry environment
+	 * @param target The target Url from which the information was obtained
+	 *
+	 * @return Returns a formatted String for console output
+	 */
+	public static String renderCloudInfoFormattedAsString(CloudInfo cloudInfo, List<ServiceConfiguration> serviceConfigurations, String target) {
+
+		StringBuilder sb = new StringBuilder("\n");
+
+		sb.append(UiUtils.HORIZONTAL_LINE);
+		sb.append(String.format("%s (v%s build %s)\n", cloudInfo.getDescription(), cloudInfo.getVersion(), cloudInfo.getBuild()));
+		sb.append(String.format("For support visit %s\n\n", cloudInfo.getSupport()));
+
+		sb.append(String.format("Target:          %s  \n"   , target));
+		sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudInfo.getFrameworks())));
+		sb.append(String.format("Runtimes:        %s\n"     , CommonUtils.runtimesToCommaDelimitedString(cloudInfo.getRuntimes())));
+		sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
+
+		if (cloudInfo.getUser() != null) {
+			sb.append(String.format("User:        %s\n", cloudInfo.getUser()));
+
+			sb.append("Usage: " + "\n");
+			sb.append(String.format("    Memory:       %sM of %sM total \n", cloudInfo.getUsage().getTotalMemory(), cloudInfo.getLimits().getMaxTotalMemory()));
+			sb.append(String.format("    Services:     %s of %s total \n" , cloudInfo.getUsage().getServices(), cloudInfo.getLimits().getMaxServices()));
+			sb.append(String.format("    Apps:         %s of %s total \n" , cloudInfo.getUsage().getApps(), cloudInfo.getLimits().getMaxApps()));
+			sb.append(String.format("    Uris Per App: %s of %s total \n" , cloudInfo.getUsage().getUrisPerApp(), cloudInfo.getLimits().getMaxUrisPerApp()));
+		}
+
+		sb.append(UiUtils.HORIZONTAL_LINE);
+		return sb.toString();
+	}
+
+	/**
 	 * Renders the Table header border, based on the map of provided headers.
 	 *
 	 * @param headers Map of headers containing meta information e.g. name+width of header

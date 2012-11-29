@@ -15,11 +15,14 @@
  */
 package org.cloudfoundry.maven;
 
+import org.apache.maven.plugin.MojoExecutionException;
+
 
 /**
  * Deletes the user with the provided login credentials.
  *
  * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  *
  * @goal delete-user
@@ -28,9 +31,14 @@ package org.cloudfoundry.maven;
 public class DeleteUser extends AbstractCloudFoundryMojo {
 
 	@Override
-	protected void doExecute() {
-		getLog().info(String.format("Deleting user...'%s'", getUsername()));
-		getClient().unregister();
-	}
+	protected void doExecute() throws MojoExecutionException {
+		Logout logout = new Logout();
 
+		getLog().debug("Unregistering the user");
+		getClient().unregister();
+
+		getLog().debug("Removing the token in the token file");
+		logout.doExecute();
+		getLog().info("User has been deleted successfully.");
+	}
 }
