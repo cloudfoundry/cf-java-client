@@ -16,9 +16,12 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
+import org.cloudfoundry.maven.common.Assert;
 
 /**
  * Updates an application.
@@ -32,11 +35,22 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
-	protected void doExecute() {
+	protected void doExecute() throws MojoExecutionException {
 
 		final File path = getPath();
 		final String appName = getAppname();
 
+		final java.util.List<String> uris = new ArrayList<String>(0);
+
+		if (getUrl() != null && !getUrls().isEmpty()) {
+			Assert.configurationUrls();
+		} else if (getUrl() != null) {
+			uris.add(getUrl());
+		} else if (!getUrls().isEmpty()) {
+			for (String uri : getUrls()) {
+				uris.add(uri);
+			}
+		}
 		validatePath(path);
 
 		CloudApplication aplication = getClient().getApplication(appName);
@@ -44,6 +58,15 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
 		uploadApplication(getClient(), path, appName);
+
+		getLog().debug("Updating application memory");
+		getClient().updateApplicationMemory(appName, getMemory());
+
+		getLog().debug("Updating application instances");
+		getClient().updateApplicationInstances(appName, getInstances());
+
+		getLog().debug("Updating application uris");
+		getClient().updateApplicationUris(appName, uris);
 
 		if (AppState.STARTED.equals(aplication.getState())) {
 			getClient().restartApplication(appName);
