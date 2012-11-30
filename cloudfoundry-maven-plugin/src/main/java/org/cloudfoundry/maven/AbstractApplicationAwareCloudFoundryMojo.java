@@ -57,6 +57,11 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private String url;
 
 	/**
+	 * @parameter expression="${urls}"
+	 */
+	private List<String> urls;
+
+	/**
 	 * The path of the WAR file to deploy.
 	 *
 	 * @parameter expression = "${project.build.directory}/${project.build.finalName}.war"
@@ -214,7 +219,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return urlProperty;
 		}
 
-		if (this.url == null && !CloudApplication.STANDALONE.equals(getFramework())) {
+		if (this.url == null && !CloudApplication.STANDALONE.equals(getFramework()) && this.urls == null) {
 
 			if (getTarget() != null) {
 
@@ -447,10 +452,25 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	public List<CloudService> getServices() {
 		final List<CloudService> servicesList = new ArrayList<CloudService>(0);
 
-		if (this.services == null ) {
+		if (this.services == null) {
 			return servicesList;
 		} else {
 			return this.services;
+		}
+	}
+
+	/**
+	 * Returns the list of urls that shall be associated with the application.
+	 *
+	 * @return Never null
+	 */
+	public List<String> getUrls() {
+		final List<String> urls = new ArrayList<String>(0);
+
+		if (this.urls == null) {
+			return urls;
+		} else {
+			return this.urls;
 		}
 	}
 
