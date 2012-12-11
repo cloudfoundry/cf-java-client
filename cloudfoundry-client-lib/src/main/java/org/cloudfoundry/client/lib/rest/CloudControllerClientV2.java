@@ -777,12 +777,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
-		UUID appId = getAppId(appName);
-		String urlPath = "/v2/apps/{appId}/instances/{instanceIndex}/files/{filePath}";
-		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
-	}
-
 	public void bindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
@@ -902,6 +896,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			throw new IllegalArgumentException("Host '" + host + "' not found for domain '" + domainName + "'.");
 		}
 		doDeleteRoute(routeGuid);
+	}
+
+	@Override
+	protected String getFileUrlPath() {
+		return "/v2/apps/{appId}/instances/{instance}/files/{filePath}";
+	}
+
+	@Override
+	protected Object getFileAppId(String appName) {
+		return getAppId(appName);
 	}
 
 	private void doDeleteRoute(UUID routeGuid) {

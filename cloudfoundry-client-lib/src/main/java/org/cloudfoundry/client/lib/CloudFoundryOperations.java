@@ -356,6 +356,27 @@ public interface CloudFoundryOperations {
 	void updateApplicationEnv(String appName, List<String> env);
 
 	/**
+	 * Get logs from the deployed application. The logs
+	 * will be returned in a Map keyed by the path of the log file
+	 * (logs/stderr.log, logs/stdout.log).
+	 * @param appName name of the application
+	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
+	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 */
+	Map<String, String> getLogs(String appName);
+
+	/**
+	 * Get logs from most recent crash of the deployed application. The logs
+	 * will be returned in a Map keyed by the path of the log file
+	 * (logs/stderr.log, logs/stdout.log).
+	 *
+	 * @param appName name of the application
+	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
+	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 */
+	Map<String, String> getCrashLogs(String appName);
+
+	/**
 	 * Get file from the deployed application.
 	 *
 	 * @param appName name of the application
