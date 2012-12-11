@@ -127,6 +127,10 @@ public interface CloudControllerClient {
 
 	void updateApplicationEnv(String appName, List<String> env);
 
+	Map<String, String> getLogs(String appName);
+
+	Map<String, String> getCrashLogs(String appName);
+
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
 
 	void bindService(String appName, String serviceName);

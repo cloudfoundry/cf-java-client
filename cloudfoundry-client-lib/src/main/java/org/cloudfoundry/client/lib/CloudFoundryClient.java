@@ -257,6 +257,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateApplicationEnv(appName, env);
 	}
 
+	public Map<String, String> getLogs(String appName) {
+		return cc.getLogs(appName);
+	}
+
+	public Map<String, String> getCrashLogs(String appName) {
+		return cc.getCrashLogs(appName);
+	}
+
 	public String getFile(String appName, int instanceIndex, String filePath) {
 		return cc.getFile(appName, instanceIndex, filePath, 0, -1);
 	}
