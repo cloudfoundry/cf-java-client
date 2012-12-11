@@ -431,11 +431,6 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		doUpdateApplication(app);
 	}
 
-	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
-		String urlPath = "/apps/{app}/instances/{instanceIndex}/files/{filePath}";
-		return doGetFile(urlPath, appName, instanceIndex, filePath, startPosition, endPosition);
-	}
-
 	public void bindService(String appName, String serviceName) {
 		CloudApplication application = getApplication(appName);
 		if (application.getServices() == null) {
@@ -498,6 +493,16 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 			stagingMap.put("model", stagingMap.remove("framework"));
 		}
 		return appMap;
+	}
+
+	@Override
+	protected String getFileUrlPath() {
+		return "/apps/{app}/instances/{instance}/files/{filePath}";
+	}
+
+	@Override
+	protected Object getFileAppId(String appName) {
+		return appName;
 	}
 
 	/**

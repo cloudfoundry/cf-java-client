@@ -23,6 +23,8 @@ import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CrashInfo;
+import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
@@ -59,9 +61,11 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base for v1 and v2 implementations.
@@ -90,7 +94,11 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		put("java_web", 512);
 	}};
 
-	private static int DEFAULT_MEMORY = 256;
+	private static final int DEFAULT_MEMORY = 256;
+
+	private static final int FILES_MAX_RETRIES = 10;
+
+	private static final String LOGS_LOCATION = "logs";
 
 	private RestTemplate restTemplate;
 
@@ -184,12 +192,27 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		configureCloudFoundryRequestFactory(restTemplate);
 	}
 
-	protected RestTemplate getRestTemplate() {
-		return this.restTemplate;
+	public Map<String, String> getLogs(String appName) {
+		String urlPath = getFileUrlPath();
+		String instance = String.valueOf(0);
+		return doGetLogs(urlPath, appName, instance);
 	}
 
-	protected String getUrl(String path) {
-		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
+	public Map<String, String> getCrashLogs(String appName) {
+		String urlPath = getFileUrlPath();
+		CrashesInfo crashes = getCrashes(appName);
+		TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
+		for (CrashInfo crash : crashes.getCrashes()) {
+			crashInstances.put(crash.getSince(), crash.getInstance());
+		}
+		String instance = crashInstances.get(crashInstances.lastKey());
+		return doGetLogs(urlPath, appName, instance);
+	}
+
+	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
+		String urlPath = getFileUrlPath();
+		Object appId = getFileAppId(appName);
+		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
 	}
 
 	public List<CloudDomain> getDomainsForOrg() {
@@ -242,6 +265,18 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
 		}
 	}
+
+	protected RestTemplate getRestTemplate() {
+		return this.restTemplate;
+	}
+
+	protected String getUrl(String path) {
+		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
+	}
+
+	protected abstract String getFileUrlPath();
+
+	protected abstract Object getFileAppId(String appName);
 
 	private void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
 		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
@@ -342,7 +377,31 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		}
 	}
 
+	protected Map<String, String> doGetLogs(String urlPath, String appName, String instance) {
+		Object appId = getFileAppId(appName);
+		String logFiles = doGetFile(urlPath, appId, instance, LOGS_LOCATION, -1, -1);
+		String separator = new String(new byte[] {0xa});
+		String[] lines = logFiles.split(separator);
+		List<String> fileNames = new ArrayList<String>();
+		for (String line : lines) {
+			String[] parts = line.split("\\s");
+			if (parts.length > 0 && parts[0] != null) {
+				fileNames.add(parts[0]);
+			}
+		}
+		Map<String, String> logs = new HashMap<String, String>(fileNames.size());
+		for(String fileName : fileNames) {
+			String logFile = LOGS_LOCATION + "/" + fileName;
+			logs.put(logFile, doGetFile(urlPath, appId, instance, logFile, -1, -1));
+		}
+		return logs;
+	}
+
 	protected String doGetFile(String urlPath, Object app, int instanceIndex, String filePath, int startPosition, int endPosition) {
+		return doGetFile(urlPath, app, String.valueOf(instanceIndex), filePath, startPosition, endPosition);
+	}
+
+	protected String doGetFile(String urlPath, Object app, String instance, String filePath, int startPosition, int endPosition) {
 		Assert.isTrue(startPosition >= -1, "Invalid start position value: " + startPosition);
 		Assert.isTrue(endPosition >= -1, "Invalid end position value: " + endPosition);
 		Assert.isTrue(startPosition < 0 || endPosition < 0 || endPosition >= startPosition,
@@ -359,6 +418,30 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 		final String range =
 				"bytes=" + (start == -1 ? "" : start) + "-" + (end == -1 ? "" : end);
+
+		//simple retry
+		int tries = 0;
+		String response = null;
+		while (response == null) {
+			tries++;
+			try {
+				response = doGetFileByRange(urlPath, app, instance, filePath, start, end, range);
+			} catch (HttpServerErrorException e) {
+				if (e.getStatusCode().equals(HttpStatus.SERVICE_UNAVAILABLE)) {
+					if (tries > FILES_MAX_RETRIES) {
+						throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+		}
+
+		return response;
+	}
+
+	private String doGetFileByRange(String urlPath, Object app, String instance, String filePath, int start, int end,
+									String range) {
 
 		boolean supportsRanges = false;
 		try {
@@ -377,7 +460,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 							return false;
 						}
 					},
-					app, instanceIndex, filePath);
+					app, instance, filePath);
 		} catch (CloudFoundryException e) {
 			if (e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)) {
 				// must be a 0 byte file
@@ -391,9 +474,8 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			headers.set("Range", range);
 		}
 		HttpEntity<Object> requestEntity = new HttpEntity<Object>(headers);
-		ResponseEntity<String> responseEntity =
-				getRestTemplate().exchange(getUrl(urlPath),
-						HttpMethod.GET, requestEntity, String.class, app, instanceIndex, filePath);
+		ResponseEntity<String> responseEntity = getRestTemplate().exchange(getUrl(urlPath),
+				HttpMethod.GET, requestEntity, String.class, app, instance, filePath);
 		String response = responseEntity.getBody();
 		boolean partialFile = false;
 		if (responseEntity.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {

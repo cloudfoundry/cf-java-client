@@ -874,6 +874,37 @@ public abstract class AbstractCloudFoundryClientTest {
 	//
 
 	@Test
+	public void getLogs() throws Exception {
+		String appName = namespacedAppName("simple_logs");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		Thread.sleep(500); // let's have some time to get some logs generated
+		Map<String, String> logs = getConnectedClient().getLogs(appName);
+		assertNotNull(logs);
+		assertTrue(logs.size() > 0);
+		for (String log : logs.keySet()) {
+			assertNotNull(logs.get(log));
+		}
+	}
+
+	@Test
+	public void getCrashLogs() throws Exception {
+		String appName = namespacedAppName("simple_crashlogs");
+		createAndUploadSimpleSpringApp(appName);
+		getConnectedClient().updateApplicationEnv(appName, Collections.singletonMap("crash", "true"));
+		getConnectedClient().startApplication(appName);
+
+		boolean pass = getInstanceInfosWithTimeout(appName, 1, false);
+		assertTrue("Couldn't get the right application state in 50 tries", pass);
+
+		Map<String, String> logs = getConnectedClient().getCrashLogs(appName);
+		assertNotNull(logs);
+		assertTrue(logs.size() > 0);
+		for (String log : logs.keySet()) {
+			assertNotNull(logs.get(log));
+		}
+	}
+
+	@Test
 	public void getFile() throws Exception {
 		String appName = namespacedAppName("simple_getFile");
 		createAndUploadAndStartSimpleSpringApp(appName);
