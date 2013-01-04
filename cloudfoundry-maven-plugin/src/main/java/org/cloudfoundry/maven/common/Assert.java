@@ -15,6 +15,8 @@
  */
 package org.cloudfoundry.maven.common;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 import org.cloudfoundry.client.lib.domain.CloudService;
@@ -167,6 +169,22 @@ public final class Assert {
 				message.append(additionalDescription + "\n");
 				message.append(UiUtils.HORIZONTAL_LINE);
 			}
+
+			throw new MojoExecutionException(message.toString());
+		}
+	}
+
+	/**
+	 * Cannot use elements url and urls together
+	 */
+	public static void configurationUrls(String url, List<String> urls) throws MojoExecutionException {
+		if (url != null && !urls.isEmpty()) {
+			final StringBuilder message = new StringBuilder("\n\n");
+
+			message.append("Both url and urls elements are specified at the same level\n");
+			message.append("========================================================================\n\n");
+			message.append("The element <url> should be nested inside a <urls> element or specified alone without a <urls> element present.\n");
+			message.append(UiUtils.HORIZONTAL_LINE);
 
 			throw new MojoExecutionException(message.toString());
 		}
