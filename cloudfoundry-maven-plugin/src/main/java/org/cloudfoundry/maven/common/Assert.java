@@ -15,6 +15,8 @@
  */
 package org.cloudfoundry.maven.common;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 import org.cloudfoundry.client.lib.domain.CloudService;
@@ -167,6 +169,23 @@ public final class Assert {
 				message.append(additionalDescription + "\n");
 				message.append(UiUtils.HORIZONTAL_LINE);
 			}
+
+			throw new MojoExecutionException(message.toString());
+		}
+	}
+
+	/**
+	 * Cannot use elements url and urls together
+	 */
+	public static void configurationUrls(String url, List<String> urls) throws MojoExecutionException {
+		if (url != null && !urls.isEmpty()) {
+			final StringBuilder message = new StringBuilder("\n\n");
+
+			message.append("Element url and urls found at the same time\n");
+			message.append("========================================================================\n\n");
+			message.append("Did you configure the parameter? The ");
+			message.append("element <url> and <urls> cannot be used together.\n Only one can be used at any time.\n");
+			message.append(UiUtils.HORIZONTAL_LINE);
 
 			throw new MojoExecutionException(message.toString());
 		}

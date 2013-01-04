@@ -31,6 +31,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
 
+import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 
 import org.springframework.http.HttpStatus;
@@ -54,12 +55,16 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
-		//Assert.configurationNotNull(getUrl(), "url", SystemProperties.URL);
+		final java.util.List<String> uris = new ArrayList<String>(0);
 
-		final java.util.List<String> uris = new ArrayList<String>(1);
+		Assert.configurationUrls(getUrl(), getUrls());
 
 		if (getUrl() != null) {
 			uris.add(getUrl());
+		} else if (!getUrls().isEmpty()) {
+			for (String uri : getUrls()) {
+				uris.add(uri);
+			}
 		}
 
 		final String appname = getAppname();
