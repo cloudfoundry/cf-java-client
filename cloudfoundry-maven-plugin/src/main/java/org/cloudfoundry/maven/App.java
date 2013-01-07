@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,29 @@
  */
 package org.cloudfoundry.maven;
 
-import java.util.List;
-
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
-
+import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Creates a service
+ * Application information. Displays the info of deployed application via name, along with
+ * information about health, instance count, bound services, and associated URLs.
  *
  * @author Ali Moghadam
  * @since 1.0.0
  *
- * @goal services
+ * @goal app
  * @phase process-sources
  */
-
-public class Services extends AbstractCloudFoundryMojo {
+public class App extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-		final List<ServiceConfiguration> serviceConfigurations = getClient().getServiceConfigurations();
-		List<CloudService> services = getClient().getServices();
-
-		getLog().info("System Services");
-		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(getClient(), serviceConfigurations));
-		getLog().info("Provisioned Services");
-		getLog().info("\n" + UiUtils.renderServiceDataAsTable(getClient(), services));
+		try {
+			final CloudApplication application = getClient().getApplication(getAppname());
+			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application));
+		} catch (CloudFoundryException e) {
+			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
+		}
 	}
 }
