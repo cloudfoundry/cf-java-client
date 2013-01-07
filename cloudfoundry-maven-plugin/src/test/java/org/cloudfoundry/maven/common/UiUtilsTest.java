@@ -69,7 +69,7 @@ public class UiUtilsTest {
 		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
 		applications.add(app1);
 
-		final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
+		final String renderedTableAsString = UiUtils.renderCloudApplicationsDataAsTable(applications);
 
 		LOGGER.info("\n" + renderedTableAsString);
 
