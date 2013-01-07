@@ -15,33 +15,29 @@
  */
 package org.cloudfoundry.maven;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.springframework.http.HttpStatus;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Stops an application.
+ * Application information. Displays the info of deployed application via name, along with
+ * information about health, instance count, bound services, and associated URLs.
  *
- * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  *
- * @goal stop
+ * @goal app
  * @phase process-sources
  */
-public class Stop extends AbstractApplicationAwareCloudFoundryMojo {
+public class App extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
-	protected void doExecute() throws MojoExecutionException {
-
-		getLog().info("Stopping application..." + getAppname());
-
+	protected void doExecute() {
 		try {
-			getClient().stopApplication(getAppname());
+			final CloudApplication application = getClient().getApplication(getAppname());
+			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application));
 		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
-						getAppname()), e);
-			}
+			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
 		}
 	}
 }
