@@ -45,6 +45,17 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
+	public void testExistenceOfAppMojo() throws Exception {
+
+		File testPom = new File( getBasedir(), testPomXmlPath);
+		App mojo = (App) lookupMojo ( "app", testPom );
+
+		assertNotNull( mojo );
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public void testExistenceOfDeleteMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
