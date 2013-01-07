@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class UiUtilsTest {
 		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
 		applications.add(app1);
 
-		final String renderedTableAsString = UiUtils.renderCloudApplicationDataAsTable(applications);
+		final String renderedTableAsString = UiUtils.renderCloudApplicationsDataAsTable(applications);
 
 		LOGGER.info("\n" + renderedTableAsString);
 

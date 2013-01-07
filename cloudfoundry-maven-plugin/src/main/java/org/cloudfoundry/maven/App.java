@@ -15,30 +15,29 @@
  */
 package org.cloudfoundry.maven;
 
-import java.util.List;
-
+import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Lists your applications. Displays all deployed applications, along with
+ * Application information. Displays the info of deployed application via name, along with
  * information about health, instance count, bound services, and associated URLs.
  *
- * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  *
- * @goal apps
+ * @goal app
  * @phase process-sources
  */
-public class Apps extends AbstractCloudFoundryMojo {
+public class App extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-
-		final List<CloudApplication> applications = getClient().getApplications();
-
-		getLog().info("\n" + UiUtils.renderCloudApplicationsDataAsTable(applications));
-
+		try {
+			final CloudApplication application = getClient().getApplication(getAppname());
+			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application));
+		} catch (CloudFoundryException e) {
+			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
+		}
 	}
-
 }
