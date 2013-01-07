@@ -56,6 +56,30 @@ public final class UiUtils {
 	}
 
 	/**
+	 * Renders a textual representation of a Application {@link CloudApplication}
+	 *
+	 * <ul>
+	 *     <li>Names of the Applications</li>
+	 *     <li>Number of Instances</li>
+	 *     <li>Current State (Health)</li>
+	 *     <li>Used Memory</li>
+	 *     <li>The comma-separated list of Uris</li>
+	 *     <li>The comma-separated list of Services</li>
+	 * <ul>
+	 */
+	public static String renderCloudApplicationDataAsTable(CloudApplication application) {
+		StringBuilder sb = new StringBuilder("\n");
+
+		sb.append(String.format("%s: %s\n", application.getName(), application.getState()));
+		sb.append(String.format("  platform: %s on %s\n", application.getStaging().getFramework(), application.getStaging().getRuntime()));
+		sb.append(String.format("  usage: %sM x %s instance\n", application.getMemory(), application.getInstances()));
+		sb.append(String.format("  urls: %s\n", CommonUtils.collectionToCommaDelimitedString(application.getUris())));
+		sb.append(String.format("  services: %s\n", CommonUtils.collectionToCommaDelimitedString(application.getServices())));
+
+		return sb.toString();
+	}
+
+	/**
 	 * Renders a textual representation of the list of provided {@link CloudApplication}
 	 *
 	 * The following information is shown:
@@ -73,7 +97,7 @@ public final class UiUtils {
 	 * @return The rendered table representation as String
 	 *
 	 */
-	public static String renderCloudApplicationDataAsTable(List<CloudApplication> applications) {
+	public static String renderCloudApplicationsDataAsTable(List<CloudApplication> applications) {
 
 		Table table = new Table();
 
