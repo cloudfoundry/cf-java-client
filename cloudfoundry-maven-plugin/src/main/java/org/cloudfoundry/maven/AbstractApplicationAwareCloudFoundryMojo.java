@@ -119,6 +119,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private List<CloudService> services;
 
 	/**
+	 * list of services to use by the application.
+	 *
+	 * @parameter expression="${domains}"
+	 */
+	private List<String> domains;
+
+	/**
 	 * Framework type, defaults to CloudApplication.Spring
 	 *
 	 * @parameter expression="${cf.framework}" default-value="spring"
@@ -456,6 +463,21 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return servicesList;
 		} else {
 			return this.services;
+		}
+	}
+
+	/**
+	 * Returns the custom domain names that shall be created and added to the application.
+	 *
+	 * @return Never null
+	 */
+	public List<String> getCustomDomains() {
+		final List<String> domainList = new ArrayList<String>(0);
+
+		if (this.domains == null) {
+			return domainList;
+		} else {
+			return this.domains;
 		}
 	}
 

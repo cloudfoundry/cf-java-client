@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.maven.common.Assert;
 
@@ -56,6 +57,15 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
 		uploadApplication(getClient(), path, appName);
+
+		if (getClient().getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			getLog().debug("Updating domains for cc v2");
+			for (String domain : getCustomDomains()) {
+				if (!getClient().getDomains().contains(domain)) {
+					getClient().addDomain(domain);
+				}
+			}
+		}
 
 		getLog().debug("Updating application memory");
 		getClient().updateApplicationMemory(appName, getMemory());
