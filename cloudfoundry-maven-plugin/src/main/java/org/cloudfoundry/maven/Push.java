@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,11 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
+
+		if (CommonUtils.isCloudControllerV2(getClient())) {
+			getLog().debug("Updating domains for cc v2");
+			addDomains();
+		}
 
 		final java.util.List<String> uris = new ArrayList<String>(0);
 

@@ -24,11 +24,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -60,7 +60,7 @@ public class ServiceCreation {
  */
 	public List<String> createServices() throws MojoExecutionException {
 		for (CloudService service: services) {
-			if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			if (CommonUtils.isCloudControllerV2(client)) {
 				Assert.configurationServiceNotNullV2(service, null);
 
 				if (service.getProvider() == null) {
@@ -99,7 +99,7 @@ public class ServiceCreation {
 		if (service.getVersion() == null) {
 			List<String> tmpServices = new ArrayList<String>();
 
-			if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			if (CommonUtils.isCloudControllerV2(client)) {
 				for (ServiceConfiguration serviceConfiguration : client.getServiceConfigurations()) {
 					if (serviceConfiguration.getCloudServiceOffering().getLabel().equals(service.getLabel())) {
 						tmpServices.add(serviceConfiguration.getCloudServiceOffering().getVersion());

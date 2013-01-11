@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 
 /**
  * Updates an application.
  *
  * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  *
  * @goal update
@@ -56,6 +58,11 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
 		uploadApplication(getClient(), path, appName);
+
+		if (CommonUtils.isCloudControllerV2(getClient())) {
+			getLog().debug("Updating domains for cc v2");
+			addDomains();
+		}
 
 		getLog().debug("Updating application memory");
 		getClient().updateApplicationMemory(appName, getMemory());
