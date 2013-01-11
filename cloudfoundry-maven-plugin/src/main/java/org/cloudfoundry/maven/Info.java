@@ -37,6 +37,7 @@ import org.cloudfoundry.maven.common.UiUtils;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Ali Moghadam
  *
  * @since 1.0.0
  *
@@ -68,7 +69,7 @@ public class Info extends AbstractCloudFoundryMojo {
 		final CloudInfo cloudInfo;
 		final List<ServiceConfiguration> serviceConfigurations;
 
-		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+		if (AbstractCloudFoundryMojo.isCloudControllerV2(client)) {
 			CloudFoundryClient newClient = null;
 
 			if (getUsername() != null && getPassword() != null) {

@@ -55,6 +55,15 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
+		if (isCloudControllerV2(getClient())) {
+			getLog().debug("Updating domains for cc v2");
+			for (String domain : getCustomDomains()) {
+				if (!getClient().getDomains().contains(domain)) {
+					getClient().addDomain(domain);
+				}
+			}
+		}
+
 		final java.util.List<String> uris = new ArrayList<String>(0);
 
 		Assert.configurationUrls(getUrl(), getUrls());

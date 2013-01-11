@@ -27,6 +27,7 @@ import org.cloudfoundry.maven.common.Assert;
  * Updates an application.
  *
  * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  *
  * @goal update
@@ -56,6 +57,15 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
 
 		uploadApplication(getClient(), path, appName);
+
+		if (isCloudControllerV2(getClient())) {
+			getLog().debug("Updating domains for cc v2");
+			for (String domain : getCustomDomains()) {
+				if (!getClient().getDomains().contains(domain)) {
+					getClient().addDomain(domain);
+				}
+			}
+		}
 
 		getLog().debug("Updating application memory");
 		getClient().updateApplicationMemory(appName, getMemory());

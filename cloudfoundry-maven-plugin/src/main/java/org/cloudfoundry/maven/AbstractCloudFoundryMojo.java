@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
  * Plugin.
  *
  * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  */
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
@@ -309,6 +310,22 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	}
 
 	/**
+	 * If true, the client is using a version 2 of cloud controller (ccng)
+	 * If false, then client is using legacy cloud controller
+	 *
+	 * @param client
+	 *
+	 * @return boolean
+	 */
+	protected static boolean isCloudControllerV2(CloudFoundryClient client) {
+		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 *  Goals will typically override this method.
 	 */
 	protected abstract void doExecute() throws MojoExecutionException, MojoFailureException;
@@ -324,7 +341,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			CloudFoundryClient simpleClient = new CloudFoundryClient(getTarget().toURL());
 			String token = null;
 
-			if (simpleClient.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			if (isCloudControllerV2(simpleClient)) {
 				if (getUsername() != null && getPassword() != null) {
 					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 				} else {
