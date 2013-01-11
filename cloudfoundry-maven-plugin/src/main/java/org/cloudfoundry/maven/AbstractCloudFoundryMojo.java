@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.ResourceAccessException;
@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
  * Plugin.
  *
  * @author Gunnar Hillert
+ * @author Ali Moghadam
  * @since 1.0.0
  */
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
@@ -324,7 +325,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			CloudFoundryClient simpleClient = new CloudFoundryClient(getTarget().toURL());
 			String token = null;
 
-			if (simpleClient.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			if (CommonUtils.isCloudControllerV2(simpleClient)) {
 				if (getUsername() != null && getPassword() != null) {
 					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 				} else {

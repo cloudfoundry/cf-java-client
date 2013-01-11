@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 
@@ -37,6 +38,7 @@ import org.cloudfoundry.maven.common.UiUtils;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Ali Moghadam
  *
  * @since 1.0.0
  *
@@ -68,7 +70,7 @@ public class Info extends AbstractCloudFoundryMojo {
 		final CloudInfo cloudInfo;
 		final List<ServiceConfiguration> serviceConfigurations;
 
-		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+		if (CommonUtils.isCloudControllerV2(client)) {
 			CloudFoundryClient newClient = null;
 
 			if (getUsername() != null && getPassword() != null) {
