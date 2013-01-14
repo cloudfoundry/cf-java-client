@@ -21,8 +21,18 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class CloudOrganization extends CloudEntity {
 
+	private boolean billingEnabled = false;
+
 	public CloudOrganization(Meta meta, String name) {
-		super(meta, name);
+		this(meta, name, false);
 	}
 
+	public CloudOrganization(Meta meta, String name, boolean billingEnabled) {
+		super(meta, name);
+		this.billingEnabled = billingEnabled;
+	}
+
+	public boolean isBillingEnabled() {
+		return billingEnabled;
+	}
 }

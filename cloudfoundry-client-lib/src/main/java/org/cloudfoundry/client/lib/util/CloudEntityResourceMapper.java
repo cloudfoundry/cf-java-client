@@ -93,7 +93,8 @@ public class CloudEntityResourceMapper {
 	}
 
 	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {
-		CloudOrganization org = new CloudOrganization(getMeta(resource), getNameOfResource(resource));
+		Boolean billingEnabled = getEntityAttribute(resource, "billing_enabled", Boolean.class);
+		CloudOrganization org = new CloudOrganization(getMeta(resource), getNameOfResource(resource), billingEnabled);
 		return org;
 	}
 
@@ -130,6 +131,12 @@ public class CloudEntityResourceMapper {
 		Integer runningInstancesAttribute = getEntityAttribute(resource, "running_instances", Integer.class);
 		if (runningInstancesAttribute != null) {
 			app.setRunningInstances(runningInstancesAttribute);
+		}
+		Boolean production = getEntityAttribute(resource, "production", Boolean.class);
+		if (production) {
+			app.setPlan("paid");
+		} else {
+			app.setPlan("free");
 		}
 		app.setDebug(null);
 		String runtime = null;
@@ -249,6 +256,9 @@ public class CloudEntityResourceMapper {
 			return (T) String.valueOf(entity.get(attributeName));
 		}
 		if (targetClass == Integer.class) {
+			return (T) entity.get(attributeName);
+		}
+		if (targetClass == Boolean.class) {
 			return (T) entity.get(attributeName);
 		}
 		if (targetClass == Map.class) {

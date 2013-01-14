@@ -135,8 +135,8 @@ public abstract class AbstractCloudFoundryClientTest {
 		} else {
 			assertEquals("mysql", service.getLabel());
 			assertEquals("core", service.getProvider());
-			assertEquals("5.1", service.getVersion());
-			assertEquals("D100", service.getPlan());
+			assertEquals("5.5", service.getVersion());
+			assertEquals("100", service.getPlan());
 		}
 	}
 
@@ -1140,7 +1140,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		}
 		getConnectedClient().createApplication(appName, staging,
 				getTestAppMemory(staging.getFramework()),
-				uris, serviceNames);
+				uris, serviceNames, "paid");
 	}
 
 	private void createMySqlService(String serviceName) {
@@ -1166,7 +1166,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			service.setProvider("core");
 			service.setLabel("mysql");
 			service.setVersion(databaseServiceConfiguration.getVersion());
-			service.setPlan("D100");
+			service.setPlan("100");
 		}
 		getConnectedClient().createService(service);
 	}

@@ -46,6 +46,7 @@ public class CloudApplication extends CloudEntity {
 	private int instances;
 	private List<String> uris;
 	private List<String> services;
+	private String plan;
 	private AppState state;
 	private DebugMode debug;
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
@@ -163,6 +164,14 @@ public class CloudApplication extends CloudEntity {
 
 	public void setUris(List<String> uris) {
 		this.uris = uris;
+	}
+
+	public String getPlan() {
+		return plan;
+	}
+
+	public void setPlan(String plan) {
+		this.plan = plan;
 	}
 
 	public AppState getState() {

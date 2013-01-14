@@ -262,6 +262,11 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
+		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists);
+	}
+
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
 		if (checkExists) {
 			try {
 				getApplication(appName);

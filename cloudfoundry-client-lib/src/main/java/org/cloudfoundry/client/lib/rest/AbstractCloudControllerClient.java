@@ -60,6 +60,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -112,6 +113,8 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected String token;
 
+	protected List<String> freeApplicationPlans = Arrays.asList("free");
+
 	public AbstractCloudControllerClient(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
 										 URL authorizationEndpoint, HttpProxyConfiguration httpProxyConfiguration) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
@@ -157,6 +160,10 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return list;
 	}
 
+	public List<String> getApplicationPlans() {
+		return Collections.unmodifiableList(freeApplicationPlans);
+	}
+
 	public int[] getApplicationMemoryChoices() {
 		// TODO: Get it from cloudcontroller's 'info/resources' end point
 		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
@@ -190,6 +197,10 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		ClientHttpRequestFactory requestFactory = restUtil.createRequestFactory(httpProxyConfiguration);
 		restTemplate.setRequestFactory(requestFactory);
 		configureCloudFoundryRequestFactory(restTemplate);
+	}
+
+	public void updateApplicationPlan(String appName, String applicationPlan) {
+		// subclasses should override this method if they support application plans
 	}
 
 	public Map<String, String> getLogs(String appName) {

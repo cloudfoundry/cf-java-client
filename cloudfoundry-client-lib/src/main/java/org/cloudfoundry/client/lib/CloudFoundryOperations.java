@@ -74,6 +74,13 @@ public interface CloudFoundryOperations {
 	List<CloudSpace> getSpaces();
 
 	/**
+	 * Get list of application plans for the current org.
+	 *
+	 * @return List of application plans
+	 */
+	List<String> getApplicationPlans();
+
+	/**
 	 * Register new user account with the provided credentials.
 	 *
 	 * @param email the email account
@@ -160,34 +167,10 @@ public interface CloudFoundryOperations {
 	 * @param memory memory to use in MB
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
+	 * @param applicationPlan the application plan for the deployed app
 	 */
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-						   List<String> serviceNames);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param framework name of framework to use
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 */
-	void createApplication(String appName, String framework, int memory, List<String> uris,
-						   List<String> serviceNames);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param framework name of framework to use
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param checkExists check if app exists before creating it
-	 */
-	void createApplication(String appName, String framework, int memory, List<String> uris,
-						   List<String> serviceNames, boolean checkExists);
+						   List<String> serviceNames, String applicationPlan);
 
 	/**
 	 * Create application.
@@ -197,9 +180,35 @@ public interface CloudFoundryOperations {
 	 * @param memory memory to use in MB
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
+	 * @param applicationPlan the application plan for the deployed app
 	 * @param checkExists check if app exists before creating it
 	 */
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
+						   List<String> serviceNames, String applicationPlan, boolean checkExists);
+
+	/**
+	 * Create application.
+	 *
+	 * @param appName application name
+	 * @param framework name of framework to use
+	 * @param memory memory to use in MB
+	 * @param uris list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 */
+	void createApplication(String appName, String framework, int memory, List<String> uris,
+						   List<String> serviceNames);
+
+	/**
+	 * Create application.
+	 *
+	 * @param appName application name
+	 * @param framework name of framework to use
+	 * @param memory memory to use in MB
+	 * @param uris list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 * @param checkExists check if app exists before creating it
+	 */
+	void createApplication(String appName, String framework, int memory, List<String> uris,
 						   List<String> serviceNames, boolean checkExists);
 
 	/**
@@ -354,6 +363,14 @@ public interface CloudFoundryOperations {
 	 * @param env list of environment settings
 	 */
 	void updateApplicationEnv(String appName, List<String> env);
+
+	/**
+	 * Update application plan for the specified app.
+	 *
+	 * @param appName name of application
+	 * @param applicationPlan the plan to use
+	 */
+	void updateApplicationPlan(String appName, String applicationPlan);
 
 	/**
 	 * Get logs from the deployed application. The logs

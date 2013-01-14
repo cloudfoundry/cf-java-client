@@ -64,7 +64,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +99,8 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private Map<String, UUID> runtimeIdCache = new HashMap<String, UUID>();
 
 	private Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
+
+	private List<String> paidApplicationPlans = Arrays.asList("free", "paid");
 
 	public CloudControllerClientV2(URL cloudControllerUrl,
 								   RestUtil restUtil,
@@ -160,6 +164,15 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			spaces.add(resourceMapper.mapResource(resource, CloudSpace.class));
 		}
 		return spaces;
+	}
+
+	public List<String> getApplicationPlans() {
+		Assert.notNull(sessionSpace, "Unable to determine application plans without specifying org and space to use.");
+		if (sessionSpace.getOrganization().isBillingEnabled()) {
+			return Collections.unmodifiableList(paidApplicationPlans);
+		} else {
+			return Collections.unmodifiableList(freeApplicationPlans);
+		}
 	}
 
 	public String login() {
@@ -370,6 +383,11 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
+		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists);
+	}
+
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
 		if (checkExists) {
 			try {
 				getAppId(appName);
@@ -392,6 +410,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			appRequest.put("command", staging.getCommand());
 		}
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
+		if (applicationPlan != null && applicationPlan.equals("paid")) {
+			appRequest.put("production", true);
+		}
 		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
 		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
 		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
@@ -775,6 +796,19 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			envHash.put(key, value);
 		}
 		updateApplicationEnv(appName, envHash);
+	}
+
+	@Override
+	public void updateApplicationPlan(String appName, String applicationPlan) {
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		if (applicationPlan != null && applicationPlan.equals("paid")) {
+			appRequest.put("production", true);
+		} else {
+			appRequest.put("production", false);
+		}
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
+
 	}
 
 	public void bindService(String appName, String serviceName) {

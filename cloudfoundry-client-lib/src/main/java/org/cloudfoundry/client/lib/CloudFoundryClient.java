@@ -111,6 +111,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getSpaces();
 	}
 
+	public List<String> getApplicationPlans() {
+		return cc.getApplicationPlans();
+	}
+
 	public void register(String email, String password) {
 		cc.register(email, password);
 	}
@@ -160,6 +164,21 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createApplication(appName, staging, memory, uris, serviceNames, false);
 	}
 
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, boolean checkExists) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, checkExists);
+	}
+
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, String applicationPlan) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false);
+	}
+
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists);
+	}
+
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
 								  List<String> serviceNames) {
 		cc.createApplication(appName, new Staging(framework), memory, uris, serviceNames, false);
@@ -168,11 +187,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void createApplication(String appName, String framework, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
 		cc.createApplication(appName, new Staging(framework), memory, uris, serviceNames, checkExists);
-	}
-
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, boolean checkExists) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, checkExists);
 	}
 
 	public void createService(CloudService service) {
@@ -255,6 +269,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void updateApplicationEnv(String appName, List<String> env) {
 		cc.updateApplicationEnv(appName, env);
+	}
+
+	public void updateApplicationPlan(String appName, String applicationPlan) {
+		cc.updateApplicationPlan(appName, applicationPlan);
 	}
 
 	public Map<String, String> getLogs(String appName) {

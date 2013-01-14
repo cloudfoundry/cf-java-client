@@ -60,6 +60,8 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	private CloudInfo cloudInfo;
 
+	private CloudSpace testSpace = null;
+
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://ccng.cloudfoundry.com");
 
@@ -254,6 +256,38 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		}
 	}
 
+	@Test
+	public void canDeployPaidApplication() throws IOException {
+		String appName = namespacedAppName("prod1");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		assertNotNull(app);
+		assertEquals("paid", app.getPlan());
+	}
+
+	@Test
+	public void canChangeApplicationPlan() throws IOException {
+		String appName = namespacedAppName("prod2");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		assertNotNull(app);
+		assertEquals("paid", app.getPlan());
+		getConnectedClient().updateApplicationPlan(appName, "free");
+		app = getConnectedClient().getApplication(appName);
+		assertEquals("free", app.getPlan());
+	}
+
+	@Test
+	public void getApplicationPlans() throws IOException {
+		List<String> appPlans = getConnectedClient().getApplicationPlans();
+		assertNotNull(appPlans);
+		assertTrue(appPlans.contains("free"));
+		if (testSpace.getOrganization().isBillingEnabled()) {
+			assertEquals(2, appPlans.size());
+			assertTrue(appPlans.contains("paid"));
+		} else {
+			assertEquals(1, appPlans.size());
+		}
+	}
+
 	private void clearTestDomainAndRoutes() {
 		for (CloudDomain domain : getConnectedClient().getDomainsForOrg()) {
 			if (domain.getName().equals(TEST_DOMAIN)) {
@@ -295,7 +329,6 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {
 		List<CloudSpace> spaces = client.getSpaces();
-		CloudSpace testSpace = null;
 		for (CloudSpace space : spaces) {
 			CloudOrganization org = space.getOrganization();
 			String orgName = null;
