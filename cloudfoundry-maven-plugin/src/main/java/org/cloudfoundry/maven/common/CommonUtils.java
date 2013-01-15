@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
@@ -244,4 +245,19 @@ public final class CommonUtils {
 		return sb.toString();
 	}
 
+	/**
+	 * If true, the client is using a version 2 of cloud controller (ccng)
+	 * If false, then client is using legacy cloud controller
+	 *
+	 * @param client
+	 *
+	 * @return boolean
+	 */
+	public static boolean isCloudControllerV2(CloudFoundryClient client) {
+		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
+			return true;
+		}
+
+		return false;
+	}
 }
