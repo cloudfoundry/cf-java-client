@@ -62,6 +62,9 @@ public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 		if (CommonUtils.isCloudControllerV2(getClient())) {
 			getLog().debug("Updating domains for cc v2");
 			addDomains();
+
+			getLog().debug("Checking for plan");
+			getClient().updateApplicationPlan(appName, getPlan());
 		}
 
 		getLog().debug("Updating application memory");
