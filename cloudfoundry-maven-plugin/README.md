@@ -122,7 +122,7 @@ Following, a typical (expected) configuration example is shown, which uses sever
       ...
     </project>
 
-> The **url** element is optional. If not specified, it defaults to *appname*.<main *target* domain> (using the *appname* element)
+> The **url** element is optional. If not specified, it defaults to *appname*.\<main *target* domain> (using the *appname* element)
 > e.g. if your **appname** is *spring-integration-rocks* and the **target** is defined as *api.cloudfoundry.com* then the url will default to: **spring-integration-rocks.cloudfoundry.com**
 
 in **settings.xml**:
