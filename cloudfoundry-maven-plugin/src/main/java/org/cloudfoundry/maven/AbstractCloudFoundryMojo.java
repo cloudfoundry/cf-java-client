@@ -417,7 +417,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 				return authenticationInfo.getPassword();
 			} else {
 				getLog().debug(String.format(
-						"In settings.xml no passwword was found for server element '%s'. Does the element exist?", this.getServer()));
+						"In settings.xml no password was found for server element '%s'. Does the element exist?", this.getServer()));
 				return null;
 			}
 
