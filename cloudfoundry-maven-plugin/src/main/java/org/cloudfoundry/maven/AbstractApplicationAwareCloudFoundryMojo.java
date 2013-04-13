@@ -128,6 +128,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private List<String> domains;
 
 	/**
+	 * Application Plan. Either free or paid
+	 *
+	 * @parameter expression="${plan}"
+	 */
+	private String plan;
+
+	/**
 	 * Framework type, defaults to CloudApplication.Spring
 	 *
 	 * @parameter expression="${cf.framework}" default-value="spring"
@@ -194,6 +201,20 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return this.framework;
 		}
 
+	}
+
+	/**
+	 * Application plan. Either free or paid
+	 *
+	 * @return Returns the plan or free, will never return Null.
+	 */
+	public String getPlan() {
+
+		if (plan != null && plan.equals("paid")) {
+			return plan;
+		} else {
+			return "free";
+		}
 	}
 
 	/**

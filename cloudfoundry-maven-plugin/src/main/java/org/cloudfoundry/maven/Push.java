@@ -140,7 +140,13 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 			staging.setCommand(command);
 			staging.setRuntime(runtime);
 
-			getClient().createApplication(appname, staging, memory, uris, serviceNames);
+			if (CommonUtils.isCloudControllerV2(getClient())) {
+				getLog().debug("Checking for plan");
+				getClient().createApplication(appname, staging, memory, uris, serviceNames, getPlan());
+			} else {
+				getClient().createApplication(appname, staging, memory, uris, serviceNames);
+			}
+
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 					getAppname(), e.getMessage(), e.getDescription()), e);
