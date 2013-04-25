@@ -65,14 +65,11 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
 /**
@@ -81,14 +78,6 @@ import java.util.zip.ZipFile;
  * @author Thomas Risberg
  */
 public class CloudControllerClientV2 extends AbstractCloudControllerClient {
-
-	// This map only contains framework/runtime mapping for frameworks that we actively support
-	private static Map<String, String[]> FRAMEWORK_RUNTIME_PATTERNS = new HashMap<String, String[]>() {{
-		put("spring", new String[] {"java.*"});
-		put("lift", new String[] {"java.*"});
-		put("grails", new String[] {"java.*"});
-		put("java_web", new String[] {"java.*"});
-	}};
 
 	private OauthClient oauthClient;
 
@@ -136,18 +125,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		CloudInfo.Limits limits = null;
 		CloudInfo.Usage usage = null;
 		boolean debug = false;
-		Map<String, CloudInfo.Runtime> runtimes = null;
-		Collection<CloudInfo.Framework> frameworks = null;
 		if (token != null) {
 			limits = new CloudInfo.Limits(limitMap);
 			usage = new CloudInfo.Usage(usageMap);
 			debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
-			runtimes = getInfoForRuntimes();
-			frameworks = getInfoForFrameworks(runtimes);
 		}
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
-				description, limits, usage, debug, frameworks, runtimes);
+				description, limits, usage, debug);
 	}
 
 	public boolean supportsSpaces() {
@@ -321,8 +306,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (resource == null) {
 			throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Not Found", "Application not found");
 		}
-		CloudApplication cloudApp = mapCloudApplication(resource);
-		return cloudApp;
+		return mapCloudApplication(resource);
 	}
 
 	private CloudApplication mapCloudApplication(Map<String, Object> resource) {
@@ -377,8 +361,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		urlVars.put("guid", appId);
 		String resp = getRestTemplate().getForObject(url, String.class, urlVars);
-		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		return respMap;
+		return JsonUtil.convertJsonToMap(resp);
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
@@ -466,10 +449,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private void addUris(List<String> uris, UUID appGuid) {
 		Map<String, UUID> domains = getDomainGuids();
 		for (String uri : uris) {
-			UUID domainGuid = null;
 			Map<String, String> uriInfo = new HashMap<String, String>(2);
 			extractUriInfo(domains, uri, uriInfo);
-			domainGuid = domains.get(uriInfo.get("domainName"));
+			UUID domainGuid = domains.get(uriInfo.get("domainName"));
 			bindRoute(uriInfo.get("host"), domainGuid, appGuid);
 		}
 	}
@@ -477,10 +459,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private void removeUris(List<String> uris, UUID appGuid) {
 		Map<String, UUID> domains = getDomainGuids();
 		for (String uri : uris) {
-			UUID domainGuid = null;
 			Map<String, String> uriInfo = new HashMap<String, String>(2);
 			extractUriInfo(domains, uri, uriInfo);
-			domainGuid = domains.get(uriInfo.get("domainName"));
+			UUID domainGuid = domains.get(uriInfo.get("domainName"));
 			unbindRoute(uriInfo.get("host"), domainGuid, appGuid);
 		}
 	}
@@ -595,8 +576,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		routeRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		String routeResp = getRestTemplate().postForObject(getUrl("/v2/routes"), routeRequest, String.class);
 		Map<String, Object> routeEntity = JsonUtil.convertJsonToMap(routeResp);
-		UUID newRouteGuid = CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
-		return newRouteGuid;
+		return CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
 	}
 
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
@@ -987,8 +967,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		domainRequest.put("wildcard", true);
 		String resp = getRestTemplate().postForObject(getUrl(urlPath), domainRequest, String.class);
 		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
-		UUID domainGuid = resourceMapper.getGuidOfResource(respMap);
-		return domainGuid;
+		return resourceMapper.getGuidOfResource(respMap);
 	}
 
 	private void doDeleteDomain(UUID domainGuid) {
@@ -1045,6 +1024,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<UUID> getAppsBoundToService(CloudService cloudService) {
 		List<UUID> appGuids = new ArrayList<UUID>();
 		String urlPath = "/v2";
@@ -1071,44 +1051,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private void doDeleteApplication(UUID appId) {
 		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), appId);
-	}
-
-	@SuppressWarnings("unchecked")
-	private Collection<CloudInfo.Framework> getInfoForFrameworks(Map<String, CloudInfo.Runtime> runtimes) {
-		List<Map<String, Object>> resourceList = getAllResources("/v2/frameworks", null);
-		Collection<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-		for (Map<String, Object> frameworkMap : resourceList) {
-			Map<String, Object> frameworkEntity = (Map<String, Object>) frameworkMap.get("entity");
-			String frameworkName = String.valueOf(frameworkEntity.get("name"));
-			String[] runtimePatterns = FRAMEWORK_RUNTIME_PATTERNS.get(frameworkName);
-			List<CloudInfo.Runtime> runtimeList = new ArrayList<CloudInfo.Runtime>();
-			if (runtimePatterns != null) {
-				for (String runtimePattern : runtimePatterns) {
-					Pattern pattern = Pattern.compile(runtimePattern);
-					for (String runtimeName : runtimes.keySet()) {
-						Matcher matcher = pattern.matcher(runtimeName);
-						if (matcher.find()) {
-							runtimeList.add(runtimes.get(runtimeName));
-						}
-					}
-				}
-			}
-			CloudInfo.Framework framework = new CloudInfo.Framework(frameworkEntity, runtimeList);
-			frameworks.add(framework);
-		}
-		return frameworks;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, CloudInfo.Runtime> getInfoForRuntimes() {
-		List<Map<String, Object>> runtimesList = getAllResources("/v2/runtimes", null);
-		Map<String, CloudInfo.Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
-		for (Map<String, Object> runtimeMap : runtimesList) {
-			Map<String, Object> runtimeEntity = (Map<String, Object>) runtimeMap.get("entity");
-			CloudInfo.Runtime runtime = new CloudInfo.Runtime(runtimeEntity);
-			runtimes.put(runtime.getName(), runtime);
-		}
-		return runtimes;
 	}
 
 	@SuppressWarnings("unchecked")
