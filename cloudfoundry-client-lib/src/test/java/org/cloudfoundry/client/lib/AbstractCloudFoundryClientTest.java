@@ -63,6 +63,8 @@ import static org.junit.Assume.assumeTrue;
  */
 public abstract class AbstractCloudFoundryClientTest {
 
+	private static final String V2_SERVICE_TEST_MYSQL_PLAN = "100";
+
 	@ClassRule
 	public static CloudVersionRule cloudVersionRule = new CloudVersionRule();
 
@@ -136,7 +138,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			assertEquals("mysql", service.getLabel());
 			assertEquals("core", service.getProvider());
 			assertEquals("5.5", service.getVersion());
-			assertEquals("100", service.getPlan());
+			assertEquals(V2_SERVICE_TEST_MYSQL_PLAN, service.getPlan());
 		}
 	}
 
@@ -1166,7 +1168,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			service.setProvider("core");
 			service.setLabel("mysql");
 			service.setVersion(databaseServiceConfiguration.getVersion());
-			service.setPlan("100");
+			service.setPlan(V2_SERVICE_TEST_MYSQL_PLAN);
 		}
 		getConnectedClient().createService(service);
 	}
