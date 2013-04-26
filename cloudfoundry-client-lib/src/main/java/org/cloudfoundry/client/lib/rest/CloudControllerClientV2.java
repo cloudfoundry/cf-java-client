@@ -85,10 +85,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
 
-	private Map<String, UUID> runtimeIdCache = new HashMap<String, UUID>();
-
-	private Map<String, UUID> frameworkIdCache = new HashMap<String, UUID>();
-
 	private List<String> paidApplicationPlans = Arrays.asList("free", "paid");
 
 	public CloudControllerClientV2(URL cloudControllerUrl,
@@ -385,8 +381,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
-		appRequest.put("framework_guid", getFrameworkId(staging.getFramework()));
-		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
 		appRequest.put("memory", memory);
 		appRequest.put("instances", 1);
 		if (staging.getCommand() != null) {
@@ -743,8 +737,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
 		}
-		appRequest.put("framework_guid", getFrameworkId(staging.getFramework()));
-		appRequest.put("runtime_guid", getRuntimeId(staging.getRuntime()));
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
@@ -1133,32 +1125,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			uris.add(uri);
 		}
 		return uris;
-	}
-
-	@SuppressWarnings("unchecked")
-	private UUID getFrameworkId(String framework) {
-		if (!frameworkIdCache.containsKey(framework)) {
-			List<Map<String, Object>> resourceList = getAllResources("/v2/frameworks", null);
-			for (Map<String, Object> resource : resourceList) {
-				String name = resourceMapper.getNameOfResource(resource);
-				UUID guid = resourceMapper.getGuidOfResource(resource);
-				frameworkIdCache.put(name, guid);
-			}
-		}
-		return frameworkIdCache.get(framework);
-	}
-
-	@SuppressWarnings("unchecked")
-	private UUID getRuntimeId(String runtime) {
-		if (!runtimeIdCache.containsKey(runtime)) {
-			List<Map<String, Object>> resourceList = getAllResources("/v2/runtimes", null);
-			for (Map<String, Object> resource : resourceList) {
-				String name = resourceMapper.getNameOfResource(resource);
-				UUID guid = resourceMapper.getGuidOfResource(resource);
-				runtimeIdCache.put(name, guid);
-			}
-		}
-		return runtimeIdCache.get(runtime);
 	}
 
 	@SuppressWarnings("unused")
