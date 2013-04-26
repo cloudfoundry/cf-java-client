@@ -661,13 +661,21 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public void deleteApplication(String appName) {
 		UUID appId = getAppId(appName);
+		unbindAllServices(appName);
 		doDeleteApplication(appId);
 	}
 
 	public void deleteAllApplications() {
 		List<CloudApplication> cloudApps = getApplications();
 		for (CloudApplication cloudApp : cloudApps) {
-			doDeleteApplication(cloudApp.getMeta().getGuid());
+			deleteApplication(cloudApp.getName());
+		}
+	}
+
+	private void unbindAllServices(String appName) {
+		CloudApplication app = getApplication(appName);
+		for (String serviceName : app.getServices()) {
+			unbindService(appName, serviceName);
 		}
 	}
 
