@@ -585,16 +585,13 @@ public abstract class AbstractCloudFoundryClientTest {
 	}
 
 	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) throws InterruptedException {
-		InstancesInfo instances = getInstancesWithTimeout(getConnectedClient(), appName);
-		assertNotNull(instances);
-		assertEquals(1, instances.getInstances().size());
-
 		if (count > 1) {
-		getConnectedClient().updateApplicationInstances(appName, count);
+			getConnectedClient().updateApplicationInstances(appName, count);
 			CloudApplication app = getConnectedClient().getApplication(appName);
 			assertEquals(count, app.getInstances());
 		}
 
+		InstancesInfo instances = null;
 		boolean pass = false;
 		for (int i = 0; i < 50; i++) {
 			instances = getInstancesWithTimeout(getConnectedClient(), appName);
@@ -632,14 +629,11 @@ public abstract class AbstractCloudFoundryClientTest {
 		createAndUploadAndStartSimpleSpringApp(appName);
 		getConnectedClient().updateApplicationInstances(appName, 2);
 		CloudApplication app = getConnectedClient().getApplication(appName);
-		getConnectedClient().startApplication(appName);
 		assertEquals(2, app.getInstances());
-		for (int i = 0; i < 10 && app.getRunningInstances() < 2; i++) {
-			Thread.sleep(1000);
-			app = getConnectedClient().getApplication(appName);
-		}
-		app = getConnectedClient().getApplication(appName);
-		assertEquals(2, app.getRunningInstances());
+		getConnectedClient().startApplication(appName);
+
+		boolean running = getInstanceInfosWithTimeout(appName, 2, true);
+		assertTrue("App failed to start 2 instances", running);		
 	}
 
 	@Test
@@ -668,7 +662,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		CloudApplication app = getConnectedClient().getApplication(appName);
 		getConnectedClient().startApplication(appName);
 		assertEquals(1, app.getInstances());
-		for (int i = 0; i < 10 && app.getRunningInstances() < 1; i++) {
+		for (int i = 0; i < 100 && app.getRunningInstances() < 1; i++) {
 			Thread.sleep(1000);
 			app = getConnectedClient().getApplication(appName);
 		}
@@ -908,6 +902,8 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void getFile() throws Exception {
 		String appName = namespacedAppName("simple_getFile");
 		createAndUploadAndStartSimpleSpringApp(appName);
+		boolean running = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("App failed to start", running);		
 		doGetFile(getConnectedClient(), appName);
 	}
 
