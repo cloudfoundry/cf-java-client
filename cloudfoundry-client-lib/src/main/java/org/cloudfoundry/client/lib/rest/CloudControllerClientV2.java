@@ -661,7 +661,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public void deleteApplication(String appName) {
 		UUID appId = getAppId(appName);
-		unbindAllServices(appName);
 		doDeleteApplication(appId);
 	}
 
@@ -669,13 +668,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		List<CloudApplication> cloudApps = getApplications();
 		for (CloudApplication cloudApp : cloudApps) {
 			deleteApplication(cloudApp.getName());
-		}
-	}
-
-	private void unbindAllServices(String appName) {
-		CloudApplication app = getApplication(appName);
-		for (String serviceName : app.getServices()) {
-			unbindService(appName, serviceName);
 		}
 	}
 
@@ -1050,7 +1042,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	}
 
 	private void doDeleteApplication(UUID appId) {
-		getRestTemplate().delete(getUrl("/v2/apps/{guid}"), appId);
+		getRestTemplate().delete(getUrl("/v2/apps/{guid}?recursive=true"), appId);
 	}
 
 	@SuppressWarnings("unchecked")
