@@ -76,7 +76,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
 			defaultNamespace(CCNG_USER_EMAIL));
 
-	private static final  String TEST_DOMAIN = "mytest.springdeveloper.com";
+	private static final  String TEST_DOMAIN = "mydomain.io";
 
 	@BeforeClass
 	public static void printTargetInfo() {
@@ -97,6 +97,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
 		clearTestDomainAndRoutes();
+		connectedClient.addDomain(TEST_DOMAIN);
 	}
 
 	@After
@@ -172,11 +173,11 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		//connectedClient.startApplication(appName);
 
 		List<String> originalUris = app.getUris();
-		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(CCNG_API_URL, appName)), originalUris);
+		assertEquals(Collections.singletonList(computeAppUrl(appName)), originalUris);
 
 		List<String> uris = new ArrayList<String>(app.getUris());
 		for (int i = 2; i < 55; i++) {
-			uris.add(computeAppUrlNoProtocol(CCNG_API_URL, namespacedAppName("page-url" + i)));
+			uris.add(computeAppUrl(namespacedAppName("page-url" + i)));
 		}
 		connectedClient.updateApplicationUris(appName, uris);
 
@@ -196,7 +197,6 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		List<CloudDomain> allDomains = getConnectedClient().getDomainsForOrg();
 		CloudDomain defaultDomain = getDefaultDomain(allDomains);
 		assertNotNull(getDefaultDomain(allDomains));
-		assertNull(getDomainNamed(TEST_DOMAIN, allDomains));
 
 		// Test adding test domain - should be there for org and space
 		getConnectedClient().addDomain(TEST_DOMAIN);
@@ -381,5 +381,15 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	@Override
 	protected boolean getCompleteApiSupported() {
 		return true;
+	}
+	
+	@Override
+	protected String computeAppUrl(String appName) {
+		return appName + "." + TEST_DOMAIN;
+	}
+
+	@Override
+	protected String computeAppUrlNoProtocol(String appName) {
+		return computeAppUrl(appName);
 	}
 }
