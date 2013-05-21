@@ -28,9 +28,12 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
@@ -160,6 +163,55 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 			if (ex.getStatusCode() != HttpStatus.FORBIDDEN) {
 				fail();
 			}
+		}
+	}
+	
+	@Test
+	public void frameworksInfoAvailable() {
+		CloudInfo info = getConnectedClient().getCloudInfo();
+
+		Collection<CloudInfo.Framework> frameworks = info.getFrameworks();
+		assertNotNull(frameworks);
+		Map<String, CloudInfo.Framework> frameworksByName = new HashMap<String, CloudInfo.Framework>();
+		for (CloudInfo.Framework framework : frameworks) {
+			frameworksByName.put(framework.getName(), framework);
+		}
+
+		assertTrue(frameworksByName.containsKey("spring"));
+		assertTrue(frameworksByName.containsKey("grails"));
+		assertTrue(frameworksByName.containsKey("rails3"));
+		assertTrue(frameworksByName.containsKey("sinatra"));
+		assertTrue(frameworksByName.containsKey("node"));
+		assertTrue(frameworksByName.containsKey("lift"));
+
+		// a basic check that runtime info is correct
+		CloudInfo.Framework springFramework = frameworksByName.get("spring");
+		assertNotNull(springFramework);
+
+		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
+		assertNotNull(springRuntimes);
+		assertTrue(springRuntimes.size() > 0);
+	}
+
+	@Test
+	public void runtimeInfoAvailable() {
+		CloudInfo info = getConnectedClient().getCloudInfo();
+
+		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
+		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
+		for (CloudInfo.Runtime runtime : runtimes) {
+			runtimesByName.put(runtime.getName(), runtime);
+		}
+
+		assertTrue(runtimesByName.containsKey("java"));
+		assertTrue(runtimesByName.containsKey("ruby19"));
+		assertTrue(runtimesByName.containsKey("ruby18"));
+		assertTrue(runtimesByName.containsKey("node"));
+
+		// a basic check that versions are right
+		//TODO: this is no longer availabe in v2
+		if (getInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V1) {
+			assertTrue(runtimesByName.get("java").getVersion().startsWith("1.6"));
 		}
 	}
 

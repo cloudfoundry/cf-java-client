@@ -149,7 +149,7 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void createApplication() {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName("travel_test-0");
-		uris.add(computeAppUrl(getApiUrl(), appName));
+		uris.add(computeAppUrl(appName));
 		Staging staging =  new Staging("spring");
 		staging.setRuntime("java");
 		getConnectedClient().createApplication(appName, staging,
@@ -212,7 +212,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
-		String url = computeAppUrlNoProtocol(getApiUrl(), appName);
+		String url = computeAppUrlNoProtocol(appName);
 		assertEquals(url, app.getUris().get(0));
 	}
 
@@ -262,7 +262,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		List<String> serviceNames= Collections.singletonList(serviceName);
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName("travel_test8");
-		uris.add(computeAppUrl(getApiUrl(), appName));
+		uris.add(computeAppUrl(appName));
 		Staging staging =  new Staging("spring");
 		staging.setRuntime("java");
 		getConnectedClient().createApplication(appName, staging,
@@ -447,10 +447,10 @@ public abstract class AbstractCloudFoundryClientTest {
 		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
 
 		List<String> originalUris = app.getUris();
-		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(getApiUrl(), appName)), originalUris);
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), originalUris);
 
 		List<String> uris = new ArrayList<String>(app.getUris());
-		uris.add(computeAppUrlNoProtocol(getApiUrl(), namespacedAppName("url2")));
+		uris.add(computeAppUrlNoProtocol(namespacedAppName("url2")));
 		getConnectedClient().updateApplicationUris(appName, uris);
 		app = getConnectedClient().getApplication(appName);
 		List<String> newUris = app.getUris();
@@ -486,7 +486,7 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void uploadStandaloneApplicationWithURLs() throws IOException {
 		String appName = namespacedAppName("standalone-node");
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(getApiUrl(), appName));
+		uris.add(computeAppUrl(appName));
 		List<String> services = new ArrayList<String>();
 		Staging staging = new Staging("standalone");
 		staging.setRuntime("node");
@@ -498,7 +498,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		CloudApplication app = getConnectedClient().getApplication(appName);
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
-		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(getApiUrl(), appName)), app.getUris());
+		assertEquals(Collections.singletonList(computeAppUrlNoProtocol(appName)), app.getUris());
 	}
 
 	@Test
@@ -744,7 +744,7 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void uploadAppWithNonAsciiFileName() throws IOException {
 		String appName = namespacedAppName("non-ascii-file-name");
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(getApiUrl(), appName));
+		uris.add(computeAppUrl(appName));
 
 		File war = SampleProjects.nonAsciFileName();
 		List<String> serviceNames = new ArrayList<String>();
@@ -806,55 +806,6 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
 		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
 		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
-	}
-
-	@Test
-	public void frameworksInfoAvailable() {
-		CloudInfo info = getConnectedClient().getCloudInfo();
-
-		Collection<CloudInfo.Framework> frameworks = info.getFrameworks();
-		assertNotNull(frameworks);
-		Map<String, CloudInfo.Framework> frameworksByName = new HashMap<String, CloudInfo.Framework>();
-		for (CloudInfo.Framework framework : frameworks) {
-			frameworksByName.put(framework.getName(), framework);
-		}
-
-		assertTrue(frameworksByName.containsKey("spring"));
-		assertTrue(frameworksByName.containsKey("grails"));
-		assertTrue(frameworksByName.containsKey("rails3"));
-		assertTrue(frameworksByName.containsKey("sinatra"));
-		assertTrue(frameworksByName.containsKey("node"));
-		assertTrue(frameworksByName.containsKey("lift"));
-
-		// a basic check that runtime info is correct
-		CloudInfo.Framework springFramework = frameworksByName.get("spring");
-		assertNotNull(springFramework);
-
-		List<CloudInfo.Runtime> springRuntimes = springFramework.getRuntimes();
-		assertNotNull(springRuntimes);
-		assertTrue(springRuntimes.size() > 0);
-	}
-
-	@Test
-	public void runtimeInfoAvailable() {
-		CloudInfo info = getConnectedClient().getCloudInfo();
-
-		Collection<CloudInfo.Runtime> runtimes = info.getRuntimes();
-		Map<String, CloudInfo.Runtime> runtimesByName = new HashMap<String, CloudInfo.Runtime>();
-		for (CloudInfo.Runtime runtime : runtimes) {
-			runtimesByName.put(runtime.getName(), runtime);
-		}
-
-		assertTrue(runtimesByName.containsKey("java"));
-		assertTrue(runtimesByName.containsKey("ruby19"));
-		assertTrue(runtimesByName.containsKey("ruby18"));
-		assertTrue(runtimesByName.containsKey("node"));
-
-		// a basic check that versions are right
-		//TODO: this is no longer availabe in v2
-		if (getInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V1) {
-			assertTrue(runtimesByName.get("java").getVersion().startsWith("1.6"));
-		}
 	}
 
 	@Test
@@ -941,8 +892,13 @@ public abstract class AbstractCloudFoundryClientTest {
 	//
 
 	protected void doGetFile(CloudFoundryClient client, String appName) throws Exception {
-		String fileName = "tomcat/webapps/ROOT/WEB-INF/web.xml";
-		String emptyPropertiesfileName = "tomcat/webapps/ROOT/WEB-INF/classes/empty.properties";
+		String appDir = "tomcat";
+		
+		if (getInfo().getCloudControllerMajorVersion().equals(CloudInfo.CC_MAJOR_VERSION.V2)) {
+			appDir = "app";
+		}
+		String fileName = appDir + "/webapps/ROOT/WEB-INF/web.xml";
+		String emptyPropertiesfileName = appDir + "/webapps/ROOT/WEB-INF/classes/empty.properties";
 
 		// Test downloading full file
 		String fileContent = client.getFile(appName, 0, fileName);
@@ -1054,7 +1010,8 @@ public abstract class AbstractCloudFoundryClientTest {
 		return getConnectedClient().getApplication(name);
 	}
 
-	protected String computeAppUrlNoProtocol(String ccUrl, String appName) {
+	protected String computeAppUrlNoProtocol(String appName) {
+		String ccUrl = getApiUrl();
 		//TODO: remove ccng at some point?
 		return ccUrl.replace("api", appName).replace("ccng", appName).replace("http://", "").replace("https://", "");
 	}
@@ -1132,7 +1089,7 @@ public abstract class AbstractCloudFoundryClientTest {
 
 	private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
 		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(getApiUrl(), appName));
+		uris.add(computeAppUrl(appName));
 		if (serviceNames != null) {
 			for (String serviceName : serviceNames) {
 				createMySqlService(serviceName);
@@ -1171,7 +1128,8 @@ public abstract class AbstractCloudFoundryClientTest {
 		getConnectedClient().createService(service);
 	}
 
-	protected String computeAppUrl(String ccUrl, String appName) {
+	protected String computeAppUrl(String appName) {
+		String ccUrl = getApiUrl();
 		int ix1 =  2 + ccUrl.indexOf("//");
 		int ix2 = ccUrl.indexOf('.');
 		return ccUrl.substring(0, ix1) + appName + ccUrl.substring(ix2);
