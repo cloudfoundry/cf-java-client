@@ -63,7 +63,7 @@ import static org.junit.Assume.assumeTrue;
  */
 public abstract class AbstractCloudFoundryClientTest {
 
-	private static final String V2_SERVICE_TEST_MYSQL_PLAN = "100";
+	private static final String V2_SERVICE_TEST_MYSQL_PLAN = "10mb";
 
 	@ClassRule
 	public static CloudVersionRule cloudVersionRule = new CloudVersionRule();
@@ -135,9 +135,9 @@ public abstract class AbstractCloudFoundryClientTest {
 			assertEquals("5.1", service.getVersion());
 			assertEquals("free", service.getTier());
 		} else {
-			assertEquals("mysql", service.getLabel());
-			assertEquals("core", service.getProvider());
-			assertEquals("5.5", service.getVersion());
+			assertEquals(getMysqlLabel(), service.getLabel());
+			assertEquals("aws", service.getProvider());
+			assertEquals("n/a", service.getVersion());
 			assertEquals(V2_SERVICE_TEST_MYSQL_PLAN, service.getPlan());
 		}
 	}
@@ -993,6 +993,7 @@ public abstract class AbstractCloudFoundryClientTest {
 
 	protected abstract boolean getCompleteApiSupported();
 
+	protected abstract String getMysqlLabel();
 	//
 	// Shared helper methods
 	//
@@ -1103,7 +1104,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		ServiceConfiguration databaseServiceConfiguration = null;
 		for (ServiceConfiguration sc : serviceConfigurations) {
 			if ((sc.getVendor() != null && sc.getVendor().equals("mysql")) ||
-				(sc.getCloudServiceOffering() != null && sc.getCloudServiceOffering().getLabel().equals("mysql"))) {
+				(sc.getCloudServiceOffering() != null && sc.getCloudServiceOffering().getLabel().equals(getMysqlLabel()))) {
 				databaseServiceConfiguration = sc;
 				break;
 			}
@@ -1119,7 +1120,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			service.setVendor(databaseServiceConfiguration.getVendor());
 		} else {
 			service.setProvider("core");
-			service.setLabel("mysql");
+			service.setLabel(getMysqlLabel());
 			service.setVersion(databaseServiceConfiguration.getVersion());
 			service.setPlan(V2_SERVICE_TEST_MYSQL_PLAN);
 		}
