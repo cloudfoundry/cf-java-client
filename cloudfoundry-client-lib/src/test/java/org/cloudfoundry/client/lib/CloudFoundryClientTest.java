@@ -387,4 +387,9 @@ public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 	protected boolean getCompleteApiSupported() {
 		return completeApiSupported;
 	}
+
+	@Override
+	protected String getMysqlLabel() {
+		return "mysql";
+	}
 }
