@@ -77,7 +77,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 			defaultNamespace(CCNG_USER_EMAIL));
 
 	private static final  String TEST_DOMAIN = "mydomain.io";
-
+	
 	@BeforeClass
 	public static void printTargetInfo() {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
@@ -137,7 +137,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 		ServiceConfiguration configuration = null;
 		for (ServiceConfiguration sc : configurations) {
-			if (sc.getCloudServiceOffering().getLabel().equals("redis")) {
+			if (sc.getCloudServiceOffering().getLabel().equals(getMysqlLabel())) {
 				configuration = sc;
 				break;
 			}
@@ -145,7 +145,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		assertNotNull(configuration);
 //		TODO: type is not currently part of the service definitions in v2
 //		assertEquals("key-value", configuration.getType());
-		assertEquals("redis", configuration.getCloudServiceOffering().getLabel());
+		assertEquals(getMysqlLabel(), configuration.getCloudServiceOffering().getLabel());
 		assertNotNull(configuration.getCloudServiceOffering().getCloudServicePlans());
 		assertTrue(configuration.getCloudServiceOffering().getCloudServicePlans().size() > 0);
 	}
@@ -392,4 +392,10 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	protected String computeAppUrlNoProtocol(String appName) {
 		return computeAppUrl(appName);
 	}
+	
+	@Override
+	protected String getMysqlLabel() {
+		return "rds_mysql";
+	}
+	
 }
