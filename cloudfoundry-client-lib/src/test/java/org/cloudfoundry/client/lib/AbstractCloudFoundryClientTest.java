@@ -514,11 +514,9 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		assertEquals(uris, app.getUris());
-		assertEquals("ruby19", app.getStaging().getRuntime());
 		assertEquals("ruby simple.rb", app.getStaging().getCommand());
 		Staging newStaging = app.getStaging();
 		newStaging.setCommand("ruby simple.rb test");
-		newStaging.setRuntime("ruby18");
 		getConnectedClient().stopApplication(appName);
 		getConnectedClient().updateApplicationStaging(appName, newStaging);
 		getConnectedClient().startApplication(appName);
@@ -526,7 +524,6 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		assertEquals(uris, app.getUris());
-		assertEquals("ruby18", app.getStaging().getRuntime());
 		assertEquals("ruby simple.rb test", app.getStaging().getCommand());
 	}
 

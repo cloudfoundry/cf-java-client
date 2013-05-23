@@ -8,5 +8,7 @@ build/
 .project
 .settings
 .gitreview
+.metadata
+Servers
 /*.DS_Store
 /*.iml
