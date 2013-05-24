@@ -821,7 +821,10 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void getLogs() throws Exception {
 		String appName = namespacedAppName("simple_logs");
 		createAndUploadAndStartSimpleSpringApp(appName);
-		Thread.sleep(500); // let's have some time to get some logs generated
+		boolean pass = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("Couldn't get the right application state", pass);
+
+		Thread.sleep(5000); // let's have some time to get some logs generated
 		Map<String, String> logs = getConnectedClient().getLogs(appName);
 		assertNotNull(logs);
 		assertTrue(logs.size() > 0);
