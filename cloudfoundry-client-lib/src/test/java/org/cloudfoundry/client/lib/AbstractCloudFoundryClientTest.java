@@ -63,7 +63,7 @@ import static org.junit.Assume.assumeTrue;
  */
 public abstract class AbstractCloudFoundryClientTest {
 
-	private static final String V2_SERVICE_TEST_MYSQL_PLAN = "10mb";
+	private static final String V2_SERVICE_TEST_MYSQL_PLAN = "spark";
 
 	@ClassRule
 	public static CloudVersionRule cloudVersionRule = new CloudVersionRule();
@@ -136,7 +136,7 @@ public abstract class AbstractCloudFoundryClientTest {
 			assertEquals("free", service.getTier());
 		} else {
 			assertEquals(getMysqlLabel(), service.getLabel());
-			assertEquals("aws", service.getProvider());
+			assertEquals("cleardb", service.getProvider());
 			assertEquals("n/a", service.getVersion());
 			assertEquals(V2_SERVICE_TEST_MYSQL_PLAN, service.getPlan());
 		}
