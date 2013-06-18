@@ -395,7 +395,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	
 	@Override
 	protected String getMysqlLabel() {
-		return "rds_mysql";
+		return "cleardb";
 	}
 	
 }
