@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.rest;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
@@ -632,13 +633,29 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
 	}
 
-	public void startApplication(String appName) {
+	public StartingInfo startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		if (app.getState() != CloudApplication.AppState.STARTED) {
 			HashMap<String, Object> appRequest = new HashMap<String, Object>();
 			appRequest.put("state", CloudApplication.AppState.STARTED);
-			getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, app.getMeta().getGuid());
+
+			HttpEntity<Object> requestEntity = new HttpEntity<Object>(
+					appRequest);
+			ResponseEntity<String> entity = getRestTemplate().exchange(
+					getUrl("/v2/apps/{guid}?stage_async=true"), HttpMethod.PUT, requestEntity,
+					String.class, app.getMeta().getGuid());
+		
+			HttpHeaders headers = entity.getHeaders();
+			
+			// Return a starting info, even with a null staging log value, as a non-null starting info
+			// indicates that the response entity did have headers. The API contract is to return starting info
+			// if there are headers in the response, null otherwise.
+			if (headers != null && !headers.isEmpty()) {
+				String value = entity.getHeaders().getFirst("x-app-staging-log");
+				return new StartingInfo(value);
+			}
 		}
+		return null;
 	}
 
 	public void debugApplication(String appName, CloudApplication.DebugMode mode) {

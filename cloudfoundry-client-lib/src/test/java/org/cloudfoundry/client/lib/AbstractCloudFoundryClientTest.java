@@ -1024,16 +1024,16 @@ public abstract class AbstractCloudFoundryClientTest {
 	}
 
 	//
-	// Private helper methods
+	// helper methods
 	//
 
-	private String createSpringTravelApp(String suffix, List<String> serviceNames) {
+	protected String createSpringTravelApp(String suffix, List<String> serviceNames) {
 		String appName = namespacedAppName("travel_test-" + suffix);
 		createSpringApplication(appName, serviceNames);
 		return appName;
 	}
 
-	private CloudApplication uploadSpringTravelApp(String appName) throws IOException {
+	protected CloudApplication uploadSpringTravelApp(String appName) throws IOException {
 		File file = SampleProjects.springTravel();
 		getConnectedClient().uploadApplication(appName, file.getCanonicalPath());
 		return getConnectedClient().getApplication(appName);

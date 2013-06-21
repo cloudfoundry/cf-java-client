@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.rest;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
+import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -106,7 +107,7 @@ public interface CloudControllerClient {
 
 	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
 
-	void startApplication(String appName);
+	StartingInfo startApplication(String appName);
 
 	void debugApplication(String appName, CloudApplication.DebugMode mode);
 
