@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
+import org.cloudfoundry.client.lib.StartingInfo;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -335,11 +336,12 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 		}
 	}
 
-	public void startApplication(String appName) {
+	public StartingInfo startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		app.setState(CloudApplication.AppState.STARTED);
 		app.setDebug(null);
 		doUpdateApplication(app);
+		return null;
 	}
 
 	public void debugApplication(String appName, CloudApplication.DebugMode mode) {

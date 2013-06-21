@@ -121,6 +121,17 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		List<CloudSpace> spaces = authenticatedClient.getSpaces();
 		assertNotNull(spaces);
 		assertTrue(spaces.size() > 0);
+	}	
+	
+	@Test
+	public void startApplicationWithInfo() throws IOException {
+		String appName = createSpringTravelApp("start", null);
+		uploadSpringTravelApp(appName);
+		StartingInfo info = getConnectedClient().startApplication(appName);
+		CloudApplication app = getConnectedClient().getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+		assertNotNull(info);
+		assertNotNull(info.getStagingFile());
 	}
 
 	@Test
