@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,11 +287,14 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
 
 	/**
-	 * Start appplication.
-	 *
-	 * @param appName name of application
+	 * Start application. May return starting info if the response obtained after the start request contains headers. 
+	 * If the response does not contain headers, null is returned instead.
+	 * 
+	 * @param appName
+	 *            name of application
+	 * @return Starting info containing response headers, if headers are present in the response. If there are no headers, return null.
 	 */
-	void startApplication(String appName);
+	StartingInfo startApplication(String appName);
 
 	/**
 	 * Debug application.
@@ -302,7 +305,7 @@ public interface CloudFoundryOperations {
 	void debugApplication(String appName, CloudApplication.DebugMode mode);
 
 	/**
-	 * Stop applicataion.
+	 * Stop application.
 	 *
 	 * @param appName name of application
 	 */
