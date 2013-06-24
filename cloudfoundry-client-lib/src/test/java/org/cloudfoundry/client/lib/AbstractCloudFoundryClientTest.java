@@ -244,6 +244,9 @@ public abstract class AbstractCloudFoundryClientTest {
 		String appName = createSpringTravelApp("restart", null);
 		uploadSpringTravelApp(appName);
 		getConnectedClient().startApplication(appName);
+		boolean passSingleInstance = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("Couldn't get the right application state in 50 tries", passSingleInstance);
+		
 		CloudApplication app = getConnectedClient().getApplication(appName);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		getConnectedClient().restartApplication(appName);
@@ -515,14 +518,13 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		assertEquals(uris, app.getUris());
 		assertEquals("ruby simple.rb", app.getStaging().getCommand());
+		getConnectedClient().stopApplication(appName);
+		
 		Staging newStaging = app.getStaging();
 		newStaging.setCommand("ruby simple.rb test");
-		getConnectedClient().stopApplication(appName);
 		getConnectedClient().updateApplicationStaging(appName, newStaging);
-		getConnectedClient().startApplication(appName);
 		app = getConnectedClient().getApplication(appName);
 		assertNotNull(app);
-		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		assertEquals(uris, app.getUris());
 		assertEquals("ruby simple.rb test", app.getStaging().getCommand());
 	}
@@ -572,18 +574,20 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void getApplicationInstances() throws Exception {
 		String appName = namespacedAppName("instance1");
 		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
-
 		assertEquals(1, app.getInstances());
 
-		boolean pass = getInstanceInfosWithTimeout(appName, 3, true);
-		assertTrue("Couldn't get the right application state in 50 tries", pass);
+		boolean passSingleInstance = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("Couldn't get the right application state in 50 tries", passSingleInstance);
+		
+		boolean passSingleMultipleInstances = getInstanceInfosWithTimeout(appName, 3, true);
+		assertTrue("Couldn't get the right application state in 50 tries", passSingleMultipleInstances);
 
 		getConnectedClient().stopApplication(appName);
 		InstancesInfo instInfo = getConnectedClient().getApplicationInstances(appName);
 		assertEquals(0, instInfo.getInstances().size());
 	}
 
-	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) throws InterruptedException {
+	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) {
 		if (count > 1) {
 			getConnectedClient().updateApplicationInstances(appName, count);
 			CloudApplication app = getConnectedClient().getApplication(appName);
@@ -593,31 +597,39 @@ public abstract class AbstractCloudFoundryClientTest {
 		InstancesInfo instances = null;
 		boolean pass = false;
 		for (int i = 0; i < 50; i++) {
-			instances = getInstancesWithTimeout(getConnectedClient(), appName);
-			assertNotNull(instances);
-
-			List<InstanceInfo> infos = instances.getInstances();
-			assertEquals(count, infos.size());
-
-			int passCount = 0;
-			for (InstanceInfo info : infos) {
-				if (shouldBeRunning) {
-					if (InstanceState.RUNNING.equals(info.getState()) ||
-							InstanceState.STARTING.equals(info.getState())) {
-						passCount++;
-					}
-				} else {
-					if (InstanceState.CRASHED.equals(info.getState()) ||
-							InstanceState.FLAPPING.equals(info.getState())) {
-						passCount++;
+			try {
+				instances = getInstancesWithTimeout(getConnectedClient(), appName);
+				assertNotNull(instances);
+	
+				List<InstanceInfo> infos = instances.getInstances();
+				assertEquals(count, infos.size());
+	
+				int passCount = 0;
+				for (InstanceInfo info : infos) {
+					if (shouldBeRunning) {
+						if (InstanceState.RUNNING.equals(info.getState()) ||
+								InstanceState.STARTING.equals(info.getState())) {
+							passCount++;
+						}
+					} else {
+						if (InstanceState.CRASHED.equals(info.getState()) ||
+								InstanceState.FLAPPING.equals(info.getState())) {
+							passCount++;
+						}
 					}
 				}
+				if (passCount == infos.size()) {
+					pass = true;
+					break;
+				}
+			} catch (CloudFoundryException ex) {
+				// ignore (we may get this when staging is still ongoing)
 			}
-			if (passCount == infos.size()) {
-				pass = true;
-				break;
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore
 			}
-			Thread.sleep(1000);
 		}
 		return pass;
 	}
@@ -626,6 +638,10 @@ public abstract class AbstractCloudFoundryClientTest {
 	public void getApplicationRunningInstances() throws Exception {
 		String appName = namespacedAppName("inst2");
 		createAndUploadAndStartSimpleSpringApp(appName);
+
+		boolean passSingleInstance = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("Couldn't get the right application state in 50 tries", passSingleInstance);
+
 		getConnectedClient().updateApplicationInstances(appName, 2);
 		CloudApplication app = getConnectedClient().getApplication(appName);
 		assertEquals(2, app.getInstances());
@@ -1134,10 +1150,14 @@ public abstract class AbstractCloudFoundryClientTest {
 		return ccUrl.substring(0, ix1) + appName + ccUrl.substring(ix2);
 	}
 
-	private InstancesInfo getInstancesWithTimeout(CloudFoundryClient client, String appName) throws InterruptedException {
+	private InstancesInfo getInstancesWithTimeout(CloudFoundryClient client, String appName) {
 		long start = System.currentTimeMillis();
 		while (true) {
-			Thread.sleep(2000);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				// ignore
+			}
 			try {
 				return client.getApplicationInstances(appName);
 			}
@@ -1152,4 +1172,20 @@ public abstract class AbstractCloudFoundryClientTest {
 
 		return null; // for the compiler
 	}
+	
+	private void startApplicationWithTimeout(String appName) {
+		for (int i = 0; i < 50; i++) {
+			try {
+				getConnectedClient().startApplication(appName);
+				break;
+			} catch (CloudFoundryException ex) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			}
+		}
+	}
+	
 }
