@@ -16,6 +16,19 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.zip.ZipFile;
+
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -59,19 +72,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.zip.ZipFile;
 
 /**
  * Empty implementation for cloud controller v2 REST API
@@ -186,7 +186,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<CloudService> getServices() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -194,16 +193,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/service_instances?inline-relations-depth={depth}";
-		urlVars.put("depth", 2);
+		urlPath = urlPath + "/service_instances";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
+			fillInEmbeddedResource(resource, "service_plan", "service");
 			services.add(resourceMapper.mapResource(resource, CloudService.class));
 		}
 		return services;
 	}
-
+	
 	public void createService(CloudService service) {
 		Assert.notNull(sessionSpace, "Unable to create service without specifying space to use.");
 		Assert.notNull(service, "Service must not be null");
@@ -237,7 +236,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	public CloudService getService(String serviceName) {
 		String urlPath = "/v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
@@ -246,7 +244,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlVars.put("q", "name:" + serviceName);
-		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
+		urlPath = urlPath + "/service_instances?q={q}";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
@@ -1043,9 +1041,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlVars.put("q", "name:" + cloudService.getName());
-		urlPath = urlPath + "/service_instances?inline-relations-depth=2&q={q}";
+		urlPath = urlPath + "/service_instances?q={q}";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		for (Map<String, Object> resource : resourceList) {
+			fillInEmbeddedResource(resource, "service_bindings");
 			List<Map<String, Object>> bindings =
 					CloudEntityResourceMapper.getEntityAttribute(resource, "service_bindings", List.class);
 			for (Map<String, Object> binding : bindings) {
@@ -1163,4 +1162,31 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return(JsonUtil.convertJsonToMap(userJson));
 	}
 
+	@SuppressWarnings("unchecked")
+	private void fillInEmbeddedResource(Map<String, Object> resource, String... resourcePath) {
+		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
+		
+		for (String path: resourcePath) {
+			if (!entity.containsKey(path)) {
+				String pathUrl = entity.get(path + "_url").toString();
+				Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
+				if (resource instanceof Map) {
+					Map responseMap = (Map)response;
+					if (responseMap.containsKey("resources")) {
+						response = responseMap.get("resources"); 
+					}
+				}
+				entity.put(path, response);
+			}
+			Object embeddedResource = entity.get(path);
+			
+			if (embeddedResource instanceof Map) {
+				Map<String, Object> embeddedResourceMap = (Map<String, Object>) embeddedResource;
+				entity = (Map<String, Object>) embeddedResourceMap.get("entity");	
+			} else {
+				// no way to proceed
+				return;
+			}
+		}
+	}
 }
