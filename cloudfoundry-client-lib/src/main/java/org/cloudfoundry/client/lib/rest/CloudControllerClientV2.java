@@ -265,7 +265,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<ServiceConfiguration> getServiceConfigurations() {
 		String urlPath = "/v2/services?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -1061,10 +1060,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		getRestTemplate().delete(getUrl("/v2/apps/{guid}?recursive=true"), appId);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
 		Assert.notNull(label, "Service label must not be null");
-		List<Map<String, Object>> resourceList = getAllResources("/v2/services?inline-relations-depth=2", null);
+		List<Map<String, Object>> resourceList = getAllResources("/v2/services?inline-relations-depth=1", null);
 		List<CloudServiceOffering> results = new ArrayList<CloudServiceOffering>();
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering cloudServiceOffering =
