@@ -3,4 +3,30 @@ language: java
 script: cd cloudfoundry-client-lib && mvn clean install && mvn -P integration-test
   clean install test -Dccng.target=$TARGET -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD
   -Dccng.org=$ORG -Dccng.space=$SPACE
+env:
+  global:
+  - secure: ! 'GOX1N4moeaV89WNQ12jSJPOnk4phpQJLCo+DpWX3vhFfiCVojhDZbx3zPZyo
 
+      aTWyh764QEYUcM1joubNRvA/YPv6jS/wc0zHeI9xqnYAomJHz4v/2wKOfezZ
+
+      ieeOzp/Nr8+3hIVZDtfy5pBMofBjnYKzQKRzpvJkevn5vSsXgCY='
+  - secure: ! 'Qi79KLY1LqhRTUKB0eYZC+g7otXSbdxi14qXRrzahpG8iN5LXGFCJjwyFjSZ
+
+      k8H9fcN+Nf8UviJBAwW9NI8DR6twbJlsSIyxBnkQG7nHoZyGtjGGEmWBw9Y8
+
+      TvZQQzGkJTj5/oSixzLEyMKSqwtktZjbdUm3Uvt3+5PvQf0BA6A='
+  - secure: ! 'pcS7qV4T6Rd6isJzcJx+pXFLvpzO8uMbFY6aga/851G1V0OvDu6CBLF/5qQp
+
+      ywcPCRukw5Z9gImujs9nplw4DX6ZAoDpyXQdIHKlOtX49XM6PTS1BqQUY7AE
+
+      60I6CEnbM24ONd+vUrdIhTFdlMaQJg42icfl95oO/zDiroMJP6E='
+  - secure: ! 'AN9C37W/EgI+0YtKd+QkXzzOtmHjVEhnNZsRtFisP4knRTjO7rX8ewyPH4Bk
+
+      HnwseimTnEuE/ZRBxen/KQJBg1xR4hT3VUCpK7UwhYt8ReTL16uBXxljDaV1
+
+      k8jUepPbWqKm2B7XR8iXTA3v9jrByI+e449y+SrVv39ke+Q4p/c='
+  - secure: ! 'v+37WU7lMYz0FbyRp6CKiaVTBPZbxm+MaAH/0B2QXRsJUsJKbUNskTXZmUMy
+
+      DYR38xJs79uS09AnD26L2flskGx3GY+LsXAvdAU+cfUQYM6MwiFUxBJetNdF
+
+      cs3XoL57ZUVM83FzgxBTRcL6/fbHTMfWCXIv5efGJ7ex+em/uXo='
