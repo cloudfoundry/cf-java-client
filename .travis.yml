@@ -1,7 +1,7 @@
 ---
 language: java
 script: cd cloudfoundry-client-lib && mvn clean install && mvn -P integration-test
-  clean install test -Dccng.target=$TARGET -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD
+  clean install test -X -Dccng.target=$TARGET -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD
   -Dccng.org=$ORG -Dccng.space=$SPACE
 env:
   global:
