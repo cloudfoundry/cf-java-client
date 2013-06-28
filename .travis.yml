@@ -1,32 +1,31 @@
 ---
 language: java
-script: cd cloudfoundry-client-lib && mvn -P integration-test clean install 
-  -Dccng.target=$TARGET -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD
-  -Dccng.org=$ORG -Dccng.space=$SPACE
+script: cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
+  -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE
 env:
   global:
-  - secure: ! 'GOX1N4moeaV89WNQ12jSJPOnk4phpQJLCo+DpWX3vhFfiCVojhDZbx3zPZyo
+  - secure: ! 'HAZuOaI9SrjTixsO00DBO0J/CvA1cqO7jankELgrK+KNKcAzCzf1H2eFBdJl
 
-      aTWyh764QEYUcM1joubNRvA/YPv6jS/wc0zHeI9xqnYAomJHz4v/2wKOfezZ
+      VeMQmwKVqO3BGiUYUbBTxoc65jeRvW2VUcR6NkYguuVa1/qBDGjftBYgBtkV
 
-      ieeOzp/Nr8+3hIVZDtfy5pBMofBjnYKzQKRzpvJkevn5vSsXgCY='
-  - secure: ! 'Qi79KLY1LqhRTUKB0eYZC+g7otXSbdxi14qXRrzahpG8iN5LXGFCJjwyFjSZ
+      M35KD911MD569IVg4+aSfmme8GCGbbND0pRzSur9AvJHEPJiQeo='
+  - secure: ! 'UE0DpHIMWf9AxyBpq8kpH1HNWM68dYfZ+/EDkBoZAAarB/PLNlmRKDqeHiY4
 
-      k8H9fcN+Nf8UviJBAwW9NI8DR6twbJlsSIyxBnkQG7nHoZyGtjGGEmWBw9Y8
+      I4o9kV3Fx1NsYwEdCY1Enl3vFJolv2g1AtaLTLKWuVvj6bdkqrM1mqEVTZth
 
-      TvZQQzGkJTj5/oSixzLEyMKSqwtktZjbdUm3Uvt3+5PvQf0BA6A='
-  - secure: ! 'pcS7qV4T6Rd6isJzcJx+pXFLvpzO8uMbFY6aga/851G1V0OvDu6CBLF/5qQp
+      aU5oIbFagpAv6IMvWiFTnEz8hpT0StzI7AjTod4T0TcFJpIXFtg='
+  - secure: ! 'fOtknm1J/aQbs1P9hRhla4OsuP9W2mErXhnCBJaDifXpSNSG1HczWdX39wEE
 
-      ywcPCRukw5Z9gImujs9nplw4DX6ZAoDpyXQdIHKlOtX49XM6PTS1BqQUY7AE
+      jDW4Hc3/y+TbJKgYyViu0FzgOwE1nsG6cS9AQBxreuH2lZwXdeEtK0ZGr124
 
-      60I6CEnbM24ONd+vUrdIhTFdlMaQJg42icfl95oO/zDiroMJP6E='
-  - secure: ! 'AN9C37W/EgI+0YtKd+QkXzzOtmHjVEhnNZsRtFisP4knRTjO7rX8ewyPH4Bk
+      pEOibTSjsLIZQ/gPjZSnvrTDDrNtmZ/Nou9saZP7ezNJxBXgXxw='
+  - secure: ! 'kRu7iaonJga1vGPxH2GvFI3JK7IETfa7f+o8654NKhePLIt5H/22hUHwryDr
 
-      HnwseimTnEuE/ZRBxen/KQJBg1xR4hT3VUCpK7UwhYt8ReTL16uBXxljDaV1
+      jfFzyIB+RkdL9DKygks7ECIsitWwZjMJXSzEvrKgpoBeNbQNKPCxMnAkhVkK
 
-      k8jUepPbWqKm2B7XR8iXTA3v9jrByI+e449y+SrVv39ke+Q4p/c='
-  - secure: ! 'v+37WU7lMYz0FbyRp6CKiaVTBPZbxm+MaAH/0B2QXRsJUsJKbUNskTXZmUMy
+      UaMQkdAWOJAOkmmH2zZOYVXMBAPpHFSqVr9+wU6mRhpu7B7garI='
+  - secure: ! 'lcyF0gr8Z9SkxHkpnDG1f9i4nSss6Vn4Tc+ZNUUM622PynFc2FBBfpmbHZ6j
 
-      DYR38xJs79uS09AnD26L2flskGx3GY+LsXAvdAU+cfUQYM6MwiFUxBJetNdF
+      x8wjK9Ib+2RbE6397mqi/XsPOinDpxLtJMD/nQY0qPvhRdA8ag09V4Ya21m7
 
-      cs3XoL57ZUVM83FzgxBTRcL6/fbHTMfWCXIv5efGJ7ex+em/uXo='
+      T5E8szgtzg7ewJemddIRz6BWBnkym0o8NyKENh9/CmSzU8oe8/o='
