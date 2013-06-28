@@ -47,6 +47,7 @@ import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -58,6 +59,7 @@ import org.springframework.http.HttpStatus;
  * @author Jennifer Hickey
  * @author Thomas Risberg
  */
+@Ignore
 @CloudVersions({"V1"})
 public class CloudFoundryClientTest extends AbstractCloudFoundryClientTest {
 

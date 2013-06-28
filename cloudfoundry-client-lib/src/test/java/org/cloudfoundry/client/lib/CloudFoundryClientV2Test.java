@@ -77,6 +77,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 			defaultNamespace(CCNG_USER_EMAIL));
 
 	private static final  String TEST_DOMAIN = "mydomain.io";
+	private static String defaultDomainName = null;
 	
 	@BeforeClass
 	public static void printTargetInfo() {
@@ -98,6 +99,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		connectedClient.deleteAllServices();
 		clearTestDomainAndRoutes();
 		connectedClient.addDomain(TEST_DOMAIN);
+		defaultDomainName = getDefaultDomain(getConnectedClient().getDomainsForOrg()).getName();
 	}
 
 	@After
@@ -396,7 +398,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	
 	@Override
 	protected String computeAppUrl(String appName) {
-		return appName + "." + TEST_DOMAIN;
+		return appName + "." + defaultDomainName;
 	}
 
 	@Override
