@@ -113,7 +113,10 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().debug("Create Application...");
 
 		validateMemoryChoice(getClient(), memory);
-		validateFrameworkChoice(getClient().getCloudInfo().getFrameworks(), framework);
+
+        if(!CommonUtils.isCloudControllerV2(getClient())) {
+            validateFrameworkChoice(getClient().getCloudInfo().getFrameworks(), framework);
+        }
 
 		boolean found = true;
 
@@ -251,7 +254,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 	 */
 	protected boolean validateFrameworkChoice(Collection<CloudInfo.Framework> frameworks, String desiredFramework) {
 
-		if( frameworks != null && !frameworks.isEmpty() ) {
+        if( frameworks != null && !frameworks.isEmpty() ) {
 			for(CloudInfo.Framework f : frameworks ) {
 				if(f.getName().equals(desiredFramework)) {
 					return true;

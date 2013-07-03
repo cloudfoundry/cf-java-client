@@ -36,252 +36,257 @@ import org.cloudfoundry.maven.common.SystemProperties;
  */
 public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testGetTarget() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testGetTarget() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+        doReturn("http://api.run.pivotal.io").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 
-		assertEquals("http://api.cloudfoundry.com", mojo.getTarget().toString());
+        assertEquals("http://api.run.pivotal.io", mojo.getTarget().toString());
 
-	}
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testGetTargetWithMalformedUrl() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testGetTargetWithMalformedUrl() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-		doReturn("api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+        doReturn("api.run.pivotal.io").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 
-		try {
-			mojo.getTarget();
-		} catch (IllegalStateException e) {
+        try {
+            mojo.getTarget();
+        } catch (IllegalStateException e) {
 
-			String expectedMessage = "The Url parameter 'api.cloudfoundry.com' " +
-						"which was passed in as system property is not valid.";
+            String expectedMessage = "The Url parameter 'api.run.pivotal.io' " +
+                    "which was passed in as system property is not valid.";
 
-			assertEquals(expectedMessage, e.getMessage());
-			return;
-		}
+            assertEquals(expectedMessage, e.getMessage());
+            return;
+        }
 
-		fail("Was a expecting an exception being thrown.");
+        fail("Was a expecting an exception being thrown.");
 
-	}
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testGetTargetWithMalformedUrl2() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testGetTargetWithMalformedUrl2() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
 
-		doReturn("/some/path").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+        doReturn("/some/path").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 
-		try {
-			mojo.getTarget();
-		} catch (IllegalStateException e) {
+        try {
+            mojo.getTarget();
+        } catch (IllegalStateException e) {
 
-			String expectedMessage = "The Url parameter '/some/path' " +
-						"which was passed in as system property is not valid.";
+            String expectedMessage = "The Url parameter '/some/path' " +
+                    "which was passed in as system property is not valid.";
 
-			assertEquals(expectedMessage, e.getMessage());
-			return;
-		}
+            assertEquals(expectedMessage, e.getMessage());
+            return;
+        }
 
-		fail("Was a expecting an exception being thrown.");
+        fail("Was a expecting an exception being thrown.");
 
-	}
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testPrecedenceWhenExecutingGetTarget() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testPrecedenceWhenExecutingGetTarget() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-		setVariableValueToObject( mojo, "target", "http://blog.hillert.com/" );
-		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+        setVariableValueToObject( mojo, "target", "http://blog.hillert.com/" );
+        doReturn("http://api.run.pivotal.io").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 
-		assertEquals("http://api.cloudfoundry.com", mojo.getTarget().toString());
+        assertEquals("http://api.run.pivotal.io", mojo.getTarget().toString());
 
-	}
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testPrecedenceWhenExecutingGetTarget2() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testPrecedenceWhenExecutingGetTarget2() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-		setVariableValueToObject( mojo, "target", "http://blog.hillert.com/" );
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+        setVariableValueToObject( mojo, "target", "http://blog.hillert.com/" );
+        doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 
-		assertEquals("http://blog.hillert.com/", mojo.getTarget().toString());
+        assertEquals("http://blog.hillert.com/", mojo.getTarget().toString());
 
-	}
+    }
 
 
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testParameterValidationWhenConnctingtoCF() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		setVariableValueToObject( mojo, "target", "https://api.cloudfoundry.com" );
+        setVariableValueToObject( mojo, "target", "https://api.run.pivotal.io" );
+        setVariableValueToObject( mojo, "org", "my-org" );
+        setVariableValueToObject( mojo, "space", "development" );
 
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-		doThrow(new IOException()).when(mojo).retrieveToken();
+        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+        doThrow(new IOException()).when(mojo).retrieveToken();
 
-		//TODO May need to think about handling parameter validation more intelligently
+        //TODO May need to think about handling parameter validation more intelligently
 
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "username", SystemProperties.USERNAME);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
+        String expectedErrorMessage = null;
+        try {
+            Assert.configurationNotNull(null, "username", SystemProperties.USERNAME);
+        } catch (MojoExecutionException e) {
+            expectedErrorMessage = e.getMessage();
+        }
 
-		try {
-		mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
+        try {
+            mojo.execute();
+        } catch (MojoExecutionException e) {
+            assertEquals(expectedErrorMessage, e.getMessage());
+            return;
+        }
 
-		fail();
+        fail();
 
-	}
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF2() throws Exception {
+    /**
+     * @throws Exception
+     */
+    public void testParameterValidationWhenConnctingtoCF2() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push mojo = spy(unspiedMojo);
+        Push mojo = spy(unspiedMojo);
 
-		setVariableValueToObject( mojo, "target", "https://api.cloudfoundry.com" );
+        setVariableValueToObject( mojo, "target", "https://api.run.pivotal.io" );
+        setVariableValueToObject( mojo, "org", "my-org" );
+        setVariableValueToObject( mojo, "space", "development" );
+        setVariableValueToObject( mojo, "username", "tester@test.com" );
 
-		setVariableValueToObject( mojo, "username", "tester@test.com" );
+        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+        doThrow(new IOException()).when(mojo).retrieveToken();
 
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-		doThrow(new IOException()).when(mojo).retrieveToken();
+        //TODO May need to think about handling parameter validation more intelligently
 
-		//TODO May need to think about handling parameter validation more intelligently
+        String expectedErrorMessage = null;
+        try {
+            Assert.configurationNotNull(null, "password", SystemProperties.PASSWORD);
+        } catch (MojoExecutionException e) {
+            expectedErrorMessage = e.getMessage();
+        }
 
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "password", SystemProperties.PASSWORD);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
+        try {
+            mojo.execute();
+        } catch (MojoExecutionException e) {
+            assertEquals(expectedErrorMessage, e.getMessage());
+            return;
+        }
 
-		try {
-			mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
+        fail();
 
-		fail();
+    }
 
-	}
+    /**
+     * @throws Exception
+     */
+    public void testParameterValidationWhenConnctingtoCF3() throws Exception {
 
-	/**
-	 * @throws Exception
-	 */
-	public void testParameterValidationWhenConnctingtoCF3() throws Exception {
+        File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push mojo = spy(unspiedMojo);
 
-		Push mojo = spy(unspiedMojo);
+        setVariableValueToObject( mojo, "username", "tester@test.com" );
+        setVariableValueToObject( mojo, "password", "secret" );
+        setVariableValueToObject( mojo, "org", "my-org" );
+        setVariableValueToObject( mojo, "space", "development" );
 
-		setVariableValueToObject( mojo, "username", "tester@test.com" );
-		setVariableValueToObject( mojo, "password", "secret" );
+        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+        //TODO May need to think about handling parameter validation more intelligently
 
-		//TODO May need to think about handling parameter validation more intelligently
+        String expectedErrorMessage = null;
+        try {
+            Assert.configurationNotNull(null, "target", SystemProperties.TARGET);
+        } catch (MojoExecutionException e) {
+            expectedErrorMessage = e.getMessage();
+        }
 
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "target", SystemProperties.TARGET);
-		} catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
+        try {
+            mojo.execute();
+        } catch (MojoExecutionException e) {
+            assertEquals(expectedErrorMessage, e.getMessage());
+            return;
+        }
 
-		try {
-			mojo.execute();
-		} catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
-			return;
-		}
-
-		fail();
-	}
+        fail();
+    }
 }

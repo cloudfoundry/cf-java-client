@@ -154,8 +154,9 @@
 			<plugin>
 				<groupId>org.cloudfoundry.maven</groupId>
 				<artifactId>cf-maven-plugin</artifactId>
-				<version>1.0.0.M1-SNAPSHOT</version>
-				<configuration></configuration>
+				<version>1.0.0.BUILD-SNAPSHOT</version>
+				<configuration>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
