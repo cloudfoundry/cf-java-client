@@ -76,7 +76,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
 			defaultNamespace(CCNG_USER_EMAIL));
 
-	private static final  String TEST_DOMAIN = "mydomain.io";
+	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
 	private static String defaultDomainName = null;
 	
 	@BeforeClass

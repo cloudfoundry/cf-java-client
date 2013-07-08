@@ -1049,9 +1049,9 @@ public abstract class AbstractCloudFoundryClientTest {
 	}
 
 	protected static String defaultNamespace(String email) {
-		return email.substring(0, email.indexOf('@')).replaceAll("\\.", "_").replaceAll("\\+", "_");
+		return email.substring(0, email.indexOf('@')).replaceAll("\\.", "-").replaceAll("\\+", "-");
 	}
-
+	
 	//
 	// helper methods
 	//
