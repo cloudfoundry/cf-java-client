@@ -486,8 +486,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		String domainPath = urlPath + "/domains?inline-relations-depth={depth}";
-		urlVars.put("depth", 1);
+		String domainPath = urlPath + "/domains?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(domainPath, urlVars);
 		Map<String, UUID> domains = new HashMap<String, UUID>(resourceList.size());
 		for (Map<String, Object> d : resourceList) {
@@ -501,8 +500,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private UUID getDomainGuid(String domainName, boolean required) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
-		String domainPath = urlPath + "/domains?inline-relations-depth={depth}&q=name:{name}";
-		urlVars.put("depth", 1);
+		String domainPath = urlPath + "/domains?inline-relations-depth=1&q=name:{name}";
 		urlVars.put("name", domainName);
 		List<Map<String, Object>> resourceList = getAllResources(domainPath, urlVars);
 		UUID domainGuid = null;
@@ -942,8 +940,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlVars.put("space", space.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/domains?inline-relations-depth={depth}";
-		urlVars.put("depth", 2);
+		urlPath = urlPath + "/domains?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudDomain> domains = new ArrayList<CloudDomain>();
 		for (Map<String, Object> resource : resourceList) {
