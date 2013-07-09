@@ -1127,9 +1127,8 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private List<String> findApplicationUris(UUID appGuid) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "/v2/apps/{app}/routes?inline-relations-depth={depth}";
+		String urlPath = "/v2/apps/{app}/routes?inline-relations-depth=1";
 		urlVars.put("app", appGuid);
-		urlVars.put("depth", 2);
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<String> uris =  new ArrayList<String>();
 		for (Map<String, Object> resource : resourceList) {
