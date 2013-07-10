@@ -284,8 +284,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/apps?inline-relations-depth={depth}";
-		urlVars.put("depth", 2);
+		urlPath = urlPath + "/apps?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> resource : resourceList) {
@@ -1113,9 +1112,14 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		urlVars.put("q", "name:" + appName);
 		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
 		urlVars.put("depth", depth);
+
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		if (resourceList.size() > 0) {
-			return resourceList.get(0);
+			Map<String, Object> resource = resourceList.get(0);
+			if (depth == 2) {
+				fillInEmbeddedResource(resource, "service_bindings");
+			}
+			return resource;
 		}
 		else {
 			return null;
