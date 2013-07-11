@@ -193,7 +193,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/service_instances";
+		urlPath = urlPath + "/service_instances?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
@@ -295,7 +295,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
-		Map<String, Object> resource = findApplicationResource(appName, 2);
+		Map<String, Object> resource = findApplicationResource(appName, true);
 		if (resource == null) {
 			throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Not Found", "Application not found");
 		}
@@ -540,8 +540,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 	private UUID getRouteGuid(String host, UUID domainGuid) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
-		urlPath = urlPath + "/routes?inline-relations-depth={depth}&q=host:{host}";
-		urlVars.put("depth", 0);
+		urlPath = urlPath + "/routes?inline-relations-depth=0&q=host:{host}";
 		urlVars.put("host", host);
 		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
 		UUID routeGuid = null;
@@ -1000,8 +999,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 //			urlVars.put("space", sessionSpace.getMeta().getGuid());
 //			urlPath = urlPath + "/spaces/{space}";
 //		}
-		urlPath = urlPath + "/routes?inline-relations-depth={depth}";
-		urlVars.put("depth", 1);
+		urlPath = urlPath + "/routes?inline-relations-depth=1";
 		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
 		List<CloudRoute> routes = new ArrayList<CloudRoute>();
 		for (Map<String, Object> route : allRoutes) {
@@ -1093,7 +1091,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	private UUID getAppId(String appName) {
-		Map<String, Object> resource = findApplicationResource(appName, 1);
+		Map<String, Object> resource = findApplicationResource(appName, false);
 		UUID guid = null;
 		if (resource != null) {
 			Map<String, Object> appMeta = (Map<String, Object>) resource.get("metadata");
@@ -1102,7 +1100,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return guid;
 	}
 
-	private Map<String, Object> findApplicationResource(String appName, int depth) {
+	private Map<String, Object> findApplicationResource(String appName, boolean fetchServiceInfo) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
 		if (sessionSpace != null) {
@@ -1110,14 +1108,13 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlVars.put("q", "name:" + appName);
-		urlPath = urlPath + "/apps?inline-relations-depth={depth}&q={q}";
-		urlVars.put("depth", depth);
+		urlPath = urlPath + "/apps?inline-relations-depth=1&q={q}";
 
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		if (resourceList.size() > 0) {
 			Map<String, Object> resource = resourceList.get(0);
-			if (depth == 2) {
-				fillInEmbeddedResource(resource, "service_bindings");
+			if (fetchServiceInfo) {
+				fillInEmbeddedResource(resource, "service_bindings", "service_instance");
 			}
 			return resource;
 		}
@@ -1162,29 +1159,40 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	@SuppressWarnings("unchecked")
 	private void fillInEmbeddedResource(Map<String, Object> resource, String... resourcePath) {
+		if (resourcePath.length == 0) {
+			return;
+		}
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		
-		for (String path: resourcePath) {
-			if (!entity.containsKey(path)) {
-				String pathUrl = entity.get(path + "_url").toString();
-				Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
-				if (resource instanceof Map) {
-					Map responseMap = (Map)response;
-					if (responseMap.containsKey("resources")) {
-						response = responseMap.get("resources"); 
-					}
+		
+		String headKey = resourcePath[0];
+		String[] tailPath = Arrays.copyOfRange(resourcePath, 1, resourcePath.length);
+		
+		if (!entity.containsKey(headKey)) {
+			String pathUrl = entity.get(headKey + "_url").toString();
+			Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
+			if (resource instanceof Map) {
+				Map responseMap = (Map)response;
+				if (responseMap.containsKey("resources")) {
+					response = responseMap.get("resources"); 
 				}
-				entity.put(path, response);
 			}
-			Object embeddedResource = entity.get(path);
-			
-			if (embeddedResource instanceof Map) {
-				Map<String, Object> embeddedResourceMap = (Map<String, Object>) embeddedResource;
-				entity = (Map<String, Object>) embeddedResourceMap.get("entity");	
-			} else {
-				// no way to proceed
-				return;
+			entity.put(headKey, response);
+		}
+		Object embeddedResource = entity.get(headKey);
+		
+		if (embeddedResource instanceof Map) {
+			Map<String, Object> embeddedResourceMap = (Map<String, Object>) embeddedResource;
+			//entity = (Map<String, Object>) embeddedResourceMap.get("entity");
+			fillInEmbeddedResource(embeddedResourceMap, tailPath);
+		} else if (embeddedResource instanceof List) {
+			List<Object> embeddedResourcesList = (List<Object>) embeddedResource;
+			for (Object r: embeddedResourcesList) {
+				fillInEmbeddedResource((Map<String, Object>)r, tailPath);
 			}
+		} else {
+			// no way to proceed
+			return;
 		}
 	}
 }
