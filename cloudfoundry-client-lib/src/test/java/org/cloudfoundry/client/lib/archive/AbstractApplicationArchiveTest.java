@@ -34,6 +34,7 @@ import org.cloudfoundry.client.lib.SampleProjects;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive.Entry;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
@@ -79,6 +80,7 @@ public abstract class AbstractApplicationArchiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldAdaptEntries() throws Exception {
         Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
         while (zipEntries.hasMoreElements()) {

@@ -141,7 +141,7 @@ Maven-based applications to Cloud Foundry instances.
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>cloudfoundry-client-lib</artifactId>
-			<version>0.8.3</version>
+			<version>0.8.4.BUILD-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>
