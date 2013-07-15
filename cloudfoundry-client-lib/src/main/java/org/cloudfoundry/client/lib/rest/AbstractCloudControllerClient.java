@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
-import org.cloudfoundry.client.lib.RestLogCallback;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.*;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -40,6 +39,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -47,17 +47,11 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.util.Assert;
-import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +61,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static java.util.Arrays.asList;
 
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base for v1 and v2 implementations.
@@ -115,10 +111,14 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 
 	protected List<String> freeApplicationPlans = Arrays.asList("free");
 
+    private final Log logger;
+
+
 	public AbstractCloudControllerClient(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
 										 URL authorizationEndpoint, HttpProxyConfiguration httpProxyConfiguration) {
-		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
+        Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restUtil, "RestUtil cannot be null");
+        logger = LogFactory.getLog(getClass().getName());
 		this.restUtil = restUtil;
 		this.cloudCredentials = cloudCredentials;
 		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
@@ -220,6 +220,46 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		return doGetLogs(urlPath, appName, instance);
 	}
 
+    public List<String> getStagingLogs(StartingInfo info) {
+        ArrayList<String> logs = new ArrayList<String>();
+        String stagingFile = info.getStagingFile();
+        if (stagingFile != null) {
+            // staging logs may come in multiple parts
+            int offset=0;
+            String decodedStagingFile = stagingFile;
+            try {
+                decodedStagingFile = URLDecoder.decode(stagingFile, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("unexpected inability to UTF-8 decode", e);
+            }
+            HashMap<String, Object> logsRequest = new HashMap<String, Object>();
+            for (int i = 0; i < 60; i++) {
+                try {
+                    logsRequest.put("offset", offset);
+                    String logObject = getRestTemplate().getForObject(decodedStagingFile + "&tail&tail_offset={offset}", String.class, logsRequest);
+                    offset += logObject.length();
+                    if (logObject.length() == 0) {
+                        break; //try to avoid asking again and generating parasite 404 warn traces.
+                    }
+                    String[] lines = logObject.split("\n");
+                    logs.addAll(Arrays.asList(lines));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("staging logs are:\n" + logObject);
+                    }
+                } catch (CloudFoundryException e) {
+                    //likely 404, the directory server won't serve again the content, too bad
+                    logger.debug("caught exception during retry#" + i + " for fetching staging logs. Aborting. Caught:" + e, e);
+                    break;
+                } catch (ResourceAccessException e) {
+                    //Likely read timeout, the directory server won't serve again the content, too bad
+                    logger.debug("caught exception during retry#" + i + " for fetching staging logs. Aborting. Caught:" + e, e);
+                    break;
+                }
+            }
+        }
+        return logs;
+    }
+
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
 		String urlPath = getFileUrlPath();
 		Object appId = getFileAppId(appName);
@@ -303,7 +343,7 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 		messageConverters.add(new UploadApplicationPayloadHttpMessageConverter());
 		messageConverters.add(getFormHttpMessageConverter());
 		messageConverters.add(new MappingJacksonHttpMessageConverter());
-		return messageConverters;
+        return messageConverters;
 	}
 
 	private FormHttpMessageConverter getFormHttpMessageConverter() {
@@ -326,13 +366,15 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 	private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
 
 		private static final String LEGACY_TOKEN_PREFIX = "0408";
-		private ClientHttpRequestFactory delegate;
+        private Integer defaultSocketTimeout = 0;
+        private ClientHttpRequestFactory delegate;
 
-		public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
+        public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
 			this.delegate = delegate;
-		}
+            captureDefaultReadTimeout(delegate);
+        }
 
-		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+        public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
 			if (token != null) {
 				String header = token;
@@ -344,9 +386,38 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
 				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
 			}
-			return request;
+            increaseReadTimeoutForStreamedTailedLogs(uri);
+
+            return request;
 		}
-	}
+
+        private void captureDefaultReadTimeout(ClientHttpRequestFactory delegate) {
+            if (delegate instanceof CommonsClientHttpRequestFactory) {
+                CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+                defaultSocketTimeout = (Integer) commonsClientHttpRequestFactory.getHttpClient().getParams().getParameter("http.socket.timeout");
+                if (defaultSocketTimeout == null) {
+                    try {
+                        defaultSocketTimeout = new Socket().getSoTimeout();
+                    } catch (SocketException e) {
+                        defaultSocketTimeout = 0;
+                    }
+                }
+            }
+        }
+
+        private void increaseReadTimeoutForStreamedTailedLogs(URI uri) {
+            //May temporary increase readtimeout on other unrelated concurrent threads, but per-request read timeout don't seem easily accessible
+            if (delegate instanceof CommonsClientHttpRequestFactory) {
+                CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+                String uriString = uri.toString();
+                if (uriString.contains("staging_tasks") && uriString.contains("tail")) {
+                    commonsClientHttpRequestFactory.setReadTimeout(5*60*1000);
+                } else {
+                    commonsClientHttpRequestFactory.setReadTimeout(defaultSocketTimeout);
+                }
+            }
+        }
+    }
 
 	public static class ErrorHandler extends DefaultResponseErrorHandler {
 		@Override
@@ -385,8 +456,8 @@ public abstract class AbstractCloudControllerClient implements CloudControllerCl
 				return ((UploadApplicationPayload) part).getArchive().getFilename();
 			}
 			return super.getFilename(part);
-		}
-	}
+        }
+    }
 
 	protected Map<String, String> doGetLogs(String urlPath, String appName, String instance) {
 		Object appId = getFileAppId(appName);

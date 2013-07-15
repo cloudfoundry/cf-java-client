@@ -644,4 +644,12 @@ public interface CloudFoundryOperations {
 	 * @param callBack the callback to be un-registered
 	 */
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
+    /**
+     * Provides staging logs. At times, this method may take times (up to minutes) to return as staging logs are
+     * streamed as they arrive from CC
+     * @param startingInfo The pointer to logs returned by {@link #startApplication(String)}
+     * @return a possibly empty list of logs containing staging logs
+     */
+    List<String> getStagingLogs(StartingInfo startingInfo);
 }
