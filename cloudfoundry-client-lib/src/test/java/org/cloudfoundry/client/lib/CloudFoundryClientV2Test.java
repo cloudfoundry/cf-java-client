@@ -65,6 +65,10 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://ccng.cloudfoundry.com");
 
+    private static final String CCNG_API_PROXY_HOST = System.getProperty("http.proxyHost", null);
+
+    private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
+
 	private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
 
 	private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
@@ -73,11 +77,11 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	private static final String CCNG_USER_SPACE = System.getProperty("ccng.space", "test");
 
-	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace",
-			defaultNamespace(CCNG_USER_EMAIL));
+	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", defaultNamespace(CCNG_USER_EMAIL));
 
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
 	private static String defaultDomainName = null;
+    private HttpProxyConfiguration httpProxyConfiguration;
 	
 	@BeforeClass
 	public static void printTargetInfo() {
@@ -91,8 +95,11 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 
 	@Before
 	public void setUp() throws MalformedURLException {
-		cloudInfo = new CloudFoundryClient(new URL(CCNG_API_URL)).getCloudInfo();
-		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL));
+        if (CCNG_API_PROXY_HOST != null) {
+            httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+        }
+        cloudInfo = new CloudFoundryClient(new URL(CCNG_API_URL), httpProxyConfiguration).getCloudInfo();
+		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration);
 		authenticatedClient.login();
 		connectedClient = setTestSpaceAsDefault(authenticatedClient);
 		connectedClient.deleteAllApplications();
@@ -171,7 +178,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		String newPassword = "newPass123";
 		connectedClient.updatePassword(newPassword);
 		CloudFoundryClient clientWithChangedPassword =
-				new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, newPassword), new URL(CCNG_API_URL));
+				new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, newPassword), new URL(CCNG_API_URL), httpProxyConfiguration);
 		clientWithChangedPassword.login();
 
 		// Revert
@@ -354,7 +361,7 @@ public class CloudFoundryClientV2Test extends AbstractCloudFoundryClientTest {
 		}
 		assertNotNull("Space to use for testing (" + CCNG_USER_SPACE + ") not found for organization (" +
 				CCNG_USER_ORG + ") - check your account or system properties", testSpace);
-		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), testSpace);
+		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration, testSpace);
 		connectedClient.login();
 		return connectedClient;
 	}

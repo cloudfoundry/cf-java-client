@@ -359,11 +359,11 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
-		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists);
+		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists, null);
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
+                                  List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl) {
 		if (checkExists) {
 			try {
 				getAppId(appName);
@@ -379,6 +379,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
+        if (buildpackUrl != null) {
+		    appRequest.put("buildpack", buildpackUrl);
+        }
 		appRequest.put("instances", 1);
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
@@ -637,9 +640,9 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			ResponseEntity<String> entity = getRestTemplate().exchange(
 					getUrl("/v2/apps/{guid}?stage_async=true"), HttpMethod.PUT, requestEntity,
 					String.class, app.getMeta().getGuid());
-		
+
 			HttpHeaders headers = entity.getHeaders();
-			
+
 			// Return a starting info, even with a null staging log value, as a non-null starting info
 			// indicates that the response entity did have headers. The API contract is to return starting info
 			// if there are headers in the response, null otherwise.
@@ -1163,24 +1166,24 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			return;
 		}
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
-		
-		
+
+
 		String headKey = resourcePath[0];
 		String[] tailPath = Arrays.copyOfRange(resourcePath, 1, resourcePath.length);
-		
+
 		if (!entity.containsKey(headKey)) {
 			String pathUrl = entity.get(headKey + "_url").toString();
 			Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
 			if (resource instanceof Map) {
 				Map responseMap = (Map)response;
 				if (responseMap.containsKey("resources")) {
-					response = responseMap.get("resources"); 
+					response = responseMap.get("resources");
 				}
 			}
 			entity.put(headKey, response);
 		}
 		Object embeddedResource = entity.get(headKey);
-		
+
 		if (embeddedResource instanceof Map) {
 			Map<String, Object> embeddedResourceMap = (Map<String, Object>) embeddedResource;
 			//entity = (Map<String, Object>) embeddedResourceMap.get("entity");

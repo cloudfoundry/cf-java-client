@@ -138,6 +138,10 @@ public class CloudEntityResourceMapper {
 		} else {
 			app.setPlan("free");
 		}
+        String buildpack = getEntityAttribute(resource, "buildpack", String.class);
+        if (buildpack != null) {
+            app.setBuildpackUrl(buildpack);
+        }
 		app.setDebug(null);
 		String runtime = null;
 		Map<String, Object> runtimeResource = getEmbeddedResource(resource, "runtime");

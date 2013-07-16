@@ -101,7 +101,7 @@ public interface CloudControllerClient {
 									  List<String> serviceNames, boolean checkExists);
 
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-									  List<String> serviceNames, String applicationPlan, boolean checkExists);
+                           List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl);
 
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
