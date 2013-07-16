@@ -168,9 +168,23 @@ public interface CloudFoundryOperations {
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
 	 * @param applicationPlan the application plan for the deployed app
+     * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git) or null to use the default one
 	 */
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-						   List<String> serviceNames, String applicationPlan);
+                           List<String> serviceNames, String applicationPlan, String buildpackUrl);
+
+	/**
+	 * Create application.
+	 *
+	 * @param appName application name
+	 * @param staging staging info
+	 * @param memory memory to use in MB
+	 * @param uris list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 * @param applicationPlan the application plan for the deployed app
+	 */
+	void createApplication(String appName, Staging staging, int memory, List<String> uris,
+                           List<String> serviceNames, String applicationPlan);
 
 	/**
 	 * Create application.
@@ -210,6 +224,21 @@ public interface CloudFoundryOperations {
 	 */
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
 						   List<String> serviceNames, String applicationPlan, boolean checkExists);
+
+	/**
+	 * Create application.
+	 *
+	 * @param appName application name
+	 * @param staging staging info
+	 * @param memory memory to use in MB
+	 * @param uris list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 * @param applicationPlan the application plan for the deployed app
+	 * @param checkExists check if app exists before creating it
+     * @param buildpackUrl a custom buildpack url (e.g. "https://github.com/cloudfoundry/java-buildpack.git") or null to use the default one
+	 */
+	void createApplication(String appName, Staging staging, int memory, List<String> uris,
+                           List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl);
 
 	/**
 	 * Create application.
@@ -287,9 +316,9 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
 
 	/**
-	 * Start application. May return starting info if the response obtained after the start request contains headers. 
+	 * Start application. May return starting info if the response obtained after the start request contains headers.
 	 * If the response does not contain headers, null is returned instead.
-	 * 
+	 *
 	 * @param appName
 	 *            name of application
 	 * @return Starting info containing response headers, if headers are present in the response. If there are no headers, return null.
