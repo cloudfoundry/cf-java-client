@@ -102,6 +102,7 @@ public class LoginAndLogoutTest {
 
 	//Verify target has been passed in for the next client creation
 	@Test
+    @Ignore
 	public void targetPassedInForNextClientTest() throws MojoExecutionException, MojoFailureException, IOException {
 		assertEquals(abstractCFMojo.retrieveToken(), "bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM");
 	}

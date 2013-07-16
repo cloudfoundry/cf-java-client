@@ -249,10 +249,12 @@ public class CloudInfo {
 		private int services;
 
 		public Usage(Map<String, Object> data) {
-			apps = CloudUtil.parse(Integer.class, data.get("apps"));
-			totalMemory = CloudUtil.parse(Integer.class,  data.get("memory"));
-			urisPerApp = CloudUtil.parse(Integer.class,  data.get("app_uris"));
-			services = CloudUtil.parse(Integer.class,  data.get("services"));
+            if(data != null && !data.isEmpty()) {
+                apps = CloudUtil.parse(Integer.class, data.get("apps"));
+                totalMemory = CloudUtil.parse(Integer.class,  data.get("memory"));
+                urisPerApp = CloudUtil.parse(Integer.class,  data.get("app_uris"));
+                services = CloudUtil.parse(Integer.class,  data.get("services"));
+            }
 		}
 
 		Usage() {
