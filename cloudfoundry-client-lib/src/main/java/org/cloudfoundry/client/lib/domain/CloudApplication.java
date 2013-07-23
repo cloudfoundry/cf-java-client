@@ -52,8 +52,9 @@ public class CloudApplication extends CloudEntity {
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
+    private String buildpackUrl;
 
-	// Constructor for V2 entities
+    // Constructor for V2 entities
 	public CloudApplication(Meta meta, String name) {
 		super(meta, name);
 	}
@@ -115,6 +116,14 @@ public class CloudApplication extends CloudEntity {
 				setCommand((String) metaValue.get(COMMAND_KEY));
 			}
 		}
+	}
+
+    public String getBuildpackUrl() {
+        return buildpackUrl;
+    }
+
+    public void setBuildpackUrl(String buildpackUrl) {
+        this.buildpackUrl = buildpackUrl;
 	}
 
 	public enum AppState {

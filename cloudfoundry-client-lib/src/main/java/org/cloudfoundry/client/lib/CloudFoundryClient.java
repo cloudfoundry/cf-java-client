@@ -169,14 +169,23 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createApplication(appName, staging, memory, uris, serviceNames, checkExists);
 	}
 
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, String applicationPlan) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false);
+    public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+                                  List<String> serviceNames, String applicationPlan) {
+        cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false, null);
+    }
+
+    public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+                                  List<String> serviceNames, String applicationPlan, String buildpackUrl) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false, buildpackUrl);
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists);
+                                  List<String> serviceNames, String applicationPlan, boolean checkExists) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists, null);
+	}
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+                                  List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists, buildpackUrl);
 	}
 
 	public void createApplication(String appName, String framework, int memory, List<String> uris,

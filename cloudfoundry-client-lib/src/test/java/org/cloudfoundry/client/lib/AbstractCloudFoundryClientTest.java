@@ -219,7 +219,26 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertEquals(url, app.getUris().get(0));
 	}
 
-	@Test
+    @Test
+    public void uploadApplicationWithBuildPack() throws IOException {
+        String buildpackUrl = "https://github.com/cloudfoundry/java-buildpack.git";
+        String appName = createSpringTravelApp("upload1", null, buildpackUrl);
+
+        File file = SampleProjects.springTravel();
+        getConnectedClient().uploadApplication(appName, file.getCanonicalPath());
+
+        CloudApplication app = getConnectedClient().getApplication(appName);
+        assertNotNull(app);
+        assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+
+        String url = computeAppUrlNoProtocol(appName);
+        assertEquals(url, app.getUris().get(0));
+
+        assertEquals(buildpackUrl, app.getBuildpackUrl());
+    }
+
+
+    @Test
 	public void startApplication() throws IOException {
 		String appName = createSpringTravelApp("start", null);
 		uploadSpringTravelApp(appName);
@@ -247,7 +266,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		getConnectedClient().startApplication(appName);
 		boolean passSingleInstance = getInstanceInfosWithTimeout(appName, 1, true);
 		assertTrue("Couldn't get the right application state in 50 tries", passSingleInstance);
-		
+
 		CloudApplication app = getConnectedClient().getApplication(appName);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		getConnectedClient().restartApplication(appName);
@@ -520,7 +539,7 @@ public abstract class AbstractCloudFoundryClientTest {
 		assertEquals(uris, app.getUris());
 		assertEquals("ruby simple.rb", app.getStaging().getCommand());
 		getConnectedClient().stopApplication(appName);
-		
+
 		Staging newStaging = app.getStaging();
 		newStaging.setCommand("ruby simple.rb test");
 		getConnectedClient().updateApplicationStaging(appName, newStaging);
@@ -579,7 +598,7 @@ public abstract class AbstractCloudFoundryClientTest {
 
 		boolean passSingleInstance = getInstanceInfosWithTimeout(appName, 1, true);
 		assertTrue("Couldn't get the right application state in 50 tries", passSingleInstance);
-		
+
 		boolean passSingleMultipleInstances = getInstanceInfosWithTimeout(appName, 3, true);
 		assertTrue("Couldn't get the right application state in 50 tries", passSingleMultipleInstances);
 
@@ -601,10 +620,10 @@ public abstract class AbstractCloudFoundryClientTest {
 			try {
 				instances = getInstancesWithTimeout(getConnectedClient(), appName);
 				assertNotNull(instances);
-	
+
 				List<InstanceInfo> infos = instances.getInstances();
 				assertEquals(count, infos.size());
-	
+
 				int passCount = 0;
 				for (InstanceInfo info : infos) {
 					if (shouldBeRunning) {
@@ -926,7 +945,7 @@ public abstract class AbstractCloudFoundryClientTest {
 				Thread.sleep(1000);
 			}
 		}
-		
+
 		// Test downloading full file
 		String fileContent = client.getFile(appName, 0, fileName);
 		assertNotNull(fileContent);
@@ -1051,14 +1070,17 @@ public abstract class AbstractCloudFoundryClientTest {
 	protected static String defaultNamespace(String email) {
 		return email.substring(0, email.indexOf('@')).replaceAll("\\.", "-").replaceAll("\\+", "-");
 	}
-	
+
 	//
 	// helper methods
 	//
 
 	protected String createSpringTravelApp(String suffix, List<String> serviceNames) {
+        return createSpringTravelApp(suffix, serviceNames, null);
+	}
+	protected String createSpringTravelApp(String suffix, List<String> serviceNames, String buildpackUrl) {
 		String appName = namespacedAppName("travel_test-" + suffix);
-		createSpringApplication(appName, serviceNames);
+		createSpringApplication(appName, serviceNames, buildpackUrl);
 		return appName;
 	}
 
@@ -1110,22 +1132,30 @@ public abstract class AbstractCloudFoundryClientTest {
 	}
 
 	private void createSpringApplication(String appName, List<String> serviceNames) {
+        createSpringApplication(appName, serviceNames, null);
+	}
+	private void createSpringApplication(String appName, List<String> serviceNames, String buildpackUrl) {
 		Staging staging =  new Staging("spring");
 		staging.setRuntime("java");
-		createTestApp(appName, serviceNames, staging);
+		createTestApp(appName, serviceNames, staging, buildpackUrl);
 	}
 
-	private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
-		List<String> uris = new ArrayList<String>();
-		uris.add(computeAppUrl(appName));
-		if (serviceNames != null) {
-			for (String serviceName : serviceNames) {
-				createMySqlService(serviceName);
-			}
-		}
-		getConnectedClient().createApplication(appName, staging,
-				getTestAppMemory(staging.getFramework()),
-				uris, serviceNames, "paid");
+    private void createTestApp(String appName, List<String> serviceNames, Staging staging, String buildPackUrl) {
+        List<String> uris = new ArrayList<String>();
+        uris.add(computeAppUrl(appName));
+        if (serviceNames != null) {
+            for (String serviceName : serviceNames) {
+                createMySqlService(serviceName);
+            }
+        }
+        getConnectedClient().createApplication(appName, staging,
+                getTestAppMemory(staging.getFramework()),
+                uris, serviceNames, "paid", buildPackUrl);
+    }
+
+
+    private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
+        createTestApp(appName, serviceNames, staging, null);
 	}
 
 	private void createMySqlService(String serviceName) {
@@ -1185,7 +1215,7 @@ public abstract class AbstractCloudFoundryClientTest {
 
 		return null; // for the compiler
 	}
-	
+
 	private void startApplicationWithTimeout(String appName) {
 		for (int i = 0; i < 50; i++) {
 			try {
@@ -1200,5 +1230,5 @@ public abstract class AbstractCloudFoundryClientTest {
 			}
 		}
 	}
-	
+
 }

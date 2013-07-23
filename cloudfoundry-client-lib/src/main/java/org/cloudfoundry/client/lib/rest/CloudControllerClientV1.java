@@ -263,11 +263,12 @@ public class CloudControllerClientV1 extends AbstractCloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
-		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists);
+        String buildpackUrl = null; //V1 clients use the default buildpack to preserve api compatibility
+        createApplication(appName, staging, memory, uris, serviceNames, null, checkExists, buildpackUrl);
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, String applicationPlan, boolean checkExists) {
+                                  List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl) {
 		if (checkExists) {
 			try {
 				getApplication(appName);
