@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>0.8.5.BUILD-SNAPSHOT</version>
+	<version>0.8.5</version>
 	<packaging>jar</packaging>
 	<name>Client library to be used from STS and other Java tools</name>
 
