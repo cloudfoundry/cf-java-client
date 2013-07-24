@@ -30,10 +30,8 @@ import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudApplication extends CloudEntity {
 
-    private static final String V1_FRAMEWORK_KEY = "model";
-    private static final String V1_RUNTIME_KEY = "stack";
-    private static final String V2_FRAMEWORK_KEY = "framework";
-    private static final String V2_RUNTIME_KEY = "runtime";
+    private static final String FRAMEWORK_KEY = "framework";
+    private static final String RUNTIME_KEY = "runtime";
     private static final String COMMAND_KEY = "command";
     private static final String MEMORY_KEY = "memory";
 
@@ -54,7 +52,6 @@ public class CloudApplication extends CloudEntity {
 	private List<String> env = new ArrayList<String>();
     private String buildpackUrl;
 
-    // Constructor for V2 entities
 	public CloudApplication(Meta meta, String name) {
 		super(meta, name);
 	}
@@ -77,10 +74,8 @@ public class CloudApplication extends CloudEntity {
 		super(CloudEntity.Meta.defaultMeta(), parse(attributes.get("name")));
 		Map<String, String> stagingMap = (Map<String, String>) attributes.get("staging");
 		if (stagingMap != null) {
-			if (stagingMap.containsKey(V1_RUNTIME_KEY) && stagingMap.containsKey(V1_FRAMEWORK_KEY)) {
-				setStaging(new Staging(stagingMap.get(V1_RUNTIME_KEY), stagingMap.get(V1_FRAMEWORK_KEY)));
-			} else if (stagingMap.containsKey(V2_RUNTIME_KEY) && stagingMap.containsKey(V2_FRAMEWORK_KEY)) {
-				setStaging(new Staging(stagingMap.get(V2_RUNTIME_KEY), stagingMap.get(V2_FRAMEWORK_KEY)));
+			if (stagingMap.containsKey(RUNTIME_KEY) && stagingMap.containsKey(FRAMEWORK_KEY)) {
+				setStaging(new Staging(stagingMap.get(RUNTIME_KEY), stagingMap.get(FRAMEWORK_KEY)));
 			} else {
 				setStaging(new Staging(null, null));
 			}

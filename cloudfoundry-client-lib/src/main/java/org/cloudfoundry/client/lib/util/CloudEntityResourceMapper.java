@@ -167,9 +167,6 @@ public class CloudEntityResourceMapper {
 		resources.put("memory", getEntityAttribute(resource, "memory", Integer.class));
 		resources.put("file_descriptors", getEntityAttribute(resource, "file_descriptors", Integer.class));
 		resources.put("disk_quota", getEntityAttribute(resource, "disk_quota", Integer.class));
-		// add v1 resources
-		resources.put("fds", getEntityAttribute(resource, "file_descriptors", Integer.class));
-		resources.put("disk", getEntityAttribute(resource, "disk_quota", Integer.class));
 		app.setResources(resources);
 		List<Map<String, Object>> serviceBindings = getEntityAttribute(resource, "service_bindings", List.class);
 		List<String> serviceList = new ArrayList<String>();

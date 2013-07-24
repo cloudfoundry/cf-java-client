@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,10 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.zip.ZipFile;
-
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
@@ -48,18 +36,21 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CrashInfo;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
+import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
+import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -67,18 +58,76 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.zip.ZipFile;
 
 /**
- * Empty implementation for cloud controller v2 REST API
+ * Abstract implementation of the CloudControllerClient intended to serve as the base.
  *
+ * @author Ramnivas Laddad
+ * @author A.B.Srinivasan
+ * @author Jennifer Hickey
+ * @author Dave Syer
  * @author Thomas Risberg
  */
-public class CloudControllerClientV2 extends AbstractCloudControllerClient {
+public class CloudControllerClientImpl implements CloudControllerClient {
+
+	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
+	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
+
+	protected static final MediaType JSON_MEDIA_TYPE = new MediaType(
+			MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(),
+			Charset.forName("UTF-8"));
+
+	// This map only contains framework/runtime mapping for frameworks that we actively support
+	private static Map<String, Integer> FRAMEWORK_DEFAULT_MEMORY = new HashMap<String, Integer>() {{
+		put("spring", 512);
+		put("lift", 512);
+		put("grails", 512);
+		put("java_web", 512);
+	}};
+
+	private static final int DEFAULT_MEMORY = 256;
+
+	private static final int FILES_MAX_RETRIES = 10;
+
+	private static final String LOGS_LOCATION = "logs";
 
 	private OauthClient oauthClient;
 
@@ -88,36 +137,394 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 
 	private List<String> paidApplicationPlans = Arrays.asList("free", "paid");
 
-	public CloudControllerClientV2(URL cloudControllerUrl,
-								   RestUtil restUtil,
-								   CloudCredentials cloudCredentials,
-								   URL authorizationEndpoint,
-								   CloudSpace sessionSpace,
-								   HttpProxyConfiguration httpProxyConfiguration) {
-		super(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, httpProxyConfiguration);
+	private RestTemplate restTemplate;
+
+	private URL cloudControllerUrl;
+
+	protected RestUtil restUtil;
+
+	protected CloudCredentials cloudCredentials;
+
+	protected URL authorizationEndpoint;
+
+	protected String token;
+
+	protected List<String> freeApplicationPlans = Arrays.asList("free");
+
+	
+	public CloudControllerClientImpl(URL cloudControllerUrl,
+			   RestUtil restUtil,
+			   CloudCredentials cloudCredentials,
+			   URL authorizationEndpoint,
+			   CloudSpace sessionSpace,
+			   HttpProxyConfiguration httpProxyConfiguration) {
+		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
+		Assert.notNull(restUtil, "RestUtil cannot be null");
+		this.restUtil = restUtil;
+		this.cloudCredentials = cloudCredentials;
+		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
+			this.token = cloudCredentials.getToken();
+		}
+		this.cloudControllerUrl = cloudControllerUrl;
+		if (authorizationEndpoint != null) {
+			this.authorizationEndpoint = determineAuthorizationEndPointToUse(authorizationEndpoint, cloudControllerUrl);
+		} else {
+			this.authorizationEndpoint = null;
+		}
+		this.restTemplate = restUtil.createRestTemplate(httpProxyConfiguration);
+		configureCloudFoundryRequestFactory(restTemplate);
+
+		this.restTemplate.setErrorHandler(new ErrorHandler());
+		this.restTemplate.setMessageConverters(getHttpMessageConverters());
+
 		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
 		this.sessionSpace = sessionSpace;
 	}
 
+	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
+		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
+			try {
+				URL newUrl = new URL("http", authorizationEndpoint.getHost(), authorizationEndpoint.getPort(),
+						authorizationEndpoint.getFile());
+				return newUrl;
+			} catch (MalformedURLException e) {
+				// this shouldn't happen
+				return authorizationEndpoint;
+			}
+		}
+		return authorizationEndpoint;
+	}
+
+	public URL getCloudControllerUrl() {
+		return this.cloudControllerUrl;
+	}
+
+	public int[] getApplicationMemoryChoices() {
+		// TODO: Get it from cloudcontroller's 'info/resources' end point
+		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
+		int maxMemory = getInfo().getLimits().getMaxTotalMemory();
+
+		int length = 0;
+		for (int generalChoice : generalChoices) {
+			if (generalChoice <= maxMemory) {
+				length++;
+			}
+		}
+
+		int[] result = new int[length];
+		System.arraycopy(generalChoices, 0, result, 0, length);
+		return result;
+	}
+
+	public int getDefaultApplicationMemory(String framework) {
+		Integer memory = FRAMEWORK_DEFAULT_MEMORY.get(framework);
+		if (memory == null) {
+			return DEFAULT_MEMORY;
+		}
+		return memory;
+	}
+
+	public void updatePassword(String newPassword) {
+		updatePassword(cloudCredentials, newPassword);
+	}
+
+	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
+		ClientHttpRequestFactory requestFactory = restUtil.createRequestFactory(httpProxyConfiguration);
+		restTemplate.setRequestFactory(requestFactory);
+		configureCloudFoundryRequestFactory(restTemplate);
+	}
+
+	public Map<String, String> getLogs(String appName) {
+		String urlPath = getFileUrlPath();
+		String instance = String.valueOf(0);
+		return doGetLogs(urlPath, appName, instance);
+	}
+
+	public Map<String, String> getCrashLogs(String appName) {
+		String urlPath = getFileUrlPath();
+		CrashesInfo crashes = getCrashes(appName);
+		TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
+		for (CrashInfo crash : crashes.getCrashes()) {
+			crashInstances.put(crash.getSince(), crash.getInstance());
+		}
+		String instance = crashInstances.get(crashInstances.lastKey());
+		return doGetLogs(urlPath, appName, instance);
+	}
+
+	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
+		String urlPath = getFileUrlPath();
+		Object appId = getFileAppId(appName);
+		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
+	}
+
+	public void registerRestLogListener(RestLogCallback callBack) {
+		if (getRestTemplate() instanceof LoggingRestTemplate) {
+			((LoggingRestTemplate)getRestTemplate()).registerRestLogListener(callBack);
+		}
+	}
+
+	public void unRegisterRestLogListener(RestLogCallback callBack) {
+		if (getRestTemplate() instanceof LoggingRestTemplate) {
+			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
+		}
+	}
+
+	protected RestTemplate getRestTemplate() {
+		return this.restTemplate;
+	}
+
+	protected String getUrl(String path) {
+		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
+	}
+
+	private void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
+		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
+		restTemplate.setRequestFactory(
+				new CloudFoundryClientHttpRequestFactory(requestFactory));
+	}
+
+	private List<HttpMessageConverter<?>> getHttpMessageConverters() {
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+		messageConverters.add(new ByteArrayHttpMessageConverter());
+		messageConverters.add(new StringHttpMessageConverter());
+		messageConverters.add(new ResourceHttpMessageConverter());
+		messageConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+		messageConverters.add(getFormHttpMessageConverter());
+		messageConverters.add(new MappingJacksonHttpMessageConverter());
+		return messageConverters;
+	}
+
+	private FormHttpMessageConverter getFormHttpMessageConverter() {
+		FormHttpMessageConverter formPartsMessageConverter = new CloudFoundryFormHttpMessageConverter();
+		formPartsMessageConverter.setPartConverters(getFormPartsMessageConverters());
+		return formPartsMessageConverter;
+	}
+
+	private List<HttpMessageConverter<?>> getFormPartsMessageConverters() {
+		List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
+		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+		stringConverter.setSupportedMediaTypes(Collections.singletonList(JSON_MEDIA_TYPE));
+		stringConverter.setWriteAcceptCharset(false);
+		partConverters.add(stringConverter);
+		partConverters.add(new ResourceHttpMessageConverter());
+		partConverters.add(new UploadApplicationPayloadHttpMessageConverter());
+		return partConverters;
+	}
+
+	private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
+
+		private static final String LEGACY_TOKEN_PREFIX = "0408";
+		private ClientHttpRequestFactory delegate;
+
+		public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
+			this.delegate = delegate;
+		}
+
+		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
+			if (token != null) {
+				String header = token;
+				if (!header.startsWith(LEGACY_TOKEN_PREFIX) && !header.toLowerCase().startsWith("bearer")) {
+					header = "Bearer " + header; // UAA token without OAuth prefix
+				}
+				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
+			}
+			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
+				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
+			}
+			return request;
+		}
+	}
+
+	public static class ErrorHandler extends DefaultResponseErrorHandler {
+		@Override
+		public void handleError(ClientHttpResponse response) throws IOException {
+			HttpStatus statusCode = response.getStatusCode();
+			switch (statusCode.series()) {
+				case CLIENT_ERROR:
+					CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
+					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+					if (response.getBody() != null) {
+						try {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
+							exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
+						} catch (JsonParseException e) {
+							exception.setDescription("Client error");
+						} catch (IOException e) {
+							exception.setDescription("Client error");
+						}
+					} else {
+						exception.setDescription("Client error");
+					}
+					throw exception;
+				case SERVER_ERROR:
+					throw new HttpServerErrorException(statusCode, response.getStatusText());
+				default:
+					throw new RestClientException("Unknown status code [" + statusCode + "]");
+			}
+		}
+	}
+
+	public static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
+		@Override
+		protected String getFilename(Object part) {
+			if (part instanceof UploadApplicationPayload) {
+				return ((UploadApplicationPayload) part).getArchive().getFilename();
+			}
+			return super.getFilename(part);
+		}
+	}
+
+	protected Map<String, String> doGetLogs(String urlPath, String appName, String instance) {
+		Object appId = getFileAppId(appName);
+		String logFiles = doGetFile(urlPath, appId, instance, LOGS_LOCATION, -1, -1);
+		String[] lines = logFiles.split("\n");
+		List<String> fileNames = new ArrayList<String>();
+		for (String line : lines) {
+			String[] parts = line.split("\\s");
+			if (parts.length > 0 && parts[0] != null) {
+				fileNames.add(parts[0]);
+			}
+		}
+		Map<String, String> logs = new HashMap<String, String>(fileNames.size());
+		for(String fileName : fileNames) {
+			String logFile = LOGS_LOCATION + "/" + fileName;
+			logs.put(logFile, doGetFile(urlPath, appId, instance, logFile, -1, -1));
+		}
+		return logs;
+	}
+
+	protected String doGetFile(String urlPath, Object app, int instanceIndex, String filePath, int startPosition, int endPosition) {
+		return doGetFile(urlPath, app, String.valueOf(instanceIndex), filePath, startPosition, endPosition);
+	}
+
+	protected String doGetFile(String urlPath, Object app, String instance, String filePath, int startPosition, int endPosition) {
+		Assert.isTrue(startPosition >= -1, "Invalid start position value: " + startPosition);
+		Assert.isTrue(endPosition >= -1, "Invalid end position value: " + endPosition);
+		Assert.isTrue(startPosition < 0 || endPosition < 0 || endPosition >= startPosition,
+				"The end position (" + endPosition + ") can't be less than the start position (" + startPosition + ")");
+
+		int start, end;
+		if (startPosition == -1 && endPosition == -1) {
+			start = 0;
+			end = -1;
+		} else {
+			start = startPosition;
+			end = endPosition;
+		}
+
+		final String range =
+				"bytes=" + (start == -1 ? "" : start) + "-" + (end == -1 ? "" : end);
+
+		//simple retry
+		int tries = 0;
+		String response = null;
+		while (response == null) {
+			tries++;
+			try {
+				response = doGetFileByRange(urlPath, app, instance, filePath, start, end, range);
+			} catch (HttpServerErrorException e) {
+				if (e.getStatusCode().equals(HttpStatus.SERVICE_UNAVAILABLE)) {
+					if (tries > FILES_MAX_RETRIES) {
+						throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+		}
+
+		return response;
+	}
+
+	private String doGetFileByRange(String urlPath, Object app, String instance, String filePath, int start, int end,
+									String range) {
+
+		boolean supportsRanges = false;
+		try {
+			supportsRanges = getRestTemplate().execute(getUrl(urlPath),
+					HttpMethod.HEAD,
+					new RequestCallback() {
+						public void doWithRequest(ClientHttpRequest request) throws IOException {
+							request.getHeaders().set("Range", "bytes=0-");
+						}
+					},
+					new ResponseExtractor<Boolean>() {
+						public Boolean extractData(ClientHttpResponse response) throws IOException {
+							if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
+								return true;
+							}
+							return false;
+						}
+					},
+					app, instance, filePath);
+		} catch (CloudFoundryException e) {
+			if (e.getStatusCode().equals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)) {
+				// must be a 0 byte file
+				return "";
+			} else {
+				throw e;
+			}
+		}
+		HttpHeaders headers = new HttpHeaders();
+		if (supportsRanges) {
+			headers.set("Range", range);
+		}
+		HttpEntity<Object> requestEntity = new HttpEntity<Object>(headers);
+		ResponseEntity<String> responseEntity = getRestTemplate().exchange(getUrl(urlPath),
+				HttpMethod.GET, requestEntity, String.class, app, instance, filePath);
+		String response = responseEntity.getBody();
+		boolean partialFile = false;
+		if (responseEntity.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
+			partialFile = true;
+		}
+		if (!partialFile && response != null) {
+			if (start == -1) {
+				return response.substring(response.length() - end);
+			} else {
+				if (start >= response.length()) {
+					if (response.length() == 0) {
+						return "";
+					}
+					throw new CloudFoundryException(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE,
+							"The starting position " + start + " is past the end of the file content.");
+				}
+				if (end != -1) {
+					if (end >= response.length()) {
+						end = response.length() - 1;
+					}
+					return response.substring(start, end + 1);
+				} else {
+					return response.substring(start);
+				}
+			}
+		}
+		return response;
+	}
+
+	
+
 	@SuppressWarnings("unchecked")
 	public CloudInfo getInfo() {
-		String infoJson = getRestTemplate().getForObject(getUrl("/v2/info"), String.class);
+		// info comes from two end points: /info and /v2/info
+		
+		String infoV2Json = getRestTemplate().getForObject(getUrl("/v2/info"), String.class);
+		Map<String, Object> infoV2Map = JsonUtil.convertJsonToMap(infoV2Json);
+
+		Map<String, Object> userMap = getUserInfo((String) infoV2Map.get("user"));
+
+		String infoJson = getRestTemplate().getForObject(getUrl("/info"), String.class);
 		Map<String, Object> infoMap = JsonUtil.convertJsonToMap(infoJson);
+		Map<String, Object> limitMap = (Map<String, Object>) infoMap.get("limits");
+		Map<String, Object> usageMap = (Map<String, Object>) infoMap.get("usage");
 
-		Map<String, Object> userMap = getUserInfo((String) infoMap.get("user"));
-
-		//TODO: replace with v2 api call once, or if, they become available
-		String infoV1Json = getRestTemplate().getForObject(getUrl("/info"), String.class);
-		Map<String, Object> infoV1Map = JsonUtil.convertJsonToMap(infoV1Json);
-		Map<String, Object> limitMap = (Map<String, Object>) infoV1Map.get("limits");
-		Map<String, Object> usageMap = (Map<String, Object>) infoV1Map.get("usage");
-
-		String name = CloudUtil.parse(String.class, infoMap.get("name"));
-		String support = CloudUtil.parse(String.class, infoMap.get("support"));
-		String authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
-		int build = CloudUtil.parse(Integer.class, infoMap.get("build"));
-		String version = "" + CloudUtil.parse(Number.class, infoMap.get("version"));
-		String description = CloudUtil.parse(String.class, infoMap.get("description"));
+		String name = CloudUtil.parse(String.class, infoV2Map.get("name"));
+		String support = CloudUtil.parse(String.class, infoV2Map.get("support"));
+		String authorizationEndpoint = CloudUtil.parse(String.class, infoV2Map.get("authorization_endpoint"));
+		int build = CloudUtil.parse(Integer.class, infoV2Map.get("build"));
+		String version = "" + CloudUtil.parse(Number.class, infoV2Map.get("version"));
+		String description = CloudUtil.parse(String.class, infoV2Map.get("description"));
 
 		CloudInfo.Limits limits = null;
 		CloudInfo.Usage usage = null;
@@ -125,7 +532,7 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		if (token != null) {
 			limits = new CloudInfo.Limits(limitMap);
 			usage = new CloudInfo.Usage(usageMap);
-			debug = CloudUtil.parse(Boolean.class, infoV1Map.get("allow_debug"));
+			debug = CloudUtil.parse(Boolean.class, infoMap.get("allow_debug"));
 		}
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
@@ -136,7 +543,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		return true;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public List<CloudSpace> getSpaces() {
 		String urlPath = "/v2/spaces?inline-relations-depth=1";
@@ -783,7 +1189,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	@Override
 	public void updateApplicationPlan(String appName, String applicationPlan) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -851,19 +1256,16 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
-	@Override
 	public List<CloudDomain> getDomainsForOrg() {
 		Assert.notNull(sessionSpace, "Unable to access organization domains without specifying organization and space to use.");
 		return doGetDomains(null);
 	}
 
-	@Override
 	public List<CloudDomain> getDomains() {
 		Assert.notNull(sessionSpace, "Unable to access domains for space without specifying organization and space to use.");
 		return doGetDomains(sessionSpace);
 	}
 
-	@Override
 	public void addDomain(String domainName) {
 		Assert.notNull(sessionSpace, "Unable to add domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, false);
@@ -873,7 +1275,6 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		doAddDomain(domainGuid);
 	}
 
-	@Override
 	public void deleteDomain(String domainName) {
 		Assert.notNull(sessionSpace, "Unable to delete domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, true);
@@ -885,28 +1286,24 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		doDeleteDomain(domainGuid);
 	}
 
-	@Override
 	public void removeDomain(String domainName) {
 		Assert.notNull(sessionSpace, "Unable to remove domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		doRemoveDomain(domainGuid);
 	}
 
-	@Override
 	public List<CloudRoute> getRoutes(String domainName) {
 		Assert.notNull(sessionSpace, "Unable to get routes for domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		return doGetRoutes(domainGuid);
 	}
 
-	@Override
 	public void addRoute(String host, String domainName) {
 		Assert.notNull(sessionSpace, "Unable to add route for domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		doAddRoute(host, domainGuid);
 	}
 
-	@Override
 	public void deleteRoute(String host, String domainName) {
 		Assert.notNull(sessionSpace, "Unable to delete route for domain without specifying organization and space to use.");
 		UUID domainGuid = getDomainGuid(domainName, true);
@@ -917,12 +1314,10 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 		doDeleteRoute(routeGuid);
 	}
 
-	@Override
 	protected String getFileUrlPath() {
 		return "/v2/apps/{appId}/instances/{instance}/files/{filePath}";
 	}
 
-	@Override
 	protected Object getFileAppId(String appName) {
 		return getAppId(appName);
 	}
@@ -1198,4 +1593,5 @@ public class CloudControllerClientV2 extends AbstractCloudControllerClient {
 			return;
 		}
 	}
+	
 }

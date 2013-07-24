@@ -142,39 +142,7 @@ public class ServiceConfiguration {
 	private String version;
 	private CloudEntity.Meta meta;
 
-	// v1 only attributes
-	private List<Tier> tiers = new ArrayList<ServiceConfiguration.Tier>();
-	private String type;
-	private String vendor;
-
-	// v2 only attributes
 	private CloudServiceOffering cloudServiceOffering;
-
-	/**
-	 * Constructor used by v1 services
-	 *
-	 * @param attributes
-	 */
-	public ServiceConfiguration(Map<String, Object> attributes) {
-		this.meta = new CloudEntity.Meta(null, null, null);
-		type = CloudUtil.parse(attributes.get("type"));
-		version = CloudUtil.parse(attributes.get("version"));
-		vendor = CloudUtil.parse(attributes.get("vendor"));
-		description = CloudUtil.parse(attributes.get("description"));
-		@SuppressWarnings("unchecked")
-		Map<String, Object> tiersAsMap = CloudUtil.parse(Map.class,
-				attributes.get("tiers"));
-		if (tiersAsMap != null) {
-			for (Map.Entry<String, Object> tierEntry : tiersAsMap.entrySet()) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> tierMap = CloudUtil.parse(Map.class,
-						tierEntry.getValue());
-				if (tierMap != null) {
-					tiers.add(new Tier(tierEntry.getKey(), tierMap));
-				}
-			}
-		}
-	}
 
 	public ServiceConfiguration(CloudServiceOffering cloudServiceOffering) {
 		this.cloudServiceOffering = cloudServiceOffering;
@@ -185,18 +153,6 @@ public class ServiceConfiguration {
 
 	public String getDescription() {
 		return description;
-	}
-
-	public List<Tier> getTiers() {
-		return tiers;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public String getVendor() {
-		return vendor;
 	}
 
 	public String getVersion() {

@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -24,17 +30,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Factory used to create cloud controller client implementations suitable for use against v1 or v2 cloud controller.
- * The factory should determine the type of client to create.
+ * Factory used to create cloud controller client implementations.
  *
  * @author Thgomas Risberg
+ * @author Ramnivas Laddad
  */
 public class CloudControllerClientFactory {
 
@@ -62,29 +62,11 @@ public class CloudControllerClientFactory {
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
 													CloudSpace sessionSpace) {
-		return createCloudControllerClient(cloudControllerUrl, cloudCredentials, sessionSpace);
-	}
-
-	private CloudControllerClient createCloudControllerClient(URL cloudControllerUrl, CloudCredentials cloudCredentials,
-															  CloudSpace sessionSpace) {
-		CloudControllerClient cc = null;
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
-		boolean v2 = isV2(infoMap);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap);
 
-		if (v2) {
-			cc = new CloudControllerClientV2(cloudControllerUrl, restUtil, cloudCredentials,
+		return new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials,
 					authorizationEndpoint, sessionSpace, httpProxyConfiguration);
-		}
-		else {
-			if (sessionSpace != null) {
-				throw new UnsupportedOperationException(
-						"Spaces are not supported for the version of Cloud Controller you are accessing");
-			}
-			cc = new CloudControllerClientV1(cloudControllerUrl, restUtil, cloudCredentials,
-					authorizationEndpoint, httpProxyConfiguration);
-		}
-		return cc;
 	}
 
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {
@@ -92,7 +74,6 @@ public class CloudControllerClientFactory {
 			return infoCache.get(cloudControllerUrl);
 		}
 		Map<String, Object> infoMap = new HashMap<String, Object>();
-		@SuppressWarnings("unchecked")
 		String s = restTemplate.getForObject(cloudControllerUrl + "/info", String.class);
 		try {
 			infoMap = objectMapper.readValue(s, new TypeReference<Map<String, Object>>() {});
@@ -100,16 +81,6 @@ public class CloudControllerClientFactory {
 			e.printStackTrace();
 		}
 		return infoMap;
-	}
-
-	private boolean isV2(Map<String,Object> infoMap) {
-		Object v = infoMap.get("version");
-		if (v != null && v instanceof String && Double.valueOf((String) v) <= 1.0) {
-			return false;
-		}
-		else {
-			return true;
-		}
 	}
 
 	private URL getAuthorizationEndpoint(Map<String,Object> infoMap) {
