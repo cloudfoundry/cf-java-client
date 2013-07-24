@@ -1,5 +1,18 @@
 package org.cloudfoundry.client.lib.rest;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -16,23 +29,9 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
- * Tests for authentication scenarios with {@link org.cloudfoundry.client.lib.rest.CloudControllerClientV1} and
- * {@link org.cloudfoundry.client.lib.rest.CloudControllerClientV2}.
+ * Tests for authentication scenarios with 
+ * {@link org.cloudfoundry.client.lib.rest.CloudControllerClientImpl}.
  *
  * @author Thomas Risberg
  */
@@ -109,36 +108,6 @@ public class AuthenticationTest {
 	}
 
 	@Test
-	public void loginWithNonOauthAuthentication() throws MalformedURLException {
-		String token = "12345678";
-		Map<String, String> tokenResponse = new HashMap<String, String>();
-		tokenResponse.put("token", token);
-		RestTemplate restTemplate = mock(RestTemplate.class);
-		ClientHttpRequestFactory clientHttpRequestFactory = mock(ClientHttpRequestFactory.class);
-		RestUtil restUtil = mock(RestUtil.class);
-		when(restUtil.createRestTemplate(any(HttpProxyConfiguration.class))).thenReturn(restTemplate);
-		when(restUtil.createRequestFactory(any(HttpProxyConfiguration.class))).thenReturn(clientHttpRequestFactory);
-		when(restTemplate.getForObject(
-				eq("http://api.cloud.me/info"),
-				any(Class.class)
-		)).thenReturn(INFO_WITHOUT_AUTH);
-		when(restTemplate.postForObject(
-				eq("http://api.cloud.me/users/{id}/tokens"),
-				any(Object.class),
-				any(Class.class),
-				any(Object[].class))).thenReturn(tokenResponse);
-
-		// Run Test
-		CloudControllerClientFactory ccf = new CloudControllerClientFactory(restUtil, null);
-		CloudControllerClient ccc = ccf.newCloudController(
-				new URL("http://api.cloud.me"),
-				new CloudCredentials("test@cloud.me", "passwd"),
-				null);
-		String loginToken = ccc.login();
-		assertThat(loginToken, is(token));
-	}
-
-	@Test
 	public void loginWithWrongPassword() throws MalformedURLException {
 		thrown.expect(CloudFoundryException.class);
 		RestTemplate restTemplate = mock(RestTemplate.class);
@@ -166,34 +135,6 @@ public class AuthenticationTest {
 				new URL("http://api.cloud.me"),
 				new CloudCredentials("test@cloud.me", "badpasswd"),
 				null);
-		ccc.login();
-	}
-
-	@Test
-	public void loginWithEmptyEmail() throws MalformedURLException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("Email cannot be null or empty");
-		RestTemplate restTemplate = mock(RestTemplate.class);
-		RestUtil restUtil = mock(RestUtil.class);
-		when(restUtil.createRestTemplate(any(HttpProxyConfiguration.class))).thenReturn(restTemplate);
-
-		// Run Test
-		CloudControllerClient ccc = new CloudControllerClientV1(new URL("http://api.cloud.me"), restUtil,
-				new CloudCredentials("", "passwd"), null, null);
-		ccc.login();
-	}
-
-	@Test
-	public void loginWithNullPassword() throws MalformedURLException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("Password cannot be null or empty");
-		RestTemplate restTemplate = mock(RestTemplate.class);
-		RestUtil restUtil = mock(RestUtil.class);
-		when(restUtil.createRestTemplate(any(HttpProxyConfiguration.class))).thenReturn(restTemplate);
-
-		// Run Test
-		CloudControllerClient ccc = new CloudControllerClientV1(new URL("http://api.cloud.me"), restUtil,
-				new CloudCredentials("test@cloud.me", null), null, null);
 		ccc.login();
 	}
 }

@@ -36,7 +36,6 @@
 						<configuration>
 							<excludes>
 								<exclude>**/CloudFoundryClientTest.java</exclude>
-								<exclude>**/CloudFoundryClientV2Test.java</exclude>
 								<exclude>**/Abstract*.java</exclude>
 							</excludes>
 						</configuration>

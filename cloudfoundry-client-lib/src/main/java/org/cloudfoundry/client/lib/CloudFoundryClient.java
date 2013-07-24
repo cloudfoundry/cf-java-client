@@ -49,7 +49,6 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Thomas Risberg
  */
-@SuppressWarnings("unused")
 public class CloudFoundryClient implements CloudFoundryOperations {
 
 	private CloudControllerClient cc;
