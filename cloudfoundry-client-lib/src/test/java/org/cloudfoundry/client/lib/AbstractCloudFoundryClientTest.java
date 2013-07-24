@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -870,7 +869,25 @@ public abstract class AbstractCloudFoundryClientTest {
 		}
 	}
 
-	@Test
+    @Test
+    public void getStagingLogs() throws Exception {
+        String appName = createSpringTravelApp("stagingLogs", null, "https://github.com/cloudfoundry/java-buildpack.git");
+
+        File file = SampleProjects.springTravel();
+        getConnectedClient().uploadApplication(appName, file.getCanonicalPath());
+
+        StartingInfo startingInfo = getConnectedClient().startApplication(appName);
+
+        List<String> logs = getConnectedClient().getStagingLogs(startingInfo);
+
+        assertNotNull(logs);
+        assertTrue(logs.size() > 0);
+        for (int i=0; i< logs.size(); i++) {
+            assertNotNull(" log #" + i, logs.get(i));
+        }
+    }
+
+    @Test
 	@Ignore("Ignore until the Java buildpack detects app crashes upon OOM correctly")
 	public void getCrashLogs() throws Exception {
 		String appName = namespacedAppName("simple_crashlogs");

@@ -398,4 +398,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.unRegisterRestLogListener(callBack);
 	}
 
+    public List<String> getStagingLogs(StartingInfo startingInfo) {
+        return cc.getStagingLogs(startingInfo);
+    }
+
 }

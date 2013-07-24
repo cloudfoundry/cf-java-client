@@ -176,4 +176,6 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
+    List<String> getStagingLogs(StartingInfo startingInfo);
 }
