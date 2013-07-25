@@ -33,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
@@ -40,7 +41,6 @@ import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.junit.After;
@@ -98,6 +98,7 @@ public class CloudFoundryClientTest {
     private HttpProxyConfiguration httpProxyConfiguration;
 
     private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
+    private static final int DEFAULT_MEMORY = 512; // MB
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -176,10 +177,9 @@ public class CloudFoundryClientTest {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName("travel_test-0");
 		uris.add(computeAppUrl(appName));
-		Staging staging =  new Staging("spring");
-		staging.setRuntime("java");
+		Staging staging =  new Staging();
 		connectedClient.createApplication(appName, staging,
-				getTestAppMemory("spring"), uris, null);
+				DEFAULT_MEMORY, uris, null);
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -255,7 +255,7 @@ public class CloudFoundryClientTest {
         String url = computeAppUrlNoProtocol(appName);
         assertEquals(url, app.getUris().get(0));
 
-        assertEquals(buildpackUrl, app.getBuildpackUrl());
+        assertEquals(buildpackUrl, app.getStaging().getBuildpackUrl());
     }
 
 
@@ -309,10 +309,9 @@ public class CloudFoundryClientTest {
 		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName("travel_test8");
 		uris.add(computeAppUrl(appName));
-		Staging staging =  new Staging("spring");
-		staging.setRuntime("java");
+		Staging staging =  new Staging();
 		connectedClient.createApplication(appName, staging,
-				getTestAppMemory("spring"), uris, serviceNames);
+				DEFAULT_MEMORY, uris, serviceNames);
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -462,8 +461,6 @@ public class CloudFoundryClientTest {
 		String appName = createSpringTravelApp("mem1", null);
 		CloudApplication app = connectedClient.getApplication(appName);
 
-		assertEquals(getTestAppMemory("spring"), app.getMemory());
-
 		connectedClient.updateApplicationMemory(appName, 256);
 		app = connectedClient.getApplication(appName);
 		assertEquals(256, app.getMemory());
@@ -534,9 +531,7 @@ public class CloudFoundryClientTest {
 		List<String> uris = new ArrayList<String>();
 		uris.add(computeAppUrl(appName));
 		List<String> services = new ArrayList<String>();
-		Staging staging = new Staging("standalone");
-		staging.setRuntime("node");
-		staging.setCommand("node app.js");
+		Staging staging = new Staging("node app.js", null);
 		File file = SampleProjects.standaloneNode();
 		connectedClient.createApplication(appName, staging, 64, uris, services);
 		connectedClient.uploadApplication(appName, file.getCanonicalPath());
@@ -561,8 +556,7 @@ public class CloudFoundryClientTest {
 		assertEquals("ruby simple.rb", app.getStaging().getCommand());
 		connectedClient.stopApplication(appName);
 
-		Staging newStaging = app.getStaging();
-		newStaging.setCommand("ruby simple.rb test");
+		Staging newStaging = new Staging("ruby simple.rb test", app.getStaging().getBuildpackUrl());
 		connectedClient.updateApplicationStaging(appName, newStaging);
 		app = connectedClient.getApplication(appName);
 		assertNotNull(app);
@@ -799,7 +793,7 @@ public class CloudFoundryClientTest {
 		List<String> serviceNames = new ArrayList<String>();
 
 		connectedClient.createApplication(appName, new Staging("java", "spring"),
-				getTestAppMemory("spring"), uris, serviceNames);
+				DEFAULT_MEMORY, uris, serviceNames);
 		connectedClient.uploadApplication(appName, war.getCanonicalPath());
 
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -855,18 +849,6 @@ public class CloudFoundryClientTest {
 		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
 		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
 		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
-	}
-
-	@Test
-	public void getApplicationMemoryChoices() {
-		int springMemory = connectedClient.getDefaultApplicationMemory("spring");
-		assertEquals(512, springMemory);
-		int railsMemory = connectedClient.getDefaultApplicationMemory("rails");
-		assertEquals(256, railsMemory);
-		int[] choices = connectedClient.getApplicationMemoryChoices();
-		assertNotNull(choices);
-		assertNotSame(0, choices.length);
-		assertTrue(connectedClient.getCloudInfo().getLimits().getMaxTotalMemory() >= choices[choices.length - 1]);
 	}
 
 	//
@@ -1082,11 +1064,9 @@ public class CloudFoundryClientTest {
 
 	private CloudApplication createAndUploadExplodedSpringTestApp(String appName)
 			throws IOException {
-		Staging staging =  new Staging("spring");
-		staging.setRuntime("java");
 		File explodedDir = SampleProjects.springTravelUnpacked(temporaryFolder);
 		assertTrue("Expected exploded test app at " + explodedDir.getCanonicalPath(), explodedDir.exists());
-		createTestApp(appName, null, staging);
+		createTestApp(appName, null, new Staging());
 		connectedClient.uploadApplication(appName, explodedDir.getCanonicalPath());
 		return connectedClient.getApplication(appName);
 	}
@@ -1113,9 +1093,7 @@ public class CloudFoundryClientTest {
 	}
 
 	private void createStandaloneRubyTestApp(String appName, List<String> uris, List<String> services) throws IOException {
-		Staging staging = new Staging("standalone");
-		staging.setRuntime("ruby19");
-		staging.setCommand("ruby simple.rb");
+		Staging staging = new Staging("ruby simple.rb", null);
 		File file = SampleProjects.standaloneRuby();
 		connectedClient.createApplication(appName, staging, 128, uris, services);
 		connectedClient.uploadApplication(appName, file.getCanonicalPath());
@@ -1124,10 +1102,9 @@ public class CloudFoundryClientTest {
 	private void createSpringApplication(String appName, List<String> serviceNames) {
         createSpringApplication(appName, serviceNames, null);
 	}
+
 	private void createSpringApplication(String appName, List<String> serviceNames, String buildpackUrl) {
-		Staging staging =  new Staging("spring");
-		staging.setRuntime("java");
-		createTestApp(appName, serviceNames, staging, buildpackUrl);
+		createTestApp(appName, serviceNames, new Staging(), buildpackUrl);
 	}
 
     private void createTestApp(String appName, List<String> serviceNames, Staging staging, String buildPackUrl) {
@@ -1139,7 +1116,7 @@ public class CloudFoundryClientTest {
             }
         }
         connectedClient.createApplication(appName, staging,
-                getTestAppMemory(staging.getFramework()),
+                DEFAULT_MEMORY,
                 uris, serviceNames, "paid", buildPackUrl);
     }
 
@@ -1149,21 +1126,21 @@ public class CloudFoundryClientTest {
 	}
 
 	private void createMySqlService(String serviceName) {
-		List<ServiceConfiguration> serviceConfigurations = connectedClient.getServiceConfigurations();
-		ServiceConfiguration databaseServiceConfiguration = null;
-		for (ServiceConfiguration sc : serviceConfigurations) {
-			if (sc.getCloudServiceOffering() != null && sc.getCloudServiceOffering().getLabel().equals(getMysqlLabel())) {
-				databaseServiceConfiguration = sc;
+		List<CloudServiceOffering> serviceOfferings = connectedClient.getServiceOfferings();
+		CloudServiceOffering databaseServiceOffering = null;
+		for (CloudServiceOffering so : serviceOfferings) {
+			if (so.getLabel().equals(getMysqlLabel())) {
+				databaseServiceOffering = so;
 				break;
 			}
 		}
-		if (databaseServiceConfiguration == null) {
-			throw new IllegalStateException("No ServiceConfiguration found for MySQL.");
+		if (databaseServiceOffering == null) {
+			throw new IllegalStateException("No CloudServiceOffering found for MySQL.");
 		}
 		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
 		service.setProvider("core");
 		service.setLabel(getMysqlLabel());
-		service.setVersion(databaseServiceConfiguration.getVersion());
+		service.setVersion(databaseServiceOffering.getVersion());
 		service.setPlan(SERVICE_TEST_MYSQL_PLAN);
 		connectedClient.createService(service);
 	}
@@ -1272,23 +1249,23 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void getServiceConfigurations() {
-		List<ServiceConfiguration> configurations = connectedClient.getServiceConfigurations();
+	public void getServiceOfferings() {
+		List<CloudServiceOffering> offerings = connectedClient.getServiceOfferings();
 
-		assertNotNull(configurations);
-		assertTrue(configurations.size() >= 2);
+		assertNotNull(offerings);
+		assertTrue(offerings.size() >= 2);
 
-		ServiceConfiguration configuration = null;
-		for (ServiceConfiguration sc : configurations) {
-			if (sc.getCloudServiceOffering().getLabel().equals(getMysqlLabel())) {
-				configuration = sc;
+		CloudServiceOffering offering = null;
+		for (CloudServiceOffering so : offerings) {
+			if (so.getLabel().equals(getMysqlLabel())) {
+				offering = so;
 				break;
 			}
 		}
-		assertNotNull(configuration);
-		assertEquals(getMysqlLabel(), configuration.getCloudServiceOffering().getLabel());
-		assertNotNull(configuration.getCloudServiceOffering().getCloudServicePlans());
-		assertTrue(configuration.getCloudServiceOffering().getCloudServicePlans().size() > 0);
+		assertNotNull(offering);
+		assertEquals(getMysqlLabel(), offering.getLabel());
+		assertNotNull(offering.getCloudServicePlans());
+		assertTrue(offering.getCloudServicePlans().size() > 0);
 	}
 
 	@Test
@@ -1485,11 +1462,6 @@ public class CloudFoundryClientTest {
 		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration, testSpace);
 		connectedClient.login();
 		return connectedClient;
-	}
-
-
-	private int getTestAppMemory(String framework) {
-		return connectedClient.getDefaultApplicationMemory(framework);
 	}
 
 	private boolean getCompleteApiSupported() {

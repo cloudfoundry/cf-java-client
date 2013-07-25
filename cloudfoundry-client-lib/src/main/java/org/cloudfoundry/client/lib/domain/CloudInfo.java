@@ -44,8 +44,6 @@ public class CloudInfo {
 	private String description;
 	private String authorizationEndpoint;
 	private boolean allowDebug;
-	private Collection<Framework> frameworks = new ArrayList<Framework>();
-	private Map<String, Runtime> runtimes = new HashMap<String, CloudInfo.Runtime>();
 
 	@SuppressWarnings("unchecked")
 	public CloudInfo(Map<String, Object> infoMap) {
@@ -83,30 +81,10 @@ public class CloudInfo {
 		} else {
 			usage = new Usage();
 		}
-
-		Map<String, Object> frameworksMap = CloudUtil.parse(Map.class, infoMap.get("frameworks"));
-		if (frameworksMap != null) {
-			for (Map.Entry<String, Object> entry : frameworksMap.entrySet()) {
-				Framework framework = new Framework((Map<String, Object>)entry.getValue());
-				frameworks.add(framework);
-				for (Runtime runtime : framework.runtimes) {
-					if (!runtimes.containsKey(runtime.getName())) {
-						runtimes.put(runtime.getName(), runtime);
-					}
-				}
-			}
-		}
 	}
 
 	public CloudInfo(String name, String support, String authorizationEndpoint, int build, String version,
 			String user, String description, Limits limits, Usage usage, boolean allowDebug) {
-		this(name, support, authorizationEndpoint, build, version,
-				user, description, limits, usage, allowDebug, null, null);
-	}
-
-	public CloudInfo(String name, String support, String authorizationEndpoint, int build, String version,
-			String user, String description, Limits limits, Usage usage, boolean allowDebug,
-			Collection<Framework> frameworks, Map<String, Runtime> runtimes) {
 		this.name = name;
 		this.support = support;
 		this.authorizationEndpoint = authorizationEndpoint;
@@ -117,12 +95,6 @@ public class CloudInfo {
 		this.limits = limits;
 		this.usage = usage;
 		this.allowDebug = allowDebug;
-		if(frameworks != null) {
-			this.frameworks.addAll(frameworks);
-		}
-		if (runtimes != null) {
-			this.runtimes.putAll(runtimes);
-		}
 	}
 
 	public Limits getLimits() {
@@ -164,15 +136,6 @@ public class CloudInfo {
 	public boolean getAllowDebug() {
 		return allowDebug;
 	}
-
-	public Collection<Framework> getFrameworks() {
-		return Collections.unmodifiableCollection(frameworks);
-	}
-
-	public Collection<Runtime> getRuntimes() {
-		return Collections.unmodifiableCollection(runtimes.values());
-	}
-
 	public static class Limits {
 		private int maxApps;
 		private int maxTotalMemory;
@@ -246,67 +209,6 @@ public class CloudInfo {
 
 		public int getServices() {
 			return services;
-		}
-	}
-
-	public static class Runtime {
-		private String name;
-		private String version;
-		private String description;
-
-		public Runtime(Map<String, Object> data) {
-			name = CloudUtil.parse(String.class,  data.get("name"));
-			description = CloudUtil.parse(String.class,  data.get("description"));
-			// The way Jackson will parse, the version will be a Double with simpler versions like "1.6" with one . but String otherwise
-			if (data.containsKey("version")) {
-				version = CloudUtil.parse(Object.class,  data.get("version")).toString();
-			}
-			else {
-				version = "?";
-			}
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getVersion() {
-			return version;
-		}
-	}
-
-	public static class Framework {
-		private String name;
-		private List<Runtime> runtimes = new ArrayList<Runtime>();
-
-		@SuppressWarnings("unchecked")
-		public Framework(Map<String, Object> data) {
-			name = CloudUtil.parse(String.class, data.get("name"));
-			List<Map<String, Object>> runtimeData = CloudUtil.parse(List.class, data.get("runtimes"));
-			if (runtimeData != null) {
-				for (Map<String, Object> runtime : runtimeData) {
-					runtimes.add(new Runtime(runtime));
-				}
-			}
-		}
-
-		public Framework(Map<String, Object> data, List<Runtime> runtimes) {
-			name = CloudUtil.parse(String.class, data.get("name"));
-			if (runtimes != null) {
-				this.runtimes.addAll(runtimes);
-			}
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public List<Runtime> getRuntimes() {
-			return Collections.unmodifiableList(runtimes);
 		}
 	}
 }

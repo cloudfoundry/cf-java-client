@@ -22,21 +22,21 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
-import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.rest.CloudControllerClient;
-import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
-import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.rest.CloudControllerClient;
+import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.util.Assert;
 
@@ -154,10 +154,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationMemoryChoices();
 	}
 
-	public int getDefaultApplicationMemory(String framework) {
-		return cc.getDefaultApplicationMemory(framework);
-	}
-
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 								  List<String> serviceNames) {
 		cc.createApplication(appName, staging, memory, uris, serviceNames, false);
@@ -187,14 +183,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists, buildpackUrl);
 	}
 
-	public void createApplication(String appName, String framework, int memory, List<String> uris,
+	public void createApplication(String appName, int memory, List<String> uris,
 								  List<String> serviceNames) {
-		cc.createApplication(appName, new Staging(framework), memory, uris, serviceNames, false);
+		cc.createApplication(appName, new Staging(), memory, uris, serviceNames, false);
 	}
 
-	public void createApplication(String appName, String framework, int memory, List<String> uris,
+	public void createApplication(String appName, int memory, List<String> uris,
 								  List<String> serviceNames, boolean checkExists) {
-		cc.createApplication(appName, new Staging(framework), memory, uris, serviceNames, checkExists);
+		cc.createApplication(appName, new Staging(), memory, uris, serviceNames, checkExists);
 	}
 
 	public void createService(CloudService service) {
@@ -329,8 +325,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteService(service);
 	}
 
-	public List<ServiceConfiguration> getServiceConfigurations() {
-		return cc.getServiceConfigurations();
+	public List<CloudServiceOffering> getServiceOfferings() {
+		return cc.getServiceOfferings();
 	}
 
 	public void bindService(String appName, String serviceName) {

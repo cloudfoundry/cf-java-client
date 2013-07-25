@@ -21,65 +21,33 @@ package org.cloudfoundry.client.lib.domain;
  * application
  *
  * @author Jennifer Hickey
+ * @author Ramnivas Laddad
  *
  */
 public class Staging {
-
-	private String runtime;
-
-	private String framework;
-
 	private String command;
+	private String buildpackUrl;
 
 	/**
-	 *
-	 * @param framework the application framework
+	 * Default staging: No command, default buildpack
 	 */
-	public Staging(String framework) {
-		this.framework = framework;
+	public Staging() {
+		
+	}
+	
+	/**
+	 *
+	 * @param command the application command, may be null
+	 * @param buildpackUrl (git url) to be used, may be null (use the default)
+	 */
+	public Staging(String command, String buildpackUrl) {
+		this.command = command;
+		this.buildpackUrl = buildpackUrl;
 	}
 
 	/**
 	 *
-	 * @param runtime the runtime name (java, ruby18, ruby19 etc.)
-	 * @param framework the application framework
-	 */
-	public Staging(String runtime, String framework) {
-		this.runtime = runtime;
-		this.framework = framework;
-	}
-
-	/**
-	 *
-	 * @return The application runtime. If null, the server will use the default
-	 *         runtime associated with the framework
-	 */
-	public String getRuntime() {
-		return runtime;
-	}
-
-	/**
-	 *
-	 * @param runtime
-	 *            The application runtime. If null, the server will use the
-	 *            default runtime associated with the framwework
-	 */
-	public void setRuntime(String runtime) {
-		this.runtime = runtime;
-	}
-
-	/**
-	 *
-	 * @return The application framework
-	 */
-	public String getFramework() {
-		return framework;
-	}
-
-	/**
-	 *
-	 * @return The start command to use if this app is a standalone app (has
-	 *         framework named "standalone")
+	 * @return The start command to use if this app is a standalone app
 	 */
 	public String getCommand() {
 		return command;
@@ -87,17 +55,16 @@ public class Staging {
 
 	/**
 	 *
-	 * @param command
-	 *            The start command to use if this app is a standalone app (has
-	 *            framework named "standalone")
+	 * @return The buildpack url. If null, the server will use the default
+	 *         buildpack detected based on application content
 	 */
-	public void setCommand(String command) {
-		this.command = command;
+	public String getBuildpackUrl() {
+		return buildpackUrl;
 	}
 
 	@Override
 	public String toString() {
-		return "Staging [runtime=" + getRuntime() + " framework=" + getFramework() + " command=" + getCommand() + "]";
+		return "Staging [command=" + getCommand() + " buildpack=" + getBuildpackUrl() + "]";
 	}
 
 }

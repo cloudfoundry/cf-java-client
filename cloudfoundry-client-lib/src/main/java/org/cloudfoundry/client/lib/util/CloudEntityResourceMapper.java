@@ -128,6 +128,8 @@ public class CloudEntityResourceMapper {
 		app.setServices(new ArrayList<String>());
 		app.setState(CloudApplication.AppState.valueOf(getEntityAttribute(resource, "state", String.class)));
 		//TODO: debug
+		app.setDebug(null);
+
 		Integer runningInstancesAttribute = getEntityAttribute(resource, "running_instances", Integer.class);
 		if (runningInstancesAttribute != null) {
 			app.setRunningInstances(runningInstancesAttribute);
@@ -138,27 +140,11 @@ public class CloudEntityResourceMapper {
 		} else {
 			app.setPlan("free");
 		}
-        String buildpack = getEntityAttribute(resource, "buildpack", String.class);
-        if (buildpack != null) {
-            app.setBuildpackUrl(buildpack);
-        }
-		app.setDebug(null);
-		String runtime = null;
-		Map<String, Object> runtimeResource = getEmbeddedResource(resource, "runtime");
-		if (runtimeResource != null) {
-			runtime = getEntityAttribute(runtimeResource, "name", String.class);
-		}
-		String framework = null;
-		Map<String, Object> frameworkResource = getEmbeddedResource(resource, "framework");
-		if (frameworkResource != null) {
-			framework = getEntityAttribute(frameworkResource, "name", String.class);
-		}
-		Staging staging = new Staging(runtime, framework);
 		String command = getEntityAttribute(resource, "command", String.class);
-		if (command != null) {
-			staging.setCommand(command);
-		}
+        String buildpack = getEntityAttribute(resource, "buildpack", String.class);
+		Staging staging = new Staging(command, buildpack);
 		app.setStaging(staging);
+
 		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
 		if (envMap.size() > 0) {
 			app.setEnv(envMap);
