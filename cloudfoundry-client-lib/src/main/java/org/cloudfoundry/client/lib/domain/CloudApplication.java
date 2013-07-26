@@ -30,15 +30,9 @@ import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudApplication extends CloudEntity {
 
-    private static final String FRAMEWORK_KEY = "framework";
-    private static final String RUNTIME_KEY = "runtime";
     private static final String COMMAND_KEY = "command";
+    private static final String BUILDPACK_URL_KEY = "buildpack";    
     private static final String MEMORY_KEY = "memory";
-
-    public static final String JAVA_WEB = "java_web/1.0";
-    public static final String SPRING = "spring_web/1.0";
-    public static final String GRAILS = "grails/1.0";
-    public static final String STANDALONE = "standalone";
 
 	private Staging staging;
 	private int instances;
@@ -50,18 +44,16 @@ public class CloudApplication extends CloudEntity {
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
-    private String buildpackUrl;
 
 	public CloudApplication(Meta meta, String name) {
 		super(meta, name);
 	}
 
-	public CloudApplication(String name, String stagingStack, String stagingModel,
-						int memory, int instances,
+	public CloudApplication(String name, String command, String buildpackUrl, int memory, int instances,
 						List<String> uris, List<String> serviceNames,
 						AppState state) {
 		super(CloudEntity.Meta.defaultMeta(), name);
-		this.staging = new Staging(stagingStack, stagingModel);
+		this.staging = new Staging(command, buildpackUrl);
 		this.resources.put(MEMORY_KEY, memory);
 		this.instances = instances;
 		this.uris = uris;
@@ -72,14 +64,6 @@ public class CloudApplication extends CloudEntity {
 	@SuppressWarnings("unchecked")
 	public CloudApplication(Map<String, Object> attributes) {
 		super(CloudEntity.Meta.defaultMeta(), parse(attributes.get("name")));
-		Map<String, String> stagingMap = (Map<String, String>) attributes.get("staging");
-		if (stagingMap != null) {
-			if (stagingMap.containsKey(RUNTIME_KEY) && stagingMap.containsKey(FRAMEWORK_KEY)) {
-				setStaging(new Staging(stagingMap.get(RUNTIME_KEY), stagingMap.get(FRAMEWORK_KEY)));
-			} else {
-				setStaging(new Staging(null, null));
-			}
-		}
 		instances = (Integer)attributes.get("instances");
 		Integer runningInstancesAttribute = (Integer) attributes.get("runningInstances");
 		if (runningInstancesAttribute != null) {
@@ -107,18 +91,19 @@ public class CloudApplication extends CloudEntity {
 				meta = new Meta(null, null, null);
 			}
 			setMeta(meta);
+
+			String command = null;
+			String buildpackUrl = null;
 			if (metaValue.containsKey(COMMAND_KEY)) {
-				setCommand((String) metaValue.get(COMMAND_KEY));
+				command = (String) metaValue.get(COMMAND_KEY);
 			}
+			if (metaValue.containsKey(BUILDPACK_URL_KEY)) {
+				command = (String) metaValue.get(BUILDPACK_URL_KEY);
+			}
+			
+			setStaging(new Staging(command, buildpackUrl));
+
 		}
-	}
-
-    public String getBuildpackUrl() {
-        return buildpackUrl;
-    }
-
-    public void setBuildpackUrl(String buildpackUrl) {
-        this.buildpackUrl = buildpackUrl;
 	}
 
 	public enum AppState {
@@ -240,14 +225,10 @@ public class CloudApplication extends CloudEntity {
 		this.env = env;
 	}
 
-	public void setCommand(String command) {
-		this.staging.setCommand(command);
-	}
-
 	@Override
 	public String toString() {
-		return "CloudApplication [framework=" + staging.getFramework() + ", instances="
-				+ instances + ", name=" + getName() + ", runtime=" + staging.getRuntime()
+		return "CloudApplication [staging=" + staging + ", instances="
+				+ instances + ", name=" + getName() 
 				+ ", memory=" + resources.get(MEMORY_KEY)
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ",services=" + services
 				+ ", env=" + env + "]";

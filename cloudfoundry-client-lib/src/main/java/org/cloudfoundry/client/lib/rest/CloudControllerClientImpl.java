@@ -16,6 +16,23 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.zip.ZipFile;
+
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -41,15 +58,14 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
-import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
@@ -79,23 +95,6 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.zip.ZipFile;
-
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base.
  *
@@ -114,14 +113,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
-
-	// This map only contains framework/runtime mapping for frameworks that we actively support
-	private static Map<String, Integer> FRAMEWORK_DEFAULT_MEMORY = new HashMap<String, Integer>() {{
-		put("spring", 512);
-		put("lift", 512);
-		put("grails", 512);
-		put("java_web", 512);
-	}};
 
 	private static final int DEFAULT_MEMORY = 256;
 
@@ -214,14 +205,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		int[] result = new int[length];
 		System.arraycopy(generalChoices, 0, result, 0, length);
 		return result;
-	}
-
-	public int getDefaultApplicationMemory(String framework) {
-		Integer memory = FRAMEWORK_DEFAULT_MEMORY.get(framework);
-		if (memory == null) {
-			return DEFAULT_MEMORY;
-		}
-		return memory;
 	}
 
 	public void updatePassword(String newPassword) {
@@ -671,15 +654,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-	public List<ServiceConfiguration> getServiceConfigurations() {
+	public List<CloudServiceOffering> getServiceOfferings() {
 		String urlPath = "/v2/services?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
-		List<ServiceConfiguration> serviceConfigurations = new ArrayList<ServiceConfiguration>();
+		List<CloudServiceOffering> serviceOfferings = new ArrayList<CloudServiceOffering>();
 		for (Map<String, Object> resource : resourceList) {
 			CloudServiceOffering serviceOffering = resourceMapper.mapResource(resource, CloudServiceOffering.class);
-			serviceConfigurations.add(new ServiceConfiguration(serviceOffering));
+			serviceOfferings.add(serviceOffering);
 		}
-		return serviceConfigurations;
+		return serviceOfferings;
 	}
 
 	@SuppressWarnings("unchecked")

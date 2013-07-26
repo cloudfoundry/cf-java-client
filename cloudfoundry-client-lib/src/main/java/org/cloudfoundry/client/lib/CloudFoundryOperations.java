@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.client.lib;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
@@ -23,17 +29,11 @@ import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The interface defining operations making up the Cloud Foundry Java client's API.
@@ -152,14 +152,6 @@ public interface CloudFoundryOperations {
 	int[] getApplicationMemoryChoices();
 
 	/**
-	 * Get default memory quota for the given framework.
-	 *
-	 * @param framework name of framework
-	 * @return default memory quota in MB
-	 */
-	int getDefaultApplicationMemory(String framework);
-
-	/**
 	 * Create application.
 	 *
 	 * @param appName application name
@@ -244,25 +236,23 @@ public interface CloudFoundryOperations {
 	 * Create application.
 	 *
 	 * @param appName application name
-	 * @param framework name of framework to use
 	 * @param memory memory to use in MB
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
 	 */
-	void createApplication(String appName, String framework, int memory, List<String> uris,
+	void createApplication(String appName, int memory, List<String> uris,
 						   List<String> serviceNames);
 
 	/**
 	 * Create application.
 	 *
 	 * @param appName application name
-	 * @param framework name of framework to use
 	 * @param memory memory to use in MB
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
 	 * @param checkExists check if app exists before creating it
 	 */
-	void createApplication(String appName, String framework, int memory, List<String> uris,
+	void createApplication(String appName, int memory, List<String> uris,
 						   List<String> serviceNames, boolean checkExists);
 
 	/**
@@ -518,11 +508,11 @@ public interface CloudFoundryOperations {
 	void deleteService(String service);
 
 	/**
-	 * Get all service configurations.
+	 * Get all service offerings.
 	 *
-	 * @return list of service configurations
+	 * @return list of service offerings
 	 */
-	List<ServiceConfiguration> getServiceConfigurations();
+	List<CloudServiceOffering> getServiceOfferings();
 
 	/**
 	 * Associate (provision) a service with an application.

@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
@@ -28,17 +34,11 @@ import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 import org.cloudfoundry.client.lib.domain.Staging;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Interface defining operations available for the cloud controller REST client implementations
@@ -83,7 +83,7 @@ public interface CloudControllerClient {
 
 	void deleteAllServices();
 
-	List<ServiceConfiguration> getServiceConfigurations();
+	List<CloudServiceOffering> getServiceOfferings();
 
 	// App methods
 
@@ -94,8 +94,6 @@ public interface CloudControllerClient {
 	ApplicationStats getApplicationStats(String appName);
 
 	int[] getApplicationMemoryChoices();
-
-	int getDefaultApplicationMemory(String framework);
 
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
 									  List<String> serviceNames, boolean checkExists);
