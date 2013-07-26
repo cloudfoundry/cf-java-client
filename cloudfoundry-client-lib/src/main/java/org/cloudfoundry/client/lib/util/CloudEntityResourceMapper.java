@@ -44,12 +44,10 @@ public class CloudEntityResourceMapper {
 
 	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
-	@SuppressWarnings("unchecked")
 	public String getNameOfResource(Map<String, Object> resource) {
 		return getEntityAttribute(resource, "name", String.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	public UUID getGuidOfResource(Map<String, Object> resource) {
 		return getMeta(resource).getGuid();
 	}
@@ -99,6 +97,7 @@ public class CloudEntityResourceMapper {
 	}
 
 	private CloudDomain mapDomainResource(Map<String, Object> resource) {
+		@SuppressWarnings("unchecked")
 		Map<String, Object> ownerResource = getEntityAttribute(resource, "owning_organization", Map.class);
 		CloudOrganization owner;
 		if (ownerResource == null) {
@@ -111,6 +110,7 @@ public class CloudEntityResourceMapper {
 	}
 
 	private CloudRoute mapRouteResource(Map<String, Object> resource) {
+		@SuppressWarnings("unchecked")
 		List<Object> apps = getEntityAttribute(resource, "apps", List.class);
 		String host = getEntityAttribute(resource, "host", String.class);
 		CloudDomain domain = mapDomainResource(getEmbeddedResource(resource, "domain"));
@@ -119,7 +119,7 @@ public class CloudEntityResourceMapper {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private CloudApplication mapApplicationResource(Map<String, Object> resource) {
 		CloudApplication app = new CloudApplication(
 				getMeta(resource),
@@ -133,12 +133,6 @@ public class CloudEntityResourceMapper {
 		Integer runningInstancesAttribute = getEntityAttribute(resource, "running_instances", Integer.class);
 		if (runningInstancesAttribute != null) {
 			app.setRunningInstances(runningInstancesAttribute);
-		}
-		Boolean production = getEntityAttribute(resource, "production", Boolean.class);
-		if (production) {
-			app.setPlan("paid");
-		} else {
-			app.setPlan("free");
 		}
 		String command = getEntityAttribute(resource, "command", String.class);
         String buildpack = getEntityAttribute(resource, "buildpack", String.class);

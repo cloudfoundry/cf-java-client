@@ -88,7 +88,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
@@ -114,8 +113,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
 
-	private static final int DEFAULT_MEMORY = 256;
-
 	private static final int FILES_MAX_RETRIES = 10;
 
 	private static final String LOGS_LOCATION = "logs";
@@ -125,8 +122,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private CloudSpace sessionSpace;
 
 	private CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
-
-	private List<String> paidApplicationPlans = Arrays.asList("free", "paid");
 
 	private RestTemplate restTemplate;
 
@@ -139,8 +134,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	protected URL authorizationEndpoint;
 
 	protected String token;
-
-	protected List<String> freeApplicationPlans = Arrays.asList("free");
 
 	
 	public CloudControllerClientImpl(URL cloudControllerUrl,
@@ -522,11 +515,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				description, limits, usage, debug);
 	}
 
-	public boolean supportsSpaces() {
-		return true;
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<CloudSpace> getSpaces() {
 		String urlPath = "/v2/spaces?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -535,15 +523,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			spaces.add(resourceMapper.mapResource(resource, CloudSpace.class));
 		}
 		return spaces;
-	}
-
-	public List<String> getApplicationPlans() {
-		Assert.notNull(sessionSpace, "Unable to determine application plans without specifying org and space to use.");
-		if (sessionSpace.getOrganization().isBillingEnabled()) {
-			return Collections.unmodifiableList(paidApplicationPlans);
-		} else {
-			return Collections.unmodifiableList(freeApplicationPlans);
-		}
 	}
 
 	public String login() {
@@ -665,7 +644,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return serviceOfferings;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -682,7 +660,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return apps;
 	}
 
-	@SuppressWarnings("unchecked")
 	public CloudApplication getApplication(String appName) {
 		Map<String, Object> resource = findApplicationResource(appName, true);
 		if (resource == null) {
@@ -691,6 +668,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return mapCloudApplication(resource);
 	}
 
+	@SuppressWarnings("unchecked")
 	private CloudApplication mapCloudApplication(Map<String, Object> resource) {
 		UUID appId = resourceMapper.getGuidOfResource(resource);
 		CloudApplication cloudApp = null;
@@ -725,6 +703,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private ApplicationStats doGetApplicationStats(UUID appId, CloudApplication.AppState appState) {
 		List<InstanceStats> instanceList = new ArrayList<InstanceStats>();
 		if (appState.equals(CloudApplication.AppState.STARTED)) {
@@ -747,38 +726,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, boolean checkExists) {
-		createApplication(appName, staging, memory, uris, serviceNames, null, checkExists, null);
-	}
-
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl) {
-		if (checkExists) {
-			try {
-				getAppId(appName);
-				return;
-			} catch (HttpClientErrorException e) {
-				if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
-					throw e;
-				}
-			}
-		}
-
+                                  List<String> serviceNames) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
-        if (buildpackUrl != null) {
-		    appRequest.put("buildpack", buildpackUrl);
+        if (staging.getBuildpackUrl() != null) {
+		    appRequest.put("buildpack", staging.getBuildpackUrl());
         }
 		appRequest.put("instances", 1);
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
 		}
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
-		if (applicationPlan != null && applicationPlan.equals("paid")) {
-			appRequest.put("production", true);
-		}
 		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
 		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
 		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
@@ -793,6 +753,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
 		List<Map<String, Object>> allResources = new ArrayList<Map<String, Object>>();
 		String resp;
@@ -805,9 +766,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
 		if (newResources != null && newResources.size() > 0) {
 			allResources.addAll(newResources);
-			for (Map<String, Object> res : newResources) {
-				Map<String, Object> ent = (Map<String, Object>) res.get("entity");
-			}
 		}
 		String nextUrl = (String) respMap.get("next_url");
 		while (nextUrl != null && nextUrl.length() > 0) {
@@ -816,15 +774,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return allResources;
 	}
 
+	@SuppressWarnings("unchecked")
 	private String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
 		String resp = getRestTemplate().getForObject(getUrl(nextUrl), String.class);
 		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
 		if (newResources != null && newResources.size() > 0) {
 			allResources.addAll(newResources);
-			for (Map<String, Object> res : newResources) {
-				Map<String, Object> ent = (Map<String, Object>) res.get("entity");
-			}
 		}
 		return (String) respMap.get("next_url");
 	}
@@ -1172,18 +1128,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	public void updateApplicationPlan(String appName, String applicationPlan) {
-		UUID appId = getAppId(appName);
-		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		if (applicationPlan != null && applicationPlan.equals("paid")) {
-			appRequest.put("production", true);
-		} else {
-			appRequest.put("production", false);
-		}
-		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
-
-	}
-
 	public void bindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
@@ -1196,6 +1140,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		doUnbindService(appId, cloudService.getMeta().getGuid());
 	}
 
+	@SuppressWarnings("unchecked")
 	public InstancesInfo getApplicationInstances(String appName) {
 		UUID appId = getAppId(appName);
 		CloudApplication app = getApplication(appName);
@@ -1219,6 +1164,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return new InstancesInfo(instanceList);
 	}
 
+	@SuppressWarnings("unchecked")
 	public CrashesInfo getCrashes(String appName) {
 		UUID appId = getAppId(appName);
 		if (appId == null) {
@@ -1519,7 +1465,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return uris;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("restriction")
 	private Map<String, Object> getUserInfo(String user) {
 //		String userJson = getRestTemplate().getForObject(getUrl("/v2/users/{guid}"), String.class, user);
 //		Map<String, Object> userInfo = (Map<String, Object>) JsonUtil.convertJsonToMap(userJson);
@@ -1553,7 +1499,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			String pathUrl = entity.get(headKey + "_url").toString();
 			Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
 			if (resource instanceof Map) {
-				Map responseMap = (Map)response;
+				Map<String, Object> responseMap = (Map<String, Object>)response;
 				if (responseMap.containsKey("resources")) {
 					response = responseMap.get("resources");
 				}

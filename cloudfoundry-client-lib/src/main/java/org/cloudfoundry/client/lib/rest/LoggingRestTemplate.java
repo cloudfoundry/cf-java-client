@@ -53,6 +53,7 @@ public class LoggingRestTemplate extends RestTemplate {
 		try {
 			results = super.doExecute(url, method, requestCallback,
 					new ResponseExtractor<T>() {
+						@SuppressWarnings("rawtypes")
 						public T extractData(ClientHttpResponse response) throws IOException {
 							httpStatus[0] = response.getStatusCode();
 							headers[0] = response.getHeaders();

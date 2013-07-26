@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.net.Proxy;
 
 /**
  * Class that encapsulates http proxy information

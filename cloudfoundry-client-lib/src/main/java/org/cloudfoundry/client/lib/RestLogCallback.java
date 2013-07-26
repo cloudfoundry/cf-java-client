@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.util.Set;
 
 /**
  * Callback to support reporting of log information for any REST calls.

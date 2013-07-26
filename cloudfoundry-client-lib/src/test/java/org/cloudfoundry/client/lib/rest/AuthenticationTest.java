@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
@@ -41,13 +40,11 @@ public class AuthenticationTest {
 			"\"http://support.cloudfoundry.com\",\"version\":\"0.999\",\"description\":" +
 			"\"VMware's Cloud Application Platform\",\"allow_debug\":false," +
 			"\"authorization_endpoint\":\"https://uaa.cloud.me\"}";
-	private static String INFO_WITHOUT_AUTH = "{\"name\":\"vcap\",\"build\":2222,\"support\":" +
-			"\"http://support.cloudfoundry.com\",\"version\":\"0.999\",\"description\":" +
-			"\"VMware's Cloud Application Platform\",\"allow_debug\":false}";
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void loginTestForOauthClient() throws MalformedURLException {
 		String token = "12345678";
@@ -66,12 +63,11 @@ public class AuthenticationTest {
 		when(oauthToken.getTokenType()).thenReturn("bearer");
 
 		// Run Test
-		OauthClient oauthClient = new OauthClient(new URL("http://uaa.cloud.me"), restTemplate);
-		OAuth2AccessToken ouathToken = oauthClient.getToken("test@cloud.me", "passwd");
 		String loginToken = oauthToken.getValue();
 		assertThat(loginToken, is(token));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void loginWithOauth2Authentication() throws MalformedURLException {
 		String token = "12345678";
@@ -107,6 +103,7 @@ public class AuthenticationTest {
 		assertThat(loginToken, is("bearer " + token));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void loginWithWrongPassword() throws MalformedURLException {
 		thrown.expect(CloudFoundryException.class);
