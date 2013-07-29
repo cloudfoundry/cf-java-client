@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -71,8 +70,6 @@ public class CloudFoundryClientTest {
 	private CloudFoundryClient authenticatedClient;
 
 	private CloudFoundryClient connectedClient;
-
-	private CloudInfo cloudInfo;
 
 	private CloudSpace testSpace = null;
 
@@ -178,8 +175,7 @@ public class CloudFoundryClientTest {
 		String appName = namespacedAppName("travel_test-0");
 		uris.add(computeAppUrl(appName));
 		Staging staging =  new Staging();
-		connectedClient.createApplication(appName, staging,
-				DEFAULT_MEMORY, uris, null);
+		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
@@ -742,7 +738,7 @@ public class CloudFoundryClientTest {
 		assertEquals(1, stats.getRecords().size());
 		InstanceStats firstInstance = stats.getRecords().get(0);
 		assertEquals("0", firstInstance.getId());
-		for (int i = 0; i < 10 && firstInstance.getUsage() == null; i++) {
+		for (int i = 0; i < 50 && firstInstance.getUsage() == null; i++) {
 			Thread.sleep(1000);
 			stats = connectedClient.getApplicationStats(appName);
 			firstInstance = stats.getRecords().get(0);
@@ -776,7 +772,7 @@ public class CloudFoundryClientTest {
 		String appName = namespacedAppName("env");
 		ClassPathResource cpr = new ClassPathResource("apps/env/");
 		File explodedDir = cpr.getFile();
-		Staging staging = new Staging("ruby19", "sinatra");
+		Staging staging = new Staging();
 		createAndUploadExplodedTestApp(appName, explodedDir, staging);
 		connectedClient.startApplication(appName);
 		CloudApplication env = connectedClient.getApplication(appName);
@@ -792,7 +788,7 @@ public class CloudFoundryClientTest {
 		File war = SampleProjects.nonAsciFileName();
 		List<String> serviceNames = new ArrayList<String>();
 
-		connectedClient.createApplication(appName, new Staging("java", "spring"),
+		connectedClient.createApplication(appName, new Staging(),
 				DEFAULT_MEMORY, uris, serviceNames);
 		connectedClient.uploadApplication(appName, war.getCanonicalPath());
 
@@ -1024,12 +1020,6 @@ public class CloudFoundryClientTest {
 	// Helper methods
 	//
 
-	private CloudApplication createAndUploadTravelTestApp(String name) throws IOException {
-		createSpringApplication(name, null);
-		uploadSpringTravelApp(name);
-		return connectedClient.getApplication(name);
-	}
-
 	private CloudApplication createAndUploadSimpleTestApp(String name) throws IOException {
 		createAndUploadSimpleSpringApp(name);
 		return connectedClient.getApplication(name);
@@ -1104,10 +1094,10 @@ public class CloudFoundryClientTest {
 	}
 
 	private void createSpringApplication(String appName, List<String> serviceNames, String buildpackUrl) {
-		createTestApp(appName, serviceNames, new Staging(), buildpackUrl);
+		createTestApp(appName, serviceNames, new Staging(null, buildpackUrl));
 	}
 
-    private void createTestApp(String appName, List<String> serviceNames, Staging staging, String buildPackUrl) {
+    private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
         List<String> uris = new ArrayList<String>();
         uris.add(computeAppUrl(appName));
         if (serviceNames != null) {
@@ -1117,13 +1107,8 @@ public class CloudFoundryClientTest {
         }
         connectedClient.createApplication(appName, staging,
                 DEFAULT_MEMORY,
-                uris, serviceNames, "paid", buildPackUrl);
+                uris, serviceNames);
     }
-
-
-    private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
-        createTestApp(appName, serviceNames, staging, null);
-	}
 
 	private void createMySqlService(String serviceName) {
 		List<CloudServiceOffering> serviceOfferings = connectedClient.getServiceOfferings();
@@ -1168,22 +1153,6 @@ public class CloudFoundryClientTest {
 		return null; // for the compiler
 	}
 
-	private void startApplicationWithTimeout(String appName) {
-		for (int i = 0; i < 50; i++) {
-			try {
-				connectedClient.startApplication(appName);
-				break;
-			} catch (CloudFoundryException ex) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-			}
-		}
-	}
-
-	
 	@BeforeClass
 	public static void printTargetCloudInfo() {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
@@ -1199,7 +1168,6 @@ public class CloudFoundryClientTest {
         if (CCNG_API_PROXY_HOST != null) {
             httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
         }
-        cloudInfo = new CloudFoundryClient(new URL(CCNG_API_URL), httpProxyConfiguration).getCloudInfo();
 		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration);
 		authenticatedClient.login();
 		connectedClient = setTestSpaceAsDefault(authenticatedClient);
@@ -1371,38 +1339,6 @@ public class CloudFoundryClientTest {
 		}
 		catch (IllegalStateException ex) {
 			assertTrue(ex.getMessage().contains("in use"));
-		}
-	}
-
-	@Test
-	public void canDeployPaidApplication() throws IOException {
-		String appName = namespacedAppName("prod1");
-		CloudApplication app = createAndUploadSimpleTestApp(appName);
-		assertNotNull(app);
-		assertEquals("paid", app.getPlan());
-	}
-
-	@Test
-	public void canChangeApplicationPlan() throws IOException {
-		String appName = namespacedAppName("prod2");
-		CloudApplication app = createAndUploadSimpleTestApp(appName);
-		assertNotNull(app);
-		assertEquals("paid", app.getPlan());
-		connectedClient.updateApplicationPlan(appName, "free");
-		app = connectedClient.getApplication(appName);
-		assertEquals("free", app.getPlan());
-	}
-
-	@Test
-	public void getApplicationPlans() throws IOException {
-		List<String> appPlans = connectedClient.getApplicationPlans();
-		assertNotNull(appPlans);
-		assertTrue(appPlans.contains("free"));
-		if (testSpace.getOrganization().isBillingEnabled()) {
-			assertEquals(2, appPlans.size());
-			assertTrue(appPlans.contains("paid"));
-		} else {
-			assertEquals(1, appPlans.size());
 		}
 	}
 

@@ -44,7 +44,6 @@ import org.cloudfoundry.client.lib.domain.Staging;
  * @author Dave Syer
  * @author Thomas Risberg
  */
-@SuppressWarnings("unused")
 public interface CloudFoundryOperations {
 
 	/**
@@ -62,23 +61,12 @@ public interface CloudFoundryOperations {
 	CloudInfo getCloudInfo();
 
 	/**
-	 * Does the currently targeted cloud controller support orgs and spaces?
-	 */
-	boolean supportsSpaces();
-
-	/**
 	 * Get list of CloudSpaces for the current cloud.
 	 *
 	 * @return List of CloudSpace objects containing the space info
 	 */
 	List<CloudSpace> getSpaces();
 
-	/**
-	 * Get list of application plans for the current org.
-	 *
-	 * @return List of application plans
-	 */
-	List<String> getApplicationPlans();
 
 	/**
 	 * Register new user account with the provided credentials.
@@ -159,101 +147,10 @@ public interface CloudFoundryOperations {
 	 * @param memory memory to use in MB
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
-	 * @param applicationPlan the application plan for the deployed app
-     * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git) or null to use the default one
 	 */
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                           List<String> serviceNames, String applicationPlan, String buildpackUrl);
+                           List<String> serviceNames);
 
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param staging staging info
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param applicationPlan the application plan for the deployed app
-	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                           List<String> serviceNames, String applicationPlan);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param staging staging info
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param checkExists check if app exists before creating it
-	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-						   List<String> serviceNames, boolean checkExists);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param staging staging info
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-						   List<String> serviceNames);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param staging staging info
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param applicationPlan the application plan for the deployed app
-	 * @param checkExists check if app exists before creating it
-	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-						   List<String> serviceNames, String applicationPlan, boolean checkExists);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param staging staging info
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param applicationPlan the application plan for the deployed app
-	 * @param checkExists check if app exists before creating it
-     * @param buildpackUrl a custom buildpack url (e.g. "https://github.com/cloudfoundry/java-buildpack.git") or null to use the default one
-	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                           List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 */
-	void createApplication(String appName, int memory, List<String> uris,
-						   List<String> serviceNames);
-
-	/**
-	 * Create application.
-	 *
-	 * @param appName application name
-	 * @param memory memory to use in MB
-	 * @param uris list of URIs for the app
-	 * @param serviceNames list of service names to bind to app
-	 * @param checkExists check if app exists before creating it
-	 */
-	void createApplication(String appName, int memory, List<String> uris,
-						   List<String> serviceNames, boolean checkExists);
 
 	/**
 	 * Create a service.
@@ -411,13 +308,6 @@ public interface CloudFoundryOperations {
 	 */
 	void updateApplicationEnv(String appName, List<String> env);
 
-	/**
-	 * Update application plan for the specified app.
-	 *
-	 * @param appName name of application
-	 * @param applicationPlan the plan to use
-	 */
-	void updateApplicationPlan(String appName, String applicationPlan);
 
 	/**
 	 * Get logs from the deployed application. The logs

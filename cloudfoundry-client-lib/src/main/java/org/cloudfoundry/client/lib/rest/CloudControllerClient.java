@@ -53,11 +53,7 @@ public interface CloudControllerClient {
 
 	CloudInfo getInfo();
 
-	boolean supportsSpaces();
-
 	List<CloudSpace> getSpaces();
-
-	List<String> getApplicationPlans();
 
 	String login();
 
@@ -96,10 +92,7 @@ public interface CloudControllerClient {
 	int[] getApplicationMemoryChoices();
 
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-									  List<String> serviceNames, boolean checkExists);
-
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                           List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl);
+                           List<String> serviceNames);
 
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
@@ -130,8 +123,6 @@ public interface CloudControllerClient {
 	void updateApplicationEnv(String appName, Map<String, String> env);
 
 	void updateApplicationEnv(String appName, List<String> env);
-
-	void updateApplicationPlan(String appName, String applicationPlan);
 
 	Map<String, String> getLogs(String appName);
 

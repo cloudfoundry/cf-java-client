@@ -102,16 +102,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return info;
 	}
 
-	public boolean supportsSpaces() {
-		return cc.supportsSpaces();
-	}
-
 	public List<CloudSpace> getSpaces() {
 		return cc.getSpaces();
-	}
-
-	public List<String> getApplicationPlans() {
-		return cc.getApplicationPlans();
 	}
 
 	public void register(String email, String password) {
@@ -154,43 +146,9 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationMemoryChoices();
 	}
 
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, false);
-	}
-
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-								  List<String> serviceNames, boolean checkExists) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, checkExists);
-	}
-
     public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames, String applicationPlan) {
-        cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false, null);
-    }
-
-    public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames, String applicationPlan, String buildpackUrl) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, false, buildpackUrl);
-	}
-
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames, String applicationPlan, boolean checkExists) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists, null);
-	}
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames, String applicationPlan, boolean checkExists, String buildpackUrl) {
-		cc.createApplication(appName, staging, memory, uris, serviceNames, applicationPlan, checkExists, buildpackUrl);
-	}
-
-	public void createApplication(String appName, int memory, List<String> uris,
-								  List<String> serviceNames) {
-		cc.createApplication(appName, new Staging(), memory, uris, serviceNames, false);
-	}
-
-	public void createApplication(String appName, int memory, List<String> uris,
-								  List<String> serviceNames, boolean checkExists) {
-		cc.createApplication(appName, new Staging(), memory, uris, serviceNames, checkExists);
+                                  List<String> serviceNames) {
+		cc.createApplication(appName, staging, memory, uris, serviceNames);
 	}
 
 	public void createService(CloudService service) {
@@ -273,10 +231,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void updateApplicationEnv(String appName, List<String> env) {
 		cc.updateApplicationEnv(appName, env);
-	}
-
-	public void updateApplicationPlan(String appName, String applicationPlan) {
-		cc.updateApplicationPlan(appName, applicationPlan);
 	}
 
 	public Map<String, String> getLogs(String appName) {

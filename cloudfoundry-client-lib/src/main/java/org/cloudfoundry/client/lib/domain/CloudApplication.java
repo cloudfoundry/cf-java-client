@@ -38,7 +38,6 @@ public class CloudApplication extends CloudEntity {
 	private int instances;
 	private List<String> uris;
 	private List<String> services;
-	private String plan;
 	private AppState state;
 	private DebugMode debug;
 	private Map<String, Integer> resources = new HashMap<String, Integer>();
@@ -93,12 +92,12 @@ public class CloudApplication extends CloudEntity {
 			setMeta(meta);
 
 			String command = null;
-			String buildpackUrl = null;
 			if (metaValue.containsKey(COMMAND_KEY)) {
 				command = (String) metaValue.get(COMMAND_KEY);
 			}
+			String buildpackUrl = null;
 			if (metaValue.containsKey(BUILDPACK_URL_KEY)) {
-				command = (String) metaValue.get(BUILDPACK_URL_KEY);
+				buildpackUrl = (String) metaValue.get(BUILDPACK_URL_KEY);
 			}
 			
 			setStaging(new Staging(command, buildpackUrl));
@@ -153,14 +152,6 @@ public class CloudApplication extends CloudEntity {
 
 	public void setUris(List<String> uris) {
 		this.uris = uris;
-	}
-
-	public String getPlan() {
-		return plan;
-	}
-
-	public void setPlan(String plan) {
-		this.plan = plan;
 	}
 
 	public AppState getState() {

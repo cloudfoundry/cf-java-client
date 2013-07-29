@@ -16,10 +16,13 @@
 
 package org.cloudfoundry.client.lib.oauth2;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.util.JsonUtil;
-import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -34,11 +37,6 @@ import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitR
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.RestTemplate;
-
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Client that can handle authentication against a UAA instance
@@ -80,6 +78,7 @@ public class OauthClient {
 		return token;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void changePassword(String token, String oldPassword, String newPassword) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(AUTHORIZATION_HEADER_KEY, token);

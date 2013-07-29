@@ -16,9 +16,6 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import org.cloudfoundry.client.lib.domain.CloudEntity;
-
-import java.util.UUID;
 
 /**
  * @author Thomas Risberg

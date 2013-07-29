@@ -38,7 +38,7 @@ public class Staging {
 	/**
 	 *
 	 * @param command the application command, may be null
-	 * @param buildpackUrl (git url) to be used, may be null (use the default)
+	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git) or null to use the default one
 	 */
 	public Staging(String command, String buildpackUrl) {
 		this.command = command;
