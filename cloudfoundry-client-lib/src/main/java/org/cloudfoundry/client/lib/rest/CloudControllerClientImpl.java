@@ -393,25 +393,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		final String range =
 				"bytes=" + (start == -1 ? "" : start) + "-" + (end == -1 ? "" : end);
 
-		//simple retry
-		int tries = 0;
-		String response = null;
-		while (response == null) {
-			tries++;
-			try {
-				response = doGetFileByRange(urlPath, app, instance, filePath, start, end, range);
-			} catch (HttpServerErrorException e) {
-				if (e.getStatusCode().equals(HttpStatus.SERVICE_UNAVAILABLE)) {
-					if (tries > FILES_MAX_RETRIES) {
-						throw e;
-					}
-				} else {
-					throw e;
-				}
-			}
-		}
-
-		return response;
+		return doGetFileByRange(urlPath, app, instance, filePath, start, end, range);
 	}
 
 	private String doGetFileByRange(String urlPath, Object app, String instance, String filePath, int start, int end,
