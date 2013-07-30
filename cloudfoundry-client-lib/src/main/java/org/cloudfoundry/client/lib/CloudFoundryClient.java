@@ -67,23 +67,23 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, CloudSpace sessionSpace) {
-		this(credentials, cloudControllerUrl, null, sessionSpace);
+		this(credentials, cloudControllerUrl, sessionSpace, null);
     }
 
 	/**
 	 * Constructors to use with an http proxy configuration.
 	 */
 	public CloudFoundryClient(URL cloudControllerUrl, HttpProxyConfiguration httpProxyConfiguration) {
-		this(null, cloudControllerUrl, httpProxyConfiguration, null);
+		this(null, cloudControllerUrl, null, httpProxyConfiguration);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
 							  HttpProxyConfiguration httpProxyConfiguration) {
-		this(credentials, cloudControllerUrl, httpProxyConfiguration, null);
+		this(credentials, cloudControllerUrl, null, httpProxyConfiguration);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
-							  HttpProxyConfiguration httpProxyConfiguration, CloudSpace sessionSpace) {
+							  CloudSpace sessionSpace, HttpProxyConfiguration httpProxyConfiguration) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
 		CloudControllerClientFactory cloudControllerClientFactory =
 				new CloudControllerClientFactory(new RestUtil(), httpProxyConfiguration);

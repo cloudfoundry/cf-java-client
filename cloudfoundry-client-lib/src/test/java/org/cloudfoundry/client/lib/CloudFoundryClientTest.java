@@ -1383,7 +1383,7 @@ public class CloudFoundryClientTest {
 		}
 		assertNotNull("Space to use for testing (" + CCNG_USER_SPACE + ") not found for organization (" +
 				CCNG_USER_ORG + ") - check your account or system properties", testSpace);
-		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration, testSpace);
+		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), testSpace, httpProxyConfiguration);
 		connectedClient.login();
 		return connectedClient;
 	}
