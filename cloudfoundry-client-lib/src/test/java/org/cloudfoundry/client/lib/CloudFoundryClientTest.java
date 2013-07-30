@@ -103,67 +103,58 @@ public class CloudFoundryClientTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	//
-	// Basic Services tests
-	//
 
-	@Test
-	public void createService() throws MalformedURLException {
-		assumeTrue(getCompleteApiSupported());
-
-		createMySqlService("mysql-test");
-	}
-
-	@Test
-	public void getService() throws MalformedURLException {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "mysql-test";
-		createMySqlService(serviceName);
-
-		CloudService service = connectedClient.getService(serviceName);
-		assertNotNull(service);
-		assertEquals(serviceName, service.getName());
-		// Allow more time deviations due to local clock being out of sync with cloud
-		int timeTolerance = 300 * 1000; // 5 minutes
-		assertTrue("Creation time should be very recent",
-				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
-	}
-
-	@Test
-	public void deleteService() throws MalformedURLException {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "mysql-test";
-		createMySqlService(serviceName);
-		connectedClient.deleteService(serviceName);
-	}
-
-	@Test
-	public void getServices() {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "mysql-test";
-		createMySqlService(serviceName);
-		createMySqlService("mysql-test2");
-
-		List<CloudService> services = connectedClient.getServices();
-		assertNotNull(services);
-		assertEquals(2, services.size());
-		CloudService service = null;
-		for (CloudService cs : services) {
-			if (cs.getName().equals(serviceName)) {
-				service = cs;
-			}
+	@BeforeClass
+	public static void printTargetCloudInfo() {
+		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
+		System.out.println("Using space " + CCNG_USER_SPACE + " of organization " + CCNG_USER_ORG );
+		if (CCNG_USER_PASS == null) {
+			fail("System property ccng.passwd must be specified, supply -Dccng.passwd=<password>");
 		}
-		assertNotNull(service);
-		assertEquals(serviceName, service.getName());
-		assertEquals(getMysqlLabel(), service.getLabel());
-		assertEquals("cleardb", service.getProvider());
-		assertEquals("n/a", service.getVersion());
-		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
+
 	}
 
+	@Before
+	public void setUp() throws MalformedURLException {
+        if (CCNG_API_PROXY_HOST != null) {
+            httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+        }
+		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration);
+		authenticatedClient.login();
+		connectedClient = setTestSpaceAsDefault(authenticatedClient);
+		connectedClient.deleteAllApplications();
+		connectedClient.deleteAllServices();
+		clearTestDomainAndRoutes();
+		connectedClient.addDomain(TEST_DOMAIN);
+		defaultDomainName = getDefaultDomain(connectedClient.getDomainsForOrg()).getName();
+	}
+
+	@After
+	public void tearDown() {
+		connectedClient.deleteAllApplications();
+		connectedClient.deleteAllServices();
+		clearTestDomainAndRoutes();
+	}
+
+	@Test
+	public void infoAvailable() throws Exception {
+		CloudInfo info = authenticatedClient.getCloudInfo();
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+	}
+
+	@Test
+	public void spacesAvailable() throws Exception {
+		List<CloudSpace> spaces = authenticatedClient.getSpaces();
+		assertNotNull(spaces);
+		assertTrue(spaces.size() > 0);
+	}	
+	
+	@Test
+	public void canSetDefaultSpace() throws Exception {
+		setTestSpaceAsDefault(authenticatedClient);
+	}
 
 	//
 	// Basic Application tests
@@ -290,106 +281,41 @@ public class CloudFoundryClientTest {
 		app = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 	}
-
-	//
-	// Application and Services tests
-	//
-
+	
 	@Test
-	public void createApplicationWithService() {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "test_database";
-		createMySqlService(serviceName);
-		List<String> serviceNames= Collections.singletonList(serviceName);
-		List<String> uris = new ArrayList<String>();
-		String appName = namespacedAppName("travel_test8");
-		uris.add(computeAppUrl(appName));
-		Staging staging =  new Staging();
-		connectedClient.createApplication(appName, staging,
-				DEFAULT_MEMORY, uris, serviceNames);
+	public void startApplicationWithInfo() throws IOException {
+		String appName = createSpringTravelApp("start", null);
+		uploadSpringTravelApp(appName);
+		StartingInfo info = connectedClient.startApplication(appName);
 		CloudApplication app = connectedClient.getApplication(appName);
-		assertNotNull(app);
-		assertEquals(appName, app.getName());
-		assertNotNull(app.getServices());
-		assertEquals(1, app.getServices().size());
-		assertEquals(serviceName, app.getServices().get(0));
+		assertEquals(CloudApplication.AppState.STARTED, app.getState());
+		assertNotNull(info);
+		assertNotNull(info.getStagingFile());
 	}
 
 	@Test
-	public void uploadApplicationWithServices() throws IOException {
-		String serviceName = "test_database";
-		List<String> serviceNames = new ArrayList<String>();
-		serviceNames.add(serviceName);
-		String appName = createSpringTravelApp("upload2", serviceNames);
-		CloudApplication app = uploadSpringTravelApp(appName);
-		assertEquals(1, app.getServices().size());
-		assertEquals(serviceName, app.getServices().get(0));
-	}
+	public void paginationWorksForUris() throws IOException {
+		String appName = namespacedAppName("page-url1");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		//connectedClient.startApplication(appName);
 
-	@Test
-	public void deleteServiceThatIsBoundToApp() throws MalformedURLException {
-		assumeTrue(getCompleteApiSupported());
+		List<String> originalUris = app.getUris();
+		assertEquals(Collections.singletonList(computeAppUrl(appName)), originalUris);
 
-		String serviceName = "mysql-del-svc";
-		List<String> serviceNames = new ArrayList<String>();
-		serviceNames.add(serviceName);
-		String appName = createSpringTravelApp("del-svc", serviceNames);
-
-		CloudApplication app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertEquals(1, app.getServices().size());
-		assertEquals(serviceName, app.getServices().get(0));
-
-		connectedClient.deleteService(serviceName);
-	}
-
-	@Test
-	public void updateApplicationService() throws IOException {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "test_database";
-		createMySqlService(serviceName);
-		String appName = createSpringTravelApp("7", null);
-
-		connectedClient.updateApplicationServices(appName, Collections.singletonList(serviceName));
-		CloudApplication app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertTrue(app.getServices().size() > 0);
-		assertEquals(serviceName, app.getServices().get(0));
-
-		List<String> emptyList = Collections.emptyList();
-		connectedClient.updateApplicationServices(appName, emptyList);
-		app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertEquals(emptyList, app.getServices());
-	}
-
-	@Test
-	public void bindAndUnbindService() throws IOException {
-		assumeTrue(getCompleteApiSupported());
-
-		String serviceName = "test_database";
-		createMySqlService(serviceName);
-
-		String appName = createSpringTravelApp("bind1", null);
-
-		CloudApplication app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertTrue(app.getServices().isEmpty());
-
-		connectedClient.bindService(appName, serviceName);
+		List<String> uris = new ArrayList<String>(app.getUris());
+		for (int i = 2; i < 55; i++) {
+			uris.add(computeAppUrl(namespacedAppName("page-url" + i)));
+		}
+		connectedClient.updateApplicationUris(appName, uris);
 
 		app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertEquals(1, app.getServices().size());
-		assertEquals(serviceName, app.getServices().get(0));
-
-		connectedClient.unbindService(appName, serviceName);
-
-		app = connectedClient.getApplication(appName);
-		assertNotNull(app.getServices());
-		assertTrue(app.getServices().isEmpty());
+		List<String> appUris = app.getUris();
+		assertNotNull(appUris);
+		assertEquals(uris.size(), appUris.size());
+		for (String uri : uris) {
+			assertTrue("Missing URI: " + uri, appUris.contains(uri));
+		}
+		connectedClient.deleteApplication(appName);
 	}
 
 	//
@@ -480,8 +406,6 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationUris() throws IOException {
-		assumeTrue(getCompleteApiSupported());
-
 		String appName = namespacedAppName("url1");
 		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
 
@@ -614,53 +538,6 @@ public class CloudFoundryClientTest {
 		connectedClient.stopApplication(appName);
 		InstancesInfo instInfo = connectedClient.getApplicationInstances(appName);
 		assertEquals(0, instInfo.getInstances().size());
-	}
-
-	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) {
-		if (count > 1) {
-			connectedClient.updateApplicationInstances(appName, count);
-			CloudApplication app = connectedClient.getApplication(appName);
-			assertEquals(count, app.getInstances());
-		}
-
-		InstancesInfo instances = null;
-		boolean pass = false;
-		for (int i = 0; i < 50; i++) {
-			try {
-				instances = getInstancesWithTimeout(connectedClient, appName);
-				assertNotNull(instances);
-
-				List<InstanceInfo> infos = instances.getInstances();
-				assertEquals(count, infos.size());
-
-				int passCount = 0;
-				for (InstanceInfo info : infos) {
-					if (shouldBeRunning) {
-						if (InstanceState.RUNNING.equals(info.getState()) ||
-								InstanceState.STARTING.equals(info.getState())) {
-							passCount++;
-						}
-					} else {
-						if (InstanceState.CRASHED.equals(info.getState()) ||
-								InstanceState.FLAPPING.equals(info.getState())) {
-							passCount++;
-						}
-					}
-				}
-				if (passCount == infos.size()) {
-					pass = true;
-					break;
-				}
-			} catch (CloudFoundryException ex) {
-				// ignore (we may get this when staging is still ongoing)
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-		}
-		return pass;
 	}
 
 	@Test
@@ -813,40 +690,7 @@ public class CloudFoundryClientTest {
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 	}
-
-	//
-	// Configuration/Metadata tests
-	//
-
-	@Test
-	public void infoAvailableWithoutLoggingIn() throws Exception {
-		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL));
-		CloudInfo info = infoClient.getCloudInfo();
-		assertNotNull(info.getName());
-		assertNotNull(info.getSupport());
-		assertNotNull(info.getBuild());
-		assertTrue(info.getUser() == null);
-	}
-
-	@Test
-	public void infoForUserAvailable() throws Exception {
-		CloudInfo info = connectedClient.getCloudInfo();
-
-		assertNotNull(info.getName());
-		assertNotNull(info.getSupport());
-		assertNotNull(info.getBuild());
-		assertNotNull(info.getSupport());
-		assertNotNull(info.getSupport());
-
-		assertEquals(CCNG_USER_EMAIL, info.getUser());
-		assertNotNull(info.getLimits());
-		// Just ensure that we got back some sensible values
-		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
-		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
-		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
-		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
-	}
-
+	
 	//
 	// Files and Log tests
 	//
@@ -895,6 +739,292 @@ public class CloudFoundryClientTest {
 		doGetFile(connectedClient, appName);
 	}
 
+	
+	//
+	// Basic Services tests
+	//
+
+	@Test
+	public void getServiceOfferings() {
+		List<CloudServiceOffering> offerings = connectedClient.getServiceOfferings();
+
+		assertNotNull(offerings);
+		assertTrue(offerings.size() >= 2);
+
+		CloudServiceOffering offering = null;
+		for (CloudServiceOffering so : offerings) {
+			if (so.getLabel().equals(getMysqlLabel())) {
+				offering = so;
+				break;
+			}
+		}
+		assertNotNull(offering);
+		assertEquals(getMysqlLabel(), offering.getLabel());
+		assertNotNull(offering.getCloudServicePlans());
+		assertTrue(offering.getCloudServicePlans().size() > 0);
+	}
+
+	@Test
+	public void createService() throws MalformedURLException {
+		createMySqlService("mysql-test");
+	}
+
+	@Test
+	public void getService() throws MalformedURLException {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+
+		CloudService service = connectedClient.getService(serviceName);
+		assertNotNull(service);
+		assertEquals(serviceName, service.getName());
+		// Allow more time deviations due to local clock being out of sync with cloud
+		int timeTolerance = 300 * 1000; // 5 minutes
+		assertTrue("Creation time should be very recent",
+				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
+	}
+
+	@Test
+	public void deleteService() throws MalformedURLException {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+		connectedClient.deleteService(serviceName);
+	}
+
+	@Test
+	public void getServices() {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
+		createMySqlService("mysql-test2");
+
+		List<CloudService> services = connectedClient.getServices();
+		assertNotNull(services);
+		assertEquals(2, services.size());
+		CloudService service = null;
+		for (CloudService cs : services) {
+			if (cs.getName().equals(serviceName)) {
+				service = cs;
+			}
+		}
+		assertNotNull(service);
+		assertEquals(serviceName, service.getName());
+		assertEquals(getMysqlLabel(), service.getLabel());
+		assertEquals("cleardb", service.getProvider());
+		assertEquals("n/a", service.getVersion());
+		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
+	}
+
+
+
+	//
+	// Application and Services tests
+	//
+
+	@Test
+	public void createApplicationWithService() {
+		String serviceName = "test_database";
+		createMySqlService(serviceName);
+		List<String> serviceNames= Collections.singletonList(serviceName);
+		List<String> uris = new ArrayList<String>();
+		String appName = namespacedAppName("travel_test8");
+		uris.add(computeAppUrl(appName));
+		Staging staging =  new Staging();
+		connectedClient.createApplication(appName, staging,
+				DEFAULT_MEMORY, uris, serviceNames);
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+		assertNotNull(app.getServices());
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+	}
+
+	@Test
+	public void uploadApplicationWithServices() throws IOException {
+		String serviceName = "test_database";
+		List<String> serviceNames = new ArrayList<String>();
+		serviceNames.add(serviceName);
+		String appName = createSpringTravelApp("upload2", serviceNames);
+		CloudApplication app = uploadSpringTravelApp(appName);
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+	}
+
+	@Test
+	public void deleteServiceThatIsBoundToApp() throws MalformedURLException {
+		String serviceName = "mysql-del-svc";
+		List<String> serviceNames = new ArrayList<String>();
+		serviceNames.add(serviceName);
+		String appName = createSpringTravelApp("del-svc", serviceNames);
+
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+
+		connectedClient.deleteService(serviceName);
+	}
+
+	@Test
+	public void updateApplicationService() throws IOException {
+		String serviceName = "test_database";
+		createMySqlService(serviceName);
+		String appName = createSpringTravelApp("7", null);
+
+		connectedClient.updateApplicationServices(appName, Collections.singletonList(serviceName));
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().size() > 0);
+		assertEquals(serviceName, app.getServices().get(0));
+
+		List<String> emptyList = Collections.emptyList();
+		connectedClient.updateApplicationServices(appName, emptyList);
+		app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(emptyList, app.getServices());
+	}
+
+	@Test
+	public void bindAndUnbindService() throws IOException {
+		String serviceName = "test_database";
+		createMySqlService(serviceName);
+
+		String appName = createSpringTravelApp("bind1", null);
+
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().isEmpty());
+
+		connectedClient.bindService(appName, serviceName);
+
+		app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
+
+		connectedClient.unbindService(appName, serviceName);
+
+		app = connectedClient.getApplication(appName);
+		assertNotNull(app.getServices());
+		assertTrue(app.getServices().isEmpty());
+	}
+	
+	@Test
+	public void manageDomainsAndRoutes() throws IOException {
+		// Test that default domain is found
+		List<CloudDomain> allDomains = connectedClient.getDomainsForOrg();
+		CloudDomain defaultDomain = getDefaultDomain(allDomains);
+		assertNotNull(getDefaultDomain(allDomains));
+
+		// Test adding test domain - should be there for org and space
+		connectedClient.addDomain(TEST_DOMAIN);
+		allDomains = connectedClient.getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
+		List<CloudDomain> spaceDomains = connectedClient.getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
+
+		// Test removing test domain from space
+		connectedClient.removeDomain(TEST_DOMAIN);
+		allDomains = connectedClient.getDomainsForOrg();
+		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
+		spaceDomains = connectedClient.getDomains();
+		assertNotNull(getDefaultDomain(spaceDomains));
+		assertNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
+
+		// Test accessing/adding/deleting routes
+		connectedClient.addDomain(TEST_DOMAIN);
+		connectedClient.addRoute("my_route1", TEST_DOMAIN);
+		connectedClient.addRoute("my_route2", TEST_DOMAIN);
+		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route2", routes));
+		connectedClient.deleteRoute("my_route2", TEST_DOMAIN);
+		routes = connectedClient.getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNull(getRouteWithHost("my_route2", routes));
+
+		// Test that apps with route are counted
+		String appName = namespacedAppName("my_route3");
+		CloudApplication app = createAndUploadSimpleTestApp(appName);
+		List<String> uris = app.getUris();
+		uris.add("my_route3." + TEST_DOMAIN);
+		connectedClient.updateApplicationUris(appName, uris);
+		routes = connectedClient.getRoutes(TEST_DOMAIN);
+		assertNotNull(getRouteWithHost("my_route1", routes));
+		assertNotNull(getRouteWithHost("my_route3", routes));
+		assertEquals(0, getRouteWithHost("my_route1", routes).getAppsUsingRoute());
+		assertFalse(getRouteWithHost("my_route1", routes).inUse());
+		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost("my_route3", routes).inUse());
+		List<CloudRoute> defaultDomainRoutes = connectedClient.getRoutes(defaultDomain.getName());
+		assertNotNull(getRouteWithHost(appName, defaultDomainRoutes));
+		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
+		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
+
+		// test that removing domain that has routes throws exception
+		try {
+			connectedClient.deleteDomain(TEST_DOMAIN);
+			fail("should have thrown exception");
+		}
+		catch (IllegalStateException ex) {
+			assertTrue(ex.getMessage().contains("in use"));
+		}
+	}
+
+
+
+	//
+	// Configuration/Metadata tests
+	//
+
+	@Test
+	public void infoAvailableWithoutLoggingIn() throws Exception {
+		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL));
+		CloudInfo info = infoClient.getCloudInfo();
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertTrue(info.getUser() == null);
+	}
+
+	@Test
+	public void infoForUserAvailable() throws Exception {
+		CloudInfo info = connectedClient.getCloudInfo();
+
+		assertNotNull(info.getName());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getBuild());
+		assertNotNull(info.getSupport());
+		assertNotNull(info.getSupport());
+
+		assertEquals(CCNG_USER_EMAIL, info.getUser());
+		assertNotNull(info.getLimits());
+		// Just ensure that we got back some sensible values
+		assertTrue(info.getLimits().getMaxApps() > 0 && info.getLimits().getMaxApps() < 1000);
+		assertTrue(info.getLimits().getMaxServices() > 0 && info.getLimits().getMaxServices() < 1000);
+		assertTrue(info.getLimits().getMaxTotalMemory() > 0 && info.getLimits().getMaxTotalMemory() < 100000);
+		assertTrue(info.getLimits().getMaxUrisPerApp() > 0 && info.getLimits().getMaxUrisPerApp() < 100);
+	}
+
+	@Test
+	public void updatePassword() throws MalformedURLException {
+		// Not working currently
+		assumeTrue(false);
+
+		String newPassword = "newPass123";
+		connectedClient.updatePassword(newPassword);
+		CloudFoundryClient clientWithChangedPassword =
+				new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, newPassword), new URL(CCNG_API_URL), httpProxyConfiguration);
+		clientWithChangedPassword.login();
+
+		// Revert
+		connectedClient.updatePassword(CCNG_USER_PASS);
+		connectedClient.login();
+	}
+
+	
 	@Test
 	public void getRestLog() throws IOException {
 		final List<RestLogEntry> log1 = new ArrayList<RestLogEntry>();
@@ -923,6 +1053,53 @@ public class CloudFoundryClientTest {
 	//
 	// Shared test methods
 	//
+
+	private boolean getInstanceInfosWithTimeout(String appName, int count, boolean shouldBeRunning) {
+		if (count > 1) {
+			connectedClient.updateApplicationInstances(appName, count);
+			CloudApplication app = connectedClient.getApplication(appName);
+			assertEquals(count, app.getInstances());
+		}
+
+		InstancesInfo instances = null;
+		boolean pass = false;
+		for (int i = 0; i < 50; i++) {
+			try {
+				instances = getInstancesWithTimeout(connectedClient, appName);
+				assertNotNull(instances);
+
+				List<InstanceInfo> infos = instances.getInstances();
+				assertEquals(count, infos.size());
+
+				int passCount = 0;
+				for (InstanceInfo info : infos) {
+					if (shouldBeRunning) {
+						if (InstanceState.RUNNING.equals(info.getState()) ||
+								InstanceState.STARTING.equals(info.getState())) {
+							passCount++;
+						}
+					} else {
+						if (InstanceState.CRASHED.equals(info.getState()) ||
+								InstanceState.FLAPPING.equals(info.getState())) {
+							passCount++;
+						}
+					}
+				}
+				if (passCount == infos.size()) {
+					pass = true;
+					break;
+				}
+			} catch (CloudFoundryException ex) {
+				// ignore (we may get this when staging is still ongoing)
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+		return pass;
+	}
 
 	private void doGetFile(CloudFoundryClient client, String appName) throws Exception {
 		String appDir = "app";
@@ -1153,195 +1330,6 @@ public class CloudFoundryClientTest {
 		return null; // for the compiler
 	}
 
-	@BeforeClass
-	public static void printTargetCloudInfo() {
-		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
-		System.out.println("Using space " + CCNG_USER_SPACE + " of organization " + CCNG_USER_ORG );
-		if (CCNG_USER_PASS == null) {
-			fail("System property ccng.passwd must be specified, supply -Dccng.passwd=<password>");
-		}
-
-	}
-
-	@Before
-	public void setUp() throws MalformedURLException {
-        if (CCNG_API_PROXY_HOST != null) {
-            httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
-        }
-		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration);
-		authenticatedClient.login();
-		connectedClient = setTestSpaceAsDefault(authenticatedClient);
-		connectedClient.deleteAllApplications();
-		connectedClient.deleteAllServices();
-		clearTestDomainAndRoutes();
-		connectedClient.addDomain(TEST_DOMAIN);
-		defaultDomainName = getDefaultDomain(connectedClient.getDomainsForOrg()).getName();
-	}
-
-	@After
-	public void tearDown() {
-		connectedClient.deleteAllApplications();
-		connectedClient.deleteAllServices();
-		clearTestDomainAndRoutes();
-	}
-
-	@Test
-	public void infoAvailable() throws Exception {
-		CloudInfo info = authenticatedClient.getCloudInfo();
-		assertNotNull(info.getName());
-		assertNotNull(info.getSupport());
-		assertNotNull(info.getBuild());
-	}
-
-	@Test
-	public void spacesAvailable() throws Exception {
-		List<CloudSpace> spaces = authenticatedClient.getSpaces();
-		assertNotNull(spaces);
-		assertTrue(spaces.size() > 0);
-	}	
-	
-	@Test
-	public void startApplicationWithInfo() throws IOException {
-		String appName = createSpringTravelApp("start", null);
-		uploadSpringTravelApp(appName);
-		StartingInfo info = connectedClient.startApplication(appName);
-		CloudApplication app = connectedClient.getApplication(appName);
-		assertEquals(CloudApplication.AppState.STARTED, app.getState());
-		assertNotNull(info);
-		assertNotNull(info.getStagingFile());
-	}
-
-	@Test
-	public void canSetDefaultSpace() throws Exception {
-		setTestSpaceAsDefault(authenticatedClient);
-	}
-
-	@Test
-	public void getServiceOfferings() {
-		List<CloudServiceOffering> offerings = connectedClient.getServiceOfferings();
-
-		assertNotNull(offerings);
-		assertTrue(offerings.size() >= 2);
-
-		CloudServiceOffering offering = null;
-		for (CloudServiceOffering so : offerings) {
-			if (so.getLabel().equals(getMysqlLabel())) {
-				offering = so;
-				break;
-			}
-		}
-		assertNotNull(offering);
-		assertEquals(getMysqlLabel(), offering.getLabel());
-		assertNotNull(offering.getCloudServicePlans());
-		assertTrue(offering.getCloudServicePlans().size() > 0);
-	}
-
-	@Test
-	public void updatePassword() throws MalformedURLException {
-		// Not working currently
-		assumeTrue(false);
-
-		String newPassword = "newPass123";
-		connectedClient.updatePassword(newPassword);
-		CloudFoundryClient clientWithChangedPassword =
-				new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, newPassword), new URL(CCNG_API_URL), httpProxyConfiguration);
-		clientWithChangedPassword.login();
-
-		// Revert
-		connectedClient.updatePassword(CCNG_USER_PASS);
-		connectedClient.login();
-	}
-
-	@Test
-	public void paginationWorksForUris() throws IOException {
-		String appName = namespacedAppName("page-url1");
-		CloudApplication app = createAndUploadSimpleTestApp(appName);
-		//connectedClient.startApplication(appName);
-
-		List<String> originalUris = app.getUris();
-		assertEquals(Collections.singletonList(computeAppUrl(appName)), originalUris);
-
-		List<String> uris = new ArrayList<String>(app.getUris());
-		for (int i = 2; i < 55; i++) {
-			uris.add(computeAppUrl(namespacedAppName("page-url" + i)));
-		}
-		connectedClient.updateApplicationUris(appName, uris);
-
-		app = connectedClient.getApplication(appName);
-		List<String> appUris = app.getUris();
-		assertNotNull(appUris);
-		assertEquals(uris.size(), appUris.size());
-		for (String uri : uris) {
-			assertTrue("Missing URI: " + uri, appUris.contains(uri));
-		}
-		connectedClient.deleteApplication(appName);
-	}
-
-	@Test
-	public void manageDomainsAndRoutes() throws IOException {
-		// Test that default domain is found
-		List<CloudDomain> allDomains = connectedClient.getDomainsForOrg();
-		CloudDomain defaultDomain = getDefaultDomain(allDomains);
-		assertNotNull(getDefaultDomain(allDomains));
-
-		// Test adding test domain - should be there for org and space
-		connectedClient.addDomain(TEST_DOMAIN);
-		allDomains = connectedClient.getDomainsForOrg();
-		assertNotNull(getDefaultDomain(allDomains));
-		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
-		List<CloudDomain> spaceDomains = connectedClient.getDomains();
-		assertNotNull(getDefaultDomain(spaceDomains));
-		assertNotNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
-
-		// Test removing test domain from space
-		connectedClient.removeDomain(TEST_DOMAIN);
-		allDomains = connectedClient.getDomainsForOrg();
-		assertNotNull(getDefaultDomain(allDomains));
-		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
-		spaceDomains = connectedClient.getDomains();
-		assertNotNull(getDefaultDomain(spaceDomains));
-		assertNull(getDomainNamed(TEST_DOMAIN, spaceDomains));
-
-		// Test accessing/adding/deleting routes
-		connectedClient.addDomain(TEST_DOMAIN);
-		connectedClient.addRoute("my_route1", TEST_DOMAIN);
-		connectedClient.addRoute("my_route2", TEST_DOMAIN);
-		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
-		assertNotNull(getRouteWithHost("my_route1", routes));
-		assertNotNull(getRouteWithHost("my_route2", routes));
-		connectedClient.deleteRoute("my_route2", TEST_DOMAIN);
-		routes = connectedClient.getRoutes(TEST_DOMAIN);
-		assertNotNull(getRouteWithHost("my_route1", routes));
-		assertNull(getRouteWithHost("my_route2", routes));
-
-		// Test that apps with route are counted
-		String appName = namespacedAppName("my_route3");
-		CloudApplication app = createAndUploadSimpleTestApp(appName);
-		List<String> uris = app.getUris();
-		uris.add("my_route3." + TEST_DOMAIN);
-		connectedClient.updateApplicationUris(appName, uris);
-		routes = connectedClient.getRoutes(TEST_DOMAIN);
-		assertNotNull(getRouteWithHost("my_route1", routes));
-		assertNotNull(getRouteWithHost("my_route3", routes));
-		assertEquals(0, getRouteWithHost("my_route1", routes).getAppsUsingRoute());
-		assertFalse(getRouteWithHost("my_route1", routes).inUse());
-		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
-		assertTrue(getRouteWithHost("my_route3", routes).inUse());
-		List<CloudRoute> defaultDomainRoutes = connectedClient.getRoutes(defaultDomain.getName());
-		assertNotNull(getRouteWithHost(appName, defaultDomainRoutes));
-		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
-		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
-
-		// test that removing domain that has routes throws exception
-		try {
-			connectedClient.deleteDomain(TEST_DOMAIN);
-			fail("should have thrown exception");
-		}
-		catch (IllegalStateException ex) {
-			assertTrue(ex.getMessage().contains("in use"));
-		}
-	}
-
 	private void clearTestDomainAndRoutes() {
 		for (CloudDomain domain : connectedClient.getDomainsForOrg()) {
 			if (domain.getName().equals(TEST_DOMAIN)) {
@@ -1400,10 +1388,6 @@ public class CloudFoundryClientTest {
 		return connectedClient;
 	}
 
-	private boolean getCompleteApiSupported() {
-		return true;
-	}
-	
 	private String computeAppUrl(String appName) {
 		return appName + "." + defaultDomainName;
 	}
