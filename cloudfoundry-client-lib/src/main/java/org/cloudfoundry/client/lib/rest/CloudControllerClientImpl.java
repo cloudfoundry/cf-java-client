@@ -46,6 +46,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
@@ -113,8 +114,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
 
-	private static final int FILES_MAX_RETRIES = 10;
-
 	private static final String LOGS_LOCATION = "logs";
 
 	private OauthClient oauthClient;
@@ -142,6 +141,32 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			   URL authorizationEndpoint,
 			   CloudSpace sessionSpace,
 			   HttpProxyConfiguration httpProxyConfiguration) {
+		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, sessionSpace, httpProxyConfiguration);
+	}
+
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
+			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
+		CloudControllerClientImpl tempClient = new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials, 
+				                                                          authorizationEndpoint, null, httpProxyConfiguration);
+		if (tempClient.token == null) {
+			tempClient.login();
+		}
+		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, null, httpProxyConfiguration);
+		List<CloudSpace> spaces = tempClient.getSpaces();
+		for (CloudSpace space : spaces) {
+			CloudOrganization org = space.getOrganization();
+			if (org.getName().equals(orgName) && space.getName().equals(spaceName)) {
+				sessionSpace = space;
+			}
+		}
+		if (sessionSpace == null) {
+			throw new IllegalArgumentException("No matching organization and space found for org: " + orgName + " space:" + spaceName);
+		}
+		token = tempClient.token;
+	}
+
+	private void initialize(URL cloudControllerUrl,  RestUtil restUtil, CloudCredentials cloudCredentials,
+			   			    URL authorizationEndpoint, CloudSpace sessionSpace, HttpProxyConfiguration httpProxyConfiguration) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restUtil, "RestUtil cannot be null");
 		this.restUtil = restUtil;
@@ -164,7 +189,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
 		this.sessionSpace = sessionSpace;
 	}
-
+	
 	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
 		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
 			try {

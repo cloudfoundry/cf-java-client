@@ -29,7 +29,6 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -67,11 +66,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class CloudFoundryClientTest {
 
-	private CloudFoundryClient authenticatedClient;
-
 	private CloudFoundryClient connectedClient;
-
-	private CloudSpace testSpace = null;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://ccng.cloudfoundry.com");
@@ -119,9 +114,9 @@ public class CloudFoundryClientTest {
         if (CCNG_API_PROXY_HOST != null) {
             httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
         }
-		authenticatedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), httpProxyConfiguration);
-		authenticatedClient.login();
-		connectedClient = setTestSpaceAsDefault(authenticatedClient);
+        connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), 
+												    new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
+        	connectedClient.login();
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
 		clearTestDomainAndRoutes();
@@ -138,7 +133,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void infoAvailable() throws Exception {
-		CloudInfo info = authenticatedClient.getCloudInfo();
+		CloudInfo info = connectedClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
 		assertNotNull(info.getBuild());
@@ -146,16 +141,11 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void spacesAvailable() throws Exception {
-		List<CloudSpace> spaces = authenticatedClient.getSpaces();
+		List<CloudSpace> spaces = connectedClient.getSpaces();
 		assertNotNull(spaces);
 		assertTrue(spaces.size() > 0);
 	}	
 	
-	@Test
-	public void canSetDefaultSpace() throws Exception {
-		setTestSpaceAsDefault(authenticatedClient);
-	}
-
 	//
 	// Basic Application tests
 	//
@@ -1367,25 +1357,6 @@ public class CloudFoundryClientTest {
 			}
 		}
 		return null;
-	}
-
-	private CloudFoundryClient setTestSpaceAsDefault(CloudFoundryClient client) throws MalformedURLException {
-		List<CloudSpace> spaces = client.getSpaces();
-		for (CloudSpace space : spaces) {
-			CloudOrganization org = space.getOrganization();
-			String orgName = null;
-			if (org != null) {
-				orgName = org.getName();
-			}
-			if (CCNG_USER_ORG.equals(orgName) && CCNG_USER_SPACE.equals(space.getName())) {
-				testSpace = space;
-			}
-		}
-		assertNotNull("Space to use for testing (" + CCNG_USER_SPACE + ") not found for organization (" +
-				CCNG_USER_ORG + ") - check your account or system properties", testSpace);
-		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), new URL(CCNG_API_URL), testSpace, httpProxyConfiguration);
-		connectedClient.login();
-		return connectedClient;
 	}
 
 	private String computeAppUrl(String appName) {
