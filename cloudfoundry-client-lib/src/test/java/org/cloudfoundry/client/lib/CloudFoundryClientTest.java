@@ -116,7 +116,7 @@ public class CloudFoundryClientTest {
         }
         connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), 
 												    new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
-        	connectedClient.login();
+		connectedClient.login();
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
 		clearTestDomainAndRoutes();
