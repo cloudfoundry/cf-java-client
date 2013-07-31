@@ -96,12 +96,12 @@ public class OauthClient {
 
 	private ImplicitResourceDetails getImplicitResource() {
 		ImplicitResourceDetails resource = new ImplicitResourceDetails();
-		String clientId = "vmc";
+		String clientId = "cf";
 		resource.setClientId(clientId);
 		resource.setId(clientId);
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
 		resource.setAccessTokenUri(authorizationUrl + "/oauth/authorize");
-		String redirectUri = "https://uaa.cloudfoundry.com/redirect/vmc";
+		String redirectUri = "https://uaa.cloudfoundry.com/redirect/cf";
 		resource.setPreEstablishedRedirectUri(redirectUri);
 		resource.setUseCurrentUri(false);
 		return resource;
