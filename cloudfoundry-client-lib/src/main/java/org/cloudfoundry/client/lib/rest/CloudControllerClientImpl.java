@@ -154,9 +154,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, null, httpProxyConfiguration);
 		List<CloudSpace> spaces = tempClient.getSpaces();
 		for (CloudSpace space : spaces) {
-			CloudOrganization org = space.getOrganization();
-			if (org.getName().equals(orgName) && space.getName().equals(spaceName)) {
-				sessionSpace = space;
+			if (space.getName().equals(spaceName)) {
+				CloudOrganization org = space.getOrganization();
+				if (orgName == null || org.getName().equals(orgName)) {
+					sessionSpace = space;
+				}
 			}
 		}
 		if (sessionSpace == null) {
