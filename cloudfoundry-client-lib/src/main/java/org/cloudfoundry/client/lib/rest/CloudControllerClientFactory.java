@@ -69,6 +69,15 @@ public class CloudControllerClientFactory {
 					authorizationEndpoint, sessionSpace, httpProxyConfiguration);
 	}
 
+	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
+												   String orgName, String spaceName) {
+		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
+		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap);
+
+		return new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials,
+				authorizationEndpoint, orgName, spaceName, httpProxyConfiguration);
+	}
+	
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		if (infoCache.containsKey(cloudControllerUrl)) {
 			return infoCache.get(cloudControllerUrl);
