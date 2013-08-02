@@ -982,6 +982,28 @@ public class CloudFoundryClientTest {
 		connectedClient.deleteAllApplications();
 		assertTrue(log1.size() > log2.size());
 	}
+	
+	@Test
+	public void getStagingLogs() throws Exception {
+		String appName = createSpringTravelApp("stagingLogs", null,
+				"https://github.com/cloudfoundry/java-buildpack.git");
+
+		File file = SampleProjects.springTravel();
+		connectedClient
+				.uploadApplication(appName, file.getCanonicalPath());
+
+		StartingInfo startingInfo = connectedClient.startApplication(
+				appName);
+		
+		assertNotNull(startingInfo);
+		int offset = 0;
+
+		String firstLine = connectedClient.getStagingLogs(startingInfo,
+				offset);
+		assertNotNull(firstLine);
+		assertTrue(firstLine.length() > 0);
+
+	}
 
 	//
 	// Shared test methods

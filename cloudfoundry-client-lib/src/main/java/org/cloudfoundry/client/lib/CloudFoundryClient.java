@@ -251,6 +251,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
 	}
+	
+	public String getStagingLogs(StartingInfo info, int offset) {
+		return cc.getStagingLogs(info, offset);
+	}
 
 	public String getFile(String appName, int instanceIndex, String filePath) {
 		return cc.getFile(appName, instanceIndex, filePath, 0, -1);
