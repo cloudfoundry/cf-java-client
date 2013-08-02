@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@ package org.cloudfoundry.client.lib.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +37,8 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -78,6 +84,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -134,6 +141,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	protected String token;
 
+	private final Log logger;
 	
 	public CloudControllerClientImpl(URL cloudControllerUrl,
 			   RestUtil restUtil,
@@ -142,10 +150,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			   CloudSpace sessionSpace,
 			   HttpProxyConfiguration httpProxyConfiguration) {
 		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, sessionSpace, httpProxyConfiguration);
+		logger = LogFactory.getLog(getClass().getName());
 	}
 
 	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
 			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
+		logger = LogFactory.getLog(getClass().getName());
 		CloudControllerClientImpl tempClient = new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials, 
 				                                                          authorizationEndpoint, null, httpProxyConfiguration);
 		if (tempClient.token == null) {
@@ -271,6 +281,40 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
 		}
 	}
+	
+	public String getStagingLogs(StartingInfo info, int offset) {
+		String stagingFile = info.getStagingFile();
+		if (stagingFile != null) {
+			CloudFoundryClientHttpRequestFactory cfRequestFactory = null;
+			try {
+				HashMap<String, Object> logsRequest = new HashMap<String, Object>();
+				logsRequest.put("offset", offset);
+
+				cfRequestFactory = getRestTemplate().getRequestFactory() instanceof CloudFoundryClientHttpRequestFactory ? (CloudFoundryClientHttpRequestFactory) getRestTemplate()
+						.getRequestFactory() : null;
+				if (cfRequestFactory != null) {
+					cfRequestFactory
+							.increaseReadTimeoutForStreamedTailedLogs(5 * 60 * 1000);
+				}
+				return getRestTemplate().getForObject(
+						stagingFile + "&tail&tail_offset={offset}",
+						String.class, logsRequest);
+			} catch (CloudFoundryException e) {
+				if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+					// Content is no longer available
+					return null;
+				} else {
+					throw e;
+				}
+			} finally {
+				if (cfRequestFactory != null) {
+					cfRequestFactory
+							.increaseReadTimeoutForStreamedTailedLogs(-1);
+				}
+			}
+		}
+		return null;
+	}
 
 	protected RestTemplate getRestTemplate() {
 		return this.restTemplate;
@@ -318,9 +362,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		private static final String LEGACY_TOKEN_PREFIX = "0408";
 		private ClientHttpRequestFactory delegate;
+		private Integer defaultSocketTimeout = 0;
 
 		public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
 			this.delegate = delegate;
+			captureDefaultReadTimeout(delegate);
 		}
 
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
@@ -336,6 +382,38 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
 			}
 			return request;
+		}
+
+		private void captureDefaultReadTimeout(ClientHttpRequestFactory delegate) {
+			if (delegate instanceof CommonsClientHttpRequestFactory) {
+				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+				defaultSocketTimeout = (Integer) commonsClientHttpRequestFactory
+						.getHttpClient().getParams()
+						.getParameter("http.socket.timeout");
+				if (defaultSocketTimeout == null) {
+					try {
+						defaultSocketTimeout = new Socket().getSoTimeout();
+					} catch (SocketException e) {
+						defaultSocketTimeout = 0;
+					}
+				}
+			}
+		}
+
+		public void increaseReadTimeoutForStreamedTailedLogs(int timeout) {
+			// May temporary increase readtimeout on other unrelated concurrent
+			// threads, but per-request read timeout don't seem easily
+			// accessible
+			if (delegate instanceof CommonsClientHttpRequestFactory) {
+				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+
+				if (timeout > 0) {
+					commonsClientHttpRequestFactory.setReadTimeout(timeout);
+				} else {
+					commonsClientHttpRequestFactory
+							.setReadTimeout(defaultSocketTimeout);
+				}
+			}
 		}
 	}
 
@@ -1001,8 +1079,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			// indicates that the response entity did have headers. The API contract is to return starting info
 			// if there are headers in the response, null otherwise.
 			if (headers != null && !headers.isEmpty()) {
-				String value = entity.getHeaders().getFirst("x-app-staging-log");
-				return new StartingInfo(value);
+				String stagingFile = headers.getFirst("x-app-staging-log");
+
+				if (stagingFile != null) {
+					try {
+						stagingFile = URLDecoder.decode(stagingFile, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						logger.error("unexpected inability to UTF-8 decode", e);
+					}
+				}
+				// Return the starting info even if decoding failed or staging file is null
+				return new StartingInfo(stagingFile);
 			}
 		}
 		return null;

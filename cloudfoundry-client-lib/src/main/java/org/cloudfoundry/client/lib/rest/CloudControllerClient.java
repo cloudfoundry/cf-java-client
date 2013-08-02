@@ -139,6 +139,8 @@ public interface CloudControllerClient {
 	CrashesInfo getCrashes(String appName);
 
 	void rename(String appName, String newName);
+	
+	String getStagingLogs(StartingInfo info, int offset);
 
 	// Domains and routes management
 
