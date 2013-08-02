@@ -49,6 +49,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
@@ -86,6 +89,9 @@ public class CloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", defaultNamespace(CCNG_USER_EMAIL));
 
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
+	
+	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
+	
 	private static String defaultDomainName = null;
     private HttpProxyConfiguration httpProxyConfiguration;
 
@@ -100,6 +106,22 @@ public class CloudFoundryClientTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	@Rule
+	public TestRule watcher = new TestWatcher() {
+		private long startTime;
+		
+		@Override
+		protected void starting(Description description) {
+			startTime = System.currentTimeMillis();
+		}
+		
+		@Override
+		protected void finished(Description description) {
+			if (!SILENT_TEST_TIMINGS) {
+				System.out.println("Test " + description.getMethodName() + " took " + (System.currentTimeMillis() - startTime) + " ms");
+			}
+		}
+	};	
 
 	@BeforeClass
 	public static void printTargetCloudInfo() {
