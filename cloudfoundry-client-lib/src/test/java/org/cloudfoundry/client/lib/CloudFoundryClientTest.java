@@ -989,20 +989,33 @@ public class CloudFoundryClientTest {
 				"https://github.com/cloudfoundry/java-buildpack.git");
 
 		File file = SampleProjects.springTravel();
-		connectedClient
-				.uploadApplication(appName, file.getCanonicalPath());
+		connectedClient.uploadApplication(appName, file.getCanonicalPath());
 
-		StartingInfo startingInfo = connectedClient.startApplication(
-				appName);
-		
+		StartingInfo startingInfo = null;
+		String firstLine = null;
+		int i = 0;
+		do {
+			startingInfo = connectedClient.startApplication(appName);
+
+			if (startingInfo != null && startingInfo.getStagingFile() != null) {
+				int offset = 0;
+				firstLine = connectedClient
+						.getStagingLogs(startingInfo, offset);
+			}
+
+			if (startingInfo != null && startingInfo.getStagingFile() != null
+					&& firstLine != null) {
+				break;
+			} else {
+				connectedClient.stopApplication(appName);
+				Thread.sleep(10000);
+			}
+		} while (++i < 5);
+
 		assertNotNull(startingInfo);
-		int offset = 0;
-
-		String firstLine = connectedClient.getStagingLogs(startingInfo,
-				offset);
+		assertNotNull(startingInfo.getStagingFile());
 		assertNotNull(firstLine);
 		assertTrue(firstLine.length() > 0);
-
 	}
 
 	//
