@@ -650,6 +650,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return mapCloudApplication(resource);
 	}
 
+	public CloudApplication getApplication(UUID appGuid) {
+		Map<String, Object> resource = findApplicationResource(appGuid, true);
+		if (resource == null) {
+			throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Not Found", "Application not found");
+		}
+		return mapCloudApplication(resource);
+	}
+
 	@SuppressWarnings("unchecked")
 	private CloudApplication mapCloudApplication(Map<String, Object> resource) {
 		UUID appId = resourceMapper.getGuidOfResource(resource);
@@ -1409,6 +1417,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return guid;
 	}
 
+	private Map<String, Object> findApplicationResource(UUID appGuid, boolean fetchServiceInfo) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/apps/{app}?inline-relations-depth=1";
+		urlVars.put("app", appGuid);
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+
+		return processApplicationResource(JsonUtil.convertJsonToMap(resp), fetchServiceInfo);
+
+	}
+
+	
 	private Map<String, Object> findApplicationResource(String appName, boolean fetchServiceInfo) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -1419,17 +1438,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		urlVars.put("q", "name:" + appName);
 		urlPath = urlPath + "/apps?inline-relations-depth=1&q={q}";
 
-		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-		if (resourceList.size() > 0) {
-			Map<String, Object> resource = resourceList.get(0);
-			if (fetchServiceInfo) {
-				fillInEmbeddedResource(resource, "service_bindings", "service_instance");
-			}
-			return resource;
+		List<Map<String, Object>> allResources = getAllResources(urlPath, urlVars);
+		if(!allResources.isEmpty()) {
+			return processApplicationResource(allResources.get(0), fetchServiceInfo);
 		}
-		else {
-			return null;
+		return null;
+	}
+	
+	private Map<String, Object> processApplicationResource(Map<String, Object> resource, boolean fetchServiceInfo) {
+		if (fetchServiceInfo) {
+			fillInEmbeddedResource(resource, "service_bindings", "service_instance");
 		}
+		return resource;
 	}
 
 	private List<String> findApplicationUris(UUID appGuid) {

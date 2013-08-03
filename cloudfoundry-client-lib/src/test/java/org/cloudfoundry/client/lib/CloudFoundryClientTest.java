@@ -173,11 +173,19 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void getApplication() {
+	public void getApplicationByName() {
 		String appName = createSpringTravelApp("1", null);
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
+	}
+	
+	@Test
+	public void getApplicationByGuid() {
+		String appName = createSpringTravelApp("1", null);
+		CloudApplication app = connectedClient.getApplication(appName);
+		CloudApplication guidApp = connectedClient.getApplication(app.getMeta().getGuid());
+		assertEquals(app.getName(), guidApp.getName());
 	}
 
 	@Test
