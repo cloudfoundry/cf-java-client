@@ -329,6 +329,22 @@ public interface CloudFoundryOperations {
 	 * the full content of the log file will be returned as a String value for the corresponding key.
 	 */
 	Map<String, String> getCrashLogs(String appName);
+	
+	/**
+	 * Get the staging log while an application is starting. A null
+	 * value indicates that no further checks for staging logs should occur as
+	 * staging logs are no longer available.
+	 * 
+	 * @param info
+	 *            starting information containing staging log file URL. Obtained
+	 *            after starting an application.
+	 * @param offset
+	 *            starting position from where content should be retrieved.
+	 * @return portion of the staging log content starting from the offset. It
+	 *         may contain multiple lines. Returns null if no further content is
+	 *         available.
+	 */
+	String getStagingLogs(StartingInfo info, int offset);
 
 	/**
 	 * Get file from the deployed application.

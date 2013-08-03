@@ -60,22 +60,26 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
 	 */
 	public CloudFoundryClient(URL cloudControllerUrl) {
-		this(null, cloudControllerUrl, null, null);
+		this(null, cloudControllerUrl);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl) {
-		this(credentials, cloudControllerUrl, null, null);
+		this(credentials, cloudControllerUrl, (CloudSpace)null);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, CloudSpace sessionSpace) {
 		this(credentials, cloudControllerUrl, sessionSpace, null);
     }
 
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, String orgName, String spaceName) {
+		this(credentials, cloudControllerUrl, orgName, spaceName, null);
+    }
+
 	/**
 	 * Constructors to use with an http proxy configuration.
 	 */
 	public CloudFoundryClient(URL cloudControllerUrl, HttpProxyConfiguration httpProxyConfiguration) {
-		this(null, cloudControllerUrl, null, httpProxyConfiguration);
+		this(null, cloudControllerUrl, httpProxyConfiguration);
 	}
 
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
@@ -91,6 +95,13 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
     }
 
+	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl,
+							  String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
+		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
+		CloudControllerClientFactory cloudControllerClientFactory =
+				new CloudControllerClientFactory(new RestUtil(), httpProxyConfiguration);
+		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
+	}
 
 	public URL getCloudControllerUrl() {
 		return cc.getCloudControllerUrl();
@@ -244,6 +255,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
+	}
+	
+	public String getStagingLogs(StartingInfo info, int offset) {
+		return cc.getStagingLogs(info, offset);
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath) {

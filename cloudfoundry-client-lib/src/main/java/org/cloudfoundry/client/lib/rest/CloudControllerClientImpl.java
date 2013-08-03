@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@ package org.cloudfoundry.client.lib.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +37,14 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.NotFinishedStagingException;
 import org.cloudfoundry.client.lib.RestLogCallback;
+import org.cloudfoundry.client.lib.StagingErrorException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
@@ -46,6 +54,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
@@ -77,6 +86,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -90,6 +100,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -113,8 +124,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("UTF-8"));
 
-	private static final int FILES_MAX_RETRIES = 10;
-
 	private static final String LOGS_LOCATION = "logs";
 
 	private OauthClient oauthClient;
@@ -135,6 +144,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	protected String token;
 
+	private final Log logger;
 	
 	public CloudControllerClientImpl(URL cloudControllerUrl,
 			   RestUtil restUtil,
@@ -142,6 +152,36 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			   URL authorizationEndpoint,
 			   CloudSpace sessionSpace,
 			   HttpProxyConfiguration httpProxyConfiguration) {
+		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, sessionSpace, httpProxyConfiguration);
+		logger = LogFactory.getLog(getClass().getName());
+	}
+
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
+			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
+		logger = LogFactory.getLog(getClass().getName());
+		CloudControllerClientImpl tempClient = new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials, 
+				                                                          authorizationEndpoint, null, httpProxyConfiguration);
+		if (tempClient.token == null) {
+			tempClient.login();
+		}
+		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, null, httpProxyConfiguration);
+		List<CloudSpace> spaces = tempClient.getSpaces();
+		for (CloudSpace space : spaces) {
+			if (space.getName().equals(spaceName)) {
+				CloudOrganization org = space.getOrganization();
+				if (orgName == null || org.getName().equals(orgName)) {
+					sessionSpace = space;
+				}
+			}
+		}
+		if (sessionSpace == null) {
+			throw new IllegalArgumentException("No matching organization and space found for org: " + orgName + " space:" + spaceName);
+		}
+		token = tempClient.token;
+	}
+
+	private void initialize(URL cloudControllerUrl,  RestUtil restUtil, CloudCredentials cloudCredentials,
+			   			    URL authorizationEndpoint, CloudSpace sessionSpace, HttpProxyConfiguration httpProxyConfiguration) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restUtil, "RestUtil cannot be null");
 		this.restUtil = restUtil;
@@ -164,7 +204,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
 		this.sessionSpace = sessionSpace;
 	}
-
+	
 	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
 		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
 			try {
@@ -244,6 +284,59 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
 		}
 	}
+	
+	/**
+	 * Returns null if no further content is available. Two errors that will
+	 * lead to a null value are 404 Bad Request errors, which are handled in the
+	 * implementation, meaning that no further log file contents are available,
+	 * or ResourceAccessException, also handled in the implementation,
+	 * indicating a possible timeout in the server serving the content. Note
+	 * that any other CloudFoundryException or RestClientException exception not
+	 * related to the two errors mentioned above may still be thrown (e.g. 500
+	 * level errors, Unauthorized or Forbidden exceptions, etc..)
+	 * 
+	 * @return content if available, which may contain multiple lines, or null
+	 *         if no further content is available.
+	 * 
+	 */
+	public String getStagingLogs(StartingInfo info, int offset) {
+		String stagingFile = info.getStagingFile();
+		if (stagingFile != null) {
+			CloudFoundryClientHttpRequestFactory cfRequestFactory = null;
+			try {
+				HashMap<String, Object> logsRequest = new HashMap<String, Object>();
+				logsRequest.put("offset", offset);
+
+				cfRequestFactory = getRestTemplate().getRequestFactory() instanceof CloudFoundryClientHttpRequestFactory ? (CloudFoundryClientHttpRequestFactory) getRestTemplate()
+						.getRequestFactory() : null;
+				if (cfRequestFactory != null) {
+					cfRequestFactory
+							.increaseReadTimeoutForStreamedTailedLogs(5 * 60 * 1000);
+				}
+				return getRestTemplate().getForObject(
+						stagingFile + "&tail&tail_offset={offset}",
+						String.class, logsRequest);
+			} catch (CloudFoundryException e) {
+				if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+					// Content is no longer available
+					return null;
+				} else {
+					throw e;
+				}
+			} catch (ResourceAccessException e) {
+				// Likely read timeout, the directory server won't serve 
+				// the content again
+				logger.debug("Caught exception while fetching staging logs. Aborting. Caught:" + e,
+						e);
+			} finally {
+				if (cfRequestFactory != null) {
+					cfRequestFactory
+							.increaseReadTimeoutForStreamedTailedLogs(-1);
+				}
+			}
+		}
+		return null;
+	}
 
 	protected RestTemplate getRestTemplate() {
 		return this.restTemplate;
@@ -291,9 +384,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		private static final String LEGACY_TOKEN_PREFIX = "0408";
 		private ClientHttpRequestFactory delegate;
+		private Integer defaultSocketTimeout = 0;
 
 		public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
 			this.delegate = delegate;
+			captureDefaultReadTimeout(delegate);
 		}
 
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
@@ -310,6 +405,38 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			}
 			return request;
 		}
+
+		private void captureDefaultReadTimeout(ClientHttpRequestFactory delegate) {
+			if (delegate instanceof CommonsClientHttpRequestFactory) {
+				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+				defaultSocketTimeout = (Integer) commonsClientHttpRequestFactory
+						.getHttpClient().getParams()
+						.getParameter("http.socket.timeout");
+				if (defaultSocketTimeout == null) {
+					try {
+						defaultSocketTimeout = new Socket().getSoTimeout();
+					} catch (SocketException e) {
+						defaultSocketTimeout = 0;
+					}
+				}
+			}
+		}
+
+		public void increaseReadTimeoutForStreamedTailedLogs(int timeout) {
+			// May temporary increase readtimeout on other unrelated concurrent
+			// threads, but per-request read timeout don't seem easily
+			// accessible
+			if (delegate instanceof CommonsClientHttpRequestFactory) {
+				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+
+				if (timeout > 0) {
+					commonsClientHttpRequestFactory.setReadTimeout(timeout);
+				} else {
+					commonsClientHttpRequestFactory
+							.setReadTimeout(defaultSocketTimeout);
+				}
+			}
+		}
 	}
 
 	public static class ErrorHandler extends DefaultResponseErrorHandler {
@@ -318,21 +445,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			HttpStatus statusCode = response.getStatusCode();
 			switch (statusCode.series()) {
 				case CLIENT_ERROR:
-					CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
-					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-					if (response.getBody() != null) {
-						try {
-							@SuppressWarnings("unchecked")
-							Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-							exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
-						} catch (JsonParseException e) {
-							exception.setDescription("Client error");
-						} catch (IOException e) {
-							exception.setDescription("Client error");
-						}
-					} else {
-						exception.setDescription("Client error");
-					}
+					CloudFoundryException exception = getException(response);
 					throw exception;
 				case SERVER_ERROR:
 					throw new HttpServerErrorException(statusCode, response.getStatusText());
@@ -340,6 +453,55 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					throw new RestClientException("Unknown status code [" + statusCode + "]");
 			}
 		}
+	}
+	
+	private static CloudFoundryException getException(
+			ClientHttpResponse response) throws IOException {
+		HttpStatus statusCode = response.getStatusCode();
+		CloudFoundryException cloudFoundryException = null;
+		
+		String description = "Client error";
+		String statusText = response.getStatusText();
+		
+		ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+
+		if (response.getBody() != null) {
+			try {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = mapper.readValue(response.getBody(),
+						Map.class);
+				description = CloudUtil.parse(String.class,
+						map.get("description"));
+
+				int cloudFoundryErrorCode = CloudUtil.parse(Integer.class,
+						map.get("code"));
+
+				if (cloudFoundryErrorCode >= 0) {
+					switch (cloudFoundryErrorCode) {
+					case StagingErrorException.ERROR_CODE:
+						cloudFoundryException = new StagingErrorException(
+								statusCode, statusText);
+						break;
+					case NotFinishedStagingException.ERROR_CODE:
+						cloudFoundryException = new NotFinishedStagingException(
+								statusCode, statusText);
+						break;
+					}
+				}
+			} catch (JsonParseException e) {
+				// Fall through. Handled below.
+			} catch (IOException e) {
+				// Fall through. Handled below.
+			}
+		}
+
+		if (cloudFoundryException == null) {
+			cloudFoundryException = new CloudFoundryException(statusCode,
+					statusText);
+		}
+		cloudFoundryException.setDescription(description);
+
+		return cloudFoundryException;
 	}
 
 	public static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
@@ -982,8 +1144,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			// indicates that the response entity did have headers. The API contract is to return starting info
 			// if there are headers in the response, null otherwise.
 			if (headers != null && !headers.isEmpty()) {
-				String value = entity.getHeaders().getFirst("x-app-staging-log");
-				return new StartingInfo(value);
+				String stagingFile = headers.getFirst("x-app-staging-log");
+
+				if (stagingFile != null) {
+					try {
+						stagingFile = URLDecoder.decode(stagingFile, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						logger.error("unexpected inability to UTF-8 decode", e);
+					}
+				}
+				// Return the starting info even if decoding failed or staging file is null
+				return new StartingInfo(stagingFile);
 			}
 		}
 		return null;
