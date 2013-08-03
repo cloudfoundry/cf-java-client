@@ -42,7 +42,9 @@ import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
+import org.cloudfoundry.client.lib.NotFinishedStagingException;
 import org.cloudfoundry.client.lib.RestLogCallback;
+import org.cloudfoundry.client.lib.StagingErrorException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
@@ -443,21 +445,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			HttpStatus statusCode = response.getStatusCode();
 			switch (statusCode.series()) {
 				case CLIENT_ERROR:
-					CloudFoundryException exception = new CloudFoundryException(statusCode, response.getStatusText());
-					ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-					if (response.getBody() != null) {
-						try {
-							@SuppressWarnings("unchecked")
-							Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-							exception.setDescription(CloudUtil.parse(String.class, map.get("description")));
-						} catch (JsonParseException e) {
-							exception.setDescription("Client error");
-						} catch (IOException e) {
-							exception.setDescription("Client error");
-						}
-					} else {
-						exception.setDescription("Client error");
-					}
+					CloudFoundryException exception = getException(response);
 					throw exception;
 				case SERVER_ERROR:
 					throw new HttpServerErrorException(statusCode, response.getStatusText());
@@ -465,6 +453,55 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					throw new RestClientException("Unknown status code [" + statusCode + "]");
 			}
 		}
+	}
+	
+	private static CloudFoundryException getException(
+			ClientHttpResponse response) throws IOException {
+		HttpStatus statusCode = response.getStatusCode();
+		CloudFoundryException cloudFoundryException = null;
+		
+		String description = "Client error";
+		String statusText = response.getStatusText();
+		
+		ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+
+		if (response.getBody() != null) {
+			try {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = mapper.readValue(response.getBody(),
+						Map.class);
+				description = CloudUtil.parse(String.class,
+						map.get("description"));
+
+				int cloudFoundryErrorCode = CloudUtil.parse(Integer.class,
+						map.get("code"));
+
+				if (cloudFoundryErrorCode >= 0) {
+					switch (cloudFoundryErrorCode) {
+					case StagingErrorException.ERROR_CODE:
+						cloudFoundryException = new StagingErrorException(
+								statusCode, statusText);
+						break;
+					case NotFinishedStagingException.ERROR_CODE:
+						cloudFoundryException = new NotFinishedStagingException(
+								statusCode, statusText);
+						break;
+					}
+				}
+			} catch (JsonParseException e) {
+				// Fall through. Handled below.
+			} catch (IOException e) {
+				// Fall through. Handled below.
+			}
+		}
+
+		if (cloudFoundryException == null) {
+			cloudFoundryException = new CloudFoundryException(statusCode,
+					statusText);
+		}
+		cloudFoundryException.setDescription(description);
+
+		return cloudFoundryException;
 	}
 
 	public static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
