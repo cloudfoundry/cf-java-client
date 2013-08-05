@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -147,6 +148,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public CloudApplication getApplication(String appName) {
 		return cc.getApplication(appName);
+	}
+
+	public CloudApplication getApplication(UUID appGuid) {
+		return cc.getApplication(appGuid);
 	}
 
 	public ApplicationStats getApplicationStats(String appName) {
