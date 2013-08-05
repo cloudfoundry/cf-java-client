@@ -112,6 +112,9 @@ public class CloudFoundryClientTest {
 		
 		@Override
 		protected void starting(Description description) {
+			if (!SILENT_TEST_TIMINGS) {			
+				System.out.println("Starting test " + description.getMethodName());
+			}
 			startTime = System.currentTimeMillis();
 		}
 		
