@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -86,6 +87,8 @@ public interface CloudControllerClient {
 	List<CloudApplication> getApplications();
 
 	CloudApplication getApplication(String appName);
+	
+	CloudApplication getApplication(UUID appGuid);
 
 	ApplicationStats getApplicationStats(String appName);
 
