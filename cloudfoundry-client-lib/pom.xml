@@ -19,7 +19,7 @@
 
 	<properties>
 		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
-		<spring.security.oauth.version>1.0.0.RC1</spring.security.oauth.version>
+		<spring.security.oauth.version>1.0.0.RELEASE</spring.security.oauth.version>
 	</properties>
 
 	<profiles>

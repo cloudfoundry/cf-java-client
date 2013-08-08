@@ -32,8 +32,8 @@ import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedExc
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
-import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.RestTemplate;
@@ -58,13 +58,10 @@ public class OauthClient {
 	}
 
 	public OAuth2AccessToken getToken(String username, String password) {
-		OAuth2ProtectedResourceDetails resource = getImplicitResource();
-		Map<String, String> parameters = new LinkedHashMap<String, String>();
-		parameters.put("credentials", String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password));
-		AccessTokenRequest request = new DefaultAccessTokenRequest();
-		request.setAll(parameters);
-		ImplicitAccessTokenProvider provider = new ImplicitAccessTokenProvider();
-		provider.setRestTemplate(restTemplate);
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
+		AccessTokenRequest request = createAccessTokenRequest(username, password);
+		
+		ResourceOwnerPasswordAccessTokenProvider provider = new ResourceOwnerPasswordAccessTokenProvider();
 		OAuth2AccessToken token = null;
 		try {
 			token = provider.obtainAccessToken(resource, request);
@@ -77,11 +74,20 @@ public class OauthClient {
 		}
 		return token;
 	}
+	
+	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
+		AccessTokenRequest request = createAccessTokenRequest(username, password);
+
+		ResourceOwnerPasswordAccessTokenProvider provider = new ResourceOwnerPasswordAccessTokenProvider();
+		
+		return provider.refreshAccessToken(resource, currentToken.getRefreshToken(), request);
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void changePassword(String token, String oldPassword, String newPassword) {
+	public void changePassword(OAuth2AccessToken token, String oldPassword, String newPassword) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(AUTHORIZATION_HEADER_KEY, token);
+		headers.add(AUTHORIZATION_HEADER_KEY, token.getTokenType() + " " + token.getValue());
 		HttpEntity info = new HttpEntity(headers);
 		ResponseEntity<String> response = restTemplate.exchange(authorizationUrl + "/userinfo", HttpMethod.GET, info, String.class);
 		Map<String, Object> responseMap = JsonUtil.convertJsonToMap(response.getBody());
@@ -94,17 +100,26 @@ public class OauthClient {
 		restTemplate.put(authorizationUrl + "/User/{id}/password", httpEntity, userId);
 	}
 
-	private ImplicitResourceDetails getImplicitResource() {
-		ImplicitResourceDetails resource = new ImplicitResourceDetails();
+	private AccessTokenRequest createAccessTokenRequest(String username, String password) {
+		Map<String, String> parameters = new LinkedHashMap<String, String>();
+		parameters.put("credentials", String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password));
+		AccessTokenRequest request = new DefaultAccessTokenRequest();
+		request.setAll(parameters);
+		
+		return request;
+	}
+	
+	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password) {
+		ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
+		resource.setUsername(username);
+		resource.setPassword(password);
+
 		String clientId = "cf";
 		resource.setClientId(clientId);
 		resource.setId(clientId);
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
-		resource.setAccessTokenUri(authorizationUrl + "/oauth/authorize");
-		String redirectUri = "https://uaa.cloudfoundry.com/redirect/cf";
-		resource.setPreEstablishedRedirectUri(redirectUri);
-		resource.setUseCurrentUri(false);
+		resource.setAccessTokenUri(authorizationUrl + "/oauth/token");
+		
 		return resource;
 	}
-
 }

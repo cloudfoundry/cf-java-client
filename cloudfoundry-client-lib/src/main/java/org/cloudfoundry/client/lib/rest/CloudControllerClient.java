@@ -40,6 +40,7 @@ import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 /**
  * Interface defining operations available for the cloud controller REST client implementations
@@ -56,7 +57,7 @@ public interface CloudControllerClient {
 
 	List<CloudSpace> getSpaces();
 
-	String login();
+	OAuth2AccessToken login();
 
 	void logout();
 

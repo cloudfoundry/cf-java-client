@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib;
 
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+
 /**
  * Class that encapsulates credentials used for authentication
  *
@@ -27,7 +29,7 @@ public class CloudCredentials {
 
 	private String password;
 
-	private String token;
+	private OAuth2AccessToken token;
 
 	private String proxyUser;
 
@@ -47,7 +49,7 @@ public class CloudCredentials {
 	 *
 	 * @param token token to use for authorization
 	 */
-	public CloudCredentials(String token) {
+	public CloudCredentials(OAuth2AccessToken token) {
 		this.token = token;
 	}
 
@@ -87,7 +89,7 @@ public class CloudCredentials {
 	 *
 	 * @return the token
 	 */
-	public String getToken() {
+	public OAuth2AccessToken getToken() {
 		return token;
 	}
 

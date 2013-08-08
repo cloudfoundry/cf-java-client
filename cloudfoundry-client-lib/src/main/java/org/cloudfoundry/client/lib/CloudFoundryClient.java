@@ -39,6 +39,7 @@ import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.util.RestUtil;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 
 /**
@@ -134,7 +135,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.unregister();
 	}
 
-	public String login() {
+	public OAuth2AccessToken login() {
 		return cc.login();
 	}
 
