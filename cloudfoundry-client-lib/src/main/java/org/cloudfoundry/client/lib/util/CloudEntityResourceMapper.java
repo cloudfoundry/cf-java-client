@@ -152,7 +152,10 @@ public class CloudEntityResourceMapper {
 		List<String> serviceList = new ArrayList<String>();
 		for (Map<String, Object> binding : serviceBindings) {
 			Map<String, Object> service = getEntityAttribute(binding, "service_instance", Map.class);
-			serviceList.add(getNameOfResource(service));
+			String serviceName = getNameOfResource(service);
+			if (serviceName != null) {
+				serviceList.add(serviceName);
+			}
 		}
 		app.setServices(serviceList);
 		return app;
