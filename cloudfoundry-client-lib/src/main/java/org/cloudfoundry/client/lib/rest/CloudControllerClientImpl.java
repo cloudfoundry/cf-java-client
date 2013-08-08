@@ -142,7 +142,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	protected URL authorizationEndpoint;
 
-	protected String token;
+	protected OAuth2AccessToken token;
 
 	private final Log logger;
 	
@@ -160,7 +160,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
 		logger = LogFactory.getLog(getClass().getName());
 		CloudControllerClientImpl tempClient = new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials, 
-				                                                          authorizationEndpoint, null, httpProxyConfiguration);
+				                                                            authorizationEndpoint, null, httpProxyConfiguration);
 		if (tempClient.token == null) {
 			tempClient.login();
 		}
@@ -382,7 +382,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
 
-		private static final String LEGACY_TOKEN_PREFIX = "0408";
 		private ClientHttpRequestFactory delegate;
 		private Integer defaultSocketTimeout = 0;
 
@@ -394,10 +393,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
 			if (token != null) {
-				String header = token;
-				if (!header.startsWith(LEGACY_TOKEN_PREFIX) && !header.toLowerCase().startsWith("bearer")) {
-					header = "Bearer " + header; // UAA token without OAuth prefix
+				if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
+					token = oauthClient.refreshToken(token, cloudCredentials.getEmail(),	cloudCredentials.getPassword());
 				}
+				String header = token.getTokenType() + " " + token.getValue();
 				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
 			}
 			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
@@ -669,11 +668,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return spaces;
 	}
 
-	public String login() {
-		OAuth2AccessToken token = oauthClient.getToken(cloudCredentials.getEmail(),
+	public OAuth2AccessToken login() {
+		token = oauthClient.getToken(cloudCredentials.getEmail(),
 				cloudCredentials.getPassword());
-		this.token = token.getTokenType() + " " + token.getValue();
-		return this.token;
+		
+		return token;
 	}
 
 	public void logout() {
@@ -1646,9 +1645,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
 		String userJson = "{}";
 		if (token != null) {
-			int x = token.indexOf('.');
-			int y = token.indexOf('.', x + 1);
-			String encodedString = token.substring(x + 1, y);
+			String tokenString = token.getValue();
+			int x = tokenString.indexOf('.');
+			int y = tokenString.indexOf('.', x + 1);
+			String encodedString = tokenString.substring(x + 1, y);
 			try {
 				byte[] decodedBytes = new sun.misc.BASE64Decoder().decodeBuffer(encodedString);
 				userJson = new String(decodedBytes, 0, decodedBytes.length, "UTF-8");

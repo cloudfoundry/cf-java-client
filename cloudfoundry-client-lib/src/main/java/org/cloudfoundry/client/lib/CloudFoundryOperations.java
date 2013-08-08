@@ -34,6 +34,7 @@ import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 /**
  * The interface defining operations making up the Cloud Foundry Java client's API.
@@ -102,7 +103,7 @@ public interface CloudFoundryOperations {
 	 *
 	 * @return authentication token
 	 */
-	String login();
+	OAuth2AccessToken login();
 
 	/**
 	 * Logout closing the current session.

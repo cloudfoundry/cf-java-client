@@ -968,6 +968,18 @@ public class CloudFoundryClientTest {
 		connectedClient.login();
 	}
 
+	@Test
+	@Ignore("This test takes, by design, at least 10 minutes. Enable this only when dealing with authentication issues "
+			+ "or a change in the client side OAuth implementation")
+	public void dealingWithExpiredToken() throws Exception {
+		// The current token expiration time is 10 minutes. If we can still make authenticated calls past that,
+		// then the transparent token refresh scheme working as expected.
+		for (int i = 0; i < 30; i++) {
+			System.out.println("Elapsed time since the last login (at least) " + i/2 + " minutes");
+			getServiceOfferings();
+			Thread.sleep(30 * 1000);			
+		}
+	}
 	
 	@Test
 	public void getRestLog() throws IOException {
