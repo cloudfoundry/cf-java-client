@@ -15,15 +15,6 @@
  */
 package org.cloudfoundry.maven;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
-import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.CommonUtils;
-
 /**
  * Updates an application.
  *
@@ -34,50 +25,6 @@ import org.cloudfoundry.maven.common.CommonUtils;
  * @goal update
  * @execute phase="package"
  */
-public class Update extends AbstractApplicationAwareCloudFoundryMojo {
+public class Update extends AbstractUpdate {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		final File path = getPath();
-		final String appName = getAppname();
-		final java.util.List<String> uris = new ArrayList<String>(0);
-
-		Assert.configurationUrls(getUrl(), getUrls());
-
-		if (getUrl() != null) {
-			uris.add(getUrl());
-		} else if (!getUrls().isEmpty()) {
-			for (String uri : getUrls()) {
-				uris.add(uri);
-			}
-		}
-		validatePath(path);
-
-		CloudApplication aplication = getClient().getApplication(appName);
-
-		getLog().info(String.format("Updating application '%s' and Deploying '%s'.", appName, path.getAbsolutePath()));
-
-		uploadApplication(getClient(), path, appName);
-
-		if (CommonUtils.isCloudControllerV2(getClient())) {
-			getLog().debug("Updating domains for cc v2");
-			addDomains();
-
-			getLog().debug("Checking for plan");
-			getClient().updateApplicationPlan(appName, getPlan());
-		}
-
-		getLog().debug("Updating application memory");
-		getClient().updateApplicationMemory(appName, getMemory());
-
-		getLog().debug("Updating application instances");
-		getClient().updateApplicationInstances(appName, getInstances());
-
-		getLog().debug("Updating application uris");
-		getClient().updateApplicationUris(appName, uris);
-
-		if (AppState.STARTED.equals(aplication.getState())) {
-			getClient().restartApplication(appName);
-		}
-	}
 }

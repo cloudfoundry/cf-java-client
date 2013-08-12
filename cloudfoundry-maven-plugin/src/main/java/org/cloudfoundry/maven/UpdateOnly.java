@@ -16,19 +16,15 @@
 package org.cloudfoundry.maven;
 
 /**
- * Push and optionally start an application.
+ * Updates an application without forking the build to execute a 'package'.
  *
  * @author Gunnar Hillert
- * @author Stephan Oudmaijer
  * @author Ali Moghadam
- *
+ * @author Mike Youngstrom
  * @since 1.0.0
  *
- * @goal push
- *
- * @execute phase="package"
- *
+ * @goal update-only
  */
-public class Push extends AbstractPush {
+public class UpdateOnly extends AbstractUpdate {
 
 }
