@@ -32,7 +32,6 @@ import org.cloudfoundry.maven.common.CommonUtils;
  * @since 1.0.0
  *
  * @goal update
- * @execute phase="package"
  */
 public class Update extends AbstractApplicationAwareCloudFoundryMojo {
 

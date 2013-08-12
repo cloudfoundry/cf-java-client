@@ -47,8 +47,6 @@ import org.springframework.http.HttpStatus;
  *
  * @goal push
  *
- * @execute phase="package"
- *
  */
 public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 
