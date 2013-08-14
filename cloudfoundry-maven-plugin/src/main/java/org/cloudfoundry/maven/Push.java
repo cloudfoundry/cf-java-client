@@ -21,11 +21,14 @@ package org.cloudfoundry.maven;
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
  * @goal push
  *
+ * @execute phase="package"
+ * *
  */
 public class Push extends AbstractPush {
 

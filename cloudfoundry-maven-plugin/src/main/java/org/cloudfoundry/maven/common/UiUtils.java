@@ -26,14 +26,15 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
 /**
  * Contains utility methods for rendering data to a formatted console output.
  * E.g. it provides helper methods for rendering ASCII-based data tables.
  *
  * @author Gunnar Hillert
+ * @author Scott Frederick
  * @since 1.0.0
  *
  */
@@ -71,7 +72,6 @@ public final class UiUtils {
 		StringBuilder sb = new StringBuilder("\n");
 
 		sb.append(String.format("%s: %s\n", application.getName(), application.getState()));
-		sb.append(String.format("  platform: %s on %s\n", application.getStaging().getFramework(), application.getStaging().getRuntime()));
 		sb.append(String.format("  usage: %sM x %s instance\n", application.getMemory(), application.getInstances()));
 		sb.append(String.format("  urls: %s\n", CommonUtils.collectionToCommaDelimitedString(application.getUris())));
 		sb.append(String.format("  services: %s\n", CommonUtils.collectionToCommaDelimitedString(application.getServices())));
@@ -93,7 +93,7 @@ public final class UiUtils {
 	 *     <li>The comma-separated list of Services</li>
 	 * <ul>
 	 *
-	 * @param table List of {@CloudApplication}
+	 * @param applications List of {@CloudApplication}
 	 * @return The rendered table representation as String
 	 *
 	 */
@@ -166,74 +166,51 @@ public final class UiUtils {
 	 *	<li>Service Plans</li>
 	 *	<li>Service Description</li>
 	 * <ul>
-	 * @param client
-	 * @param serviceConfigurations
+	 *
+	 * @param serviceOfferings
 	 * @return The rendered table representation as String
 	 *
 	 */
-	public static String renderServiceConfigurationDataAsTable(final CloudFoundryClient client, List<ServiceConfiguration> serviceConfigurations) {
-		Comparator<ServiceConfiguration> labelComparator = new Comparator<ServiceConfiguration>() {
-			public int compare(ServiceConfiguration a, ServiceConfiguration b) {
-				if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
-					return a.getCloudServiceOffering().getLabel().compareTo(b.getCloudServiceOffering().getLabel());
-				} else {
-					return a.getVendor().compareTo(b.getVendor());
-				}
+	public static String renderServiceConfigurationDataAsTable(List<CloudServiceOffering> serviceOfferings) {
+		Comparator<CloudServiceOffering> labelComparator = new Comparator<CloudServiceOffering>() {
+			public int compare(CloudServiceOffering a, CloudServiceOffering b) {
+				return a.getLabel().compareTo(b.getLabel());
 			}
 		};
-		Collections.sort(serviceConfigurations, labelComparator);
+		Collections.sort(serviceOfferings, labelComparator);
 
 		Table table = new Table();
 		table.getHeaders().put(COLUMN_1, new TableHeader("Service"));
 		table.getHeaders().put(COLUMN_2, new TableHeader("Version"));
 
-		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
-			table.getHeaders().put(COLUMN_3, new TableHeader("Provider"));
-			table.getHeaders().put(COLUMN_4, new TableHeader("Plans"));
-			table.getHeaders().put(COLUMN_5, new TableHeader("Description"));
-			List<String> CloudServicePlanNames;
+		table.getHeaders().put(COLUMN_3, new TableHeader("Provider"));
+		table.getHeaders().put(COLUMN_4, new TableHeader("Plans"));
+		table.getHeaders().put(COLUMN_5, new TableHeader("Description"));
+		List<String> CloudServicePlanNames;
 
-			for (ServiceConfiguration serviceConfiguration : serviceConfigurations) {
-				TableRow tableRow = new TableRow();
+		for (CloudServiceOffering serviceOffering : serviceOfferings) {
+			TableRow tableRow = new TableRow();
 
-				table.getHeaders().get(COLUMN_1).updateWidth(serviceConfiguration.getCloudServiceOffering().getLabel().length());
-				tableRow.addValue(COLUMN_1, serviceConfiguration.getCloudServiceOffering().getLabel());
+			table.getHeaders().get(COLUMN_1).updateWidth(serviceOffering.getLabel().length());
+			tableRow.addValue(COLUMN_1, serviceOffering.getLabel());
 
-				table.getHeaders().get(COLUMN_2).updateWidth(serviceConfiguration.getCloudServiceOffering().getVersion().length());
-				tableRow.addValue(COLUMN_2, serviceConfiguration.getCloudServiceOffering().getVersion());
+			table.getHeaders().get(COLUMN_2).updateWidth(serviceOffering.getVersion().length());
+			tableRow.addValue(COLUMN_2, serviceOffering.getVersion());
 
-				table.getHeaders().get(COLUMN_3).updateWidth(serviceConfiguration.getCloudServiceOffering().getProvider().length());
-				tableRow.addValue(COLUMN_3, serviceConfiguration.getCloudServiceOffering().getProvider());
+			table.getHeaders().get(COLUMN_3).updateWidth(serviceOffering.getProvider().length());
+			tableRow.addValue(COLUMN_3, serviceOffering.getProvider());
 
-				CloudServicePlanNames = new ArrayList<String>();
-				for (CloudServicePlan servicePlan : serviceConfiguration.getCloudServiceOffering().getCloudServicePlans()) {
-					CloudServicePlanNames.add(servicePlan.getName());
-				}
-				table.getHeaders().get(COLUMN_4).updateWidth(CloudServicePlanNames.toString().length() - 1);
-				tableRow.addValue(COLUMN_4, CloudServicePlanNames.toString().substring(1, CloudServicePlanNames.toString().length() - 1));
-
-				table.getHeaders().get(COLUMN_5).updateWidth(serviceConfiguration.getCloudServiceOffering().getDescription().length());
-				tableRow.addValue(COLUMN_5, serviceConfiguration.getCloudServiceOffering().getDescription());
-
-				table.getRows().add(tableRow);
+			CloudServicePlanNames = new ArrayList<String>();
+			for (CloudServicePlan servicePlan : serviceOffering.getCloudServicePlans()) {
+				CloudServicePlanNames.add(servicePlan.getName());
 			}
-		} else {
-			table.getHeaders().put(COLUMN_3, new TableHeader("Description"));
+			table.getHeaders().get(COLUMN_4).updateWidth(CloudServicePlanNames.toString().length() - 1);
+			tableRow.addValue(COLUMN_4, CloudServicePlanNames.toString().substring(1, CloudServicePlanNames.toString().length() - 1));
 
-			for (ServiceConfiguration serviceConfiguration : serviceConfigurations) {
-				TableRow tableRow = new TableRow();
+			table.getHeaders().get(COLUMN_5).updateWidth(serviceOffering.getDescription().length());
+			tableRow.addValue(COLUMN_5, serviceOffering.getDescription());
 
-				table.getHeaders().get(COLUMN_1).updateWidth(serviceConfiguration.getVendor().length());
-				tableRow.addValue(COLUMN_1, serviceConfiguration.getVendor());
-
-				table.getHeaders().get(COLUMN_2).updateWidth(serviceConfiguration.getVersion().length());
-				tableRow.addValue(COLUMN_2, serviceConfiguration.getVersion());
-
-				table.getHeaders().get(COLUMN_3).updateWidth(serviceConfiguration.getDescription().length());
-				tableRow.addValue(COLUMN_3, serviceConfiguration.getDescription());
-
-				table.getRows().add(tableRow);
-			}
+			table.getRows().add(tableRow);
 		}
 
 		return renderTextTable(table);
@@ -258,12 +235,12 @@ public final class UiUtils {
 	 *	<li>Service Plan</li>
 	 * <ul>
 	 *
-	 * @param client
+	 *
 	 * @param services
 	 * @return The rendered table representation as String
 	 *
 	 */
-	public static String renderServiceDataAsTable(CloudFoundryClient client, List<CloudService> services) {
+	public static String renderServiceDataAsTable(List<CloudService> services) {
 		Comparator<CloudService> nameComparator = new Comparator<CloudService>() {
 			public int compare(CloudService a, CloudService b) {
 				return a.getName().compareTo(b.getName());
@@ -275,48 +252,33 @@ public final class UiUtils {
 		table.getHeaders().put(COLUMN_1, new TableHeader("Name"));
 		table.getHeaders().put(COLUMN_2, new TableHeader("Service"));
 
-		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
-			table.getHeaders().put(COLUMN_3, new TableHeader("Version"));
-			table.getHeaders().put(COLUMN_4, new TableHeader("Plan"));
+		table.getHeaders().put(COLUMN_3, new TableHeader("Version"));
+		table.getHeaders().put(COLUMN_4, new TableHeader("Plan"));
 
-			for (CloudService service : services) {
-				TableRow tableRow = new TableRow();
+		for (CloudService service : services) {
+			TableRow tableRow = new TableRow();
 
-				table.getHeaders().get(COLUMN_1).updateWidth(service.getName().length());
-				tableRow.addValue(COLUMN_1, service.getName());
+			table.getHeaders().get(COLUMN_1).updateWidth(service.getName().length());
+			tableRow.addValue(COLUMN_1, service.getName());
 
-				table.getHeaders().get(COLUMN_2).updateWidth(service.getLabel().length());
-				tableRow.addValue(COLUMN_2, service.getLabel());
+			table.getHeaders().get(COLUMN_2).updateWidth(service.getLabel().length());
+			tableRow.addValue(COLUMN_2, service.getLabel());
 
-				table.getHeaders().get(COLUMN_3).updateWidth(service.getVersion().length());
-				tableRow.addValue(COLUMN_3, service.getVersion());
+			table.getHeaders().get(COLUMN_3).updateWidth(service.getVersion().length());
+			tableRow.addValue(COLUMN_3, service.getVersion());
 
-				table.getHeaders().get(COLUMN_4).updateWidth(service.getPlan().length());
-				tableRow.addValue(COLUMN_4, service.getPlan());
+			table.getHeaders().get(COLUMN_4).updateWidth(service.getPlan().length());
+			tableRow.addValue(COLUMN_4, service.getPlan());
 
-				table.getRows().add(tableRow);
-			}
-		} else {
-			for (CloudService service : services) {
-				TableRow tableRow = new TableRow();
-
-				table.getHeaders().get(COLUMN_1).updateWidth(service.getName().length());
-				tableRow.addValue(COLUMN_1, service.getName());
-
-				table.getHeaders().get(COLUMN_2).updateWidth(service.getVendor().length());
-				tableRow.addValue(COLUMN_2, service.getVendor());
-
-				table.getRows().add(tableRow);
-			}
+			table.getRows().add(tableRow);
 		}
-
 		return renderTextTable(table);
 	}
 
 	/**
 	 * Renders a textual representation of provided parameter map.
 	 *
-	 * @param table Map of parameters (key, value)
+	 * @param parameters Map of parameters (key, value)
 	 * @return The rendered table representation as String
 	 *
 	 */
@@ -376,12 +338,12 @@ public final class UiUtils {
 	 * information is rendered if not only basic Cloud Foundry information is
 	 * rendered and returned as String.
 	 *
-	 * @param cloudinfo Contains the information about the Cloud Foundry environment
+	 * @param cloudInfo Contains the information about the Cloud Foundry environment
 	 * @param target The target Url from which the information was obtained
 	 *
 	 * @return Returns a formatted String for console output
 	 */
-	public static String renderCloudInfoFormattedAsString(CloudInfo cloudInfo, List<ServiceConfiguration> serviceConfigurations, String target) {
+	public static String renderCloudInfoFormattedAsString(CloudInfo cloudInfo, List<CloudServiceOffering> serviceOfferings, String target) {
 
 		StringBuilder sb = new StringBuilder("\n");
 
@@ -390,9 +352,7 @@ public final class UiUtils {
 		sb.append(String.format("For support visit %s\n\n", cloudInfo.getSupport()));
 
 		sb.append(String.format("Target:          %s  \n"   , target));
-		sb.append(String.format("Frameworks:      %s\n"     , CommonUtils.frameworksToCommaDelimitedString(cloudInfo.getFrameworks())));
-		sb.append(String.format("Runtimes:        %s\n"     , CommonUtils.runtimesToCommaDelimitedString(cloudInfo.getRuntimes())));
-		sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceConfigurationsToCommaDelimitedString(serviceConfigurations)));
+		sb.append(String.format("System Services: %s\n\n"   , CommonUtils.serviceOfferingsToCommaDelimitedString(serviceOfferings)));
 
 		if (cloudInfo.getUser() != null) {
 			sb.append(String.format("User:        %s\n", cloudInfo.getUser()));

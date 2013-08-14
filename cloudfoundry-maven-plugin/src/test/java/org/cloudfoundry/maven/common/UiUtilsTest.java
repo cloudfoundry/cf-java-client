@@ -64,7 +64,7 @@ public class UiUtilsTest {
 		Assert.assertNotNull(expectedTableAsString);
 
 		final CloudApplication app1 = new CloudApplication("Name", "stagingStack",
-						 "StaginModel", 512, 1, uris, services, AppState.STARTED);
+						 "StagingModel", 512, 1, uris, services, AppState.STARTED);
 
 		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
 		applications.add(app1);

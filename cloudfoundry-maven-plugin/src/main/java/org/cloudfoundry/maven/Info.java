@@ -26,10 +26,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
 import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 
@@ -39,6 +38,7 @@ import org.cloudfoundry.maven.common.UiUtils;
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
@@ -67,29 +67,23 @@ public class Info extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		final CloudInfo cloudInfo;
-		final List<ServiceConfiguration> serviceConfigurations;
 
-		if (CommonUtils.isCloudControllerV2(client)) {
-			CloudFoundryClient newClient = null;
+		CloudFoundryClient newClient;
 
-			if (getUsername() != null && getPassword() != null) {
-				newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-			} else {
-				try {
-					String token = retrieveToken();
-					newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
-				} catch (IOException e) {
-					newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-				}
-			}
-			cloudInfo = newClient.getCloudInfo();
-			serviceConfigurations = newClient.getServiceConfigurations();
+		if (getUsername() != null && getPassword() != null) {
+			newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 		} else {
-			cloudInfo = client.getCloudInfo();
-			serviceConfigurations = client.getServiceConfigurations();
+			try {
+				String token = retrieveToken();
+				newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
+			} catch (IOException e) {
+				newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
+			}
 		}
 
-		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, serviceConfigurations, getTarget().toString()));
+		final CloudInfo cloudInfo = newClient.getCloudInfo();
+		final List<CloudServiceOffering> serviceOfferings = newClient.getServiceOfferings();
+
+		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, serviceOfferings, getTarget().toString()));
 	}
 }

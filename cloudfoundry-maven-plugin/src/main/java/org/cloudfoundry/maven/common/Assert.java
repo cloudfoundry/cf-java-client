@@ -25,6 +25,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
  * Various helper methods that help with the validation of parameters.
  *
  * @author Gunnar Hillert
+ * @author Scott Frederick
  * @since 1.0.0
  *
  */
@@ -100,51 +101,11 @@ public final class Assert {
 
 	/**
 	 *
-	 * @param CloudService Object
-	 * @param objectName
-	 * @param property
+	 * @param cloudService Object
 	 * @param additionalDescription
 	 */
-	public static void configurationServiceNotNullV1(CloudService cloudService,
-			String additionalDescription) throws MojoExecutionException {
-
-		if (cloudService.getName() == null || cloudService.getVendor() == null) {
-
-			final StringBuilder message = new StringBuilder("\n\n");
-
-			message.append(UiUtils.HORIZONTAL_LINE);
-			message.append(String.format("\nRequired arguments for '%s' are missing.\n", cloudService.getName()));
-			message.append("========================================================================\n\n");
-			message.append("Did you configure the parameter? You ");
-			message.append("can provide the parameter in the pom.xml under the plugin's configuration element:\n\n");
-			message.append("<configuration>\n");
-			message.append("  <services>\n");
-			message.append("    <service>\n");
-			message.append("      <name>provide value</name>\n");
-			message.append("      <vendor>provide value</vendor>\n");
-			message.append("    <service>\n");
-			message.append("  <services>\n");
-			message.append("</configuration>\n\n");
-			message.append(UiUtils.HORIZONTAL_LINE);
-
-			if (additionalDescription != null) {
-				message.append(additionalDescription + "\n");
-				message.append(UiUtils.HORIZONTAL_LINE);
-			}
-
-			throw new MojoExecutionException(message.toString());
-		}
-	}
-
-	/**
-	 *
-	 * @param CloudService Object
-	 * @param objectName
-	 * @param property
-	 * @param additionalDescription
-	 */
-	public static void configurationServiceNotNullV2(CloudService cloudService,
-			String additionalDescription) throws MojoExecutionException {
+	public static void configurationServiceNotNull(CloudService cloudService,
+												   String additionalDescription) throws MojoExecutionException {
 
 		if (cloudService.getName() == null || cloudService.getLabel() == null) {
 

@@ -24,6 +24,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
  * Bind Services
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal bind-services
@@ -41,7 +42,7 @@ public class BindServices extends AbstractApplicationAwareCloudFoundryMojo {
 			}
 
 			if (getClient().getApplication(getAppname()).getServices().contains(service.getName())) {
-				getLog().info(String.format("Binding Service '%s': Already Binded", service.getName()));
+				getLog().info(String.format("Binding Service '%s': Already bound", service.getName()));
 			} else {
 				getClient().bindService(getAppname(), service.getName());
 				getLog().info(String.format("Binding Service '%s': OK", service.getName()));

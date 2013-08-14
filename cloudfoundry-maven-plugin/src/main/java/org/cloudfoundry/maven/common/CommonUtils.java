@@ -22,10 +22,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.cloudfoundry.client.lib.CloudFoundryClient;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.springframework.util.StringUtils;
 
 /**
  * Contains common non-ui related helper methods for the Cloud Foundry Maven
@@ -33,6 +32,7 @@ import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Scott Frederick
  *
  * @since 1.0.0
  */
@@ -85,22 +85,7 @@ public final class CommonUtils {
 	 *         String for a Null or empty list.
 	 */
 	public static String collectionToCommaDelimitedString(Collection<String> list) {
-		if (list == null || list.isEmpty()) {
-			return "";
-		}
-
-		StringBuilder sb = new StringBuilder();
-		final Iterator<String> it = list.iterator();
-
-		while (it.hasNext()) {
-
-			sb.append(it.next());
-
-			if (it.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
+		return StringUtils.collectionToCommaDelimitedString(list);
 	}
 
 	/**
@@ -164,100 +149,28 @@ public final class CommonUtils {
 	}
 
 	/**
-	 * Formats the supported frameworks as a comma separated list.
-	 *
-	 * @param list List of supported frameworks
-	 * @return a String but never null.
-	 */
-	public static String frameworksToCommaDelimitedString(final Collection<CloudInfo.Framework> list) {
-
-		if (list == null || list.isEmpty()) {
-			return "";
-		}
-
-		StringBuilder sb = new StringBuilder();
-		final Iterator<CloudInfo.Framework> it = list.iterator();
-
-		while (it.hasNext()) {
-
-			sb.append(it.next().getName());
-
-			if (it.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * Formats the supported runtimes as a command separated list.
-	 *
-	 * @param list List of supported runtimes
-	 * @return a String but never null.
-	 */
-	public static String runtimesToCommaDelimitedString(final Collection<CloudInfo.Runtime> list) {
-
-		if (list == null || list.isEmpty()) {
-			return "";
-		}
-
-		StringBuilder sb = new StringBuilder();
-		final Iterator<CloudInfo.Runtime> it = list.iterator();
-
-		while (it.hasNext()) {
-
-			sb.append(it.next().getName());
-
-			if (it.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
-	}
-
-	/**
 	 * Formats the supported frameworks as a command separated list.
 	 *
-	 * @param list List of supported frameworks
-	 * @return a String but never null.
+	 * @param offerings List of services
+	 * @return a String but never null
 	 */
-	public static String serviceConfigurationsToCommaDelimitedString(final Collection<ServiceConfiguration> list) {
+	public static String serviceOfferingsToCommaDelimitedString(final Collection<CloudServiceOffering> offerings) {
 
-		if (list == null || list.isEmpty()) {
+		if (offerings == null || offerings.isEmpty()) {
 			return "";
 		}
 
 		StringBuilder sb = new StringBuilder();
-		final Iterator<ServiceConfiguration> it = list.iterator();
+		final Iterator<CloudServiceOffering> it = offerings.iterator();
 
 		while (it.hasNext()) {
-			ServiceConfiguration serviceConfig = it.next();
-			if (serviceConfig.getCloudServiceOffering() != null) {
-				sb.append(serviceConfig.getCloudServiceOffering().getLabel());
-			} else {
-				sb.append(serviceConfig.getVendor());
-			}
+			CloudServiceOffering offering = it.next();
+			sb.append(offering.getLabel());
 
 			if (it.hasNext()) {
 				sb.append(", ");
 			}
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * If true, the client is using a version 2 of cloud controller (ccng)
-	 * If false, then client is using legacy cloud controller
-	 *
-	 * @param client
-	 *
-	 * @return boolean
-	 */
-	public static boolean isCloudControllerV2(CloudFoundryClient client) {
-		if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
-			return true;
-		}
-
-		return false;
 	}
 }

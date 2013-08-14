@@ -40,6 +40,11 @@ Maven-based applications to Cloud Foundry instances.
 			<name>Ali Moghadam</name>
 			<email>amoghadam at rbcon.com</email>
 		</developer>
+		<developer>
+			<id>sfrederick</id>
+			<name>Scott Frederick</name>
+			<email>sfrederick at gopivotal.com</email>
+		</developer>
 	</developers>
 
 	<scm>
@@ -141,7 +146,7 @@ Maven-based applications to Cloud Foundry instances.
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>cloudfoundry-client-lib</artifactId>
-			<version>0.8.5</version>
+			<version>0.8.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>

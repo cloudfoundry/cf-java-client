@@ -28,6 +28,7 @@ import org.cloudfoundry.maven.common.SystemProperties;
 /**
  *
  * @author Gunnar Hillert
+ * @author Scott Frederick
  * @since 1.0.0
  *
  */
@@ -59,7 +60,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
 		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
 		assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
 
@@ -81,7 +81,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
 		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
 		assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
 
@@ -124,7 +123,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
 		assertEquals("myapp.<undefined target>", mojo.getUrl());
 
@@ -146,7 +144,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
 		doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-		doReturn("standalone").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
 
 		assertNull(mojo.getUrl());
 
@@ -185,23 +182,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn("false").when(mojo).getCommandlineProperty(SystemProperties.NO_START);
 
 		assertEquals(Boolean.FALSE, mojo.isNoStart());
-
-	}
-
-	public void testGetFramework() throws Exception {
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "framework", "custom");
-		doReturn("custom").when(mojo).getCommandlineProperty(SystemProperties.FRAMEWORK);
-
-		assertEquals("custom", mojo.getFramework());
 
 	}
 

@@ -20,14 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.cloudfoundry.client.lib.CloudFoundryClient;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -38,6 +35,7 @@ import org.cloudfoundry.maven.common.UiUtils;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
@@ -65,29 +63,23 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	 *
 	 * @return
 	 */
-	private Map<String, String> getParameterMap(int version) {
+	private Map<String, String> getParameterMap() {
 		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
 		parameterMap.put("Appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
 		parameterMap.put("Command", getCommand() != null ? getCommand() : NOT_AVAILABLE);
-		parameterMap.put("Framework", getFramework() != null ? getFramework() : NOT_AVAILABLE);
 		parameterMap.put("Instances", getInstances() != null ? String.valueOf(getInstances()) : NOT_AVAILABLE);
 		parameterMap.put("Memory (in MB)", getMemory() != null ? String.valueOf(getMemory()) : NOT_AVAILABLE);
 
-		if (version == 2) {
-			parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
-		}
+		parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
 
 		parameterMap.put("Env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
 		parameterMap.put("No-start", isNoStart() != null ? String.valueOf(isNoStart()) : NOT_AVAILABLE);
 		parameterMap.put("Password", getPassword() != null ? CommonUtils.maskPassword(getPassword()) : NOT_AVAILABLE);
-		parameterMap.put("Runtime", getRuntime() != null ? getRuntime() : NOT_AVAILABLE);
 		parameterMap.put("Server", getServer());
 		parameterMap.put("Services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
 
-		if (version == 2) {
-			parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
-		}
+		parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
 
 		parameterMap.put("Target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);
 		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
@@ -100,21 +92,13 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
-		int version = 1;
-
-		try {
-			final CloudFoundryClient client = new CloudFoundryClient(getTarget().toURL());
-			if (client.getCloudInfo().getCloudControllerMajorVersion() == CloudInfo.CC_MAJOR_VERSION.V2) {
-				version = 2;
-			}
-		} catch (MalformedURLException e) {}
 
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append("\n" + UiUtils.HORIZONTAL_LINE);
-		sb.append("\nCloud Foundry Maven Plugin detected Parameters and/or default values:\n\n");
+		sb.append("\nCloud Foundry Maven Plugin detected parameters and/or default values:\n\n");
 
-		sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap(version)));
+		sb.append(UiUtils.renderParameterInfoDataAsTable(getParameterMap()));
 
 		Reader reader = null;
 		BufferedReader in = null;
