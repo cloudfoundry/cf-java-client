@@ -1,3 +1,3 @@
-  Application  #  Health   Memory  URLS                                        Services
-  -----------  -  -------  ------  ------------------------------------------  --------
-  Name         1  STARTED  512     cf-rocks.cloudfoundry.com, MyMongoInstance  mysql, MyMongoInstance
+  Application  #  Health   Memory  URLS                                       Services
+  -----------  -  -------  ------  -----------------------------------------  --------
+  Name         1  STARTED  512     cf-rocks.cloudfoundry.com,MyMongoInstance  mysql,MyMongoInstance

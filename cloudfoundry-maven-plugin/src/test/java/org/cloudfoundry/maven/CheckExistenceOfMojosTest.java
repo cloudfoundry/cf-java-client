@@ -145,17 +145,6 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
-	public void testExistenceOfUpdateMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Update mojo = (Update) lookupMojo ( "update", testPom );
-
-		assertNotNull( mojo );
-	}
-
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfRegisterMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);

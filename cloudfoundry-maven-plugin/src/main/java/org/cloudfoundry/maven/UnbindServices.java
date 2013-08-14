@@ -24,6 +24,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
  * Unbind Services
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal unbind-services
@@ -44,7 +45,7 @@ public class UnbindServices extends AbstractApplicationAwareCloudFoundryMojo {
 				getClient().unbindService(getAppname(), service.getName());
 				getLog().info(String.format("Unbinding Service '%s': OK", service.getName()));
 			} else {
-				getLog().info(String.format("Unbinding Service '%s': Already Unbinded", service.getName()));
+				getLog().info(String.format("Unbinding Service '%s': Not bound", service.getName()));
 			}
 		}
 	}

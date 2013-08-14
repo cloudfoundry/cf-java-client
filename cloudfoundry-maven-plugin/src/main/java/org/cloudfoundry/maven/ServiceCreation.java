@@ -25,10 +25,9 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
 import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
 
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.CommonUtils;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -60,25 +59,12 @@ public class ServiceCreation {
  */
 	public List<String> createServices() throws MojoExecutionException {
 		for (CloudService service: services) {
-			if (CommonUtils.isCloudControllerV2(client)) {
-				Assert.configurationServiceNotNullV2(service, null);
+			Assert.configurationServiceNotNull(service, null);
 
-				if (service.getProvider() == null) {
-					service.setProvider("core");
-				}
-				setServiceVersion(service);
-
-				if (service.getPlan() == null && (service.getTier() == null || service.getTier().equals("free"))) {
-					service.setPlan("D100");
-				}
-			} else {
-				Assert.configurationServiceNotNullV1(service, null);
-
-				if (service.getTier() == null) {
-					service.setTier("free");
-				}
-				setServiceVersion(service);
+			if (service.getProvider() == null) {
+				service.setProvider("core");
 			}
+			setServiceVersion(service);
 
 			try {
 				client.createService(service);
@@ -99,17 +85,9 @@ public class ServiceCreation {
 		if (service.getVersion() == null) {
 			List<String> tmpServices = new ArrayList<String>();
 
-			if (CommonUtils.isCloudControllerV2(client)) {
-				for (ServiceConfiguration serviceConfiguration : client.getServiceConfigurations()) {
-					if (serviceConfiguration.getCloudServiceOffering().getLabel().equals(service.getLabel())) {
-						tmpServices.add(serviceConfiguration.getCloudServiceOffering().getVersion());
-					}
-				}
-			} else {
-				for (ServiceConfiguration serviceConfiguration : client.getServiceConfigurations()) {
-					if (serviceConfiguration.getVendor().equals(service.getVendor())) {
-						tmpServices.add(serviceConfiguration.getVersion());
-					}
+			for (CloudServiceOffering serviceOffering : client.getServiceOfferings()) {
+				if (serviceOffering.getLabel().equals(service.getLabel())) {
+					tmpServices.add(serviceOffering.getVersion());
 				}
 			}
 

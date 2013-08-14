@@ -16,20 +16,18 @@
 package org.cloudfoundry.maven.common;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 
 import org.junit.Test;
 
 /**
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Scott Frederick
  *
  */
 public class CommonUtilsTest {
@@ -45,32 +43,13 @@ public class CommonUtilsTest {
 	}
 
 	@Test
-	public void testFrameworksToCommaDelimitedString() {
+	public void testServiceConfigurationsToCommaDelimitedString() {
+		List<CloudServiceOffering> list = new ArrayList<CloudServiceOffering>();
+		list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
 
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("name", "custom");
-		data.put("runtimes", new ArrayList<Runtime>());
+		Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql");
 
-		List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-		frameworks.add(new CloudInfo.Framework(data));
-
-		Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom");
-
-		frameworks.add(new CloudInfo.Framework(data));
-		Assert.assertEquals(CommonUtils.frameworksToCommaDelimitedString(frameworks), "custom, custom");
-	}
-
-	@Test
-	public void testSserviceConfigurationsToCommaDelimitedString() {
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("vendor", "mysql");
-
-		List<ServiceConfiguration> list = new ArrayList<ServiceConfiguration>();
-		list.add(new ServiceConfiguration(data));
-
-		Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql");
-
-		list.add(new ServiceConfiguration(data));
-		Assert.assertEquals(CommonUtils.serviceConfigurationsToCommaDelimitedString(list), "mysql, mysql");
+		list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
+		Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql, mysql");
 	}
 }

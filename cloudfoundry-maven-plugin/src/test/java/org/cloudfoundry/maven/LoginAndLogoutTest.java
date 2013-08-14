@@ -35,6 +35,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,7 +77,7 @@ public class LoginAndLogoutTest {
 	//Verify target has been created in token file
 	@Test
 	public void targetCreatedTest() throws MojoExecutionException, IOException, URISyntaxException {
-		when(client.login()).thenReturn("bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM");
+		when(client.login()).thenReturn(new DefaultOAuth2AccessToken("bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM"));
 
 		login.setClient(client);
 		login.doExecute();
@@ -84,7 +85,7 @@ public class LoginAndLogoutTest {
 		File newFile = new File(tempFolder.getRoot(), ".mvn-cf.xml");
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = null;
+		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(newFile);
@@ -114,7 +115,7 @@ public class LoginAndLogoutTest {
 
 		File file  = new File(tempFolder.getRoot(), ".mvn-cf.xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = null;
+		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(file);
@@ -132,12 +133,11 @@ class TestableLogin extends Login {
 
 	@Override
 	protected File createFileWriter() {
-		File newFile = null;
 		try {
-			newFile = LoginAndLogoutTest.tempFolder.newFile(".mvn-cf.xml");
-		} catch (IOException e) {}
-
-		return newFile;
+			return LoginAndLogoutTest.tempFolder.newFile(".mvn-cf.xml");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void setClient(CloudFoundryClient client) {
@@ -151,12 +151,11 @@ class TestableLogin extends Login {
 
 	@Override
 	public URI getTarget() {
-		URI target = null;
 		try {
-			target = new URI("https://api.sample.com");
-		} catch (URISyntaxException e) {}
-
-		return target;
+			return new URI("https://api.sample.com");
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
 
@@ -165,19 +164,16 @@ class TestableLogout extends Logout {
 
 	@Override
 	protected File getFile() {
-		File file  = new File(LoginAndLogoutTest.tempFolder.getRoot(), ".mvn-cf.xml");
-
-		return file;
+		return new File(LoginAndLogoutTest.tempFolder.getRoot(), ".mvn-cf.xml");
 	}
 
 	@Override
 	public URI getTarget() {
-		URI target = null;
 		try {
-			target = new URI("https://api.sample.com");
-		} catch (URISyntaxException e) {}
-
-		return target;
+			return new URI("https://api.sample.com");
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
 
@@ -186,12 +182,11 @@ class TestableAbstractCFMojo extends AbstractCloudFoundryMojo {
 
 	@Override
 	public URI getTarget() {
-		URI target = null;
 		try {
-			target = new URI("https://api.sample.com");
-		} catch (URISyntaxException e) {}
-
-		return target;
+			return new URI("https://api.sample.com");
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

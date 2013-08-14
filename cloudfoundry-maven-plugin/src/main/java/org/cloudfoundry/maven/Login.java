@@ -42,6 +42,8 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.SystemProperties;
 
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,6 +57,7 @@ import org.xml.sax.SAXException;
  * instead of username/password
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal login
@@ -81,9 +84,9 @@ public class Login extends AbstractCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		File file = createFileWriter();
-		Element targets = null;
+		Element targets;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = null;
+		DocumentBuilder builder;
 
 		try {
 			builder = factory.newDocumentBuilder();
@@ -106,7 +109,8 @@ public class Login extends AbstractCloudFoundryMojo {
 
 						exist = true;
 						Element token = doc.createElement("token");
-						CDATASection tokenData = doc.createCDATASection(client.login());
+						final OAuth2AccessToken authToken = client.login();
+						CDATASection tokenData = doc.createCDATASection(authToken.getValue());
 						token.appendChild(tokenData);
 
 						childNode.replaceChild(token, childNode.getLastChild());
@@ -122,7 +126,8 @@ public class Login extends AbstractCloudFoundryMojo {
 					url.setTextContent(getTarget().toString());
 
 					Element token = doc.createElement("token");
-					CDATASection tokenData = doc.createCDATASection(client.login());
+					final OAuth2AccessToken authToken = client.login();
+					CDATASection tokenData = doc.createCDATASection(authToken.getValue());
 					token.appendChild(tokenData);
 
 					target.appendChild(url);
@@ -145,7 +150,8 @@ public class Login extends AbstractCloudFoundryMojo {
 			url.setTextContent(getTarget().toString());
 
 			Element token = doc.createElement("token");
-			CDATASection tokenData = doc.createCDATASection(client.login());
+			final OAuth2AccessToken authToken = client.login();
+			CDATASection tokenData = doc.createCDATASection(authToken.getValue());
 			token.appendChild(tokenData);
 
 			target.appendChild(url);
@@ -172,8 +178,6 @@ public class Login extends AbstractCloudFoundryMojo {
 	}
 
 	protected File createFileWriter() {
-		File file = new File(System.getProperty("user.home") + "/.mvn-cf.xml");
-
-		return file;
+		return new File(System.getProperty("user.home") + "/.mvn-cf.xml");
 	}
 }
