@@ -33,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -56,6 +57,8 @@ public interface CloudControllerClient {
 	CloudInfo getInfo();
 
 	List<CloudSpace> getSpaces();
+
+	List<CloudOrganization> getOrganizations();
 
 	OAuth2AccessToken login();
 
@@ -108,7 +111,7 @@ public interface CloudControllerClient {
 
 	void stopApplication(String appName);
 
-	void restartApplication(String appName);
+	StartingInfo restartApplication(String appName);
 
 	void deleteApplication(String appName);
 

@@ -27,6 +27,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -68,6 +69,12 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudSpace> getSpaces();
 
+	/**
+	 * Get list of CloudOrganizations for the current cloud.
+	 *
+	 * @return List of CloudOrganizations objects containing the organization info
+	 */
+	List<CloudOrganization> getOrganizations();
 
 	/**
 	 * Register new user account with the provided credentials.
@@ -233,7 +240,7 @@ public interface CloudFoundryOperations {
 	 *
 	 * @param appName name of application
 	 */
-	void restartApplication(String appName);
+	StartingInfo restartApplication(String appName);
 
 	/**
 	 * Delete application.

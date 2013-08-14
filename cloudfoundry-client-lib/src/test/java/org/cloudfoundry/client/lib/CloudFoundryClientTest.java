@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -178,8 +179,15 @@ public class CloudFoundryClientTest {
 		List<CloudSpace> spaces = connectedClient.getSpaces();
 		assertNotNull(spaces);
 		assertTrue(spaces.size() > 0);
-	}	
+	}
 	
+	@Test
+	public void orgsAvailable() throws Exception {
+		List<CloudOrganization> orgs = connectedClient.getOrganizations();
+		assertNotNull(orgs);
+		assertTrue(orgs.size() > 0);
+	}
+
 	//
 	// Basic Application tests
 	//

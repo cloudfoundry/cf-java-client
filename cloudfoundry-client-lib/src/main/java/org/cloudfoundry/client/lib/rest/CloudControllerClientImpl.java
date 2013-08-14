@@ -668,6 +668,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return spaces;
 	}
 
+	public List<CloudOrganization> getOrganizations() {
+		String urlPath = "/v2/organizations?inline-relations-depth=0";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudOrganization> orgs = new ArrayList<CloudOrganization>();
+		for (Map<String, Object> resource : resourceList) {
+			orgs.add(resourceMapper.mapResource(resource, CloudOrganization.class));
+		}
+		return orgs;
+	}
+
 	public OAuth2AccessToken login() {
 		token = oauthClient.getToken(cloudCredentials.getEmail(),
 				cloudCredentials.getPassword());
@@ -1172,9 +1182,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-	public void restartApplication(String appName) {
+	public StartingInfo restartApplication(String appName) {
 		stopApplication(appName);
-		startApplication(appName);
+		return startApplication(appName);
 	}
 
 	public void deleteApplication(String appName) {
