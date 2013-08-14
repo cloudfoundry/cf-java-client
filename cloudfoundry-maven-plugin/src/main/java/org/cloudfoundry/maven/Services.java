@@ -20,7 +20,7 @@ package org.cloudfoundry.maven;
 import java.util.List;
 
 import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.ServiceConfiguration;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 
 import org.cloudfoundry.maven.common.UiUtils;
 
@@ -28,6 +28,7 @@ import org.cloudfoundry.maven.common.UiUtils;
  * Creates a service
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal services
@@ -38,12 +39,12 @@ public class Services extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-		final List<ServiceConfiguration> serviceConfigurations = getClient().getServiceConfigurations();
+		final List<CloudServiceOffering> serviceConfigurations = getClient().getServiceOfferings();
 		List<CloudService> services = getClient().getServices();
 
 		getLog().info("System Services");
-		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(getClient(), serviceConfigurations));
+		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(serviceConfigurations));
 		getLog().info("Provisioned Services");
-		getLog().info("\n" + UiUtils.renderServiceDataAsTable(getClient(), services));
+		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services));
 	}
 }

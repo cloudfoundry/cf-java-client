@@ -35,11 +35,11 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.web.client.ResourceAccessException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,6 +53,7 @@ import org.xml.sax.SAXException;
  *
  * @author Gunnar Hillert
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  */
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
@@ -148,63 +149,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	}
 
 	/**
-	 * Cloud Controller Version 1 Client (Token)
-	 * @param token
-	 * @param target
-	 * @return client
-	 * @throws MojoExecutionException
-	 */
-	protected CloudFoundryClient createCloudFoundryClient(String token, URI target)
-			throws MojoExecutionException {
-
-		getLog().debug("Cloud Controller Version 1");
-		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using Token", target.toString()));
-
-		final CloudFoundryClient client;
-
-		try {
-			client = new CloudFoundryClient(new CloudCredentials(token), target.toURL());
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
-		}
-
-		return client;
-	}
-
-	/**
-	 * Cloud Controller Version 1 Client
-	 * @param username
-	 * @param password
-	 * @param target
-	 * @return client
-	 * @throws MojoExecutionException
-	 */
-	protected CloudFoundryClient createCloudFoundryClient(String username, String password, URI target)
-			throws MojoExecutionException {
-
-		Assert.configurationNotNull(username, "username", SystemProperties.USERNAME);
-		Assert.configurationNotNull(password, "password", SystemProperties.PASSWORD);
-
-		getLog().debug("Cloud Controller Version 1");
-		getLog().debug(String.format(
-				"Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
-				target, username));
-
-		final CloudFoundryClient client;
-
-		try {
-			client = new CloudFoundryClient(new CloudCredentials(username, password), target.toURL());
-			connectToCloudFoundry(client);
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
-		}
-
-		return client;
-	}
-
-	/**
 	 * Cloud Controller Version 2 Client (Token)
 	 * @param token
 	 * @param target
@@ -219,25 +163,16 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Assert.configurationNotNull(org, "org", SystemProperties.ORG);
 		Assert.configurationNotNull(space, "space", SystemProperties.SPACE);
 
-		getLog().debug("Cloud Controller Version 2");
 		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using Token", target.toString()));
 
-		final CloudFoundryClient client;
-
 		try {
-			CloudFoundryClient authClient = new CloudFoundryClient(new CloudCredentials(token), target.toURL());
-
-			for (CloudSpace userSpace : authClient.getSpaces()) {
-				if (userSpace.getName().equals(space) && userSpace.getOrganization().getName().equals(org)) {
-					client = new CloudFoundryClient(new CloudCredentials(token), target.toURL(), userSpace);
-					return client;
-				}
-			}
+			final DefaultOAuth2AccessToken authToken = new DefaultOAuth2AccessToken(token);
+			final CloudCredentials credentials = new CloudCredentials(authToken);
+			return new CloudFoundryClient(credentials, target.toURL(), org, space);
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
 		}
-		return null;
 	}
 
 	/**
@@ -258,7 +193,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Assert.configurationNotNull(org, "org", SystemProperties.ORG);
 		Assert.configurationNotNull(space, "space", SystemProperties.SPACE);
 
-		getLog().debug("Cloud Controller Version 2");
 		getLog().debug(String.format(
 				"Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
 				target, username));
@@ -322,30 +256,16 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 		try {
-			CloudFoundryClient simpleClient = new CloudFoundryClient(getTarget().toURL());
-			String token = null;
+			String token;
 
-			if (CommonUtils.isCloudControllerV2(simpleClient)) {
-				if (getUsername() != null && getPassword() != null) {
-					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-				} else {
-					try {
-						token = retrieveToken();
-						client = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
-					} catch (IOException e1) {
-						client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-					}
-				}
+			if (getUsername() != null && getPassword() != null) {
+				client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 			} else {
-				if (getUsername() != null && getPassword() != null) {
-					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget());
-				} else {
-					try {
-						token = retrieveToken();
-						client = createCloudFoundryClient(token, getTarget());
-					} catch (IOException e) {
-						client = createCloudFoundryClient(getUsername(), getPassword(), getTarget());
-					}
+				try {
+					token = retrieveToken();
+					client = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
+				} catch (IOException e1) {
+					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 				}
 			}
 
@@ -353,9 +273,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 		} catch (RuntimeException e) {
 			throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", getTarget()), e);
 		}
 	}
 
@@ -378,7 +295,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	}
 
 	/**
-	 * See {@link http://maven.apache.org/plugin-developers/common-bugs.html#Using_System_Properties}
+	 * See http://maven.apache.org/plugin-developers/common-bugs.html#Using_System_Properties
 	 *
 	 * @param property Supported system properties
 	 * @return Null if the property is not found, otherwise returns the property

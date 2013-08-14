@@ -16,19 +16,14 @@
 package org.cloudfoundry.maven;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import junit.framework.Assert;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 
 /**
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
@@ -47,8 +42,8 @@ public class PushTest extends AbstractMojoTestCase {
 	 */
 	public void testValidateMemoryChoice() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-		Push mojo = (Push) lookupMojo ( "push", testPom );
+		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
+		Push mojo = (Push) lookupMojo("push", testPom);
 
 		final int[] availableMemoryChoices = new int[]{64, 128, 256, 512};
 		final Integer desiredMemory = 128;
@@ -64,8 +59,8 @@ public class PushTest extends AbstractMojoTestCase {
 	 */
 	public void testValidateMemoryChoice2() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-		Push mojo = (Push) lookupMojo ( "push", testPom );
+		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
+		Push mojo = (Push) lookupMojo("push", testPom);
 
 		final int[] availableMemoryChoices = new int[]{64, 128, 256};
 		final Integer desiredMemory = 512;
@@ -73,61 +68,10 @@ public class PushTest extends AbstractMojoTestCase {
 		try {
 			mojo.validateMemoryChoice(availableMemoryChoices, desiredMemory);
 		} catch (IllegalStateException e) {
-			assertEquals("Memory must be one of the following values: 64, 128, 256", e.getMessage());
+			assertEquals("Memory must be one of the following values: 64,128,256", e.getMessage());
 			return;
 		}
 
 		fail();
-
-	}
-
-
-	/**
-	 * Test for a custom framework choice if it is validated correctly.
-	 */
-	public void testValidateFrameworkChoiceHappyPath() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-		Push mojo = (Push) lookupMojo ( "push", testPom );
-
-		List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("name", "custom");
-		data.put("runtimes", new ArrayList<Object>());
-
-		frameworks.add(new CloudInfo.Framework(data));
-		final String desiredFramework = "custom";
-
-		try {
-			Assert.assertTrue(mojo.validateFrameworkChoice(frameworks, desiredFramework));
-		} catch (IllegalStateException e) {
-			fail();
-		}
-	}
-
-	/**
-	 * Test for a custom framework choice with invalid choice.
-	 */
-	public void testValidateFrameworkChoiceNonExisting() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-		Push mojo = (Push) lookupMojo ( "push", testPom );
-
-		List<CloudInfo.Framework> frameworks = new ArrayList<CloudInfo.Framework>();
-
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("name", "custom");
-		data.put("runtimes", new ArrayList<Object>());
-		frameworks.add(new CloudInfo.Framework(data));
-
-		final String desiredFramework = "spring";
-
-		try {
-			mojo.validateFrameworkChoice(frameworks, desiredFramework);
-			fail();
-		} catch (IllegalStateException e) {
-			Assert.assertEquals(e.getMessage(), "Framework must be one of the following values: custom");
-		}
 	}
 }

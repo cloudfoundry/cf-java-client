@@ -19,6 +19,7 @@ package org.cloudfoundry.maven.common;
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
@@ -27,20 +28,17 @@ public enum SystemProperties {
 
 	APP_NAME("cf.appname", "appname"),
 	COMMAND("cf.command", "command"),
-	FRAMEWORK("cf.framework", "framework"),
 	INSTANCES("cf.instances", "instances"),
 	MEMORY("cf.memory", "memory"),
 	NO_START("cf.no-start", "no-start"),
 	PASSWORD("cf.password", "password"),
 	PATH("cf.path", "path"),
-	RUNTIME("cf.runtime", "runtime"),
 	SETTINGS_SERVER("server", "server"),
 	TARGET("cf.target", "target"),
 	URL("cf.url", "url"),
 	USERNAME("cf.username", "username"),
 	ORG("cf.org", "org"),
-	SPACE("cf.space", "space"),
-	WARFILE("cf.warfile", "warfile"); //deprecated use PATH instead
+	SPACE("cf.space", "space");
 
 	private String property;
 	private String xmlElement;

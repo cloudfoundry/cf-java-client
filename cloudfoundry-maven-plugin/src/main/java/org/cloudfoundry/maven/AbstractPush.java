@@ -18,7 +18,6 @@ package org.cloudfoundry.maven;
 import java.io.File;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
-import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
 
@@ -42,23 +40,17 @@ import org.springframework.http.HttpStatus;
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
- * @goal push
- *
- * @execute phase="package"
- *
  */
-public class Push extends AbstractApplicationAwareCloudFoundryMojo {
+public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
-		if (CommonUtils.isCloudControllerV2(getClient())) {
-			getLog().debug("Updating domains for cc v2");
-			addDomains();
-		}
+		addDomains();
 
 		final java.util.List<String> uris = new ArrayList<String>(0);
 
@@ -75,11 +67,9 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 		final String appname = getAppname();
 		final String command = getCommand();
 		final Map<String,String> env = getEnv();
-		final String framework = getFramework();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
 		final File path = getPath();
-		final String runtime = getRuntime();
 
 		ServiceCreation serviceCreation = new ServiceCreation(getClient(), getNonCreatedServices());
 
@@ -100,23 +90,17 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 				"Pushing App - Appname: %s," +
 				             " Command: %s," +
 				                 " Env: %s," +
-				           " Framework: %s," +
 				           " Instances: %s," +
 				              " Memory: %s," +
 				                " Path: %s," +
-					         " Runtime: %s," +
 				            " Services: %s," +
 				                " Uris: %s,",
 
-			appname, command, env, framework, instances, memory, path, runtime, serviceNames, uris));
+			appname, command, env, instances, memory, path, serviceNames, uris));
 
 		getLog().debug("Create Application...");
 
 		validateMemoryChoice(getClient(), memory);
-
-        if(!CommonUtils.isCloudControllerV2(getClient())) {
-            validateFrameworkChoice(getClient().getCloudInfo().getFrameworks(), framework);
-        }
 
 		boolean found = true;
 
@@ -138,18 +122,9 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 
 		try {
-			final Staging staging = new Staging(framework);
+			final Staging staging = new Staging(command, null);
 
-			staging.setCommand(command);
-			staging.setRuntime(runtime);
-
-			if (CommonUtils.isCloudControllerV2(getClient())) {
-				getLog().debug("Checking for plan");
-				getClient().createApplication(appname, staging, memory, uris, serviceNames, getPlan());
-			} else {
-				getClient().createApplication(appname, staging, memory, uris, serviceNames);
-			}
-
+			getClient().createApplication(appname, staging, memory, uris, serviceNames);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 					getAppname(), e.getMessage(), e.getDescription()), e);
@@ -204,7 +179,7 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 		if (getUrl() != null) {
 			getLog().info(String.format("'%s' was successfully deployed to: '%s'.", appname, getUrl()));
 		} else {
-			getLog().info(String.format("'%s' was successfully deployed.", appname, getUrl()));
+			getLog().info(String.format("'%s' was successfully deployed.", appname));
 		}
 
 	}
@@ -245,24 +220,4 @@ public class Push extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 
 	}
-
-	/**
-	 *
-	 * @param frameworks
-	 * @param desiredFramework
-	 * @return true if valid
-	 */
-	protected boolean validateFrameworkChoice(Collection<CloudInfo.Framework> frameworks, String desiredFramework) {
-
-        if( frameworks != null && !frameworks.isEmpty() ) {
-			for(CloudInfo.Framework f : frameworks ) {
-				if(f.getName().equals(desiredFramework)) {
-					return true;
-				}
-			}
-		}
-		throw new IllegalStateException("Framework must be one of the following values: " +
-					CommonUtils.frameworksToCommaDelimitedString(frameworks));
-	}
-
 }

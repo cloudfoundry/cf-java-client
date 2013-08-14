@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
-import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudService;
 
@@ -41,6 +40,7 @@ import org.springframework.util.Assert;
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
+ * @author Scott Frederick
  *
  * @since 1.0.0
  *
@@ -85,8 +85,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private File path;
 
 	/**
-	 * The start command to use if this app is a standalone app (has framework
-	 * named "standalone".
+	 * The start command to use for the application.
 	 *
 	 * @parameter expression = "${cf.command}"
 	 */
@@ -98,13 +97,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @parameter expression="${cf.memory}"
 	 */
 	private Integer memory;
-
-	/**
-	 * Set the runtime for the application, defaults to 'java'.
-	 *
-	 * @parameter expression="${cf.runtime}"
-	 */
-	private String runtime;
 
 	/**
 	 * Set the expected number <N> of instances
@@ -121,25 +113,11 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	private List<CloudService> services;
 
 	/**
-	 * list of services to use by the application.
+	 * list of domains to use by the application.
 	 *
 	 * @parameter expression="${domains}"
 	 */
 	private List<String> domains;
-
-	/**
-	 * Application Plan. Either free or paid
-	 *
-	 * @parameter expression="${plan}"
-	 */
-	private String plan;
-
-	/**
-	 * Framework type, defaults to CloudApplication.Spring
-	 *
-	 * @parameter expression="${cf.framework}" default-value="spring"
-	 */
-	private String framework;
 
 	/**
 	 * Environment variables
@@ -181,43 +159,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	}
 
 	/**
-	 * If the framework was specified via the command line ({@link SystemProperties})
-	 * then use that property. Otherwise return the framework as injected via Maven or
-	 * if framework is Null return the default value (CloudApplication.Spring) instead.
-	 *
-	 * @return Returns the framework, will never return Null.
-	 */
-	public String getFramework() {
-
-		final String frameworkProperty = getCommandlineProperty(SystemProperties.FRAMEWORK);
-
-		if (frameworkProperty != null) {
-			return frameworkProperty;
-		}
-
-		if (this.framework == null) {
-			return CloudApplication.SPRING;
-		} else {
-			return this.framework;
-		}
-
-	}
-
-	/**
-	 * Application plan. Either free or paid
-	 *
-	 * @return Returns the plan or free, will never return Null.
-	 */
-	public String getPlan() {
-
-		if (plan != null && plan.equals("paid")) {
-			return plan;
-		} else {
-			return "free";
-		}
-	}
-
-	/**
 	 * Environment properties can only be specified from the maven pom.
 	 *
 	 * Example:
@@ -249,7 +190,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return urlProperty;
 		}
 
-		if (this.url == null && !CloudApplication.STANDALONE.equals(getFramework()) && this.urls == null) {
+		if (this.url == null && this.urls == null) {
 
 			if (getTarget() != null) {
 
@@ -303,27 +244,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	}
 
 	/**
-	 * Returns the warfile-parameter. The parameter will typically return the
-	 * resolved Maven expression: ${project.build.directory}/${project.build.finalName}.war
-	 *
-	 * If the parameter is set via the command line (aka system property, then
-	 * that value is used). If not the pom.xml configuration parameter is used,
-	 * if available.
-	 *
-	 * Null is never returned.
-	 *
-	 * For a list of available properties see {@link SystemProperties}
-	 *
-	 * @return Returns the resolved warfile
-	 * @throws IllegalStateException Thrown if no warfile can be resolved
-	 * @deprecated Use {@link AbstractApplicationAwareCloudFoundryMojo#getPath()} instead (-Dcf.path)
-	 */
-	@Deprecated
-	public File getWarfile() {
-		return getPath();
-	}
-
-	/**
 	 * Returns the memory-parameter.
 	 *
 	 * If the parameter is set via the command line (aka system property, then
@@ -352,11 +272,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	}
 
 	/**
-	 * Specifies the file or directory that shall be pushed to Cloud Foundry (or updated).
-	 * If your {@link #framework} property resolves to {@link CloudApplication#STANDALONE}
-	 * then you must explicitly set the deployment path.
+	 * Specifies the file or directory that shall be pushed to Cloud Foundry.
 	 *
-	 * Otherwise, this property defaults to the Maven property
+	 * This property defaults to the Maven property
 	 * "${project.build.directory}/${project.build.finalName}.war"
 	 *
 	 *
@@ -367,7 +285,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 		final String pathProperty = getCommandlineProperty(SystemProperties.PATH);
 
 		if (pathProperty != null) {
-
 			final File path = new File(pathProperty);
 
 			validatePath(path);
@@ -375,41 +292,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 		}
 
 		if (this.path == null) {
-
-			if (CloudApplication.STANDALONE.equals(getFramework())) {
-				throw new IllegalStateException(
-						String.format("The selected framework is '%s'. Please specify the 'path' property.",
-								CloudApplication.STANDALONE));
-			}
-
 			return this.warfile;
-
 		} else {
 			return this.path;
-		}
-
-	}
-
-	/**
-	 * This property returns the specified runtime for the application. If not
-	 * set, this property defaults to "java" as defined by {@link DefaultConstants#RUNTIME}.
-	 *
-	 * @return Never null
-	 *
-	 * @see SystemProperties
-	 */
-	public String getRuntime() {
-
-		final String runtimeProperty = getCommandlineProperty(SystemProperties.RUNTIME);
-
-		if (runtimeProperty != null) {
-			return runtimeProperty;
-		}
-
-		if (this.runtime == null) {
-			return DefaultConstants.RUNTIME;
-		} else {
-			return this.runtime;
 		}
 
 	}
@@ -432,19 +317,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return commandProperty;
 		}
 
-		if (this.command == null) {
-
-			if (CloudApplication.STANDALONE.equals(getFramework())) {
-				throw new IllegalStateException(
-						String.format("The selected framework is '%s'. Please specify the 'command' property.",
-								CloudApplication.STANDALONE));
-			}
-
-			return null;
-
-		} else {
-			return this.command;
-		}
+		return this.command;
 
 	}
 
@@ -566,8 +439,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * Executes the actual war deployment to Cloud Foundry.
 	 *
 	 * @param client The Cloud Foundry client to use
-	 * @param fiel The file or directory to upload
-	 * @param appName The name of the application this warfile upload is for
+	 * @param file The file or directory to upload
+	 * @param appName The name of the application this file upload is for
 	 */
 	protected void uploadApplication(CloudFoundryClient client, File file, String appName) {
 

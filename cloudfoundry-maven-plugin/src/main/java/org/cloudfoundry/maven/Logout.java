@@ -45,6 +45,7 @@ import javax.xml.transform.stream.StreamResult;
  * Deletes the user's token mvn-cf file
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal logout
@@ -63,7 +64,7 @@ public class Logout extends AbstractCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		File file  = getFile();
-		Element targets = null;
+		Element targets;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
 		try {
