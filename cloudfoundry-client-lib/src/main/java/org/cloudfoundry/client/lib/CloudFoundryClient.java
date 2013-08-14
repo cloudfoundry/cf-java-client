@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -119,6 +120,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getSpaces();
 	}
 
+	public List<CloudOrganization> getOrganizations() {
+		return cc.getOrganizations();
+	}
+
 	public void register(String email, String password) {
 		cc.register(email, password);
 	}
@@ -163,8 +168,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationMemoryChoices();
 	}
 
-    public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames) {
+	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+								  List<String> serviceNames) {
 		cc.createApplication(appName, staging, memory, uris, serviceNames);
 	}
 
@@ -172,27 +177,25 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createService(service);
 	}
 
+	public void uploadApplication(String appName, String file) throws IOException {
+		cc.uploadApplication(appName, new File(file), null);
+	}
 
-    public void uploadApplication(String appName, String file) throws IOException {
-        cc.uploadApplication(appName, new File(file), null);
-    }
+	public void uploadApplication(String appName, File file) throws IOException {
+		cc.uploadApplication(appName, file, null);
+	}
 
-    public void uploadApplication(String appName, File file) throws IOException {
-        cc.uploadApplication(appName, file, null);
-    }
-
-    public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
+	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
 		cc.uploadApplication(appName, file, callback);
-    }
+	}
 
-    public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
-        cc.uploadApplication(appName, archive, null);
-    }
+	public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
+		cc.uploadApplication(appName, archive, null);
+	}
 
-    public void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException {
+	public void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException {
 		cc.uploadApplication(appName, archive, callback);
-    }
-
+	}
 
 	public StartingInfo startApplication(String appName) {
 		return cc.startApplication(appName);
@@ -206,8 +209,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.stopApplication(appName);
 	}
 
-	public void restartApplication(String appName) {
-		cc.restartApplication(appName);
+	public StartingInfo restartApplication(String appName) {
+		return cc.restartApplication(appName);
 	}
 
 	public void deleteApplication(String appName) {
