@@ -4,7 +4,7 @@ Usage: mvn cf:command [command_options]
 Currently available Cloud Foundry Maven Plugin Goals are:
 
   Getting Started
-    info                                         System and account information
+    target                                       Shows information about the target Cloud Foundry service
     login                                        Log into the Cloud Foundry service
     logout                                       Log out of the Cloud Foundry service
 

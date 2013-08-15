@@ -15,7 +15,6 @@
  */
 package org.cloudfoundry.maven;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
@@ -42,10 +41,10 @@ import org.cloudfoundry.maven.common.UiUtils;
  *
  * @since 1.0.0
  *
- * @goal info
+ * @goal target
  * @requiresProject false
  */
-public class Info extends AbstractCloudFoundryMojo {
+public class Target extends AbstractCloudFoundryMojo {
 
 	/**
 	 * 	@FIXME Not sure whether one should be able to overwrite execute()
@@ -73,17 +72,13 @@ public class Info extends AbstractCloudFoundryMojo {
 		if (getUsername() != null && getPassword() != null) {
 			newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 		} else {
-			try {
-				String token = retrieveToken();
-				newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
-			} catch (IOException e) {
-				newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-			}
+			String token = retrieveToken();
+			newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
 		}
 
 		final CloudInfo cloudInfo = newClient.getCloudInfo();
 		final List<CloudServiceOffering> serviceOfferings = newClient.getServiceOfferings();
 
-		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, serviceOfferings, getTarget().toString()));
+		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, getTarget().toString(), getOrg(), getSpace()));
 	}
 }

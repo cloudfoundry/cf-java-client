@@ -190,7 +190,7 @@ class TestableAbstractCFMojo extends AbstractCloudFoundryMojo {
 	}
 
 	@Override
-	protected String retrieveToken() throws IOException {
+	protected String retrieveToken() {
 		File newFile = new File(LoginAndLogoutTest.tempFolder.getRoot(), ".mvn-cf.xml");
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -208,10 +208,8 @@ class TestableAbstractCFMojo extends AbstractCloudFoundryMojo {
 					return childNode.getLastChild().getTextContent();
 				}
 			}
-		} catch (SAXException e) {
-			throw new IOException();
-		} catch (ParserConfigurationException e) {
-			throw new IOException();
+		} catch (Exception e) {
+			throw new RuntimeException();
 		}
 
 		return null;

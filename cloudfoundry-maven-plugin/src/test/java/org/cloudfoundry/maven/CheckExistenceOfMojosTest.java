@@ -78,10 +78,10 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
-	public void testExistenceOfInfoMojo() throws Exception {
+	public void testExistenceOfTargetMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
-		Info mojo = (Info) lookupMojo ( "info", testPom );
+		Target mojo = (Target) lookupMojo ( "target", testPom );
 
 		assertNotNull( mojo );
 	}

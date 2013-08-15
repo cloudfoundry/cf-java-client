@@ -97,7 +97,9 @@ Following, a typical (expected) configuration example is shown, which uses sever
                 <version>1.0.0.M1-SNAPSHOT</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
-                    <target>http://api.cloudfoundry.com</target>
+                    <target>http://api.run.pivotal.io</target>
+                    <org>mycloudfoundry-org</org>
+                    <space>development</space>
                     <appname>spring-integration-rocks</appname>
                     <url>spring-integration-rocks.cloudfoundry.com</url>
                     <memory>1024</memory>
@@ -119,9 +121,6 @@ Following, a typical (expected) configuration example is shown, which uses sever
     </project>
 ~~~
 
-> The `url` element is optional. If not specified, it defaults to *appname*.\<main *target* domain> (using the *appname* element)
-> e.g. if your **appname** is *spring-integration-rocks* and the **target** is defined as *api.cloudfoundry.com* then the url will default to: **spring-integration-rocks.cloudfoundry.com**
-
 in **settings.xml**:
 
 ~~~xml
@@ -135,7 +134,6 @@ in **settings.xml**:
       </servers>
       ...
     </settings>
-
 ~~~
 
 ## Command Line Usage
@@ -149,12 +147,12 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     <tr><th align="left">cf:app</th>              <td>List deployed applications.</td></tr>
     <tr><th align="left">cf:delete</th>           <td>Deletes an application.</td></tr>
     <tr><th align="left">cf:help</th>             <td>Documentation for all available commands.</td></tr>
-    <tr><th align="left">cf:info</th>             <td>Shows usage information.</td></tr>
     <tr><th align="left">cf:push</th>             <td>Push and optionally start an application.</td></tr>
     <tr><th align="left">cf:push-only</th>        <td>Push and optionally start an application, without packaging.</td></tr>
     <tr><th align="left">cf:restart</th>          <td>Restarts an application.</td></tr>
     <tr><th align="left">cf:start</th>            <td>Starts an application.</td></tr>
     <tr><th align="left">cf:stop</th>             <td>Stops an application.</td></tr>
+    <tr><th align="left">cf:target</th>           <td>Shows information about the target Cloud Foundry service.</td></tr>
     <tr><th align="left">cf:logs</th>             <td>Shows log files (stdout and stderr).</td></tr>
     <tr><th align="left">cf:scale</th>            <td>Scale the application instances up or down.</td></tr>
     <tr><th align="left">cf:services</th>         <td>Shows a list of available services along with provisioned.</td></tr>
@@ -176,9 +174,9 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
 
     $ mvn cf:help
 
-**Show usage information**
+**Show target service information**
 
-    $ mvn cf:info
+    $ mvn cf:target
 
 **Scale the application instances up or down**
 
@@ -228,7 +226,7 @@ Additional certain configuration parameter will fall back to using default value
 + **no-start**: Defaults to *false*
 + **memory**: Defaults to *512* (MB)
 + **path**: Defaults to *${project.build.directory}/${project.build.finalName}.war*
-+ **server**: Special parameter to tell **Maven** which server element in *settings.xml*
++ **server**: Special parameter to tell **Maven** which server element in `settings.xml`
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
 
 > The parameters **username**, **password**, **target**, and **space** don't have default values and you are required to provide them.

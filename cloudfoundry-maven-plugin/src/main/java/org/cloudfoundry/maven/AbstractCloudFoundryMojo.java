@@ -122,7 +122,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	protected String retrieveToken() throws IOException {
+	protected String retrieveToken() throws MojoExecutionException {
 		File file = new File(System.getProperty("user.home") + "/.mvn-cf.xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -139,10 +139,8 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 					return childNode.getLastChild().getTextContent();
 				}
 			}
-		} catch (SAXException e) {
-			throw new IOException();
-		} catch (ParserConfigurationException e) {
-			throw new IOException();
+		} catch (Exception e) {
+			throw new MojoExecutionException("Error reading tokens from " + file.getPath());
 		}
 
 		return null;
@@ -197,25 +195,15 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 				"Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
 				target, username));
 
-		final CloudFoundryClient client;
-
 		try {
-			CloudFoundryClient authClient = new CloudFoundryClient(new CloudCredentials(username, password), target.toURL());
-			authClient.login();
-
-			for (CloudSpace userSpace : authClient.getSpaces()) {
-				if (userSpace.getName().equals(space) && userSpace.getOrganization().getName().equals(org)) {
-					client = new CloudFoundryClient(new CloudCredentials(username, password), target.toURL(), userSpace);
-					connectToCloudFoundry(client);
-
-					return client;
-				}
-			}
+			final CloudCredentials credentials = new CloudCredentials(username, password);
+			CloudFoundryClient client = new CloudFoundryClient(credentials, target.toURL(), org, space);
+			connectToCloudFoundry(client);
+			return client;
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
 		}
-		return null;
 	}
 
 	/**
@@ -261,12 +249,8 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			if (getUsername() != null && getPassword() != null) {
 				client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 			} else {
-				try {
-					token = retrieveToken();
-					client = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
-				} catch (IOException e1) {
-					client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-				}
+				token = retrieveToken();
+				client = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
 			}
 
 			doExecute();

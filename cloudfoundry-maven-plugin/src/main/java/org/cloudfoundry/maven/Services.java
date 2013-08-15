@@ -17,8 +17,12 @@
 
 package org.cloudfoundry.maven;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 
@@ -39,12 +43,34 @@ public class Services extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() {
-		final List<CloudServiceOffering> serviceConfigurations = getClient().getServiceOfferings();
-		List<CloudService> services = getClient().getServices();
+		final List<CloudService> services = getClient().getServices();
+		final List<CloudApplication> apps = getClient().getApplications();
+		final Map<String, List<String>> servicesToApps = mapServicesToApps(services, apps);
+		getLog().info("Services instances");
+		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services, servicesToApps));
 
-		getLog().info("System Services");
-		getLog().info("\n" + UiUtils.renderServiceConfigurationDataAsTable(serviceConfigurations));
-		getLog().info("Provisioned Services");
-		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services));
+		final List<CloudServiceOffering> serviceOfferings = getClient().getServiceOfferings();
+		getLog().info("Available Services");
+		getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
+	}
+
+
+	protected Map<String, List<String>> mapServicesToApps(List<CloudService> services, List<CloudApplication> apps) {
+		Map<String, List<String>> servicesToApps = new HashMap<String, List<String>>(services.size());
+
+		for (CloudApplication app : apps) {
+			// todo: when client.getApplications() fills out service names, remove this extra call
+			app = client.getApplication(app.getName());
+			for (String serviceName : app.getServices()) {
+				List<String> appNames = servicesToApps.get(serviceName);
+				if (appNames == null) {
+					appNames = new ArrayList<String>();
+				}
+				appNames.add(app.getName());
+				servicesToApps.put(serviceName, appNames);
+			}
+		}
+
+		return servicesToApps;
 	}
 }
