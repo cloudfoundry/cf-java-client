@@ -714,11 +714,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/service_instances?inline-relations-depth=1";
+		urlPath = urlPath + "/service_instances?inline-relations-depth=2&return_user_provided_service_instances=true";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
-			fillInEmbeddedResource(resource, "service_plan", "service");
 			services.add(resourceMapper.mapResource(resource, CloudService.class));
 		}
 		return services;
@@ -765,7 +764,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlVars.put("q", "name:" + serviceName);
-		urlPath = urlPath + "/service_instances?q={q}";
+		urlPath = urlPath + "/service_instances?q={q}&inline-relations-depth=2&return_user_provided_service_instances=true";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
@@ -804,7 +803,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/apps?inline-relations-depth=1";
+		urlPath = urlPath + "/apps?inline-relations-depth=2";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> resource : resourceList) {
