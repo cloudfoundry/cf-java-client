@@ -39,7 +39,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.gradle.api.plugins', name: 'gradle-cf-plugin', version: '0.2.2-SNAPSHOT'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '0.3.0-SNAPSHOT'
     }
 }
 
