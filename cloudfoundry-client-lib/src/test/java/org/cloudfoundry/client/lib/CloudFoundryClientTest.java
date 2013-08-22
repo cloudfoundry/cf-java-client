@@ -805,7 +805,22 @@ public class CloudFoundryClientTest {
 		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
 	}
 
+	@Test
+	public void getService() {
+		String serviceName = "mysql-test";
+		createMySqlService(serviceName);
 
+		CloudService service = connectedClient.getService(serviceName);
+
+		assertNotNull(service);
+		assertEquals(serviceName, service.getName());
+		assertEquals(getMysqlLabel(), service.getLabel());
+		assertEquals("cleardb", service.getProvider());
+		assertEquals("n/a", service.getVersion());
+		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
+	}
+
+	//
 
 	//
 	// Application and Services tests
