@@ -1,6 +1,21 @@
 VMware Cloud Application Platform - Java Client Library
 =======================================================
 
+API Changes for version 0.8.6:
+------------------------------
+
+### Removed V1 support to only keep V2 support
+
+- frameworks are gone along with their default memory
+- Runtimes are gone along with frameworks.
+- ServiceConfiguration changed to CloudServiceOffering
+- App plans and service plans are two different concepts. App plans were removed, service plans were added.
+- Buildpack and command were added to the Staging object used for createApplication.
+
+### Additional API changes
+- v1 params were removed from the CloudFoundryClient constructors and params shuffled a bit.
+
+
 API Changes for version 0.8.0
 -----------------------------
 
