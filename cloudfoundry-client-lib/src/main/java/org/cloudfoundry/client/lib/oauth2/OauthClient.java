@@ -62,6 +62,7 @@ public class OauthClient {
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 		
 		ResourceOwnerPasswordAccessTokenProvider provider = new ResourceOwnerPasswordAccessTokenProvider();
+        provider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
 		OAuth2AccessToken token = null;
 		try {
 			token = provider.obtainAccessToken(resource, request);

@@ -15,6 +15,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
@@ -42,6 +44,10 @@ import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.util.RestUtil;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -70,7 +76,8 @@ import org.springframework.web.client.RestTemplate;
  */
 public class CloudFoundryClientTest {
 
-	private CloudFoundryClient connectedClient;
+    private static final String FAKE_FDQN_PROXIED_SUFFIX = ".injvmproxy.io";
+    private CloudFoundryClient connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://ccng.cloudfoundry.com");
@@ -92,9 +99,15 @@ public class CloudFoundryClientTest {
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
 	
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
-	
-	private static String defaultDomainName = null;
+
+    private static final boolean SKIP_INJVM_PROXY = Boolean.getBoolean("http.skipInJvmProxy");
+
+
+    private static String defaultDomainName = null;
     private HttpProxyConfiguration httpProxyConfiguration;
+    private Server inJvmProxyServer;
+    private int inJvmProxyPort;
+    private AtomicInteger nbInJvmProxyRcvReqs;
 
     private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
     private static final int DEFAULT_MEMORY = 512; // MB
@@ -125,25 +138,33 @@ public class CloudFoundryClientTest {
 				System.out.println("Test " + description.getMethodName() + " took " + (System.currentTimeMillis() - startTime) + " ms");
 			}
 		}
-	};	
+	};
 
-	@BeforeClass
+    @BeforeClass
 	public static void printTargetCloudInfo() {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
 		System.out.println("Using space " + CCNG_USER_SPACE + " of organization " + CCNG_USER_ORG );
 		if (CCNG_USER_PASS == null) {
 			fail("System property ccng.passwd must be specified, supply -Dccng.passwd=<password>");
 		}
-
 	}
 
 	@Before
-	public void setUp() throws MalformedURLException {
+	public void setUp() throws Exception {
         if (CCNG_API_PROXY_HOST != null) {
             httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
         }
-        connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), 
-												new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
+        URL cloudControllerUrl;
+        if (! SKIP_INJVM_PROXY) {
+            startInJvmProxy();
+            HttpProxyConfiguration inJvmHttpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
+            httpProxyConfiguration = inJvmHttpProxyConfiguration;
+            cloudControllerUrl = new URL(CCNG_API_URL + FAKE_FDQN_PROXIED_SUFFIX);
+        } else {
+            cloudControllerUrl = new URL(CCNG_API_URL);
+        }
+        connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
+                cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
 		connectedClient.login();
 		defaultDomainName = getDefaultDomain(connectedClient.getDomainsForOrg()).getName();
 		
@@ -158,12 +179,15 @@ public class CloudFoundryClientTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		// Clean after ourselves so that there are no leftover apps, services, domains, and routes
 		connectedClient.deleteAllApplications();
 		connectedClient.deleteAllServices();
 		clearTestDomainAndRoutes();
 		tearDownComplete = true;
+
+        inJvmProxyServer.stop();
+        nbInJvmProxyRcvReqs.set(0);
 	}
 
 	@Test
@@ -172,9 +196,42 @@ public class CloudFoundryClientTest {
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
 		assertNotNull(info.getBuild());
-	}
+        assertTrue(SKIP_INJVM_PROXY || nbInJvmProxyRcvReqs.get() >1 );
+    }
 
-	@Test
+    private int getNextAvailablePort(int initial) {
+        int current = initial;
+        while (! PortAvailability.available(current)) {
+            current ++;
+            if (current - initial > 100) {
+                throw new RuntimeException("did not find an available port from " + initial + " up to:" + current);
+            }
+        }
+        return current;
+    }
+
+    /**
+     * To test that the CF client is able to go through a proxy, we point the CC client to a broken url
+     * that can only be resolved by going through an inJVM proxy which rewrites the URI.
+     * This method starts this inJvm proxy.
+     * @throws Exception
+     */
+    private void startInJvmProxy() throws Exception {
+        inJvmProxyPort = getNextAvailablePort(8080);
+        inJvmProxyServer = new Server(inJvmProxyPort);
+        QueuedThreadPool threadPool = new QueuedThreadPool();
+        threadPool.setMinThreads(1);
+        inJvmProxyServer.setThreadPool(threadPool);
+        ServletHandler handler = new ServletHandler();
+        inJvmProxyServer.setHandler(handler);
+        nbInJvmProxyRcvReqs = new AtomicInteger();
+        InterceptingProxyServlet interceptingProxyServlet = new InterceptingProxyServlet(httpProxyConfiguration, FAKE_FDQN_PROXIED_SUFFIX, nbInJvmProxyRcvReqs);
+        handler.addServletWithMapping(new ServletHolder(interceptingProxyServlet), "/*");
+        inJvmProxyServer.start();
+    }
+
+
+    @Test
 	public void spacesAvailable() throws Exception {
 		List<CloudSpace> spaces = connectedClient.getSpaces();
 		assertNotNull(spaces);
