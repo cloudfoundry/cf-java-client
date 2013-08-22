@@ -769,7 +769,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
-			cloudService = resourceMapper.mapResource(resourceList.get(0), CloudService.class);
+			final Map<String, Object> resource = resourceList.get(0);
+			fillInEmbeddedResource(resource, "service_plan", "service");
+			cloudService = resourceMapper.mapResource(resource, CloudService.class);
 		}
 		return cloudService;
 	}
