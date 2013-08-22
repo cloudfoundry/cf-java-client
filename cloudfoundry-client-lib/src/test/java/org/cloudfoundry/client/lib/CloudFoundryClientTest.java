@@ -73,11 +73,11 @@ public class CloudFoundryClientTest {
 	private CloudFoundryClient connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
-	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://ccng.cloudfoundry.com");
+	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://api.run.pivotal.io");
 
-    private static final String CCNG_API_PROXY_HOST = System.getProperty("http.proxyHost", null);
+	private static final String CCNG_API_PROXY_HOST = System.getProperty("http.proxyHost", null);
 
-    private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
+	private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
 
 	private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
 
@@ -94,13 +94,13 @@ public class CloudFoundryClientTest {
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 	
 	private static String defaultDomainName = null;
-    private HttpProxyConfiguration httpProxyConfiguration;
+	private HttpProxyConfiguration httpProxyConfiguration;
 
-    private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
-    private static final int DEFAULT_MEMORY = 512; // MB
+	private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
+	private static final int DEFAULT_MEMORY = 512; // MB
 
-    private static boolean tearDownComplete = false;
-    
+	private static boolean tearDownComplete = false;
+
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -139,11 +139,11 @@ public class CloudFoundryClientTest {
 
 	@Before
 	public void setUp() throws MalformedURLException {
-        if (CCNG_API_PROXY_HOST != null) {
-            httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
-        }
-        connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS), 
-												new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
+		if (CCNG_API_PROXY_HOST != null) {
+			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+		}
+		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
+				new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
 		connectedClient.login();
 		defaultDomainName = getDefaultDomain(connectedClient.getDomainsForOrg()).getName();
 		
@@ -206,10 +206,14 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationByName() {
-		String appName = createSpringTravelApp("1", null);
+		final String serviceName = "test_database";
+		String appName = createSpringTravelApp("1", Collections.singletonList(serviceName));
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
+
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
 	}
 	
 	@Test
@@ -231,13 +235,18 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplications() {
-		String appName = createSpringTravelApp("2", null);
+		final String serviceName = "test_database";
+		String appName = createSpringTravelApp("2", Collections.singletonList(serviceName));
 		List<CloudApplication> apps = connectedClient.getApplications();
 		assertEquals(1, apps.size());
-		assertEquals(appName, apps.get(0).getName());
-		assertNotNull(apps.get(0));
-		assertNotNull(apps.get(0).getMeta());
-		assertNotNull(apps.get(0).getMeta().getGuid());
+
+		CloudApplication app = apps.get(0);
+		assertEquals(appName, app.getName());
+		assertNotNull(app.getMeta());
+		assertNotNull(app.getMeta().getGuid());
+
+		assertEquals(1, app.getServices().size());
+		assertEquals(serviceName, app.getServices().get(0));
 
 		createSpringTravelApp("3", null);
 		apps = connectedClient.getApplications();
@@ -252,43 +261,43 @@ public class CloudFoundryClientTest {
 		assertEquals(0, connectedClient.getApplications().size());
 	}
 
-    @Test
-    public void uploadApplicationWithBuildPack() throws IOException {
-        String buildpackUrl = "https://github.com/cloudfoundry/java-buildpack.git";
-        String appName = createSpringTravelApp("upload1", null, buildpackUrl);
+	@Test
+	public void uploadApplicationWithBuildPack() throws IOException {
+		String buildpackUrl = "https://github.com/cloudfoundry/java-buildpack.git";
+		String appName = createSpringTravelApp("upload1", null, buildpackUrl);
 
-        File file = SampleProjects.springTravel();
-        connectedClient.uploadApplication(appName, file.getCanonicalPath());
+		File file = SampleProjects.springTravel();
+		connectedClient.uploadApplication(appName, file.getCanonicalPath());
 
-        CloudApplication app = connectedClient.getApplication(appName);
-        assertNotNull(app);
-        assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
-        String url = computeAppUrlNoProtocol(appName);
-        assertEquals(url, app.getUris().get(0));
+		String url = computeAppUrlNoProtocol(appName);
+		assertEquals(url, app.getUris().get(0));
 
-        assertEquals(buildpackUrl, app.getStaging().getBuildpackUrl());
-    }
+		assertEquals(buildpackUrl, app.getStaging().getBuildpackUrl());
+	}
 
-    @Test
-    public void uploadApplicationDefaultBuildPack() throws IOException {
-        String appName = createSpringTravelApp("upload1", null, null);
+	@Test
+	public void uploadApplicationDefaultBuildPack() throws IOException {
+		String appName = createSpringTravelApp("upload1", null, null);
 
-        File file = SampleProjects.springTravel();
-        connectedClient.uploadApplication(appName, file.getCanonicalPath());
+		File file = SampleProjects.springTravel();
+		connectedClient.uploadApplication(appName, file.getCanonicalPath());
 
-        CloudApplication app = connectedClient.getApplication(appName);
-        assertNotNull(app);
-        assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
-        String url = computeAppUrlNoProtocol(appName);
-        assertEquals(url, app.getUris().get(0));
+		String url = computeAppUrlNoProtocol(appName);
+		assertEquals(url, app.getUris().get(0));
 
-        assertEquals(null, app.getStaging().getBuildpackUrl());
-        assertEquals(null, app.getStaging().getCommand());
-    }
+		assertEquals(null, app.getStaging().getBuildpackUrl());
+		assertEquals(null, app.getStaging().getCommand());
+	}
 
-    @Test
+	@Test
 	public void startStopApplication() throws IOException {
 		String appName = createSpringTravelApp("upload-start-stop", null);
 		CloudApplication app = uploadSpringTravelApp(appName);
@@ -395,10 +404,8 @@ public class CloudFoundryClientTest {
 	@Test
 	public void updateApplicationMemory() throws IOException {
 		String appName = createSpringTravelApp("mem1", null);
-		CloudApplication app = connectedClient.getApplication(appName);
-
 		connectedClient.updateApplicationMemory(appName, 256);
-		app = connectedClient.getApplication(appName);
+		CloudApplication app = connectedClient.getApplication(appName);
 		assertEquals(256, app.getMemory());
 	}
 
@@ -594,10 +601,10 @@ public class CloudFoundryClientTest {
 	@Test
 	public void getApplicationStats() throws Exception {
 		String appName = namespacedAppName("stats2");
-		CloudApplication app = createAndUploadSimpleSpringApp(appName);
+		createAndUploadSimpleSpringApp(appName);
 		connectedClient.updateApplicationInstances(appName, 3);
 		connectedClient.startApplication(appName);
-		app = connectedClient.getApplication(appName);
+		CloudApplication app = connectedClient.getApplication(appName);
 		
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 
@@ -633,7 +640,7 @@ public class CloudFoundryClientTest {
 		connectedClient.stopApplication(appName);
 
 		ApplicationStats stats = connectedClient.getApplicationStats(appName);
-		assertEquals(Collections.emptyList(), stats.getRecords());
+		assertTrue(stats.getRecords().isEmpty());
 	}
 
 	@Test
@@ -807,10 +814,9 @@ public class CloudFoundryClientTest {
 	@Test
 	public void createApplicationWithService() throws IOException {
 		String serviceName = "test_database";
-		List<String> serviceNames= Collections.singletonList(serviceName);
-		String appName = createSpringTravelApp("application-with-services", serviceNames);
-		CloudApplication app = uploadSpringTravelApp(appName);
-		app = connectedClient.getApplication(appName);
+		String appName = createSpringTravelApp("application-with-services", Collections.singletonList(serviceName));
+		uploadSpringTravelApp(appName);
+		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
 		assertNotNull(app.getServices());
@@ -821,9 +827,7 @@ public class CloudFoundryClientTest {
 	@Test
 	public void deleteServiceThatIsBoundToApp() throws MalformedURLException {
 		String serviceName = "mysql-del-svc";
-		List<String> serviceNames = new ArrayList<String>();
-		serviceNames.add(serviceName);
-		String appName = createSpringTravelApp("del-svc", serviceNames);
+		String appName = createSpringTravelApp("del-svc", Collections.singletonList(serviceName));
 
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app.getServices());
@@ -1039,7 +1043,7 @@ public class CloudFoundryClientTest {
 		File file = SampleProjects.springTravel();
 		connectedClient.uploadApplication(appName, file.getCanonicalPath());
 
-		StartingInfo startingInfo = null;
+		StartingInfo startingInfo;
 		String firstLine = null;
 		int i = 0;
 		do {
@@ -1077,7 +1081,7 @@ public class CloudFoundryClientTest {
 			assertEquals(count, app.getInstances());
 		}
 
-		InstancesInfo instances = null;
+		InstancesInfo instances;
 		boolean pass = false;
 		for (int i = 0; i < 50; i++) {
 			try {
@@ -1233,6 +1237,7 @@ public class CloudFoundryClientTest {
 	private String createSpringTravelApp(String suffix, List<String> serviceNames) {
         return createSpringTravelApp(suffix, serviceNames, null);
 	}
+
 	private String createSpringTravelApp(String suffix, List<String> serviceNames, String buildpackUrl) {
 		String appName = namespacedAppName("travel_test-" + suffix);
 		createSpringApplication(appName, serviceNames, buildpackUrl);
@@ -1290,18 +1295,18 @@ public class CloudFoundryClientTest {
 		createTestApp(appName, serviceNames, new Staging(null, buildpackUrl));
 	}
 
-    private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
-        List<String> uris = new ArrayList<String>();
-        uris.add(computeAppUrl(appName));
-        if (serviceNames != null) {
-            for (String serviceName : serviceNames) {
-                createMySqlService(serviceName);
-            }
-        }
-        connectedClient.createApplication(appName, staging,
-                DEFAULT_MEMORY,
-                uris, serviceNames);
-    }
+	private void createTestApp(String appName, List<String> serviceNames, Staging staging) {
+		List<String> uris = new ArrayList<String>();
+		uris.add(computeAppUrl(appName));
+		if (serviceNames != null) {
+			for (String serviceName : serviceNames) {
+				createMySqlService(serviceName);
+			}
+		}
+		connectedClient.createApplication(appName, staging,
+				DEFAULT_MEMORY,
+				uris, serviceNames);
+	}
 
 	private void createMySqlService(String serviceName) {
 		List<CloudServiceOffering> serviceOfferings = connectedClient.getServiceOfferings();
@@ -1347,7 +1352,7 @@ public class CloudFoundryClientTest {
 	}
 
 	private void clearTestDomainAndRoutes() {
-		List<CloudDomain> domains = connectedClient.getDomainsForOrg();
+		List<CloudDomain> domains = connectedClient.getDomains();
 		for (CloudDomain domain : domains) {
 			List<CloudRoute> routes = connectedClient.getRoutes(domain.getName());
 			for (CloudRoute route : routes) {

@@ -808,6 +808,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
 		for (Map<String, Object> resource : resourceList) {
+			processApplicationResource(resource, true);
 			apps.add(mapCloudApplication(resource));
 		}
 		return apps;
