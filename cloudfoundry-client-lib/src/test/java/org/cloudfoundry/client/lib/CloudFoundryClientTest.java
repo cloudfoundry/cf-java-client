@@ -270,6 +270,23 @@ public class CloudFoundryClientTest {
         assertEquals(buildpackUrl, app.getStaging().getBuildpackUrl());
     }
 
+    @Test
+    public void uploadApplicationDefaultBuildPack() throws IOException {
+        String appName = createSpringTravelApp("upload1", null, null);
+
+        File file = SampleProjects.springTravel();
+        connectedClient.uploadApplication(appName, file.getCanonicalPath());
+
+        CloudApplication app = connectedClient.getApplication(appName);
+        assertNotNull(app);
+        assertEquals(CloudApplication.AppState.STOPPED, app.getState());
+
+        String url = computeAppUrlNoProtocol(appName);
+        assertEquals(url, app.getUris().get(0));
+
+        assertEquals(null, app.getStaging().getBuildpackUrl());
+        assertEquals(null, app.getStaging().getCommand());
+    }
 
     @Test
 	public void startStopApplication() throws IOException {
