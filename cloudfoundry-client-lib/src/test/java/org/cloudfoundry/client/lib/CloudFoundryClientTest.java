@@ -1027,6 +1027,7 @@ public class CloudFoundryClientTest {
 		connectedClient.registerRestLogListener(callback2);
 		getApplications();
 		connectedClient.deleteAllApplications();
+		connectedClient.deleteAllServices();
 		assertTrue(log1.size() > 0);
 		assertEquals(log1, log2);
 		connectedClient.unRegisterRestLogListener(callback2);
