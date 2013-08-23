@@ -15,7 +15,6 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +47,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMRules;
+import org.jboss.byteman.contrib.bmunit.BMScript;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,6 +62,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
@@ -74,6 +78,13 @@ import org.springframework.web.client.RestTemplate;
  * @author Jennifer Hickey
  * @author Thomas Risberg
  */
+@RunWith(BMUnitRunner.class)
+@BMRules(rules={
+        @BMRule(name="throw IOException socket opening",
+                targetClass = "^java.net.Socket",
+                targetMethod = "<init> (String , int , InetAddress,  int)",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1, $2)")})
 public class CloudFoundryClientTest {
 
     private static final String FAKE_FDQN_PROXIED_SUFFIX = ".injvmproxy.io";
@@ -156,6 +167,7 @@ public class CloudFoundryClientTest {
         }
         URL cloudControllerUrl;
         if (! SKIP_INJVM_PROXY) {
+            SocketDestHelper.setForbiddenOnCurrentThread();
             startInJvmProxy();
             HttpProxyConfiguration inJvmHttpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
             httpProxyConfiguration = inJvmHttpProxyConfiguration;
@@ -186,8 +198,10 @@ public class CloudFoundryClientTest {
 		clearTestDomainAndRoutes();
 		tearDownComplete = true;
 
-        inJvmProxyServer.stop();
-        nbInJvmProxyRcvReqs.set(0);
+        if (inJvmProxyServer != null) {
+            inJvmProxyServer.stop();
+            nbInJvmProxyRcvReqs.set(0);
+        }
 	}
 
 	@Test
