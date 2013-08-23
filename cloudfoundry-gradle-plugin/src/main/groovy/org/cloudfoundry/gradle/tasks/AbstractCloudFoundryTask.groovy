@@ -18,6 +18,7 @@ package org.cloudfoundry.gradle.tasks
 import org.cloudfoundry.client.lib.CloudCredentials
 import org.cloudfoundry.client.lib.CloudFoundryClient
 import org.cloudfoundry.client.lib.CloudFoundryException
+import org.cloudfoundry.client.lib.CloudFoundryOperations
 import org.cloudfoundry.client.lib.RestLogCallback
 import org.cloudfoundry.client.lib.domain.CloudSpace
 import org.gradle.api.DefaultTask
@@ -27,7 +28,7 @@ import org.springframework.web.client.ResourceAccessException
 import org.gradle.api.GradleException
 
 abstract class AbstractCloudFoundryTask extends DefaultTask {
-    protected CloudFoundryClient client
+    protected CloudFoundryOperations client
 
     AbstractCloudFoundryTask() {
         super()

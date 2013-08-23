@@ -236,28 +236,18 @@ public class CloudEntityResourceMapper {
 			return null;
 		}
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
+		Object attributeValue = entity.get(attributeName);
+		if (attributeValue == null) {
+			return null;
+		}
 		if (targetClass == String.class) {
-			return (T) String.valueOf(entity.get(attributeName));
+			return (T) String.valueOf(attributeValue);
 		}
-		if (targetClass == Integer.class) {
-			return (T) entity.get(attributeName);
+		if (targetClass == Integer.class || targetClass == Boolean.class || targetClass == Map.class || targetClass == List.class) {
+			return (T) attributeValue;
 		}
-		if (targetClass == Boolean.class) {
-			return (T) entity.get(attributeName);
-		}
-		if (targetClass == Map.class) {
-			return (T) entity.get(attributeName);
-		}
-		if (targetClass == List.class) {
-			return (T) entity.get(attributeName);
-		}
-		if (targetClass == UUID.class) {
-			Object value = entity.get(attributeName);
-			if (value != null && value instanceof String) {
-				return (T) UUID.fromString((String)value);
-			} else {
-				return null;
-			}
+		if (targetClass == UUID.class && attributeValue instanceof String) {
+			return (T) UUID.fromString((String)attributeValue);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for attribute mapping " + targetClass.getName());

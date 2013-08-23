@@ -1,5 +1,21 @@
-VMware Cloud Application Platform - Java Client Library
-=======================================================
+Cloud Foundry Client Library
+============================
+
+API Changes for version 0.8.6:
+------------------------------
+
+### Removed V1 concepts
+
+* Frameworks
+* Runtimes
+* ServiceConfiguration (replaced by CloudServiceOffering)
+* Application plans
+* CloudFoundryClient constructors and parameters modified accordingly
+
+### Added V2 concepts
+
+* Buildpack and command fields were added to the Staging object used for createApplication
+* Space name and Org name added as a CloudFoundryClient constructor parameters
 
 API Changes for version 0.8.0
 -----------------------------
