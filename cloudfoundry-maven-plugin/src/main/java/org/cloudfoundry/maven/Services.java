@@ -54,13 +54,10 @@ public class Services extends AbstractCloudFoundryMojo {
 		getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
 	}
 
-
 	protected Map<String, List<String>> mapServicesToApps(List<CloudService> services, List<CloudApplication> apps) {
 		Map<String, List<String>> servicesToApps = new HashMap<String, List<String>>(services.size());
 
 		for (CloudApplication app : apps) {
-			// todo: when client.getApplications() fills out service names, remove this extra call
-			app = client.getApplication(app.getName());
 			for (String serviceName : app.getServices()) {
 				List<String> appNames = servicesToApps.get(serviceName);
 				if (appNames == null) {

@@ -7,9 +7,9 @@
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<name>Cloud Foundry Maven Plugin</name>
 
-	<description><![CDATA[The Cloud Foundry Maven Plugin makes it easy to deploy
-Maven-based applications to Cloud Foundry instances.
-		]]></description>
+	<description>
+		The Cloud Foundry Maven Plugin makes it easy to deploy Maven-based applications to Cloud Foundry instances.
+	</description>
 
 	<prerequisites>
 		<maven>2.2.1</maven>
@@ -139,14 +139,15 @@ Maven-based applications to Cloud Foundry instances.
 
 	<dependencies>
 		<dependency>
+			<groupId>org.cloudfoundry</groupId>
+			<artifactId>cloudfoundry-client-lib</artifactId>
+			<version>0.8.7.BUILD-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.cloudfoundry</groupId>
-			<artifactId>cloudfoundry-client-lib</artifactId>
-			<version>0.8.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>
@@ -173,12 +174,14 @@ Maven-based applications to Cloud Foundry instances.
 			<artifactId>maven-artifact-manager</artifactId>
 			<version>2.2.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.maven.shared</groupId>
 			<artifactId>maven-plugin-testing-harness</artifactId>
