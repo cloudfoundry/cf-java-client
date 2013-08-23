@@ -18,6 +18,7 @@ package org.cloudfoundry.maven.common;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -39,8 +40,6 @@ public class UiUtilsTest {
 
 	@Test
 	public void testRenderTextTable() {
-
-
 		final List<String> services = new ArrayList<String>();
 
 		services.add("mysql");
@@ -48,8 +47,8 @@ public class UiUtilsTest {
 
 		final List<String> uris = new ArrayList<String>();
 
-		uris.add("cf-rocks.cloudfoundry.com");
-		uris.add("MyMongoInstance");
+		uris.add("cf-rocks.api.run.pivotal.io");
+		uris.add("spring-rocks.api.run.pivotal.io");
 
 		String expectedTableAsString = null;
 
@@ -63,11 +62,12 @@ public class UiUtilsTest {
 
 		Assert.assertNotNull(expectedTableAsString);
 
-		final CloudApplication app1 = new CloudApplication("Name", "stagingStack",
-						 "StagingModel", 512, 1, uris, services, AppState.STARTED);
+		final CloudApplication app1 = new CloudApplication("first", "command",
+						 "buildpack", 512, 1, uris, services, AppState.STARTED);
+		final CloudApplication app2 = new CloudApplication("second", "command",
+						 "buildpack", 1024, 2, uris, services, AppState.STOPPED);
 
-		final List<CloudApplication> applications = new ArrayList<CloudApplication>();
-		applications.add(app1);
+		final List<CloudApplication> applications = Arrays.asList(app1, app2);
 
 		final String renderedTableAsString = UiUtils.renderCloudApplicationsDataAsTable(applications);
 

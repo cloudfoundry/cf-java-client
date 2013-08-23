@@ -30,7 +30,7 @@ import org.cloudfoundry.maven.common.SystemProperties;
  * @since 1.0.0
  *
  */
-public class InstancesTest extends AbstractMojoTestCase {
+public class ScaleTest extends AbstractMojoTestCase {
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -46,9 +46,9 @@ public class InstancesTest extends AbstractMojoTestCase {
 
 		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
 
-		Instances unspiedMojo = (Instances) lookupMojo ( "instances", testPom );
+		Scale unspiedMojo = (Scale) lookupMojo ( "scale", testPom );
 
-		Instances mojo = spy(unspiedMojo);
+		Scale mojo = spy(unspiedMojo);
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
