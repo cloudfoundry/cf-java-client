@@ -24,12 +24,11 @@ import java.util.Map;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Creates a service
+ * Displays information about provisioned service instances.
  *
  * @author Ali Moghadam
  * @author Scott Frederick
@@ -48,10 +47,6 @@ public class Services extends AbstractCloudFoundryMojo {
 		final Map<String, List<String>> servicesToApps = mapServicesToApps(services, apps);
 		getLog().info("Services instances");
 		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services, servicesToApps));
-
-		final List<CloudServiceOffering> serviceOfferings = getClient().getServiceOfferings();
-		getLog().info("Available Services");
-		getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
 	}
 
 	protected Map<String, List<String>> mapServicesToApps(List<CloudService> services, List<CloudApplication> apps) {

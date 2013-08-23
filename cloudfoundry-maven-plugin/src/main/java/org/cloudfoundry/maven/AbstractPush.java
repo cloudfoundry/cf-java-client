@@ -66,18 +66,12 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 		final String appname = getAppname();
 		final String command = getCommand();
-		final Map<String,String> env = getEnv();
+		final Map<String, String> env = getEnv();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
 		final File path = getPath();
 
-		ServiceCreation serviceCreation = new ServiceCreation(getClient(), getNonCreatedServices());
-
-		List<String> newCreatedServiceNames = serviceCreation.createServices();
-
-		for (String serviceName : newCreatedServiceNames) {
-			getLog().info(String.format("Creating Service '%s': OK", serviceName));
-		}
+		createServices();
 
 		final List<CloudService> services = getServices();
 		List<String> serviceNames = new ArrayList<String>();

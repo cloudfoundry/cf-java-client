@@ -17,23 +17,27 @@
 
 package org.cloudfoundry.maven;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.maven.common.UiUtils;
+
+import java.util.List;
 
 /**
- * Create Services
+ * Displays information about available services.
  *
- * @author Ali Moghadam
  * @author Scott Frederick
  * @since 1.0.0
  *
- * @goal create-services
+ * @goal service-plans
  * @phase process-sources
  */
 
-public class CreateServices extends AbstractApplicationAwareCloudFoundryMojo {
+public class ServicePlans extends AbstractCloudFoundryMojo {
 
 	@Override
-	protected void doExecute() throws MojoExecutionException {
-		createServices();
+	protected void doExecute() {
+		final List<CloudServiceOffering> serviceOfferings = getClient().getServiceOfferings();
+		getLog().info("Available Services");
+		getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
 	}
 }

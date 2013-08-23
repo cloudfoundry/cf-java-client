@@ -18,6 +18,8 @@
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 
 /**
@@ -37,15 +39,21 @@ public class BindServices extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() throws MojoExecutionException {
 		for (CloudService service : getServices()) {
 			if (getClient().getService(service.getName()) == null) {
-				throw new MojoExecutionException(String.format("The Service '%s' does not exist.",
-						service.getName()));
+				throw new MojoExecutionException(String.format("Service '%s' does not exist", service.getName()));
 			}
 
-			if (getClient().getApplication(getAppname()).getServices().contains(service.getName())) {
-				getLog().info(String.format("Binding Service '%s': Already bound", service.getName()));
-			} else {
-				getClient().bindService(getAppname(), service.getName());
-				getLog().info(String.format("Binding Service '%s': OK", service.getName()));
+			try {
+				final CloudApplication application = getClient().getApplication(getAppname());
+				if (application.getServices().contains(service.getName())) {
+					getLog().info(String.format("Service '%s' is already bound to application '%s'",
+							service.getName(), application.getName()));
+				} else {
+					getClient().bindService(getAppname(), service.getName());
+					getLog().info(String.format("Binding Service '%s'", service.getName()));
+				}
+			}
+			catch (CloudFoundryException e) {
+				throw new MojoExecutionException(String.format("Application '%s' does not exist", getAppname()));
 			}
 		}
 	}

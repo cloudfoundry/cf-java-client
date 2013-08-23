@@ -24,14 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
+import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudService;
 
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
-import org.springframework.util.Assert;
 
 /**
  * Abstract goal for the Cloud Foundry Maven plugin that bundles access to commonly
@@ -45,8 +47,7 @@ import org.springframework.util.Assert;
  * @since 1.0.0
  *
  */
-abstract class AbstractApplicationAwareCloudFoundryMojo extends
-		AbstractCloudFoundryMojo {
+abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFoundryMojo {
 
 	/**
 	 * @parameter expression="${cf.appname}"
@@ -353,10 +354,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @return Never null
 	 */
 	public List<CloudService> getServices() {
-		final List<CloudService> servicesList = new ArrayList<CloudService>(0);
-
 		if (this.services == null) {
-			return servicesList;
+			return new ArrayList<CloudService>(0);
 		} else {
 			return this.services;
 		}
@@ -368,10 +367,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @return Never null
 	 */
 	public List<String> getCustomDomains() {
-		final List<String> domainList = new ArrayList<String>(0);
-
 		if (this.domains == null) {
-			return domainList;
+			return new ArrayList<String>(0);
 		} else {
 			return this.domains;
 		}
@@ -383,10 +380,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 	 * @return Never null
 	 */
 	public List<String> getUrls() {
-		final List<String> urls = new ArrayList<String>(0);
-
 		if (this.urls == null) {
-			return urls;
+			return new ArrayList<String>(0);
 		} else {
 			return this.urls;
 		}
@@ -432,6 +427,31 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends
 			return DefaultConstants.NO_START;
 		} else {
 			return this.noStart;
+		}
+	}
+
+	public void createServices() throws MojoExecutionException {
+		List<CloudService> currentServices = getClient().getServices();
+		List<String> currentServicesNames = new ArrayList<String>(currentServices.size());
+
+		for (CloudService currentService : currentServices) {
+			currentServicesNames.add(currentService.getName());
+		}
+
+		for (CloudService service: getServices()) {
+			if (currentServicesNames.contains(service.getName())) {
+				getLog().debug(String.format("Service '%s' already exists", service.getName()));
+			}
+			else {
+				getLog().info(String.format("Creating Service '%s'", service.getName()));
+				Assert.configurationServiceNotNull(service, null);
+
+				try {
+					client.createService(service);
+				} catch (CloudFoundryException e) {
+					throw new MojoExecutionException(String.format("Not able to create service '%s'.", service.getName()));
+				}
+			}
 		}
 	}
 

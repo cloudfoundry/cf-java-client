@@ -17,6 +17,7 @@ package org.cloudfoundry.maven;
 
 import java.io.File;
 
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -31,196 +32,89 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 		super.setUp();
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfAppsMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Apps mojo = (Apps) lookupMojo ( "apps", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("apps", Apps.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfAppMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		App mojo = (App) lookupMojo ( "app", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("app", App.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfDeleteMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Delete mojo = (Delete) lookupMojo ( "delete", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("delete", Delete.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfHelpMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Help mojo = (Help) lookupMojo ( "help", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("help", Help.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfTargetMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Target mojo = (Target) lookupMojo ( "target", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("target", Target.class);
 	}
 
-
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfScaleMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Scale mojo = (Scale) lookupMojo ( "scale", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("scale", Scale.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfPushMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Push mojo = (Push) lookupMojo ( "push", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("push", Push.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfRestartMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Restart mojo = (Restart) lookupMojo ( "restart", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("restart", Restart.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfStartMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Start mojo = (Start) lookupMojo ( "start", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("start", Start.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfStopMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Stop mojo = (Stop) lookupMojo ( "stop", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("stop", Stop.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfServicesMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Services mojo = (Services) lookupMojo ( "services", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("services", Services.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
+	public void testExistenceOfServicePlanssMojo() throws Exception {
+		assertMojoExists("service-plans", ServicePlans.class);
+	}
+
 	public void testExistenceOfCreateServicesMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		CreateServices mojo = (CreateServices) lookupMojo ( "create-services", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("create-services", CreateServices.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfDeleteServicesMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		DeleteServices mojo = (DeleteServices) lookupMojo ( "delete-services", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("delete-services", DeleteServices.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfLogsMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Logs mojo = (Logs) lookupMojo ( "logs", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("logs", Logs.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfBindServicesMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		BindServices mojo = (BindServices) lookupMojo ( "bind-services", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("bind-services", BindServices.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testExistenceOfUnbindServicesMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		UnbindServices mojo = (UnbindServices) lookupMojo ( "unbind-services", testPom );
-
-		assertNotNull( mojo );
+		assertMojoExists("unbind-services", UnbindServices.class);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	public void testNonExistingMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
+		File testPom = new File(getBasedir(), testPomXmlPath);
 
 		try {
-			lookupMojo ( "something", testPom );
+			lookupMojo("something", testPom);
+			fail("A ComponentLookupException should have been thrown.");
 		} catch (ComponentLookupException e) {
-			return;
 		}
+	}
 
-		fail("A ComponentLookupException should have been thrown.");
+	private void assertMojoExists(String mojoName, Class<?> mojoType) throws Exception {
+		File testPom = new File(getBasedir(), testPomXmlPath);
+		Mojo mojo = lookupMojo(mojoName, testPom);
+
+		assertTrue(mojoType.isInstance(mojo));
+		assertNotNull(mojo);
 	}
 }

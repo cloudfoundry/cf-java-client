@@ -24,6 +24,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
  * Delete Services
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal delete-services
@@ -35,12 +36,11 @@ public class DeleteServices extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		for (CloudService service : getServices()) {
-
 			try {
+				getLog().info(String.format("Deleting service '%s'", service.getName()));
 				getClient().deleteService(service.getName());
-				getLog().info(String.format("Deleting service '%s': OK", service.getName()));
 			} catch (NullPointerException e) {
-				getLog().info(String.format("Service '%s' doesn't exist", service.getName()));
+				getLog().info(String.format("Service '%s' does not exist", service.getName()));
 			}
 		}
 	}
