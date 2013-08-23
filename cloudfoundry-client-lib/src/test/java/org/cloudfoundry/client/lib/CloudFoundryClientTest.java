@@ -80,11 +80,43 @@ import org.springframework.web.client.RestTemplate;
  */
 @RunWith(BMUnitRunner.class)
 @BMRules(rules={
-        @BMRule(name="throw IOException socket opening",
+        @BMRule(name="1- throw IOException socket opening",
                 targetClass = "^java.net.Socket",
                 targetMethod = "<init> (String , int , InetAddress,  int)",
                 helper = "org.cloudfoundry.client.lib.SocketDestHelper",
-                action = "throwExceptionIfForbidden($1, $2)")})
+                action = "throwExceptionIfForbidden($1, $2)"),
+        @BMRule(name="2- throw IOException socket opening",
+                targetClass = "^java.net.Socket",
+                targetMethod = "<init> (SocketAddress , SocketAddress, boolean )",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1)"),
+        @BMRule(name="3- throw IOException SSL socket opening",
+                targetClass = "^java.net.ssl.SSLSocket",
+                targetMethod = "<init> (InetAddress , int )",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1)"),
+        @BMRule(name="4- throw IOException SSL socket opening",
+                targetClass = "^java.net.ssl.SSLSocket",
+                targetMethod = "<init> (InetAddress, int , InetAddress , int )",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1, $2)"),
+        @BMRule(name="5- throw IOException SSL socket opening",
+                targetClass = "^java.net.ssl.SSLSocket",
+                targetMethod = "<init> (String, int )",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1, $2)"),
+        @BMRule(name="6- throw IOException SSL socket opening",
+                targetClass = "^java.net.ssl.SSLSocket",
+                targetMethod = "<init> (String, int ,InetAddress , int )",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "throwExceptionIfForbidden($1, $2)"),
+        @BMRule(name="7- throw IOException SSL socket opening",
+                targetClass = "^java.net.ssl.SSLSocketFactory",
+                targetMethod = "getDefault()",
+                helper = "org.cloudfoundry.client.lib.SocketDestHelper",
+                action = "getDefaultSslSocketFactory()"),
+
+})
 public class CloudFoundryClientTest {
 
     private static final String FAKE_FDQN_PROXIED_SUFFIX = ".injvmproxy.io";
