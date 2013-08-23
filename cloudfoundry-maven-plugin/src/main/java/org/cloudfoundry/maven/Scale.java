@@ -26,10 +26,10 @@ import org.cloudfoundry.maven.common.SystemProperties;
  * @author Gunnar Hillert
  * @since 1.0.0
  *
- * @goal instances
+ * @goal scale
  * @phase process-sources
  */
-public class Instances extends AbstractApplicationAwareCloudFoundryMojo {
+public class Scale extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {

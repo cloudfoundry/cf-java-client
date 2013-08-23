@@ -67,11 +67,10 @@ class ServicesCloudFoundryTask extends AbstractCloudFoundryTask {
 
     protected def mapServicesToApps(def services) {
         def servicesToApps = [:]
-        services.each { servicesToApps[it.name] = []}
+        services.each { servicesToApps[it.name] = [] }
 
         List<CloudApplication> apps = client.applications
-        apps.each {
-            CloudApplication app = client.getApplication(it.name)
+        apps.each { app ->
             app.services.each { serviceName -> servicesToApps[serviceName] << app.name }
         }
         servicesToApps

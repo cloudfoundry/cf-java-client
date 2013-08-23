@@ -78,10 +78,10 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
-	public void testExistenceOfInfoMojo() throws Exception {
+	public void testExistenceOfTargetMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
-		Info mojo = (Info) lookupMojo ( "info", testPom );
+		Target mojo = (Target) lookupMojo ( "target", testPom );
 
 		assertNotNull( mojo );
 	}
@@ -90,10 +90,10 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
-	public void testExistenceOfInstancesMojo() throws Exception {
+	public void testExistenceOfScaleMojo() throws Exception {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
-		Instances mojo = (Instances) lookupMojo ( "instances", testPom );
+		Scale mojo = (Scale) lookupMojo ( "scale", testPom );
 
 		assertNotNull( mojo );
 	}
@@ -138,39 +138,6 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 
 		File testPom = new File( getBasedir(), testPomXmlPath);
 		Stop mojo = (Stop) lookupMojo ( "stop", testPom );
-
-		assertNotNull( mojo );
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public void testExistenceOfRegisterMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		Register mojo = (Register) lookupMojo ( "register", testPom );
-
-		assertNotNull( mojo );
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public void testExistenceOfAddUserMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		AddUser mojo = (AddUser) lookupMojo ( "add-user", testPom );
-
-		assertNotNull( mojo );
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public void testExistenceOfDeleteUserMojo() throws Exception {
-
-		File testPom = new File( getBasedir(), testPomXmlPath);
-		DeleteUser mojo = (DeleteUser) lookupMojo ( "delete-user", testPom );
 
 		assertNotNull( mojo );
 	}

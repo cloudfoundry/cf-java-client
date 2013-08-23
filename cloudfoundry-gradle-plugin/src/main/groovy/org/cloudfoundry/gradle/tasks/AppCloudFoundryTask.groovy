@@ -39,7 +39,7 @@ class AppCloudFoundryTask extends AbstractCloudFoundryTask {
                 sb << "  usage: ${app.instances} x ${app.memory}M\n"
                 sb << "  uris: ${app.uris ? app.uris.join(', ') : 'none'}\n"
 
-                List<String> services = app.getServices()
+                List<String> services = app.services
                 if (!services.isEmpty()) {
                     sb << "  services: ${services.join(', ')}"
                 }

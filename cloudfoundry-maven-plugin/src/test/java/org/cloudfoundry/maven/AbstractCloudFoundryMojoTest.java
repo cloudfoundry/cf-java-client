@@ -191,23 +191,15 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 		setVariableValueToObject(mojo, "space", "development");
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-		doThrow(new IOException()).when(mojo).retrieveToken();
+		doThrow(new MojoExecutionException("Retrieve token failed")).when(mojo).retrieveToken();
 
 		// TODO May need to think about handling parameter validation more intelligently
-
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "username", SystemProperties.USERNAME);
-		}
-		catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
 
 		try {
 			mojo.execute();
 		}
 		catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
+			assertEquals("Retrieve token failed", e.getMessage());
 			return;
 		}
 
@@ -232,23 +224,15 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 		setVariableValueToObject(mojo, "username", "tester@test.com");
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
-		doThrow(new IOException()).when(mojo).retrieveToken();
+		doThrow(new MojoExecutionException("Retrieve token failed")).when(mojo).retrieveToken();
 
 		// TODO May need to think about handling parameter validation more intelligently
-
-		String expectedErrorMessage = null;
-		try {
-			Assert.configurationNotNull(null, "password", SystemProperties.PASSWORD);
-		}
-		catch (MojoExecutionException e) {
-			expectedErrorMessage = e.getMessage();
-		}
 
 		try {
 			mojo.execute();
 		}
 		catch (MojoExecutionException e) {
-			assertEquals(expectedErrorMessage, e.getMessage());
+			assertEquals("Retrieve token failed", e.getMessage());
 			return;
 		}
 

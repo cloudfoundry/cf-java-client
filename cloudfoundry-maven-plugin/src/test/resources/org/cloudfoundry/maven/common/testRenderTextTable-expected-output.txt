@@ -1,3 +1,4 @@
-  Application  #  Health   Memory  URLS                                       Services
-  -----------  -  -------  ------  -----------------------------------------  --------
-  Name         1  STARTED  512     cf-rocks.cloudfoundry.com,MyMongoInstance  mysql,MyMongoInstance
+  name    status   usage      url                                                        
+  ------  -------  ---------  -----------------------------------------------------------
+  first   0%       1 x 512M   cf-rocks.api.run.pivotal.io,spring-rocks.api.run.pivotal.io
+  second  stopped  2 x 1024M  cf-rocks.api.run.pivotal.io,spring-rocks.api.run.pivotal.io
