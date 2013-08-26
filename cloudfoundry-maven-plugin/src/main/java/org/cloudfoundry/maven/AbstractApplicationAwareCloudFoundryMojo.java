@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
@@ -388,29 +390,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	/**
-	 * Returns a list of services which have not yet been created
-	 *
-	 * @return List of non created services
-	 */
-	public List<CloudService> getNonCreatedServices() {
-		List<CloudService> currentServices = getClient().getServices();
-		List<String>currentServicesNames = new ArrayList<String>();
-		List<CloudService> returnServices = new ArrayList<CloudService>(0);
-
-		for (CloudService currentService : currentServices) {
-			currentServicesNames.add(currentService.getName());
-		}
-
-		for (CloudService service: getServices()) {
-			if (!currentServicesNames.contains(service.getName())) {
-				returnServices.add(service);
-			}
-		}
-
-		return returnServices;
-	}
-
-	/**
 	 * If true, this property specifies that the application shall not automatically
 	 * started upon "push". If not set, this property defaults to <code>false</code>
 	 *
@@ -476,6 +455,30 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			client.uploadApplication(appName, file);
 		} catch (IOException e) {
 			throw new IllegalStateException("Error while uploading application.", e);
+		}
+	}
+
+	protected void showStagingStatus(StartingInfo startingInfo) {
+		if (startingInfo != null) {
+			int offset = 0;
+			String staging = client.getStagingLogs(startingInfo, offset);
+			while (staging != null) {
+				getLog().info(staging);
+				offset += staging.length();
+				staging = client.getStagingLogs(startingInfo, offset);
+			}
+		}
+	}
+
+	protected void showStartingStatus() {
+		getLog().info(String.format("Checking status of application '%s'", getAppname()));
+		while (true) {
+			CloudApplication app = client.getApplication(getAppname());
+			getLog().info(String.format("%d of %d instances running",
+					app.getRunningInstances(), app.getInstances()));
+
+			if (app.getRunningInstances() == app.getInstances())
+				break;
 		}
 	}
 

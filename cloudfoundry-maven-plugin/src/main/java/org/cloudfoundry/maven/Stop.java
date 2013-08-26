@@ -33,13 +33,13 @@ public class Stop extends AbstractApplicationAwareCloudFoundryMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 
-		getLog().info("Stopping application..." + getAppname());
+		getLog().info(String.format("Stopping application '%s'", getAppname()));
 
 		try {
 			getClient().stopApplication(getAppname());
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
+				throw new MojoExecutionException(String.format("Application '%s' does not exist",
 						getAppname()), e);
 			}
 		}

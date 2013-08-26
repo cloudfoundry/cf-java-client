@@ -15,6 +15,12 @@
  */
 package org.cloudfoundry.maven;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.springframework.http.HttpStatus;
+
 /**
  * Starts an application.
  *
@@ -27,8 +33,25 @@ package org.cloudfoundry.maven;
 public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
-	protected void doExecute() {
-		getLog().info("Starting application..." + getAppname());
-		getClient().startApplication(getAppname());
+	protected void doExecute() throws MojoExecutionException {
+
+		try {
+			final CloudApplication application = getClient().getApplication(getAppname());
+
+			if (application.getRunningInstances() > 0) {
+				getLog().info(String.format("Application '%s' is already started", getAppname()));
+			} else {
+				getLog().info(String.format("Starting application '%s'", getAppname()));
+
+				final StartingInfo startingInfo = getClient().startApplication(getAppname());
+				// showStagingStatus(startingInfo);
+				showStartingStatus();
+			}
+		} catch (CloudFoundryException e) {
+			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+				throw new MojoExecutionException(String.format("Application '%s' does not exist",
+						getAppname()), e);
+			}
+		}
 	}
 }

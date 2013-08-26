@@ -35,17 +35,17 @@ public class Scale extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() throws MojoExecutionException {
 
 		final Integer instances = getInstances();
-		final String  appname = getAppname();
+		final String appname = getAppname();
 
 		Assert.configurationNotNull(instances, "instances", SystemProperties.INSTANCES);
 
-		getLog().info(String.format("Setting number of instances for " + "application '%s' to '%s'.", appname, instances));
+		getLog().info(String.format("Setting number of instances for application '%s' to '%s'", appname, instances));
 
 		try {
 			getClient().updateApplicationInstances(appname, instances);
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(
-					String.format("Error while setting  number of instances for " +
+					String.format("Error setting  number of instances for " +
 							"application '%s'. Error message: '%s'. Description: '%s'",
 							getAppname(), e.getMessage(), e.getDescription()), e);
 		}

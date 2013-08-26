@@ -40,8 +40,9 @@ class StartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
                     log "Starting ${application}"
                     StartingInfo startingInfo = client.startApplication(application)
                     // showStagingStatus(startingInfo) todo: configure RestTemplate to disable warnings
-                    showStartingStatus()}
+                    showStartingStatus()
                 }
+            }
         }
     }
 }
