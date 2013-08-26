@@ -89,6 +89,17 @@ public final class CommonUtils {
 	}
 
 	/**
+	 * Convert a List of Strings to a comma delimited String.
+	 *
+	 * @param list
+	 * @return Returns the List as a comma delimited String. Returns an empty
+	 *         String for a Null or empty list.
+	 */
+	public static String collectionToCommaDelimitedString(Collection<String> list, String prefix) {
+		return StringUtils.collectionToDelimitedString(list, ",", prefix, "");
+	}
+
+	/**
 	 * Convert a List of CloudServices to a comma delimited String using their names.
 	 *
 	 * @param list

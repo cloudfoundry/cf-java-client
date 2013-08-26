@@ -27,18 +27,19 @@ package org.cloudfoundry.maven.common;
 public enum SystemProperties {
 
 	APP_NAME("cf.appname", "appname"),
+	BUILDPACK("cf.buildpack", "buildpack"),
 	COMMAND("cf.command", "command"),
 	INSTANCES("cf.instances", "instances"),
 	MEMORY("cf.memory", "memory"),
 	NO_START("cf.no-start", "no-start"),
+	ORG("cf.org", "org"),
 	PASSWORD("cf.password", "password"),
 	PATH("cf.path", "path"),
 	SETTINGS_SERVER("server", "server"),
+	SPACE("cf.space", "space"),
 	TARGET("cf.target", "target"),
 	URL("cf.url", "url"),
-	USERNAME("cf.username", "username"),
-	ORG("cf.org", "org"),
-	SPACE("cf.space", "space");
+	USERNAME("cf.username", "username");
 
 	private String property;
 	private String xmlElement;

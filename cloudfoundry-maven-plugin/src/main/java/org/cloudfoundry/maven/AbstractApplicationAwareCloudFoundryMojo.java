@@ -88,6 +88,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private File path;
 
 	/**
+	 * The buidpack to use for the application.
+	 *
+	 * @parameter expression = "${cf.buildpack}"
+	 */
+	private String buildpack;
+
+	/**
 	 * The start command to use for the application.
 	 *
 	 * @parameter expression = "${cf.command}"
@@ -310,7 +317,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 *
 	 * For a list of available properties see {@link SystemProperties}.
 	 *
-	 * @return Returns the number of configured instance or null
+	 * @return Returns the command or null
 	 */
 	public String getCommand() {
 
@@ -321,6 +328,28 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		}
 
 		return this.command;
+
+	}
+
+	/**
+	 * Returns the buildpack to use, if set. Otherwise Null is returned.
+	 * If the parameter is set via the command line (aka system property, then
+	 * that value is used). If not the pom.xml configuration parameter is used,
+	 * if available.
+	 *
+	 * For a list of available properties see {@link SystemProperties}.
+	 *
+	 * @return Returns the buildpack or null
+	 */
+	public String getBuildpack() {
+
+		final String buildpackProperty = getCommandlineProperty(SystemProperties.BUILDPACK);
+
+		if (buildpackProperty != null) {
+			return buildpackProperty;
+		}
+
+		return this.buildpack;
 
 	}
 
@@ -446,9 +475,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		boolean isDirectory = file.isDirectory();
 
 		if (isDirectory) {
-			getLog().info(String.format("Deploying directory %s to %s.", file.getAbsolutePath(), appName));
+			getLog().debug(String.format("Deploying directory %s to %s.", file.getAbsolutePath(), appName));
 		} else {
-			getLog().info(String.format("Deploying file %s (%s Kb) to %s.", file.getAbsolutePath(), file.length() / 1024, appName));
+			getLog().debug(String.format("Deploying file %s (%s Kb) to %s.", file.getAbsolutePath(), file.length() / 1024, appName));
 		}
 
 		try {
@@ -488,8 +517,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	protected void addDomains() {
 		List<CloudDomain> domains  = getClient().getDomains();
 
+		List<String> currentDomains = new ArrayList<String>(domains.size());
+		for (CloudDomain domain : domains) {
+			currentDomains.add(domain.getName());
+		}
+
 		for (String domain : getCustomDomains()) {
-			if (!domains.contains(domain)) {
+			if (!currentDomains.contains(domain)) {
 				getClient().addDomain(domain);
 			}
 		}

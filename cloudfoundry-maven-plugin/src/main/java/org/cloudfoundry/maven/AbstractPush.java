@@ -26,6 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
+import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
 
@@ -41,90 +42,45 @@ import org.springframework.http.HttpStatus;
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
  * @author Scott Frederick
- *
  * @since 1.0.0
- *
  */
 public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-
-		addDomains();
-
-		final java.util.List<String> uris = new ArrayList<String>(0);
-
-		Assert.configurationUrls(getUrl(), getUrls());
-
-		if (getUrl() != null) {
-			uris.add(getUrl());
-		} else if (!getUrls().isEmpty()) {
-			for (String uri : getUrls()) {
-				uris.add(uri);
-			}
-		}
-
 		final String appname = getAppname();
 		final String command = getCommand();
+		final String buildpack = getBuildpack();
 		final Map<String, String> env = getEnv();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
 		final File path = getPath();
+		final List<String> uris = getAllUris();
+		final List<String> serviceNames = getServiceNames();
+
+		validateMemoryChoice(getClient(), memory);
+		validatePath(path);
+
+		addDomains();
 
 		createServices();
 
-		final List<CloudService> services = getServices();
-		List<String> serviceNames = new ArrayList<String>();
-
-		for (CloudService service : services) {
-			serviceNames.add(service.getName());
-		}
-
 		getLog().debug(String.format(
 				"Pushing App - Appname: %s," +
-				             " Command: %s," +
-				                 " Env: %s," +
-				           " Instances: %s," +
-				              " Memory: %s," +
-				                " Path: %s," +
-				            " Services: %s," +
-				                " Uris: %s,",
+						" Command: %s," +
+						" Env: %s," +
+						" Instances: %s," +
+						" Memory: %s," +
+						" Path: %s," +
+						" Services: %s," +
+						" Uris: %s,",
+				appname, command, env, instances, memory, path, serviceNames, uris));
 
-			appname, command, env, instances, memory, path, serviceNames, uris));
+		getLog().info(String.format("Creating application '%s'", appname));
 
-		getLog().debug("Create Application...");
+		createApplication(appname, command, buildpack, memory, uris, serviceNames);
 
-		validateMemoryChoice(getClient(), memory);
-
-		boolean found = true;
-
-		try {
-			getClient().getApplication(appname);
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				found = false;
-			} else {
-				throw new MojoExecutionException(String.format("Error while checking for existing application '%s'. Error message: '%s'. Description: '%s'",
-						appname, e.getMessage(), e.getDescription()), e);
-			}
-
-		}
-
-		if (found) {
-			throw new MojoExecutionException(
-					String.format("The application '%s' is already deployed.", appname));
-		}
-
-		try {
-			final Staging staging = new Staging(command, null);
-
-			getClient().createApplication(appname, staging, memory, uris, serviceNames);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
-					getAppname(), e.getMessage(), e.getDescription()), e);
-		}
-
-		getLog().debug("Updating Application env...");
+		getLog().debug("Updating application env...");
 
 		try {
 			getClient().updateApplicationEnv(appname, env);
@@ -133,9 +89,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 					getAppname(), e.getMessage(), e.getDescription()), e);
 		}
 
-		getLog().debug("Deploy Application...");
-
-		validatePath(path);
+		getLog().info(String.format("Uploading '%s'", path));
 
 		try {
 			uploadApplication(getClient(), path, appname);
@@ -156,26 +110,82 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 
 		if (!isNoStart()) {
-
-			getLog().debug("Start Application..." + appname);
+			getLog().info("Starting application");
 
 			try {
-				getClient().startApplication(appname);
+				final StartingInfo startingInfo = getClient().startApplication(appname);
+				// showStagingStatus(startingInfo);
+				showStartingStatus();
 			} catch (CloudFoundryException e) {
 				throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
-
-		} else {
-			getLog().debug("Not Starting Application.");
 		}
+
+		if (!uris.isEmpty()) {
+			getLog().info(String.format("Application '%s' is available at '%s'",
+					appname, CommonUtils.collectionToCommaDelimitedString(uris, "http://")));
+		} else {
+			getLog().info(String.format("Application '%s' is available", appname));
+		}
+
+	}
+
+	private void createApplication(String appname, String command, String buildpack,
+								   Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
+		boolean found;
+		try {
+			getClient().getApplication(appname);
+			found = true;
+		} catch (CloudFoundryException e) {
+			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+				found = false;
+			} else {
+				throw new MojoExecutionException(String.format("Error while checking for existing application '%s'. Error message: '%s'. Description: '%s'",
+						appname, e.getMessage(), e.getDescription()), e);
+			}
+		}
+
+		try {
+			final Staging staging = new Staging(command, buildpack);
+			if (!found) {
+				getClient().createApplication(appname, staging, memory, uris, serviceNames);
+			} else {
+				client.stopApplication(appname);
+				client.updateApplicationStaging(appname, staging);
+				client.updateApplicationMemory(appname, memory);
+				client.updateApplicationUris(appname, uris);
+				client.updateApplicationServices(appname, serviceNames);
+			}
+		} catch (CloudFoundryException e) {
+			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
+					getAppname(), e.getMessage(), e.getDescription()), e);
+		}
+	}
+
+	private List<String> getServiceNames() {
+		final List<CloudService> services = getServices();
+		List<String> serviceNames = new ArrayList<String>();
+
+		for (CloudService service : services) {
+			serviceNames.add(service.getName());
+		}
+		return serviceNames;
+	}
+
+	private List<String> getAllUris() throws MojoExecutionException {
+		final List<String> uris = new ArrayList<String>(0);
+
+		Assert.configurationUrls(getUrl(), getUrls());
 
 		if (getUrl() != null) {
-			getLog().info(String.format("'%s' was successfully deployed to: '%s'.", appname, getUrl()));
-		} else {
-			getLog().info(String.format("'%s' was successfully deployed.", appname));
+			uris.add(getUrl());
+		} else if (!getUrls().isEmpty()) {
+			for (String uri : getUrls()) {
+				uris.add(uri);
+			}
 		}
-
+		return uris;
 	}
 
 	/**
@@ -183,9 +193,9 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 	 *
 	 * @param cloudFoundryClient
 	 * @param desiredMemory
-	 *
 	 * @throws IllegalStateException if memory constraints are violated.
 	 */
+
 	protected void validateMemoryChoice(CloudFoundryClient cloudFoundryClient, Integer desiredMemory) {
 		int[] memoryChoices = cloudFoundryClient.getApplicationMemoryChoices();
 		validateMemoryChoice(memoryChoices, desiredMemory);
