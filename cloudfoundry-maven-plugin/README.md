@@ -16,7 +16,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.0.M1-SNAPSHOT</version>
+        <version>1.0.0</version>
     </plugin>
 ~~~
 
@@ -75,8 +75,13 @@ e.g. by using:
 
     $ mvn cf:info -Dcf.username=myusername -Dcf.password=s3cr3t -Dtarget=http://api.cloudfoundry.com
 
-
 > If the credentials are defined via the server element (in `settings.xml`) AND through the command line, then the command line parameter takes the precedence.
+
+Another alternative is to use the `login` and `logout` goals to authenticate with a user name and password, and allow all other goals to use access tokens saved by `login`.
+
+    $ mvn cf:login -Dcf.username=myusername -Dcf.password=s3cr3t -Dtarget=http://api.cloudfoundry.com
+
+After the `login` goal is executed in this way, it is not necessary to have a user name or password configured.
 
 Finally, describing probably a rather rare use-case: If you have multiple Cloud Foundry specific `server` elements defined in your `settings.xml`, you can address those through command line parameters as well using:
 
@@ -231,130 +236,6 @@ Additional certain configuration parameter will fall back to using default value
 
 > The parameters **username**, **password**, **target**, and **space** don't have default values and you are required to provide them.
 
-# Samples
-
-## Deploying a Stand-alone Spring Application
-
-The following sample is based on the blog posting:
-
-* [http://blog.cloudfoundry.com/2012/05/09/running-workers-on-cloud-foundry-with-spring/](http://blog.cloudfoundry.com/2012/05/09/running-workers-on-cloud-foundry-with-spring/)
-
-We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
-
-1. Checkout the sample using [GIT](http://git-scm.com/)
-
-		$ git clone git://github.com/ghillert/twitter-rabbit-socks-sample.git
-
-2. Go to the `twitter2rabbit` directory
-
-		$ cd twitter-rabbit-socks-sample/twitter2rabbit
-
-3. Add the [Maven Application Assembler Plugin](http://mojo.codehaus.org/appassembler/appassembler-maven-plugin) to the **pom.xml** file:
-
-		<build>
-			...
-		    <plugins>
-				...
-		        <plugin>
-		            <groupId>org.codehaus.mojo</groupId>
-		            <artifactId>appassembler-maven-plugin</artifactId>
-		            <version>1.2.2</version>
-		            <executions>
-		                <execution>
-		                    <phase>package</phase>
-		                    <goals>
-		                        <goal>assemble</goal>
-		                    </goals>
-		                    <configuration>
-		                        <assembledirectory>target</assembledirectory>
-		                        <programs>
-		                            <program>
-		                                <mainClass>org.springsource.samples.twitter.Demo</mainClass>
-		                            </program>
-		                        </programs>
-		                    </configuration>
-		                </execution>
-		            </executions>
-		        </plugin>
-				...
-		    </plugins>
-			...
-		</build>
-
-4. Add the Cloud Foundry Maven Plugin:
-
-		<build>
-			...
-		    <plugins>
-				...
-		        <plugin>
-					<groupId>org.cloudfoundry</groupId>
-					<artifactId>cf-maven-plugin</artifactId>
-					<version>1.0.0.M2</version>
-					<configuration>
-						<command>bin/demo</command>
-						<framework>standalone</framework>
-						<memory>256</memory>
-						<path>target/appassembler</path>
-						<services>
-							<service>
-								<name>myRabbitService</name>
-								<vendor>rabbitmq</service>
-							</service>
-						</services>
-						<target>http://api.cloudfoundry.com</target>
-					</configuration>
-		        </plugin>
-				...
-		    </plugins>
-			...
-		</build>
-
-5. Deploy the application:
-
-		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
-
-## Deploying a Web Application
-
-1. Checkout the sample using [GIT](http://git-scm.com/), IF you have not checked it out per the previous example:
-
-		$ git clone git://github.com/ghillert/twitter-rabbit-socks-sample.git
-
-2. Go to the `twitter2rabbit` directory
-
-		$ cd twitter-rabbit-socks-sample/rabbit2spring
-
-3. Add the Cloud Foundry Maven Plugin:
-
-		<build>
-			...
-		    <plugins>
-				...
-		        <plugin>
-					<groupId>org.cloudfoundry</groupId>
-					<artifactId>cf-maven-plugin</artifactId>
-					<version>1.0.0.M2</version>
-					<configuration>
-						<target>http://api.cloudfoundry.com</target>
-						<url>spring-integration-twitter.cloudfoundry.com</url>
-						<memory>256</memory>
-						<services>
-							<service>
-								<name>myRabbitService</name>
-								<vendor>rabbitmq</vendor>
-							</service>
-						</services>
-					</configuration>
-		        </plugin>
-				...
-		    </plugins>
-			...
-		</build>
-
-5. Deploy the application:
-
-		$ mvn cf:push -Dcf.username=your_username -Dcf.password=yu0r p455w0rd
-
 # History
 
 ## Changes from version 1.0.0.M4 to 1.0.0.M5
@@ -363,6 +244,7 @@ We will adapt the used sample to work with the *Cloud Foundry Maven Plugin*
 * Removed v1 support and all v1 concepts (update goal, runtime and framework parameters)
 * Added support for buildpacks
 * Renamed goals and parameters for consistency with 'cf' and Cloud Foundry Gradle Plugin
+* Changed login and logout goals to save tokens to the file `~/.cf/tokens.yml` instead of `~/.mvn-cf.xml`, for compatibility with the cf CLI
 
 ## Changes from version 1.0.0.M3 to 1.0.0.M4
 
