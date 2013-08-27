@@ -4,30 +4,22 @@ Usage: mvn cf:command [command_options]
 Currently available Cloud Foundry Maven Plugin Goals are:
 
   Getting Started
-    target                                       Shows information about the target Cloud Foundry service
-    login                                        Log into the Cloud Foundry service
-    logout                                       Log out of the Cloud Foundry service
+    target                                      Shows information about the target Cloud Foundry service
+    login                                       Log into the Cloud Foundry service
+    logout                                      Log out of the Cloud Foundry service
 
   Applications
-    apps                                         List deployed applications
-    app                                          Show details of the application
-
-  Application Creation
-    push [-Dcf.appname]                         Create, push, map, and start a new application
-    push [-Dcf.appname] [-Dcf.path]             Push application from specified path
-    push [-Dcf.appname] [-Dcf.url]              Set the url for the application
-    push [-Dcf.appname] [-Dcf.instances]        Set the expected number of instances
-    push [-Dcf.appname] [-Dcf.memory]           Set the memory reservation for the application
-    push [-Dcf.appname] [-Dcf.services]         Set the services to use for the application
-    push [-Dcf.appname] [-Dcf.no-start]         Do not auto-start the application
+    apps                                        List deployed applications
+    app                                         Show details of the application
 
   Application Operations
-    start   [-Dcf.appname]                      Start the application
-    stop    [-Dcf.appname]                      Stop the application
-    restart [-Dcf.appname]                      Restart the application
-    delete  [-Dcf.appname]                      Delete the application
-    scale   [-Dcf.appname] [-Dcf.instances]     Scale the application instances up or down
-    logs    [-Dcf.appname]                      Show application logs
+    push                                        Create, push, map, and start a new application
+    start                                       Start the application
+    stop                                        Stop the application
+    restart                                     Restart the application
+    delete                                      Delete the application
+    scale                                       Scale the application instances up or down
+    logs                                        Show application logs
 
   Services
     services                                    List the available services along with provisioned

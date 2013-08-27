@@ -17,44 +17,21 @@
 
 package org.cloudfoundry.maven;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import java.net.MalformedURLException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.AuthTokens;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.util.List;
 
 /**
- * Writes the user's token into mvn-cf file
- * in user's home directory - This will be used
- * instead of username/password
+ * Writes the user's token into ~/.cf/tokens.yml file.
  *
  * @author Ali Moghadam
  * @author Scott Frederick
@@ -64,6 +41,12 @@ import org.xml.sax.SAXException;
  * @requiresProject false
  */
 public class Login extends AbstractCloudFoundryMojo {
+	public Login() {
+	}
+
+	public Login(AuthTokens authTokens) {
+		this.authTokens = authTokens;
+	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -71,113 +54,27 @@ public class Login extends AbstractCloudFoundryMojo {
 		Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
 		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
 
-		try {
-			client = new CloudFoundryClient(new CloudCredentials(getUsername(), getPassword()), getTarget().toURL());
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", getTarget()), e);
-		}
-
-		doExecute();
+		super.execute();
 	}
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		File file = createFileWriter();
-		Element targets;
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
+		final OAuth2AccessToken token = getClient().login();
+		final CloudInfo cloudInfo = getClient().getCloudInfo();
+		final CloudSpace space = getCurrentSpace();
 
-		try {
-			builder = factory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new MojoExecutionException("Error Parser Configuration", e);
-		}
+		authTokens.saveToken(getTarget(), token, cloudInfo, space);
 
-		if (file.exists() && file.length() != 0) {
-			getLog().debug("Token file already exists.");
-			boolean exist = false;
-			try {
-				Document doc = builder.parse(file);
-				targets = doc.getDocumentElement();
-				NodeList list = targets.getElementsByTagName("target");
-
-				for (int i = 0; i < list.getLength(); i++) {
-					Node childNode = list.item(i);
-					if (childNode.getFirstChild().getTextContent().equals(getTarget().toString())) {
-						getLog().debug("Target found in token file. Updating target");
-
-						exist = true;
-						Element token = doc.createElement("token");
-						final OAuth2AccessToken authToken = client.login();
-						CDATASection tokenData = doc.createCDATASection(authToken.getValue());
-						token.appendChild(tokenData);
-
-						childNode.replaceChild(token, childNode.getLastChild());
-						break;
-					}
-				}
-				if (!exist) {
-					getLog().debug("Target not found in token file. Adding target");
-
-					Element target = doc.createElement("target");
-
-					Element url = doc.createElement("url");
-					url.setTextContent(getTarget().toString());
-
-					Element token = doc.createElement("token");
-					final OAuth2AccessToken authToken = client.login();
-					CDATASection tokenData = doc.createCDATASection(authToken.getValue());
-					token.appendChild(tokenData);
-
-					target.appendChild(url);
-					target.appendChild(token);
-					targets.appendChild(target);
-				}
-			} catch (SAXException e) {
-				throw new MojoExecutionException("Error reading token file", e);
-			} catch (IOException e) {
-				throw new MojoExecutionException("Error locating token file", e);
-			}
-		} else {
-			getLog().debug("Creating token file");
-			Document doc = builder.newDocument();
-			targets = doc.createElement("targets");
-
-			Element target = doc.createElement("target");
-
-			Element url = doc.createElement("url");
-			url.setTextContent(getTarget().toString());
-
-			Element token = doc.createElement("token");
-			final OAuth2AccessToken authToken = client.login();
-			CDATASection tokenData = doc.createCDATASection(authToken.getValue());
-			token.appendChild(tokenData);
-
-			target.appendChild(url);
-			target.appendChild(token);
-			targets.appendChild(target);
-		}
-
-		DOMSource source = new DOMSource(targets);
-		try {
-			PrintStream ps = new PrintStream(file);
-			StreamResult result = new StreamResult(ps);
-
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			transformer.transform(source, result);
-		} catch (TransformerConfigurationException e) {
-			throw new MojoExecutionException("Error in Transformer Configuration", e);
-		} catch (TransformerException e) {
-			throw new MojoExecutionException("Error in Transforming Exception", e);
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException("Token File Not Found", e);
-		}
-		getLog().info("You are now logged in");
+		getLog().info("Authentication successful");
 	}
 
-	protected File createFileWriter() {
-		return new File(System.getProperty("user.home") + "/.mvn-cf.xml");
+	protected CloudSpace getCurrentSpace() {
+		List<CloudSpace> spaces = client.getSpaces();
+		for (CloudSpace space : spaces) {
+			if (space.getName().equals(getSpace())) {
+				return space;
+			}
+		}
+		return null;
 	}
 }

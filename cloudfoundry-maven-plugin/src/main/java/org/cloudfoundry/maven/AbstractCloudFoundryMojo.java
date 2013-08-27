@@ -15,14 +15,11 @@
  */
 package org.cloudfoundry.maven;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.artifact.manager.WagonManager;
@@ -35,17 +32,12 @@ import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.maven.common.Assert;
+import org.cloudfoundry.maven.common.AuthTokens;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResourceAccessException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Abstract goal that provides common configuration for the Cloud Foundry Maven
@@ -56,6 +48,7 @@ import org.xml.sax.SAXException;
  * @author Scott Frederick
  * @since 1.0.0
  */
+@SuppressWarnings("UnusedDeclaration")
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
@@ -64,6 +57,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	private String artifactId;
 
 	protected CloudFoundryClient client;
+	protected AuthTokens authTokens = new AuthTokens();
 
 	/**
 	 * @parameter expression="${cf.password}"
@@ -116,34 +110,27 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		super();
 	}
 
+	public AbstractCloudFoundryMojo(AuthTokens authTokens) {
+		this.authTokens = authTokens;
+	}
+
 	/**
-	 * Retrieve Token from .mvn-cf.xml
+	 * Retrieve Token from ~/.cf/tokens.yml
+	 *
 	 * @return token (String)
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	protected String retrieveToken() throws MojoExecutionException {
-		File file = new File(System.getProperty("user.home") + "/.mvn-cf.xml");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	protected OAuth2AccessToken retrieveToken() throws MojoExecutionException {
+		final OAuth2AccessToken token = authTokens.retrieveToken(getTarget());
 
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(file);
-
-			Element targets = doc.getDocumentElement();
-			NodeList list = targets.getElementsByTagName("target");
-
-			for (int i = 0; i < list.getLength(); i++) {
-				Node childNode = list.item(i);
-				if (childNode.getFirstChild().getTextContent().equals(getTarget().toString())) {
-					return childNode.getLastChild().getTextContent();
-				}
-			}
-		} catch (Exception e) {
-			throw new MojoExecutionException("Error reading tokens from " + file.getPath());
+		if (token == null) {
+			throw new MojoExecutionException(String.format("Access token could not be read from '%s' for target '%s'. " +
+					"Configure a username and password, or use the login goal.",
+					authTokens.getTokensFilePath(), getTarget().toString()));
 		}
 
-		return null;
+		return token;
 	}
 
 	/**
@@ -155,21 +142,20 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * @return client
 	 * @throws MojoExecutionException
 	 */
-	protected CloudFoundryClient createCloudFoundryClient(String token, URI target, String org, String space)
+	protected CloudFoundryClient createCloudFoundryClient(OAuth2AccessToken token, URI target, String org, String space)
 			throws MojoExecutionException {
 
 		Assert.configurationNotNull(org, "org", SystemProperties.ORG);
 		Assert.configurationNotNull(space, "space", SystemProperties.SPACE);
 
-		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using Token", target.toString()));
+		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using token", target.toString()));
 
 		try {
-			final DefaultOAuth2AccessToken authToken = new DefaultOAuth2AccessToken(token);
-			final CloudCredentials credentials = new CloudCredentials(authToken);
+			final CloudCredentials credentials = new CloudCredentials(token);
 			return new CloudFoundryClient(credentials, target.toURL(), org, space);
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
+					String.format("Incorrect Cloud Foundry target URL '%s'. Make sure the URL contains a scheme, e.g. http://...", target), e);
 		}
 	}
 
@@ -192,7 +178,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Assert.configurationNotNull(space, "space", SystemProperties.SPACE);
 
 		getLog().debug(String.format(
-				"Connecting to Cloud Foundry at '%s' (Username: '%s', password: '***')",
+				"Connecting to Cloud Foundry at '%s' with username: '%s'",
 				target, username));
 
 		try {
@@ -202,7 +188,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			return client;
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://...", target), e);
+					String.format("Incorrect Cloud Foundry target URL '%s'. Make sure the URL contains a scheme, e.g. http://...", target), e);
 		}
 	}
 
@@ -244,17 +230,13 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 		try {
-			String token;
-
 			if (getUsername() != null && getPassword() != null) {
 				client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 			} else {
-				token = retrieveToken();
-				client = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
+				client = createCloudFoundryClient(retrieveToken(), getTarget(), getOrg(), getSpace());
 			}
 
 			doExecute();
-
 		} catch (RuntimeException e) {
 			throw new MojoExecutionException("An exception was caught while executing Mojo.", e);
 		}

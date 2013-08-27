@@ -178,7 +178,7 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 	/**
 	 * @throws Exception
 	 */
-	public void testParameterValidationWhenConnctingtoCF() throws Exception {
+	public void testParameterValidationWhenConnectingToCF() throws Exception {
 
 		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
 
@@ -204,13 +204,12 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 		}
 
 		fail();
-
 	}
 
 	/**
 	 * @throws Exception
 	 */
-	public void testParameterValidationWhenConnctingtoCF2() throws Exception {
+	public void testParameterValidationWhenConnectingToCF2() throws Exception {
 
 		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
 

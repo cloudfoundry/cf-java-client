@@ -17,7 +17,6 @@ package org.cloudfoundry.maven;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -26,7 +25,6 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
@@ -72,12 +70,10 @@ public class Target extends AbstractCloudFoundryMojo {
 		if (getUsername() != null && getPassword() != null) {
 			newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
 		} else {
-			String token = retrieveToken();
-			newClient = createCloudFoundryClient(token, getTarget(), getOrg(), getSpace());
+			newClient = createCloudFoundryClient(retrieveToken(), getTarget(), getOrg(), getSpace());
 		}
 
 		final CloudInfo cloudInfo = newClient.getCloudInfo();
-		final List<CloudServiceOffering> serviceOfferings = newClient.getServiceOfferings();
 
 		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, getTarget().toString(), getOrg(), getSpace()));
 	}

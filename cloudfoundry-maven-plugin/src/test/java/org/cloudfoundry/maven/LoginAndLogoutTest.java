@@ -17,18 +17,23 @@
 
 package org.cloudfoundry.maven;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.CloudEntity;
+import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.maven.common.AuthTokens;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -36,11 +41,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 
 import static org.junit.Assert.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -57,7 +58,7 @@ public class LoginAndLogoutTest {
 
 	private TestableLogout logout;
 
-	private TestableAbstractCFMojo abstractCFMojo;
+	private TestableCloudFoundryMojo cloudFoundryMojo;
 
 	@ClassRule
 	public static TemporaryFolder tempFolder = new TemporaryFolder();
@@ -69,108 +70,92 @@ public class LoginAndLogoutTest {
 	public void setup() throws Exception {
 		initMocks(this);
 
-		abstractCFMojo = new TestableAbstractCFMojo();
-		login = new TestableLogin();
-		logout = new TestableLogout();
+		TestableAuthTokens authTokens = new TestableAuthTokens();
+
+		cloudFoundryMojo = new TestableCloudFoundryMojo(authTokens);
+
+		login = new TestableLogin(client, authTokens);
+		logout = new TestableLogout(authTokens);
 	}
 
-	//Verify target has been created in token file
 	@Test
-	public void targetCreatedTest() throws MojoExecutionException, IOException, URISyntaxException {
-		when(client.login()).thenReturn(new DefaultOAuth2AccessToken("bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM"));
+	public void tokenSavedOnLogin() throws MojoExecutionException, IOException, URISyntaxException {
+		DefaultOAuth2RefreshToken refreshToken = new DefaultOAuth2RefreshToken("refreshtoken");
+		DefaultOAuth2AccessToken accessToken = new DefaultOAuth2AccessToken("accesstoken");
+		accessToken.setRefreshToken(refreshToken);
+		when(client.login()).thenReturn(accessToken);
 
-		login.setClient(client);
+		HashMap<String, Object> info = new HashMap<String, Object>(1);
+		info.put("version", "2");
+		when(client.getCloudInfo()).thenReturn(new CloudInfo(info));
+
+		Date date = new Date();
+		CloudOrganization org = new CloudOrganization(new CloudEntity.Meta(UUID.randomUUID(), date, date), "my-org");
+		CloudSpace space = new CloudSpace(new CloudEntity.Meta(UUID.randomUUID(), date, date), "my-space", org);
+		List<CloudSpace> spaces = Arrays.asList(space);
+		when(client.getSpaces()).thenReturn(spaces);
+
 		login.doExecute();
 
-		File newFile = new File(tempFolder.getRoot(), ".mvn-cf.xml");
+		assertEquals(cloudFoundryMojo.retrieveToken().getValue(), "accesstoken");
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		try {
-			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(newFile);
-			Element targets = doc.getDocumentElement();
-			NodeList list = targets.getElementsByTagName("target");
-
-			for (int i = 0; i < list.getLength(); i++) {
-				Node childNode = list.item(i);
-
-				assertTrue("Target url found", childNode.getFirstChild().getTextContent().equals(login.getTarget().toString()));
-				assertTrue("Target token found", childNode.getLastChild().getTextContent().equals("bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM"));
-			}
-		} catch (ParserConfigurationException e) {} catch (SAXException e) {}
-	}
-
-	//Verify target has been passed in for the next client creation
-	@Test
-    @Ignore
-	public void targetPassedInForNextClientTest() throws MojoExecutionException, MojoFailureException, IOException {
-		assertEquals(abstractCFMojo.retrieveToken(), "bearer qwrX12JK541ca2LPOIUYTREWQZXCVBNM");
-	}
-
-	//Verify target has been delete from token file
-	@Test
-	public void targetHasBeenDeleted() throws MojoExecutionException, IOException {
 		logout.doExecute();
 
-		File file  = new File(tempFolder.getRoot(), ".mvn-cf.xml");
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
 		try {
-			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(file);
-			Element targets = doc.getDocumentElement();
-			NodeList list = targets.getElementsByTagName("target");
+			cloudFoundryMojo.retrieveToken();
+			fail();
+		} catch (MojoExecutionException e) {
+			assertTrue(e.getMessage().contains("Access token could not be read"));
+		}
+	}
+}
 
-			assertFalse(list.getLength() > 0);
-
-		} catch (ParserConfigurationException e) {} catch (SAXException e) {}
+@Ignore
+class TestableAuthTokens extends AuthTokens {
+	@Override
+	public String getTokensFilePath() {
+		try {
+			return LoginAndLogoutTest.tempFolder.newFile("tokens.yml").getAbsolutePath();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
 
 @Ignore
 class TestableLogin extends Login {
 
-	@Override
-	protected File createFileWriter() {
-		try {
-			return LoginAndLogoutTest.tempFolder.newFile(".mvn-cf.xml");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void setClient(CloudFoundryClient client) {
+	public TestableLogin(CloudFoundryClient client, AuthTokens authTokens) {
+		super(authTokens);
 		this.client = client;
-	}
-
-	@Override
-	public CloudFoundryClient getClient() {
-		return client;
 	}
 
 	@Override
 	public URI getTarget() {
 		try {
-			return new URI("https://api.sample.com");
+			return new URI("https://api.example.com");
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public String getSpace() {
+		return "my-space";
 	}
 }
 
 @Ignore
 class TestableLogout extends Logout {
 
-	@Override
-	protected File getFile() {
-		return new File(LoginAndLogoutTest.tempFolder.getRoot(), ".mvn-cf.xml");
+	public TestableLogout(AuthTokens authTokens) {
+		super(authTokens);
 	}
 
 	@Override
 	public URI getTarget() {
 		try {
-			return new URI("https://api.sample.com");
+			return new URI("https://api.example.com");
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
@@ -178,44 +163,22 @@ class TestableLogout extends Logout {
 }
 
 @Ignore
-class TestableAbstractCFMojo extends AbstractCloudFoundryMojo {
+class TestableCloudFoundryMojo extends AbstractCloudFoundryMojo {
+
+	public TestableCloudFoundryMojo(AuthTokens authTokens) {
+		this.authTokens = authTokens;
+	}
 
 	@Override
 	public URI getTarget() {
 		try {
-			return new URI("https://api.sample.com");
+			return new URI("https://api.example.com");
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	protected String retrieveToken() {
-		File newFile = new File(LoginAndLogoutTest.tempFolder.getRoot(), ".mvn-cf.xml");
-
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(newFile);
-
-			Element targets = doc.getDocumentElement();
-			NodeList list = targets.getElementsByTagName("target");
-
-			for (int i = 0; i < list.getLength(); i++) {
-				Node childNode = list.item(i);
-				if (childNode.getFirstChild().getTextContent().equals(getTarget().toString())) {
-					return childNode.getLastChild().getTextContent();
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException();
-		}
-
-		return null;
+	protected void doExecute() throws MojoExecutionException, MojoFailureException {
 	}
-
-	@Override
-	protected void doExecute() throws MojoExecutionException,
-			MojoFailureException {}
 }

@@ -21,12 +21,15 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 /**
  * Shows application logs
  *
  * @author Ali Moghadam
+ * @author Scott Frederick
  * @since 1.0.0
- *
+
  * @goal logs
  * @phase process-sources
  */
@@ -37,27 +40,19 @@ public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() throws MojoExecutionException {
 
 		try {
-			getClient().getApplication(getAppname());
-		} catch (CloudFoundryException e) {
-			getLog().info("Application Not Found");
-			return;
-		}
+			getLog().info(String.format("Getting logs for '%s'", getAppname()));
 
-		getLog().info("============== /logs/stderr.log ==============" + "\n");
-		try {
-			getLog().info(getClient().getFile(getAppname(), 0, "logs/stderr.log"));
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				getLog().info("File Doesn't Exist");
+			final Map<String, String> logs = getClient().getLogs(getAppname());
+			for (Map.Entry<String, String> entry : logs.entrySet()) {
+				getLog().info(String.format("Reading '%s'\n%s", entry.getKey(), entry.getValue()));
 			}
-		}
-
-		getLog().info("============== /logs/stdout.log ==============" + "\n");
-		try {
-			getLog().info(getClient().getFile(getAppname(), 0, "logs/stdout.log"));
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				getLog().info("File Doesn't Exist");
+				throw new MojoExecutionException(String.format("Application '%s' does not exist",
+						getAppname()), e);
+			} else {
+				throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error message: '%s'. Description: '%s'",
+						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
 		}
 	}
