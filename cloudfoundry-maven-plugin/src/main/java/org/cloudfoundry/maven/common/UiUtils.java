@@ -162,6 +162,21 @@ public final class UiUtils {
 	}
 
 	/**
+	 * Renders a textual representation of a application's environment variables
+	 */
+	public static String renderEnvVarDataAsTable(CloudApplication application) {
+		StringBuilder sb = new StringBuilder("\n");
+
+		sb.append(String.format("Environment for application '%s'\n", application.getName()));
+		final List<String> envVars = application.getEnv();
+		for (String envVar : envVars) {
+			sb.append(envVar).append("\n");
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Renders a sorted textual representation of the list of provided {@link CloudFoundryClient, @link CloudServiceOffering}
 	 *
 	 * @param serviceOfferings

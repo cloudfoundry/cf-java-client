@@ -1,8 +1,4 @@
 # Cloud Foundry Maven Plugin
-Version 1.0.0.M4, November 16, 2012
-
-* Project website: [https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin](https://github.com/cloudfoundry/vcap-java-client/tree/master/cloudfoundry-maven-plugin)
-* Source code:     [git://github.com/cloudfoundry/vcap-java-client.git](git://github.com/cloudfoundry/vcap-java-client.git)
 
 ## Introduction
 
@@ -108,6 +104,9 @@ Following, a typical (expected) configuration example is shown, which uses sever
                     <appname>spring-integration-rocks</appname>
                     <url>spring-integration-rocks.cloudfoundry.com</url>
                     <memory>1024</memory>
+                    <env>
+                        <ENV-VAR-NAME>env-var-value</ENV-VAR-NAME>
+                    </env>
                     <services>
                         <service>
                             <name>mysql-test</name>
@@ -149,20 +148,26 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
 
 <table>
     <tr><th align="left">cf:apps</th>             <td>List deployed applications.</td></tr>
-    <tr><th align="left">cf:app</th>              <td>List deployed applications.</td></tr>
-    <tr><th align="left">cf:delete</th>           <td>Deletes an application.</td></tr>
+    <tr><th align="left">cf:app</th>              <td>Show details of an application.</td></tr>
+    <tr><th align="left">cf:delete</th>           <td>Delete an application.</td></tr>
+    <tr><th align="left">cf:env</th>              <td>Show an application's environment variables.</td></tr>
     <tr><th align="left">cf:help</th>             <td>Documentation for all available commands.</td></tr>
     <tr><th align="left">cf:push</th>             <td>Push and optionally start an application.</td></tr>
     <tr><th align="left">cf:push-only</th>        <td>Push and optionally start an application, without packaging.</td></tr>
-    <tr><th align="left">cf:restart</th>          <td>Restarts an application.</td></tr>
-    <tr><th align="left">cf:start</th>            <td>Starts an application.</td></tr>
-    <tr><th align="left">cf:stop</th>             <td>Stops an application.</td></tr>
-    <tr><th align="left">cf:target</th>           <td>Shows information about the target Cloud Foundry service.</td></tr>
-    <tr><th align="left">cf:logs</th>             <td>Shows log files (stdout and stderr).</td></tr>
+    <tr><th align="left">cf:restart</th>          <td>Restart an application.</td></tr>
+    <tr><th align="left">cf:start</th>            <td>Start an application.</td></tr>
+    <tr><th align="left">cf:stop</th>             <td>Stop an application.</td></tr>
+    <tr><th align="left">cf:target</th>           <td>Show information about the target Cloud Foundry service.</td></tr>
+    <tr><th align="left">cf:logs</th>             <td>Show log files (stdout and stderr).</td></tr>
     <tr><th align="left">cf:scale</th>            <td>Scale the application instances up or down.</td></tr>
-    <tr><th align="left">cf:services</th>         <td>Shows a list of available services along with provisioned.</td></tr>
-    <tr><th align="left">cf:create-services</th>  <td>Creates services defined in the pom.</td></tr>
-    <tr><th align="left">cf:delete-services</th>  <td>Deletes services defined in the pom.</td></tr>
+    <tr><th align="left">cf:services</th>         <td>Show a list of provisioned services.</td></tr>
+    <tr><th align="left">cf:service-plans</th>    <td>Show a list of available service plans.</td></tr>
+    <tr><th align="left">cf:create-services</th>  <td>Create services defined in the pom.</td></tr>
+    <tr><th align="left">cf:delete-services</th>  <td>Delete services defined in the pom.</td></tr>
+    <tr><th align="left">cf:bind-services</th>    <td>Bind services to an application.</td></tr>
+    <tr><th align="left">cf:unbind-services</th>  <td>Unbind services from an application.</td></tr>
+    <tr><th align="left">cf:login</th>            <td>Log in to the target Cloud Foundry service and saves access tokens.</td></tr>
+    <tr><th align="left">cf:logout</th>           <td>Log out of the target Cloud Foundry service and removes access tokens.</td></tr>
 </table>
 
 ### Usage Examples
@@ -277,6 +282,3 @@ Additional certain configuration parameter will fall back to using default value
 * Improved **cf:info** Maven goal. It will now show a list of available **frameworks** and **system services**, as well as a list of available **runtimes***
 * **instances** property now defaults to *1*.
 
-# Resources
-
-http://blog.springsource.com/2011/09/22/rapid-cloud-foundry-deployments-with-maven/

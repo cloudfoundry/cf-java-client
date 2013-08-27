@@ -44,6 +44,10 @@ public class CheckExistenceOfMojosTest extends AbstractMojoTestCase {
 		assertMojoExists("delete", Delete.class);
 	}
 
+	public void testExistenceOfEnvMojo() throws Exception {
+		assertMojoExists("env", Env.class);
+	}
+
 	public void testExistenceOfHelpMojo() throws Exception {
 		assertMojoExists("help", Help.class);
 	}
