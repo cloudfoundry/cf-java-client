@@ -57,8 +57,10 @@ artifacts {
     archives javadocJar
 }
 
-signing {
-    sign configurations.archives
+if (project.hasProperty('signArchives')) {
+    signing {
+        sign configurations.archives
+    }
 }
 
 def credentials = [userName: System.getProperty('deployUser'), password: System.getProperty('deployPass')]
