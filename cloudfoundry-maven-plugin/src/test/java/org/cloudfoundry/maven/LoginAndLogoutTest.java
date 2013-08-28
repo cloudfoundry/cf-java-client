@@ -33,7 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.maven.common.AuthTokens;
+import org.cloudfoundry.client.lib.tokens.TokensFile;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -70,7 +70,7 @@ public class LoginAndLogoutTest {
 	public void setup() throws Exception {
 		initMocks(this);
 
-		TestableAuthTokens authTokens = new TestableAuthTokens();
+		TestableTokensFile authTokens = new TestableTokensFile();
 
 		cloudFoundryMojo = new TestableCloudFoundryMojo(authTokens);
 
@@ -105,13 +105,13 @@ public class LoginAndLogoutTest {
 			cloudFoundryMojo.retrieveToken();
 			fail();
 		} catch (MojoExecutionException e) {
-			assertTrue(e.getMessage().contains("Access token could not be read"));
+			assertTrue(e.getMessage().contains("Can not authenticate to target"));
 		}
 	}
 }
 
 @Ignore
-class TestableAuthTokens extends AuthTokens {
+class TestableTokensFile extends TokensFile {
 	@Override
 	public String getTokensFilePath() {
 		try {
@@ -125,8 +125,8 @@ class TestableAuthTokens extends AuthTokens {
 @Ignore
 class TestableLogin extends Login {
 
-	public TestableLogin(CloudFoundryClient client, AuthTokens authTokens) {
-		super(authTokens);
+	public TestableLogin(CloudFoundryClient client, TokensFile tokensFile) {
+		super(tokensFile);
 		this.client = client;
 	}
 
@@ -148,8 +148,8 @@ class TestableLogin extends Login {
 @Ignore
 class TestableLogout extends Logout {
 
-	public TestableLogout(AuthTokens authTokens) {
-		super(authTokens);
+	public TestableLogout(TokensFile tokensFile) {
+		super(tokensFile);
 	}
 
 	@Override
@@ -165,8 +165,8 @@ class TestableLogout extends Logout {
 @Ignore
 class TestableCloudFoundryMojo extends AbstractCloudFoundryMojo {
 
-	public TestableCloudFoundryMojo(AuthTokens authTokens) {
-		this.authTokens = authTokens;
+	public TestableCloudFoundryMojo(TokensFile tokensFile) {
+		this.tokensFile = tokensFile;
 	}
 
 	@Override
