@@ -26,11 +26,13 @@ import org.cloudfoundry.gradle.tasks.DeleteApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeleteServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.EnvCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.InfoCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.LogsCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LoginCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LogoutCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.MapCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.PushApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.RestartApplicationCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.ScaleCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ServicesCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ServiceOfferingsCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.SetEnvCloudFoundryTask
@@ -60,12 +62,14 @@ class CloudFoundryPlugin implements Plugin<Project> {
         project.task('cf-logout', type: LogoutCloudFoundryTask)
         project.task('cf-spaces', type: SpacesCloudFoundryTask)
         project.task('cf-push', type: PushApplicationCloudFoundryTask)
+        project.task('cf-delete', type: DeleteApplicationCloudFoundryTask)
         project.task('cf-start', type: StartApplicationCloudFoundryTask)
         project.task('cf-restart', type: RestartApplicationCloudFoundryTask)
         project.task('cf-stop', type: StopApplicationCloudFoundryTask)
+        project.task('cf-scale', type: ScaleCloudFoundryTask)
         project.task('cf-apps', type: AppsCloudFoundryTask)
         project.task('cf-app', type: AppCloudFoundryTask)
-        project.task('cf-delete', type: DeleteApplicationCloudFoundryTask)
+        project.task('cf-logs', type: LogsCloudFoundryTask)
         project.task('cf-services', type: ServicesCloudFoundryTask)
         project.task('cf-service-plans', type: ServiceOfferingsCloudFoundryTask)
         project.task('cf-create-service', type: CreateServiceCloudFoundryTask)

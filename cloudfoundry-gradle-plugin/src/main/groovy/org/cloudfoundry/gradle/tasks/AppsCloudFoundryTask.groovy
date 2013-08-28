@@ -55,7 +55,6 @@ class AppsCloudFoundryTask extends AbstractCloudFoundryTask {
                 }
                 log sb.toString()
             }
-            client.logout()
         }
     }
 }
