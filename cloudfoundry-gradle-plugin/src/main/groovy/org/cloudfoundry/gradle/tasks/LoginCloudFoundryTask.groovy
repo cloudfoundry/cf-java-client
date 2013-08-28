@@ -15,22 +15,36 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.CloudFoundryClient
+import org.cloudfoundry.client.lib.tokens.TokensFile
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
+import org.springframework.security.oauth2.common.OAuth2AccessToken
 
 /**
- * A basic task which can be used to verify credentials. It logs in, then logs out.
+ * Logs in and saves access token.
  */
 class LoginCloudFoundryTask extends AbstractCloudFoundryTask {
 
     LoginCloudFoundryTask() {
         super()
-        description = 'Logs in then out to verify credentials'
+        description = 'Logs in to the target Cloud Foundry platform'
     }
 
     @TaskAction
     void login() {
-        withCloudFoundryClient {
-            client.logout()
+        if (username == null || password == null) {
+            throw new GradleException("The Cloud Foundry username and password must be configured.")
         }
+
+        log "Authenticating to '${target}' with username '${username}'"
+
+        CloudFoundryClient client = createClientWithUsernamePassword()
+        OAuth2AccessToken token = client.login()
+
+        TokensFile tokensFile = new TokensFile()
+        tokensFile.saveToken(target.toURI(), token, client.cloudInfo, getCurrentSpace(client))
+
+        log "Authentication successful"
     }
 }

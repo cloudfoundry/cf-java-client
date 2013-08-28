@@ -21,9 +21,11 @@ import org.cloudfoundry.client.lib.CloudFoundryException
 import org.cloudfoundry.client.lib.CloudFoundryOperations
 import org.cloudfoundry.client.lib.RestLogCallback
 import org.cloudfoundry.client.lib.domain.CloudSpace
+import org.cloudfoundry.client.lib.tokens.TokensFile
 import org.gradle.api.DefaultTask
 import org.cloudfoundry.gradle.GradlePluginRestLogCallback
 import org.springframework.http.HttpStatus
+import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.web.client.ResourceAccessException
 import org.gradle.api.GradleException
 
@@ -56,30 +58,59 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
             throw new GradleException("The Cloud Foundry target must be configured.")
         }
 
-        if (username == null || password == null) {
-            throw new GradleException("The Cloud Foundry username and password must be configured.")
+        if (space == null) {
+            throw new GradleException("The Cloud Foundry space must be configured.")
         }
     }
 
     private void connectToCloudFoundry() {
-        if (verbose) {
-            log "Connecting to '${target}' with user '${username}'"
+        if (username != null && password != null) {
+            client = createClientWithUsernamePassword()
+        } else {
+            client = createClientWithToken()
         }
-
-        CloudFoundryClient localClient = getClient()
-
-        login(localClient)
-
-        client = localClient
     }
 
-    private CloudFoundryClient getClient() {
+    protected CloudFoundryClient createClientWithUsernamePassword() {
         try {
+            if (verbose) {
+                log "Connecting to '${target}' with username '${username}'"
+            }
+
             CloudCredentials credentials = new CloudCredentials(username, password)
+            CloudFoundryClient localClient = new CloudFoundryClient(credentials, target.toURL(), organization, space)
+
+            login(localClient)
+
+            localClient
+        } catch (MalformedURLException e) {
+            throw new GradleException("Incorrect Cloud Foundry target URL '${target}'. Make sure the URL contains a scheme, e.g. http://...", e)
+        }
+    }
+
+    protected CloudFoundryClient createClientWithToken() {
+        try {
+            if (verbose) {
+                log "Connecting to '${target}' with stored token"
+            }
+
+            CloudCredentials credentials = new CloudCredentials(retrieveToken())
             return new CloudFoundryClient(credentials, target.toURL(), organization, space)
         } catch (MalformedURLException e) {
-            throw new GradleException("Incorrect Cloud Foundry target url, are you sure '${target}' is correct? Make sure the url contains a scheme, e.g. http://...", e)
+            throw new GradleException("Incorrect Cloud Foundry target URL '${target}'. Make sure the URL contains a scheme, e.g. http://...", e)
         }
+    }
+
+    private OAuth2AccessToken retrieveToken() {
+        TokensFile tokensFile = new TokensFile()
+        OAuth2AccessToken token = tokensFile.retrieveToken(target.toURI())
+
+        if (token == null) {
+            throw new GradleException("Can not authenticate to target ${target}. " +
+                    "Configure a username and password, or use the login task.")
+        }
+
+        token
     }
 
     private void login(localClient) {
@@ -87,7 +118,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
             localClient.login()
         } catch (CloudFoundryException e) {
             if (HttpStatus.FORBIDDEN == e.statusCode) {
-                throw new GroovyRuntimeException("Login failed to '${target}' using username '${username}'. Please verify your login credentials.", e)
+                throw new GroovyRuntimeException("Login failed to '${target}'. Please verify your login credentials.", e)
             } else if (HttpStatus.NOT_FOUND == e.statusCode) {
                 throw new GradleException("The target host '${target}' exists but it does not appear to be a valid Cloud Foundry target url.", e)
             } else {
@@ -139,8 +170,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    protected CloudSpace getCurrentSpace() {
-        List<CloudSpace> spaces = client.spaces
+    protected CloudSpace getCurrentSpace(CloudFoundryOperations c = client) {
+        List<CloudSpace> spaces = c.spaces
         spaces.find { it.name.equals(space) }
     }
 

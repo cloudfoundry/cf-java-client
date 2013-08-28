@@ -27,6 +27,7 @@ import org.cloudfoundry.gradle.tasks.DeleteServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.EnvCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.InfoCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LoginCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.LogoutCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.MapCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.PushApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.RestartApplicationCloudFoundryTask
@@ -56,6 +57,7 @@ class CloudFoundryPlugin implements Plugin<Project> {
         // register tasks
         project.task('cf-target', type: InfoCloudFoundryTask)
         project.task('cf-login', type: LoginCloudFoundryTask)
+        project.task('cf-logout', type: LogoutCloudFoundryTask)
         project.task('cf-spaces', type: SpacesCloudFoundryTask)
         project.task('cf-push', type: PushApplicationCloudFoundryTask)
         project.task('cf-start', type: StartApplicationCloudFoundryTask)
