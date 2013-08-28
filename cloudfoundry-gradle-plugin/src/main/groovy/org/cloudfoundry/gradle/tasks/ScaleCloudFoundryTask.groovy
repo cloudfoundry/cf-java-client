@@ -32,7 +32,7 @@ class ScaleCloudFoundryTask extends AbstractEnvCloudFoundryTask {
             log "Setting number of instances of application ${application} to ${instances}"
 
             withApplication {
-                client.updateApplicationInstances(application, instances)
+                client.updateApplicationInstances(application, instances as Integer)
             }
         }
     }

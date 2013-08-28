@@ -49,7 +49,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
             c.call(args)
 
-            logout()
+            disconnectFromCloudFoundry()
         }
     }
 
@@ -68,6 +68,16 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
             client = createClientWithUsernamePassword()
         } else {
             client = createClientWithToken()
+        }
+    }
+
+    protected void disconnectFromCloudFoundry() {
+        try {
+            if (username != null && password != null) {
+                client.logout()
+            }
+        } finally {
+            client = null
         }
     }
 
@@ -129,14 +139,6 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    protected void logout() {
-        try {
-            client.logout()
-        } finally {
-            client = null
-        }
-    }
-
     protected def setupLogging() {
         if (debugTrace) {
             RestLogCallback callback = new GradlePluginRestLogCallback()
@@ -180,6 +182,10 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     protected def propertyMissing(String name) {
-        project.cloudfoundry[name]
+        if (project.hasProperty('cf.' + name)) {
+            project.property('cf.' + name)
+        } else {
+            project.cloudfoundry[name]
+        }
     }
 }
