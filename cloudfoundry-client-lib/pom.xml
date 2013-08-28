@@ -18,7 +18,7 @@
 	</licenses>
 
 	<properties>
-		<spring.framework.version>3.0.7.RELEASE</spring.framework.version>
+		<spring.framework.version>3.2.2.RELEASE</spring.framework.version>
 		<spring.security.oauth.version>1.0.0.RELEASE</spring.security.oauth.version>
 	</properties>
 
@@ -87,6 +87,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.esotericsoftware.yamlbeans</groupId>
+			<artifactId>yamlbeans</artifactId>
+			<version>1.06</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
 			<version>1.6.2</version>
@@ -132,6 +138,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.cloudfoundry.test</groupId>
 			<artifactId>non-ascii-file-name</artifactId>
