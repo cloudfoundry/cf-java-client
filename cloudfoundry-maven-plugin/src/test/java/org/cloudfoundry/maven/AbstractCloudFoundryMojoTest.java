@@ -40,6 +40,20 @@ public class AbstractCloudFoundryMojoTest extends AbstractMojoTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
+	
+	/**
+	 * @throws Exception
+	 */
+	public void testSkip() throws Exception {
+
+		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
+
+		Push mojo = (Push) lookupMojo("push", testPom);
+
+		setVariableValueToObject(mojo, "skip", true);
+		
+		mojo.execute();
+	}
 
 	/**
 	 * @throws Exception
