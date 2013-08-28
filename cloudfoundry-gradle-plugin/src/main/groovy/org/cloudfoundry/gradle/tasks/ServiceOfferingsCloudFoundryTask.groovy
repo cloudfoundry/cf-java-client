@@ -16,6 +16,7 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering
+import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -29,34 +30,25 @@ class ServiceOfferingsCloudFoundryTask extends AbstractCloudFoundryTask {
 
     @TaskAction
     void showServiceOfferings() {
-        int NAME_PAD = 15
-        int VERSION_PAD = 10
-        int PROVIDER_PAD = 15
-        int PLANS_PAD = 12
-
         withCloudFoundryClient {
             List<CloudServiceOffering> services = client.serviceOfferings
 
             if (services.isEmpty()) {
                 log 'No services available'
             } else {
-                StringBuilder sb = new StringBuilder("Services\n")
-                sb << "service".padRight(NAME_PAD)
-                sb << "version".padRight(VERSION_PAD)
-                sb << "provider".padRight(PROVIDER_PAD)
-                sb << "plans".padRight(PLANS_PAD)
-                sb << "description\n"
+                FlexibleTableOutput output = new FlexibleTableOutput()
+
                 services.each { CloudServiceOffering service ->
                     def plans = service.cloudServicePlans.collect { it.name }
 
-                    sb << service.name.padRight(NAME_PAD)
-                    sb << service.version.padRight(VERSION_PAD)
-                    sb << service.provider.padRight(PROVIDER_PAD)
-                    sb << plans.join(', ').padRight(PLANS_PAD)
-                    sb << service.description
-                    sb << '\n'
+                    output.addRow(service: service.name,
+                            version: service.version,
+                            provider: service.provider,
+                            plans: plans.join(', '),
+                            description: service.description)
                 }
-                log sb.toString()
+
+                log 'Services\n' + output.toString()
             }
         }
     }

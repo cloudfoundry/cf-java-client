@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 import org.cloudfoundry.client.lib.domain.CloudApplication
 
@@ -31,29 +32,23 @@ class AppsCloudFoundryTask extends AbstractCloudFoundryTask {
 
     @TaskAction
     void showApps() {
-        int NAME_PAD = 30
-        int STATUS_PAD = 10
-        int USAGE_PAD = 11
-
         withCloudFoundryClient {
             List<CloudApplication> apps = client.applications
 
             if (apps.isEmpty()) {
                 log 'No applications'
             } else {
+                FlexibleTableOutput output = new FlexibleTableOutput()
+
                 apps.sort { it.name }
-                StringBuilder sb = new StringBuilder('Applications\n')
-                sb << "name".padRight(NAME_PAD)
-                sb << "status".padRight(STATUS_PAD)
-                sb << "usage".padRight(USAGE_PAD)
-                sb << "uris\n"
                 apps.each { CloudApplication app ->
-                    sb << app.name.padRight(NAME_PAD)
-                    sb << health(app).padRight(STATUS_PAD)
-                    sb << "${app.instances} x ${app.memory}M".padRight(USAGE_PAD)
-                    sb << "${app.uris ? app.uris.join(', ') : 'none'}\n"
+                    output.addRow(name: app.name,
+                            status: health(app),
+                            usage: "${app.instances} x ${app.memory}M",
+                            uris: "${app.uris ? app.uris.join(', ') : 'none'}")
                 }
-                log sb.toString()
+
+                log 'Applications\n' + output.toString()
             }
         }
     }
