@@ -23,7 +23,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.AuthTokens;
+import org.cloudfoundry.client.lib.tokens.TokensFile;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -44,8 +44,8 @@ public class Login extends AbstractCloudFoundryMojo {
 	public Login() {
 	}
 
-	public Login(AuthTokens authTokens) {
-		this.authTokens = authTokens;
+	public Login(TokensFile tokensFile) {
+		this.tokensFile = tokensFile;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class Login extends AbstractCloudFoundryMojo {
 		final CloudInfo cloudInfo = getClient().getCloudInfo();
 		final CloudSpace space = getCurrentSpace();
 
-		authTokens.saveToken(getTarget(), token, cloudInfo, space);
+		tokensFile.saveToken(getTarget(), token, cloudInfo, space);
 
 		getLog().info("Authentication successful");
 	}

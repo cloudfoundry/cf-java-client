@@ -31,8 +31,8 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.tokens.TokensFile;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.AuthTokens;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.springframework.http.HttpStatus;
@@ -57,7 +57,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	private String artifactId;
 
 	protected CloudFoundryClient client;
-	protected AuthTokens authTokens = new AuthTokens();
+	protected TokensFile tokensFile = new TokensFile();
 
 	/**
 	 * @parameter expression="${cf.password}"
@@ -110,8 +110,8 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		super();
 	}
 
-	public AbstractCloudFoundryMojo(AuthTokens authTokens) {
-		this.authTokens = authTokens;
+	public AbstractCloudFoundryMojo(TokensFile tokensFile) {
+		this.tokensFile = tokensFile;
 	}
 
 	/**
@@ -122,12 +122,11 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * @throws ParserConfigurationException
 	 */
 	protected OAuth2AccessToken retrieveToken() throws MojoExecutionException {
-		final OAuth2AccessToken token = authTokens.retrieveToken(getTarget());
+		final OAuth2AccessToken token = tokensFile.retrieveToken(getTarget());
 
 		if (token == null) {
-			throw new MojoExecutionException(String.format("Access token could not be read from '%s' for target '%s'. " +
-					"Configure a username and password, or use the login goal.",
-					authTokens.getTokensFilePath(), getTarget().toString()));
+			throw new MojoExecutionException(String.format("Can not authenticate to target '%s'. " +
+					"Configure a username and password, or use the login goal.", getTarget().toString()));
 		}
 
 		return token;

@@ -1,9 +1,8 @@
-package org.cloudfoundry.maven.common;
+package org.cloudfoundry.client.lib.tokens;
 
 import com.esotericsoftware.yamlbeans.YamlConfig;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -11,14 +10,16 @@ import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class AuthTokens {
-	public OAuth2AccessToken retrieveToken(URI target) throws MojoExecutionException {
+public class TokensFile {
+	public OAuth2AccessToken retrieveToken(URI target) {
 		TargetInfos targetInfos = getTokensFromFile();
 
 		if (targetInfos == null) {
@@ -38,7 +39,7 @@ public class AuthTokens {
 		return token;
 	}
 
-	public void saveToken(URI target, OAuth2AccessToken token, CloudInfo cloudInfo, CloudSpace space) throws MojoExecutionException {
+	public void saveToken(URI target, OAuth2AccessToken token, CloudInfo cloudInfo, CloudSpace space) {
 		TargetInfos targetInfos = getTokensFromFile();
 
 		if (targetInfos == null) {
@@ -62,7 +63,7 @@ public class AuthTokens {
 		saveTokensToFile(targetInfos);
 	}
 
-	public void removeToken(URI target) throws MojoExecutionException {
+	public void removeToken(URI target) {
 		TargetInfos targetInfos = getTokensFromFile();
 		targetInfos.remove(target);
 		saveTokensToFile(targetInfos);
@@ -72,18 +73,21 @@ public class AuthTokens {
 		return System.getProperty("user.home") + "/.cf/tokens.yml";
 	}
 
-	protected TargetInfos getTokensFromFile() throws MojoExecutionException {
+	protected TargetInfos getTokensFromFile() {
 		final File tokensFile = getTokensFile();
 		try {
 			YamlReader reader = new YamlReader(new FileReader(tokensFile));
 			return reader.read(TargetInfos.class);
-		} catch (Exception e) {
-			throw new MojoExecutionException("An error occurred reading the tokens file at " +
-					tokensFile.getPath() + ":" + e.getMessage());
+		} catch (FileNotFoundException fnfe) {
+			return new TargetInfos();
+		} catch (IOException e) {
+			throw new RuntimeException("An error occurred reading the tokens file at " +
+					tokensFile.getPath() + ":" + e.getMessage(), e);
 		}
+
 	}
 
-	protected void saveTokensToFile(TargetInfos targetInfos) throws MojoExecutionException {
+	protected void saveTokensToFile(TargetInfos targetInfos) {
 		final File tokensFile = getTokensFile();
 		try {
 			FileWriter fileWriter = new FileWriter(tokensFile);
@@ -99,9 +103,9 @@ public class AuthTokens {
 
 			yamlWriter.close();
 			fileWriter.close();
-		} catch (Exception e) {
-			throw new MojoExecutionException("An error occurred writing the tokens file at " +
-					tokensFile.getPath() + ":" + e.getMessage());
+		} catch (IOException e) {
+			throw new RuntimeException("An error occurred writing the tokens file at " +
+					tokensFile.getPath() + ":" + e.getMessage(), e);
 		}
 	}
 

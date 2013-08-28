@@ -19,7 +19,7 @@ package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.cloudfoundry.maven.common.AuthTokens;
+import org.cloudfoundry.client.lib.tokens.TokensFile;
 
 /**
  * Performs logout and removes the target info from ~/.cf/tokens.yml.
@@ -35,8 +35,8 @@ public class Logout extends AbstractCloudFoundryMojo {
 	public Logout() {
 	}
 
-	public Logout(AuthTokens authTokens) {
-		super(authTokens);
+	public Logout(TokensFile tokensFile) {
+		super(tokensFile);
 	}
 
 	@Override
@@ -49,6 +49,6 @@ public class Logout extends AbstractCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		authTokens.removeToken(getTarget());
+		tokensFile.removeToken(getTarget());
 	}
 }
