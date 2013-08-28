@@ -232,10 +232,11 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * Delegates to doExecute() for the actual business logic.
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if(skip) {
-			getLog().info("Skipping execution of CloudFoundry Maven Plugin");
+		if (skip) {
+			getLog().info("Skipping execution of Cloud Foundry Maven Plugin");
 			return;
 		}
+
 		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 		try {
