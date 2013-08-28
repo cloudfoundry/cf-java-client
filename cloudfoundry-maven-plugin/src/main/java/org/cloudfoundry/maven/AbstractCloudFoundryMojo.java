@@ -95,6 +95,12 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	private String space;
 
 	/**
+	 * Skip any and all execution of this plugin.
+	 * @parameter expression="${cf.skip}" default="false"
+	 */
+	private boolean skip;
+	
+	/**
 	 * The Maven Wagon manager to use when obtaining server authentication details.
 	 *
 	 * @component role="org.apache.maven.artifact.manager.WagonManager"
@@ -226,6 +232,10 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * Delegates to doExecute() for the actual business logic.
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if(skip) {
+			getLog().info("Skipping execution of CloudFoundry Maven Plugin");
+			return;
+		}
 		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 		try {
