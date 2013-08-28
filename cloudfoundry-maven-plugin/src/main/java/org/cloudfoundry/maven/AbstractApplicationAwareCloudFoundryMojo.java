@@ -24,7 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.Assert;
@@ -36,6 +43,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Abstract goal for the Cloud Foundry Maven plugin that bundles access to commonly
@@ -67,13 +75,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private List<String> urls;
 
 	/**
-	 * The path of the WAR file to deploy.
-	 *
-	 * @parameter expression = "${project.build.directory}/${project.build.finalName}.war"
-	 */
-	private File warfile;
-
-	/**
 	 * The path of one of the following:
 	 *
 	 * <ul>
@@ -86,6 +87,12 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @parameter expression = "${cf.path}"
 	 */
 	private File path;
+
+	/**
+	 * A string of the form groupId:artifactId:version:packaging[:classifier].
+	 * @parameter expression = "${cf.artifact}" default-value="${project.groupId}:${project.artifactId}:${project.version}:${project.packaging}"
+	 */
+	private String artifact;
 
 	/**
 	 * The buidpack to use for the application.
@@ -142,6 +149,30 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @parameter expression="${cf.no-start}"
 	 */
 	private Boolean noStart;
+
+	/** 
+	 * @parameter default-value="${localRepository}" 
+	 * @readonly
+	 * @required
+	 */
+	protected ArtifactRepository localRepository;
+
+	/** 
+	 * @parameter default-value="${project.remoteArtifactRepositories}" 
+	 * @readonly
+	 * @required
+	 */
+	protected java.util.List<ArtifactRepository> remoteRepositories;
+	
+	/**
+	* @component
+	*/
+	private ArtifactFactory artifactFactory;
+
+	/**
+	* @component
+	*/
+	private ArtifactResolver artifactResolver;
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -239,7 +270,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 */
 	protected void validatePath(File path) {
 
-		Assert.notNull(path, "The path must not be null.");
+		Assert.notNull(path, "A path could not be found to deploy.  Please specify a path or artifact GAV.");
 
 		final String absolutePath = path.getAbsolutePath();
 
@@ -263,7 +294,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * If the value is not defined, 512 (MB) is returned as default.
 	 *
 	 * @return Returns the configured memory choice
-	 * @throws IllegalStateException Thrown if no warfile can be resolved
 	 */
 	public Integer getMemory() {
 
@@ -280,7 +310,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		}
 
 	}
-
+	
 	/**
 	 * Specifies the file or directory that shall be pushed to Cloud Foundry.
 	 *
@@ -288,9 +318,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * "${project.build.directory}/${project.build.finalName}.war"
 	 *
 	 *
-	 * @return Never returns null. Will throw an {@IllegalStateException} if not set.
+	 * @return null if not found.
 	 */
-	public File getPath() {
+	public File getPath() throws MojoExecutionException {
 
 		final String pathProperty = getCommandlineProperty(SystemProperties.PATH);
 
@@ -301,12 +331,61 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			return path;
 		}
 
-		if (this.path == null) {
-			return this.warfile;
-		} else {
+		if (this.path != null) {
 			return this.path;
 		}
+		File resolvedArtifact = this.getArtifact();
+		if (resolvedArtifact != null) {
+			return resolvedArtifact;
+		}
+		return null;
+	}
+	
+	/**
+	 * Provides the File to deploy based on the GAV set in the "artifact" property.
+	 * 
+	 * @return Returns null of no artifact specified.
+	 */
+	private File getArtifact() throws MojoExecutionException {
+		if (artifact != null) {
+			Artifact resolvedArtifact = createArtifactFromGAV();
 
+			try {
+			    artifactResolver.resolve(resolvedArtifact, remoteRepositories, localRepository );
+			} catch (ArtifactNotFoundException ex) {
+			    throw new MojoExecutionException("could not find deploy artifact ["+artifact+"]", ex);
+			} catch (ArtifactResolutionException ex) {
+			    throw new MojoExecutionException("could not resolve deploy artifact ["+artifact+"]", ex);
+			}
+			return resolvedArtifact.getFile();
+		}
+		return null;
+	}
+
+	Artifact createArtifactFromGAV() throws MojoExecutionException {
+		String[] tokens = StringUtils.split(artifact, ":");
+		if (tokens.length < 4 || tokens.length > 5) {
+			throw new MojoExecutionException(
+					"Invalid artifact, you must specify groupId:artifactId:version:packaging[:classifier] "
+							+ artifact);
+		}
+		String groupId = tokens[0];
+		String artifactId = tokens[1];
+		String version = tokens[2];
+		String packaging = null;
+		if (tokens.length >= 4) {
+			packaging = tokens[3];
+		}
+		String classifier = null;
+		if (tokens.length == 5) {
+			classifier = tokens[4];
+		} else {
+			classifier = null;
+		}
+		Artifact resolvedArtifact = classifier == null
+			? artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging )
+			: artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, packaging, classifier );
+		return resolvedArtifact;
 	}
 
 	/**

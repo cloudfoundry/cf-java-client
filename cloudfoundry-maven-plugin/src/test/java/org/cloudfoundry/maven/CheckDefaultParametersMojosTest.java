@@ -55,7 +55,7 @@ public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
 		 * Injecting some test values as expressions are not evaluated.
 		 */
 		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-		setVariableValueToObject( mojo, "warfile", testPom);
+		setVariableValueToObject( mojo, "artifact", "someGAV");
 
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 

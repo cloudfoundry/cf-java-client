@@ -19,10 +19,21 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.plugin.testing.stubs.StubArtifactRepository;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
@@ -201,6 +212,98 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		setVariableValueToObject( mojo, "env", env);
 
 		assertEquals("-XX:MaxPermSize=256m", mojo.getEnv().get("JAVA_OPTS"));
+	}
+	
+	public void testRepositoryArtifactResolution() throws Exception {
+		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
+
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+
+		Push mojo = spy(unspiedMojo);
+
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.PATH);
+		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+		
+		setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version:war");
+		
+		final File file = File.createTempFile("cf-maven-plugin", "testrepo");
+		file.delete();
+		file.mkdir();
+		
+		final File artifactFile = File.createTempFile(
+				"test", "artifact", file);
+		artifactFile.deleteOnExit();
+
+		setVariableValueToObject(mojo, "localRepository",
+				new StubArtifactRepository(file.getAbsolutePath()) {
+					@Override
+					public String pathOf(Artifact artifact) {
+						//Return tmp file name
+						return artifactFile.getName();
+					}
+				});
+		assertNotNull(mojo.getPath());
+		assertEquals(mojo.getPath(), artifactFile);
+	}
+	
+	public void testGAVProcessing() throws Exception {
+		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
+
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+
+		Push mojo = spy(unspiedMojo);
+
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.PATH);
+		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
+		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
+
+		{ //Test No Classifier or Type
+			setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version");
+			
+			boolean exception = false;
+			try {
+				mojo.createArtifactFromGAV();
+			} catch(MojoExecutionException e) {
+				exception = true;
+			}
+			if(!exception) {
+				fail("Should have thrown a MojoExcecutionException");
+			}
+		}
+
+		{ //Test No Classifier
+			setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version:type");
+			
+			Artifact artifact = mojo.createArtifactFromGAV();
+			assertEquals("groupId", artifact.getGroupId());
+			assertEquals("artifactId", artifact.getArtifactId());
+			assertEquals("version", artifact.getVersion());
+			assertEquals("type", artifact.getType());
+			assertNull(artifact.getClassifier());
+		}
+
+		{ //All
+			setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version:type:classifier");
+			
+			Artifact artifact = mojo.createArtifactFromGAV();
+			assertEquals("groupId", artifact.getGroupId());
+			assertEquals("artifactId", artifact.getArtifactId());
+			assertEquals("version", artifact.getVersion());
+			assertEquals("type", artifact.getType());
+			assertEquals("classifier", artifact.getClassifier());
+		}
+
 	}
 
 }
