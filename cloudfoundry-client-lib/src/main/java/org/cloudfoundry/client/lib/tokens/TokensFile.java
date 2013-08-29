@@ -89,6 +89,7 @@ public class TokensFile {
 
 	protected void saveTokensToFile(TargetInfos targetInfos) {
 		final File tokensFile = getTokensFile();
+		tokensFile.getParentFile().mkdirs();
 		try {
 			FileWriter fileWriter = new FileWriter(tokensFile);
 
