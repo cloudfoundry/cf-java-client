@@ -1354,7 +1354,7 @@ public class CloudFoundryClientTest {
 			}
 
 			final InstancesInfo applicationInstances = client.getApplicationInstances(appName);
-			if (applicationInstances.getInstances().size() > 0) {
+			if (applicationInstances.getInstances() != null) {
 				return applicationInstances;
 			}
 

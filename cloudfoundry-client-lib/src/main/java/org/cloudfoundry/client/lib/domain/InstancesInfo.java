@@ -25,11 +25,6 @@ public class InstancesInfo {
 
 	private final List<InstanceInfo> instances;
 
-	public InstancesInfo() {
-		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(0);
-		this.instances = Collections.unmodifiableList(instances);
-	}
-
 	public InstancesInfo(List<Map<String, Object>> attributes) {
 		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
 		for (Map<String, Object> data : attributes) {

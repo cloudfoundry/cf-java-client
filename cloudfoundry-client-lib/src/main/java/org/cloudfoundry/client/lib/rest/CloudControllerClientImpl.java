@@ -1320,14 +1320,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		if (app.getState().equals(CloudApplication.AppState.STARTED)) {
 			return doGetApplicationInstances(app.getMeta().getGuid());
 		}
-		return new InstancesInfo();
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	private InstancesInfo doGetApplicationInstances(UUID appId) {
-		List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
-
 		try {
+			List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
 			Map<String, Object> respMap = getInstanceInfoForApp(appId, "instances");
 			List<String> keys = new ArrayList<String>(respMap.keySet());
 			Collections.sort(keys);
@@ -1342,16 +1341,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				instanceMap.put("index", index);
 				instanceList.add(instanceMap);
 			}
+			return new InstancesInfo(instanceList);
 		} catch (CloudFoundryException e) {
 			if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-				// app has not finished staging, no instance info is available
+				return null;
 			} else {
 				throw e;
 			}
 
 		}
-
-		return new InstancesInfo(instanceList);
 	}
 
 	@SuppressWarnings("unchecked")
