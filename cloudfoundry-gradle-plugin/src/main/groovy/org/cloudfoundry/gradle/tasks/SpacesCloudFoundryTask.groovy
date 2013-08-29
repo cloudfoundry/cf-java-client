@@ -16,6 +16,7 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudSpace
+import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -30,24 +31,18 @@ class SpacesCloudFoundryTask extends AbstractCloudFoundryTask {
 
     @TaskAction
     void showSpaces() {
-        int NAME_PAD = 15
-        int APPS_PAD = 45
-
         withCloudFoundryClient {
             List<CloudSpace> spaces = client.spaces
             CloudSpace current = currentSpace
 
-            StringBuilder sb = new StringBuilder("Spaces in ${current.organization}\n")
-            sb << "name".padRight(NAME_PAD)
-            sb << '\n'
+            FlexibleTableOutput output = new FlexibleTableOutput()
 
             spaces.each { space ->
-                sb << space.name.padRight(NAME_PAD)
                 // todo: display apps and service instances
-                sb << '\n'
+                output.addRow(name: space.name)
             }
 
-            log sb.toString()
+            log "Spaces in ${current.organization.name}\n" + output.toString()
         }
     }
 }

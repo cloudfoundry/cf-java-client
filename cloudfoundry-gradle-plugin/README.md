@@ -180,41 +180,63 @@ run other tasks without providing credentials.
 
 ## Advanced configuration
 
+### Configuration variables
+
+#### randomWord
+
+The `${randomWord}` variable is replaced with a randomly-generated set of characters. This can be useful to make application
+URIs and service names unique:
+
+~~~
+cloudfoundry {
+    ...
+    uri = "http://app-name-${randomWord}.run.pivotal.io"
+    ...
+
+    serviceInfos {
+        "mongodb-${randomWord}" {
+            ...
+        }
+    }
+}
+~~~
+
 ### Conditional configuration based on properties
 
 Command-line properties can be used to conditionally set configuration options in `build.gradle`. This can be used to
-support multiple Cloud Foundry targets from a single `build.gradle` file, to select an organization and space, or to .
+support multiple Cloud Foundry targets from a single `build.gradle` file, to select an organization and space, or to
+customize other configuration options.
 
 Selecting an organization and space based on a property might like like this:
 
 ~~~
-    if (project.hasProperty('dev')) {
-        cloudfoundry {
-            organization = 'my-org'
-            space = 'development'
-        }
-    }
-
-    if (project.hasProperty('staging')) {
-        cloudfoundry {
-            organization = 'my-org'
-            space = 'staging'
-        }
-    }
-
-    if (project.hasProperty('prod')) {
-        cloudfoundry {
-            organization = 'production-org'
-            space = 'production'
-        }
-    }
-
+if (project.hasProperty('dev')) {
     cloudfoundry {
-        target = 'https://api.run.pivotal.io'
-        application = 'my-app'
-        file = file('build/libs/my-app.war')
-        ...
+        organization = 'my-org'
+        space = 'development'
     }
+}
+
+if (project.hasProperty('staging')) {
+    cloudfoundry {
+        organization = 'my-org'
+        space = 'staging'
+    }
+}
+
+if (project.hasProperty('prod')) {
+    cloudfoundry {
+        organization = 'production-org'
+        space = 'production'
+    }
+}
+
+cloudfoundry {
+    target = 'https://api.run.pivotal.io'
+    application = 'my-app'
+    file = file('build/libs/my-app.war')
+    ...
+}
 ~~~
 
 The organization and space would then be selected from the command line:

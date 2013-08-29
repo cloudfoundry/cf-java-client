@@ -31,7 +31,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.Assert;
@@ -75,6 +74,12 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private List<String> urls;
 
 	/**
+	 * A string of the form groupId:artifactId:version:packaging[:classifier].
+	 * @parameter expression = "${cf.artifact}" default-value="${project.groupId}:${project.artifactId}:${project.version}:${project.packaging}"
+	 */
+	private String artifact;
+
+	/**
 	 * The path of one of the following:
 	 *
 	 * <ul>
@@ -87,12 +92,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @parameter expression = "${cf.path}"
 	 */
 	private File path;
-
-	/**
-	 * A string of the form groupId:artifactId:version:packaging[:classifier].
-	 * @parameter expression = "${cf.artifact}" default-value="${project.groupId}:${project.artifactId}:${project.version}:${project.packaging}"
-	 */
-	private String artifact;
 
 	/**
 	 * The buidpack to use for the application.
@@ -310,7 +309,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		}
 
 	}
-	
+
 	/**
 	 * Specifies the file or directory that shall be pushed to Cloud Foundry.
 	 *

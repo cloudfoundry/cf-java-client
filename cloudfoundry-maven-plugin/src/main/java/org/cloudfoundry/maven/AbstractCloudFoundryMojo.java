@@ -48,7 +48,6 @@ import org.springframework.web.client.ResourceAccessException;
  * @author Scott Frederick
  * @since 1.0.0
  */
-@SuppressWarnings("UnusedDeclaration")
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
@@ -94,6 +93,12 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 */
 	private String space;
 
+	/**
+	 * Skip any and all execution of this plugin.
+	 * @parameter expression="${cf.skip}" default-value="false"
+	 */
+	private boolean skip;
+	
 	/**
 	 * The Maven Wagon manager to use when obtaining server authentication details.
 	 *
@@ -226,6 +231,11 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * Delegates to doExecute() for the actual business logic.
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (skip) {
+			getLog().info("Skipping execution of Cloud Foundry Maven Plugin");
+			return;
+		}
+
 		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
 
 		try {

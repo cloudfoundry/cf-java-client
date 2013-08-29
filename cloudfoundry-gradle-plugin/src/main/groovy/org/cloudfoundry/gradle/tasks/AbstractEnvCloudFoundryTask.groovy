@@ -29,16 +29,14 @@ abstract class AbstractEnvCloudFoundryTask extends AbstractCloudFoundryTask {
         if (env.isEmpty()) {
             sb << 'No environment variables set\n'
         }
-        env.each { key, value -> sb << "  $key=$value\n" }
+        env.each { key, value ->
+            sb << "  $key=$value\n"
+        }
 
         log sb.toString()
     }
 
     protected def modifyAppEnv(CloudApplication app, Closure c) {
-        StringBuilder sb = new StringBuilder()
-        env.each { key, value -> sb << "  $key=$value\n" }
-        println sb.toString()
-
         def newEnv = c.call(app.getEnvAsMap(), env)
 
         client.updateApplicationEnv(application, newEnv)

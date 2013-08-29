@@ -15,22 +15,13 @@
  */
 package org.cloudfoundry.maven;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.stubs.StubArtifactRepository;
@@ -230,12 +221,13 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 		
-		setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version:war");
+		setVariableValueToObject(mojo, "artifact", "groupId:artifactId:version:type");
 		
 		final File file = File.createTempFile("cf-maven-plugin", "testrepo");
 		file.delete();
 		file.mkdir();
-		
+		file.deleteOnExit();
+
 		final File artifactFile = File.createTempFile(
 				"test", "artifact", file);
 		artifactFile.deleteOnExit();
@@ -248,7 +240,6 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 						return artifactFile.getName();
 					}
 				});
-		assertNotNull(mojo.getPath());
 		assertEquals(mojo.getPath(), artifactFile);
 	}
 	

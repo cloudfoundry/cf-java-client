@@ -17,6 +17,7 @@ package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.cloudfoundry.client.lib.domain.CloudService
+import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -30,12 +31,6 @@ class ServicesCloudFoundryTask extends AbstractCloudFoundryTask {
 
     @TaskAction
     void showServices() {
-        int NAME_PAD = 17
-        int SERVICE_PAD = 14
-        int PROVIDER_PAD = 14
-        int VERSION_PAD = 10
-        int PLAN_PAD = 11
-
         withCloudFoundryClient {
             List<CloudService> services = client.services
 
@@ -44,23 +39,17 @@ class ServicesCloudFoundryTask extends AbstractCloudFoundryTask {
             } else {
                 def servicesToApps = mapServicesToApps(services)
 
-                StringBuilder sb = new StringBuilder("Services\n")
-                sb << "name".padRight(NAME_PAD)
-                sb << "service".padRight(SERVICE_PAD)
-                sb << "provider".padRight(PROVIDER_PAD)
-                sb << "version".padRight(VERSION_PAD)
-                sb << "plan".padRight(PLAN_PAD)
-                sb << "bound apps\n"
+                FlexibleTableOutput output = new FlexibleTableOutput()
+
                 services.each { CloudService service ->
-                    sb << service.name.padRight(NAME_PAD)
-                    sb << service.label.padRight(SERVICE_PAD)
-                    sb << service.provider.padRight(PROVIDER_PAD)
-                    sb << service.version.padRight(VERSION_PAD)
-                    sb << service.plan.padRight(PLAN_PAD)
-                    sb << servicesToApps[service.name].join(', ')
-                    sb << '\n'
+                    output.addRow(name: service.name,
+                            service: service.label,
+                            provider: service.provider,
+                            version: service.version,
+                            plan: service.plan,
+                            'bound apps': servicesToApps[service.name].join(', '))
                 }
-                log sb.toString()
+                log 'Services\n' + output.toString()
             }
         }
     }
