@@ -319,6 +319,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationInstances(appName);
 	}
 
+	public InstancesInfo getApplicationInstances(CloudApplication app) {
+		return cc.getApplicationInstances(app);
+	}
+
 	public CrashesInfo getCrashes(String appName) {
 		return cc.getCrashes(appName);
 	}

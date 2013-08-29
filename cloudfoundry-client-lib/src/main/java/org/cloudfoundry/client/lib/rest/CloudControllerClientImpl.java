@@ -861,10 +861,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public ApplicationStats getApplicationStats(String appName) {
-		UUID appId = getAppId(appName);
 		CloudApplication app = getApplication(appName);
-		return doGetApplicationStats(appId, app.getState());
-
+		return doGetApplicationStats(app.getMeta().getGuid(), app.getState());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1313,15 +1311,26 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		doUnbindService(appId, cloudService.getMeta().getGuid());
 	}
 
-	@SuppressWarnings("unchecked")
 	public InstancesInfo getApplicationInstances(String appName) {
-		UUID appId = getAppId(appName);
 		CloudApplication app = getApplication(appName);
-		List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
+		return getApplicationInstances(app);
+	}
+
+	public InstancesInfo getApplicationInstances(CloudApplication app) {
 		if (app.getState().equals(CloudApplication.AppState.STARTED)) {
+			return doGetApplicationInstances(app.getMeta().getGuid());
+		}
+		return new InstancesInfo();
+	}
+
+	@SuppressWarnings("unchecked")
+	private InstancesInfo doGetApplicationInstances(UUID appId) {
+		List<Map<String, Object>> instanceList = new ArrayList<Map<String, Object>>();
+
+		try {
 			Map<String, Object> respMap = getInstanceInfoForApp(appId, "instances");
 			List<String> keys = new ArrayList<String>(respMap.keySet());
-			java.util.Collections.sort(keys);
+			Collections.sort(keys);
 			for (String instanceId : keys) {
 				Integer index;
 				try {
@@ -1333,7 +1342,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				instanceMap.put("index", index);
 				instanceList.add(instanceMap);
 			}
+		} catch (CloudFoundryException e) {
+			if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+				// app has not finished staging, no instance info is available
+			} else {
+				throw e;
+			}
+
 		}
+
 		return new InstancesInfo(instanceList);
 	}
 

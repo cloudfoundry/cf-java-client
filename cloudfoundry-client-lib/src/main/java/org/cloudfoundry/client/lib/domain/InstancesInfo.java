@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import org.cloudfoundry.client.lib.domain.InstanceInfo;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +24,11 @@ import java.util.Map;
 public class InstancesInfo {
 
 	private final List<InstanceInfo> instances;
+
+	public InstancesInfo() {
+		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(0);
+		this.instances = Collections.unmodifiableList(instances);
+	}
 
 	public InstancesInfo(List<Map<String, Object>> attributes) {
 		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
