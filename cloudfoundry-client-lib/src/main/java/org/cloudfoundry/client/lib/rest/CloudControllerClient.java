@@ -143,6 +143,8 @@ public interface CloudControllerClient {
 
 	InstancesInfo getApplicationInstances(String appName);
 
+	InstancesInfo getApplicationInstances(CloudApplication app);
+
 	CrashesInfo getCrashes(String appName);
 
 	void rename(String appName, String newName);
