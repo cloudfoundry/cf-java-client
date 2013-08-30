@@ -29,7 +29,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.cloudfoundry:cloudfoundry-client-lib:0.8.7.BUILD-SNAPSHOT'
-    compile 'org.codehaus.groovy:groovy:1.8.6'
+    compile 'org.codehaus.groovy:groovy:2.1.6'
     testCompile 'junit:junit:4.8.2'
 }
 

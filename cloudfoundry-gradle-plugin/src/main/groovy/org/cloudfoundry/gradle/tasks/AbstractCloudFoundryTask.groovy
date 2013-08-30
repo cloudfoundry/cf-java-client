@@ -15,6 +15,7 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.apache.commons.logging.LogFactory
 import org.cloudfoundry.client.lib.CloudCredentials
 import org.cloudfoundry.client.lib.CloudFoundryClient
 import org.cloudfoundry.client.lib.CloudFoundryException

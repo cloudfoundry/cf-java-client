@@ -2,8 +2,12 @@ package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.StartingInfo
 import org.cloudfoundry.client.lib.domain.CloudApplication
+import org.cloudfoundry.client.lib.domain.InstanceInfo
+import org.cloudfoundry.client.lib.domain.InstancesInfo
 
 class AppStatusCloudFoundryHelper {
+    static final int MAX_STATUS_CHECKS = 60
+
     String health(CloudApplication app) {
         String state = app.state
 
@@ -25,6 +29,14 @@ class AppStatusCloudFoundryHelper {
         }
     }
 
+    void showAppStartup(startingInfo) {
+        CloudApplication app = client.getApplication(application)
+
+        showStagingStatus(startingInfo)
+        showStartingStatus(app)
+        showStartResults(app)
+    }
+
     void showStagingStatus(StartingInfo startingInfo) {
         if (startingInfo) {
             int offset = 0
@@ -37,14 +49,89 @@ class AppStatusCloudFoundryHelper {
         }
     }
 
-    void showStartingStatus() {
-        while (true) {
-            sleep 1000
-            CloudApplication app = client.getApplication(application)
-            println "${app.runningInstances} of ${app.instances} instances running"
+    void showStartingStatus(CloudApplication app) {
+        println "Checking status of ${app.name}"
 
-            if (app.runningInstances == app.instances)
+        def statusChecks = 0
+
+        while (true) {
+            List<InstanceInfo> instances = getApplicationInstances(app)
+
+            if (instances) {
+                def expectedInstances = getExpectedInstances(instances)
+                def runningInstances = getRunningInstances(instances)
+                def flappingInstances = getFlappingInstances(instances)
+
+                showInstancesStatus(instances, runningInstances, expectedInstances)
+
+                if (flappingInstances > 0)
+                    break
+
+                if (runningInstances == expectedInstances)
+                    break
+            }
+
+            if (statusChecks > MAX_STATUS_CHECKS)
                 break
+
+            statusChecks++
+            sleep 1000
         }
+    }
+
+    void showInstancesStatus(List<InstanceInfo> instances, runningInstances, expectedInstances) {
+        def stateCounts = [:].withDefault { 0 }
+        instances.each { instance ->
+            stateCounts[instance.state] += 1
+        }
+
+        def stateStrings = []
+        stateCounts.each { state, count ->
+            stateStrings << "${count} ${state.toString().toLowerCase()}"
+        }
+
+        def expectedString = "${expectedInstances}"
+        def runningString = "${runningInstances}".padLeft(expectedString.length())
+        println "  ${runningString} of ${expectedString} instances running (${stateStrings.join(", ")})"
+    }
+
+    void showStartResults(CloudApplication app) {
+        List<InstanceInfo> instances = getApplicationInstances(app)
+
+        def expectedInstances = getExpectedInstances(instances)
+        def runningInstances = getRunningInstances(instances)
+        def flappingInstances = getFlappingInstances(instances)
+
+        if (flappingInstances > 0 || runningInstances == 0) {
+            log "Application start unsuccessful"
+        } else if (runningInstances > 0) {
+            List<String> uris = allUris
+            if (uris.empty) {
+                log "Application ${application} is available"
+            } else {
+                log "Application ${application} is available at ${uris.collect{"http://$it"}.join(',')}"
+            }
+        }
+
+        if (expectedInstances != runningInstances) {
+            log "TIP: The system will continue to start all requested app instances. Use the 'cf-app' task to monitor app status."
+        }
+    }
+
+    List<InstanceInfo> getApplicationInstances(CloudApplication app) {
+        InstancesInfo instancesInfo = client.getApplicationInstances(app)
+        instancesInfo?.instances
+    }
+
+    def getExpectedInstances(List<InstanceInfo> instances) {
+        instances.size()
+    }
+
+    def getRunningInstances(List<InstanceInfo> instances) {
+        instances.count { instance -> instance.state.toString() == "RUNNING" }
+    }
+
+    def getFlappingInstances(List<InstanceInfo> instances) {
+        instances.count { instance -> instance.state.toString() == "FLAPPING" }
     }
 }

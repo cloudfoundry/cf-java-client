@@ -15,6 +15,7 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.StartingInfo
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -32,9 +33,8 @@ class RestartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
         withCloudFoundryClient {
             log "Restarting ${application}"
             withApplication {
-                client.restartApplication(application)
-                // showStagingStatus(startingInfo) todo: change client.restartApplication to return StartingInfo
-                showStartingStatus()
+                StartingInfo startingInfo = client.restartApplication(application)
+                showAppStartup(startingInfo)
             }
         }
     }

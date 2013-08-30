@@ -63,15 +63,7 @@ class PushApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
             if (startApp) {
                 log "Starting ${application}"
                 StartingInfo startingInfo = client.startApplication(application)
-                // showStagingStatus(startingInfo) todo: configure RestTemplate to disable warnings
-                showStartingStatus()
-
-                List<String> uris = allUris
-                if (uris.empty) {
-                    log "Application ${application} is available"
-                } else {
-                    log "Application ${application} is available at ${uris.collect{"http://$it"}.join(',')}"
-                }
+                showAppStartup(startingInfo)
             }
         }
     }
