@@ -558,7 +558,7 @@ public class CloudFoundryClientTest {
 
 		connectedClient.stopApplication(appName);
 		InstancesInfo instInfo = connectedClient.getApplicationInstances(appName);
-		assertEquals(0, instInfo.getInstances().size());
+		assertNull(instInfo);
 	}
 
 	@Test
@@ -1354,7 +1354,7 @@ public class CloudFoundryClientTest {
 			}
 
 			final InstancesInfo applicationInstances = client.getApplicationInstances(appName);
-			if (applicationInstances.getInstances() != null) {
+			if (applicationInstances != null) {
 				return applicationInstances;
 			}
 
