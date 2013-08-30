@@ -48,7 +48,6 @@ import org.springframework.web.client.ResourceAccessException;
  * @author Scott Frederick
  * @since 1.0.0
  */
-@SuppressWarnings("UnusedDeclaration")
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
@@ -96,7 +95,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
 	 * Skip any and all execution of this plugin.
-	 * @parameter expression="${cf.skip}" default="false"
+	 * @parameter expression="${cf.skip}" default-value="false"
 	 */
 	private boolean skip;
 	
