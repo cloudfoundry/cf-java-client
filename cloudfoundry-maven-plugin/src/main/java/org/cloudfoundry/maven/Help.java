@@ -63,7 +63,7 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	 *
 	 * @return
 	 */
-	private Map<String, String> getParameterMap() {
+	private Map<String, String> getParameterMap() throws MojoExecutionException {
 		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
 		parameterMap.put("Appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
