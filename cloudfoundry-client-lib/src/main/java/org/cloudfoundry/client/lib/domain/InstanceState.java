@@ -19,18 +19,16 @@ package org.cloudfoundry.client.lib.domain;
 /**
  * Enum used for the state of an instance
  *
- * @author: Thomas Risberg
+ * @author Thomas Risberg
  */
 public enum InstanceState {
-	STARTING, RUNNING, CRASHED, FLAPPING, UNKNOWN;
+	DOWN, STARTING, RUNNING, CRASHED, FLAPPING, UNKNOWN;
 
 	public static InstanceState valueOfWithDefault(String s) {
-		InstanceState enumValue = null;
 		try {
-			enumValue = InstanceState.valueOf(s);
+			return InstanceState.valueOf(s);
 		} catch (IllegalArgumentException e) {
-			enumValue = InstanceState.UNKNOWN;
+			return InstanceState.UNKNOWN;
 		}
-		return enumValue;
 	}
 }

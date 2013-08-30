@@ -452,6 +452,14 @@ public interface CloudFoundryOperations {
 	InstancesInfo getApplicationInstances(String appName);
 
 	/**
+	 * Get application instances info for application.
+	 *
+	 * @param app the application.
+	 * @return instances info
+	 */
+	InstancesInfo getApplicationInstances(CloudApplication app);
+
+	/**
 	 * Get crashes info for application.
 	 * @param appName name of application
 	 * @return crashes info

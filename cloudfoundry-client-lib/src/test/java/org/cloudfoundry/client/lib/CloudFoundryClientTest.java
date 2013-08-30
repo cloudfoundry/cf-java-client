@@ -558,7 +558,7 @@ public class CloudFoundryClientTest {
 
 		connectedClient.stopApplication(appName);
 		InstancesInfo instInfo = connectedClient.getApplicationInstances(appName);
-		assertEquals(0, instInfo.getInstances().size());
+		assertNull(instInfo);
 	}
 
 	@Test
@@ -1352,12 +1352,12 @@ public class CloudFoundryClientTest {
 			} catch (InterruptedException e1) {
 				// ignore
 			}
-			try {
-				return client.getApplicationInstances(appName);
+
+			final InstancesInfo applicationInstances = client.getApplicationInstances(appName);
+			if (applicationInstances != null) {
+				return applicationInstances;
 			}
-			catch (HttpServerErrorException e) {
-				// error 500, keep waiting
-			}
+
 			if (System.currentTimeMillis() - start > 30000) {
 				fail("Timed out waiting for startup");
 				break; // for the compiler
