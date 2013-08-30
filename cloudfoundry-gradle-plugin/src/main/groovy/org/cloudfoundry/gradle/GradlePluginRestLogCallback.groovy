@@ -4,9 +4,15 @@ import org.cloudfoundry.client.lib.RestLogCallback
 import org.cloudfoundry.client.lib.RestLogEntry
 
 class GradlePluginRestLogCallback implements RestLogCallback {
+    private def logger
+
+    GradlePluginRestLogCallback(def logger) {
+        this.logger = logger
+    }
+
     @Override
     void onNewLogEntry(RestLogEntry logEntry) {
-        println "REQUEST: ${logEntry.method} ${logEntry.uri}"
-        println "RESPONSE: ${logEntry.httpStatus} ${logEntry.status} ${logEntry.message}"
+        logger.debug "REQUEST: ${logEntry.method} ${logEntry.uri}"
+        logger.debug "RESPONSE: ${logEntry.httpStatus} ${logEntry.status} ${logEntry.message}"
     }
 }

@@ -30,7 +30,7 @@ class SetEnvCloudFoundryTask extends AbstractEnvCloudFoundryTask {
     @TaskAction
     void setEnvironmentVariables() {
         withCloudFoundryClient {
-            log "Setting environment variable for ${application}"
+            log "Setting environment variables for ${application}"
 
             withApplication {
                 CloudApplication app = client.getApplication(application)
@@ -39,9 +39,7 @@ class SetEnvCloudFoundryTask extends AbstractEnvCloudFoundryTask {
                     existingEnv + passedEnv
                 }
 
-                if (verbose) {
-                    listEnvironmentVariables(newEnv)
-                }
+                listEnvironmentVariables(newEnv)
             }
         }
     }

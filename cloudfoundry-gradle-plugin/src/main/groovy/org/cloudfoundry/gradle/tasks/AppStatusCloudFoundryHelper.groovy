@@ -42,7 +42,7 @@ class AppStatusCloudFoundryHelper {
             int offset = 0
             String staging = client.getStagingLogs(startingInfo, offset)
             while (staging != null) {
-                println staging
+                log staging
                 offset += staging.size()
                 staging = client.getStagingLogs(startingInfo, offset)
             }
@@ -50,7 +50,7 @@ class AppStatusCloudFoundryHelper {
     }
 
     void showStartingStatus(CloudApplication app) {
-        println "Checking status of ${app.name}"
+        log "Checking status of ${app.name}"
 
         def statusChecks = 0
 
@@ -92,7 +92,7 @@ class AppStatusCloudFoundryHelper {
 
         def expectedString = "${expectedInstances}"
         def runningString = "${runningInstances}".padLeft(expectedString.length())
-        println "  ${runningString} of ${expectedString} instances running (${stateStrings.join(", ")})"
+        log "  ${runningString} of ${expectedString} instances running (${stateStrings.join(", ")})"
     }
 
     void showStartResults(CloudApplication app) {

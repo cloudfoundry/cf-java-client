@@ -28,15 +28,17 @@ abstract class AbstractMapCloudFoundryTask extends AbstractCloudFoundryTask {
     }
 
     protected void listUriMappings(def uris) {
-        StringBuilder sb = new StringBuilder("Current uri mappings for ${application}\n")
+        if (verboseEnabled) {
+            StringBuilder sb = new StringBuilder("Current uri mappings for ${application}\n")
 
-        if (uris.isEmpty()) {
-            sb << '  none\n'
-        }
-        for (uri in uris) {
-            sb << "  ${uri}\n"
-        }
+            if (uris.isEmpty()) {
+                sb << '  none\n'
+            }
+            for (uri in uris) {
+                sb << "  ${uri}\n"
+            }
 
-        log sb.toString()
+            logVerbose sb.toString()
+        }
     }
 }

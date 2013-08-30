@@ -39,9 +39,7 @@ class MapCloudFoundryTask extends AbstractMapCloudFoundryTask {
                     existingUris + passedUris
                 }
 
-                if (verbose) {
-                    listUriMappings(applicationUris)
-                }
+                listUriMappings(applicationUris)
             }
         }
     }

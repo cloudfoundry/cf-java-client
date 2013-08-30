@@ -27,8 +27,8 @@ class ServiceCloudFoundryHelper {
             it.name.equals(service.name)
         }
         if (foundService) {
-            if (verbose) {
-                log "Service ${service.name} already exists, not creating"
+            if (verboseEnabled) {
+                logVerbose "Service ${service.name} already exists, not creating"
             }
             return
         }

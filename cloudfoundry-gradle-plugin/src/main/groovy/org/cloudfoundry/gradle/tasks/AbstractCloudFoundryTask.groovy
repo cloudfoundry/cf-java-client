@@ -15,7 +15,6 @@
 
 package org.cloudfoundry.gradle.tasks
 
-import org.apache.commons.logging.LogFactory
 import org.cloudfoundry.client.lib.CloudCredentials
 import org.cloudfoundry.client.lib.CloudFoundryClient
 import org.cloudfoundry.client.lib.CloudFoundryException
@@ -39,7 +38,15 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     protected void log(msg) {
-        println "Cloud Foundry - $msg"
+        logger.quiet msg
+    }
+
+    protected boolean isVerboseEnabled() {
+        logger.infoEnabled
+    }
+
+    protected void logVerbose(msg) {
+        logger.info msg
     }
 
     protected def withCloudFoundryClient(Closure c, Object[] args) {
@@ -84,8 +91,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
     protected CloudFoundryClient createClientWithUsernamePassword() {
         try {
-            if (verbose) {
-                log "Connecting to '${target}' with username '${username}'"
+            if (logger.infoEnabled) {
+                logger.info "Connecting to '${target}' with username '${username}'"
             }
 
             CloudCredentials credentials = new CloudCredentials(username, password)
@@ -101,8 +108,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
     protected CloudFoundryClient createClientWithToken() {
         try {
-            if (verbose) {
-                log "Connecting to '${target}' with stored token"
+            if (verboseEnabled) {
+                logVerbose "Connecting to '${target}' with stored token"
             }
 
             CloudCredentials credentials = new CloudCredentials(retrieveToken())
@@ -141,8 +148,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     protected def setupLogging() {
-        if (debugTrace) {
-            RestLogCallback callback = new GradlePluginRestLogCallback()
+        if (logger.debugEnabled) {
+            RestLogCallback callback = new GradlePluginRestLogCallback(logger)
             client.registerRestLogListener(callback)
         }
     }

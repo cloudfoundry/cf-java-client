@@ -42,9 +42,6 @@ class CloudFoundry {
 
     Map<String, String> env = [:]
 
-    boolean verbose = false
-    boolean debugTrace = false
-
     CloudFoundry(String projectName) {
         application = projectName
     }
