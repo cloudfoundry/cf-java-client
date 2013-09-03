@@ -42,6 +42,7 @@ import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
+import org.springframework.web.client.ResponseErrorHandler;
 
 /**
  * A Java client to exercise the Cloud Foundry API.
@@ -103,6 +104,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		CloudControllerClientFactory cloudControllerClientFactory =
 				new CloudControllerClientFactory(new RestUtil(), httpProxyConfiguration);
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
+	}
+
+	public void setResponseErrorHandler(ResponseErrorHandler errorHandler) {
+		cc.setResponseErrorHandler(errorHandler);
 	}
 
 	public URL getCloudControllerUrl() {

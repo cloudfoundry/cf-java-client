@@ -36,6 +36,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.web.client.ResponseErrorHandler;
 
 /**
  * The interface defining operations making up the Cloud Foundry Java client's API.
@@ -47,6 +48,13 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
  * @author Thomas Risberg
  */
 public interface CloudFoundryOperations {
+
+	/**
+	 * Override the default REST response error handler with a custom error handler.
+	 *
+	 * @param errorHandler
+	 */
+	void setResponseErrorHandler(ResponseErrorHandler errorHandler);
 
 	/**
 	 * Get the URL used for the cloud controller.
