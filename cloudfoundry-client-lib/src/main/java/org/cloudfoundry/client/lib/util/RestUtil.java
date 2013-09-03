@@ -1,10 +1,12 @@
 package org.cloudfoundry.client.lib.util;
 
+import org.apache.http.HttpHost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.rest.LoggingRestTemplate;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
@@ -12,7 +14,7 @@ import java.net.URL;
 /**
  * Some helper utilities for creating classes used for the REST support.
  *
- * @author: Thomas Risberg
+ * @author Thomas Risberg
  */
 public class RestUtil {
 
@@ -23,10 +25,10 @@ public class RestUtil {
 	}
 
 	public ClientHttpRequestFactory createRequestFactory(HttpProxyConfiguration httpProxyConfiguration) {
-		CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
+		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 		if (httpProxyConfiguration != null) {
-			requestFactory.getHttpClient().getHostConfiguration().setProxy(httpProxyConfiguration.getProxyHost(),
-					httpProxyConfiguration.getProxyPort());
+			HttpHost proxy = new HttpHost(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort());
+			requestFactory.getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		}
 		return requestFactory;
 	}

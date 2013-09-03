@@ -83,7 +83,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -386,7 +386,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		public CloudFoundryClientHttpRequestFactory(ClientHttpRequestFactory delegate) {
 			this.delegate = delegate;
-			captureDefaultReadTimeout(delegate);
+			captureDefaultReadTimeout();
 		}
 
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
@@ -404,10 +404,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			return request;
 		}
 
-		private void captureDefaultReadTimeout(ClientHttpRequestFactory delegate) {
-			if (delegate instanceof CommonsClientHttpRequestFactory) {
-				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
-				defaultSocketTimeout = (Integer) commonsClientHttpRequestFactory
+		private void captureDefaultReadTimeout() {
+			if (delegate instanceof HttpComponentsClientHttpRequestFactory) {
+				HttpComponentsClientHttpRequestFactory httpRequestFactory =
+						(HttpComponentsClientHttpRequestFactory) delegate;
+				defaultSocketTimeout = (Integer) httpRequestFactory
 						.getHttpClient().getParams()
 						.getParameter("http.socket.timeout");
 				if (defaultSocketTimeout == null) {
@@ -421,16 +422,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 
 		public void increaseReadTimeoutForStreamedTailedLogs(int timeout) {
-			// May temporary increase readtimeout on other unrelated concurrent
+			// May temporary increase read timeout on other unrelated concurrent
 			// threads, but per-request read timeout don't seem easily
 			// accessible
-			if (delegate instanceof CommonsClientHttpRequestFactory) {
-				CommonsClientHttpRequestFactory commonsClientHttpRequestFactory = (CommonsClientHttpRequestFactory) delegate;
+			if (delegate instanceof HttpComponentsClientHttpRequestFactory) {
+				HttpComponentsClientHttpRequestFactory httpRequestFactory =
+						(HttpComponentsClientHttpRequestFactory) delegate;
 
 				if (timeout > 0) {
-					commonsClientHttpRequestFactory.setReadTimeout(timeout);
+					httpRequestFactory.setReadTimeout(timeout);
 				} else {
-					commonsClientHttpRequestFactory
+					httpRequestFactory
 							.setReadTimeout(defaultSocketTimeout);
 				}
 			}
