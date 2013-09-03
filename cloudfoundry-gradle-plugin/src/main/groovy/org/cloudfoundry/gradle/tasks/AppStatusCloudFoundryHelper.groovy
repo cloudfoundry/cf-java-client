@@ -5,6 +5,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.cloudfoundry.client.lib.domain.InstanceInfo
 import org.cloudfoundry.client.lib.domain.InstanceState
 import org.cloudfoundry.client.lib.domain.InstancesInfo
+import org.gradle.api.GradleException
 import org.springframework.http.HttpStatus
 
 class AppStatusCloudFoundryHelper {
@@ -113,7 +114,7 @@ class AppStatusCloudFoundryHelper {
         def flappingInstances = getFlappingInstances(instances)
 
         if (flappingInstances > 0 || runningInstances == 0) {
-            log "Application start unsuccessful"
+            throw new GradleException("Application ${application} start unsuccessful")
         } else if (runningInstances > 0) {
             List<String> uris = allUris
             if (uris.empty) {

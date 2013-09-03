@@ -643,7 +643,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				CommonUtils.collectionToCommaDelimitedString(stateStrings)));
 	}
 
-	protected void showStartResults(CloudApplication app, List<String> uris) {
+	protected void showStartResults(CloudApplication app, List<String> uris) throws MojoExecutionException {
 		List<InstanceInfo> instances = getApplicationInstances(app);
 
 		int expectedInstances = getExpectedInstances(instances);
@@ -651,7 +651,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		int flappingInstances = getFlappingInstances(instances);
 
 		if (flappingInstances > 0 || runningInstances == 0) {
-			getLog().info("Application start unsuccessful");
+			throw new MojoExecutionException("Application start unsuccessful");
 		} else if (runningInstances > 0) {
 			if (uris.isEmpty()) {
 				getLog().info(String.format("Application '%s' is available", app.getName()));
