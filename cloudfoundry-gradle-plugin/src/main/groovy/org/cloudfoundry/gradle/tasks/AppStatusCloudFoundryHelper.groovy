@@ -32,6 +32,8 @@ class AppStatusCloudFoundryHelper {
     void showAppStartup(startingInfo) {
         CloudApplication app = client.getApplication(application)
 
+        client.responseErrorHandler = new AppStagingStatusRestErrorHandler()
+
         showStagingStatus(startingInfo)
         showStartingStatus(app)
         showStartResults(app)

@@ -47,7 +47,11 @@ class CloudFoundry {
     }
 
     public List<String> getAllUris() {
-        uri ? (uris + uri) as List<String> : uris
+        def allUris = uris.collect { it.toString() }
+        if (uri) {
+            allUris << uri.toString()
+        }
+        allUris as List<String>
     }
 
     protected String getRandomWord() {
