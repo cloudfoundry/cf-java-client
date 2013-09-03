@@ -42,6 +42,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.web.client.ResponseErrorHandler;
 
 /**
  * Interface defining operations available for the cloud controller REST client implementations
@@ -51,6 +52,8 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 public interface CloudControllerClient {
 
 	// User and Info methods
+
+	void setResponseErrorHandler(ResponseErrorHandler errorHandler);
 
 	URL getCloudControllerUrl();
 
