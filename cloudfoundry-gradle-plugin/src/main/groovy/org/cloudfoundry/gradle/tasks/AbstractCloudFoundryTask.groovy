@@ -31,6 +31,7 @@ import org.gradle.api.GradleException
 
 abstract class AbstractCloudFoundryTask extends DefaultTask {
     protected CloudFoundryOperations client
+    protected WarningBypassingResponseErrorHandler errorHandler
 
     AbstractCloudFoundryTask() {
         super()
@@ -77,6 +78,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         } else {
             client = createClientWithToken()
         }
+        errorHandler = new WarningBypassingResponseErrorHandler()
+        client.responseErrorHandler = errorHandler
     }
 
     protected void disconnectFromCloudFoundry() {

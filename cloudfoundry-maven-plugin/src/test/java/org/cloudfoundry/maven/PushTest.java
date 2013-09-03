@@ -68,7 +68,7 @@ public class PushTest extends AbstractMojoTestCase {
 		try {
 			mojo.validateMemoryChoice(availableMemoryChoices, desiredMemory);
 		} catch (IllegalStateException e) {
-			assertEquals("Memory must be one of the following values: 64,128,256", e.getMessage());
+			assertEquals("Memory must be one of the following values: 64, 128, 256", e.getMessage());
 			return;
 		}
 

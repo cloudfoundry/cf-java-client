@@ -1,4 +1,4 @@
-  name    status   usage      url                                                        
-  ------  -------  ---------  -----------------------------------------------------------
-  first   0%       1 x 512M   cf-rocks.api.run.pivotal.io,spring-rocks.api.run.pivotal.io
-  second  stopped  2 x 1024M  cf-rocks.api.run.pivotal.io,spring-rocks.api.run.pivotal.io
+  name    status   usage      url                                                         
+  ------  -------  ---------  ------------------------------------------------------------
+  first   0%       1 x 512M   cf-rocks.api.run.pivotal.io, spring-rocks.api.run.pivotal.io
+  second  stopped  2 x 1024M  cf-rocks.api.run.pivotal.io, spring-rocks.api.run.pivotal.io

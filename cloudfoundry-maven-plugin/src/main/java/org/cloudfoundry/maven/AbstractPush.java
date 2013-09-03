@@ -27,6 +27,7 @@ import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
 import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
 
@@ -99,7 +100,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 
 		if (instances != null) {
-			getLog().debug("Set the number of instances to " + instances);
+			getLog().debug("Setting the number of instances to " + instances);
 
 			try {
 				getClient().updateApplicationInstances(appname, instances);
@@ -114,21 +115,16 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 			try {
 				final StartingInfo startingInfo = getClient().startApplication(appname);
-				// showStagingStatus(startingInfo);
-				showStartingStatus();
+				showStagingStatus(startingInfo);
+
+				final CloudApplication app = getClient().getApplication(appname);
+				showStartingStatus(app);
+				showStartResults(app, uris);
 			} catch (CloudFoundryException e) {
 				throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
 		}
-
-		if (!uris.isEmpty()) {
-			getLog().info(String.format("Application '%s' is available at '%s'",
-					appname, CommonUtils.collectionToCommaDelimitedString(uris, "http://")));
-		} else {
-			getLog().info(String.format("Application '%s' is available", appname));
-		}
-
 	}
 
 	private void createApplication(String appname, String command, String buildpack,
@@ -171,21 +167,6 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 			serviceNames.add(service.getName());
 		}
 		return serviceNames;
-	}
-
-	private List<String> getAllUris() throws MojoExecutionException {
-		final List<String> uris = new ArrayList<String>(0);
-
-		Assert.configurationUrls(getUrl(), getUrls());
-
-		if (getUrl() != null) {
-			uris.add(getUrl());
-		} else if (!getUrls().isEmpty()) {
-			for (String uri : getUrls()) {
-				uris.add(uri);
-			}
-		}
-		return uris;
 	}
 
 	/**

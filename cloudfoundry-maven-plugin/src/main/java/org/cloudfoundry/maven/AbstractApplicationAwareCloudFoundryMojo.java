@@ -33,6 +33,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.InstanceInfo;
+import org.cloudfoundry.client.lib.domain.InstanceState;
+import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 
@@ -40,9 +43,11 @@ import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudService;
 
+import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
 import org.codehaus.plexus.util.StringUtils;
+import org.springframework.http.HttpStatus;
 
 /**
  * Abstract goal for the Cloud Foundry Maven plugin that bundles access to commonly
@@ -56,7 +61,9 @@ import org.codehaus.plexus.util.StringUtils;
  * @since 1.0.0
  *
  */
+@SuppressWarnings("UnusedDeclaration")
 abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFoundryMojo {
+	private static final int MAX_STATUS_CHECKS = 60;
 
 	/**
 	 * @parameter expression="${cf.appname}"
@@ -352,9 +359,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			try {
 			    artifactResolver.resolve(resolvedArtifact, remoteRepositories, localRepository );
 			} catch (ArtifactNotFoundException ex) {
-			    throw new MojoExecutionException("could not find deploy artifact ["+artifact+"]", ex);
+			    throw new MojoExecutionException("Could not find deploy artifact ["+artifact+"]", ex);
 			} catch (ArtifactResolutionException ex) {
-			    throw new MojoExecutionException("could not resolve deploy artifact ["+artifact+"]", ex);
+			    throw new MojoExecutionException("Could not resolve deploy artifact ["+artifact+"]", ex);
 			}
 			return resolvedArtifact.getFile();
 		}
@@ -378,13 +385,10 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		String classifier = null;
 		if (tokens.length == 5) {
 			classifier = tokens[4];
-		} else {
-			classifier = null;
 		}
-		Artifact resolvedArtifact = classifier == null
+		return (classifier == null
 			? artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging )
-			: artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, packaging, classifier );
-		return resolvedArtifact;
+			: artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, packaging, classifier));
 	}
 
 	/**
@@ -567,6 +571,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 	protected void showStagingStatus(StartingInfo startingInfo) {
 		if (startingInfo != null) {
+			responseErrorHandler.addExpectedStatus(HttpStatus.NOT_FOUND);
+
 			int offset = 0;
 			String staging = client.getStagingLogs(startingInfo, offset);
 			while (staging != null) {
@@ -574,18 +580,85 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				offset += staging.length();
 				staging = client.getStagingLogs(startingInfo, offset);
 			}
+
+			responseErrorHandler.clearExpectedStatus();
 		}
 	}
 
-	protected void showStartingStatus() {
+	protected void showStartingStatus(CloudApplication app) {
 		getLog().info(String.format("Checking status of application '%s'", getAppname()));
-		while (true) {
-			CloudApplication app = client.getApplication(getAppname());
-			getLog().info(String.format("%d of %d instances running",
-					app.getRunningInstances(), app.getInstances()));
 
-			if (app.getRunningInstances() == app.getInstances())
-				break;
+		responseErrorHandler.addExpectedStatus(HttpStatus.BAD_REQUEST);
+
+		int statusChecks = 0;
+
+		while (statusChecks < MAX_STATUS_CHECKS) {
+			List<InstanceInfo> instances = getApplicationInstances(app);
+
+			if (instances != null) {
+				int expectedInstances = getExpectedInstances(instances);
+				int runningInstances = getRunningInstances(instances);
+				int flappingInstances = getFlappingInstances(instances);
+
+				showInstancesStatus(instances, runningInstances, expectedInstances);
+
+				if (flappingInstances > 0)
+					break;
+
+				if (runningInstances == expectedInstances)
+					break;
+			}
+
+			statusChecks++;
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+
+		responseErrorHandler.clearExpectedStatus();
+	}
+
+	protected void showInstancesStatus(List<InstanceInfo> instances, int runningInstances, int expectedInstances) {
+		Map<String, Integer> stateCounts = new HashMap<String, Integer>();
+
+		for (InstanceInfo instance : instances) {
+			final String state = instance.getState().toString();
+			final Integer stateCount = stateCounts.get(state);
+			if (stateCount == null) {
+				stateCounts.put(state, 1);
+			} else {
+				stateCounts.put(state, stateCount + 1);
+			}
+		}
+
+		List<String> stateStrings = new ArrayList<String>();
+		for (Map.Entry<String, Integer> stateCount : stateCounts.entrySet()) {
+			stateStrings.add(String.format("%s %s", stateCount.getValue(), stateCount.getKey().toLowerCase()));
+		}
+
+		getLog().info(String.format("  %d of %d instances running (%s)", runningInstances, expectedInstances,
+				CommonUtils.collectionToCommaDelimitedString(stateStrings)));
+	}
+
+	protected void showStartResults(CloudApplication app, List<String> uris) {
+		List<InstanceInfo> instances = getApplicationInstances(app);
+
+		int expectedInstances = getExpectedInstances(instances);
+		int runningInstances = getRunningInstances(instances);
+		int flappingInstances = getFlappingInstances(instances);
+
+		if (flappingInstances > 0 || runningInstances == 0) {
+			getLog().info("Application start unsuccessful");
+		} else if (runningInstances > 0) {
+			if (uris.isEmpty()) {
+				getLog().info(String.format("Application '%s' is available", app.getName()));
+			} else {
+				getLog().info(String.format("Application '%s' is available at '%s'",
+						app.getName(), CommonUtils.collectionToCommaDelimitedString(uris, "http://")));
+			}
 		}
 	}
 
@@ -605,5 +678,52 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				getClient().addDomain(domain);
 			}
 		}
+	}
+
+	private List<InstanceInfo> getApplicationInstances(CloudApplication app) {
+		InstancesInfo instancesInfo = client.getApplicationInstances(app);
+		if (instancesInfo != null) {
+			return instancesInfo.getInstances();
+		}
+		return null;
+	}
+
+	private int getExpectedInstances(List<InstanceInfo> instances) {
+		return instances == null ? 0 : instances.size();
+	}
+
+	private int getRunningInstances(List<InstanceInfo> instances) {
+		return getInstanceCount(instances, InstanceState.RUNNING);
+	}
+
+	private int getFlappingInstances(List<InstanceInfo> instances) {
+		return getInstanceCount(instances, InstanceState.FLAPPING);
+	}
+
+	private int getInstanceCount(List<InstanceInfo> instances, InstanceState state) {
+		int count = 0;
+		if (instances != null) {
+			for (InstanceInfo instance : instances) {
+				if (instance.getState().equals(state)) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	protected List<String> getAllUris() throws MojoExecutionException {
+		final List<String> uris = new ArrayList<String>(0);
+
+		Assert.configurationUrls(getUrl(), getUrls());
+
+		if (getUrl() != null) {
+			uris.add(getUrl());
+		} else if (!getUrls().isEmpty()) {
+			for (String uri : getUrls()) {
+				uris.add(uri);
+			}
+		}
+		return uris;
 	}
 }

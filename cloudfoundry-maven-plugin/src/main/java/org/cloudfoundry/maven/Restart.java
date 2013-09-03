@@ -18,12 +18,14 @@ package org.cloudfoundry.maven;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.springframework.http.HttpStatus;
 
 /**
  * Restarts an application.
  *
  * @author Gunnar Hillert
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal restart
@@ -37,8 +39,11 @@ public class Restart extends AbstractApplicationAwareCloudFoundryMojo {
 			getLog().info(String.format("Restarting application '%s'", getAppname()));
 
 			final StartingInfo startingInfo = getClient().restartApplication(getAppname());
-			// showStagingStatus(startingInfo);
-			showStartingStatus();
+			showStagingStatus(startingInfo);
+
+			final CloudApplication application = getClient().getApplication(getAppname());
+			showStartingStatus(application);
+			showStartResults(application, getAllUris());
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
 				throw new MojoExecutionException(String.format("Application '%s' does not exist",

@@ -15,12 +15,9 @@
  */
 package org.cloudfoundry.maven;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.execution.MavenSession;
@@ -35,6 +32,7 @@ import org.cloudfoundry.client.lib.tokens.TokensFile;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
+import org.cloudfoundry.maven.common.WarningBypassingResponseErrorHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResourceAccessException;
@@ -48,6 +46,7 @@ import org.springframework.web.client.ResourceAccessException;
  * @author Scott Frederick
  * @since 1.0.0
  */
+@SuppressWarnings("UnusedDeclaration")
 public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
@@ -57,6 +56,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	protected CloudFoundryClient client;
 	protected TokensFile tokensFile = new TokensFile();
+	protected WarningBypassingResponseErrorHandler responseErrorHandler = new WarningBypassingResponseErrorHandler();
 
 	/**
 	 * @parameter expression="${cf.password}"
@@ -123,8 +123,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	 * Retrieve Token from ~/.cf/tokens.yml
 	 *
 	 * @return token (String)
-	 * @throws IOException
-	 * @throws ParserConfigurationException
 	 */
 	protected OAuth2AccessToken retrieveToken() throws MojoExecutionException {
 		final OAuth2AccessToken token = tokensFile.retrieveToken(getTarget());
@@ -139,12 +137,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
 	 * Cloud Controller Version 2 Client (Token)
-	 * @param token
-	 * @param target
-	 * @param org
-	 * @param space
-	 * @return client
-	 * @throws MojoExecutionException
 	 */
 	protected CloudFoundryClient createCloudFoundryClient(OAuth2AccessToken token, URI target, String org, String space)
 			throws MojoExecutionException {
@@ -156,7 +148,9 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 		try {
 			final CloudCredentials credentials = new CloudCredentials(token);
-			return new CloudFoundryClient(credentials, target.toURL(), org, space);
+			final CloudFoundryClient client = new CloudFoundryClient(credentials, target.toURL(), org, space);
+			client.setResponseErrorHandler(responseErrorHandler);
+			return client;
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target URL '%s'. Make sure the URL contains a scheme, e.g. http://...", target), e);
@@ -165,13 +159,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
 	 * Cloud Controller Version 2 Client
-	 * @param username
-	 * @param password
-	 * @param target
-	 * @param org
-	 * @param space
-	 * @return client/null
-	 * @throws MojoExecutionException
 	 */
 	protected CloudFoundryClient createCloudFoundryClient(String username, String password, URI target, String org, String space)
 			throws MojoExecutionException {
@@ -189,6 +176,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 			final CloudCredentials credentials = new CloudCredentials(username, password);
 			CloudFoundryClient client = new CloudFoundryClient(credentials, target.toURL(), org, space);
 			connectToCloudFoundry(client);
+			client.setResponseErrorHandler(responseErrorHandler);
 			return client;
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
@@ -198,9 +186,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	/**
 	 * Cloud Foundry Connection Login
-	 * @param client
-	 * @return
-	 * @throws MojoExecutionException
 	 */
 	protected void connectToCloudFoundry(CloudFoundryClient client) throws MojoExecutionException {
 		try {
@@ -261,10 +246,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		return artifactId;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	public CloudFoundryClient getClient() {
 		return client;
 	}
@@ -279,10 +260,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		return session.getExecutionProperties().getProperty(property.getProperty());
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	public String getPassword() {
 
 		final String passwordProperty = getCommandlineProperty(SystemProperties.PASSWORD);
@@ -387,10 +364,6 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	public String getUsername() {
 
 		final String usernameProperty = getCommandlineProperty(SystemProperties.USERNAME);

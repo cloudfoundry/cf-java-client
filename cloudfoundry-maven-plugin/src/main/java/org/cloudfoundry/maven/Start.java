@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
  * Starts an application.
  *
  * @author Gunnar Hillert
+ * @author Scott Frederick
  * @since 1.0.0
  *
  * @goal start
@@ -36,7 +37,7 @@ public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() throws MojoExecutionException {
 
 		try {
-			final CloudApplication application = getClient().getApplication(getAppname());
+			CloudApplication application = getClient().getApplication(getAppname());
 
 			if (application.getRunningInstances() > 0) {
 				getLog().info(String.format("Application '%s' is already started", getAppname()));
@@ -44,8 +45,11 @@ public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 				getLog().info(String.format("Starting application '%s'", getAppname()));
 
 				final StartingInfo startingInfo = getClient().startApplication(getAppname());
-				// showStagingStatus(startingInfo);
-				showStartingStatus();
+				showStagingStatus(startingInfo);
+
+				application = getClient().getApplication(getAppname());
+				showStartingStatus(application);
+				showStartResults(application, getAllUris());
 			}
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {

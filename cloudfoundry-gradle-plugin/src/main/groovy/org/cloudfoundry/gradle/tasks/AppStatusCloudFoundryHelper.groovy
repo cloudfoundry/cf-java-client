@@ -3,7 +3,9 @@ package org.cloudfoundry.gradle.tasks
 import org.cloudfoundry.client.lib.StartingInfo
 import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.cloudfoundry.client.lib.domain.InstanceInfo
+import org.cloudfoundry.client.lib.domain.InstanceState
 import org.cloudfoundry.client.lib.domain.InstancesInfo
+import org.springframework.http.HttpStatus
 
 class AppStatusCloudFoundryHelper {
     static final int MAX_STATUS_CHECKS = 60
@@ -32,8 +34,6 @@ class AppStatusCloudFoundryHelper {
     void showAppStartup(startingInfo) {
         CloudApplication app = client.getApplication(application)
 
-        client.responseErrorHandler = new AppStagingStatusRestErrorHandler()
-
         showStagingStatus(startingInfo)
         showStartingStatus(app)
         showStartResults(app)
@@ -41,6 +41,8 @@ class AppStatusCloudFoundryHelper {
 
     void showStagingStatus(StartingInfo startingInfo) {
         if (startingInfo) {
+            errorHandler.addExpectedStatus(HttpStatus.NOT_FOUND)
+
             int offset = 0
             String staging = client.getStagingLogs(startingInfo, offset)
             while (staging != null) {
@@ -48,11 +50,15 @@ class AppStatusCloudFoundryHelper {
                 offset += staging.size()
                 staging = client.getStagingLogs(startingInfo, offset)
             }
+
+            errorHandler.clearExpectedStatus()
         }
     }
 
     void showStartingStatus(CloudApplication app) {
         log "Checking status of ${app.name}"
+
+        errorHandler.addExpectedStatus(HttpStatus.BAD_REQUEST)
 
         def statusChecks = 0
 
@@ -79,6 +85,8 @@ class AppStatusCloudFoundryHelper {
             statusChecks++
             sleep 1000
         }
+
+        errorHandler.clearExpectedStatus()
     }
 
     void showInstancesStatus(List<InstanceInfo> instances, runningInstances, expectedInstances) {
@@ -130,10 +138,10 @@ class AppStatusCloudFoundryHelper {
     }
 
     def getRunningInstances(List<InstanceInfo> instances) {
-        instances.count { instance -> instance.state.toString() == "RUNNING" }
+        instances.count { instance -> instance.state == InstanceState.RUNNING }
     }
 
     def getFlappingInstances(List<InstanceInfo> instances) {
-        instances.count { instance -> instance.state.toString() == "FLAPPING" }
+        instances.count { instance -> instance.state == InstanceState.FLAPPING }
     }
 }

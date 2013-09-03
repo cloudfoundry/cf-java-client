@@ -85,7 +85,7 @@ public final class CommonUtils {
 	 *         String for a Null or empty list.
 	 */
 	public static String collectionToCommaDelimitedString(Collection<String> list) {
-		return StringUtils.collectionToCommaDelimitedString(list);
+		return StringUtils.collectionToDelimitedString(list, ", ");
 	}
 
 	/**
@@ -96,7 +96,7 @@ public final class CommonUtils {
 	 *         String for a Null or empty list.
 	 */
 	public static String collectionToCommaDelimitedString(Collection<String> list, String prefix) {
-		return StringUtils.collectionToDelimitedString(list, ",", prefix, "");
+		return StringUtils.collectionToDelimitedString(list, ", ", prefix, "");
 	}
 
 	/**
