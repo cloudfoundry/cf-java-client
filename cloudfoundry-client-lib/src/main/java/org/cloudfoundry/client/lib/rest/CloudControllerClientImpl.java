@@ -151,6 +151,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		logger = LogFactory.getLog(getClass().getName());
 	}
 
+    /**
+     * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
+     * hence can not be overloaded, making it impossible to write unit tests that don't trigger network calls.
+     */
+    protected CloudControllerClientImpl() {
+        logger = LogFactory.getLog(getClass().getName());
+    }
+
 	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
 			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
 		logger = LogFactory.getLog(getClass().getName());
@@ -345,7 +353,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return cloudControllerUrl + (path.startsWith("/") ? path : "/" + path);
 	}
 
-	private void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
+	protected void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
 		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
 		restTemplate.setRequestFactory(
 				new CloudFoundryClientHttpRequestFactory(requestFactory));
@@ -901,16 +909,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-	private void extractUriInfo(Map<String, UUID> domains, String uri, Map<String, String> uriInfo) {
+	protected void extractUriInfo(Map<String, UUID> domains, String uri, Map<String, String> uriInfo) {
 		URI newUri = URI.create(uri);
 		String authority = newUri.getScheme() != null ? newUri.getAuthority(): newUri.getPath();
 		for (String domain : domains.keySet()) {
 			if (authority != null && authority.endsWith(domain)) {
-				uriInfo.put("domainName", domain);
-				if (domain.length() < authority.length()) {
-					uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
-				}
-				break;
+                String previousDomain = uriInfo.get("domainName");
+                if (previousDomain == null || domain.length() > previousDomain.length()) {
+                    //Favor most specific subdomains
+                    uriInfo.put("domainName", domain);
+                    if (domain.length() < authority.length()) {
+                        uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
+                    }
+                }
 			}
 		}
 		if (uriInfo.get("domainName") == null) {
