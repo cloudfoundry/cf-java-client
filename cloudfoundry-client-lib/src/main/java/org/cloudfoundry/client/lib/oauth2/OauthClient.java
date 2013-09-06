@@ -41,8 +41,8 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Client that can handle authentication against a UAA instance
  *
- * @author: Dave Syer
- * @author: Thomas Risberg
+ * @author Dave Syer
+ * @author Thomas Risberg
  */
 public class OauthClient {
 
@@ -62,8 +62,7 @@ public class OauthClient {
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
         ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
-        provider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
-        OAuth2AccessToken token = null;
+        OAuth2AccessToken token;
 		try {
 			token = provider.obtainAccessToken(resource, request);
 		}
@@ -77,7 +76,9 @@ public class OauthClient {
 	}
 
     protected ResourceOwnerPasswordAccessTokenProvider createResourceOwnerPasswordAccessTokenProvider() {
-        return new ResourceOwnerPasswordAccessTokenProvider();
+        ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+        resourceOwnerPasswordAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
+        return resourceOwnerPasswordAccessTokenProvider;
     }
 
     public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password) {
