@@ -61,8 +61,8 @@ public class OauthClient {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
-        ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
-        OAuth2AccessToken token;
+		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
+		OAuth2AccessToken token;
 		try {
 			token = provider.obtainAccessToken(resource, request);
 		}
@@ -75,19 +75,19 @@ public class OauthClient {
 		return token;
 	}
 
-    protected ResourceOwnerPasswordAccessTokenProvider createResourceOwnerPasswordAccessTokenProvider() {
-        ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
-        resourceOwnerPasswordAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
-        return resourceOwnerPasswordAccessTokenProvider;
-    }
+	protected ResourceOwnerPasswordAccessTokenProvider createResourceOwnerPasswordAccessTokenProvider() {
+		ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+		resourceOwnerPasswordAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
+		return resourceOwnerPasswordAccessTokenProvider;
+	}
 
-    public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password) {
+	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password) {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
-        ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
+		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
 
-        return provider.refreshAccessToken(resource, currentToken.getRefreshToken(), request);
+		return provider.refreshAccessToken(resource, currentToken.getRefreshToken(), request);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
