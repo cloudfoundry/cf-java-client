@@ -151,13 +151,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		logger = LogFactory.getLog(getClass().getName());
 	}
 
-    /**
-     * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
-     * hence can not be overloaded, making it impossible to write unit tests that don't trigger network calls.
-     */
-    protected CloudControllerClientImpl() {
-        logger = LogFactory.getLog(getClass().getName());
-    }
+	/**
+	 * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
+	 * hence can not be overloaded, making it impossible to write unit tests that don't trigger network calls.
+	 */
+	protected CloudControllerClientImpl() {
+		logger = LogFactory.getLog(getClass().getName());
+	}
 
 	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
 			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
