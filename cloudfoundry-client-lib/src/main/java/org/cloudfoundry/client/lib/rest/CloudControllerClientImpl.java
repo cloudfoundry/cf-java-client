@@ -215,9 +215,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
 		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
 			try {
-				URL newUrl = new URL("http", authorizationEndpoint.getHost(), authorizationEndpoint.getPort(),
+				return new URL("http", authorizationEndpoint.getHost(), authorizationEndpoint.getPort(),
 						authorizationEndpoint.getFile());
-				return newUrl;
 			} catch (MalformedURLException e) {
 				// this shouldn't happen
 				return authorizationEndpoint;
@@ -401,7 +400,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
 			if (token != null) {
 				if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
-					token = oauthClient.refreshToken(token, cloudCredentials.getEmail(),	cloudCredentials.getPassword());
+					token = oauthClient.refreshToken(token, cloudCredentials.getEmail(), cloudCredentials.getPassword(),
+							cloudCredentials.getClientId());
 				}
 				String header = token.getTokenType() + " " + token.getValue();
 				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
@@ -624,7 +624,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	public OAuth2AccessToken login() {
 		token = oauthClient.getToken(cloudCredentials.getEmail(),
-				cloudCredentials.getPassword());
+				cloudCredentials.getPassword(), cloudCredentials.getClientId());
 		
 		return token;
 	}
@@ -1646,8 +1646,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		if (!entity.containsKey(headKey)) {
 			String pathUrl = entity.get(headKey + "_url").toString();
 			Object response = getRestTemplate().getForObject(getUrl(pathUrl), Object.class);
-			if (resource instanceof Map) {
-				Map<String, Object> responseMap = (Map<String, Object>)response;
+			if (response instanceof Map) {
+				Map<String, Object> responseMap = (Map<String, Object>) response;
 				if (responseMap.containsKey("resources")) {
 					response = responseMap.get("resources");
 				}
