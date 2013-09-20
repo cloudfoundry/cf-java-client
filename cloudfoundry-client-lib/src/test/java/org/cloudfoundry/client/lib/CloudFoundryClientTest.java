@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -202,6 +204,15 @@ public class CloudFoundryClientTest {
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
+
+		assertNotNull(app.getMeta().getGuid());
+
+		final Calendar now = Calendar.getInstance();
+		now.setTime(new Date());
+		final Calendar createdDate = Calendar.getInstance();
+		createdDate.setTime(app.getMeta().getCreated());
+
+		assertEquals(now.get(Calendar.DATE), createdDate.get(Calendar.DATE));
 	}
 
 	@Test
@@ -657,7 +668,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadAppWithNonAsciiFileName() throws IOException {
-		String appName = namespacedAppName("non-ascii-file-name");
+		String appName = namespacedAppName("non-ascii");
 		List<String> uris = new ArrayList<String>();
 		uris.add(computeAppUrl(appName));
 
@@ -734,7 +745,7 @@ public class CloudFoundryClientTest {
 		String appName = namespacedAppName("simple_getFile");
 		createAndUploadAndStartSimpleSpringApp(appName);
 		boolean running = getInstanceInfosWithTimeout(appName, 1, true);
-		assertTrue("App failed to start", running);		
+		assertTrue("App failed to start", running);
 		doGetFile(connectedClient, appName);
 	}
 
@@ -1139,8 +1150,8 @@ public class CloudFoundryClientTest {
 
 	private void doGetFile(CloudFoundryClient client, String appName) throws Exception {
 		String appDir = "app";
-		String fileName = appDir + "/webapps/ROOT/WEB-INF/web.xml";
-		String emptyPropertiesfileName = appDir + "/webapps/ROOT/WEB-INF/classes/empty.properties";
+		String fileName = appDir + "/WEB-INF/web.xml";
+		String emptyPropertiesFileName = appDir + "/WEB-INF/classes/empty.properties";
 
 		// File is often not available immediately after starting an app... so allow up to 60 seconds wait
 		for (int i = 0; i < 60; i++) {
@@ -1192,9 +1203,8 @@ public class CloudFoundryClientTest {
 		}
 
 		// Test downloading empty file
-		String fileContent7 = client.getFile(appName, 0, emptyPropertiesfileName);
-		assertNotNull(fileContent7);
-		assertTrue(fileContent7.length() == 0);
+		String fileContent7 = client.getFile(appName, 0, emptyPropertiesFileName);
+		assertNull(fileContent7);
 
 		// Test downloading with invalid parameters - should all throw exceptions
 		try {
@@ -1358,7 +1368,7 @@ public class CloudFoundryClientTest {
 				return applicationInstances;
 			}
 
-			if (System.currentTimeMillis() - start > 30000) {
+			if (System.currentTimeMillis() - start > 60000) {
 				fail("Timed out waiting for startup");
 				break; // for the compiler
 			}
