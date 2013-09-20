@@ -21,13 +21,15 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 /**
  * Class that encapsulates credentials used for authentication
  *
- * @author: Thomas Risberg
+ * @author Thomas Risberg
  */
 public class CloudCredentials {
 
 	private String email;
 
 	private String password;
+
+	private String clientId = "cf";
 
 	private OAuth2AccessToken token;
 
@@ -45,12 +47,36 @@ public class CloudCredentials {
 	}
 
 	/**
+	 * Create credentials using email, password, and client ID.
+	 *
+	 * @param email email to authenticate with
+	 * @param password the password
+	 * @param clientId the client ID to use for authorization
+	 */
+	public CloudCredentials(String email, String password, String clientId) {
+		this.email = email;
+		this.password = password;
+		this.clientId = clientId;
+	}
+
+	/**
 	 * Create credentials using a token.
 	 *
 	 * @param token token to use for authorization
 	 */
 	public CloudCredentials(OAuth2AccessToken token) {
 		this.token = token;
+	}
+
+	/**
+	 * Create credentials using a token.
+	 *
+	 * @param token token to use for authorization
+	 * @param clientId the client ID to use for authorization
+	 */
+	public CloudCredentials(OAuth2AccessToken token, String clientId) {
+		this.token = token;
+		this.clientId = clientId;
 	}
 
 	/**
@@ -62,6 +88,7 @@ public class CloudCredentials {
 	public CloudCredentials(CloudCredentials cloudCredentials, String proxyForUser) {
 		this.email = cloudCredentials.getEmail();
 		this.password = cloudCredentials.getPassword();
+		this.clientId = cloudCredentials.getClientId();
 		this.token = cloudCredentials.getToken();
 		this.proxyUser = proxyForUser;
 	}
@@ -94,6 +121,15 @@ public class CloudCredentials {
 	}
 
 	/**
+	 * Get the client ID.
+	 *
+	 * @return the client ID
+	 */
+	public String getClientId() {
+		return clientId;
+	}
+
+	/**
 	 * Get the proxy user.
 	 *
 	 * @return the proxy user
@@ -108,18 +144,17 @@ public class CloudCredentials {
 	 * @return whether a proxy user is set
 	 */
 	public boolean isProxyUserSet()  {
-		return proxyUser == null ? false : true;
+		return proxyUser != null;
 	}
 
 	/**
 	 * Run commands as a different user.  The authenticated user must be
 	 * privileged to run as this user.
 
-	 * @param user
-	 * @return
+	 * @param user the user to proxy for
+	 * @return credentials for the proxied user
 	 */
 	public CloudCredentials proxyForUser(String user) {
 		return new CloudCredentials(this, user);
 	}
-
 }
