@@ -35,7 +35,7 @@ class CloudFoundry {
     String buildpack
     boolean startApp = true
     int memory = 512
-    int instances = -1
+    int instances = 1
     String uri
     List<String> uris = []
     File file
