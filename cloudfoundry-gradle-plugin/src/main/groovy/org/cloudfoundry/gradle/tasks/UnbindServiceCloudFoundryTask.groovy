@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -24,20 +25,28 @@ import org.gradle.api.tasks.TaskAction
  * @author Cedric Champeau
  */
 class UnbindServiceCloudFoundryTask extends AbstractCloudFoundryTask {
-    String serviceName
-    String application
-
     UnbindServiceCloudFoundryTask() {
         super()
-        description = 'Unbinds a service from an application'
+        description = 'Unbinds services from an application'
     }
 
     @TaskAction
     void unbindService() {
         withCloudFoundryClient {
-            if (getServiceName()) {
-                log "Unbinding service '${getServiceName()}' from application '${getApplication()}"
-                client.unbindService(getApplication(), getServiceName())
+            withApplication {
+                CloudApplication app = client.getApplication(application)
+                List<String> servicesNames = app.services
+
+                serviceInfos.each { serviceInfo ->
+                    String serviceName = serviceInfo.name
+
+                    if (!servicesNames.contains(serviceName)) {
+                        log "Service ${serviceName} is not bound to ${application}"
+                    } else {
+                        log "Unbinding service ${serviceName} from application ${application}"
+                        client.unbindService(application, serviceName)
+                    }
+                }
             }
         }
     }
