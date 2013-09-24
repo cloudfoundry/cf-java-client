@@ -85,7 +85,7 @@ import org.springframework.web.client.RestTemplate;
 @BMScript(value="trace", dir="target/test-classes")
 public class CloudFoundryClientTest {
 
-    private CloudFoundryClient connectedClient;
+	private CloudFoundryClient connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://api.run.pivotal.io");
@@ -105,17 +105,17 @@ public class CloudFoundryClientTest {
 	private static final String TEST_NAMESPACE = System.getProperty("vcap.test.namespace", defaultNamespace(CCNG_USER_EMAIL));
 
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
-	
+
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 
-    private static final boolean SKIP_INJVM_PROXY = Boolean.getBoolean("http.skipInJvmProxy");
+	private static final boolean SKIP_INJVM_PROXY = Boolean.getBoolean("http.skipInJvmProxy");
 
-    private static String defaultDomainName = null;
+	private static String defaultDomainName = null;
 
-    private static HttpProxyConfiguration httpProxyConfiguration;
-    private static Server inJvmProxyServer;
-    private static int inJvmProxyPort;
-    private static AtomicInteger nbInJvmProxyRcvReqs;
+	private static HttpProxyConfiguration httpProxyConfiguration;
+	private static Server inJvmProxyServer;
+	private static int inJvmProxyPort;
+	private static AtomicInteger nbInJvmProxyRcvReqs;
 
 	private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
 	private static final int DEFAULT_MEMORY = 512; // MB
@@ -131,7 +131,7 @@ public class CloudFoundryClientTest {
 	@Rule
 	public TestRule watcher = new TestWatcher() {
 		private long startTime;
-		
+
 		@Override
 		protected void starting(Description description) {
 			if (!SILENT_TEST_TIMINGS) {			
@@ -139,7 +139,7 @@ public class CloudFoundryClientTest {
 			}
 			startTime = System.currentTimeMillis();
 		}
-		
+
 		@Override
 		protected void finished(Description description) {
 			if (!SILENT_TEST_TIMINGS) {
@@ -148,9 +148,9 @@ public class CloudFoundryClientTest {
 		}
 	};
 
-    private static HttpProxyConfiguration inJvmHttpProxyConfiguration;
+	private static HttpProxyConfiguration inJvmHttpProxyConfiguration;
 
-    @BeforeClass
+	@BeforeClass
 	public static void beforeClass() throws Exception {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
 		System.out.println("Using space " + CCNG_USER_SPACE + " of organization " + CCNG_USER_ORG );
@@ -158,182 +158,182 @@ public class CloudFoundryClientTest {
 			fail("System property ccng.passwd must be specified, supply -Dccng.passwd=<password>");
 		}
 
-        if (CCNG_API_PROXY_HOST != null) {
-            httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
-        }
-        if (! SKIP_INJVM_PROXY) {
-            new SocketDestHelper().setForbiddenOnCurrentThread();
-            startInJvmProxy();
-            inJvmHttpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
-            httpProxyConfiguration = inJvmHttpProxyConfiguration;
-        }
+		if (CCNG_API_PROXY_HOST != null) {
+			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+		}
+		if (! SKIP_INJVM_PROXY) {
+			new SocketDestHelper().setForbiddenOnCurrentThread();
+			startInJvmProxy();
+			inJvmHttpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
+			httpProxyConfiguration = inJvmHttpProxyConfiguration;
+		}
 	}
 
-    @AfterClass
-    public static void afterClass() throws Exception {
-        if (inJvmProxyServer != null) {
-            inJvmProxyServer.stop();
-            nbInJvmProxyRcvReqs.set(0);
-        }
-    }
+	@AfterClass
+	public static void afterClass() throws Exception {
+		if (inJvmProxyServer != null) {
+			inJvmProxyServer.stop();
+			nbInJvmProxyRcvReqs.set(0);
+		}
+	}
 
 	@Before
 	public void setUp() throws Exception {
-        URL cloudControllerUrl;
+		URL cloudControllerUrl;
 
-        cloudControllerUrl = new URL(CCNG_API_URL);
-        connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
-                cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
+		cloudControllerUrl = new URL(CCNG_API_URL);
+		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
+				cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
 		connectedClient.login();
 		defaultDomainName = getDefaultDomain(connectedClient.getDomainsForOrg()).getName();
-		
+
 		// Optimization to avoid redoing the work already done is tearDown()
 		if (!tearDownComplete) {
-            tearDown();
-        }
+			tearDown();
+		}
 		tearDownComplete = false;
 		connectedClient.addDomain(TEST_DOMAIN);
-		
+
 		// connectedClient.registerRestLogListener(new RestLogger("CF_REST"));
-        if (nbInJvmProxyRcvReqs != null) {
-            nbInJvmProxyRcvReqs.set(0); //reset calls made in setup to leave a clean state for tests to assert
-        }
-    }
+		if (nbInJvmProxyRcvReqs != null) {
+			nbInJvmProxyRcvReqs.set(0); //reset calls made in setup to leave a clean state for tests to assert
+		}
+	}
 
 	@After
 	public void tearDown() throws Exception {
-        // Clean after ourselves so that there are no leftover apps, services, domains, and routes
-        if (connectedClient != null) { //may happen if setUp() fails
-            connectedClient.deleteAllApplications();
-            connectedClient.deleteAllServices();
-            clearTestDomainAndRoutes();
-        }
-        tearDownComplete = true;
-    }
+		// Clean after ourselves so that there are no leftover apps, services, domains, and routes
+		if (connectedClient != null) { //may happen if setUp() fails
+			connectedClient.deleteAllApplications();
+			connectedClient.deleteAllServices();
+			clearTestDomainAndRoutes();
+		}
+		tearDownComplete = true;
+	}
 
 
-    @Test
+	@Test
 	public void infoAvailable() throws Exception {
 		CloudInfo info = connectedClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
 		assertNotNull(info.getBuild());
-    }
+	}
 
-    /**
-     * Self tests that the assert mechanisms with jetty and byteman are properly working. If debugging is needed
-     * consider enabling one or more of the following system properties
-     * -Dorg.jboss.byteman.verbose=true
-     * -Dorg.jboss.byteman.debug=true
-     * -Dorg.jboss.byteman.rule.debug=true
-     * -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog
-     * -Dorg.eclipse.jetty.LEVEL=INFO
-     * -Dorg.eclipse.jetty.server.LEVEL=INFO
-     * -Dorg.eclipse.jetty.server.handler.ConnectHandler=DEBUG
-     * Documentation on byteman at http://downloads.jboss.org/byteman/2.1.3/ProgrammersGuideSinglePage.2.1.3.1.html
-     */
-    @Test
-    public void checkByteManrulesAndInJvmProxyAssertMechanisms() {
-        if (SKIP_INJVM_PROXY) {
-            return; //inJvm Proxy test skipped.
-        }
-        assertTrue(SocketDestHelper.isSocketRestrictionFlagActive());
+	/**
+	 * Self tests that the assert mechanisms with jetty and byteman are properly working. If debugging is needed
+	 * consider enabling one or more of the following system properties
+	 * -Dorg.jboss.byteman.verbose=true
+	 * -Dorg.jboss.byteman.debug=true
+	 * -Dorg.jboss.byteman.rule.debug=true
+	 * -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog
+	 * -Dorg.eclipse.jetty.LEVEL=INFO
+	 * -Dorg.eclipse.jetty.server.LEVEL=INFO
+	 * -Dorg.eclipse.jetty.server.handler.ConnectHandler=DEBUG
+	 * Documentation on byteman at http://downloads.jboss.org/byteman/2.1.3/ProgrammersGuideSinglePage.2.1.3.1.html
+	 */
+	@Test
+	public void checkByteManrulesAndInJvmProxyAssertMechanisms() {
+		if (SKIP_INJVM_PROXY) {
+			return; //inJvm Proxy test skipped.
+		}
+		assertTrue(SocketDestHelper.isSocketRestrictionFlagActive());
 
-        RestTemplate restTemplate = new RestTemplate();
-        ClientHttpRequestFactory requestFactory;
+		RestTemplate restTemplate = new RestTemplate();
+		ClientHttpRequestFactory requestFactory;
 
-        //when called directly without a proxy, and we configure byteman to detect them
-        //then we expect an exception to be thrown
-        assertNetworkCallFails(restTemplate, new HttpComponentsClientHttpRequestFactory());
-        // Repeat that with different request factory used in the code as this exercise different byteman rules
-        assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
-        //And with the actual one used by RestUtil
-        assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null));
+		//when called directly without a proxy, and we configure byteman to detect them
+		//then we expect an exception to be thrown
+		assertNetworkCallFails(restTemplate, new HttpComponentsClientHttpRequestFactory());
+		// Repeat that with different request factory used in the code as this exercise different byteman rules
+		assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
+		//And with the actual one used by RestUtil
+		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null));
 
-        //when called with a proxy
-        requestFactory = new HttpComponentsClientHttpRequestFactory();//avoid reusing keep alive connections
-        HttpComponentsClientHttpRequestFactory commonsFactory = (HttpComponentsClientHttpRequestFactory) requestFactory;
+		//when called with a proxy
+		requestFactory = new HttpComponentsClientHttpRequestFactory();//avoid reusing keep alive connections
+		HttpComponentsClientHttpRequestFactory commonsFactory = (HttpComponentsClientHttpRequestFactory) requestFactory;
 
-        HttpHost proxy = new HttpHost("127.0.0.1", inJvmProxyPort);
-        commonsFactory.getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-        restTemplate.setRequestFactory(requestFactory);
-        restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET,null, null);
+		HttpHost proxy = new HttpHost("127.0.0.1", inJvmProxyPort);
+		commonsFactory.getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+		restTemplate.setRequestFactory(requestFactory);
+		restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET,null, null);
 
-        //then executes fines, and the jetty proxy indeed received one request
-        assertEquals("expected network calls to make it through the inJvmProxy.", 1, nbInJvmProxyRcvReqs.get());
-        nbInJvmProxyRcvReqs.set(0); //reset for next test
+		//then executes fines, and the jetty proxy indeed received one request
+		assertEquals("expected network calls to make it through the inJvmProxy.", 1, nbInJvmProxyRcvReqs.get());
+		nbInJvmProxyRcvReqs.set(0); //reset for next test
 
-        //Make sure
-        assertTrue(SocketDestHelper.isActivated());
-        assertFalse("expected some installed rules, got:" + SocketDestHelper.getInstalledRules(), SocketDestHelper.getInstalledRules().isEmpty());
+		//Make sure
+		assertTrue(SocketDestHelper.isActivated());
+		assertFalse("expected some installed rules, got:" + SocketDestHelper.getInstalledRules(), SocketDestHelper.getInstalledRules().isEmpty());
    }
 
-    private void assertNetworkCallFails(RestTemplate restTemplate, ClientHttpRequestFactory requestFactory) {
-        restTemplate.setRequestFactory(requestFactory);
-        try {
-            HttpStatus status = restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET, null, new ResponseExtractor<HttpStatus>() {
-                public HttpStatus extractData(ClientHttpResponse response) throws IOException {
-                    return response.getStatusCode();
-                }
-            });
-            Assert.fail("Expected byteman rules to detect direct socket connections, status is:" + status);
-        } catch (Exception e) {
-            //good, byteman rejected it as expected
-            //e.printStackTrace();
-        }
-        assertEquals("Not expecting Jetty to receive requests since we asked direct connections", 0, nbInJvmProxyRcvReqs.get());
-    }
+	private void assertNetworkCallFails(RestTemplate restTemplate, ClientHttpRequestFactory requestFactory) {
+		restTemplate.setRequestFactory(requestFactory);
+		try {
+			HttpStatus status = restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET, null, new ResponseExtractor<HttpStatus>() {
+				public HttpStatus extractData(ClientHttpResponse response) throws IOException {
+					return response.getStatusCode();
+				}
+			});
+			Assert.fail("Expected byteman rules to detect direct socket connections, status is:" + status);
+		} catch (Exception e) {
+			//good, byteman rejected it as expected
+			//e.printStackTrace();
+		}
+		assertEquals("Not expecting Jetty to receive requests since we asked direct connections", 0, nbInJvmProxyRcvReqs.get());
+	}
 
 
-    private static int getNextAvailablePort(int initial) {
-        int current = initial;
-        while (! PortAvailability.available(current)) {
-            current ++;
-            if (current - initial > 100) {
-                throw new RuntimeException("did not find an available port from " + initial + " up to:" + current);
-            }
-        }
-        return current;
-    }
+	private static int getNextAvailablePort(int initial) {
+		int current = initial;
+		while (! PortAvailability.available(current)) {
+			current ++;
+			if (current - initial > 100) {
+				throw new RuntimeException("did not find an available port from " + initial + " up to:" + current);
+			}
+		}
+		return current;
+	}
 
-    /**
-     * To test that the CF client is able to go through a proxy, we point the CC client to a broken url
-     * that can only be resolved by going through an inJVM proxy which rewrites the URI.
-     * This method starts this inJvm proxy.
-     * @throws Exception
-     */
-    private static void startInJvmProxy() throws Exception {
-        inJvmProxyPort = getNextAvailablePort(8080);
-        inJvmProxyServer = new Server(new InetSocketAddress("127.0.0.1", inJvmProxyPort)); //forcing use of loopback that will be used both for Httpclient proxy and SocketDestHelper
-        QueuedThreadPool threadPool = new QueuedThreadPool();
-        threadPool.setMinThreads(1);
-        inJvmProxyServer.setThreadPool(threadPool);
+	/**
+	 * To test that the CF client is able to go through a proxy, we point the CC client to a broken url
+	 * that can only be resolved by going through an inJVM proxy which rewrites the URI.
+	 * This method starts this inJvm proxy.
+	 * @throws Exception
+	 */
+	private static void startInJvmProxy() throws Exception {
+		inJvmProxyPort = getNextAvailablePort(8080);
+		inJvmProxyServer = new Server(new InetSocketAddress("127.0.0.1", inJvmProxyPort)); //forcing use of loopback that will be used both for Httpclient proxy and SocketDestHelper
+		QueuedThreadPool threadPool = new QueuedThreadPool();
+		threadPool.setMinThreads(1);
+		inJvmProxyServer.setThreadPool(threadPool);
 
-        HandlerCollection handlers = new HandlerCollection();
-        inJvmProxyServer.setHandler(handlers);
+		HandlerCollection handlers = new HandlerCollection();
+		inJvmProxyServer.setHandler(handlers);
 
-        ServletHandler servletHandler = new ServletHandler();
-        handlers.addHandler(servletHandler);
-        nbInJvmProxyRcvReqs = new AtomicInteger();
-        ChainedProxyServlet chainedProxyServlet = new ChainedProxyServlet(httpProxyConfiguration, nbInJvmProxyRcvReqs);
-        servletHandler.addServletWithMapping(new ServletHolder(chainedProxyServlet), "/*");
+		ServletHandler servletHandler = new ServletHandler();
+		handlers.addHandler(servletHandler);
+		nbInJvmProxyRcvReqs = new AtomicInteger();
+		ChainedProxyServlet chainedProxyServlet = new ChainedProxyServlet(httpProxyConfiguration, nbInJvmProxyRcvReqs);
+		servletHandler.addServletWithMapping(new ServletHolder(chainedProxyServlet), "/*");
 
-        // Setup proxy handler to handle CONNECT methods
-        ConnectHandler proxyHandler;
-        proxyHandler = new ChainedProxyConnectHandler(httpProxyConfiguration, nbInJvmProxyRcvReqs);
-        handlers.addHandler(proxyHandler);
+		// Setup proxy handler to handle CONNECT methods
+		ConnectHandler proxyHandler;
+		proxyHandler = new ChainedProxyConnectHandler(httpProxyConfiguration, nbInJvmProxyRcvReqs);
+		handlers.addHandler(proxyHandler);
 
-        inJvmProxyServer.start();
-    }
+		inJvmProxyServer.start();
+	}
 
 
-    @Test
+	@Test
 	public void spacesAvailable() throws Exception {
 		List<CloudSpace> spaces = connectedClient.getSpaces();
 		assertNotNull(spaces);
 		assertTrue(spaces.size() > 0);
 	}
-	
+
 	@Test
 	public void orgsAvailable() throws Exception {
 		List<CloudOrganization> orgs = connectedClient.getOrganizations();
@@ -377,7 +377,7 @@ public class CloudFoundryClientTest {
 		assertEquals(1, app.getServices().size());
 		assertEquals(serviceName, app.getServices().get(0));
 	}
-	
+
 	@Test
 	public void getApplicationByGuid() {
 		String appName = createSpringTravelApp("3", null);
@@ -465,7 +465,7 @@ public class CloudFoundryClientTest {
 		CloudApplication app = uploadSpringTravelApp(appName);
 		assertNotNull(app);
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
-		
+
 		String url = computeAppUrlNoProtocol(appName);
 		assertEquals(url, app.getUris().get(0));
 
@@ -474,11 +474,11 @@ public class CloudFoundryClientTest {
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 		assertNotNull(info);
 		assertNotNull(info.getStagingFile());
-		
+
 		connectedClient.stopApplication(appName);
 		app = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
-    }
+	}
 
 	@Test
 	public void paginationWorksForUris() throws IOException {
@@ -767,7 +767,7 @@ public class CloudFoundryClientTest {
 		connectedClient.updateApplicationInstances(appName, 3);
 		connectedClient.startApplication(appName);
 		CloudApplication app = connectedClient.getApplication(appName);
-		
+
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 
 		ApplicationStats stats = connectedClient.getApplicationStats(appName);
@@ -851,7 +851,7 @@ public class CloudFoundryClientTest {
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 	}
-	
+
 	//
 	// Files and Log tests
 	//
@@ -900,7 +900,7 @@ public class CloudFoundryClientTest {
 		doGetFile(connectedClient, appName);
 	}
 
-	
+
 	//
 	// Basic Services tests
 	//
@@ -937,7 +937,7 @@ public class CloudFoundryClientTest {
 		int timeTolerance = 300 * 1000; // 5 minutes
 		assertTrue("Creation time should be very recent",
 				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
-		
+
 		connectedClient.deleteService(serviceName);
 		List<CloudService> services = connectedClient.getServices();
 		assertNotNull(services);
@@ -1057,7 +1057,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(app.getServices());
 		assertTrue(app.getServices().isEmpty());
 	}
-	
+
 	@Test
 	public void manageDomainsAndRoutes() throws IOException {
 		// Test that default domain is found
@@ -1186,7 +1186,7 @@ public class CloudFoundryClientTest {
 			Thread.sleep(30 * 1000);			
 		}
 	}
-	
+
 	@Test
 	public void getRestLog() throws IOException {
 		final List<RestLogEntry> log1 = new ArrayList<RestLogEntry>();
@@ -1212,7 +1212,7 @@ public class CloudFoundryClientTest {
 		connectedClient.deleteAllApplications();
 		assertTrue(log1.size() > log2.size());
 	}
-	
+
 	@Test
 	public void getStagingLogs() throws Exception {
 		String appName = createSpringTravelApp("stagingLogs", null,
@@ -1412,7 +1412,7 @@ public class CloudFoundryClientTest {
 	//
 
 	private String createSpringTravelApp(String suffix, List<String> serviceNames) {
-        return createSpringTravelApp(suffix, serviceNames, null);
+		return createSpringTravelApp(suffix, serviceNames, null);
 	}
 
 	private String createSpringTravelApp(String suffix, List<String> serviceNames, String buildpackUrl) {
@@ -1465,7 +1465,7 @@ public class CloudFoundryClientTest {
 	}
 
 	private void createSpringApplication(String appName, List<String> serviceNames) {
-        createSpringApplication(appName, serviceNames, null);
+		createSpringApplication(appName, serviceNames, null);
 	}
 
 	private void createSpringApplication(String appName, List<String> serviceNames, String buildpackUrl) {
@@ -1575,7 +1575,7 @@ public class CloudFoundryClientTest {
 	private String computeAppUrlNoProtocol(String appName) {
 		return computeAppUrl(appName);
 	}
-	
+
 	private String getMysqlLabel() {
 		return "cleardb";
 	}
