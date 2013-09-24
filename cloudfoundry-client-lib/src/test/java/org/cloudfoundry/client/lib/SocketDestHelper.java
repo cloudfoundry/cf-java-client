@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,7 +76,16 @@ public class SocketDestHelper {
         logDebugTrace("throwExceptionIfForbidden(host=" + host + " port=" + port + ") with isSocketRestrictingOnlyLocalHost=" + isSocketRestrictingOnlyLocalHost.get());
         Boolean flag = isSocketRestrictingOnlyLocalHost.get();
         if (flag != null && flag.booleanValue()) {
-            if (! host.equals("127.0.0.1") && ! host.equals("localhost")) {
+            InetAddress inetAddress;
+            //Trying to resolve host to check if this resolves to loopback where is started
+            InetAddress loopBack = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});
+            try {
+                inetAddress = InetAddress.getByName(host);
+            } catch (UnknownHostException e) {
+                //Unable to resolve host, unlikely to be loopback
+                inetAddress = null;
+            }
+            if (inetAddress == null || ! inetAddress.equals(loopBack)) {
                 IOException ioe = new IOException("detected direct socket connect while tests expect them to go through proxy instead: Only jetty proxy threads should go through external hosts, got:host=" + host + " port=" + port);
                 printStackTrace(ioe);
                 throw ioe;
