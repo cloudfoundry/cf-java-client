@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -303,7 +304,7 @@ public class CloudFoundryClientTest {
      */
     private static void startInJvmProxy() throws Exception {
         inJvmProxyPort = getNextAvailablePort(8080);
-        inJvmProxyServer = new Server(inJvmProxyPort);
+        inJvmProxyServer = new Server(new InetSocketAddress("127.0.0.1", inJvmProxyPort)); //forcing use of loopback that will be used both for Httpclient proxy and SocketDestHelper
         QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setMinThreads(1);
         inJvmProxyServer.setThreadPool(threadPool);
@@ -754,7 +755,7 @@ public class CloudFoundryClientTest {
 		}
 		assertEquals(1, app.getRunningInstances());
 		RestUtil restUtil = new RestUtil();
-		RestTemplate rest = restUtil.createRestTemplate(null);
+		RestTemplate rest = restUtil.createRestTemplate(httpProxyConfiguration);
 		String results = rest.getForObject("http://" + app.getUris().get(0), String.class);
 		assertTrue(results.contains("Hello world!"));
 	}
@@ -1130,7 +1131,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void infoAvailableWithoutLoggingIn() throws Exception {
-		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL));
+		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL), httpProxyConfiguration);
 		CloudInfo info = infoClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
