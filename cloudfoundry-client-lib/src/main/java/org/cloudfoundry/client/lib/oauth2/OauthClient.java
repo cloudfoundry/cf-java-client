@@ -57,8 +57,8 @@ public class OauthClient {
 		this.restTemplate = restTemplate;
 	}
 
-	public OAuth2AccessToken getToken(String username, String password, String clientId) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId);
+	public OAuth2AccessToken getToken(String username, String password, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
@@ -71,10 +71,6 @@ public class OauthClient {
 			cfEx.setDescription(oauthEx.getSummary());
 			throw cfEx;
 		}
-	}
-
-	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId) {
-		return refreshToken(currentToken, username, password, clientId, "");
 	}
 
 	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
@@ -115,10 +111,6 @@ public class OauthClient {
 		request.setAll(parameters);
 
 		return request;
-	}
-
-	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId) {
-		return getResourceDetails(username, password, clientId, "");
 	}
 
 	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId, String clientSecret) {

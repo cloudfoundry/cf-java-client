@@ -624,7 +624,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	public OAuth2AccessToken login() {
 		token = oauthClient.getToken(cloudCredentials.getEmail(),
-				cloudCredentials.getPassword(), cloudCredentials.getClientId());
+				cloudCredentials.getPassword(), cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
 		
 		return token;
 	}
