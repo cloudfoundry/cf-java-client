@@ -401,7 +401,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			if (token != null) {
 				if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
 					token = oauthClient.refreshToken(token, cloudCredentials.getEmail(), cloudCredentials.getPassword(),
-							cloudCredentials.getClientId());
+							cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
 				}
 				String header = token.getTokenType() + " " + token.getValue();
 				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
@@ -624,7 +624,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	public OAuth2AccessToken login() {
 		token = oauthClient.getToken(cloudCredentials.getEmail(),
-				cloudCredentials.getPassword(), cloudCredentials.getClientId());
+				cloudCredentials.getPassword(), cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
 		
 		return token;
 	}
