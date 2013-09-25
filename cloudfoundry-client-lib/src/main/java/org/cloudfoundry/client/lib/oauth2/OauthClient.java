@@ -57,8 +57,8 @@ public class OauthClient {
 		this.restTemplate = restTemplate;
 	}
 
-	public OAuth2AccessToken getToken(String username, String password, String clientId) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId);
+	public OAuth2AccessToken getToken(String username, String password, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
@@ -73,8 +73,8 @@ public class OauthClient {
 		}
 	}
 
-	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId);
+	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
@@ -109,20 +109,21 @@ public class OauthClient {
 		parameters.put("credentials", String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password));
 		AccessTokenRequest request = new DefaultAccessTokenRequest();
 		request.setAll(parameters);
-		
+
 		return request;
 	}
-	
-	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId) {
+
+	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId, String clientSecret) {
 		ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
 		resource.setUsername(username);
 		resource.setPassword(password);
 
 		resource.setClientId(clientId);
+		resource.setClientSecret(clientSecret);
 		resource.setId(clientId);
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
 		resource.setAccessTokenUri(authorizationUrl + "/oauth/token");
-		
+
 		return resource;
 	}
 }

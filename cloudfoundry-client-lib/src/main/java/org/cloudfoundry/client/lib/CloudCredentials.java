@@ -31,6 +31,8 @@ public class CloudCredentials {
 
 	private String clientId = "cf";
 
+	private String clientSecret = "";
+
 	private OAuth2AccessToken token;
 
 	private String proxyUser;
@@ -60,6 +62,20 @@ public class CloudCredentials {
 	}
 
 	/**
+	 * Create credentials using email, password and client ID.
+	 * @param email email to authenticate with
+	 * @param password the password
+	 * @param clientId the client ID to use for authorization
+	 * @param clientSecret the secret for the given client
+	 */
+	public CloudCredentials(String email, String password, String clientId, String clientSecret) {
+		this.email = email;
+		this.password = password;
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
+	}
+
+	/**
 	 * Create credentials using a token.
 	 *
 	 * @param token token to use for authorization
@@ -77,6 +93,19 @@ public class CloudCredentials {
 	public CloudCredentials(OAuth2AccessToken token, String clientId) {
 		this.token = token;
 		this.clientId = clientId;
+	}
+
+	/**
+	 * Create credentials using a token.
+	 *
+	 * @param token token to use for authorization
+	 * @param clientId the client ID to use for authorization
+	 * @param clientSecret the password for the specified client
+	 */
+	public CloudCredentials(OAuth2AccessToken token, String clientId, String clientSecret) {
+		this.token = token;
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 	}
 
 	/**
@@ -127,6 +156,15 @@ public class CloudCredentials {
 	 */
 	public String getClientId() {
 		return clientId;
+	}
+
+	/**
+	 * Get the client secret
+	 *
+	 * @return the client secret
+	 */
+	public String getClientSecret() {
+		return clientSecret;
 	}
 
 	/**
