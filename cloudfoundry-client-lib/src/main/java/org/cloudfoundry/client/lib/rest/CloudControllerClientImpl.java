@@ -832,14 +832,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
-                                  List<String> serviceNames) {
+	                              List<String> serviceNames) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
-        if (staging.getBuildpackUrl() != null) {
-		    appRequest.put("buildpack", staging.getBuildpackUrl());
-        }
+		if (staging.getBuildpackUrl() != null) {
+			appRequest.put("buildpack", staging.getBuildpackUrl());
+		}
 		appRequest.put("instances", 1);
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
@@ -1212,6 +1212,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
+		}
+		if (staging.getBuildpackUrl() != null) {
+			appRequest.put("buildpack", staging.getBuildpackUrl());
 		}
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
