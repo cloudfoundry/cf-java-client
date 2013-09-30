@@ -217,7 +217,7 @@ public class CloudFoundryClientTest {
 		CloudInfo info = connectedClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
-		assertNotNull(info.getBuild());
+		assertTrue(info.getBuild() > 0);
 	}
 
 	/**
@@ -659,12 +659,13 @@ public class CloudFoundryClientTest {
 		assertEquals("ruby simple.rb", app.getStaging().getCommand());
 		connectedClient.stopApplication(appName);
 
-		Staging newStaging = new Staging("ruby simple.rb test", app.getStaging().getBuildpackUrl());
+		Staging newStaging = new Staging("ruby simple.rb test", "https://github.com/cloudfoundry/heroku-buildpack-ruby");
 		connectedClient.updateApplicationStaging(appName, newStaging);
 		app = connectedClient.getApplication(appName);
 		assertNotNull(app);
 		assertEquals(uris, app.getUris());
 		assertEquals("ruby simple.rb test", app.getStaging().getCommand());
+		assertEquals("https://github.com/cloudfoundry/heroku-buildpack-ruby", app.getStaging().getBuildpackUrl());
 	}
 
 	@Test

@@ -76,10 +76,18 @@ public class CloudUtil {
 			// special handling for int and long since smaller numbers become ints
 			// but may be requested as long and vice versa
 			if (clazz == Integer.class) {
-				return clazz.cast(Integer.valueOf(((Number)object).intValue()));
+				if (object instanceof Number) {
+					return clazz.cast(Integer.valueOf(((Number) object).intValue()));
+				} else if (object instanceof String) {
+					return clazz.cast(Integer.valueOf(((String) object)));
+				}
 			}
 			if (clazz == Long.class) {
-				return clazz.cast(Long.valueOf(((Number)object).longValue()));
+				if (object instanceof Number) {
+					return clazz.cast(Long.valueOf(((Number)object).longValue()));
+				} else if (object instanceof String) {
+					return clazz.cast(Long.valueOf(((String) object)));
+				}
 			}
 
 			return clazz.cast(object);
