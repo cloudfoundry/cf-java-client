@@ -23,18 +23,17 @@ apply plugin: 'signing'
 repositories {
     mavenCentral()
     mavenLocal()
-    mavenRepo url:'http://repo.springsource.org/milestone/'
 }
 
 dependencies {
     compile gradleApi()
-    compile 'org.cloudfoundry:cloudfoundry-client-lib:0.8.8.BUILD-SNAPSHOT'
+    compile 'org.cloudfoundry:cloudfoundry-client-lib:1.0.0'
     compile 'org.codehaus.groovy:groovy:2.1.6'
     testCompile 'junit:junit:4.8.2'
 }
 
 group = 'org.cloudfoundry'
-version = '0.3.0-SNAPSHOT'
+version = '1.0.0'
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {
@@ -48,32 +47,33 @@ task javadocJar(type: Jar, dependsOn:javadoc) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.6'
+    gradleVersion = '1.8'
 }
 
 // add javadoc/source jar tasks as artifacts
 artifacts {
+    archives jar
     archives sourcesJar
     archives javadocJar
 }
 
-if (project.hasProperty('signArchives')) {
+if (project.hasProperty('performRelease')) {
     signing {
         sign configurations.archives
     }
 }
 
-def credentials = [userName: System.getProperty('deployUser'), password: System.getProperty('deployPass')]
+def credentials = [userName: deployUser, password: deployPassword]
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(id:'sonatype-nexus-staging',url: uri('https://oss.sonatype.org/service/local/staging/deploy/maven2'), authentication: credentials)
             snapshotRepository(id:'sonatype-nexus-snapshots', url: uri('https://oss.sonatype.org/content/repositories/snapshots'), authentication: credentials)
             pom.project {
-                name 'Cloud Foundry plugin for Gradle'
+                name 'Cloud Foundry Gradle Plugin'
                 parent {
                     groupId 'org.sonatype.oss'
                     artifactId 'oss-parent'
@@ -87,14 +87,15 @@ uploadArchives {
                     }
                 }
                 scm(
-                    url:'git@github.com:cloudfoundry/vcap-java-client.git',
-                    connection:'scm:git:git@github.com:cloudfoundry/vcap-java-client.git',
-                    developerConnection:'scm:git:git@github.com:cloudfoundry/vcap-java-client.git')
+                    url:'git@github.com:cloudfoundry/cf-java-client.git',
+                    connection:'scm:git:git@github.com:cloudfoundry/cf-java-client.git',
+                    developerConnection:'scm:git:git@github.com:cloudfoundry/cf-java-client.git')
                 developers {
                     developer(id:'melix', name:'Cédric Champeau')
                     developer(id:'scottfrederick', name:'Scott Frederick')
                 }
-                description('A plugin for Gradle that allows various operations on the Cloud Foundry platform.')
+                description('A Gradle plugin that makes it easy to deploy Gradle-based applications to Cloud Foundry instances.')
+                url('https://github.com/cloudfoundry/cf-java-client/cloudfoundry-gradle-plugin')
             }
 
             // courtesy of http://jedicoder.blogspot.com/2011/11/automated-gradle-project-deployment-to.html
