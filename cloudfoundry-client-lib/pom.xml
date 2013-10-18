@@ -5,9 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>0.8.8.BUILD-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>Client library to be used from STS and other Java tools</name>
+	<name>Cloud Foundry Java Client Library</name>
+	<description>A Cloud Foundry client library for Java</description>
+	<url>http://github.com/cloudfoundry/cf-java-client</url>
 
 	<licenses>
 		<license>
@@ -16,6 +18,12 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<scm>
+		<url>http://github.com/cloudfoundry/cf-java-client</url>
+		<connection>scm:git:git@github.com/cloudfoundry/cf-java-client</connection>
+		<developerConnection>scm:git:git@github.com/cloudfoundry/cf-java-client</developerConnection>
+	</scm>
 
 	<properties>
 		<spring.framework.version>3.2.2.RELEASE</spring.framework.version>
@@ -75,14 +83,34 @@
 			</properties>
 		</profile>      <!-- We override the tools.jar property on mac osx -->
 
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-
-	<repositories>
-		<repository>
-			<id>spring-libs-milestone</id>
-			<url>http://repo.springsource.org/libs-milestone</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -211,11 +239,11 @@
 
 	<build>
 		<extensions>
-                        <extension>
-                                <groupId>org.springframework.build</groupId>
-                                <artifactId>aws-maven</artifactId>
-                                <version>4.4.0.RELEASE</version>
-                        </extension>
+			<extension>
+				<groupId>org.springframework.build</groupId>
+				<artifactId>aws-maven</artifactId>
+				<version>4.4.0.RELEASE</version>
+			</extension>
 		</extensions>
 		<plugins>
 			<plugin>
@@ -349,9 +377,9 @@
 
 	<distributionManagement>
 		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
+			<id>sonatype-ossrh-staging</id>
+			<name>Sonatype OSSRH</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
@@ -359,5 +387,18 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<developers>
+		<developer>
+			<id>rladdad</id>
+			<name>Ramnivas Laddad</name>
+			<email>rladdad at gopivotal.com</email>
+		</developer>
+		<developer>
+			<id>sfrederick</id>
+			<name>Scott Frederick</name>
+			<email>sfrederick at gopivotal.com</email>
+		</developer>
+	</developers>
 
 </project>
