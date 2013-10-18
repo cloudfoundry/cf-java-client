@@ -34,7 +34,7 @@ Plugin configuration in `pom.xml`:
     <plugin>
       <groupId>org.cloudfoundry</groupId>
       <artifactId>cf-maven-plugin</artifactId>
-      <version>1.0.0.BUILD-SNAPSHOT</version>
+      <version>1.0.0</version>
       <configuration>
           <server>mycloudfoundry-instance</server>
           <target>http://api.cloudfoundry.com</target>
@@ -95,7 +95,7 @@ Following, a typical (expected) configuration example is shown, which uses sever
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>maven-cf-plugin</artifactId>
-                <version>1.0.0.M1-SNAPSHOT</version>
+                <version>1.0.0</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
