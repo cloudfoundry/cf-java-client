@@ -1,9 +1,9 @@
-vcap-java-client
+cf-java-client
 ================
 
-[![Build Status](https://travis-ci.org/cloudfoundry/vcap-java-client.png)](https://travis-ci.org/cloudfoundry/vcap-java-client)
+[![Build Status](https://travis-ci.org/cloudfoundry/cf-java-client.png)](https://travis-ci.org/cloudfoundry/cf-java-client)
 
-The vcap-java-client repo contains a Java client library and tools for Cloud Foundry. Three major components are included
+The cf-java-client repo contains a Java client library and tools for Cloud Foundry. Three major components are included
 in this repo.
 
 # Components
