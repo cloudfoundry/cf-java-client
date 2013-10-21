@@ -101,20 +101,26 @@ Following, a typical (expected) configuration example is shown, which uses sever
                     <target>http://api.run.pivotal.io</target>
                     <org>mycloudfoundry-org</org>
                     <space>development</space>
-                    <appname>spring-integration-rocks</appname>
-                    <url>spring-integration-rocks.cloudfoundry.com</url>
-                    <memory>1024</memory>
+                    <appname>my-app</appname>
+                    <url>my-app.cfapps.io</url>
+                    <memory>512</memory>
                     <env>
                         <ENV-VAR-NAME>env-var-value</ENV-VAR-NAME>
                     </env>
                     <services>
                         <service>
-                            <name>mysql-test</name>
-                            <vendor>mysql</vendor>
+                            <name>postgres-test</name>
+                            <label>elephantsql</label>
+                            <provider>elephantsql</provider>
+                            <version>n/a</version>
+                            <plan>turtle</plan>
                         </service>
                         <service>
                             <name>mongodb-test</name>
-                            <vendor>mongodb</vendor>
+                            <label>mongolab</label>
+                            <provider>mongolab</provider>
+                            <version>n/a</version>
+                            <plan>sandbox</plan>
                         </service>
                     </services>
                 </configuration>
@@ -243,9 +249,9 @@ Additional certain configuration parameter will fall back to using default value
 
 # History
 
-## Changes from version 1.0.0.M4 to 1.0.0.M5
+## Changes from version 1.0.0.M4 to 1.0.0
 
-* Upgraded to cloudfoundry-client-lib 0.8.7
+* Upgraded to cloudfoundry-client-lib 1.0.0
 * Removed v1 support and all v1 concepts (update goal, runtime and framework parameters)
 * Added support for buildpacks
 * Renamed goals and parameters for consistency with 'cf' and Cloud Foundry Gradle Plugin
