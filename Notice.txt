@@ -1,4 +1,4 @@
-VCAP Java Client
+Cloud Foundry Java Client
 
 Copyright (c) 2011-2013 GoPivotal, Inc. All Rights Reserved. 
 
