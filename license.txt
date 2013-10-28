@@ -204,9 +204,9 @@
 =======================================================================   
 
 
-VCAP Java Client:
+Cloud Foundry Java Client:
 
-VCAP Java Client: includes a number of subcomponents with separate copyright 
+Cloud Foundry Java Client: includes a number of subcomponents with separate copyright
 notices and license terms.  The product that includes this file
 does not necessarily use all the open source subcomponents referred 
 to below. Your use of the source code for the these subcomponents 
@@ -1945,7 +1945,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 >>> simple-spring-app-0.1.0.build-snapshot
 
-VCAP Java Client 1.0
+Cloud Foundry Java Client 1.0
 Copyright (c) 2010-2011 VMware, Inc. All Rights Reserved.
 
 This product is licensed to you under the Apache License, Version 2.0 (the "License").
