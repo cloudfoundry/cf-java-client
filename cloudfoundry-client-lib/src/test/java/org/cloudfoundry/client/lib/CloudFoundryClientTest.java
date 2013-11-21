@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -39,6 +40,7 @@ import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
@@ -117,7 +119,8 @@ public class CloudFoundryClientTest {
 	private static int inJvmProxyPort;
 	private static AtomicInteger nbInJvmProxyRcvReqs;
 
-	private static final String SERVICE_TEST_MYSQL_PLAN = "spark";
+	private static final String MYSQL_SERVICE_LABEL = "cleardb";
+
 	private static final int DEFAULT_MEMORY = 512; // MB
 
 	private static boolean tearDownComplete = false;
@@ -148,8 +151,6 @@ public class CloudFoundryClientTest {
 		}
 	};
 
-	private static HttpProxyConfiguration inJvmHttpProxyConfiguration;
-
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		System.out.println("Running tests on " + CCNG_API_URL + " on behalf of " + CCNG_USER_EMAIL);
@@ -161,11 +162,10 @@ public class CloudFoundryClientTest {
 		if (CCNG_API_PROXY_HOST != null) {
 			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
 		}
-		if (! SKIP_INJVM_PROXY) {
+		if (!SKIP_INJVM_PROXY) {
 			new SocketDestHelper().setForbiddenOnCurrentThread();
 			startInJvmProxy();
-			inJvmHttpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
-			httpProxyConfiguration = inJvmHttpProxyConfiguration;
+			httpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
 		}
 	}
 
@@ -915,13 +915,13 @@ public class CloudFoundryClientTest {
 
 		CloudServiceOffering offering = null;
 		for (CloudServiceOffering so : offerings) {
-			if (so.getLabel().equals(getMysqlLabel())) {
+			if (so.getLabel().equals(MYSQL_SERVICE_LABEL)) {
 				offering = so;
 				break;
 			}
 		}
 		assertNotNull(offering);
-		assertEquals(getMysqlLabel(), offering.getLabel());
+		assertEquals(MYSQL_SERVICE_LABEL, offering.getLabel());
 		assertNotNull(offering.getCloudServicePlans());
 		assertTrue(offering.getCloudServicePlans().size() > 0);
 	}
@@ -947,43 +947,60 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getServices() {
-		String serviceName = "mysql-test";
-		createMySqlService(serviceName);
-		createMySqlService("mysql-test2");
+		List<CloudService> expectedServices = Arrays.asList(
+				createMySqlService("mysql-test"),
+				createUserProvidedService("user-provided-test"),
+				createMySqlService("mysql-test2")
+		);
 
 		List<CloudService> services = connectedClient.getServices();
 		assertNotNull(services);
-		assertEquals(2, services.size());
-		CloudService service = null;
-		for (CloudService cs : services) {
-			if (cs.getName().equals(serviceName)) {
-				service = cs;
+		assertEquals(3, services.size());
+		for (CloudService expectedService : expectedServices) {
+			assertServiceMatching(expectedService, services);
+		}
+	}
+
+	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
+		for (CloudService service : services) {
+			if (service.getName().equals(expectedService.getName())) {
+				assertServicesEqual(expectedService, service);
+				return;
 			}
 		}
-		assertNotNull(service);
-		assertEquals(serviceName, service.getName());
-		assertEquals(getMysqlLabel(), service.getLabel());
-		assertEquals("cleardb", service.getProvider());
-		assertEquals("n/a", service.getVersion());
-		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
+		fail("No service found matching " + expectedService.getName());
 	}
 
 	@Test
 	public void getService() {
 		String serviceName = "mysql-test";
-		createMySqlService(serviceName);
 
+		CloudService expectedService = createMySqlService(serviceName);
 		CloudService service = connectedClient.getService(serviceName);
 
 		assertNotNull(service);
-		assertEquals(serviceName, service.getName());
-		assertEquals(getMysqlLabel(), service.getLabel());
-		assertEquals("cleardb", service.getProvider());
-		assertEquals("n/a", service.getVersion());
-		assertEquals(SERVICE_TEST_MYSQL_PLAN, service.getPlan());
+		assertServicesEqual(expectedService, service);
 	}
 
-	//
+	@Test
+	public void getUserProvidedService() {
+		String serviceName = "user-provided-test-service";
+
+		CloudService expectedService = createUserProvidedService(serviceName);
+		CloudService service = connectedClient.getService(serviceName);
+
+		assertNotNull(service);
+		assertServicesEqual(expectedService, service);
+	}
+
+	private void assertServicesEqual(CloudService expectedService, CloudService service) {
+		assertEquals(expectedService.getName(), service.getName());
+		assertEquals(expectedService.getLabel(), service.getLabel());
+		assertEquals(expectedService.getProvider(), service.getProvider());
+		assertEquals(expectedService.getVersion(), service.getVersion());
+		assertEquals(expectedService.getPlan(), service.getPlan());
+		assertEquals(expectedService.isUserProvided(), service.isUserProvided());
+	}
 
 	//
 	// Application and Services tests
@@ -1184,7 +1201,7 @@ public class CloudFoundryClientTest {
 		for (int i = 0; i < 30; i++) {
 			System.out.println("Elapsed time since the last login (at least) " + i/2 + " minutes");
 			getServiceOfferings();
-			Thread.sleep(30 * 1000);			
+			Thread.sleep(30 * 1000);
 		}
 	}
 
@@ -1486,24 +1503,42 @@ public class CloudFoundryClientTest {
 				uris, serviceNames);
 	}
 
-	private void createMySqlService(String serviceName) {
+	private CloudService createMySqlService(String serviceName) {
+		CloudServiceOffering databaseServiceOffering = getCloudServiceOffering(MYSQL_SERVICE_LABEL);
+		List<CloudServicePlan> plans = databaseServiceOffering.getCloudServicePlans();
+
+		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
+		service.setProvider(databaseServiceOffering.getProvider());
+		service.setLabel(databaseServiceOffering.getLabel());
+		service.setVersion(databaseServiceOffering.getVersion());
+		service.setPlan(plans.get(0).getName());
+
+		connectedClient.createService(service);
+
+		return service;
+	}
+
+	private CloudService createUserProvidedService(String serviceName) {
+		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
+
+		Map<String, Object> credentials = new HashMap<String, Object>();
+		credentials.put("host", "example.com");
+		credentials.put("port", 1234);
+		credentials.put("user", "me");
+
+		connectedClient.createUserProvidedService(service, credentials);
+
+		return service;
+	}
+
+	private CloudServiceOffering getCloudServiceOffering(String label) {
 		List<CloudServiceOffering> serviceOfferings = connectedClient.getServiceOfferings();
-		CloudServiceOffering databaseServiceOffering = null;
 		for (CloudServiceOffering so : serviceOfferings) {
-			if (so.getLabel().equals(getMysqlLabel())) {
-				databaseServiceOffering = so;
-				break;
+			if (so.getLabel().equals(label)) {
+				return so;
 			}
 		}
-		if (databaseServiceOffering == null) {
-			throw new IllegalStateException("No CloudServiceOffering found for MySQL.");
-		}
-		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
-		service.setProvider("core");
-		service.setLabel(getMysqlLabel());
-		service.setVersion(databaseServiceOffering.getVersion());
-		service.setPlan(SERVICE_TEST_MYSQL_PLAN);
-		connectedClient.createService(service);
+		throw new IllegalStateException("No CloudServiceOffering found with label " + label + ".");
 	}
 
 	private InstancesInfo getInstancesWithTimeout(CloudFoundryClient client, String appName) {
@@ -1575,9 +1610,5 @@ public class CloudFoundryClientTest {
 
 	private String computeAppUrlNoProtocol(String appName) {
 		return computeAppUrl(appName);
-	}
-
-	private String getMysqlLabel() {
-		return "cleardb";
 	}
 }

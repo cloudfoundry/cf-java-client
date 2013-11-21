@@ -20,7 +20,7 @@ package org.cloudfoundry.client.lib.domain;
 /**
  * Class representing an instance of a service created for a space.
  *
- * @author: Thomas Risberg
+ * @author Thomas Risberg
  */
 public class CloudService extends CloudEntity {
 
@@ -38,6 +38,9 @@ public class CloudService extends CloudEntity {
 		super(meta, name);
 	}
 
+	public boolean isUserProvided() {
+		return plan == null && provider == null && version == null;
+	}
 
 	public String getVersion() {
 		return version;

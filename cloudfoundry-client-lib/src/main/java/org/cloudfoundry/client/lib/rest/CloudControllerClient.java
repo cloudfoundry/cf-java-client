@@ -81,6 +81,8 @@ public interface CloudControllerClient {
 
 	void createService(CloudService service);
 
+	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+
 	CloudService getService(String service);
 
 	void deleteService(String service);

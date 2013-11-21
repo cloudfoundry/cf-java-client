@@ -182,6 +182,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createService(service);
 	}
 
+	public void createUserProvidedService(CloudService service, Map<String, Object> credentials) {
+		cc.createUserProvidedService(service, credentials);
+	}
+
 	public void uploadApplication(String appName, String file) throws IOException {
 		cc.uploadApplication(appName, new File(file), null);
 	}
