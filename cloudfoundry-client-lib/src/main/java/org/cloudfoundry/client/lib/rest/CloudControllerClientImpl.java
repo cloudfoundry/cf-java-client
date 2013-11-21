@@ -658,47 +658,64 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
-		urlPath = urlPath + "/service_instances?inline-relations-depth=1";
+		urlPath = urlPath + "/service_instances?inline-relations-depth=1&return_user_provided_service_instances=true";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudService> services = new ArrayList<CloudService>();
 		for (Map<String, Object> resource : resourceList) {
-			fillInEmbeddedResource(resource, "service_plan", "service");
+			if (hasEmbeddedResource(resource, "service_plan")) {
+				fillInEmbeddedResource(resource, "service_plan", "service");
+			}
 			services.add(resourceMapper.mapResource(resource, CloudService.class));
 		}
 		return services;
 	}
 	
 	public void createService(CloudService service) {
-		Assert.notNull(sessionSpace, "Unable to create service without specifying space to use.");
+		Assert.notNull(sessionSpace, "Unable to create service without specifying space to use");
 		Assert.notNull(service, "Service must not be null");
 		Assert.notNull(service.getName(), "Service name must not be null");
 		Assert.notNull(service.getLabel(), "Service label must not be null");
-
-		// until we have defaults - the version and plan are required
 		Assert.notNull(service.getVersion(), "Service version must not be null");
 		Assert.notNull(service.getPlan(), "Service plan must not be null");
 
-		List<CloudServiceOffering> offerings = getServiceOfferings(service.getLabel());
-		CloudServicePlan cloudServicePlan = null;
-		for (CloudServiceOffering offering : offerings) {
-			if (service.getVersion() != null || service.getVersion().equals(offering.getVersion())) {
-				for (CloudServicePlan plan : offering.getCloudServicePlans()) {
-					if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
-						cloudServicePlan = plan;
-						break;
-					}
-				}
-			}
-			if (cloudServicePlan != null) {
-				break;
-			}
-		}
-		Assert.notNull(cloudServicePlan, "Service Plan not found.");
+		CloudServicePlan cloudServicePlan = findPlanForService(service);
+
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
 		serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
 		getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
+	}
+
+	private CloudServicePlan findPlanForService(CloudService service) {
+		List<CloudServiceOffering> offerings = getServiceOfferings(service.getLabel());
+		for (CloudServiceOffering offering : offerings) {
+			if (service.getVersion() != null || service.getVersion().equals(offering.getVersion())) {
+				for (CloudServicePlan plan : offering.getCloudServicePlans()) {
+					if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
+						return plan;
+					}
+				}
+			}
+		}
+		throw new IllegalArgumentException("Service plan " + service.getPlan() + " not found");
+	}
+
+	public void createUserProvidedService(CloudService service, Map<String, Object> credentials) {
+		Assert.notNull(sessionSpace, "Unable to create service without specifying space to use");
+		Assert.notNull(credentials, "Service credentials must not be null");
+		Assert.notNull(service, "Service must not be null");
+		Assert.notNull(service.getName(), "Service name must not be null");
+		Assert.isNull(service.getLabel(), "Service label is not valid for user-provided services");
+		Assert.isNull(service.getProvider(), "Service provider is not valid for user-provided services");
+		Assert.isNull(service.getVersion(), "Service version is not valid for user-provided services");
+		Assert.isNull(service.getPlan(), "Service plan is not valid for user-provided services");
+
+		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
+		serviceRequest.put("name", service.getName());
+		serviceRequest.put("credentials", credentials);
+		getRestTemplate().postForObject(getUrl("/v2/user_provided_service_instances"), serviceRequest, String.class);
 	}
 
 	public CloudService getService(String serviceName) {
@@ -709,12 +726,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlPath = urlPath + "/spaces/{space}";
 		}
 		urlVars.put("q", "name:" + serviceName);
-		urlPath = urlPath + "/service_instances?q={q}";
+		urlPath = urlPath + "/service_instances?q={q}&return_user_provided_service_instances=true";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		CloudService cloudService = null;
 		if (resourceList.size() > 0) {
 			final Map<String, Object> resource = resourceList.get(0);
-			fillInEmbeddedResource(resource, "service_plan", "service");
+			if (hasEmbeddedResource(resource, "service_plan")) {
+				fillInEmbeddedResource(resource, "service_plan", "service");
+			}
 			cloudService = resourceMapper.mapResource(resource, CloudService.class);
 		}
 		return cloudService;
@@ -1642,7 +1661,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 
-
 		String headKey = resourcePath[0];
 		String[] tailPath = Arrays.copyOfRange(resourcePath, 1, resourcePath.length);
 
@@ -1672,6 +1690,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			// no way to proceed
 			return;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean hasEmbeddedResource(Map<String, Object> resource, String resourceKey) {
+		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
+		return entity.containsKey(resourceKey) || entity.containsKey(resourceKey + "_url");
 	}
 	
 }

@@ -160,18 +160,16 @@ public class CloudEntityResourceMapper {
 				getMeta(resource),
 				getNameOfResource(resource));
 		Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
-		Map<String, Object> serviceResource = null;
-		if (servicePlanResource != null) {
-			serviceResource = getEmbeddedResource(servicePlanResource, "service");
-		}
-		if (servicePlanResource != null && serviceResource != null) {
-			//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
-			cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
-			cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
-			cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
-		}
 		if (servicePlanResource != null) {
 			cloudService.setPlan(getEntityAttribute(servicePlanResource, "name", String.class));
+
+			Map<String, Object> serviceResource = getEmbeddedResource(servicePlanResource, "service");
+			if (serviceResource != null) {
+				//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
+				cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
+				cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
+				cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
+			}
 		}
 		return cloudService;
 	}

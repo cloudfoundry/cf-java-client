@@ -176,6 +176,14 @@ public interface CloudFoundryOperations {
 	void createService(CloudService service);
 
 	/**
+	 * Create a user-provided service.
+	 *
+	 * @param service cloud service info
+	 * @param credentials the user-provided service credentials
+	 */
+	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+
+	/**
 	 * Upload an application.
 	 *
 	 * @param appName application name
