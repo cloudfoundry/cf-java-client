@@ -24,6 +24,7 @@ class CloudFoundryServices {
     String provider
     String plan
     String version
+    Map<String, Object> userProvidedCredentials = [:]
     boolean bind = false
 
     CloudFoundryServices() {

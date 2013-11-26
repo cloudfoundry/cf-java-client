@@ -43,10 +43,9 @@ class ServicesCloudFoundryTask extends AbstractCloudFoundryTask {
 
                 services.each { CloudService service ->
                     output.addRow(name: service.name,
-                            service: service.label,
-                            provider: service.provider,
-                            version: service.version,
-                            plan: service.plan,
+                            service: service.isUserProvided() ? 'user-provided' : service.label,
+                            provider: service.isUserProvided() ? '' : service.provider,
+                            plan: service.isUserProvided() ? '' : service.plan,
                             'bound apps': servicesToApps[service.name].join(', '))
                 }
                 log 'Services\n' + output.toString()
