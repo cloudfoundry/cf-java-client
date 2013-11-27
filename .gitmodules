@@ -1,3 +1,0 @@
-[submodule "vmc"]
-	path = vmc
-	url = https://github.com/cloudfoundry/vmc.git
