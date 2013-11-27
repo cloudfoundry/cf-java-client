@@ -251,32 +251,43 @@ public final class UiUtils {
 		table.getHeaders().put(COLUMN_1, new TableHeader("name"));
 		table.getHeaders().put(COLUMN_2, new TableHeader("service"));
 		table.getHeaders().put(COLUMN_3, new TableHeader("provider"));
-		table.getHeaders().put(COLUMN_4, new TableHeader("version"));
-		table.getHeaders().put(COLUMN_5, new TableHeader("plan"));
-		table.getHeaders().put(COLUMN_6, new TableHeader("bound apps"));
+		table.getHeaders().put(COLUMN_4, new TableHeader("plan"));
+		table.getHeaders().put(COLUMN_5, new TableHeader("bound apps"));
 
 		for (CloudService service : services) {
 			TableRow tableRow = new TableRow();
 
-			table.getHeaders().get(COLUMN_1).updateWidth(service.getName().length());
-			tableRow.addValue(COLUMN_1, service.getName());
+			String name = service.getName();
 
-			table.getHeaders().get(COLUMN_2).updateWidth(service.getLabel().length());
-			tableRow.addValue(COLUMN_2, service.getLabel());
+			String label;
+			String provider;
+			String plan;
+			if (service.isUserProvided()) {
+				label = "user-provided";
+				provider = "";
+				plan = "";
+			} else {
+				label = service.getLabel();
+				provider = service.getProvider();
+				plan = service.getPlan();
+			}
 
-			table.getHeaders().get(COLUMN_3).updateWidth(service.getProvider().length());
-			tableRow.addValue(COLUMN_3, service.getProvider());
+			table.getHeaders().get(COLUMN_1).updateWidth(name.length());
+			tableRow.addValue(COLUMN_1, name);
 
-			table.getHeaders().get(COLUMN_4).updateWidth(service.getVersion().length());
-			tableRow.addValue(COLUMN_4, service.getVersion());
+			table.getHeaders().get(COLUMN_2).updateWidth(label.length());
+			tableRow.addValue(COLUMN_2, label);
 
-			table.getHeaders().get(COLUMN_5).updateWidth(service.getPlan().length());
-			tableRow.addValue(COLUMN_5, service.getPlan());
+			table.getHeaders().get(COLUMN_3).updateWidth(provider.length());
+			tableRow.addValue(COLUMN_3, provider);
 
-			final List<String> appNames = servicesToApps.get(service.getName());
+			table.getHeaders().get(COLUMN_4).updateWidth(plan.length());
+			tableRow.addValue(COLUMN_4, plan);
+
+			final List<String> appNames = servicesToApps.get(name);
 			final String appNamesString = CommonUtils.collectionToCommaDelimitedString(appNames);
-			table.getHeaders().get(COLUMN_6).updateWidth(appNamesString.length());
-			tableRow.addValue(COLUMN_6, appNamesString);
+			table.getHeaders().get(COLUMN_5).updateWidth(appNamesString.length());
+			tableRow.addValue(COLUMN_5, appNamesString);
 
 			table.getRows().add(tableRow);
 		}

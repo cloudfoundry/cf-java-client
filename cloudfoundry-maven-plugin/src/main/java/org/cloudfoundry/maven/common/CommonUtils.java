@@ -106,7 +106,7 @@ public final class CommonUtils {
 	 * @return Returns the List as a comma delimited String. Returns an empty
 	 *         String for a Null or empty list.
 	 */
-	public static String collectionServicesToCommaDelimitedString(Collection<CloudService> list) {
+	public static String collectionServicesToCommaDelimitedString(Collection<? extends CloudService> list) {
 		if (list == null || list.isEmpty()) {
 			return "";
 		}
