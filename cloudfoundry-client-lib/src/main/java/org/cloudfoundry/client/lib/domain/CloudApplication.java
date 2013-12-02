@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib.domain;
 
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,8 +26,6 @@ import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
-
-import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudApplication extends CloudEntity {
@@ -190,7 +190,7 @@ public class CloudApplication extends CloudEntity {
 		Map<String,String> envMap = new HashMap<String, String>();
 		for (String nameAndValue : env) {
 			String[] parts = nameAndValue.split("=");
-			envMap.put(parts[0], parts[1]);
+			envMap.put(parts[0], parts.length == 2 ? parts[1] : null);
 		}
 		return envMap;
 	}
