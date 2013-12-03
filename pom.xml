@@ -15,6 +15,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+				<module>cf-java-client-test-apps</module>
 				<module>cloudfoundry-client-lib</module>
 				<module>cloudfoundry-maven-plugin</module>
 			</modules>
