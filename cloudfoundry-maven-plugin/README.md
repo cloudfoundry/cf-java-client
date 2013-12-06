@@ -12,7 +12,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </plugin>
 ~~~
 
@@ -34,7 +34,7 @@ Plugin configuration in `pom.xml`:
     <plugin>
       <groupId>org.cloudfoundry</groupId>
       <artifactId>cf-maven-plugin</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
       <configuration>
           <server>mycloudfoundry-instance</server>
           <target>http://api.cloudfoundry.com</target>
@@ -95,7 +95,7 @@ Following, a typical (expected) configuration example is shown, which uses sever
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>maven-cf-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
