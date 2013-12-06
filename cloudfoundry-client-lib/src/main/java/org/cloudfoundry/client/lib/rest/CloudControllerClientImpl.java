@@ -852,33 +852,39 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
 	                              List<String> serviceNames) {
-		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
-		appRequest.put("name", appName);
-		appRequest.put("memory", memory);
-		if (staging.getBuildpackUrl() != null) {
-			appRequest.put("buildpack", staging.getBuildpackUrl());
-		}
-		appRequest.put("instances", 1);
-		if (staging.getCommand() != null) {
-			appRequest.put("command", staging.getCommand());
-		}
-		appRequest.put("state", CloudApplication.AppState.STOPPED);
-		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
-		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
-		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
-
-		if (serviceNames != null && serviceNames.size() > 0) {
-			updateApplicationServices(appName, serviceNames);
-		}
-
-		if (uris != null && uris.size() > 0) {
-			addUris(uris, newAppGuid);
-		}
-
+    createApplication(appName, staging, 0, memory, uris, serviceNames);
 	}
 
-	@SuppressWarnings("unchecked")
+  public void createApplication(String appName, Staging staging, int disk, int memory, List<String> uris, List<String> serviceNames) {
+    HashMap<String, Object> appRequest = new HashMap<String, Object>();
+    appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
+    appRequest.put("name", appName);
+    appRequest.put("memory", memory);
+    if (disk > 0) {
+      appRequest.put("disk_quota", disk);
+    }
+    if (staging.getBuildpackUrl() != null) {
+      appRequest.put("buildpack", staging.getBuildpackUrl());
+    }
+    appRequest.put("instances", 1);
+    if (staging.getCommand() != null) {
+      appRequest.put("command", staging.getCommand());
+    }
+    appRequest.put("state", CloudApplication.AppState.STOPPED);
+    String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
+    Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
+    UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
+
+    if (serviceNames != null && serviceNames.size() > 0) {
+      updateApplicationServices(appName, serviceNames);
+    }
+
+    if (uris != null && uris.size() > 0) {
+      addUris(uris, newAppGuid);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
 	private List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
 		List<Map<String, Object>> allResources = new ArrayList<Map<String, Object>>();
 		String resp;

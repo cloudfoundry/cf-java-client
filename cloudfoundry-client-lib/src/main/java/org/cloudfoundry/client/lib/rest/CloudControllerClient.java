@@ -106,6 +106,9 @@ public interface CloudControllerClient {
 	void createApplication(String appName, Staging staging, int memory, List<String> uris,
                            List<String> serviceNames);
 
+  void createApplication(String appName, Staging staging, int disk, int memory, List<String> uris,
+                         List<String> serviceNames);
+
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
 	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
