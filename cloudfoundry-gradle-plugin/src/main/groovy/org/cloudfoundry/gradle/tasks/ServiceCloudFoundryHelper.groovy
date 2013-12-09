@@ -18,10 +18,10 @@ package org.cloudfoundry.gradle.tasks
 import org.cloudfoundry.client.lib.domain.CloudService
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering
 import org.gradle.api.GradleException
-import org.cloudfoundry.gradle.CloudFoundryServices
+import org.cloudfoundry.gradle.CloudFoundryServiceExtension
 
 class ServiceCloudFoundryHelper {
-    void createService(CloudFoundryServices service) {
+    void createService(CloudFoundryServiceExtension service) {
         List<CloudService> services = client.services
         CloudService foundService = services.find {
             it.name.equals(service.name)

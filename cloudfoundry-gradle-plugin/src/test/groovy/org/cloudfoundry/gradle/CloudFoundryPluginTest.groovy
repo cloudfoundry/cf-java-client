@@ -61,7 +61,7 @@ class CloudFoundryPluginTest {
 
     @Test
     public void configuration() {
-        assertTrue(project.cloudfoundry instanceof CloudFoundry)
+        assertTrue(project.cloudfoundry instanceof CloudFoundryExtension)
     }
 
     @Test

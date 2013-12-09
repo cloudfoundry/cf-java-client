@@ -35,9 +35,10 @@ class InfoCloudFoundryTask extends AbstractCloudFoundryTask {
             CloudInfo info = client.cloudInfo
             CloudSpace space = currentSpace
             log """
-CF instance: $target (API version: $info.version)
-user: $username
-target app space: ${space?.name ?: 'n/a'} in org: ${space?.organization?.name ?: 'n/a'}
+API Endpoint: $target (API version: $info.version)
+User: $info.user
+Org: ${space?.organization?.name ?: 'n/a'}
+Space: ${space?.name ?: 'n/a'}
 """
         }
     }

@@ -82,7 +82,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         client.responseErrorHandler = errorHandler
     }
 
-    protected void disconnectFromCloudFoundry() {
+    private void disconnectFromCloudFoundry() {
         try {
             if (username != null && password != null) {
                 client.logout()
@@ -92,7 +92,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    protected CloudFoundryClient createClientWithUsernamePassword() {
+    private CloudFoundryClient createClientWithUsernamePassword() {
         try {
             if (logger.infoEnabled) {
                 logger.info "Connecting to '${target}' with username '${username}'"
@@ -109,7 +109,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    protected CloudFoundryClient createClientWithToken() {
+    private CloudFoundryClient createClientWithToken() {
         try {
             if (verboseEnabled) {
                 logVerbose "Connecting to '${target}' with stored token"
@@ -150,7 +150,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    protected def setupLogging() {
+    private def setupLogging() {
         if (logger.debugEnabled) {
             RestLogCallback callback = new GradlePluginRestLogCallback(logger)
             client.registerRestLogListener(callback)
@@ -186,10 +186,6 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     protected CloudSpace getCurrentSpace(CloudFoundryOperations c = client) {
         List<CloudSpace> spaces = c.spaces
         spaces.find { it.name.equals(space) }
-    }
-
-    protected def getServiceInfos() {
-        project.serviceInfos
     }
 
     protected def propertyMissing(String name) {
