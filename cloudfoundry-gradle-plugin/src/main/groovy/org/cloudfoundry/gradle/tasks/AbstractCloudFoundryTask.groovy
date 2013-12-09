@@ -19,6 +19,7 @@ import org.cloudfoundry.client.lib.CloudCredentials
 import org.cloudfoundry.client.lib.CloudFoundryClient
 import org.cloudfoundry.client.lib.CloudFoundryException
 import org.cloudfoundry.client.lib.CloudFoundryOperations
+import org.cloudfoundry.client.lib.HttpProxyConfiguration
 import org.cloudfoundry.client.lib.RestLogCallback
 import org.cloudfoundry.client.lib.domain.CloudSpace
 import org.cloudfoundry.client.lib.tokens.TokensFile
@@ -99,7 +100,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
             }
 
             CloudCredentials credentials = new CloudCredentials(username, password)
-            CloudFoundryClient localClient = new CloudFoundryClient(credentials, target.toURL(), organization, space)
+            CloudFoundryClient localClient = createClient(credentials)
 
             login(localClient)
 
@@ -116,10 +117,25 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
             }
 
             CloudCredentials credentials = new CloudCredentials(retrieveToken())
-            return new CloudFoundryClient(credentials, target.toURL(), organization, space)
+            return createClient(credentials)
         } catch (MalformedURLException e) {
             throw new GradleException("Incorrect Cloud Foundry target URL '${target}'. Make sure the URL contains a scheme, e.g. http://...", e)
         }
+    }
+
+    private CloudFoundryClient createClient(CloudCredentials credentials) {
+        HttpProxyConfiguration proxyConfiguration = getHttpProxyConfiguration()
+        URL targetUrl = target.toURL()
+        new CloudFoundryClient(credentials, targetUrl, organization, space, proxyConfiguration)
+    }
+
+    private HttpProxyConfiguration getHttpProxyConfiguration() {
+        String proxyHost = System.getProperty("http.proxyHost")
+        String proxyPort = System.getProperty("http.proxyPort")
+        if (proxyHost != null && proxyPort != null) {
+            return new HttpProxyConfiguration(proxyHost, Integer.parseInt(proxyPort))
+        }
+        null
     }
 
     private OAuth2AccessToken retrieveToken() {
