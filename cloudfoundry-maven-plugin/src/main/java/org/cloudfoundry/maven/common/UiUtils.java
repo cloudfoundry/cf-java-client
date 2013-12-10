@@ -370,9 +370,10 @@ public final class UiUtils {
 		StringBuilder sb = new StringBuilder("\n");
 
 		sb.append(UiUtils.HORIZONTAL_LINE);
-		sb.append(String.format("CF instance: %s (API version: %s) \n", target, cloudInfo.getVersion()));
-		sb.append(String.format("  user:        %s\n", cloudInfo.getUser()));
-		sb.append(String.format("  target app space: %s (org: %s) \n", target, org, space));
+		sb.append(String.format("API endpoint: %s (API version: %s) \n", target, cloudInfo.getVersion()));
+		sb.append(String.format("user:         %s\n", cloudInfo.getUser()));
+		sb.append(String.format("org:          %s\n", org));
+		sb.append(String.format("space:        %s\n", space));
 
 		sb.append(UiUtils.HORIZONTAL_LINE);
 		return sb.toString();
