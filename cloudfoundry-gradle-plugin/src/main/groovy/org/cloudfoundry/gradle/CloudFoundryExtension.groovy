@@ -41,8 +41,9 @@ class CloudFoundryExtension {
     String uri
     List<String> uris = []
     File file
-
     Map<String, String> env = [:]
+
+    boolean useSystemProxy = true
 
     CloudFoundryExtension(Project project) {
         application = project.name

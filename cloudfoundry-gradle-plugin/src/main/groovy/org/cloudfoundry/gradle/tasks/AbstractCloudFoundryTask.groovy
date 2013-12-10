@@ -130,10 +130,12 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     private HttpProxyConfiguration getHttpProxyConfiguration() {
-        String proxyHost = System.getProperty("http.proxyHost")
-        String proxyPort = System.getProperty("http.proxyPort")
-        if (proxyHost != null && proxyPort != null) {
-            return new HttpProxyConfiguration(proxyHost, Integer.parseInt(proxyPort))
+        if (useSystemProxy) {
+            String proxyHost = System.getProperty("http.proxyHost")
+            String proxyPort = System.getProperty("http.proxyPort")
+            if (proxyHost != null && proxyPort != null) {
+                return new HttpProxyConfiguration(proxyHost, Integer.parseInt(proxyPort))
+            }
         }
         null
     }
