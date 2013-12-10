@@ -89,6 +89,13 @@ public class CloudUtil {
 					return clazz.cast(Long.valueOf(((String) object)));
 				}
 			}
+			if (clazz == Double.class) {
+				if (object instanceof Number) {
+					return clazz.cast(Double.valueOf(((Number)object).doubleValue()));
+				} else if (object instanceof String) {
+					return clazz.cast(Double.valueOf(((String) object)));
+				}
+			}
 
 			return clazz.cast(object);
 		} catch (ClassCastException e) {

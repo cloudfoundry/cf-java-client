@@ -123,6 +123,8 @@ public class CloudFoundryClientTest {
 
 	private static final int DEFAULT_MEMORY = 512; // MB
 
+	private static final int FIVE_MINUTES = 300 * 1000;
+
 	private static boolean tearDownComplete = false;
 
 	@Rule
@@ -217,7 +219,7 @@ public class CloudFoundryClientTest {
 		CloudInfo info = connectedClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
-		assertTrue(info.getBuild() > 0);
+		assertNotNull(info.getBuild());
 	}
 
 	/**
@@ -763,37 +765,55 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getApplicationStats() throws Exception {
+		final int instanceCount = 3;
 		String appName = namespacedAppName("stats2");
 		createAndUploadSimpleSpringApp(appName);
-		connectedClient.updateApplicationInstances(appName, 3);
+		connectedClient.updateApplicationInstances(appName, instanceCount);
 		connectedClient.startApplication(appName);
 		CloudApplication app = connectedClient.getApplication(appName);
 
 		assertEquals(CloudApplication.AppState.STARTED, app.getState());
 
-		ApplicationStats stats = connectedClient.getApplicationStats(appName);
+		waitForStatsAvailable(appName, instanceCount);
 
+		ApplicationStats stats = connectedClient.getApplicationStats(appName);
 		assertNotNull(stats);
 		assertNotNull(stats.getRecords());
+		assertEquals(instanceCount, stats.getRecords().size());
+
+		for (InstanceStats instanceStats : stats.getRecords()) {
+			assertNotNull(instanceStats.getUris());
+			assertNotNull(instanceStats.getHost());
+			assertTrue(instanceStats.getPort() > 0);
+			assertTrue(instanceStats.getDiskQuota() > 0);
+			assertTrue(instanceStats.getMemQuota() > 0);
+			assertTrue(instanceStats.getFdsQuota() > 0);
+			assertTrue(instanceStats.getUptime() > 0);
+
+			InstanceStats.Usage usage = instanceStats.getUsage();
+			assertNotNull(usage);
+			assertTrue(usage.getDisk() > 0);
+			assertTrue(usage.getMem() > 0);
+
+			assertTimeWithinRange("Usage time should be very recent", usage.getTime().getTime(), FIVE_MINUTES);
+		}
+	}
+
+	private void waitForStatsAvailable(String appName, int instanceCount) throws InterruptedException {
 		// TODO: Make this pattern reusable
-		for (int i = 0; i < 10 && stats.getRecords().size() < 3; i++) {
+		ApplicationStats stats = connectedClient.getApplicationStats(appName);
+		for (int retries = 0; retries < 10 && stats.getRecords().size() < instanceCount; retries++) {
 			Thread.sleep(1000);
 			stats = connectedClient.getApplicationStats(appName);
 		}
-		assertEquals(3, stats.getRecords().size());
+
 		InstanceStats firstInstance = stats.getRecords().get(0);
 		assertEquals("0", firstInstance.getId());
-		for (int i = 0; i < 50 && firstInstance.getUsage() == null; i++) {
+		for (int retries = 0; retries < 50 && firstInstance.getUsage() == null; retries++) {
 			Thread.sleep(1000);
 			stats = connectedClient.getApplicationStats(appName);
 			firstInstance = stats.getRecords().get(0);
 		}
-		assertNotNull(firstInstance.getUsage());
-
-		// Allow more time deviations due to local clock being out of sync with cloud
-		int timeTolerance = 300 * 1000; // 5 minutes
-		assertTrue("Usage time should be very recent",
-				Math.abs(System.currentTimeMillis() - firstInstance.getUsage().getTime().getTime()) < timeTolerance);
 	}
 
 	@Test
@@ -934,10 +954,8 @@ public class CloudFoundryClientTest {
 		CloudService service = connectedClient.getService(serviceName);
 		assertNotNull(service);
 		assertEquals(serviceName, service.getName());
-		// Allow more time deviations due to local clock being out of sync with cloud
-		int timeTolerance = 300 * 1000; // 5 minutes
-		assertTrue("Creation time should be very recent",
-				Math.abs(System.currentTimeMillis() - service.getMeta().getCreated().getTime()) < timeTolerance);
+		assertTimeWithinRange("Creation time should be very recent",
+				service.getMeta().getCreated().getTime(), FIVE_MINUTES);
 
 		connectedClient.deleteService(serviceName);
 		List<CloudService> services = connectedClient.getServices();
@@ -1610,5 +1628,11 @@ public class CloudFoundryClientTest {
 
 	private String computeAppUrlNoProtocol(String appName) {
 		return computeAppUrl(appName);
+	}
+
+	private void assertTimeWithinRange(String message, long actual, int timeTolerance) {
+		// Allow more time deviations due to local clock being out of sync with cloud
+		assertTrue(message,
+				Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
 	}
 }
