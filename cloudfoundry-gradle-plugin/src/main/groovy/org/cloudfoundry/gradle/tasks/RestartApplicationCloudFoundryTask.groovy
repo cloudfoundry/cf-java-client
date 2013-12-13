@@ -21,7 +21,7 @@ import org.gradle.api.tasks.TaskAction
 /**
  * Task used to restart an application.
  */
-@Mixin(AppStatusCloudFoundryHelper)
+@Mixin(StartCloudFoundryHelper)
 class RestartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
     RestartApplicationCloudFoundryTask() {
         super()
@@ -29,7 +29,7 @@ class RestartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
     }
 
     @TaskAction
-    void startApplication() {
+    void restart() {
         withCloudFoundryClient {
             log "Restarting ${application}"
             withApplication {

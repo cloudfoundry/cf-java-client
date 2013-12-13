@@ -15,14 +15,13 @@
 
 package org.cloudfoundry.gradle.tasks
 
-import org.cloudfoundry.client.lib.StartingInfo
 import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.gradle.api.tasks.TaskAction
 
 /**
  * Task used to start an application.
  */
-@Mixin(AppStatusCloudFoundryHelper)
+@Mixin(StartCloudFoundryHelper)
 class StartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
     StartApplicationCloudFoundryTask() {
         super()
@@ -30,16 +29,14 @@ class StartApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
     }
 
     @TaskAction
-    void startApplication() {
+    void start() {
         withCloudFoundryClient {
             withApplication {
                 CloudApplication app = client.getApplication(application)
                 if (app.runningInstances > 0) {
                     log "Application ${application} is already started"
                 } else {
-                    log "Starting ${application}"
-                    StartingInfo startingInfo = client.startApplication(application)
-                    showAppStartup(startingInfo)
+                    startApplication()
                 }
             }
         }

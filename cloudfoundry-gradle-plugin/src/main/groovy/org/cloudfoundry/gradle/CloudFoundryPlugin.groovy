@@ -24,13 +24,14 @@ import org.cloudfoundry.gradle.tasks.BindServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.CreateServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeleteApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeleteServiceCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.DeployCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.EnvCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.InfoCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LogsCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LoginCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LogoutCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.MapCloudFoundryTask
-import org.cloudfoundry.gradle.tasks.PushApplicationCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.PushCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.RestartApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ScaleCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ServicesCloudFoundryTask
@@ -39,7 +40,9 @@ import org.cloudfoundry.gradle.tasks.SetEnvCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.SpacesCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.StartApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.StopApplicationCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.SwapDeployedCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.UnbindServiceCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.UndeployCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.UnmapCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.UnsetEnvCloudFoundryTask
 
@@ -63,11 +66,14 @@ class CloudFoundryPlugin implements Plugin<Project> {
         project.tasks.create('cf-login', LoginCloudFoundryTask)
         project.tasks.create('cf-logout', LogoutCloudFoundryTask)
         project.tasks.create('cf-spaces', SpacesCloudFoundryTask)
-        project.tasks.create('cf-push', PushApplicationCloudFoundryTask)
+        project.tasks.create('cf-push', PushCloudFoundryTask)
         project.tasks.create('cf-delete', DeleteApplicationCloudFoundryTask)
         project.tasks.create('cf-start', StartApplicationCloudFoundryTask)
         project.tasks.create('cf-restart', RestartApplicationCloudFoundryTask)
         project.tasks.create('cf-stop', StopApplicationCloudFoundryTask)
+        project.tasks.create('cf-deploy', DeployCloudFoundryTask)
+        project.tasks.create('cf-undeploy', UndeployCloudFoundryTask)
+        project.tasks.create('cf-swap-deployed', SwapDeployedCloudFoundryTask)
         project.tasks.create('cf-scale', ScaleCloudFoundryTask)
         project.tasks.create('cf-apps', AppsCloudFoundryTask)
         project.tasks.create('cf-app', AppCloudFoundryTask)

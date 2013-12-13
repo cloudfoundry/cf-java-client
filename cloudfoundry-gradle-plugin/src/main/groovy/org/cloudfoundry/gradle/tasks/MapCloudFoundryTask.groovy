@@ -35,9 +35,7 @@ class MapCloudFoundryTask extends AbstractMapCloudFoundryTask {
             log "Mapping uris ${allUris} for ${application}"
 
             withApplication {
-                def applicationUris = modifyUris { existingUris, passedUris ->
-                    existingUris + passedUris
-                }
+                List<String> applicationUris = mapUrisToApplication()
 
                 listUriMappings(applicationUris)
             }

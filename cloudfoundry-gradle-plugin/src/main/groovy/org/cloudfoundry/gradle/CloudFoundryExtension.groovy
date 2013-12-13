@@ -35,26 +35,28 @@ class CloudFoundryExtension {
     String application
     String command
     String buildpack
+    String stack
+    Integer healthCheckTimeout
     boolean startApp = true
     int memory = 512
     int instances = 1
     String uri
     List<String> uris = []
+    String host
+    List<String> hosts
+    String domain
     File file
     Map<String, String> env = [:]
+
+    List<String> versions = []
+
+    // plugin configuration
+    Integer appStartupTimeout
 
     boolean useSystemProxy = true
 
     CloudFoundryExtension(Project project) {
         application = project.name
-    }
-
-    public List<String> getAllUris() {
-        def allUris = uris.collect { it.toString() }
-        if (uri) {
-            allUris << uri.toString()
-        }
-        allUris as List<String>
     }
 
     protected String getRandomWord() {

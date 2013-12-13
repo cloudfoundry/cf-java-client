@@ -15,39 +15,37 @@
 
 package org.cloudfoundry.gradle.tasks
 
-import org.cloudfoundry.client.lib.domain.CloudSpace
-import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 
 /**
- * A task used to display available spaces.
+ * Tasks used to push an application to a Cloud Foundry cloud.
  *
+ * @author Cedric Champeau
  * @author Scott Frederick
  */
-@Mixin(AppStatusCloudFoundryHelper)
-class SpacesCloudFoundryTask extends AbstractCloudFoundryTask {
-    SpacesCloudFoundryTask() {
+@Mixin(ServiceCloudFoundryHelper)
+@Mixin(PushCloudFoundryHelper)
+@Mixin(StartCloudFoundryHelper)
+class PushCloudFoundryTask extends AbstractCloudFoundryTask {
+    PushCloudFoundryTask() {
         super()
-        description = 'Displays available spaces'
+        description = 'Pushes an application'
     }
 
     @TaskAction
-    void showSpaces() {
+    void push() {
         withCloudFoundryClient {
-            List<CloudSpace> spaces = client.spaces
-            CloudSpace current = currentSpace
+            validateApplicationConfig()
 
-            FlexibleTableOutput output = new FlexibleTableOutput()
+            createServices(serviceInfos)
 
-            spaces.findAll { space ->
-                space.organization.name == current.organization.name
+            createApplication()
+
+            uploadApplication()
+
+            if (startApp) {
+                startApplication()
             }
-            .each { space ->
-                output.addRow(name: space.name)
-            }
-
-            log "Spaces in org ${current.organization.name}\n\n" + output.toString()
         }
     }
 }
-

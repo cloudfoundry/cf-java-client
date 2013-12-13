@@ -33,6 +33,7 @@ import org.gradle.api.GradleException
 abstract class AbstractCloudFoundryTask extends DefaultTask {
     protected CloudFoundryOperations client
     protected WarningBypassingResponseErrorHandler errorHandler
+    protected String currentVersionSuffix
 
     AbstractCloudFoundryTask() {
         super()
@@ -52,14 +53,20 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     protected def withCloudFoundryClient(Closure c, Object[] args) {
-        validateConfiguration()
-        connectToCloudFoundry()
-        if (client) {
-            setupLogging()
+        try {
+            validateConfiguration()
+            connectToCloudFoundry()
+            if (client) {
+                setupLogging()
 
-            c.call(args)
+                c.call(args)
 
-            disconnectFromCloudFoundry()
+                disconnectFromCloudFoundry()
+            }
+        } catch (CloudFoundryException cfe) {
+            throw new GradleException("Error calling Cloud Foundry: ${cfe.message}: ${cfe.description}")
+        } catch (Exception e) {
+            throw e
         }
     }
 
@@ -206,7 +213,122 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         spaces.find { it.name.equals(space) }
     }
 
-    protected def propertyMissing(String name) {
+    protected void applyVersionSuffix(String version) {
+        currentVersionSuffix = version
+    }
+
+    protected void removeVersionSuffix() {
+        currentVersionSuffix = null
+    }
+
+    // extension accessors
+
+    String getTarget() {
+        propertyOrExtension('target')
+    }
+
+    String getOrganization() {
+        propertyOrExtension('organization')
+    }
+
+    String getSpace() {
+        propertyOrExtension('space')
+    }
+
+    String getUsername() {
+        propertyOrExtension('username')
+    }
+
+    String getPassword() {
+        propertyOrExtension('password')
+    }
+
+    String getApplication() {
+        def appName = propertyOrExtension('application')
+        appName + (currentVersionSuffix ?: "")
+    }
+
+    String getCommand() {
+        propertyOrExtension('command')
+    }
+
+    String getBuildpack() {
+        propertyOrExtension('buildpack')
+    }
+
+    String getStack() {
+        propertyOrExtension('stack')
+    }
+
+    Integer getHealthCheckTimeout() {
+        propertyOrExtension('healthCheckTimeout')
+    }
+
+    boolean getStartApp() {
+        propertyOrExtension('startApp')
+    }
+
+    int getMemory() {
+        propertyOrExtension('memory') as int
+    }
+
+    int getInstances() {
+        propertyOrExtension('instances') as int
+    }
+
+    List<String> getAllUris() {
+        String uri = propertyOrExtension('uri')
+        List<String> uris = project.cloudfoundry.uris
+
+        String domain = propertyOrExtension('domain')
+        String host = propertyOrExtension('host')
+        List<String> hosts = project.cloudfoundry.hosts
+
+        def allUris = []
+
+        if (!currentVersionSuffix) {
+            allUris += uris.collect { it.toString() }
+            if (uri) {
+                allUris << uri.toString()
+            }
+        }
+        if (domain) {
+            if (host) {
+                allUris << "${host}${(currentVersionSuffix ?: "")}.${domain}".toString()
+            }
+            if (hosts) {
+                allUris += hosts.collect { "${it}${(currentVersionSuffix ?: "")}.${domain}".toString() }
+            }
+        }
+
+        allUris as List<String>
+    }
+
+    File getFile() {
+        project.cloudfoundry.file
+    }
+
+    Map<String, String> getEnv() {
+        project.cloudfoundry.env
+    }
+
+    List<String> getVersions() {
+        project.cloudfoundry.versions
+    }
+
+    Integer getAppStartupTimeout() {
+        propertyOrExtension('appStartupTimeout')
+    }
+
+    boolean getUseSystemProxy() {
+        propertyOrExtension('useSystemProxy')
+    }
+
+    def getServiceInfos() {
+        project.cloudfoundry.services
+    }
+
+    def propertyOrExtension(String name) {
         if (project.hasProperty('cf.' + name)) {
             project.property('cf.' + name)
         } else {

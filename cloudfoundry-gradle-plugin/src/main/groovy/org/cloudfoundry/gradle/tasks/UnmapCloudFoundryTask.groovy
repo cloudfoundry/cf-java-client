@@ -35,9 +35,7 @@ class UnmapCloudFoundryTask extends AbstractMapCloudFoundryTask {
             log "Unmapping uris ${allUris} for ${application}"
 
             withApplication {
-                def applicationUris = modifyUris { existingUris, passedUris ->
-                    existingUris - passedUris
-                }
+                List<String> applicationUris = unmapUrisFromApplication()
 
                 listUriMappings(applicationUris)
             }
