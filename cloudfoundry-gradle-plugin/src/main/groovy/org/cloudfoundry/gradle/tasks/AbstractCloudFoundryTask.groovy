@@ -93,7 +93,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
-    private CloudFoundryClient createClientWithUsernamePassword() {
+    protected CloudFoundryClient createClientWithUsernamePassword() {
         try {
             if (logger.infoEnabled) {
                 logger.info "Connecting to '${target}' with username '${username}'"
