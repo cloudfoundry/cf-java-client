@@ -354,24 +354,12 @@
 							<artifactSet>
 								<includes>
 									<include>org.codehaus.jackson:*</include>
-									<include>org.springframework:*</include>
-									<include>org.springframework.security.oauth:*</include>
-									<include>org.springframework.security:*</include>
-									<include>org.apache.httpcomponents:*</include>
 								</includes>
 							</artifactSet>
 							<relocations>
 								<relocation>
 									<pattern>org.codehaus.jackson</pattern>
 									<shadedPattern>org.cloudfoundry.client.lib.org.codehaus.jackson</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.springframework</pattern>
-									<shadedPattern>org.cloudfoundry.client.lib.org.springframework</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.apache.httpcomponents</pattern>
-									<shadedPattern>org.cloudfoundry.client.lib.org.apache.httpcomponents</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
