@@ -272,12 +272,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public Map<String, String> getCrashLogs(String appName) {
 		String urlPath = getFileUrlPath();
 		CrashesInfo crashes = getCrashes(appName);
-		TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
-		for (CrashInfo crash : crashes.getCrashes()) {
-			crashInstances.put(crash.getSince(), crash.getInstance());
+		if (crashes.getCrashes().isEmpty()) {
+		    return Collections.emptyMap();
 		}
-		String instance = crashInstances.get(crashInstances.lastKey());
-		return doGetLogs(urlPath, appName, instance);
+        TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
+        for (CrashInfo crash : crashes.getCrashes()) {
+            crashInstances.put(crash.getSince(), crash.getInstance());
+        }
+	    String instance = crashInstances.get(crashInstances.lastKey());
+	    return doGetLogs(urlPath, appName, instance);
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
