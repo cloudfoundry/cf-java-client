@@ -422,22 +422,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			return request;
 		}
 
-		private void captureDefaultReadTimeout() {
-			if (delegate instanceof HttpComponentsClientHttpRequestFactory) {
-				HttpComponentsClientHttpRequestFactory httpRequestFactory =
-						(HttpComponentsClientHttpRequestFactory) delegate;
-				defaultSocketTimeout = (Integer) httpRequestFactory
-						.getHttpClient().getParams()
-						.getParameter("http.socket.timeout");
-				if (defaultSocketTimeout == null) {
-					try {
-						defaultSocketTimeout = new Socket().getSoTimeout();
-					} catch (SocketException e) {
-						defaultSocketTimeout = 0;
-					}
-				}
-			}
-		}
+        private void captureDefaultReadTimeout() {
+            // As of HttpClient 4.3.x, obtaining the default parameters is deprecated and removed,
+            // so we fallback to java.net.Socket.
+
+            if (defaultSocketTimeout == null) {
+                try {
+                    defaultSocketTimeout = new Socket().getSoTimeout();
+                } catch (SocketException e) {
+                    defaultSocketTimeout = 0;
+                }
+            }
+        }
 
 		public void increaseReadTimeoutForStreamedTailedLogs(int timeout) {
 			// May temporary increase read timeout on other unrelated concurrent
