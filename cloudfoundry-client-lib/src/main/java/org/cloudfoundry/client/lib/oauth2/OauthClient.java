@@ -57,14 +57,13 @@ public class OauthClient {
 		this.restTemplate = restTemplate;
 	}
 
-	public OAuth2AccessToken getToken(String username, String password) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
+	public OAuth2AccessToken getToken(String username, String password, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
-		OAuth2AccessToken token;
 		try {
-			token = provider.obtainAccessToken(resource, request);
+			return provider.obtainAccessToken(resource, request);
 		}
 		catch (OAuth2AccessDeniedException oauthEx) {
 			HttpStatus status = HttpStatus.valueOf(oauthEx.getHttpErrorCode());
@@ -72,17 +71,10 @@ public class OauthClient {
 			cfEx.setDescription(oauthEx.getSummary());
 			throw cfEx;
 		}
-		return token;
 	}
 
-	protected ResourceOwnerPasswordAccessTokenProvider createResourceOwnerPasswordAccessTokenProvider() {
-		ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
-		resourceOwnerPasswordAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
-		return resourceOwnerPasswordAccessTokenProvider;
-	}
-
-	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password);
+	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
@@ -106,26 +98,32 @@ public class OauthClient {
 		restTemplate.put(authorizationUrl + "/User/{id}/password", httpEntity, userId);
 	}
 
+	protected ResourceOwnerPasswordAccessTokenProvider createResourceOwnerPasswordAccessTokenProvider() {
+		ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+		resourceOwnerPasswordAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
+		return resourceOwnerPasswordAccessTokenProvider;
+	}
+
 	private AccessTokenRequest createAccessTokenRequest(String username, String password) {
 		Map<String, String> parameters = new LinkedHashMap<String, String>();
 		parameters.put("credentials", String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password));
 		AccessTokenRequest request = new DefaultAccessTokenRequest();
 		request.setAll(parameters);
-		
+
 		return request;
 	}
-	
-	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password) {
+
+	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId, String clientSecret) {
 		ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
 		resource.setUsername(username);
 		resource.setPassword(password);
 
-		String clientId = "cf";
 		resource.setClientId(clientId);
+		resource.setClientSecret(clientSecret);
 		resource.setId(clientId);
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
 		resource.setAccessTokenUri(authorizationUrl + "/oauth/token");
-		
+
 		return resource;
 	}
 }

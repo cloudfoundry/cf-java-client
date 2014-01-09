@@ -18,16 +18,20 @@ package org.cloudfoundry.maven;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.tokens.TokensFile;
 import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.DefaultConstants;
@@ -146,15 +150,8 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using token", target.toString()));
 
-		try {
-			final CloudCredentials credentials = new CloudCredentials(token);
-			final CloudFoundryClient client = new CloudFoundryClient(credentials, target.toURL(), org, space);
-			client.setResponseErrorHandler(responseErrorHandler);
-			return client;
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target URL '%s'. Make sure the URL contains a scheme, e.g. http://...", target), e);
-		}
+		final CloudCredentials credentials = new CloudCredentials(token);
+		return createConnection(credentials, target, org, space);
 	}
 
 	/**
@@ -172,16 +169,55 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 				"Connecting to Cloud Foundry at '%s' with username: '%s'",
 				target, username));
 
+		final CloudCredentials credentials = new CloudCredentials(username, password);
+		CloudFoundryClient client = createConnection(credentials, target, org, space);
+		connectToCloudFoundry(client);
+		return client;
+	}
+
+	private CloudFoundryClient createConnection(CloudCredentials credentials, URI target, String org, String space)
+			throws MojoExecutionException {
 		try {
-			final CloudCredentials credentials = new CloudCredentials(username, password);
-			CloudFoundryClient client = new CloudFoundryClient(credentials, target.toURL(), org, space);
-			connectToCloudFoundry(client);
-			client.setResponseErrorHandler(responseErrorHandler);
-			return client;
+			CloudFoundryClient cloudFoundryClient =
+					new CloudFoundryClient(credentials, target.toURL(), org, space, getHttpProxyConfiguration(target));
+			cloudFoundryClient.setResponseErrorHandler(responseErrorHandler);
+			return cloudFoundryClient;
 		} catch (MalformedURLException e) {
 			throw new MojoExecutionException(
 					String.format("Incorrect Cloud Foundry target URL '%s'. Make sure the URL contains a scheme, e.g. http://...", target), e);
 		}
+	}
+
+	private HttpProxyConfiguration getHttpProxyConfiguration(URI target) {
+		Proxy proxy = getMavenProxy();
+		if (proxy != null) {
+			if (!targetIsExcludedFromProxy(target.getHost(), proxy)) {
+				return new HttpProxyConfiguration(proxy.getHost(), proxy.getPort());
+			}
+		}
+		return null;
+	}
+
+	protected Proxy getMavenProxy() {
+		List<Proxy> proxies = session.getSettings().getProxies();
+		if (proxies == null || proxies.isEmpty())
+			return null;
+
+		for (Proxy proxy : proxies) {
+			if (proxy.isActive() && "http".equalsIgnoreCase(proxy.getProtocol())) {
+				return proxy;
+			}
+		}
+
+		return null;
+	}
+
+	private boolean targetIsExcludedFromProxy(String targetHost, Proxy proxy) {
+		if (proxy.getNonProxyHosts() != null) {
+			List<String> nonProxyHosts = Arrays.asList(proxy.getNonProxyHosts().split("\\|"));
+			return nonProxyHosts.contains(targetHost);
+		}
+		return false;
 	}
 
 	/**

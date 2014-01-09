@@ -53,9 +53,7 @@ class PushApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
                 client.updateApplicationEnv(application, env)
             }
 
-            if (instances > 0) {
-                client.updateApplicationInstances(application, instances)
-            }
+            client.updateApplicationInstances(application, instances)
 
             log "Uploading '${file}'"
             client.uploadApplication(application, file)

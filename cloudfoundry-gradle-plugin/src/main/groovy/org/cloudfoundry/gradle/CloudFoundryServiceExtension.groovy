@@ -18,18 +18,16 @@ package org.cloudfoundry.gradle
 /**
  * Configuration options used for creation of services.
  */
-class CloudFoundryServices {
-    final String name
+class CloudFoundryServiceExtension {
+    String name
     String label
     String provider
     String plan
     String version
+    Map<String, Object> userProvidedCredentials = [:]
     boolean bind = false
 
-    CloudFoundryServices() {
-    }
-
-    CloudFoundryServices(String name) {
+    CloudFoundryServiceExtension(String name) {
         this.name = name
     }
 }

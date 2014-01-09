@@ -3,13 +3,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.cloudfoundry.test</groupId>
-    <artifactId>simple-spring-app</artifactId>
-    <name>simple-spring-app</name>
+    <artifactId>non-ascii-file-name</artifactId>
+    <name>non-ascii-file-name</name>
     <packaging>war</packaging>
     <version>0.1.0.BUILD-SNAPSHOT</version>
     <properties>
         <java-version>1.6</java-version>
-        <org.springframework-version>3.1.0.RELEASE</org.springframework-version>
+        <org.springframework-version>3.2.2.RELEASE</org.springframework-version>
         <org.aspectj-version>1.6.9</org.aspectj-version>
         <org.slf4j-version>1.5.10</org.slf4j-version>
     </properties>
@@ -142,7 +142,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <warName>simple-spring-app</warName>
+                    <warName>non-ascii-file-name</warName>
                 </configuration>
             </plugin>
         </plugins>

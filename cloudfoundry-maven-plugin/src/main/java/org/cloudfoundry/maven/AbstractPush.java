@@ -31,7 +31,6 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
 
-import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
 
 import org.springframework.http.HttpStatus;
@@ -160,7 +159,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 	}
 
 	private List<String> getServiceNames() {
-		final List<CloudService> services = getServices();
+		final List<? extends CloudService> services = getServices();
 		List<String> serviceNames = new ArrayList<String>();
 
 		for (CloudService service : services) {

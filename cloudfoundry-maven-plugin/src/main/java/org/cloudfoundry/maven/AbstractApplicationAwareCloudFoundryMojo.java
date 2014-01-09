@@ -133,7 +133,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 *
 	 * @parameter expression="${services}"
 	 */
-	private List<CloudService> services;
+	private List<CloudServiceWithUserProvided> services;
 
 	/**
 	 * list of domains to use by the application.
@@ -466,9 +466,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 *
 	 * @return Never null
 	 */
-	public List<CloudService> getServices() {
+	public List<CloudServiceWithUserProvided> getServices() {
 		if (this.services == null) {
-			return new ArrayList<CloudService>(0);
+			return new ArrayList<CloudServiceWithUserProvided>(0);
 		} else {
 			return this.services;
 		}
@@ -528,7 +528,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			currentServicesNames.add(currentService.getName());
 		}
 
-		for (CloudService service: getServices()) {
+		for (CloudServiceWithUserProvided service: getServices()) {
 			if (currentServicesNames.contains(service.getName())) {
 				getLog().debug(String.format("Service '%s' already exists", service.getName()));
 			}
@@ -537,7 +537,12 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				Assert.configurationServiceNotNull(service, null);
 
 				try {
-					client.createService(service);
+					if (service.getLabel().equals("user-provided")) {
+						service.setLabel(null);
+						client.createUserProvidedService(service, service.getUserProvidedCredentials());
+					} else {
+						client.createService(service);
+					}
 				} catch (CloudFoundryException e) {
 					throw new MojoExecutionException(String.format("Not able to create service '%s'.", service.getName()));
 				}

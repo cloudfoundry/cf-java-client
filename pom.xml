@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
-	<artifactId>vcap-java-client</artifactId>
+	<artifactId>cf-java-client</artifactId>
 	<packaging>pom</packaging>
-	<name>vcap-java-client</name>
-	<version>0.1.0-BUILD-SNAPSHOT</version>
+	<name>Cloud Foundry Java Client Parent</name>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
 
 	<profiles>
 		<profile>
@@ -15,20 +15,17 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
-				<module>vcap-java-client-test-apps</module>
+				<module>cf-java-client-test-apps</module>
 				<module>cloudfoundry-client-lib</module>
 				<module>cloudfoundry-maven-plugin</module>
-				<module>cloudfoundry-caldecott-lib</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>integration-test</id>
 			<modules>
-				<module>vcap-java-client-test-apps</module>
+				<module>cf-java-client-test-apps</module>
 				<module>cloudfoundry-client-lib</module>
 				<module>cloudfoundry-maven-plugin</module>
-				<module>cloudfoundry-caldecott-lib</module>
-				<module>cloudfoundry-caldecott-test</module>
 			</modules>
 		</profile>
 	</profiles>

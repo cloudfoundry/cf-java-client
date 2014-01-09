@@ -4,11 +4,12 @@
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cf-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.2.BUILD-SNAPSHOT</version>
 	<name>Cloud Foundry Maven Plugin</name>
+	<url>https://github.com/cloudfoundry/cf-java-client/cloudfoundry-maven-plugin</url>
 
 	<description>
-		The Cloud Foundry Maven Plugin makes it easy to deploy Maven-based applications to Cloud Foundry instances.
+		A Maven plugin that makes it easy to deploy Maven-based applications to Cloud Foundry instances.
 	</description>
 
 	<prerequisites>
@@ -21,6 +22,12 @@
 		<slf4j-version>1.5.6</slf4j-version>
 	</properties>
 
+	<scm>
+		<url>http://github.com/cloudfoundry/cf-java-client</url>
+		<connection>scm:git:git@github.com/cloudfoundry/cf-java-client</connection>
+		<developerConnection>scm:git:git@github.com/cloudfoundry/cf-java-client</developerConnection>
+	</scm>
+
 	<licenses>
 		<license>
 			<name>Apache 2.0 License</name>
@@ -29,81 +36,35 @@
 		</license>
 	</licenses>
 
-	<developers>
-		<developer>
-			<id>ghillert</id>
-			<name>Gunnar Hillert</name>
-			<email>ghillert at vmware.com</email>
-		</developer>
-		<developer>
-			<id>amoghadam</id>
-			<name>Ali Moghadam</name>
-			<email>amoghadam at rbcon.com</email>
-		</developer>
-		<developer>
-			<id>sfrederick</id>
-			<name>Scott Frederick</name>
-			<email>sfrederick at gopivotal.com</email>
-		</developer>
-	</developers>
-
-	<scm>
-		<url>http://github.com/cloudfoundry/vcap-java-client</url>
-		<connection>scm:git:git@github.com/cloudfoundry/vcap-java-client</connection>
-		<developerConnection>scm:git:git@github.com/cloudfoundry/vcap-java-client</developerConnection>
-	</scm>
-
 	<profiles>
 		<profile>
-			<id>staging</id>
-			<distributionManagement>
-				<repository>
-					<id>spring-milestone-staging</id>
-					<url>file:///${java.io.tmpdir}/${project.artifactId}/milestone</url>
-				</repository>
-				<snapshotRepository>
-					<id>spring-snapshot-staging</id>
-					<url>file:///${java.io.tmpdir}/${project.artifactId}/snapshot</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		<profile>
-			<id>milestone</id>
-			<distributionManagement>
-				<repository>
-					<id>spring-milestone</id>
-					<name>Spring Milestone Repository</name>
-					<url>s3://maven.springframework.org/milestone</url>
-				</repository>
-			</distributionManagement>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
-
-	<repositories>
-		<repository>
-			<id>repository.springframework.maven.release</id>
-			<name>Spring Framework Maven Release Repository</name>
-			<url>http://maven.springframework.org/release</url>
-		</repository>
-		<repository>
-			<id>repository.springframework.maven.milestone</id>
-			<name>Spring Framework Maven Milestone Repository</name>
-			<url>http://maven.springframework.org/milestone</url>
-		</repository>
-	</repositories>
-
-	<distributionManagement>
-		<repository>
-			<id>spring-release</id>
-			<name>Spring Release Repository</name>
-			<url>s3://maven.springframework.org/release</url>
-		</repository>
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<build>
 		<extensions>
@@ -141,7 +102,7 @@
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>cloudfoundry-client-lib</artifactId>
-			<version>0.8.8.BUILD-SNAPSHOT</version>
+			<version>1.0.2.BUILD-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -216,4 +177,35 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<developers>
+		<developer>
+			<id>ghillert</id>
+			<name>Gunnar Hillert</name>
+			<email>ghillert at vmware.com</email>
+		</developer>
+		<developer>
+			<id>amoghadam</id>
+			<name>Ali Moghadam</name>
+			<email>amoghadam at rbcon.com</email>
+		</developer>
+		<developer>
+			<id>sfrederick</id>
+			<name>Scott Frederick</name>
+			<email>sfrederick at gopivotal.com</email>
+		</developer>
+	</developers>
+
+	<distributionManagement>
+		<repository>
+			<id>sonatype-ossrh-staging</id>
+			<name>Sonatype OSSRH</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://maven.springframework.org/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

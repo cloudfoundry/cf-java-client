@@ -15,13 +15,15 @@
 
 package org.cloudfoundry.gradle
 
+import org.gradle.api.Project
+
 /**
  * Configuration for the Cloud Foundry plugin.
  * 
  * @author Cedric Champeau
  * @author Scott Frederick
  */
-class CloudFoundry {
+class CloudFoundryExtension {
     // primary config options
     String target = 'http://api.run.pivotal.io'
     String organization
@@ -35,15 +37,16 @@ class CloudFoundry {
     String buildpack
     boolean startApp = true
     int memory = 512
-    int instances = -1
+    int instances = 1
     String uri
     List<String> uris = []
     File file
-
     Map<String, String> env = [:]
 
-    CloudFoundry(String projectName) {
-        application = projectName
+    boolean useSystemProxy = true
+
+    CloudFoundryExtension(Project project) {
+        application = project.name
     }
 
     public List<String> getAllUris() {

@@ -42,7 +42,7 @@ import java.util.UUID;
 //TODO: use some more advanced JSON mapping framework?
 public class CloudEntityResourceMapper {
 
-	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 	public String getNameOfResource(Map<String, Object> resource) {
 		return getEntityAttribute(resource, "name", String.class);
@@ -85,15 +85,12 @@ public class CloudEntityResourceMapper {
 		if (organizationMap != null) {
 			organization = mapOrganizationResource(organizationMap);
 		}
-		CloudSpace space =
-				new CloudSpace(getMeta(resource), getNameOfResource(resource), organization);
-		return space;
+		return new CloudSpace(getMeta(resource), getNameOfResource(resource), organization);
 	}
 
 	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {
 		Boolean billingEnabled = getEntityAttribute(resource, "billing_enabled", Boolean.class);
-		CloudOrganization org = new CloudOrganization(getMeta(resource), getNameOfResource(resource), billingEnabled);
-		return org;
+		return new CloudOrganization(getMeta(resource), getNameOfResource(resource), billingEnabled);
 	}
 
 	private CloudDomain mapDomainResource(Map<String, Object> resource) {
@@ -105,8 +102,7 @@ public class CloudEntityResourceMapper {
 		} else {
 			owner = mapOrganizationResource(ownerResource);
 		}
-		CloudDomain domain = new CloudDomain(getMeta(resource), getNameOfResource(resource), owner);
-		return domain;
+		return new CloudDomain(getMeta(resource), getNameOfResource(resource), owner);
 	}
 
 	private CloudRoute mapRouteResource(Map<String, Object> resource) {
@@ -114,9 +110,7 @@ public class CloudEntityResourceMapper {
 		List<Object> apps = getEntityAttribute(resource, "apps", List.class);
 		String host = getEntityAttribute(resource, "host", String.class);
 		CloudDomain domain = mapDomainResource(getEmbeddedResource(resource, "domain"));
-		CloudRoute route = new CloudRoute(getMeta(resource), host, domain, apps.size());
-		return route;
-
+		return new CloudRoute(getMeta(resource), host, domain, apps.size());
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -135,7 +129,7 @@ public class CloudEntityResourceMapper {
 			app.setRunningInstances(runningInstancesAttribute);
 		}
 		String command = getEntityAttribute(resource, "command", String.class);
-        String buildpack = getEntityAttribute(resource, "buildpack", String.class);
+		String buildpack = getEntityAttribute(resource, "buildpack", String.class);
 		Staging staging = new Staging(command, buildpack);
 		app.setStaging(staging);
 
@@ -166,18 +160,16 @@ public class CloudEntityResourceMapper {
 				getMeta(resource),
 				getNameOfResource(resource));
 		Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
-		Map<String, Object> serviceResource = null;
-		if (servicePlanResource != null) {
-			serviceResource = getEmbeddedResource(servicePlanResource, "service");
-		}
-		if (servicePlanResource != null && serviceResource != null) {
-			//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
-			cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
-			cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
-			cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
-		}
 		if (servicePlanResource != null) {
 			cloudService.setPlan(getEntityAttribute(servicePlanResource, "name", String.class));
+
+			Map<String, Object> serviceResource = getEmbeddedResource(servicePlanResource, "service");
+			if (serviceResource != null) {
+				//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
+				cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
+				cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
+				cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
+			}
 		}
 		return cloudService;
 	}
@@ -207,22 +199,21 @@ public class CloudEntityResourceMapper {
 	public static CloudEntity.Meta getMeta(Map<String, Object> resource) {
 		Map<String, Object> metadata = (Map<String, Object>) resource.get("metadata");
 		UUID guid = UUID.fromString(String.valueOf(metadata.get("guid")));
-		Date createdDate = null;
-		String created = String.valueOf(metadata.get("created_at"));
-		if (created != null) {
+		Date createdDate = parseDate(String.valueOf(metadata.get("created_at")));
+		Date updatedDate = parseDate(String.valueOf(metadata.get("updated_at")));
+		return new CloudEntity.Meta(guid, createdDate, updatedDate);
+	}
+
+	private static Date parseDate(String dateString) {
+		if (dateString != null) {
 			try {
-				createdDate = dateFormatter.parse(created);
+				// if the time zone part of the dateString contains a colon (e.g. 2013-09-19T21:56:36+00:00)
+				// then remove it before parsing
+				String isoDateString = dateString.replaceFirst(":(?=[0-9]{2}$)", "");
+				return dateFormatter.parse(isoDateString);
 			} catch (Exception ignore) {}
 		}
-		Date updatedDate = null;
-		String updated = String.valueOf(metadata.get("updated_at"));
-		if (updated != null) {
-			try {
-				updatedDate = dateFormatter.parse(updated);
-			} catch (Exception ignore) {}
-		}
-		CloudEntity.Meta meta = new CloudEntity.Meta(guid, createdDate, updatedDate);
-		return meta;
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

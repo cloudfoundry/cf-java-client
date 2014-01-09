@@ -15,6 +15,7 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -23,21 +24,30 @@ import org.gradle.api.tasks.TaskAction
  * @author Cedric Champeau
  */
 class BindServiceCloudFoundryTask extends AbstractCloudFoundryTask {
-    String serviceName
-    String application
-
     BindServiceCloudFoundryTask() {
         super()
-        description = 'Binds a service to an application'
+        description = 'Binds services to an application'
     }
 
     @TaskAction
     void bindService() {
         withCloudFoundryClient {
-            if (getServiceName()) {
-                log "Binding service '${getServiceName()}' to application '${getApplication()}"
-                client.bindService(getApplication(), getServiceName())
-                client.logout()
+            withApplication {
+                CloudApplication app = client.getApplication(application)
+                List<String> servicesNames = app.services
+
+                serviceInfos.each { serviceInfo ->
+                    String serviceName = serviceInfo.name
+
+                    if (!client.getService(serviceName)) {
+                        log "Service ${serviceName} does not exist"
+                    } else if (servicesNames.contains(serviceName)) {
+                        log "Service ${serviceName} is already bound to ${application}"
+                    } else {
+                        log "Binding service ${serviceName} to application ${application}"
+                        client.bindService(application, serviceName)
+                    }
+                }
             }
         }
     }
