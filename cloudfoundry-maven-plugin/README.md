@@ -240,7 +240,7 @@ Additional certain configuration parameter will fall back to using default value
 + **appname**: If no app name is specified, the Maven artifact id is being used
 + **instances**: Defaults to *1*
 + **no-start**: Defaults to *false*
-+ **memory**: Defaults to *512* (MB)
++ **memory**: Defaults to Cloud Controller value
 + **path**: Defaults to *${project.build.directory}/${project.build.finalName}.war*
 + **server**: Special parameter to tell **Maven** which server element in `settings.xml`
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
