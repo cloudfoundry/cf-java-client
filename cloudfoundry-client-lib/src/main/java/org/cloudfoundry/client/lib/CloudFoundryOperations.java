@@ -164,7 +164,7 @@ public interface CloudFoundryOperations {
 	 * @param uris list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
 	 */
-	void createApplication(String appName, Staging staging, int memory, List<String> uris,
+	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
                            List<String> serviceNames);
 
 

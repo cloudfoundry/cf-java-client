@@ -173,7 +173,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationMemoryChoices();
 	}
 
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+	public void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 								  List<String> serviceNames) {
 		cc.createApplication(appName, staging, memory, uris, serviceNames);
 	}

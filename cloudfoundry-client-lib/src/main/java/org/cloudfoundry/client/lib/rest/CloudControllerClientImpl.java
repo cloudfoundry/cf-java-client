@@ -860,7 +860,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return JsonUtil.convertJsonToMap(resp);
 	}
 
-	public void createApplication(String appName, Staging staging, int memory, List<String> uris,
+	public void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                              List<String> serviceNames) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());

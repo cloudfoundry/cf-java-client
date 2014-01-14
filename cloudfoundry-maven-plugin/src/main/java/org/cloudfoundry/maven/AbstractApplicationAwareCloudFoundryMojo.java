@@ -297,7 +297,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * that value is used). If not the pom.xml configuration parameter is used,
 	 * if available.
 	 *
-	 * If the value is not defined, 512 (MB) is returned as default.
+	 * If the value is not defined, null is returned.  Triggering an empty value
+	 * to be sent to the Cloud Controller where its default will be used.
 	 *
 	 * @return Returns the configured memory choice
 	 */
@@ -309,12 +310,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			return Integer.valueOf(urlProperty);
 		}
 
-		if (this.memory == null) {
-			return DefaultConstants.MEMORY;
-		} else {
-			return this.memory;
-		}
-
+		return this.memory;
 	}
 
 	/**
