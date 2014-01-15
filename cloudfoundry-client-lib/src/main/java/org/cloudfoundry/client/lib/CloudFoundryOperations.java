@@ -32,6 +32,7 @@ import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -369,6 +370,22 @@ public interface CloudFoundryOperations {
 	 *         available.
 	 */
 	String getStagingLogs(StartingInfo info, int offset);
+
+
+	/**
+	 * Get the list of stacks available for staging applications.
+	 *
+	 * @return the list of available stacks
+	 */
+	List<CloudStack> getStacks();
+
+	/**
+	 * Get a stack by name.
+	 *
+	 * @param name the name of the stack to get
+	 * @return the stack, or null if not found
+	 */
+	CloudStack getStack(String name);
 
 	/**
 	 * Get file from the deployed application.

@@ -38,36 +38,27 @@ public class CloudServiceOffering extends CloudEntity {
 		this.version = version;
 	}
 
-	public String getLabel() {
-		return getName();
+	public CloudServiceOffering(Meta meta, String name, String provider, String version, String description) {
+		super(meta, name);
+		this.provider = provider;
+		this.version = version;
+		this.description = description;
 	}
 
-	public void setLabel(String label) {
-		setName(label);
+	public String getLabel() {
+		return getName();
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getProvider() {
 		return provider;
 	}
 
-	public void setProvider(String provider) {
-		this.provider = provider;
-	}
-
 	public String getVersion() {
 		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	public List<CloudServicePlan> getCloudServicePlans() {

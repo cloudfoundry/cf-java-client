@@ -60,6 +60,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
@@ -866,14 +867,21 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
+		appRequest.put("instances", 1);
 		if (staging.getBuildpackUrl() != null) {
 			appRequest.put("buildpack", staging.getBuildpackUrl());
 		}
-		appRequest.put("instances", 1);
 		if (staging.getCommand() != null) {
 			appRequest.put("command", staging.getCommand());
 		}
+		if (staging.getStack() != null) {
+			appRequest.put("stack_guid", getStack(staging.getStack()).getMeta().getGuid());
+		}
+		if (staging.getHealthCheckTimeout() != null) {
+			appRequest.put("health_check_timeout", staging.getHealthCheckTimeout());
+		}
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
+
 		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
 		Map<String, Object> appEntity = JsonUtil.convertJsonToMap(appResp);
 		UUID newAppGuid = CloudEntityResourceMapper.getMeta(appEntity).getGuid();
@@ -1352,6 +1360,28 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	public List<CloudStack> getStacks() {
+		String urlPath = "/v2/stacks";
+		List<Map<String, Object>> resources = getAllResources(urlPath, null);
+		List<CloudStack> stacks = new ArrayList<CloudStack>();
+		for (Map<String, Object> resource : resources) {
+			stacks.add(resourceMapper.mapResource(resource, CloudStack.class));
+		}
+		return stacks;
+	}
+
+	public CloudStack getStack(String name) {
+		String urlPath = "/v2/stacks?q={q}";
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("q", "name:" + name);
+		List<Map<String, Object>> resources = getAllResources(urlPath, urlVars);
+		if (resources.size() > 0) {
+			Map<String, Object> resource = resources.get(0);
+			return resourceMapper.mapResource(resource, CloudStack.class);
+		}
+		return null;
+	}
+
 	public List<CloudDomain> getDomainsForOrg() {
 		Assert.notNull(sessionSpace, "Unable to access organization domains without specifying organization and space to use.");
 		return doGetDomains(null);
@@ -1626,6 +1656,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		if (fetchServiceInfo) {
 			fillInEmbeddedResource(resource, "service_bindings", "service_instance");
 		}
+		fillInEmbeddedResource(resource, "stack");
 		return resource;
 	}
 

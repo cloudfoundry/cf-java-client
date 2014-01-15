@@ -34,6 +34,7 @@ import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -334,6 +335,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public CrashesInfo getCrashes(String appName) {
 		return cc.getCrashes(appName);
+	}
+
+	public List<CloudStack> getStacks() {
+		return cc.getStacks();
+	}
+
+	public CloudStack getStack(String name) {
+		return cc.getStack(name);
 	}
 
 	public void rename(String appName, String newName) {

@@ -25,6 +25,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.Staging;
 
 import java.text.SimpleDateFormat;
@@ -74,6 +75,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudServiceOffering.class) {
 			return (T) mapServiceResource(resource);
+		}
+		if (targetClass == CloudStack.class) {
+			return (T) mapStackResource(resource);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
@@ -130,7 +134,10 @@ public class CloudEntityResourceMapper {
 		}
 		String command = getEntityAttribute(resource, "command", String.class);
 		String buildpack = getEntityAttribute(resource, "buildpack", String.class);
-		Staging staging = new Staging(command, buildpack);
+		Map<String, Object> stackResource = getEmbeddedResource(resource, "stack");
+		CloudStack stack = mapStackResource(stackResource);
+		Integer healthCheckTimeout = getEntityAttribute(resource, "health_check_timeout", Integer.class);
+		Staging staging = new Staging(command, buildpack, stack.getName(), healthCheckTimeout);
 		app.setStaging(staging);
 
 		Map envMap = getEntityAttribute(resource, "environment_json", Map.class);
@@ -179,8 +186,8 @@ public class CloudEntityResourceMapper {
 				getMeta(resource),
 				getEntityAttribute(resource, "label", String.class),
 				getEntityAttribute(resource, "provider", String.class),
-				getEntityAttribute(resource, "version", String.class));
-		cloudServiceOffering.setDescription(getEntityAttribute(resource, "description", String.class));
+				getEntityAttribute(resource, "version", String.class),
+				getEntityAttribute(resource, "description", String.class));
 		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
 		if (servicePlanList != null) {
 			for (Map<String, Object> servicePlanResource : servicePlanList) {
@@ -193,6 +200,12 @@ public class CloudEntityResourceMapper {
 			}
 		}
 		return cloudServiceOffering;
+	}
+
+	private CloudStack mapStackResource(Map<String, Object> resource) {
+		return new CloudStack(getMeta(resource),
+				getNameOfResource(resource),
+				getEntityAttribute(resource, "description", String.class));
 	}
 
 	@SuppressWarnings("unchecked")
