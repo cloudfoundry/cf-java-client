@@ -508,45 +508,57 @@ public interface CloudFoundryOperations {
 	void rename(String appName, String newName);
 
 	/**
-	 * Get list of all domain registered for the current organization
-	 * of this session.
+	 * Get list of all domain registered for the current organization.
 	 *
 	 * @return list of domains
 	 */
 	List<CloudDomain> getDomainsForOrg();
 
 	/**
-	 * Get list of all domain registered for the given space.
+	 * Get list of all private domains.
+	 *
+	 * @return list of private domains
+	 */
+	List<CloudDomain> getPrivateDomains();
+
+	/**
+	 * Get list of all shared domains.
+	 *
+	 * @return list of shared domains
+	 */
+	List<CloudDomain> getSharedDomains();
+
+	/**
+	 * Get list of all domain shared and private domains.
 	 *
 	 * @return list of domains
 	 */
 	List<CloudDomain> getDomains();
 
 	/**
-	 * Add domain to the current space of this session. If the domain
-	 * doesn't exist for the organization it will be created.
+	 * Add a private domain in the current organization.
 	 *
 	 * @param domainName the domain to add
 	 */
 	void addDomain(String domainName);
 
 	/**
-	 * Remove a domain from the space of the current session.
+	 * Delete a private domain in the current organization.
 	 *
-	 * @param domainName the domain to delete
+	 * @param domainName the domain to remove
+	 * @deprecated alias for {@link #deleteDomain}
 	 */
 	void removeDomain(String domainName);
 
 	/**
-	 * Delete a domain registered to the current organization of this session.
+	 * Delete a private domain in the current organization.
 	 *
 	 * @param domainName the domain to delete
 	 */
 	void deleteDomain(String domainName);
 
 	/**
-	 * Get the info for all routes for a domain belonging to the current space
-	 * of this session.
+	 * Get the info for all routes for a domain.
 	 *
 	 * @param domainName the domain the routes belong to
 	 * @return list of routes
@@ -554,7 +566,7 @@ public interface CloudFoundryOperations {
 	List<CloudRoute> getRoutes(String domainName);
 
 	/**
-	 * Register a new route to the space of the current session.
+	 * Register a new route to the a domain.
 	 *
 	 * @param host the host of the route to register
 	 * @param domainName the domain of the route to register

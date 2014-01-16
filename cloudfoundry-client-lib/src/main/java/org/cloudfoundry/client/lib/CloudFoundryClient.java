@@ -353,6 +353,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getDomainsForOrg();
 	}
 
+	public List<CloudDomain> getPrivateDomains() {
+		return cc.getPrivateDomains();
+	}
+
+	public List<CloudDomain> getSharedDomains() {
+		return cc.getSharedDomains();
+	}
+
 	public List<CloudDomain> getDomains() {
 		return cc.getDomains();
 	}

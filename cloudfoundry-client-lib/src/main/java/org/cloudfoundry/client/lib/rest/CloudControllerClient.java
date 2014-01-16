@@ -167,6 +167,10 @@ public interface CloudControllerClient {
 
 	List<CloudDomain> getDomains();
 
+	List<CloudDomain> getPrivateDomains();
+
+	List<CloudDomain> getSharedDomains();
+
 	void addDomain(String domainName);
 
 	void deleteDomain(String domainName);
