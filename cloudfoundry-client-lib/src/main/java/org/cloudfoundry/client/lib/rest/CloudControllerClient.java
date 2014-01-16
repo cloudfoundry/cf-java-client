@@ -38,6 +38,7 @@ import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -153,14 +154,22 @@ public interface CloudControllerClient {
 	CrashesInfo getCrashes(String appName);
 
 	void rename(String appName, String newName);
-	
+
 	String getStagingLogs(StartingInfo info, int offset);
+
+	List<CloudStack> getStacks();
+
+	CloudStack getStack(String name);
 
 	// Domains and routes management
 
 	List<CloudDomain> getDomainsForOrg();
 
 	List<CloudDomain> getDomains();
+
+	List<CloudDomain> getPrivateDomains();
+
+	List<CloudDomain> getSharedDomains();
 
 	void addDomain(String domainName);
 

@@ -58,7 +58,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		final List<String> uris = getAllUris();
 		final List<String> serviceNames = getServiceNames();
 
-		if(memory != null) {
+		if (memory != null) {
 			validateMemoryChoice(getClient(), memory);
 		}
 		validatePath(path);
@@ -150,7 +150,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 			} else {
 				client.stopApplication(appname);
 				client.updateApplicationStaging(appname, staging);
-				if(memory != null) {
+				if (memory != null) {
 					client.updateApplicationMemory(appname, memory);
 				}
 				client.updateApplicationUris(appname, uris);

@@ -22,11 +22,14 @@ package org.cloudfoundry.client.lib.domain;
  *
  * @author Jennifer Hickey
  * @author Ramnivas Laddad
+ * @author Scott Frederick
  *
  */
 public class Staging {
 	private String command;
 	private String buildpackUrl;
+	private String stack;
+	private Integer healthCheckTimeout;
 
 	/**
 	 * Default staging: No command, default buildpack
@@ -37,8 +40,8 @@ public class Staging {
 	
 	/**
 	 *
-	 * @param command the application command, may be null
-	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git) or null to use the default one
+	 * @param command the application command; may be null
+	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
 	 */
 	public Staging(String command, String buildpackUrl) {
 		this.command = command;
@@ -47,7 +50,20 @@ public class Staging {
 
 	/**
 	 *
-	 * @return The start command to use if this app is a standalone app
+	 * @param command the application command; may be null
+	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
+	 * @param stack the stack to use when staging the application; may be null
+	 * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
+	 */
+	public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout) {
+		this(command, buildpackUrl);
+		this.stack = stack;
+		this.healthCheckTimeout = healthCheckTimeout;
+	}
+
+	/**
+	 *
+	 * @return The start command to use
 	 */
 	public String getCommand() {
 		return command;
@@ -55,16 +71,35 @@ public class Staging {
 
 	/**
 	 *
-	 * @return The buildpack url. If null, the server will use the default
+	 * @return The buildpack url, or null to use the default
 	 *         buildpack detected based on application content
 	 */
 	public String getBuildpackUrl() {
 		return buildpackUrl;
 	}
 
-	@Override
-	public String toString() {
-		return "Staging [command=" + getCommand() + " buildpack=" + getBuildpackUrl() + "]";
+	/**
+	 *
+	 * @return the stack to use when staging the application, or null to use the default stack
+	 */
+	public String getStack() {
+		return stack;
 	}
 
+	/**
+	 *
+	 * @return the health check timeout value
+	 */
+	public Integer getHealthCheckTimeout() {
+		return healthCheckTimeout;
+	}
+
+	@Override
+	public String toString() {
+		return "Staging [command=" + getCommand() +
+				" buildpack=" + getBuildpackUrl() +
+				" stack=" + getStack() +
+				" healthCheckTimeout=" + getHealthCheckTimeout() +
+				"]";
+	}
 }
