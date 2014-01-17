@@ -26,23 +26,31 @@ package org.cloudfoundry.maven.common;
  */
 public enum SystemProperties {
 
-	APP_NAME("cf.appname", "appname"),
-	BUILDPACK("cf.buildpack", "buildpack"),
-	COMMAND("cf.command", "command"),
-	INSTANCES("cf.instances", "instances"),
-	MEMORY("cf.memory", "memory"),
-	NO_START("cf.no-start", "no-start"),
-	ORG("cf.org", "org"),
-	PASSWORD("cf.password", "password"),
-	PATH("cf.path", "path"),
+	APP_NAME("appname"),
+	COMMAND("command"),
+	BUILDPACK("buildpack"),
+	STACK("stack"),
+	HEALTH_CHECK_TIMEOUT("healthCheckTimeout"),
+	APP_STARTUP_TIMEOUT("appStartupTimeout"),
+	INSTANCES("instances"),
+	MEMORY("memory"),
+	NO_START("no-start"),
+	ORG("org"),
+	PASSWORD("password"),
+	PATH("path"),
 	SETTINGS_SERVER("server", "server"),
-	SPACE("cf.space", "space"),
-	TARGET("cf.target", "target"),
-	URL("cf.url", "url"),
-	USERNAME("cf.username", "username");
+	SPACE("space"),
+	TARGET("target"),
+	URL("url"),
+	USERNAME("username");
 
 	private String property;
 	private String xmlElement;
+
+	private SystemProperties(String xmlElement) {
+		this.property = "cf." + xmlElement;
+		this.xmlElement = xmlElement;
+	}
 
 	private SystemProperties(String property, String xmlElement) {
 		this.property = property;

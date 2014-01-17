@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -63,8 +64,6 @@ import org.springframework.http.HttpStatus;
  */
 @SuppressWarnings("UnusedDeclaration")
 abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFoundryMojo {
-	private static final int MAX_STATUS_CHECKS = 60;
-
 	/**
 	 * @parameter expression="${cf.appname}"
 	 */
@@ -101,18 +100,39 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private File path;
 
 	/**
-	 * The buidpack to use for the application.
+	 * The start command to use for the application.
+	 *
+	 * @parameter expression = "${cf.command}"
+	 */
+	private String command;
+
+	/**
+	 * The buildpack to use for the application.
 	 *
 	 * @parameter expression = "${cf.buildpack}"
 	 */
 	private String buildpack;
 
 	/**
-	 * The start command to use for the application.
+	 * The stack to use for the application.
 	 *
-	 * @parameter expression = "${cf.command}"
+	 * @parameter expression = "${cf.stack}"
 	 */
-	private String command;
+	private String stack;
+
+	/**
+	 * The health check timeout to use for the application.
+	 *
+	 * @parameter expression = "${cf.healthCheckTimeout}"
+	 */
+	private Integer healthCheckTimeout;
+
+	/**
+	 * The app startup timeout to use for the application.
+	 *
+	 * @parameter expression = "${cf.appStartupTimeout}"
+	 */
+	private Integer appStartupTimeout;
 
 	/**
 	 * Set the memory reservation for the application
@@ -191,13 +211,11 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 */
 	public String getAppname() {
 
-		final String appnameProperty = getCommandlineProperty(SystemProperties.APP_NAME);
+		final String property = getCommandlineProperty(SystemProperties.APP_NAME);
 
-		if (appnameProperty != null) {
-			return appnameProperty;
-		}
-
-		if (this.appname == null) {
+		if (property != null) {
+			return property;
+		} else if (this.appname == null) {
 			return getArtifactId();
 		} else {
 			return appname;
@@ -231,14 +249,12 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 */
 	public String getUrl() {
 
-		final String urlProperty = getCommandlineProperty(SystemProperties.URL);
+		final String property = getCommandlineProperty(SystemProperties.URL);
 
-		if (urlProperty != null) {
-			return urlProperty;
+		if (property != null) {
+			return property;
 		}
-
-		if (this.url == null && this.urls == null) {
-
+		else if (this.url == null && this.urls == null) {
 			if (getTarget() != null) {
 
 				final URI targetUri = getTarget();
@@ -263,7 +279,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			} else {
 				return getAppname() + "." + "<undefined target>";
 			}
-
 		} else {
 			return this.url;
 		}
@@ -303,14 +318,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the configured memory choice
 	 */
 	public Integer getMemory() {
-
-		final String urlProperty = getCommandlineProperty(SystemProperties.MEMORY);
-
-		if (urlProperty != null) {
-			return Integer.valueOf(urlProperty);
-		}
-
-		return this.memory;
+		final String property = getCommandlineProperty(SystemProperties.MEMORY);
+		return property != null ? Integer.valueOf(property) : this.memory;
 	}
 
 	/**
@@ -323,24 +332,21 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return null if not found.
 	 */
 	public File getPath() throws MojoExecutionException {
+		final String property = getCommandlineProperty(SystemProperties.PATH);
 
-		final String pathProperty = getCommandlineProperty(SystemProperties.PATH);
-
-		if (pathProperty != null) {
-			final File path = new File(pathProperty);
-
+		if (property != null) {
+			final File path = new File(property);
 			validatePath(path);
 			return path;
-		}
-
-		if (this.path != null) {
+		} else if (this.path != null) {
 			return this.path;
+		} else {
+			File resolvedArtifact = this.getArtifact();
+			if (resolvedArtifact != null) {
+				return resolvedArtifact;
+			}
+			return null;
 		}
-		File resolvedArtifact = this.getArtifact();
-		if (resolvedArtifact != null) {
-			return resolvedArtifact;
-		}
-		return null;
 	}
 	
 	/**
@@ -398,15 +404,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the command or null
 	 */
 	public String getCommand() {
-
-		final String commandProperty = getCommandlineProperty(SystemProperties.COMMAND);
-
-		if (commandProperty != null) {
-			return commandProperty;
-		}
-
-		return this.command;
-
+		final String property = getCommandlineProperty(SystemProperties.COMMAND);
+		return property != null ? property : this.command;
 	}
 
 	/**
@@ -420,15 +419,53 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the buildpack or null
 	 */
 	public String getBuildpack() {
+		final String property = getCommandlineProperty(SystemProperties.BUILDPACK);
+		return property != null ? property : this.buildpack;
+	}
 
-		final String buildpackProperty = getCommandlineProperty(SystemProperties.BUILDPACK);
+	/**
+	 * Returns the stack to use, if set. Otherwise Null is returned.
+	 * If the parameter is set via the command line (aka system property, then
+	 * that value is used). If not the pom.xml configuration parameter is used,
+	 * if available.
+	 *
+	 * For a list of available properties see {@link SystemProperties}.
+	 *
+	 * @return Returns the stack or null
+	 */
+	public String getStack() {
+		final String property = getCommandlineProperty(SystemProperties.STACK);
+		return property != null ? property : this.stack;
+	}
 
-		if (buildpackProperty != null) {
-			return buildpackProperty;
-		}
+	/**
+	 * Returns the health check timeout to use, if set. Otherwise Null is returned.
+	 * If the parameter is set via the command line (aka system property, then
+	 * that value is used). If not the pom.xml configuration parameter is used,
+	 * if available.
+	 *
+	 * For a list of available properties see {@link SystemProperties}.
+	 *
+	 * @return Returns the health check timeout or null
+	 */
+	public Integer getHealthCheckTimeout() {
+		final String property = getCommandlineProperty(SystemProperties.HEALTH_CHECK_TIMEOUT);
+		return property != null ? Integer.valueOf(property) : this.healthCheckTimeout;
+	}
 
-		return this.buildpack;
-
+	/**
+	 * Returns the app startup timeout to use, if set. Otherwise Null is returned.
+	 * If the parameter is set via the command line (aka system property, then
+	 * that value is used). If not the pom.xml configuration parameter is used,
+	 * if available.
+	 *
+	 * For a list of available properties see {@link SystemProperties}.
+	 *
+	 * @return Returns the app startup timeout or null
+	 */
+	public Integer getAppStartupTimeout() {
+		final String property = getCommandlineProperty(SystemProperties.APP_STARTUP_TIMEOUT);
+		return property != null ? Integer.valueOf(property) : this.appStartupTimeout;
 	}
 
 	/**
@@ -442,19 +479,15 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the number of configured instance or null
 	 */
 	public Integer getInstances() {
+		final String property = getCommandlineProperty(SystemProperties.INSTANCES);
 
-		final String instancesProperty = getCommandlineProperty(SystemProperties.INSTANCES);
-
-		if (instancesProperty != null) {
-			return Integer.valueOf(instancesProperty);
-		}
-
-		if (this.instances == null) {
+		if (property != null) {
+			return Integer.valueOf(property);
+		} else if (this.instances == null) {
 			return DefaultConstants.DEFAULT_INSTANCE;
 		} else {
 			return this.instances;
 		}
-
 	}
 
 	/**
@@ -463,11 +496,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Never null
 	 */
 	public List<CloudServiceWithUserProvided> getServices() {
-		if (this.services == null) {
-			return new ArrayList<CloudServiceWithUserProvided>(0);
-		} else {
-			return this.services;
-		}
+		return this.services == null ? new ArrayList<CloudServiceWithUserProvided>(0) : this.services;
 	}
 
 	/**
@@ -476,11 +505,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Never null
 	 */
 	public List<String> getCustomDomains() {
-		if (this.domains == null) {
-			return new ArrayList<String>(0);
-		} else {
-			return this.domains;
-		}
+		return this.domains == null ? new ArrayList<String>(0) : this.domains;
 	}
 
 	/**
@@ -489,11 +514,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Never null
 	 */
 	public List<String> getUrls() {
-		if (this.urls == null) {
-			return new ArrayList<String>(0);
-		} else {
-			return this.urls;
-		}
+		return this.urls == null ? new ArrayList<String>(0) : this.urls;
 	}
 
 	/**
@@ -503,13 +524,12 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Never null
 	 */
 	public Boolean isNoStart() {
-		final String urlProperty = getCommandlineProperty(SystemProperties.NO_START);
+		final String property = getCommandlineProperty(SystemProperties.NO_START);
 
-		if (urlProperty != null) {
-			return Boolean.valueOf(urlProperty);
+		if (property != null) {
+			return Boolean.valueOf(property);
 		}
-
-		if (this.noStart == null) {
+		else if (this.noStart == null) {
 			return DefaultConstants.NO_START;
 		} else {
 			return this.noStart;
@@ -591,9 +611,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 		responseErrorHandler.addExpectedStatus(HttpStatus.BAD_REQUEST);
 
-		int statusChecks = 0;
+		long appStartupExpiry = getAppStartupExpiry();
 
-		while (statusChecks < MAX_STATUS_CHECKS) {
+		while (System.currentTimeMillis() < appStartupExpiry) {
 			List<InstanceInfo> instances = getApplicationInstances(app);
 
 			if (instances != null) {
@@ -609,8 +629,6 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				if (runningInstances == expectedInstances)
 					break;
 			}
-
-			statusChecks++;
 
 			try {
 				Thread.sleep(1000);
@@ -651,8 +669,11 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		int runningInstances = getRunningInstances(instances);
 		int flappingInstances = getFlappingInstances(instances);
 
-		if (flappingInstances > 0 || runningInstances == 0) {
+		if (flappingInstances > 0) {
 			throw new MojoExecutionException("Application start unsuccessful");
+		}
+		else if (runningInstances == 0) {
+			throw new MojoExecutionException("Application start timed out");
 		} else if (runningInstances > 0) {
 			if (uris.isEmpty()) {
 				getLog().info(String.format("Application '%s' is available", app.getName()));
@@ -726,5 +747,22 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			}
 		}
 		return uris;
+	}
+
+	private long getAppStartupExpiry() {
+		long timeout = System.currentTimeMillis();
+		if (getAppStartupTimeout() != null) {
+			timeout += minutesToMillis(getAppStartupTimeout());
+		} else if (getHealthCheckTimeout() != null) {
+			timeout += minutesToMillis(getHealthCheckTimeout());
+		} else {
+			timeout += minutesToMillis(1);
+		}
+
+		return timeout;
+	}
+
+	private long minutesToMillis(Integer duration) {
+		return TimeUnit.MINUTES.toMillis(duration);
 	}
 }

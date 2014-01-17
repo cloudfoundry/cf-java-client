@@ -868,18 +868,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
 		appRequest.put("instances", 1);
-		if (staging.getBuildpackUrl() != null) {
-			appRequest.put("buildpack", staging.getBuildpackUrl());
-		}
-		if (staging.getCommand() != null) {
-			appRequest.put("command", staging.getCommand());
-		}
-		if (staging.getStack() != null) {
-			appRequest.put("stack_guid", getStack(staging.getStack()).getMeta().getGuid());
-		}
-		if (staging.getHealthCheckTimeout() != null) {
-			appRequest.put("health_check_timeout", staging.getHealthCheckTimeout());
-		}
+		addStagingToRequest(staging, appRequest);
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
 
 		String appResp = getRestTemplate().postForObject(getUrl("/v2/apps"), appRequest, String.class);
@@ -894,6 +883,21 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			addUris(uris, newAppGuid);
 		}
 
+	}
+
+	private void addStagingToRequest(Staging staging, HashMap<String, Object> appRequest) {
+		if (staging.getBuildpackUrl() != null) {
+			appRequest.put("buildpack", staging.getBuildpackUrl());
+		}
+		if (staging.getCommand() != null) {
+			appRequest.put("command", staging.getCommand());
+		}
+		if (staging.getStack() != null) {
+			appRequest.put("stack_guid", getStack(staging.getStack()).getMeta().getGuid());
+		}
+		if (staging.getHealthCheckTimeout() != null) {
+			appRequest.put("health_check_timeout", staging.getHealthCheckTimeout());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1246,12 +1250,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public void updateApplicationStaging(String appName, Staging staging) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		if (staging.getCommand() != null) {
-			appRequest.put("command", staging.getCommand());
-		}
-		if (staging.getBuildpackUrl() != null) {
-			appRequest.put("buildpack", staging.getBuildpackUrl());
-		}
+		addStagingToRequest(staging, appRequest);
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 

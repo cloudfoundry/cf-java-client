@@ -51,6 +51,8 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		final String appname = getAppname();
 		final String command = getCommand();
 		final String buildpack = getBuildpack();
+		final String stack = getStack();
+		final Integer healthCheckTimeout = getHealthCheckTimeout();
 		final Map<String, String> env = getEnv();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
@@ -80,7 +82,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 		getLog().info(String.format("Creating application '%s'", appname));
 
-		createApplication(appname, command, buildpack, memory, uris, serviceNames);
+		createApplication(appname, command, buildpack, stack, healthCheckTimeout, memory, uris, serviceNames);
 
 		getLog().debug("Updating application env...");
 
@@ -128,7 +130,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 	}
 
-	private void createApplication(String appname, String command, String buildpack,
+	private void createApplication(String appname, String command, String buildpack, String stack, Integer healthCheckTimeout,
 								   Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
 		boolean found;
 		try {
@@ -144,7 +146,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		}
 
 		try {
-			final Staging staging = new Staging(command, buildpack);
+			final Staging staging = new Staging(command, buildpack, stack, healthCheckTimeout);
 			if (!found) {
 				getClient().createApplication(appname, staging, memory, uris, serviceNames);
 			} else {
