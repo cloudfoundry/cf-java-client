@@ -64,6 +64,8 @@ import org.springframework.http.HttpStatus;
  */
 @SuppressWarnings("UnusedDeclaration")
 abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFoundryMojo {
+	private static final int DEFAULT_APP_STARTUP_TIMEOUT = 5;
+
 	/**
 	 * @parameter expression="${cf.appname}"
 	 */
@@ -754,9 +756,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		if (getAppStartupTimeout() != null) {
 			timeout += minutesToMillis(getAppStartupTimeout());
 		} else if (getHealthCheckTimeout() != null) {
-			timeout += minutesToMillis(getHealthCheckTimeout());
+			timeout += secondsToMillis(getHealthCheckTimeout());
 		} else {
-			timeout += minutesToMillis(1);
+			timeout += minutesToMillis(DEFAULT_APP_STARTUP_TIMEOUT);
 		}
 
 		return timeout;
@@ -764,5 +766,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 	private long minutesToMillis(Integer duration) {
 		return TimeUnit.MINUTES.toMillis(duration);
+	}
+
+	private long secondsToMillis(Integer duration) {
+		return TimeUnit.SECONDS.toMillis(duration);
 	}
 }
