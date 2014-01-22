@@ -963,7 +963,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
                     uriInfo.put("domainName", domain);
                     if (domain.length() < authority.length()) {
                         uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
-                    }
+                    } else if (domain.length() == authority.length()) {
+                        uriInfo.put("host", "");
+                    } 
                 }
 			}
 		}
@@ -1260,8 +1262,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		newUris.removeAll(app.getUris());
 		List<String> removeUris = app.getUris();
 		removeUris.removeAll(uris);
-		addUris(newUris, app.getMeta().getGuid());
 		removeUris(removeUris, app.getMeta().getGuid());
+		addUris(newUris, app.getMeta().getGuid());
 	}
 
 	public void updateApplicationEnv(String appName, Map<String, String> env) {
