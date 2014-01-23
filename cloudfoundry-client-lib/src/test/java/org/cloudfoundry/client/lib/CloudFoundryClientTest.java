@@ -352,9 +352,8 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void createApplication() {
-		List<String> uris = new ArrayList<String>();
 		String appName = namespacedAppName("travel_test-0");
-		uris.add(computeAppUrl(appName));
+		List<String> uris = Arrays.asList(computeAppUrl(appName));
 		Staging staging =  new Staging();
 		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -406,6 +405,24 @@ public class CloudFoundryClientTest {
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
 		assertEquals(2, app.getStaging().getHealthCheckTimeout().intValue());
+	}
+
+	@Test
+	public void createApplicationWithDomainOnly() {
+		String appName = namespacedAppName("travel_test-tld");
+
+		connectedClient.addDomain(TEST_DOMAIN);
+		List<String> uris = Arrays.asList(TEST_DOMAIN);
+
+		Staging staging =  new Staging();
+		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+
+		List<String> actualUris = app.getUris();
+		assertTrue(actualUris.size() == 1);
+		assertEquals(TEST_DOMAIN, actualUris.get(0));
 	}
 
 	@Test
