@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,7 +59,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.jboss.byteman.contrib.bmunit.BMScript;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
@@ -68,7 +76,10 @@ import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.*;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -373,7 +384,7 @@ public class CloudFoundryClientTest {
 	@Test
 	public void createApplicationWithBuildPack() throws IOException {
 		String buildpackUrl = "https://github.com/cloudfoundry/java-buildpack.git";
-		String appName = "buildpack";
+		String appName = namespacedAppName("buildpack");
 		createSpringApplication(appName, buildpackUrl);
 
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -385,7 +396,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void createApplicationWithStack() throws IOException {
-		String appName = "stack";
+		String appName = namespacedAppName("stack");
 		createSpringApplication(appName, DEFAULT_STACK_NAME, null);
 
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -397,7 +408,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void createApplicationWithHealthCheckTimeout() throws IOException {
-		String appName = "health_check";
+		String appName = namespacedAppName("health_check");
 		createSpringApplication(appName, null, 2);
 
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -855,6 +866,30 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void uploadAppWithNonUnsubscribingCallback() throws IOException {
+	    String appName = namespacedAppName("upload-non-unsubscribing-callback");
+	    createSpringApplication(appName);
+        File file = SampleProjects.springTravel();
+        NonUnsubscribingUploadStatusCallback callback = new NonUnsubscribingUploadStatusCallback();
+        connectedClient.uploadApplication(appName, file, callback);
+        CloudApplication env = connectedClient.getApplication(appName);
+        assertEquals(CloudApplication.AppState.STOPPED, env.getState());
+        assertTrue(callback.progressCount > 1); // must have taken at least 10 seconds
+	}
+	
+    @Test
+    public void uploadAppWithUnsubscribingCallback() throws IOException {
+        String appName = namespacedAppName("upload-unsubscribing-callback");
+        createSpringApplication(appName);
+        File file = SampleProjects.springTravel();
+        UnsubscribingUploadStatusCallback callback = new UnsubscribingUploadStatusCallback();
+        connectedClient.uploadApplication(appName, file, callback);
+        CloudApplication env = connectedClient.getApplication(appName);
+        assertEquals(CloudApplication.AppState.STOPPED, env.getState());
+        assertTrue(callback.progressCount == 1);
+    }
+
+    @Test
 	public void uploadSinatraApp() throws IOException {
 		String appName = namespacedAppName("env");
 		ClassPathResource cpr = new ClassPathResource("apps/env/");
@@ -1716,4 +1751,36 @@ public class CloudFoundryClientTest {
 		assertTrue(message,
 				Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
 	}
+
+    private static abstract class NoOpUploadStatusCallback implements UploadStatusCallback {
+        public void onCheckResources() { }
+
+        public void onMatchedFileNames(Set<String> matchedFileNames) { }
+
+        public void onProcessMatchedResources(int length) { }
+    }
+	
+	private static class NonUnsubscribingUploadStatusCallback extends NoOpUploadStatusCallback {
+	    public int progressCount = 0;
+
+        public boolean onProgress(String status) {
+            progressCount++;
+            return false;
+        }
+	}
+	
+    private static class UnsubscribingUploadStatusCallback extends NoOpUploadStatusCallback {
+        public int progressCount = 0;
+
+        public boolean onProgress(String status) {
+            progressCount++;
+            // unsubscribe after the first report
+            if (progressCount == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+	
 }

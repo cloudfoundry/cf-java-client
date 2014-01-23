@@ -75,6 +75,7 @@ import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -121,6 +122,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			Charset.forName("UTF-8"));
 
 	private static final String LOGS_LOCATION = "logs";
+	private static final int JOB_POLLING_PERIOD = 5000; // matches that of gcf
 
 	private OauthClient oauthClient;
 
@@ -1097,10 +1099,35 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
 		callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
 		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
-		String url = getUrl("/v2/apps/{guid}/bits");
-		getRestTemplate().put(url, entity, appId);
+		ResponseEntity<Map<String,Map<String,String>>> responseEntity =
+		            getRestTemplate().exchange(getUrl("/v2/apps/{guid}/bits?async=true"), HttpMethod.PUT, entity, 
+		                                        new ParameterizedTypeReference<Map<String, Map<String,String>>>() {}, appId);
+		processAsyncJob(responseEntity, callback);
 	}
 
+	private void processAsyncJob(ResponseEntity<Map<String,Map<String,String>>> jobCreationEntity, UploadStatusCallback callback) {
+        Map<String,String> jobEntity = jobCreationEntity.getBody().get("entity");
+        String jobStatus = null;
+        do {
+            jobStatus = jobEntity.get("status");
+            boolean unsubscribe = callback.onProgress(jobStatus);
+            if (unsubscribe) {
+                return;
+            } else {
+                try {
+                    Thread.sleep(JOB_POLLING_PERIOD);
+                } catch (InterruptedException ex) {
+                    return;
+                }
+            }
+            String jobId = jobEntity.get("guid");
+            ResponseEntity<Map<String,Map<String,String>>> jobProgressEntity = 
+                    getRestTemplate().exchange(getUrl("/v2/jobs/{guid}"), HttpMethod.GET, HttpEntity.EMPTY, 
+                            new ParameterizedTypeReference<Map<String, Map<String,String>>>() {}, jobId);
+            jobEntity = jobProgressEntity.getBody().get("entity");
+        } while(!jobStatus.equals("finished"));
+	}
+	
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
 		CloudResources archiveResources = new CloudResources(archive);
 		String json = JsonUtil.convertToJson(archiveResources);
