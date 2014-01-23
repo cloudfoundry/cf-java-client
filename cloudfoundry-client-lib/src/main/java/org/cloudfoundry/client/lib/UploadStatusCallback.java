@@ -35,6 +35,10 @@ public interface UploadStatusCallback {
 
         public void onProcessMatchedResources(int length) {
         }
+        
+        public boolean onProgress(String status) {
+            return false;
+        }
     };
 
 	/**
@@ -53,4 +57,17 @@ public interface UploadStatusCallback {
 	 * @param length the size of the upload data (before compression)
 	 */
 	void onProcessMatchedResources(int length);
+	
+	/**
+	 * Called during asynchronous upload process.
+	 * 
+	 * Implementation can return true to unsubscribe from progress update reports.
+	 * This is useful if the caller want to unblock the thread that initiated the upload.
+	 * Note, however, that the upload job that has been asynchronously started will
+	 * continue to execute on the server. 
+	 * 
+	 * @param status string such as "queued", "finished"
+	 * @return true to unsubscribe from update report
+	 */
+	boolean onProgress(String status);
 }
