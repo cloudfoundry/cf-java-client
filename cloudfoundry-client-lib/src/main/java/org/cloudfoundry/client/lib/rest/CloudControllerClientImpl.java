@@ -1651,16 +1651,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	private List<String> findApplicationUris(UUID appGuid) {
-		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/apps/{app}/routes?inline-relations-depth=1";
+		Map<String, Object> urlVars = new HashMap<String, Object>();
 		urlVars.put("app", appGuid);
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<String> uris =  new ArrayList<String>();
 		for (Map<String, Object> resource : resourceList) {
 			Map<String, Object> domainResource = CloudEntityResourceMapper.getEmbeddedResource(resource, "domain");
-			String uri = CloudEntityResourceMapper.getEntityAttribute(resource, "host", String.class) + "." +
-					CloudEntityResourceMapper.getEntityAttribute(domainResource, "name", String.class);
-			uris.add(uri);
+			String host = CloudEntityResourceMapper.getEntityAttribute(resource, "host", String.class);
+			String domain = CloudEntityResourceMapper.getEntityAttribute(domainResource, "name", String.class);
+			if (host != null && host.length() > 0)
+				uris.add(host + "." + domain);
+			else
+				uris.add(domain);
 		}
 		return uris;
 	}
