@@ -21,6 +21,12 @@ import org.gradle.api.GradleException
 import org.cloudfoundry.gradle.CloudFoundryServiceExtension
 
 class ServiceCloudFoundryHelper {
+    void createServices(def services) {
+        services.each { CloudFoundryServiceExtension service ->
+            createService(service)
+        }
+    }
+
     void createService(CloudFoundryServiceExtension service) {
         List<CloudService> services = client.services
         CloudService foundService = services.find {

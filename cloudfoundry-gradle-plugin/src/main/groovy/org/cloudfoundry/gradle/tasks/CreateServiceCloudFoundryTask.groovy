@@ -33,9 +33,7 @@ class CreateServiceCloudFoundryTask extends AbstractCloudFoundryTask {
     @TaskAction
     void createService() {
         withCloudFoundryClient {
-            serviceInfos.each { service ->
-                createService(service)
-            }
+            createServices(serviceInfos)
 
             withApplicationIfExists {
                 client.getApplication(application)

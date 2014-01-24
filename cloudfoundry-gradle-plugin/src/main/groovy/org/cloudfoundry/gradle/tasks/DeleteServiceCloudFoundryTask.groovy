@@ -16,6 +16,7 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudApplication
+import org.cloudfoundry.gradle.CloudFoundryServiceExtension
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -36,7 +37,7 @@ class DeleteServiceCloudFoundryTask extends AbstractCloudFoundryTask {
                 appServiceNames = app.services
             }
 
-            serviceInfos.each { service ->
+            serviceInfos.each { CloudFoundryServiceExtension service ->
                 if (appServiceNames.contains(service.name)) {
                     log "Unbinding service ${service.name} from application ${application}"
                     client.unbindService(application, service.name)
