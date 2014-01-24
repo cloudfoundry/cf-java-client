@@ -168,6 +168,18 @@ public interface CloudFoundryOperations {
 	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
                            List<String> serviceNames);
 
+	/**
+	 * Create application.
+	 *
+	 * @param appName      application name
+	 * @param staging      staging info
+	 * @param disk         memory to use in MB
+	 * @param memory       memory to use in MB
+	 * @param uris         list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 */
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
+	                              List<String> serviceNames);
 
 	/**
 	 * Create a service.
