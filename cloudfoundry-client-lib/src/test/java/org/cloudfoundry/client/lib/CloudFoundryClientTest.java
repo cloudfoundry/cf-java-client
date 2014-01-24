@@ -1259,10 +1259,7 @@ public class CloudFoundryClientTest {
 		connectedClient.updateApplicationUris(appName, uris);
 
 		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
-		assertNotNull(getRouteWithHost("my_route1", routes));
 		assertNotNull(getRouteWithHost("my_route3", routes));
-		assertEquals(0, getRouteWithHost("my_route1", routes).getAppsUsingRoute());
-		assertFalse(getRouteWithHost("my_route1", routes).inUse());
 		assertEquals(1, getRouteWithHost("my_route3", routes).getAppsUsingRoute());
 		assertTrue(getRouteWithHost("my_route3", routes).inUse());
 
