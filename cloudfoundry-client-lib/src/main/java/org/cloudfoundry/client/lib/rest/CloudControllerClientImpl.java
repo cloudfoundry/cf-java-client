@@ -276,14 +276,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String urlPath = getFileUrlPath();
 		CrashesInfo crashes = getCrashes(appName);
 		if (crashes.getCrashes().isEmpty()) {
-		    return Collections.emptyMap();
+			return Collections.emptyMap();
 		}
-        TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
-        for (CrashInfo crash : crashes.getCrashes()) {
-            crashInstances.put(crash.getSince(), crash.getInstance());
-        }
-	    String instance = crashInstances.get(crashInstances.lastKey());
-	    return doGetLogs(urlPath, appName, instance);
+		TreeMap<Date, String> crashInstances = new TreeMap<Date, String>();
+		for (CrashInfo crash : crashes.getCrashes()) {
+			crashInstances.put(crash.getSince(), crash.getInstance());
+		}
+		String instance = crashInstances.get(crashInstances.lastKey());
+		return doGetLogs(urlPath, appName, instance);
 	}
 
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
@@ -865,10 +865,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	public void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                              List<String> serviceNames) {
+		createApplication(appName, staging, null, memory, uris, serviceNames);
+	}
+
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
+	                              List<String> uris, List<String> serviceNames) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
+		if (disk != null) {
+			appRequest.put("disk_quota", disk);
+		}
 		appRequest.put("instances", 1);
 		addStagingToRequest(staging, appRequest);
 		appRequest.put("state", CloudApplication.AppState.STOPPED);
@@ -884,7 +892,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		if (uris != null && uris.size() > 0) {
 			addUris(uris, newAppGuid);
 		}
-
 	}
 
 	private void addStagingToRequest(Staging staging, HashMap<String, Object> appRequest) {
@@ -959,16 +966,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String authority = newUri.getScheme() != null ? newUri.getAuthority(): newUri.getPath();
 		for (String domain : domains.keySet()) {
 			if (authority != null && authority.endsWith(domain)) {
-                String previousDomain = uriInfo.get("domainName");
-                if (previousDomain == null || domain.length() > previousDomain.length()) {
-                    //Favor most specific subdomains
-                    uriInfo.put("domainName", domain);
-                    if (domain.length() < authority.length()) {
-                        uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
-                    } else if (domain.length() == authority.length()) {
-                        uriInfo.put("host", "");
-                    } 
-                }
+				String previousDomain = uriInfo.get("domainName");
+				if (previousDomain == null || domain.length() > previousDomain.length()) {
+					//Favor most specific subdomains
+					uriInfo.put("domainName", domain);
+					if (domain.length() < authority.length()) {
+						uriInfo.put("host", authority.substring(0, authority.indexOf(domain) - 1));
+					} else if (domain.length() == authority.length()) {
+						uriInfo.put("host", "");
+					}
+				}
 			}
 		}
 		if (uriInfo.get("domainName") == null) {
@@ -1106,26 +1113,27 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	private void processAsyncJob(ResponseEntity<Map<String,Map<String,String>>> jobCreationEntity, UploadStatusCallback callback) {
-        Map<String,String> jobEntity = jobCreationEntity.getBody().get("entity");
-        String jobStatus = null;
-        do {
-            jobStatus = jobEntity.get("status");
-            boolean unsubscribe = callback.onProgress(jobStatus);
-            if (unsubscribe) {
-                return;
-            } else {
-                try {
-                    Thread.sleep(JOB_POLLING_PERIOD);
-                } catch (InterruptedException ex) {
-                    return;
-                }
-            }
-            String jobId = jobEntity.get("guid");
-            ResponseEntity<Map<String,Map<String,String>>> jobProgressEntity = 
-                    getRestTemplate().exchange(getUrl("/v2/jobs/{guid}"), HttpMethod.GET, HttpEntity.EMPTY, 
-                            new ParameterizedTypeReference<Map<String, Map<String,String>>>() {}, jobId);
-            jobEntity = jobProgressEntity.getBody().get("entity");
-        } while(!jobStatus.equals("finished"));
+		Map<String, String> jobEntity = jobCreationEntity.getBody().get("entity");
+		String jobStatus = null;
+		do {
+			jobStatus = jobEntity.get("status");
+			boolean unsubscribe = callback.onProgress(jobStatus);
+			if (unsubscribe) {
+				return;
+			} else {
+				try {
+					Thread.sleep(JOB_POLLING_PERIOD);
+				} catch (InterruptedException ex) {
+					return;
+				}
+			}
+			String jobId = jobEntity.get("guid");
+			ResponseEntity<Map<String, Map<String, String>>> jobProgressEntity =
+					getRestTemplate().exchange(getUrl("/v2/jobs/{guid}"), HttpMethod.GET, HttpEntity.EMPTY,
+							new ParameterizedTypeReference<Map<String, Map<String, String>>>() {
+							}, jobId);
+			jobEntity = jobProgressEntity.getBody().get("entity");
+		} while (!jobStatus.equals("finished"));
 	}
 	
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {

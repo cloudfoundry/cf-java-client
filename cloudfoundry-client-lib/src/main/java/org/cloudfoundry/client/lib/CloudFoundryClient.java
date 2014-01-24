@@ -179,6 +179,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createApplication(appName, staging, memory, uris, serviceNames);
 	}
 
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
+								  List<String> serviceNames) {
+		cc.createApplication(appName, staging, disk, memory, uris, serviceNames);
+	}
+
 	public void createService(CloudService service) {
 		cc.createService(service);
 	}
