@@ -27,11 +27,11 @@ package org.cloudfoundry.maven.common;
 public enum SystemProperties {
 
 	APP_NAME("appname"),
+	APP_STARTUP_TIMEOUT("appStartupTimeout"),
 	COMMAND("command"),
 	BUILDPACK("buildpack"),
-	STACK("stack"),
+	DISK("disk"),
 	HEALTH_CHECK_TIMEOUT("healthCheckTimeout"),
-	APP_STARTUP_TIMEOUT("appStartupTimeout"),
 	INSTANCES("instances"),
 	MEMORY("memory"),
 	NO_START("no-start"),
@@ -40,6 +40,7 @@ public enum SystemProperties {
 	PATH("path"),
 	SETTINGS_SERVER("server", "server"),
 	SPACE("space"),
+	STACK("stack"),
 	TARGET("target"),
 	URL("url"),
 	USERNAME("username");

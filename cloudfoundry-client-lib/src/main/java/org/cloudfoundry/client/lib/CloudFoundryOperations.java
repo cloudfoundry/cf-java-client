@@ -150,13 +150,6 @@ public interface CloudFoundryOperations {
 	ApplicationStats getApplicationStats(String appName);
 
 	/**
-	 * Get choices for application memory quota.
-	 *
-	 * @return memory choices in MB
-	 */
-	int[] getApplicationMemoryChoices();
-
-	/**
 	 * Create application.
 	 *
 	 * @param appName application name
@@ -173,7 +166,7 @@ public interface CloudFoundryOperations {
 	 *
 	 * @param appName      application name
 	 * @param staging      staging info
-	 * @param disk         memory to use in MB
+	 * @param disk         disk quota to use in MB
 	 * @param memory       memory to use in MB
 	 * @param uris         list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
@@ -289,10 +282,18 @@ public interface CloudFoundryOperations {
 	void deleteAllServices();
 
 	/**
+	 * Update application disk quota.
+	 *
+	 * @param appName name of application
+	 * @param disk new disk setting in MB
+	 */
+	void updateApplicationDiskQuota(String appName, int disk);
+
+	/**
 	 * Update application memory.
 	 *
 	 * @param appName name of application
-	 * @param memory new memory setting
+	 * @param memory new memory setting in MB
 	 */
 	void updateApplicationMemory(String appName, int memory);
 

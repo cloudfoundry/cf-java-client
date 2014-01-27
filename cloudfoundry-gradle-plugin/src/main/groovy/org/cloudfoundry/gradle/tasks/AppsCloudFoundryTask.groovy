@@ -44,11 +44,13 @@ class AppsCloudFoundryTask extends AbstractCloudFoundryTask {
                 apps.each { CloudApplication app ->
                     output.addRow(name: app.name,
                             status: health(app),
-                            usage: "${app.instances} x ${app.memory}M",
+                            instances: "${app.runningInstances}/${app.instances}",
+                            memory: "${formatMBytes(app.memory)}",
+                            disk: "${formatMBytes(app.disk)}",
                             uris: "${app.uris ? app.uris.join(', ') : 'none'}")
                 }
 
-                log 'Applications\n' + output.toString()
+                log 'Applications\n\n' + output.toString()
             }
         }
     }

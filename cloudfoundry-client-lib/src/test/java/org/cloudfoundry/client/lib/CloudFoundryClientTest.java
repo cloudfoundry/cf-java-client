@@ -136,6 +136,7 @@ public class CloudFoundryClientTest {
 	private static AtomicInteger nbInJvmProxyRcvReqs;
 
 	private static final int DEFAULT_MEMORY = 512; // MB
+	private static final int DEFAULT_DISK = 1024; // MB
 
 	private static final int FIVE_MINUTES = 300 * 1000;
 
@@ -449,6 +450,7 @@ public class CloudFoundryClientTest {
 
 		assertEquals(1, app.getInstances());
 		assertEquals(DEFAULT_MEMORY, app.getMemory());
+		assertEquals(DEFAULT_DISK, app.getDisk());
 
 		assertNull(app.getStaging().getCommand());
 		assertNull(app.getStaging().getBuildpackUrl());
@@ -605,8 +607,16 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void updateApplicationDisk() throws IOException {
+		String appName = createSpringTravelApp("updateDisk");
+		connectedClient.updateApplicationDiskQuota(appName, 2048);
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertEquals(2048, app.getDisk());
+	}
+
+	@Test
 	public void updateApplicationMemory() throws IOException {
-		String appName = createSpringTravelApp("mem1");
+		String appName = createSpringTravelApp("updateMemory");
 		connectedClient.updateApplicationMemory(appName, 256);
 		CloudApplication app = connectedClient.getApplication(appName);
 		assertEquals(256, app.getMemory());
@@ -614,7 +624,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationInstances() throws Exception {
-		String appName = createSpringTravelApp("inst1");
+		String appName = createSpringTravelApp("updateInstances");
 		CloudApplication app = connectedClient.getApplication(appName);
 
 		assertEquals(1, app.getInstances());
@@ -630,7 +640,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void updateApplicationUris() throws IOException {
-		String appName = namespacedAppName("url1");
+		String appName = namespacedAppName("updateUris");
 		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
 
 		List<String> originalUris = app.getUris();
@@ -1749,35 +1759,34 @@ public class CloudFoundryClientTest {
 				Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
 	}
 
-    private static abstract class NoOpUploadStatusCallback implements UploadStatusCallback {
-        public void onCheckResources() { }
+	private static abstract class NoOpUploadStatusCallback implements UploadStatusCallback {
+		public void onCheckResources() {
+		}
 
-        public void onMatchedFileNames(Set<String> matchedFileNames) { }
+		public void onMatchedFileNames(Set<String> matchedFileNames) {
+		}
 
-        public void onProcessMatchedResources(int length) { }
-    }
-	
+		public void onProcessMatchedResources(int length) {
+		}
+	}
+
 	private static class NonUnsubscribingUploadStatusCallback extends NoOpUploadStatusCallback {
 	    public int progressCount = 0;
 
-        public boolean onProgress(String status) {
-            progressCount++;
-            return false;
-        }
+		public boolean onProgress(String status) {
+			progressCount++;
+			return false;
+		}
 	}
-	
-    private static class UnsubscribingUploadStatusCallback extends NoOpUploadStatusCallback {
-        public int progressCount = 0;
 
-        public boolean onProgress(String status) {
-            progressCount++;
-            // unsubscribe after the first report
-            if (progressCount == 1) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-	
+	private static class UnsubscribingUploadStatusCallback extends NoOpUploadStatusCallback {
+		public int progressCount = 0;
+
+		public boolean onProgress(String status) {
+			progressCount++;
+			// unsubscribe after the first report
+			return progressCount == 1;
+		}
+	}
+
 }

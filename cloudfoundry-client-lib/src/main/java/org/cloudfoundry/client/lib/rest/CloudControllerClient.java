@@ -102,8 +102,6 @@ public interface CloudControllerClient {
 
 	ApplicationStats getApplicationStats(String appName);
 
-	int[] getApplicationMemoryChoices();
-
 	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                       List<String> serviceNames);
 
@@ -125,6 +123,8 @@ public interface CloudControllerClient {
 	void deleteApplication(String appName);
 
 	void deleteAllApplications();
+
+	void updateApplicationDiskQuota(String appName, int disk);
 
 	void updateApplicationMemory(String appName, int memory);
 

@@ -23,15 +23,12 @@ import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.Staging;
-
-import org.cloudfoundry.maven.common.CommonUtils;
 
 import org.springframework.http.HttpStatus;
 
@@ -56,13 +53,11 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		final Map<String, String> env = getEnv();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
+		final Integer disk = getDisk();
 		final File path = getPath();
 		final List<String> uris = getAllUris();
 		final List<String> serviceNames = getServiceNames();
 
-		if (memory != null) {
-			validateMemoryChoice(getClient(), memory);
-		}
 		validatePath(path);
 
 		addDomains();
@@ -75,14 +70,15 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 						" Env: %s," +
 						" Instances: %s," +
 						" Memory: %s," +
+						" Disk: %s," +
 						" Path: %s," +
 						" Services: %s," +
 						" Uris: %s,",
-				appname, command, env, instances, memory, path, serviceNames, uris));
+				appname, command, env, instances, memory, disk, path, serviceNames, uris));
 
 		getLog().info(String.format("Creating application '%s'", appname));
 
-		createApplication(appname, command, buildpack, stack, healthCheckTimeout, memory, uris, serviceNames);
+		createApplication(appname, command, buildpack, stack, healthCheckTimeout, disk, memory, uris, serviceNames);
 
 		getLog().debug("Updating application env...");
 
@@ -131,7 +127,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 	}
 
 	private void createApplication(String appname, String command, String buildpack, String stack, Integer healthCheckTimeout,
-								   Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
+								   Integer disk, Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
 		boolean found;
 		try {
 			getClient().getApplication(appname);
@@ -148,12 +144,15 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		try {
 			final Staging staging = new Staging(command, buildpack, stack, healthCheckTimeout);
 			if (!found) {
-				getClient().createApplication(appname, staging, memory, uris, serviceNames);
+				getClient().createApplication(appname, staging, disk, memory, uris, serviceNames);
 			} else {
 				client.stopApplication(appname);
 				client.updateApplicationStaging(appname, staging);
 				if (memory != null) {
 					client.updateApplicationMemory(appname, memory);
+				}
+				if (disk != null) {
+					client.updateApplicationDiskQuota(appname, disk);
 				}
 				client.updateApplicationUris(appname, uris);
 				client.updateApplicationServices(appname, serviceNames);
@@ -172,42 +171,5 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 			serviceNames.add(service.getName());
 		}
 		return serviceNames;
-	}
-
-	/**
-	 * Helper method that validates that the memory size selected is valid and available.
-	 *
-	 * @param cloudFoundryClient
-	 * @param desiredMemory
-	 * @throws IllegalStateException if memory constraints are violated.
-	 */
-
-	protected void validateMemoryChoice(CloudFoundryClient cloudFoundryClient, Integer desiredMemory) {
-		int[] memoryChoices = cloudFoundryClient.getApplicationMemoryChoices();
-		validateMemoryChoice(memoryChoices, desiredMemory);
-	}
-
-	/**
-	 * Helper method that validates that the memory size selected is valid and available.
-	 *
-	 * @param desiredMemory
-	 * @throws IllegalStateException if memory constraints are violated.
-	 */
-	protected void validateMemoryChoice(int[] availableMemoryChoices, Integer desiredMemory) {
-
-		boolean match = false;
-		List<String> memoryChoicesAsString = new ArrayList<String>();
-		for (int i : availableMemoryChoices) {
-			if (Integer.valueOf(i).equals(desiredMemory)) {
-				match = true;
-			}
-			memoryChoicesAsString.add(String.valueOf(i));
-		}
-
-		if (!match) {
-			throw new IllegalStateException("Memory must be one of the following values: " +
-					CommonUtils.collectionToCommaDelimitedString(memoryChoicesAsString));
-		}
-
 	}
 }

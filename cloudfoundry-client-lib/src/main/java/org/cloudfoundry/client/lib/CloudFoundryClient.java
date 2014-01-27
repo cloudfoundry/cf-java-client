@@ -170,10 +170,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplicationStats(appName);
 	}
 
-	public int[] getApplicationMemoryChoices() {
-		return cc.getApplicationMemoryChoices();
-	}
-
 	public void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 								  List<String> serviceNames) {
 		cc.createApplication(appName, staging, memory, uris, serviceNames);
@@ -238,6 +234,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void deleteAllServices() {
 		cc.deleteAllServices();
+	}
+
+	public void updateApplicationDiskQuota(String appName, int disk) {
+		cc.updateApplicationDiskQuota(appName, disk);
 	}
 
 	public void updateApplicationMemory(String appName, int memory) {
