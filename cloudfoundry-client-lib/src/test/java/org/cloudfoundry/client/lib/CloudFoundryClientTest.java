@@ -450,7 +450,7 @@ public class CloudFoundryClientTest {
 
 		assertEquals(1, app.getInstances());
 		assertEquals(DEFAULT_MEMORY, app.getMemory());
-		assertEquals(DEFAULT_DISK, app.getDisk());
+		assertEquals(DEFAULT_DISK, app.getDiskQuota());
 
 		assertNull(app.getStaging().getCommand());
 		assertNull(app.getStaging().getBuildpackUrl());
@@ -611,7 +611,7 @@ public class CloudFoundryClientTest {
 		String appName = createSpringTravelApp("updateDisk");
 		connectedClient.updateApplicationDiskQuota(appName, 2048);
 		CloudApplication app = connectedClient.getApplication(appName);
-		assertEquals(2048, app.getDisk());
+		assertEquals(2048, app.getDiskQuota());
 	}
 
 	@Test

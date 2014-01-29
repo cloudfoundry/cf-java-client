@@ -38,7 +38,7 @@ public class CloudApplication extends CloudEntity {
 	private Staging staging;
 	private int instances;
 	private int memory;
-	private int disk;
+	private int diskQuota;
 	private List<String> uris;
 	private List<String> services;
 	private AppState state;
@@ -77,7 +77,7 @@ public class CloudApplication extends CloudEntity {
 			memory = (Integer) attributes.get("memory");
 		}
 		if (attributes.containsKey("disk_quota")) {
-			disk = (Integer) attributes.get("disk_quota");
+			diskQuota = (Integer) attributes.get("disk_quota");
 		}
 		env = (List<String>) attributes.get("env");
 
@@ -126,7 +126,7 @@ public class CloudApplication extends CloudEntity {
 	public Map<String,Integer> getResources() {
 		Map<String, Integer> resources = new HashMap<String, Integer>();
 		resources.put(MEMORY_KEY, memory);
-		resources.put(DISK_KEY, disk);
+		resources.put(DISK_KEY, diskQuota);
 		return resources;
 	}
 
@@ -138,12 +138,12 @@ public class CloudApplication extends CloudEntity {
 		this.instances = instances;
 	}
 
-	public int getDisk() {
-		return disk;
+	public int getDiskQuota() {
+		return diskQuota;
 	}
 
-	public void setDisk(int disk) {
-		this.disk = disk;
+	public void setDiskQuota(int diskQuota) {
+		this.diskQuota = diskQuota;
 	}
 
 	public int getMemory() {
@@ -228,7 +228,7 @@ public class CloudApplication extends CloudEntity {
 	public String toString() {
 		return "CloudApplication [staging=" + staging + ", instances="
 				+ instances + ", name=" + getName() 
-				+ ", memory=" + memory + ", disk=" + disk
+				+ ", memory=" + memory + ", diskQuota=" + diskQuota
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ",services=" + services
 				+ ", env=" + env + "]";
 	}

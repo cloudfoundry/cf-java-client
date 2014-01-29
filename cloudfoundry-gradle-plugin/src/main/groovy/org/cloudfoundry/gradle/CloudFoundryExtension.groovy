@@ -39,7 +39,7 @@ class CloudFoundryExtension {
     Integer healthCheckTimeout
     boolean startApp = true
     Integer memory
-    Integer disk
+    Integer diskQuota
     int instances = 1
     String uri
     List<String> uris = []

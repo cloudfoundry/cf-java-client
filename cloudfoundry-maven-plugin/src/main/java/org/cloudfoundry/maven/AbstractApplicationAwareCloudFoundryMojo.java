@@ -139,9 +139,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	/**
 	 * Set the disk quota for the application
 	 *
-	 * @parameter expression="${cf.disk}"
+	 * @parameter expression="${cf.diskQuota}"
 	 */
-	private Integer disk;
+	private Integer diskQuota;
 
 	/**
 	 * Set the memory reservation for the application
@@ -315,13 +315,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	/**
-	 * Returns the disk parameter.
+	 * Returns the diskQuota parameter.
 	 *
 	 * @return Returns the configured disk quota choice
 	 */
-	public Integer getDisk() {
-		final String property = getCommandlineProperty(SystemProperties.DISK);
-		return property != null ? Integer.valueOf(property) : this.disk;
+	public Integer getDiskQuota() {
+		final String property = getCommandlineProperty(SystemProperties.DISK_QUOTA);
+		return property != null ? Integer.valueOf(property) : this.diskQuota;
 	}
 
 	/**

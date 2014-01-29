@@ -53,7 +53,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		final Map<String, String> env = getEnv();
 		final Integer instances = getInstances();
 		final Integer memory = getMemory();
-		final Integer disk = getDisk();
+		final Integer disk = getDiskQuota();
 		final File path = getPath();
 		final List<String> uris = getAllUris();
 		final List<String> serviceNames = getServiceNames();
@@ -70,7 +70,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 						" Env: %s," +
 						" Instances: %s," +
 						" Memory: %s," +
-						" Disk: %s," +
+						" DiskQuota: %s," +
 						" Path: %s," +
 						" Services: %s," +
 						" Uris: %s,",
@@ -127,7 +127,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 	}
 
 	private void createApplication(String appname, String command, String buildpack, String stack, Integer healthCheckTimeout,
-								   Integer disk, Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
+								   Integer diskQuota, Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
 		boolean found;
 		try {
 			getClient().getApplication(appname);
@@ -144,15 +144,15 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		try {
 			final Staging staging = new Staging(command, buildpack, stack, healthCheckTimeout);
 			if (!found) {
-				getClient().createApplication(appname, staging, disk, memory, uris, serviceNames);
+				getClient().createApplication(appname, staging, diskQuota, memory, uris, serviceNames);
 			} else {
 				client.stopApplication(appname);
 				client.updateApplicationStaging(appname, staging);
 				if (memory != null) {
 					client.updateApplicationMemory(appname, memory);
 				}
-				if (disk != null) {
-					client.updateApplicationDiskQuota(appname, disk);
+				if (diskQuota != null) {
+					client.updateApplicationDiskQuota(appname, diskQuota);
 				}
 				client.updateApplicationUris(appname, uris);
 				client.updateApplicationServices(appname, serviceNames);

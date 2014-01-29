@@ -30,7 +30,7 @@ public enum SystemProperties {
 	APP_STARTUP_TIMEOUT("appStartupTimeout"),
 	COMMAND("command"),
 	BUILDPACK("buildpack"),
-	DISK("disk"),
+	DISK_QUOTA("diskQuota"),
 	HEALTH_CHECK_TIMEOUT("healthCheckTimeout"),
 	INSTANCES("instances"),
 	MEMORY("memory"),

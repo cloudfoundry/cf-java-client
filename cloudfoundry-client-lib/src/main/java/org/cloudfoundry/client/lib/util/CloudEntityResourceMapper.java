@@ -145,7 +145,7 @@ public class CloudEntityResourceMapper {
 			app.setEnv(envMap);
 		}
 		app.setMemory(getEntityAttribute(resource, "memory", Integer.class));
-		app.setDisk(getEntityAttribute(resource, "disk_quota", Integer.class));
+		app.setDiskQuota(getEntityAttribute(resource, "disk_quota", Integer.class));
 		List<Map<String, Object>> serviceBindings = getEntityAttribute(resource, "service_bindings", List.class);
 		List<String> serviceList = new ArrayList<String>();
 		for (Map<String, Object> binding : serviceBindings) {

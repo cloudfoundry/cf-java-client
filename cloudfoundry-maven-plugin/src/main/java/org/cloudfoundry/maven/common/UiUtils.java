@@ -180,7 +180,7 @@ public final class UiUtils {
 			table.getHeaders().get(COLUMN_4).updateWidth(String.valueOf(memory).length());
 			tableRow.addValue(COLUMN_4, String.valueOf(memory));
 
-			String disk = formatMBytes(application.getDisk());
+			String disk = formatMBytes(application.getDiskQuota());
 			table.getHeaders().get(COLUMN_5).updateWidth(String.valueOf(disk).length());
 			tableRow.addValue(COLUMN_5, String.valueOf(disk));
 

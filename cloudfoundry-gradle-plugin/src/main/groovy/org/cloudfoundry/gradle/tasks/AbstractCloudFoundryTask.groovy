@@ -268,8 +268,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         propertyOrExtension('startApp')
     }
 
-    Integer getDisk() {
-        propertyOrExtension('disk')
+    Integer getDiskQuota() {
+        propertyOrExtension('diskQuota')
     }
 
     Integer getMemory() {

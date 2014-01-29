@@ -46,7 +46,7 @@ class AppsCloudFoundryTask extends AbstractCloudFoundryTask {
                             status: health(app),
                             instances: "${app.runningInstances}/${app.instances}",
                             memory: "${formatMBytes(app.memory)}",
-                            disk: "${formatMBytes(app.disk)}",
+                            disk: "${formatMBytes(app.diskQuota)}",
                             uris: "${app.uris ? app.uris.join(', ') : 'none'}")
                 }
 

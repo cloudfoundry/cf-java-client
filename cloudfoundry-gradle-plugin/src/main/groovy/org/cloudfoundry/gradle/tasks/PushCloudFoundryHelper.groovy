@@ -33,14 +33,14 @@ class PushCloudFoundryHelper {
             if (memory) {
                 client.updateApplicationMemory(application, memory)
             }
-            if (disk) {
-                client.updateApplicationDiskQuota(application, disk)
+            if (diskQuota) {
+                client.updateApplicationDiskQuota(application, diskQuota)
             }
             client.updateApplicationUris(application, allUris)
             client.updateApplicationServices(application, serviceNames)
         } else {
             log "Creating application ${application}"
-            client.createApplication(application, staging, disk, memory, allUris, serviceNames)
+            client.createApplication(application, staging, diskQuota, memory, allUris, serviceNames)
         }
 
         if (env) {
