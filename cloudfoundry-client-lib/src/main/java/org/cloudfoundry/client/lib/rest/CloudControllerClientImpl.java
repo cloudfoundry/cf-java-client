@@ -239,23 +239,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return this.cloudControllerUrl;
 	}
 
-	public int[] getApplicationMemoryChoices() {
-		// TODO: Get it from cloudcontroller's 'info/resources' end point
-		int[] generalChoices = new int[] {64, 128, 256, 512, 1024, 2048};
-		int maxMemory = getInfo().getLimits().getMaxTotalMemory();
-
-		int length = 0;
-		for (int generalChoice : generalChoices) {
-			if (generalChoice <= maxMemory) {
-				length++;
-			}
-		}
-
-		int[] result = new int[length];
-		System.arraycopy(generalChoices, 0, result, 0, length);
-		return result;
-	}
-
 	public void updatePassword(String newPassword) {
 		updatePassword(cloudCredentials, newPassword);
 	}
@@ -1222,6 +1205,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		for (CloudApplication cloudApp : cloudApps) {
 			deleteApplication(cloudApp.getName());
 		}
+	}
+
+	public void updateApplicationDiskQuota(String appName, int disk) {
+		UUID appId = getAppId(appName);
+		HashMap<String, Object> appRequest = new HashMap<String, Object>();
+		appRequest.put("disk_quota", disk);
+		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
 	public void updateApplicationMemory(String appName, int memory) {

@@ -30,12 +30,17 @@ class PushCloudFoundryHelper {
             log "Updating application ${application}"
             client.stopApplication(application)
             client.updateApplicationStaging(application, staging)
-            client.updateApplicationMemory(application, memory)
+            if (memory) {
+                client.updateApplicationMemory(application, memory)
+            }
+            if (diskQuota) {
+                client.updateApplicationDiskQuota(application, diskQuota)
+            }
             client.updateApplicationUris(application, allUris)
             client.updateApplicationServices(application, serviceNames)
         } else {
             log "Creating application ${application}"
-            client.createApplication(application, staging, memory, allUris, serviceNames)
+            client.createApplication(application, staging, diskQuota, memory, allUris, serviceNames)
         }
 
         if (env) {
@@ -66,21 +71,11 @@ class PushCloudFoundryHelper {
 
     void validateApplicationConfig() {
         ensureFileExists()
-        checkValidMemory()
     }
 
     void ensureFileExists() {
         if (!file || !file.isFile()) {
             throw new GradleException("You must specify a valid file ('${file}' is not valid)")
-        }
-    }
-
-    void checkValidMemory() {
-        int requestedMemory = memory
-        int[] memoryChoices = client.getApplicationMemoryChoices()
-
-        if (!(requestedMemory in memoryChoices)) {
-            throw new GradleException("Memory size $requestedMemory not allowed. Available memory sizes are: $memoryChoices")
         }
     }
 

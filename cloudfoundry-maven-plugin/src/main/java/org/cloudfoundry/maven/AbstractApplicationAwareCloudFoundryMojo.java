@@ -137,6 +137,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private Integer appStartupTimeout;
 
 	/**
+	 * Set the disk quota for the application
+	 *
+	 * @parameter expression="${cf.diskQuota}"
+	 */
+	private Integer diskQuota;
+
+	/**
 	 * Set the memory reservation for the application
 	 *
 	 * @parameter expression="${cf.memory}"
@@ -305,6 +312,16 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			throw new IllegalStateException(String.format("No files found in directory '%s'.", absolutePath));
 		}
 
+	}
+
+	/**
+	 * Returns the diskQuota parameter.
+	 *
+	 * @return Returns the configured disk quota choice
+	 */
+	public Integer getDiskQuota() {
+		final String property = getCommandlineProperty(SystemProperties.DISK_QUOTA);
+		return property != null ? Integer.valueOf(property) : this.diskQuota;
 	}
 
 	/**

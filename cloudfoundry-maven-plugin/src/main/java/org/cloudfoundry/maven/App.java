@@ -16,6 +16,7 @@
 package org.cloudfoundry.maven;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
@@ -35,7 +36,8 @@ public class App extends AbstractApplicationAwareCloudFoundryMojo {
 	protected void doExecute() {
 		try {
 			final CloudApplication application = getClient().getApplication(getAppname());
-			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application));
+			final ApplicationStats stats = getClient().getApplicationStats(getAppname());
+			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application, stats));
 		} catch (CloudFoundryException e) {
 			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
 		}

@@ -33,14 +33,16 @@ public class CloudApplication extends CloudEntity {
     private static final String COMMAND_KEY = "command";
     private static final String BUILDPACK_URL_KEY = "buildpack";    
     private static final String MEMORY_KEY = "memory";
+    private static final String DISK_KEY = "disk_quota";
 
 	private Staging staging;
 	private int instances;
+	private int memory;
+	private int diskQuota;
 	private List<String> uris;
 	private List<String> services;
 	private AppState state;
 	private DebugMode debug;
-	private Map<String, Integer> resources = new HashMap<String, Integer>();
 	private int runningInstances;
 	private List<String> env = new ArrayList<String>();
 
@@ -53,7 +55,7 @@ public class CloudApplication extends CloudEntity {
 						AppState state) {
 		super(CloudEntity.Meta.defaultMeta(), name);
 		this.staging = new Staging(command, buildpackUrl);
-		this.resources.put(MEMORY_KEY, memory);
+		this.memory = memory;
 		this.instances = instances;
 		this.uris = uris;
 		this.services = serviceNames;
@@ -71,7 +73,12 @@ public class CloudApplication extends CloudEntity {
 		uris = (List<String>)attributes.get("uris");
 		services = (List<String>)attributes.get("services");
 		state = AppState.valueOf((String) attributes.get("state"));
-		resources = (Map<String, Integer>) attributes.get("resources");
+		if (attributes.containsKey("memory")) {
+			memory = (Integer) attributes.get("memory");
+		}
+		if (attributes.containsKey("disk_quota")) {
+			diskQuota = (Integer) attributes.get("disk_quota");
+		}
 		env = (List<String>) attributes.get("env");
 
 		Map<String, Object> metaValue = parse(Map.class,
@@ -82,14 +89,8 @@ public class CloudApplication extends CloudEntity {
 				debug = DebugMode.valueOf(debugAttribute);
 			}
 			long created = parse(Long.class, metaValue.get("created"));
-			Meta meta = null;
-			if (created != 0) {
-				meta = new Meta(null, new Date(created * 1000), null);
-			}
-			else {
-				meta = new Meta(null, null, null);
-			}
-			setMeta(meta);
+			Date createdDate = created != 0 ? new Date(created * 1000) : null;
+			setMeta(new Meta(null, createdDate, null));
 
 			String command = null;
 			if (metaValue.containsKey(COMMAND_KEY)) {
@@ -101,7 +102,6 @@ public class CloudApplication extends CloudEntity {
 			}
 			
 			setStaging(new Staging(command, buildpackUrl));
-
 		}
 	}
 
@@ -122,12 +122,12 @@ public class CloudApplication extends CloudEntity {
 		this.staging = staging;
 	}
 
-	public void setResources(Map<String,Integer> resources) {
-		this.resources = resources;
-	}
-
+	// for backward compatibility
 	public Map<String,Integer> getResources() {
-		return new HashMap<String, Integer>(resources);
+		Map<String, Integer> resources = new HashMap<String, Integer>();
+		resources.put(MEMORY_KEY, memory);
+		resources.put(DISK_KEY, diskQuota);
+		return resources;
 	}
 
 	public int getInstances() {
@@ -138,12 +138,20 @@ public class CloudApplication extends CloudEntity {
 		this.instances = instances;
 	}
 
+	public int getDiskQuota() {
+		return diskQuota;
+	}
+
+	public void setDiskQuota(int diskQuota) {
+		this.diskQuota = diskQuota;
+	}
+
 	public int getMemory() {
-		return resources.get(MEMORY_KEY);
+		return memory;
 	}
 
 	public void setMemory(int memory) {
-		resources.put(MEMORY_KEY, memory);
+		this.memory = memory;
 	}
 
 	public List<String> getUris() {
@@ -220,7 +228,7 @@ public class CloudApplication extends CloudEntity {
 	public String toString() {
 		return "CloudApplication [staging=" + staging + ", instances="
 				+ instances + ", name=" + getName() 
-				+ ", memory=" + resources.get(MEMORY_KEY)
+				+ ", memory=" + memory + ", diskQuota=" + diskQuota
 				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ",services=" + services
 				+ ", env=" + env + "]";
 	}

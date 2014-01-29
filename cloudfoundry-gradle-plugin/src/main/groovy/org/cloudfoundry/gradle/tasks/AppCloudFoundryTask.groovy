@@ -15,7 +15,10 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.domain.ApplicationStats
 import org.cloudfoundry.client.lib.domain.CloudApplication
+import org.cloudfoundry.client.lib.domain.InstanceStats
+import org.cloudfoundry.gradle.text.FlexibleTableOutput
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -34,15 +37,30 @@ class AppCloudFoundryTask extends AbstractCloudFoundryTask {
             withApplication {
                 CloudApplication app = client.getApplication(application)
 
-                StringBuilder sb = new StringBuilder("Application\n")
-                sb << "${app.name}: ${health(app)}\n"
-                sb << "  usage: ${app.instances} x ${app.memory}M\n"
-                sb << "  uris: ${app.uris ? app.uris.join(', ') : 'none'}\n"
+                StringBuilder sb = new StringBuilder("Application ${app.name}\n")
+                sb << "status: ${health(app)}\n"
+                sb << "instances: ${app.runningInstances}/${app.instances}\n"
+                sb << "usage: ${app.memory}M x ${app.instances} instances\n"
+                sb << "uris: ${app.uris ? app.uris.join(', ') : 'none'}\n"
 
                 List<String> services = app.services
                 if (!services.isEmpty()) {
-                    sb << "  services: ${services.join(', ')}"
+                    sb << "services: ${services.join(', ')}"
                 }
+
+                FlexibleTableOutput output = new FlexibleTableOutput()
+
+                ApplicationStats stats = client.getApplicationStats(application)
+                stats.records.each { InstanceStats instance ->
+                    output.addRow(instance: "${instance.id}",
+                            state: instance.state.toString().toLowerCase(),
+                            cpu: "${formatPercentage(instance.usage.cpu * 100)}%",
+                            memory: "${formatBytes(instance.usage.mem)} of ${formatBytes(instance.memQuota)}",
+                            disk: "${formatBytes(instance.usage.disk)} of ${formatBytes(instance.diskQuota)}")
+                }
+
+                sb << "\n"
+                sb << output.toString()
 
                 log sb.toString()
             }
