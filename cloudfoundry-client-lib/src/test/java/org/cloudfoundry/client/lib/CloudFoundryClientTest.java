@@ -107,6 +107,8 @@ public class CloudFoundryClientTest {
 
 	private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
 
+	private static final boolean CCNG_API_SSL = Boolean.getBoolean("ccng.ssl");
+
 	private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
 
 	private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
@@ -200,9 +202,9 @@ public class CloudFoundryClientTest {
 
 		cloudControllerUrl = new URL(CCNG_API_URL);
 		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
-				cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration);
+				cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration, CCNG_API_SSL);
 		connectedClient.login();
-		defaultDomainName = getDefaultDomain(connectedClient.getSharedDomains()).getName();
+		defaultDomainName = getDefaultDomain(connectedClient.getDomains()).getName();
 
 		// Optimization to avoid redoing the work already done is tearDown()
 		if (!tearDownComplete) {
@@ -265,7 +267,7 @@ public class CloudFoundryClientTest {
 		// Repeat that with different request factory used in the code as this exercise different byteman rules
 		assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
 		//And with the actual one used by RestUtil
-		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null));
+		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null, false));
 
 		//when called with a proxy
 		requestFactory = new HttpComponentsClientHttpRequestFactory();//avoid reusing keep alive connections
@@ -807,7 +809,7 @@ public class CloudFoundryClientTest {
 		}
 		assertEquals(1, app.getRunningInstances());
 		RestUtil restUtil = new RestUtil();
-		RestTemplate rest = restUtil.createRestTemplate(httpProxyConfiguration);
+		RestTemplate rest = restUtil.createRestTemplate(httpProxyConfiguration, false);
 		String results = rest.getForObject("http://" + app.getUris().get(0), String.class);
 		assertTrue(results.contains("Hello world!"));
 	}
@@ -1708,7 +1710,7 @@ public class CloudFoundryClientTest {
 	}
 
 	private void clearTestDomainAndRoutes() {
-		CloudDomain domain = getDomainNamed(TEST_DOMAIN, connectedClient.getPrivateDomains());
+		CloudDomain domain = getDomainNamed(TEST_DOMAIN, connectedClient.getDomains());
 		if (domain != null) {
 			List<CloudRoute> routes = connectedClient.getRoutes(domain.getName());
 			for (CloudRoute route : routes) {

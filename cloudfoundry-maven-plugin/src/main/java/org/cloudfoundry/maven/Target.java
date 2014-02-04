@@ -44,37 +44,9 @@ import org.cloudfoundry.maven.common.UiUtils;
  */
 public class Target extends AbstractCloudFoundryMojo {
 
-	/**
-	 * 	@FIXME Not sure whether one should be able to overwrite execute()
-	 *
-	 */
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		final URI target = getTarget();
-		Assert.configurationNotNull(target, "target", SystemProperties.TARGET);
-
-		try {
-			client = new CloudFoundryClient(getTarget().toURL());
-			doExecute();
-		} catch (MalformedURLException e) {
-			throw new MojoExecutionException(
-					String.format("Incorrect Cloud Foundry target url, are you sure '%s' is correct? Make sure the url contains a scheme, e.g. http://... ", target), e);
-		}
-	}
-
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-
-		CloudFoundryClient newClient;
-
-		if (getUsername() != null && getPassword() != null) {
-			newClient = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
-		} else {
-			newClient = createCloudFoundryClient(retrieveToken(), getTarget(), getOrg(), getSpace());
-		}
-
-		final CloudInfo cloudInfo = newClient.getCloudInfo();
-
+		final CloudInfo cloudInfo = getClient().getCloudInfo();
 		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, getTarget().toString(), getOrg(), getSpace()));
 	}
 }

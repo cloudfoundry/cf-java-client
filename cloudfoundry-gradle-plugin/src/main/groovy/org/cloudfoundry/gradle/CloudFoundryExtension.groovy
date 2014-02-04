@@ -55,6 +55,7 @@ class CloudFoundryExtension {
     Integer appStartupTimeout
 
     boolean useSystemProxy = true
+    boolean trustSelfSignedCerts = false;
 
     CloudFoundryExtension(Project project) {
         application = project.name

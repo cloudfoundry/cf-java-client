@@ -133,7 +133,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     private CloudFoundryClient createClient(CloudCredentials credentials) {
         HttpProxyConfiguration proxyConfiguration = getHttpProxyConfiguration()
         URL targetUrl = target.toURL()
-        new CloudFoundryClient(credentials, targetUrl, organization, space, proxyConfiguration)
+        new CloudFoundryClient(credentials, targetUrl, organization, space, proxyConfiguration, trustSelfSignedCerts)
     }
 
     private HttpProxyConfiguration getHttpProxyConfiguration() {
@@ -326,6 +326,10 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
     boolean getUseSystemProxy() {
         propertyOrExtension('useSystemProxy')
+    }
+
+    boolean getTrustSelfSignedCerts() {
+        propertyOrExtension('trustSelfSignedCerts')
     }
 
     def getServiceInfos() {

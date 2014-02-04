@@ -12,11 +12,9 @@ import org.mockito.Mock;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import static java.util.Arrays.asList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,57 +22,61 @@ import static org.mockito.Mockito.when;
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
 public class CloudControllerClientImplTest {
 
-    private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://api.run.pivotal.io");
-    private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
-    private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
-    private static final String CCNG_USER_ORG = System.getProperty("ccng.org", "gopivotal.com");
-    private static final String CCNG_USER_SPACE = System.getProperty("ccng.space", "test");
+	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://api.run.pivotal.io");
+	private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
+	private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
+	private static final String CCNG_USER_ORG = System.getProperty("ccng.org", "gopivotal.com");
+	private static final String CCNG_USER_SPACE = System.getProperty("ccng.space", "test");
 
-    @Mock
-    private RestUtil restUtil;
-    @Mock
-    private RestTemplate restTemplate;
-    @Mock
-    private ClientHttpRequestFactory clientHttpRequestFactory;
-    @Mock
-    private OauthClient oauthClient;
+	@Mock
+	private RestUtil restUtil;
+	@Mock
+	private RestTemplate restTemplate;
+	@Mock
+	private ClientHttpRequestFactory clientHttpRequestFactory;
+	@Mock
+	private OauthClient oauthClient;
 
-    private CloudControllerClientImpl controllerClient;
+	private CloudControllerClientImpl controllerClient;
 
-    /**
-     * Failed attempt to instanciate CloudControllerClientImpl with existing constructors. Just here to illustrate the
-     * need to move the initialize() method out of the constructor.
-     */
-    public void setUpWithNonEmptyConstructorWithoutLuck() throws Exception {
-        restUtil = mock(RestUtil.class);
-        when(restUtil.createRestTemplate(any(HttpProxyConfiguration.class))).thenReturn(restTemplate);
-        when(restUtil.createOauthClient(any(URL.class), any(HttpProxyConfiguration.class))).thenReturn(oauthClient);
-        when(restTemplate.getRequestFactory()).thenReturn(clientHttpRequestFactory);
+	/**
+	 * Failed attempt to instantiate CloudControllerClientImpl with existing constructors. Just here to illustrate the
+	 * need to move the initialize() method out of the constructor.
+	 */
+	public void setUpWithNonEmptyConstructorWithoutLuck() throws Exception {
+		restUtil = mock(RestUtil.class);
+		when(restUtil.createRestTemplate(any(HttpProxyConfiguration.class), false)).thenReturn(restTemplate);
+		when(restUtil.createOauthClient(any(URL.class), any(HttpProxyConfiguration.class), false)).thenReturn(oauthClient);
+		when(restTemplate.getRequestFactory()).thenReturn(clientHttpRequestFactory);
 
-        controllerClient = new CloudControllerClientImpl(new URL("http://api.dummyendpoint.com/login"), restUtil, new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
-                new URL(CCNG_API_URL), CCNG_USER_ORG, CCNG_USER_SPACE, null);
-    }
+		restUtil.createRestTemplate(null, false);
+		restUtil.createOauthClient(new URL(CCNG_API_URL), null, false);
 
-    @Before
-    public void setUpWithEmptyConstructor() throws Exception {
-        controllerClient = new CloudControllerClientImpl();
-    }
+		controllerClient = new CloudControllerClientImpl(new URL("http://api.dummyendpoint.com/login"), restTemplate, oauthClient,
+				new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
+				CCNG_USER_ORG, CCNG_USER_SPACE);
+	}
 
-    @Test
-    public void extractUriInfo_selects_most_specific_subdomain() throws Exception {
-        //given
-        String uri = "myhost.sub1.sub2.domain.com";
-        Map<String, UUID> domains = new LinkedHashMap<String, UUID>(); //Since impl iterates key, need to control iteration order with a LinkedHashMap
-        domains.put("domain.com", UUID.randomUUID());
-        domains.put("sub1.sub2.domain.com", UUID.randomUUID());
-        Map<String, String> uriInfo = new HashMap<String, String>(2);
+	@Before
+	public void setUpWithEmptyConstructor() throws Exception {
+		controllerClient = new CloudControllerClientImpl();
+	}
 
-        //when
-        controllerClient.extractUriInfo(domains, uri, uriInfo);
+	@Test
+	public void extractUriInfo_selects_most_specific_subdomain() throws Exception {
+		//given
+		String uri = "myhost.sub1.sub2.domain.com";
+		Map<String, UUID> domains = new LinkedHashMap<String, UUID>(); //Since impl iterates key, need to control iteration order with a LinkedHashMap
+		domains.put("domain.com", UUID.randomUUID());
+		domains.put("sub1.sub2.domain.com", UUID.randomUUID());
+		Map<String, String> uriInfo = new HashMap<String, String>(2);
 
-        //then
-        Assert.assertEquals(domains.get("sub1.sub2.domain.com"), domains.get(uriInfo.get("domainName")));
-        Assert.assertEquals("myhost", uriInfo.get("host"));
-    }
+		//when
+		controllerClient.extractUriInfo(domains, uri, uriInfo);
+
+		//then
+		Assert.assertEquals(domains.get("sub1.sub2.domain.com"), domains.get(uriInfo.get("domainName")));
+		Assert.assertEquals("myhost", uriInfo.get("host"));
+	}
 
 }
