@@ -188,8 +188,6 @@ public interface CloudControllerClient {
 
 	// Misc. utility methods
 
-	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
-
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);

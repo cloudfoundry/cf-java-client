@@ -98,6 +98,11 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	private String space;
 
 	/**
+	 * @parameter expression="${cf.trustSelfSignedCerts}"
+	 */
+	private boolean trustSelfSignedCerts;
+
+	/**
 	 * Skip any and all execution of this plugin.
 	 * @parameter expression="${cf.skip}" default-value="false"
 	 */
@@ -142,7 +147,7 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	/**
 	 * Cloud Controller Version 2 Client (Token)
 	 */
-	protected CloudFoundryClient createCloudFoundryClient(OAuth2AccessToken token, URI target, String org, String space)
+	protected CloudFoundryClient createCloudFoundryClient(OAuth2AccessToken token, URI target, String org, String space, boolean trustSelfSignedCerts)
 			throws MojoExecutionException {
 
 		Assert.configurationNotNull(org, "org", SystemProperties.ORG);
@@ -151,13 +156,13 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		getLog().debug(String.format("Connecting to Cloud Foundry at '%s' using token", target.toString()));
 
 		final CloudCredentials credentials = new CloudCredentials(token);
-		return createConnection(credentials, target, org, space);
+		return createConnection(credentials, target, org, space, trustSelfSignedCerts);
 	}
 
 	/**
 	 * Cloud Controller Version 2 Client
 	 */
-	protected CloudFoundryClient createCloudFoundryClient(String username, String password, URI target, String org, String space)
+	protected CloudFoundryClient createCloudFoundryClient(String username, String password, URI target, String org, String space, boolean trustSelfSignedCerts)
 			throws MojoExecutionException {
 
 		Assert.configurationNotNull(username, "username", SystemProperties.USERNAME);
@@ -170,16 +175,16 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 				target, username));
 
 		final CloudCredentials credentials = new CloudCredentials(username, password);
-		CloudFoundryClient client = createConnection(credentials, target, org, space);
+		CloudFoundryClient client = createConnection(credentials, target, org, space, trustSelfSignedCerts);
 		connectToCloudFoundry(client);
 		return client;
 	}
 
-	private CloudFoundryClient createConnection(CloudCredentials credentials, URI target, String org, String space)
+	private CloudFoundryClient createConnection(CloudCredentials credentials, URI target, String org, String space, boolean trustSelfSignedCert)
 			throws MojoExecutionException {
 		try {
 			CloudFoundryClient cloudFoundryClient =
-					new CloudFoundryClient(credentials, target.toURL(), org, space, getHttpProxyConfiguration(target));
+					new CloudFoundryClient(credentials, target.toURL(), org, space, getHttpProxyConfiguration(target), trustSelfSignedCert);
 			cloudFoundryClient.setResponseErrorHandler(responseErrorHandler);
 			return cloudFoundryClient;
 		} catch (MalformedURLException e) {
@@ -261,9 +266,9 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 		try {
 			if (getUsername() != null && getPassword() != null) {
-				client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace());
+				client = createCloudFoundryClient(getUsername(), getPassword(), getTarget(), getOrg(), getSpace(), getTrustSelfSignedCerts());
 			} else {
-				client = createCloudFoundryClient(retrieveToken(), getTarget(), getOrg(), getSpace());
+				client = createCloudFoundryClient(retrieveToken(), getTarget(), getOrg(), getSpace(), getTrustSelfSignedCerts());
 			}
 
 			doExecute();
@@ -444,5 +449,9 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 	public String getSpace() {
 		Assert.notNull(space, "The space is not set.");
 		return space;
+	}
+
+	public boolean getTrustSelfSignedCerts() {
+		return trustSelfSignedCerts;
 	}
 }

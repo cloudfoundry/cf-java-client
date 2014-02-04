@@ -595,13 +595,6 @@ public interface CloudFoundryOperations {
 	void deleteRoute(String host, String domainName);
 
 	/**
-	 * Update http proxy configuration settings.
-	 *
-	 * @param httpProxyConfiguration the new configuration settings
-	 */
-	void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration);
-
-	/**
 	 * Register a new RestLogCallback
 	 *
 	 * @param callBack the callback to be registered

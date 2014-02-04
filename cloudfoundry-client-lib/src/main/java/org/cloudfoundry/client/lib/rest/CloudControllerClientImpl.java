@@ -19,13 +19,11 @@ package org.cloudfoundry.client.lib.rest;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +39,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
@@ -72,8 +69,6 @@ import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
-import org.cloudfoundry.client.lib.util.RestUtil;
-import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -86,12 +81,7 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -116,11 +106,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
 
-	protected static final MediaType JSON_MEDIA_TYPE = new MediaType(
-			MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(),
-			Charset.forName("UTF-8"));
-
 	private static final String LOGS_LOCATION = "logs";
 	private static final int JOB_POLLING_PERIOD = 5000; // matches that of gcf
 
@@ -134,25 +119,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private URL cloudControllerUrl;
 
-	protected RestUtil restUtil;
-
 	protected CloudCredentials cloudCredentials;
-
-	protected URL authorizationEndpoint;
 
 	protected OAuth2AccessToken token;
 
 	private final Log logger;
-	
-	public CloudControllerClientImpl(URL cloudControllerUrl,
-			   RestUtil restUtil,
-			   CloudCredentials cloudCredentials,
-			   URL authorizationEndpoint,
-			   CloudSpace sessionSpace,
-			   HttpProxyConfiguration httpProxyConfiguration) {
-		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, sessionSpace, httpProxyConfiguration);
-		logger = LogFactory.getLog(getClass().getName());
-	}
 
 	/**
 	 * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
@@ -162,45 +133,48 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		logger = LogFactory.getLog(getClass().getName());
 	}
 
-	public CloudControllerClientImpl(URL cloudControllerUrl, RestUtil restUtil, CloudCredentials cloudCredentials,
-			URL authorizationEndpoint, String orgName, String spaceName, HttpProxyConfiguration httpProxyConfiguration) {
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	                                 CloudCredentials cloudCredentials, CloudSpace sessionSpace) {
 		logger = LogFactory.getLog(getClass().getName());
-		CloudControllerClientImpl tempClient = new CloudControllerClientImpl(cloudControllerUrl, restUtil, cloudCredentials, 
-				                                                            authorizationEndpoint, null, httpProxyConfiguration);
+
+		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
+
+		this.sessionSpace = sessionSpace;
+	}
+
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	                                 CloudCredentials cloudCredentials, String orgName, String spaceName) {
+		logger = LogFactory.getLog(getClass().getName());
+		CloudControllerClientImpl tempClient =
+				new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials, null);
+
 		if (tempClient.token == null) {
 			tempClient.login();
 		}
 
-		initialize(cloudControllerUrl, restUtil, cloudCredentials, authorizationEndpoint, null, httpProxyConfiguration);
+		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
 
-		sessionSpace = validateSpaceAndOrg(spaceName, orgName, tempClient);
+		this.sessionSpace = validateSpaceAndOrg(spaceName, orgName, tempClient);
 
 		token = tempClient.token;
 	}
 
-	private void initialize(URL cloudControllerUrl,  RestUtil restUtil, CloudCredentials cloudCredentials,
-							URL authorizationEndpoint, CloudSpace sessionSpace, HttpProxyConfiguration httpProxyConfiguration) {
+	private void initialize(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	                        CloudCredentials cloudCredentials) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
-		Assert.notNull(restUtil, "RestUtil cannot be null");
-		this.restUtil = restUtil;
+		Assert.notNull(restTemplate, "RestTemplate cannot be null");
+		Assert.notNull(oauthClient, "OauthClient cannot be null");
 		this.cloudCredentials = cloudCredentials;
 		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
 			this.token = cloudCredentials.getToken();
 		}
+
 		this.cloudControllerUrl = cloudControllerUrl;
-		if (authorizationEndpoint != null) {
-			this.authorizationEndpoint = determineAuthorizationEndPointToUse(authorizationEndpoint, cloudControllerUrl);
-		} else {
-			this.authorizationEndpoint = null;
-		}
-		this.restTemplate = restUtil.createRestTemplate(httpProxyConfiguration);
+
+		this.restTemplate = restTemplate;
 		configureCloudFoundryRequestFactory(restTemplate);
 
-		this.restTemplate.setErrorHandler(new CloudControllerResponseErrorHandler());
-		this.restTemplate.setMessageConverters(getHttpMessageConverters());
-
-		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration);
-		this.sessionSpace = sessionSpace;
+		this.oauthClient = oauthClient;
 	}
 
 	private CloudSpace validateSpaceAndOrg(String spaceName, String orgName, CloudControllerClientImpl client) {
@@ -222,31 +196,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		this.restTemplate.setErrorHandler(errorHandler);
 	}
 
-	protected URL determineAuthorizationEndPointToUse(URL authorizationEndpoint, URL cloudControllerUrl) {
-		if (cloudControllerUrl.getProtocol().equals("http") && authorizationEndpoint.getProtocol().equals("https")) {
-			try {
-				return new URL("http", authorizationEndpoint.getHost(), authorizationEndpoint.getPort(),
-						authorizationEndpoint.getFile());
-			} catch (MalformedURLException e) {
-				// this shouldn't happen
-				return authorizationEndpoint;
-			}
-		}
-		return authorizationEndpoint;
-	}
-
 	public URL getCloudControllerUrl() {
 		return this.cloudControllerUrl;
 	}
 
 	public void updatePassword(String newPassword) {
 		updatePassword(cloudCredentials, newPassword);
-	}
-
-	public void updateHttpProxyConfiguration(HttpProxyConfiguration httpProxyConfiguration) {
-		ClientHttpRequestFactory requestFactory = restUtil.createRequestFactory(httpProxyConfiguration);
-		restTemplate.setRequestFactory(requestFactory);
-		configureCloudFoundryRequestFactory(restTemplate);
 	}
 
 	public Map<String, String> getLogs(String appName) {
@@ -350,36 +305,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	protected void configureCloudFoundryRequestFactory(RestTemplate restTemplate) {
 		ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-		restTemplate.setRequestFactory(
-				new CloudFoundryClientHttpRequestFactory(requestFactory));
-	}
-
-	private List<HttpMessageConverter<?>> getHttpMessageConverters() {
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-		messageConverters.add(new ByteArrayHttpMessageConverter());
-		messageConverters.add(new StringHttpMessageConverter());
-		messageConverters.add(new ResourceHttpMessageConverter());
-		messageConverters.add(new UploadApplicationPayloadHttpMessageConverter());
-		messageConverters.add(getFormHttpMessageConverter());
-		messageConverters.add(new MappingJacksonHttpMessageConverter());
-		return messageConverters;
-	}
-
-	private FormHttpMessageConverter getFormHttpMessageConverter() {
-		FormHttpMessageConverter formPartsMessageConverter = new CloudFoundryFormHttpMessageConverter();
-		formPartsMessageConverter.setPartConverters(getFormPartsMessageConverters());
-		return formPartsMessageConverter;
-	}
-
-	private List<HttpMessageConverter<?>> getFormPartsMessageConverters() {
-		List<HttpMessageConverter<?>> partConverters = new ArrayList<HttpMessageConverter<?>>();
-		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
-		stringConverter.setSupportedMediaTypes(Collections.singletonList(JSON_MEDIA_TYPE));
-		stringConverter.setWriteAcceptCharset(false);
-		partConverters.add(stringConverter);
-		partConverters.add(new ResourceHttpMessageConverter());
-		partConverters.add(new UploadApplicationPayloadHttpMessageConverter());
-		return partConverters;
+		if (!(requestFactory instanceof CloudFoundryClientHttpRequestFactory)) {
+			restTemplate.setRequestFactory(
+					new CloudFoundryClientHttpRequestFactory(requestFactory));
+		}
 	}
 
 	private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
@@ -1097,7 +1026,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private void processAsyncJob(ResponseEntity<Map<String,Map<String,String>>> jobCreationEntity, UploadStatusCallback callback) {
 		Map<String, String> jobEntity = jobCreationEntity.getBody().get("entity");
-		String jobStatus = null;
+		String jobStatus;
 		do {
 			jobStatus = jobEntity.get("status");
 			boolean unsubscribe = callback.onProgress(jobStatus);
@@ -1123,7 +1052,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		CloudResources archiveResources = new CloudResources(archive);
 		String json = JsonUtil.convertToJson(archiveResources);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(JSON_MEDIA_TYPE);
+		headers.setContentType(JsonUtil.JSON_MEDIA_TYPE);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
 		ResponseEntity<String> responseEntity =
 			getRestTemplate().exchange(getUrl("/v2/resource_match"), HttpMethod.PUT, requestEntity, String.class);

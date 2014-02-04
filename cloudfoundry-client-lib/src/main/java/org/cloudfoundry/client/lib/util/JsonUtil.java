@@ -22,8 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +42,11 @@ public class JsonUtil {
 	protected static final Log logger = LogFactory.getLog(JsonUtil.class);
 
 	private final static ObjectMapper mapper = new ObjectMapper();
+
+	public static final MediaType JSON_MEDIA_TYPE = new MediaType(
+			MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(),
+			Charset.forName("UTF-8"));
 
 	public static Map<String, Object> convertJsonToMap(String json) {
 		Map<String, Object> retMap = new HashMap<String, Object>();
