@@ -97,12 +97,7 @@ public class CloudControllerClientFactory {
 		String authEndPoint = (String) infoMap.get("authorization_endpoint");
 
 		try {
-			URL authEndPointUrl = new URL(authEndPoint);
-			if (cloudControllerUrl.getProtocol().equals("http") && authEndPointUrl.getProtocol().equals("https")) {
-				return new URL("http", authEndPointUrl.getHost(), authEndPointUrl.getPort(), authEndPointUrl.getFile());
-			} else {
-				return authEndPointUrl;
-			}
+			return new URL(authEndPoint);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("Error creating auth endpoint URL for endpoint " + authEndPoint, e);
 		}
