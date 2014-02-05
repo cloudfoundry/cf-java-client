@@ -313,7 +313,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     Map<String, String> getEnv() {
-        project.cloudfoundry.env
+        project.cloudfoundry.env.collectEntries { key, value -> [(key.toString()): value.toString()] }
     }
 
     List<String> getVersions() {

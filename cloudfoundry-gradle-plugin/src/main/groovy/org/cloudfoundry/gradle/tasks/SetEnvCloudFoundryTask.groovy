@@ -16,6 +16,7 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudApplication
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -36,10 +37,12 @@ class SetEnvCloudFoundryTask extends AbstractEnvCloudFoundryTask {
                 CloudApplication app = client.getApplication(application)
 
                 def newEnv = modifyAppEnv(app) { existingEnv, passedEnv ->
-                    existingEnv + passedEnv
+                    existingEnv + passedEnv.collectEntries { key, value -> [(key.toString()): value.toString()] }
                 }
 
-                listEnvironmentVariables(newEnv)
+                if (verboseEnabled) {
+                    listEnvironmentVariables(newEnv)
+                }
             }
         }
     }

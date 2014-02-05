@@ -63,7 +63,10 @@ if (project.hasProperty('performRelease')) {
     }
 }
 
-def credentials = [userName: deployUser, password: deployPassword]
+def credentials = [ : ]
+if (project.hasProperty('deployUser') && project.hasProperty('deployPassword')) {
+    credentials << [userName: deployUser, password: deployPassword]
+}
 
 uploadArchives {
     repositories {

@@ -39,7 +39,9 @@ class UnsetEnvCloudFoundryTask extends AbstractEnvCloudFoundryTask {
                     existingEnv - passedEnv
                 }
 
-                listEnvironmentVariables(newEnv)
+                if (verboseEnabled) {
+                    listEnvironmentVariables(newEnv)
+                }
             }
         }
     }

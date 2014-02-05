@@ -24,18 +24,16 @@ abstract class AbstractEnvCloudFoundryTask extends AbstractCloudFoundryTask {
     }
 
     protected void listEnvironmentVariables(def env) {
-        if (verboseEnabled) {
-            StringBuilder sb = new StringBuilder("Environment variables for ${application}\n")
+        StringBuilder sb = new StringBuilder("Environment variables for ${application}\n")
 
-            if (env.isEmpty()) {
-                sb << 'No environment variables set\n'
-            }
-            env.each { key, value ->
-                sb << "  $key=$value\n"
-            }
-
-            logVerbose sb.toString()
+        if (env.isEmpty()) {
+            sb << 'No environment variables set\n'
         }
+        env.each { key, value ->
+            sb << "$key=$value\n"
+        }
+
+        log sb.toString()
     }
 
     protected def modifyAppEnv(CloudApplication app, Closure c) {
