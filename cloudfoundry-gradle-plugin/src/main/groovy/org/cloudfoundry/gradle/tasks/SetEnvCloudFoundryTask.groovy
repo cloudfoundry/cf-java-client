@@ -16,7 +16,6 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.domain.CloudApplication
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**

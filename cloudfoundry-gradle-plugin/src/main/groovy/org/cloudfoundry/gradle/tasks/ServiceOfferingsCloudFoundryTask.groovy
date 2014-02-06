@@ -42,8 +42,6 @@ class ServiceOfferingsCloudFoundryTask extends AbstractCloudFoundryTask {
                     def plans = service.cloudServicePlans.collect { it.name }
 
                     output.addRow(service: service.name,
-                            version: service.version,
-                            provider: service.provider,
                             plans: plans.join(', '),
                             description: service.description)
                 }

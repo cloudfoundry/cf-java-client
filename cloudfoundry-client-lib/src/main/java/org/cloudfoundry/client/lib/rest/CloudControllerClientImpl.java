@@ -600,7 +600,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		Assert.notNull(service, "Service must not be null");
 		Assert.notNull(service.getName(), "Service name must not be null");
 		Assert.notNull(service.getLabel(), "Service label must not be null");
-		Assert.notNull(service.getVersion(), "Service version must not be null");
 		Assert.notNull(service.getPlan(), "Service plan must not be null");
 
 		CloudServicePlan cloudServicePlan = findPlanForService(service);
@@ -615,7 +614,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private CloudServicePlan findPlanForService(CloudService service) {
 		List<CloudServiceOffering> offerings = getServiceOfferings(service.getLabel());
 		for (CloudServiceOffering offering : offerings) {
-			if (service.getVersion() != null || service.getVersion().equals(offering.getVersion())) {
+			if (service.getVersion() == null || service.getVersion().equals(offering.getVersion())) {
 				for (CloudServicePlan plan : offering.getCloudServicePlans()) {
 					if (service.getPlan() != null && service.getPlan().equals(plan.getName())) {
 						return plan;

@@ -248,10 +248,8 @@ public final class UiUtils {
 
 		Table table = new Table();
 		table.getHeaders().put(COLUMN_1, new TableHeader("service"));
-		table.getHeaders().put(COLUMN_2, new TableHeader("version"));
-		table.getHeaders().put(COLUMN_3, new TableHeader("provider"));
-		table.getHeaders().put(COLUMN_4, new TableHeader("plans"));
-		table.getHeaders().put(COLUMN_5, new TableHeader("description"));
+		table.getHeaders().put(COLUMN_2, new TableHeader("plans"));
+		table.getHeaders().put(COLUMN_3, new TableHeader("description"));
 
 		List<String> CloudServicePlanNames;
 
@@ -261,21 +259,15 @@ public final class UiUtils {
 			table.getHeaders().get(COLUMN_1).updateWidth(serviceOffering.getLabel().length());
 			tableRow.addValue(COLUMN_1, serviceOffering.getLabel());
 
-			table.getHeaders().get(COLUMN_2).updateWidth(serviceOffering.getVersion().length());
-			tableRow.addValue(COLUMN_2, serviceOffering.getVersion());
-
-			table.getHeaders().get(COLUMN_3).updateWidth(serviceOffering.getProvider().length());
-			tableRow.addValue(COLUMN_3, serviceOffering.getProvider());
-
 			CloudServicePlanNames = new ArrayList<String>();
 			for (CloudServicePlan servicePlan : serviceOffering.getCloudServicePlans()) {
 				CloudServicePlanNames.add(servicePlan.getName());
 			}
-			table.getHeaders().get(COLUMN_4).updateWidth(CloudServicePlanNames.toString().length() - 1);
-			tableRow.addValue(COLUMN_4, CloudServicePlanNames.toString().substring(1, CloudServicePlanNames.toString().length() - 1));
+			table.getHeaders().get(COLUMN_2).updateWidth(CloudServicePlanNames.toString().length() - 1);
+			tableRow.addValue(COLUMN_2, CloudServicePlanNames.toString().substring(1, CloudServicePlanNames.toString().length() - 1));
 
-			table.getHeaders().get(COLUMN_5).updateWidth(serviceOffering.getDescription().length());
-			tableRow.addValue(COLUMN_5, serviceOffering.getDescription());
+			table.getHeaders().get(COLUMN_3).updateWidth(serviceOffering.getDescription().length());
+			tableRow.addValue(COLUMN_3, serviceOffering.getDescription());
 
 			table.getRows().add(tableRow);
 		}
@@ -305,9 +297,8 @@ public final class UiUtils {
 		Table table = new Table();
 		table.getHeaders().put(COLUMN_1, new TableHeader("name"));
 		table.getHeaders().put(COLUMN_2, new TableHeader("service"));
-		table.getHeaders().put(COLUMN_3, new TableHeader("provider"));
-		table.getHeaders().put(COLUMN_4, new TableHeader("plan"));
-		table.getHeaders().put(COLUMN_5, new TableHeader("bound apps"));
+		table.getHeaders().put(COLUMN_3, new TableHeader("plan"));
+		table.getHeaders().put(COLUMN_4, new TableHeader("bound apps"));
 
 		for (CloudService service : services) {
 			TableRow tableRow = new TableRow();
@@ -315,15 +306,12 @@ public final class UiUtils {
 			String name = service.getName();
 
 			String label;
-			String provider;
 			String plan;
 			if (service.isUserProvided()) {
 				label = "user-provided";
-				provider = "";
 				plan = "";
 			} else {
 				label = service.getLabel();
-				provider = service.getProvider();
 				plan = service.getPlan();
 			}
 
@@ -333,16 +321,13 @@ public final class UiUtils {
 			table.getHeaders().get(COLUMN_2).updateWidth(label.length());
 			tableRow.addValue(COLUMN_2, label);
 
-			table.getHeaders().get(COLUMN_3).updateWidth(provider.length());
-			tableRow.addValue(COLUMN_3, provider);
-
-			table.getHeaders().get(COLUMN_4).updateWidth(plan.length());
-			tableRow.addValue(COLUMN_4, plan);
+			table.getHeaders().get(COLUMN_3).updateWidth(plan.length());
+			tableRow.addValue(COLUMN_3, plan);
 
 			final List<String> appNames = servicesToApps.get(name);
 			final String appNamesString = CommonUtils.collectionToCommaDelimitedString(appNames);
-			table.getHeaders().get(COLUMN_5).updateWidth(appNamesString.length());
-			tableRow.addValue(COLUMN_5, appNamesString);
+			table.getHeaders().get(COLUMN_4).updateWidth(appNamesString.length());
+			tableRow.addValue(COLUMN_4, appNamesString);
 
 			table.getRows().add(tableRow);
 		}
