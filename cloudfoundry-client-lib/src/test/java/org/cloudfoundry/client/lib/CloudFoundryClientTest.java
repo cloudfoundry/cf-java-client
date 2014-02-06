@@ -1102,6 +1102,19 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void getServiceWithVersionAndProvider() {
+		String serviceName = "mysql-test-version-provider";
+
+		CloudService expectedService = createMySqlServiceWithVersionAndProvider(serviceName);
+		CloudService service = connectedClient.getService(serviceName);
+
+		assertNotNull(service);
+		assertServicesEqual(expectedService, service);
+		assertEquals(expectedService.getProvider(), service.getProvider());
+		assertEquals(expectedService.getVersion(), service.getVersion());
+	}
+
+	@Test
 	public void getUserProvidedService() {
 		String serviceName = "user-provided-test-service";
 
@@ -1115,8 +1128,6 @@ public class CloudFoundryClientTest {
 	private void assertServicesEqual(CloudService expectedService, CloudService service) {
 		assertEquals(expectedService.getName(), service.getName());
 		assertEquals(expectedService.getLabel(), service.getLabel());
-		assertEquals(expectedService.getProvider(), service.getProvider());
-		assertEquals(expectedService.getVersion(), service.getVersion());
 		assertEquals(expectedService.getPlan(), service.getPlan());
 		assertEquals(expectedService.isUserProvided(), service.isUserProvided());
 	}
@@ -1649,13 +1660,23 @@ public class CloudFoundryClientTest {
 				uris, serviceNames);
 	}
 
-	private CloudService createMySqlService(String serviceName) {
+	private CloudService createMySqlServiceWithVersionAndProvider(String serviceName) {
 		CloudServiceOffering databaseServiceOffering = getCloudServiceOffering(MYSQL_SERVICE_LABEL);
 
 		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
 		service.setProvider(databaseServiceOffering.getProvider());
 		service.setLabel(databaseServiceOffering.getLabel());
 		service.setVersion(databaseServiceOffering.getVersion());
+		service.setPlan(MYSQL_SERVICE_PLAN);
+
+		connectedClient.createService(service);
+
+		return service;
+	}
+
+	private CloudService createMySqlService(String serviceName) {
+		CloudService service = new CloudService(CloudEntity.Meta.defaultMeta(), serviceName);
+		service.setLabel(MYSQL_SERVICE_LABEL);
 		service.setPlan(MYSQL_SERVICE_PLAN);
 
 		connectedClient.createService(service);
