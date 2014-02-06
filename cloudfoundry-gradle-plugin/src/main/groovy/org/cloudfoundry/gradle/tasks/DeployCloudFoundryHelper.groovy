@@ -19,26 +19,26 @@ import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.gradle.api.GradleException
 
 class DeployCloudFoundryHelper {
-    void validateVersionsForDeploy() {
-        if (!versions || versions.size() < 2) {
-            throw new GradleException("At least two 'versions' suffixes must be specified.")
+    void validateVariantsForDeploy() {
+        if (!variants || variants.size() < 2) {
+            throw new GradleException("At least two 'variants' suffixes must be specified.")
         }
     }
 
-    String findNextVersionToDeploy(String appName, List<CloudApplication> apps) {
-        versions.reverse().find { String version ->
-            boolean notUsed = !apps.any { app -> appHasDecoratedName(app, appName, version) }
-            boolean usedButUnmapped = apps.any { app -> appVersionExistsAndUnmapped(app, appName, version) }
+    String findNextVariantToDeploy(String appName, List<CloudApplication> apps) {
+        variants.reverse().find { String variant ->
+            boolean notUsed = !apps.any { app -> appHasDecoratedName(app, appName, variant) }
+            boolean usedButUnmapped = apps.any { app -> appVariantExistsAndUnmapped(app, appName, variant) }
             notUsed || usedButUnmapped
         }
     }
 
-    List<String> findMappedVersions(String appName, List<CloudApplication> apps) {
+    List<String> findMappedVariants(String appName, List<CloudApplication> apps) {
         def appNames = []
 
-        versions.each { String version ->
+        variants.each { String variant ->
             appNames += apps.findAll { app ->
-                appVersionExistsAndMapped(app, appName, version)
+                appVariantExistsAndMapped(app, appName, variant)
             }.collect { app ->
                 app.name
             }
@@ -47,12 +47,12 @@ class DeployCloudFoundryHelper {
         appNames
     }
 
-    List<String> findUnmappedVersions(String appName, List<CloudApplication> apps) {
+    List<String> findUnmappedVariants(String appName, List<CloudApplication> apps) {
         def appNames = []
 
-        versions.each { String version ->
+        variants.each { String variant ->
             appNames += apps.findAll { app ->
-                appVersionExistsAndUnmapped(app, appName, version)
+                appVariantExistsAndUnmapped(app, appName, variant)
             }.collect { app ->
                 app.name
             }
@@ -61,15 +61,15 @@ class DeployCloudFoundryHelper {
         appNames
     }
 
-    boolean appVersionExistsAndMapped(CloudApplication app, String appName, String version) {
-        appHasDecoratedName(app, appName, version) && app.uris.containsAll(allUris)
+    boolean appVariantExistsAndMapped(CloudApplication app, String appName, String variant) {
+        appHasDecoratedName(app, appName, variant) && app.uris.containsAll(allUris)
     }
 
-    boolean appVersionExistsAndUnmapped(CloudApplication app, String appName, String version) {
-        appHasDecoratedName(app, appName, version) && app.uris.disjoint(allUris)
+    boolean appVariantExistsAndUnmapped(CloudApplication app, String appName, String variant) {
+        appHasDecoratedName(app, appName, variant) && app.uris.disjoint(allUris)
     }
 
-    boolean appHasDecoratedName(CloudApplication app, String appName, String version) {
-        app.name == appName + version
+    boolean appHasDecoratedName(CloudApplication app, String appName, String variant) {
+        app.name == appName + variant
     }
 }

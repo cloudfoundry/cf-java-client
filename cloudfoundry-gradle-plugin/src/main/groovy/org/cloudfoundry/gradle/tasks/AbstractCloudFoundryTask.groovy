@@ -33,7 +33,7 @@ import org.gradle.api.GradleException
 abstract class AbstractCloudFoundryTask extends DefaultTask {
     protected CloudFoundryOperations client
     protected WarningBypassingResponseErrorHandler errorHandler
-    protected String currentVersionSuffix
+    protected String currentVariantSuffix
 
     AbstractCloudFoundryTask() {
         super()
@@ -213,12 +213,12 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         spaces.find { it.name.equals(space) }
     }
 
-    protected void applyVersionSuffix(String version) {
-        currentVersionSuffix = version
+    protected void applyVariantSuffix(String variant) {
+        currentVariantSuffix = variant
     }
 
-    protected void removeVersionSuffix() {
-        currentVersionSuffix = null
+    protected void removeVariantSuffix() {
+        currentVariantSuffix = null
     }
 
     // extension accessors
@@ -245,7 +245,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
     String getApplication() {
         def appName = propertyOrExtension('application')
-        appName + (currentVersionSuffix ?: "")
+        appName + (currentVariantSuffix ?: "")
     }
 
     String getCommand() {
@@ -290,7 +290,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
 
         def allUris = []
 
-        if (!currentVersionSuffix) {
+        if (!currentVariantSuffix) {
             allUris += uris.collect { it.toString() }
             if (uri) {
                 allUris << uri.toString()
@@ -298,10 +298,10 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
         if (domain) {
             if (host) {
-                allUris << "${host}${(currentVersionSuffix ?: "")}.${domain}".toString()
+                allUris << "${host}${(currentVariantSuffix ?: "")}.${domain}".toString()
             }
             if (hosts) {
-                allUris += hosts.collect { "${it}${(currentVersionSuffix ?: "")}.${domain}".toString() }
+                allUris += hosts.collect { "${it}${(currentVariantSuffix ?: "")}.${domain}".toString() }
             }
         }
 
@@ -316,8 +316,8 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         project.cloudfoundry.env.collectEntries { key, value -> [(key.toString()): value.toString()] }
     }
 
-    List<String> getVersions() {
-        project.cloudfoundry.versions
+    List<String> getVariants() {
+        project.cloudfoundry.variants
     }
 
     Integer getAppStartupTimeout() {

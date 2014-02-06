@@ -19,7 +19,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Tasks used to deploy versions of an application to a Cloud Foundry cloud.
+ * Tasks used to deploy variants of an application to a Cloud Foundry cloud.
  *
  * @author Scott Frederick
  */
@@ -30,31 +30,31 @@ import org.gradle.api.tasks.TaskAction
 class DeployCloudFoundryTask extends AbstractCloudFoundryTask {
     DeployCloudFoundryTask() {
         super()
-        description = 'Deploys a version of an application'
+        description = 'Deploys a variants of an application'
     }
 
     @TaskAction
     void deploy() {
         withCloudFoundryClient {
             validateApplicationConfig()
-            validateVersionsForDeploy()
+            validateVariantsForDeploy()
 
             def apps = client.applications
 
-            String next = findNextVersionToDeploy(application, apps)
+            String next = findNextVariantToDeploy(application, apps)
 
-            List<String> mappedAppVersions = findMappedVersions(application, apps)
+            List<String> mappedAppVariants = findMappedVariants(application, apps)
 
             if (!next) {
-                throw new GradleException("All versions are active, none available for deployment")
+                throw new GradleException("All variants are active, none available for deployment")
             }
 
-            applyVersionSuffix(next)
+            applyVariantSuffix(next)
 
-            if (mappedAppVersions)
-                log "Currently active versions are ${mappedAppVersions}, deploying ${application}"
+            if (mappedAppVariants)
+                log "Currently active variants are ${mappedAppVariants}, deploying ${application}"
             else
-                log "No currently active versions, deploying ${application}"
+                log "No currently active variants, deploying ${application}"
 
             createServices(serviceInfos)
 
@@ -66,7 +66,7 @@ class DeployCloudFoundryTask extends AbstractCloudFoundryTask {
                 startApplication()
             }
 
-            removeVersionSuffix()
+            removeVariantSuffix()
         }
     }
 }

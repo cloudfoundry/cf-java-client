@@ -49,7 +49,7 @@ class CloudFoundryExtension {
     File file
     Map<String, String> env = [:]
 
-    List<String> versions = []
+    List<String> variants = []
 
     // plugin configuration
     Integer appStartupTimeout

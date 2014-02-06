@@ -78,10 +78,4 @@ class PushCloudFoundryHelper {
             throw new GradleException("You must specify a valid file ('${file}' is not valid)")
         }
     }
-
-    void validateVersionsForDeploy() {
-        if (!versions || versions.size() < 2) {
-            throw new GradleException("At least two version suffixes must be specified.")
-        }
-    }
 }

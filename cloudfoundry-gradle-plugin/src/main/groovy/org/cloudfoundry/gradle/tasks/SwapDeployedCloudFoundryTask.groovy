@@ -28,33 +28,33 @@ class SwapDeployedCloudFoundryTask extends AbstractMapCloudFoundryTask {
 
     SwapDeployedCloudFoundryTask() {
         super()
-        description = 'Swaps the URIs for deployed versions of an application'
+        description = 'Swaps the URIs for deployed variants of an application'
     }
 
     @TaskAction
     void swapDeployedUris() {
         withCloudFoundryClient {
-            validateVersionsForDeploy()
+            validateVariantsForDeploy()
 
             List<CloudApplication> apps = client.applications
 
-            List<String> mappedAppVersions = findMappedVersions(application, apps)
-            List<String> unmappedAppVersions = findUnmappedVersions(application, apps)
+            List<String> mappedAppVariants = findMappedVariants(application, apps)
+            List<String> unmappedAppVariants = findUnmappedVariants(application, apps)
 
-            if (unmappedAppVersions) {
-                log "Mapping URIs ${allUris} for ${unmappedAppVersions}"
+            if (unmappedAppVariants) {
+                log "Mapping URIs ${allUris} for ${unmappedAppVariants}"
             }
-            if (mappedAppVersions) {
-                log "Unmapping URIs ${allUris} for ${mappedAppVersions}"
+            if (mappedAppVariants) {
+                log "Unmapping URIs ${allUris} for ${mappedAppVariants}"
             }
 
             withApplication {
-                unmappedAppVersions.each { appName ->
+                unmappedAppVariants.each { appName ->
                     project.cloudfoundry.application = appName
                     mapUrisToApplication()
                 }
 
-                mappedAppVersions.each { appName ->
+                mappedAppVariants.each { appName ->
                     project.cloudfoundry.application = appName
                     unmapUrisFromApplication()
                 }

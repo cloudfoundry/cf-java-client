@@ -25,7 +25,7 @@ class CloudFoundryServiceExtension {
     String plan
     String version
     Map<String, Object> userProvidedCredentials = [:]
-    boolean bind = false
+    boolean bind = true
 
     CloudFoundryServiceExtension(String name) {
         this.name = name

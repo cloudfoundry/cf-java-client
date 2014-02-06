@@ -19,7 +19,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Tasks used to undeploy unused versions of an application to a Cloud Foundry cloud.
+ * Tasks used to undeploy unused variants of an application to a Cloud Foundry cloud.
  *
  * @author Scott Frederick
  */
@@ -27,23 +27,23 @@ import org.gradle.api.tasks.TaskAction
 class UndeployCloudFoundryTask extends AbstractCloudFoundryTask {
     UndeployCloudFoundryTask() {
         super()
-        description = 'Undeploys versions of an application'
+        description = 'Undeploys variants of an application'
     }
 
     @TaskAction
     void undeploy() {
         withCloudFoundryClient {
-            validateVersionsForDeploy()
+            validateVariantsForDeploy()
 
             List<CloudApplication> runningApps = client.applications
 
-            List<String> unmappedAppVersions = findUnmappedVersions(application, runningApps)
+            List<String> unmappedAppVariants = findUnmappedVariants(application, runningApps)
 
-            if (unmappedAppVersions.isEmpty()) {
+            if (unmappedAppVariants.isEmpty()) {
                 log "No candidates for undeploying found"
             }
 
-            unmappedAppVersions.each { String appName ->
+            unmappedAppVariants.each { String appName ->
                 project.cloudfoundry.application = appName
                 log "Deleting application ${appName}"
                 withApplication {
