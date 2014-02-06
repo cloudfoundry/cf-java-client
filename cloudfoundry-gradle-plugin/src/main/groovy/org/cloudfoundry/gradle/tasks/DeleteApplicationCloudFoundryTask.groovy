@@ -21,6 +21,7 @@ import org.gradle.api.tasks.TaskAction
  * Task used to delete an application. If the application name is '*', then
  * all applications are deleted.
  */
+@Mixin(PushCloudFoundryHelper)
 class DeleteApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
     DeleteApplicationCloudFoundryTask() {
         super()
@@ -35,10 +36,12 @@ class DeleteApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
                 client.deleteAllApplications()
                 log "Deleted successfully"
             } else {
-                log "Deleting application ${application}"
-                withApplication {
+                if (applicationExists(application)) {
+                    log "Deleting application ${application}"
                     client.deleteApplication(application)
                     log "Deleted successfully"
+                } else {
+                    log "Application ${application} not found"
                 }
             }
         }

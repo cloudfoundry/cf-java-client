@@ -32,14 +32,17 @@ public class Delete extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		getLog().info("Deleting application..." + getAppname());
+		getLog().info("Deleting application '" + getAppname() + "'");
 
 		try {
+			getClient().getApplication(getAppname());
 			getClient().deleteApplication(getAppname());
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("The Application '%s' does not exist.",
-						getAppname()), e);
+				getLog().info("Application '" + getAppname() + "' does not exist");
+			} else {
+				throw new MojoExecutionException(String.format("Error while deleting application '%s'. Error message: '%s'. Description: '%s'",
+						getAppname(), e.getMessage(), e.getDescription()), e);
 			}
 		}
 	}
