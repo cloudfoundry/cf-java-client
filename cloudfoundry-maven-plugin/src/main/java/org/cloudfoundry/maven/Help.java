@@ -66,25 +66,28 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	private Map<String, String> getParameterMap() throws MojoExecutionException {
 		final Map<String, String> parameterMap = new TreeMap<String, String>();
 
-		parameterMap.put("Appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
-		parameterMap.put("Command", getCommand() != null ? getCommand() : NOT_AVAILABLE);
-		parameterMap.put("Instances", getInstances() != null ? String.valueOf(getInstances()) : NOT_AVAILABLE);
-		parameterMap.put("Memory (in MB)", getMemory() != null ? String.valueOf(getMemory()) : NOT_AVAILABLE);
+		parameterMap.put("appname", getAppname() != null ? getAppname() : NOT_AVAILABLE);
+		parameterMap.put("command", getCommand() != null ? getCommand() : NOT_AVAILABLE);
+		parameterMap.put("instances", getInstances() != null ? String.valueOf(getInstances()) : NOT_AVAILABLE);
+		parameterMap.put("memory (in MB)", getMemory() != null ? String.valueOf(getMemory()) : NOT_AVAILABLE);
+		parameterMap.put("diskQuota (in MB)", getDiskQuota() != null ? String.valueOf(getDiskQuota()) : NOT_AVAILABLE);
+		parameterMap.put("healthCheckTimeout", getHealthCheckTimeout() != null ? String.valueOf(getHealthCheckTimeout()) : NOT_AVAILABLE);
+		parameterMap.put("url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
+		parameterMap.put("urls", getUrls().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(getUrls()));
+		parameterMap.put("path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
 
-		parameterMap.put("Org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
+		parameterMap.put("env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
+		parameterMap.put("services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
+		parameterMap.put("noStart", isNoStart() != null ? String.valueOf(isNoStart()) : NOT_AVAILABLE);
 
-		parameterMap.put("Env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
-		parameterMap.put("No-start", isNoStart() != null ? String.valueOf(isNoStart()) : NOT_AVAILABLE);
-		parameterMap.put("Password", getPassword() != null ? CommonUtils.maskPassword(getPassword()) : NOT_AVAILABLE);
-		parameterMap.put("Server", getServer());
-		parameterMap.put("Services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
+		parameterMap.put("server", getServer());
+		parameterMap.put("target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);
+		parameterMap.put("org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
+		parameterMap.put("space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
+		parameterMap.put("username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
+		parameterMap.put("password", getPassword() != null ? CommonUtils.maskPassword(getPassword()) : NOT_AVAILABLE);
 
-		parameterMap.put("Space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
-
-		parameterMap.put("Target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);
-		parameterMap.put("Url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
-		parameterMap.put("Username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
-		parameterMap.put("Path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
+		parameterMap.put("trustSelfSignedCerts", String.valueOf(getTrustSelfSignedCerts()));
 
 		return parameterMap;
 	}

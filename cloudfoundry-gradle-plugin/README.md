@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.1'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.2'
     }
 }
 
@@ -65,7 +65,7 @@ cloudfoundry {
     space = 'development'
     username = 'user@example.com'
     password = 's3cr3t'
-    file = new File('build/libs/my-app.war')
+    file = file("${war.archivePath}")
     uri = 'http://my-app.run.pivotal.io'
     env = [
         "key": "value"
@@ -80,11 +80,16 @@ Configuration options are:
 * username - your username on the target platform
 * password - your password on the target platform
 * application - the name of your application (defaults to the Gradle project name)
-* file (type: File) - path to the WAR file to be deployed
-* memory - amount of memory for an application in megabytes (defaults to 512)
+* file (type: File) - path to the JAR or WAR file to be deployed
+* memory - amount of memory in megabytes to allocate to an application
+* diskQuota - amount of disk space in megabytes to allocate to an application
+* healthCheckTimeout - the amount of time in seconds that Cloud Foundry should wait for the application to start
 * instances - number of instances (defaults to 1)
 * uri - a URI to map to the application
 * uris (type: List) - a list of URIs to map to the application
+* host - combined with `domain` to specify a URI to map to the application
+* hosts (type: List) - combined with `domain` to specify a list of URIs to map to the application
+* domain - the domain part of URIs to map to the application
 * command - the command to run when the application is started
 * buildpack - the URL of a buildpack to use to stage the application
 * env (type: Map) - environment variables to set for the application
@@ -92,7 +97,7 @@ Configuration options are:
 
 ### Configuring services
 
-The configuration can contain information about services that should be bound to the application or otherwise
+The configuration can contain information about system-provisioned services that should be bound to the application or otherwise
 managed by tasks. One or more services can be nested in the `cloudfoundry` configuration:
 
 ~~~
@@ -103,11 +108,9 @@ cloudfoundry {
     file = new File('build/libs/my-app.war')
     uri = 'http://app-name.run.pivotal.io'
 
-    serviceInfos {
+    services {
         'my-mongodb' {
             label = 'mongolab'
-            provider = 'mongolab'
-            version = 'n/a'
             plan = 'sandbox'
             bind = true
         }
@@ -115,14 +118,41 @@ cloudfoundry {
 }
 ~~~
 
-The service configuration options are:
+The configuration options for system-provisioned services are:
 * label - the type of the service
-* provider - the name of the service vendor
-* version - the version of the service
 * plan - the tier option of the service
 * bind (type: boolean) - bind the service to the application on push (defaults to true)
 
 Use the `cf-service-plans` task to see the valid values for service configuration.
+
+The configuration can also contain information about user-provided service instances, where service credentials are
+specified by the user. In this case, the `label` must be `user-provided`.
+
+~~~
+cloudfoundry {
+    username = 'user@example.com'
+    password = 's3cr3t'
+    application = 'app-name'
+    file = new File('build/libs/my-app.war')
+    uri = 'http://app-name.run.pivotal.io'
+
+    services {
+        'my-web-service' {
+            label = 'user-provided'
+            userProvidedCredentials = [
+                'uri': 'http://example.com/service',
+                'accessKey': 'abc123'
+            ]
+            bind = true
+        }
+    }
+}
+~~~
+
+userProvidedCredentials = [
+                    'uri': 'mysql://b56d0d229a2478:f98e2c5c@us-cdbr-east-04.cleardb.com:3306/ad_fb30a5b6060fc84?reconnect=true',
+                    'port': 12345
+            ]
 
 ### Overriding configuration from command line
 
@@ -179,6 +209,24 @@ The tokens are saved in a way that is compatible with the `cf` command-line tool
 run other tasks without providing credentials.
 
 ## Advanced configuration
+
+### HTTP Proxies
+
+By default, the Cloud Foundry Gradle Plugin will honor the Gradle HTTP proxy configuration when communicating with the
+target Cloud Foundry service. See http://www.gradle.org/docs/current/userguide/userguide_single.html#sec:accessing_the_web_via_a_proxy
+for more information on configuring Gradle to use an HTTP proxy.
+
+If Gradle needs a proxy to resolve build dependencies but you do not want to use the proxy to communicate to the target
+Cloud Foundry service, include the configuration setting `useSystemProxy=false` in your Cloud Foundry plugin configuration.
+
+### Self-signed SSL Certificates
+
+Some Cloud Foundry deployments, such as those deployed using Pivotal CF, use a self-signed certificate for SSL
+connectivity. If you attempt to target a Cloud Foundry service that is using self-signed certificates, you may get an
+error containing the text `javax.net.ssl.SSLPeerUnverifiedException: peer not authenticated`.
+
+To instruct the Cloud Foundry Gradle plugin to accept self-signed certificates from the Cloud Foundry target endpoint,
+add `trustSelfSignedCerts=true` to the plugin configuration block.
 
 ### Configuration variables
 
@@ -245,3 +293,13 @@ The organization and space would then be selected from the command line:
 $ gradle cf-push -Pdev
 $ gradle cf-push -Pprod
 ~~~
+
+# History
+
+## Changes in 1.0.2
+
+* Added HTTP Proxy support for targeting CF platforms from behind a proxy
+* Added support for user-provided service instances
+* Added support for `healthCheckTimeout` and `diskQuota` application parameters
+* Removed defaulting of `memory` app setting to prefer the default configured in Cloud Controller
+* Added `trustSelfSignedCerts` plugin parameter

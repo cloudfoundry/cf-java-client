@@ -77,7 +77,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private String url;
 
 	/**
-	 * @parameter expression="${urls}"
+	 * @parameter expression="${cf.urls}"
 	 */
 	private List<String> urls;
 
