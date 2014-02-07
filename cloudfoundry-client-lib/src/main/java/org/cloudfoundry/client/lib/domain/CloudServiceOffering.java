@@ -25,7 +25,14 @@ public class CloudServiceOffering extends CloudEntity {
 	private String provider;
 	private String version;
 	private String description;
-
+	private boolean active;
+	private boolean bindable;
+	private String url;
+	private String infoUrl;
+	private String uniqueId;
+	private String extra;
+	private String docUrl;
+	
 	private List<CloudServicePlan> cloudServicePlans = new ArrayList<CloudServicePlan>();
 
 	public CloudServiceOffering(Meta meta, String name) {
@@ -38,11 +45,16 @@ public class CloudServiceOffering extends CloudEntity {
 		this.version = version;
 	}
 
-	public CloudServiceOffering(Meta meta, String name, String provider, String version, String description) {
+	public CloudServiceOffering(Meta meta, String name, String provider, String version, 
+								String description, boolean active, boolean bindable,
+								String url, String infoUrl, String uniqueId, String extra,
+								String docUrl) {
 		super(meta, name);
 		this.provider = provider;
 		this.version = version;
 		this.description = description;
+		this.active = active;
+		this.bindable = bindable;
 	}
 
 	public String getLabel() {
@@ -61,6 +73,34 @@ public class CloudServiceOffering extends CloudEntity {
 		return version;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+	
+	public boolean isBindable() {
+		return bindable;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public String getInfoUrl() {
+		return infoUrl;
+	}
+	
+	public String getUniqueId() {
+		return uniqueId;
+	}
+	
+	public String getExtra() {
+		return extra;
+	}
+	
+	public String getDocumenationUrl() {
+		return docUrl;
+	}
+	
 	public List<CloudServicePlan> getCloudServicePlans() {
 		return cloudServicePlans;
 	}
