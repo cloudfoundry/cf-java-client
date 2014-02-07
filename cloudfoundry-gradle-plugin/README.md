@@ -149,11 +149,6 @@ cloudfoundry {
 }
 ~~~
 
-userProvidedCredentials = [
-                    'uri': 'mysql://b56d0d229a2478:f98e2c5c@us-cdbr-east-04.cleardb.com:3306/ad_fb30a5b6060fc84?reconnect=true',
-                    'port': 12345
-            ]
-
 ### Overriding configuration from command line
 
 In addition to the `build.gradle` file-based configuration, it is also possible to use command line options to set
