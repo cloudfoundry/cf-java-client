@@ -184,7 +184,14 @@ public class CloudEntityResourceMapper {
 				getEntityAttribute(resource, "label", String.class),
 				getEntityAttribute(resource, "provider", String.class),
 				getEntityAttribute(resource, "version", String.class),
-				getEntityAttribute(resource, "description", String.class));
+				getEntityAttribute(resource, "description", String.class),
+				getEntityAttribute(resource, "active", Boolean.class),
+				getEntityAttribute(resource, "bindable", Boolean.class),
+				getEntityAttribute(resource, "url", String.class),
+				getEntityAttribute(resource, "info_url", String.class),
+				getEntityAttribute(resource, "unique_id", String.class),
+				getEntityAttribute(resource, "extra", String.class),
+				getEntityAttribute(resource, "documentation_url", String.class));
 		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
 		if (servicePlanList != null) {
 			for (Map<String, Object> servicePlanResource : servicePlanList) {
@@ -192,6 +199,11 @@ public class CloudEntityResourceMapper {
 						new CloudServicePlan(
 								getMeta(servicePlanResource),
 								getEntityAttribute(servicePlanResource, "name", String.class),
+								getEntityAttribute(servicePlanResource, "description", String.class),
+								getEntityAttribute(servicePlanResource, "free", Boolean.class),
+								getEntityAttribute(servicePlanResource, "public", Boolean.class),
+								getEntityAttribute(servicePlanResource, "extra", String.class),
+								getEntityAttribute(servicePlanResource, "unique_id", String.class),
 								cloudServiceOffering);
 				cloudServiceOffering.addCloudServicePlan(servicePlan);
 			}

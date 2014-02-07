@@ -19,16 +19,49 @@ package org.cloudfoundry.client.lib.domain;
 
 public class CloudServicePlan extends CloudEntity {
 
+	private boolean free;
+	private boolean _public;
+	private String description;
+	private String extra;
+	private String uniqueId;
+	
 	private CloudServiceOffering serviceOffering;
 
 	public CloudServicePlan() {
 	}
 
-	public CloudServicePlan(Meta meta, String name, CloudServiceOffering serviceOffering) {
+	public CloudServicePlan(Meta meta, String name, String description, boolean free,
+							boolean _public, String extra, String uniqueId,
+							CloudServiceOffering serviceOffering) {
 		super(meta, name);
+		this.description = description;
+		this.free = free;
+		this._public = _public;
+		this.extra = extra;
+		this.uniqueId = uniqueId;
 		this.serviceOffering = serviceOffering;
 	}
 
+	public boolean isFree() {
+		return this.free;
+	}
+	
+	public boolean isPublic() {
+		return this._public;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public String getExtra() {
+		return extra;
+	}
+	
+	public String getUniqueId() {
+		return uniqueId;
+	}
+	
 	public CloudServiceOffering getServiceOffering() {
 		return serviceOffering;
 	}
