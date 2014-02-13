@@ -202,7 +202,7 @@ public class CloudApplication extends CloudEntity {
 	public void setEnv(Map<String, String> env) {
 		List<String> joined = new ArrayList<String>();
 		for (Map.Entry<String, String> entry : env.entrySet()) {
-			joined.add(entry.getKey() + '=' + entry.getValue());
+			joined.add(entry.getKey() + '=' + String.valueOf(entry.getValue()));
 		}
 		this.env = joined;
 	}
