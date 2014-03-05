@@ -90,7 +90,7 @@ public final class Assert {
 			message.append(UiUtils.HORIZONTAL_LINE);
 
 			if (additionalDescription != null) {
-				message.append(additionalDescription + "\n");
+				message.append(additionalDescription).append("\n");
 				message.append(UiUtils.HORIZONTAL_LINE);
 			}
 
@@ -127,7 +127,7 @@ public final class Assert {
 			message.append(UiUtils.HORIZONTAL_LINE);
 
 			if (additionalDescription != null) {
-				message.append(additionalDescription + "\n");
+				message.append(additionalDescription).append("\n");
 				message.append(UiUtils.HORIZONTAL_LINE);
 			}
 
@@ -140,14 +140,13 @@ public final class Assert {
 	 */
 	public static void configurationUrls(String url, List<String> urls) throws MojoExecutionException {
 		if (url != null && !urls.isEmpty()) {
-			final StringBuilder message = new StringBuilder("\n\n");
+			final String message = "\n\n" +
+			"Both url and urls elements are specified at the same level\n" +
+			"========================================================================\n\n" +
+			"The element <url> should be nested inside a <urls> element or specified alone without a <urls> element present.\n" +
+			UiUtils.HORIZONTAL_LINE;
 
-			message.append("Both url and urls elements are specified at the same level\n");
-			message.append("========================================================================\n\n");
-			message.append("The element <url> should be nested inside a <urls> element or specified alone without a <urls> element present.\n");
-			message.append(UiUtils.HORIZONTAL_LINE);
-
-			throw new MojoExecutionException(message.toString());
+			throw new MojoExecutionException(message);
 		}
 	}
 }

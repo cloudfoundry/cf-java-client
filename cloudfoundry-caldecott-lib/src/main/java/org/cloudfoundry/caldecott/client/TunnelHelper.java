@@ -62,6 +62,10 @@ public class TunnelHelper {
 
 	private static ObjectMapper objectMapper = new ObjectMapper();
 
+	private TunnelHelper() {
+		throw new AssertionError("Helper class should not be instantiated.");
+	}
+
 	public static String getTunnelAppName() {
 		return TUNNEL_APP_NAME;
 	}
@@ -75,7 +79,7 @@ public class TunnelHelper {
 		try {
 			File temp = copyCaldecottZipFile(cpr);
 			client.createApplication(TUNNEL_APP_NAME, new Staging("ruby19", "sinatra"), 64,
-					Arrays.asList(new String[]{getRandomUrl(client, TUNNEL_APP_NAME)}),
+					Arrays.asList(getRandomUrl(client, TUNNEL_APP_NAME)),
 					Arrays.asList(new String[] {}), false);
 			client.uploadApplication(TUNNEL_APP_NAME, temp);
 			client.updateApplicationEnv(TUNNEL_APP_NAME,

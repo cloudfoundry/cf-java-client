@@ -54,7 +54,7 @@ class ChainedProxyConnectHandler extends ConnectHandler {
 
 		int foo = 0;
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		while (foo >= 0) {
 			foo = in.read();
 			if (foo != 13) {

@@ -123,7 +123,7 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 				}
 
 				if (line != null) {
-					helpTextStringBuilder.append(line + "\n");
+					helpTextStringBuilder.append(line).append("\n");
 				}
 			}
 			sb.append(helpTextStringBuilder);

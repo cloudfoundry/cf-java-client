@@ -440,10 +440,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					},
 					new ResponseExtractor<Boolean>() {
 						public Boolean extractData(ClientHttpResponse response) throws IOException {
-							if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
-								return true;
-							}
-							return false;
+							return response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT);
 						}
 					},
 					app, instance, filePath);

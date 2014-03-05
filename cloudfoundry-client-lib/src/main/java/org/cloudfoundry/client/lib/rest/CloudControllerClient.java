@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
