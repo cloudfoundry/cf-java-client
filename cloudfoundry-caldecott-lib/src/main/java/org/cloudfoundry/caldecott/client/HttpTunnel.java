@@ -203,12 +203,12 @@ public class HttpTunnel implements Tunnel {
 
 	private static String printBytes(byte[] array) {
 		StringBuilder printable = new StringBuilder();
-		printable.append("[" + array.length + "] = " + "0x");
-		for (int k = 0; k < array.length; k++) {
-			printable.append(byteToHex(array[k]));
+		printable.append("[").append(array.length).append("] = ").append("0x");
+	        for (byte aByte : array) {
+	            printable.append(byteToHex(aByte));
+	        }
+			return printable.toString();
 		}
-		return printable.toString();
-	}
 
 	private static String byteToHex(byte b) {
 		// Returns hex String representation of byte b

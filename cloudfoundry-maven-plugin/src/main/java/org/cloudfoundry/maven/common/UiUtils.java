@@ -407,16 +407,15 @@ public final class UiUtils {
 	 */
 	public static String renderCloudInfoFormattedAsString(CloudInfo cloudInfo, String target, String org, String space) {
 
-		StringBuilder sb = new StringBuilder("\n");
+		final String cloudInfoMessage = "\n" +
+		UiUtils.HORIZONTAL_LINE +
+		String.format("API endpoint: %s (API version: %s) \n", target, cloudInfo.getVersion()) +
+		String.format("user:         %s\n", cloudInfo.getUser()) +
+		String.format("org:          %s\n", org) +
+		String.format("space:        %s\n", space) +
+		UiUtils.HORIZONTAL_LINE;
 
-		sb.append(UiUtils.HORIZONTAL_LINE);
-		sb.append(String.format("API endpoint: %s (API version: %s) \n", target, cloudInfo.getVersion()));
-		sb.append(String.format("user:         %s\n", cloudInfo.getUser()));
-		sb.append(String.format("org:          %s\n", org));
-		sb.append(String.format("space:        %s\n", space));
-
-		sb.append(UiUtils.HORIZONTAL_LINE);
-		return sb.toString();
+		return cloudInfoMessage;
 	}
 
 	/**

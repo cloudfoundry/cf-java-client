@@ -51,6 +51,10 @@ public class CloudUtil {
 		return parse(String.class, object);
 	}
 
+	private CloudUtil() {
+		throw new AssertionError("Helper class should not be instantiated.");
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T> T parse(Class<T> clazz, Object object) {
 		T defaultValue = null;
@@ -77,21 +81,21 @@ public class CloudUtil {
 			// but may be requested as long and vice versa
 			if (clazz == Integer.class) {
 				if (object instanceof Number) {
-					return clazz.cast(Integer.valueOf(((Number) object).intValue()));
+					return clazz.cast(((Number) object).intValue());
 				} else if (object instanceof String) {
 					return clazz.cast(Integer.valueOf(((String) object)));
 				}
 			}
 			if (clazz == Long.class) {
 				if (object instanceof Number) {
-					return clazz.cast(Long.valueOf(((Number)object).longValue()));
+					return clazz.cast(((Number) object).longValue());
 				} else if (object instanceof String) {
 					return clazz.cast(Long.valueOf(((String) object)));
 				}
 			}
 			if (clazz == Double.class) {
 				if (object instanceof Number) {
-					return clazz.cast(Double.valueOf(((Number)object).doubleValue()));
+					return clazz.cast(((Number) object).doubleValue());
 				} else if (object instanceof String) {
 					return clazz.cast(Double.valueOf(((String) object)));
 				}
