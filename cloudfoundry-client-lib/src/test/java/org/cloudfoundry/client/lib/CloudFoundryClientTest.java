@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -1022,6 +1024,14 @@ public class CloudFoundryClientTest {
 		doGetFile(connectedClient, appName);
 	}
 
+	@Test
+	public void openFile() throws Exception {
+		String appName = namespacedAppName("simple_openFile");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		boolean running = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("App failed to start", running);
+		doOpenFile(connectedClient, appName);
+	}
 
 	//
 	// Basic Services tests
@@ -1464,6 +1474,45 @@ public class CloudFoundryClientTest {
 			}
 		}
 		return pass;
+	}
+
+	private void doOpenFile(CloudFoundryClient client, String appName) throws Exception {
+		String appDir = "app";
+		String fileName = appDir + "/WEB-INF/web.xml";
+		String emptyPropertiesFileName = appDir + "/WEB-INF/classes/empty.properties";
+
+		// File is often not available immediately after starting an app... so
+		// allow up to 60 seconds wait
+		for (int i = 0; i < 60; i++) {
+			try {
+				client.getFile(appName, 0, fileName);
+				break;
+			} catch (HttpServerErrorException ex) {
+				Thread.sleep(1000);
+			}
+		}
+		// Test open file
+
+		client.openFile(appName, 0, fileName, new ClientHttpResponseCallback() {
+
+			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+				InputStream in = clientHttpResponse.getBody();
+				assertNotNull(in);
+				byte[] fileContents = IOUtils.toByteArray(in);
+				assertTrue(fileContents.length > 5);
+			}
+		});
+
+		client.openFile(appName, 0, emptyPropertiesFileName, new ClientHttpResponseCallback() {
+
+			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+				InputStream in = clientHttpResponse.getBody();
+				assertNotNull(in);
+				byte[] fileContents = IOUtils.toByteArray(in);
+				assertTrue(fileContents.length == 0);
+			}
+		});
+
 	}
 
 	private void doGetFile(CloudFoundryClient client, String appName) throws Exception {

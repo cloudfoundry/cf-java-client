@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -37,6 +38,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.RestLogCallback;
@@ -73,7 +75,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -81,11 +85,15 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -228,6 +236,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String urlPath = getFileUrlPath();
 		Object appId = getFileAppId(appName);
 		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
+	}
+
+
+	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
+		String urlPath = getFileUrlPath();
+		Object appId = getFileAppId(appName);
+		doOpenFile(urlPath, appId, instanceIndex, filePath, callback);
 	}
 
 	public void registerRestLogListener(RestLogCallback callBack) {
@@ -399,6 +414,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			logs.put(logFile, doGetFile(urlPath, appId, instance, logFile, -1, -1));
 		}
 		return logs;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void doOpenFile(String urlPath, Object app, int instanceIndex, String filePath,
+			ClientHttpResponseCallback callback) {
+		getRestTemplate().execute(getUrl(urlPath), HttpMethod.GET, null, new ResponseExtractorWrapper(callback), app,
+				String.valueOf(instanceIndex), filePath);
 	}
 
 	protected String doGetFile(String urlPath, Object app, int instanceIndex, String filePath, int startPosition, int endPosition) {
@@ -1685,4 +1707,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return entity.containsKey(resourceKey) || entity.containsKey(resourceKey + "_url");
 	}
 	
+	private static class ResponseExtractorWrapper implements ResponseExtractor {
+
+		private ClientHttpResponseCallback callback;
+
+		public ResponseExtractorWrapper(ClientHttpResponseCallback callback) {
+			this.callback = callback;
+		}
+
+		public Object extractData(ClientHttpResponse clientHttpResponse) throws IOException {
+			callback.onClientHttpResponse(clientHttpResponse);
+			return null;
+		}
+
+	}
 }

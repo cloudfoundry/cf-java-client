@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
@@ -145,6 +145,8 @@ public interface CloudControllerClient {
 	Map<String, String> getCrashLogs(String appName);
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
+
+	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
 
 	void bindService(String appName, String serviceName);
 

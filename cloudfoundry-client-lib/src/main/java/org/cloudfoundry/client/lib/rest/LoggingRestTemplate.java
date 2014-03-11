@@ -57,8 +57,8 @@ public class LoggingRestTemplate extends RestTemplate {
 						public T extractData(ClientHttpResponse response) throws IOException {
 							httpStatus[0] = response.getStatusCode();
 							headers[0] = response.getHeaders();
-							if (responseExtractor != null) {
-								T data = responseExtractor.extractData(response);
+							T data = null;
+							if (responseExtractor != null && (data = responseExtractor.extractData(response)) != null) {
 								if (data instanceof String) {
 									message[0] = ((String)data).length() + " bytes";
 								} else if (data instanceof Map) {
