@@ -38,7 +38,7 @@ public class InstanceStats {
 			this.time = parseDate(parse(String.class, attributes.get("time")));
 			this.cpu = parse(Double.class, attributes.get("cpu"));
 			this.disk = parse(Integer.class, attributes.get("disk"));
-			this.mem = parse(integer.class, attributes.get("mem"));
+			this.mem = parse(Integer.class, attributes.get("mem"));
 		}
 
 		public double getCpu() {
