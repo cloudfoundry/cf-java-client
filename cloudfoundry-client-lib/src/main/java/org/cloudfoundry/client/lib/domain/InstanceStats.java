@@ -31,14 +31,14 @@ public class InstanceStats {
 
 		private double cpu;
 		private int disk;
-		private double mem;
+		private int mem;
 		private Date time;
 
 		public Usage(Map<String, Object> attributes) {
 			this.time = parseDate(parse(String.class, attributes.get("time")));
 			this.cpu = parse(Double.class, attributes.get("cpu"));
 			this.disk = parse(Integer.class, attributes.get("disk"));
-			this.mem = parse(Double.class, attributes.get("mem"));
+			this.mem = parse(integer.class, attributes.get("mem"));
 		}
 
 		public double getCpu() {
