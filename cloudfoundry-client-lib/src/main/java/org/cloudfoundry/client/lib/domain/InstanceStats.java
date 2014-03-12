@@ -49,7 +49,7 @@ public class InstanceStats {
 			return disk;
 		}
 
-		public double getMem() {
+		public Integer getMem() {
 			return mem;
 		}
 
