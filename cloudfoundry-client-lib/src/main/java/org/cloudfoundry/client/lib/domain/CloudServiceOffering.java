@@ -55,6 +55,11 @@ public class CloudServiceOffering extends CloudEntity {
 		this.description = description;
 		this.active = active;
 		this.bindable = bindable;
+        this.url = url;
+        this.infoUrl = infoUrl;
+        this.uniqueId = uniqueId;
+        this.extra = extra;
+        this.docUrl = docUrl;
 	}
 
 	public String getLabel() {
