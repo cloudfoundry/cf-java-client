@@ -1045,6 +1045,14 @@ public class CloudFoundryClientTest {
 		assertEquals(MYSQL_SERVICE_LABEL, offering.getLabel());
 		assertNotNull(offering.getCloudServicePlans());
 		assertTrue(offering.getCloudServicePlans().size() > 0);
+		assertNotNull(offering.getName());
+		assertNotNull(offering.getDescription());
+		assertNotNull(offering.getLabel());
+		assertNotNull(offering.getProvider());
+		assertNotNull(offering.getUrl());
+		assertNotNull(offering.getDocumentationUrl());
+		assertNotNull(offering.getUniqueId());
+		assertNotNull(offering.getExtra());
 	}
 
 	@Test
