@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -345,6 +346,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 				endPosition + " is not a valid value for end position, it should be greater than startPosition " +
 						"which is " + startPosition + ".");
 		return cc.getFile(appName, instanceIndex, filePath, startPosition, endPosition - 1);
+	}
+
+	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
+		cc.openFile(appName, instanceIndex, filePath, callback);
 	}
 
 	public String getFileTail(String appName, int instanceIndex, String filePath, int length) {
