@@ -289,6 +289,50 @@ $ gradle cf-push -Pdev
 $ gradle cf-push -Pprod
 ~~~
 
+### Zero-downtime deployment
+
+The Cloud Foundry Gradle plugin has support for zero-downtime deployments using the [blue-green deployment technique](http://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html). 
+
+These tasks should be considered *experimental*. Zero-downtime deployment features are planned for future versions of Cloud Foundry, at which time the semantics and behavior of these tasks will be adapted to the platform's capabilities as appropriate. 
+
+The zero-downtime deployment tasks rely on a `variants` field being configured in the CF Gradle plugin configuration: 
+
+~~~
+cloudfoundry {
+    target = "https://api.run.pivotal.io"
+    organization = "my-org"
+    space = "development"
+
+    file = file("${war.archivePath}")
+    host = "my-app"
+    domain = "cfapps.io"
+    memory = 512
+    instances = 1
+
+    variants = ['-blue', '-green']
+}
+~~~
+
+Three additional Gradle tasks can be used to manage the deployment: 
+
+* cf-deploy
+
+The plugin detects which `variant` is currently running and mapped to the canonical route (determined by combining `host` and `domain`), and pushes the app using the “other” variant. Both the application name and the route are decorated with the chosen variant string. If `my-app-blue` is running and mapped to the well-known route (e.g. `my-app.cfapps.io`) then the app is pushed with the name `my-app-green` and mapped to `my-app-green.cfapps.io`. If no version is currently running or mapped to the canonical route, the first variant in the list is used. 
+
+Multiple routes can be assigned to an application using the `hosts = [‘my-app’, ‘www-my-app’]` syntax. In this case, the decoration of routes and mapping/unmapping applies to each route.
+
+The plugin also allows setting routes using `uri` and `uris` fields. These fields can be used with the deployment tasks, but will not be decorated with the variant values. Using `host` and `domain` together with `uri` give a high degree of control over how routes are configured.
+
+After deployment, the new variant can then be tested using the decorated URL.
+
+* cf-swap-deployed
+
+Variants that are not currently mapped to the canonical `my-app.cfapps.io` route are mapped to it. Variants that are currently mapped to `my-app.cfapps.io` have that route removed from them.
+
+* cf-undeploy
+
+All running variants that are not mapped to the canonical route are deleted. 
+
 # History
 
 ## Changes in 1.0.2
