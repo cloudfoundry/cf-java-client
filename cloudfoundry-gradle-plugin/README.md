@@ -327,7 +327,7 @@ After deployment, the new variant can then be tested using the decorated URL.
 
 * cf-swap-deployed
 
-Variants that are not currently mapped to the canonical `my-app.cfapps.io` route are mapped to it. Variants that are currently mapped to `my-app.cfapps.io` have that route removed from them.
+Variants that are not currently mapped to the canonical `my-app.cfapps.io` route are mapped to it. Variants that are currently mapped to `my-app.cfapps.io` have that route removed from them. This effectively swaps the newer variant into service and the older variant out of service.
 
 * cf-undeploy
 
