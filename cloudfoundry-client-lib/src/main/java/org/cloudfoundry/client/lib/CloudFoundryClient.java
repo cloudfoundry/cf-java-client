@@ -316,10 +316,21 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateApplicationEnv(appName, env);
 	}
 
+	/**
+	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #streamRecentLogs(String, ApplicationLogListener)}
+	 */
 	public Map<String, String> getLogs(String appName) {
 		return cc.getLogs(appName);
 	}
 
+	public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
+	    return cc.streamLogs(appName, listener);
+	}
+
+    public StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener) {
+        return cc.streamRecentLogs(appName, listener);
+    }
+	
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
 	}

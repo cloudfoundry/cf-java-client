@@ -354,8 +354,33 @@ public interface CloudFoundryOperations {
 	 * @param appName name of the application
 	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
 	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #streamRecentLogs(String, ApplicationLogListener)}
 	 */
 	Map<String, String> getLogs(String appName);
+	
+	/**
+	 * Stream application logs produced <em>after</em> this method is called.
+	 * 
+	 * This method has 'tail'-like behavior. Every time there is a new log entry,
+	 * it notifies the listener.
+	 * 
+	 * @param appName the name of the application
+	 * @param listener listener object to be notified
+	 * @return token than can be used to cancel listening for logs
+	 */
+	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+	
+	/**
+	 * Stream recent log entries.
+	 * 
+	 * Stream logs that were recently produced for an app. Once recent log entries have been notified,
+	 * the listener will not be notified any more.
+	 * 
+     * @param appName the name of the application
+     * @param listener listener object to be notified
+     * @return token than can be used to cancel listening for logs
+	 */
+	StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener);
 
 	/**
 	 * Get logs from most recent crash of the deployed application. The logs
