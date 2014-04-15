@@ -80,6 +80,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -993,6 +994,44 @@ public class CloudFoundryClientTest {
 			assertNotNull(logs.get(log));
 		}
 	}
+	
+	@Test
+	public void streamLogs() throws Exception {
+        String appName = namespacedAppName("simple_logs");
+        CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+        boolean pass = getInstanceInfosWithTimeout(appName, 1, true);
+        assertTrue("Couldn't get the right application state", pass);
+
+        AccumulatingApplicationLogListener testListener = new AccumulatingApplicationLogListener();
+        connectedClient.streamRecentLogs(appName, testListener);
+        
+        int attempt = 0;
+        do {
+            if (testListener.logs.size() > 0) {
+                break;
+            }
+            Thread.sleep(1000);    
+        } while (attempt < 20);
+        assertTrue("Failed to see recent logs", testListener.logs.size() > 0);
+        
+        testListener.logs.clear();
+        connectedClient.streamLogs(appName, testListener);
+        String appUri = "http://" + app.getUris().get(0);
+        RestTemplate appTemplate = new RestTemplate();
+        attempt = 0;
+        do {
+            // no need to sleep, visiting the app uri should be sufficient
+            try {
+                appTemplate.getForObject(appUri, String.class);
+            } catch (HttpClientErrorException ex) {
+                // ignore
+            }
+            if (testListener.logs.size() > 0) {
+                break;
+            }
+        } while(attempt < 20);
+        assertTrue("Failed to stream normal log", testListener.logs.size() > 0);
+	}
 
 	@Test
 	@Ignore("Ignore until the Java buildpack detects app crashes upon OOM correctly")
@@ -1820,4 +1859,19 @@ public class CloudFoundryClientTest {
 		}
 	}
 
+	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
+	    private List<ApplicationLog> logs = new ArrayList<ApplicationLog>();
+	    
+        public void onMessage(ApplicationLog log) {
+            logs.add(log);
+        }
+
+        public void onError(Throwable exception) {
+            fail(exception.getMessage());
+        }
+
+        public void onComplete() {
+        }
+	    
+	}
 }

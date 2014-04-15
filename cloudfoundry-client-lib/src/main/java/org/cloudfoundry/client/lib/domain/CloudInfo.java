@@ -38,6 +38,7 @@ public class CloudInfo {
 	private String description;
 	private String authorizationEndpoint;
 	private boolean allowDebug;
+    private String loggregatorEndpoint;
 
 	@SuppressWarnings("unchecked")
 	public CloudInfo(Map<String, Object> infoMap) {
@@ -54,6 +55,7 @@ public class CloudInfo {
 		user = CloudUtil.parse(String.class, infoMap.get("user"));
 		description = CloudUtil.parse(String.class, infoMap.get("description"));
 		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
+		loggregatorEndpoint = CloudUtil.parse(String.class, infoMap.get("logging_endpoint"));
 
 		Object allowDebugValue = infoMap.get("allow_debug");
 		if (allowDebugValue != null) {
@@ -78,10 +80,11 @@ public class CloudInfo {
 	}
 
 	public CloudInfo(String name, String support, String authorizationEndpoint, String build, String version,
-			String user, String description, Limits limits, Usage usage, boolean allowDebug) {
+			String user, String description, Limits limits, Usage usage, boolean allowDebug, String loggregatorEndpoint) {
 		this.name = name;
 		this.support = support;
 		this.authorizationEndpoint = authorizationEndpoint;
+        this.loggregatorEndpoint = loggregatorEndpoint;
 		this.build = build;
 		this.version = version;
 		this.user = user;
@@ -109,6 +112,10 @@ public class CloudInfo {
 
 	public String getAuthorizationEndpoint() {
 		return authorizationEndpoint;
+	}
+	
+	public String getLoggregatorEndpoint() {
+	    return loggregatorEndpoint;
 	}
 
 	public String getBuild() {

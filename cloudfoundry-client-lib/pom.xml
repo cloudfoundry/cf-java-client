@@ -241,6 +241,22 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-websocket</artifactId>
+			<version>8.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>juli</artifactId>
+			<version>6.0.39</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.5.0</version>
+		</dependency>			
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
@@ -313,6 +329,18 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.github.igor-petruk.protobuf</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>0.6.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
