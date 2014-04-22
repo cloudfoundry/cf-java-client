@@ -243,7 +243,7 @@
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-websocket</artifactId>
-			<version>8.0.5</version>
+			<version>8.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
@@ -312,6 +312,13 @@
 		</dependency>
 	</dependencies>
 
+	<repositories>
+		<repository>
+			<id>Apache-snapshot</id>
+			<url>https://repository.apache.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+	
 	<build>
 		<extensions>
 			<extension>
