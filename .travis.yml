@@ -1,9 +1,10 @@
 ---
 language: java
 
-install:
-- sudo apt-get install libprotobuf-dev protobuf-compiler
-
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq libprotobuf-dev protobuf-compiler
+ 
 before_script:
 - protoc --version
 
