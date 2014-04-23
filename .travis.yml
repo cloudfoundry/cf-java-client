@@ -1,7 +1,12 @@
 ---
 language: java
+
+install:
+- sudo apt-get install protobuf-compiler
+
 script: cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
   -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE -Dsurefire.useFile=false
+
 env:
   global:
   - secure: ! 'CEnlffjCZBVHaO9yXS6Q1cWdorIovujdzAeRuAXBD9MFGnqWxJkACRyfTC2o
