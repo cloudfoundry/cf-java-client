@@ -4,6 +4,9 @@ language: java
 install:
 - sudo apt-get install libprotobuf-dev protobuf-compiler
 
+before_script:
+- protoc --version
+
 script: mvn install -DskipTests=true -B -V && cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
   -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE -Dsurefire.useFile=false
 
