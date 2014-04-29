@@ -1606,7 +1606,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
             Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
-            session.addMessageHandler(new LoggregatorMessageHandler(listener));
             return new StreamingLogTokenImpl(session);
         } catch (DeploymentException e) {
             throw new CloudOperationException(e);

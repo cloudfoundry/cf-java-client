@@ -17,11 +17,13 @@ public class LoggregatorEndpoint extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
+        session.addMessageHandler(new LoggregatorMessageHandler(listener));
     }
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
-        if (closeReason.getCloseCode() == CloseReason.CloseCodes.NORMAL_CLOSURE) {
+        if (closeReason.getCloseCode() == CloseReason.CloseCodes.NORMAL_CLOSURE 
+            || closeReason.getCloseCode() == CloseReason.CloseCodes.GOING_AWAY) {
             listener.onComplete();
         } else {
             listener.onError(new CloudOperationException("Loggregrator connection closed unexpectedly " + closeReason));
