@@ -150,8 +150,8 @@ public interface CloudControllerClient {
     Map<String, String> getCrashLogs(String appName);
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
-
-	void bindService(String appName, String serviceName);
+           // get information of bindservice
+	String bindService(String appName, String serviceName);
 
 	void unbindService(String appName, String serviceName);
 

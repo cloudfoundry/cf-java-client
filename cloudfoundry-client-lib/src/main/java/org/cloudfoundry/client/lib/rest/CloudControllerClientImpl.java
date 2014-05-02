@@ -1212,11 +1212,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-	private void doBindService(UUID appId, UUID serviceId) {
+	private String doBindService(UUID appId, UUID serviceId) {
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
 		serviceRequest.put("service_instance_guid", serviceId);
 		serviceRequest.put("app_guid", appId);
-		getRestTemplate().postForObject(getUrl("/v2/service_bindings"), serviceRequest, String.class);
+		String result=getRestTemplate().postForObject(getUrl("/v2/service_bindings"), serviceRequest, String.class);
+		return result;
 	}
 
 	private void doUnbindService(UUID appId, UUID serviceId) {
@@ -1261,10 +1262,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	public void bindService(String appName, String serviceName) {
+	public String bindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
-		doBindService(appId, cloudService.getMeta().getGuid());
+		return doBindService(appId, cloudService.getMeta().getGuid());
 	}
 
 	public void unbindService(String appName, String serviceName) {
