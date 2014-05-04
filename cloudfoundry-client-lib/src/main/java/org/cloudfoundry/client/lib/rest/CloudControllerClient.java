@@ -23,10 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.StreamingLogToken;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
@@ -142,10 +143,14 @@ public interface CloudControllerClient {
 
 	Map<String, String> getLogs(String appName);
 
-	Map<String, String> getCrashLogs(String appName);
+	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+
+    StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener);
+
+    Map<String, String> getCrashLogs(String appName);
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
-	
+
 	void bindService(String appName, String serviceName);
 
 	void unbindService(String appName, String serviceName);
@@ -191,4 +196,6 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
+    
 }
