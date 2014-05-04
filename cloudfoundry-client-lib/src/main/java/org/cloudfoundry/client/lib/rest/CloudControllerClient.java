@@ -145,8 +145,8 @@ public interface CloudControllerClient {
 	Map<String, String> getCrashLogs(String appName);
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
-           // get information of bindservice
-	String bindService(String appName, String serviceName);
+        
+	void bindService(String appName, String serviceName);
 
 	void unbindService(String appName, String serviceName);
 
