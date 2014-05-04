@@ -1190,12 +1190,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-	private String doBindService(UUID appId, UUID serviceId) {
+	private void doBindService(UUID appId, UUID serviceId) {
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
 		serviceRequest.put("service_instance_guid", serviceId);
 		serviceRequest.put("app_guid", appId);
-		String result=getRestTemplate().postForObject(getUrl("/v2/service_bindings"), serviceRequest, String.class);
-		return result;
+		getRestTemplate().postForObject(getUrl("/v2/service_bindings"), serviceRequest, String.class);
 	}
 
 	private void doUnbindService(UUID appId, UUID serviceId) {
