@@ -1239,10 +1239,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
-	public String bindService(String appName, String serviceName) {
+	public void bindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
-		return doBindService(appId, cloudService.getMeta().getGuid());
+		doBindService(appId, cloudService.getMeta().getGuid());
 	}
 
 	public void unbindService(String appName, String serviceName) {
