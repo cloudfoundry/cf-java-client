@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * RestTemplate that provides for logging of any REST calls made
@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class LoggingRestTemplate extends RestTemplate {
 
-	private List<RestLogCallback> listeners = new ArrayList<RestLogCallback>();
+	private Set<RestLogCallback> listeners = new LinkedHashSet<RestLogCallback>();
 
 	@Override
 	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback, final ResponseExtractor<T> responseExtractor) throws RestClientException {
@@ -98,7 +98,9 @@ public class LoggingRestTemplate extends RestTemplate {
 	}
 
 	void registerRestLogListener(RestLogCallback callBack) {
-		listeners.add(callBack);
+		if (callBack != null) {
+			listeners.add(callBack);
+		}
 	}
 
 	void unRegisterRestLogListener(RestLogCallback callBack) {
