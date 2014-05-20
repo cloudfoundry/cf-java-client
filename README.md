@@ -13,7 +13,7 @@ in this repo.
 The cloudfoundry-client-lib is a Java library that provides a Java language binding for the Cloud Foundry Cloud Controller REST API.
 The library can be used by Java, Groovy, and Scala apps to interact with a Cloud Foundry service on behalf of a user.
 
-[Read more](http://docs.cloudfoundry.org/devguide/deploy-apps/java-client.html)
+[Read more](http://docs.cloudfoundry.org/buildpacks/java/java-client.html)
 
 ## cloudfoundry-maven-plugin
 
