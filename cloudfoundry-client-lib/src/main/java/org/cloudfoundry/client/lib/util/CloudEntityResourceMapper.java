@@ -195,13 +195,14 @@ public class CloudEntityResourceMapper {
 		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
 		if (servicePlanList != null) {
 			for (Map<String, Object> servicePlanResource : servicePlanList) {
+				Boolean publicPlan = getEntityAttribute(servicePlanResource, "public", Boolean.class);
 				CloudServicePlan servicePlan =
 						new CloudServicePlan(
 								getMeta(servicePlanResource),
 								getEntityAttribute(servicePlanResource, "name", String.class),
 								getEntityAttribute(servicePlanResource, "description", String.class),
 								getEntityAttribute(servicePlanResource, "free", Boolean.class),
-								getEntityAttribute(servicePlanResource, "public", Boolean.class),
+								publicPlan == null ? true : publicPlan,
 								getEntityAttribute(servicePlanResource, "extra", String.class),
 								getEntityAttribute(servicePlanResource, "unique_id", String.class),
 								cloudServiceOffering);

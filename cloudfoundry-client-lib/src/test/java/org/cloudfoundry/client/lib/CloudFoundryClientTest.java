@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
@@ -41,6 +42,7 @@ import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
@@ -1087,11 +1089,14 @@ public class CloudFoundryClientTest {
 		assertNotNull(offering.getName());
 		assertNotNull(offering.getDescription());
 		assertNotNull(offering.getLabel());
-		assertNotNull(offering.getProvider());
-		assertNotNull(offering.getUrl());
-		assertNotNull(offering.getDocumentationUrl());
 		assertNotNull(offering.getUniqueId());
 		assertNotNull(offering.getExtra());
+
+		CloudServicePlan plan = offering.getCloudServicePlans().get(0);
+		assertNotNull(plan.getName());
+		assertNotNull(plan.getUniqueId());
+		assertNotNull(plan.getDescription());
+		assertSame(offering, plan.getServiceOffering());
 	}
 
 	@Test
