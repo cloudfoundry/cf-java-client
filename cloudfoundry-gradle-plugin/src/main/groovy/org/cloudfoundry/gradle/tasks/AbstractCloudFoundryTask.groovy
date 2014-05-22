@@ -25,6 +25,7 @@ import org.cloudfoundry.client.lib.domain.CloudSpace
 import org.cloudfoundry.client.lib.tokens.TokensFile
 import org.gradle.api.DefaultTask
 import org.cloudfoundry.gradle.GradlePluginRestLogCallback
+import org.gradle.api.Task
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.web.client.ResourceAccessException
@@ -337,10 +338,17 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     def propertyOrExtension(String name) {
-        if (project.hasProperty('cf.' + name)) {
-            project.property('cf.' + name)
-        } else {
-            project.cloudfoundry[name]
+        projectProperty(name) ?: project.cloudfoundry[name]
+    }
+
+    def projectProperty(String name) {
+        def propertyName = 'cf' + name.capitalize()
+        if (project.hasProperty(propertyName)) {
+            def propertyValue = project.property(propertyName)
+            if (!(propertyValue instanceof Task)) {
+                return propertyValue
+            }
         }
+        null
     }
 }
