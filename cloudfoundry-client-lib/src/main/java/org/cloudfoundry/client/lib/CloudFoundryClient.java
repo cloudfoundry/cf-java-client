@@ -429,6 +429,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getDomains();
 	}
 
+	public CloudDomain getDefaultDomain() {
+		return cc.getDefaultDomain();
+	}
+
 	public void addDomain(String domainName) {
 		cc.addDomain(domainName);
 	}

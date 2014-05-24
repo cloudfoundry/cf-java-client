@@ -574,6 +574,13 @@ public interface CloudFoundryOperations {
 	List<CloudDomain> getDomains();
 
 	/**
+	 * Gets the default domain for the current org, which is the first shared domain.
+	 *
+	 * @return the default domain
+	 */
+	CloudDomain getDefaultDomain();
+
+	/**
 	 * Add a private domain in the current organization.
 	 *
 	 * @param domainName the domain to add

@@ -1374,6 +1374,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return doGetDomains("/v2/shared_domains");
 	}
 
+	public CloudDomain getDefaultDomain() {
+		List<CloudDomain> sharedDomains = getSharedDomains();
+		if (sharedDomains.isEmpty()) {
+			return null;
+		} else {
+			return sharedDomains.get(0);
+		}
+	}
+
 	public void addDomain(String domainName) {
 		assertSpaceProvided("add domain");
 		UUID domainGuid = getDomainGuid(domainName, false);
