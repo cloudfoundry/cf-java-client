@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.ApplicationLogListener;
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
@@ -151,6 +152,8 @@ public interface CloudControllerClient {
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
 
+	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
+
 	void bindService(String appName, String serviceName);
 
 	void unbindService(String appName, String serviceName);
@@ -170,6 +173,7 @@ public interface CloudControllerClient {
 	CloudStack getStack(String name);
 
 	// Domains and routes management
+
 
 	List<CloudDomain> getDomainsForOrg();
 
@@ -198,6 +202,4 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
-
-    
 }
