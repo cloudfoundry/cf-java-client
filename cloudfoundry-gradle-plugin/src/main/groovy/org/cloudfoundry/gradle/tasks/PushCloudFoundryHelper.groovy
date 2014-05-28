@@ -64,7 +64,11 @@ class PushCloudFoundryHelper {
     }
 
     void uploadApplication() {
-        log "Uploading ${file}"
+        if (file.isDirectory()) {
+            log "Uploading from ${file}"
+        } else {
+            log "Uploading file ${file}"
+        }
 
         client.uploadApplication(application, file)
     }
@@ -74,7 +78,7 @@ class PushCloudFoundryHelper {
     }
 
     void ensureFileExists() {
-        if (!file || !file.isFile()) {
+        if (!file || !file.exists()) {
             throw new GradleException("You must specify a valid file ('${file}' is not valid)")
         }
     }
