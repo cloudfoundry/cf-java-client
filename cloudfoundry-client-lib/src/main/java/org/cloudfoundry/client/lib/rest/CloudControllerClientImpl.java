@@ -44,6 +44,7 @@ import javax.websocket.WebSocketContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.ApplicationLogListener;
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.CloudOperationException;
@@ -250,6 +251,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
 	}
 
+
+	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
+		String urlPath = getFileUrlPath();
+		Object appId = getFileAppId(appName);
+		doOpenFile(urlPath, appId, instanceIndex, filePath, callback);
+	}
+
 	public void registerRestLogListener(RestLogCallback callBack) {
 		if (getRestTemplate() instanceof LoggingRestTemplate) {
 			((LoggingRestTemplate)getRestTemplate()).registerRestLogListener(callBack);
@@ -422,6 +430,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			logs.put(logFile, doGetFile(urlPath, appId, instance, logFile, -1, -1));
 		}
 		return logs;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void doOpenFile(String urlPath, Object app, int instanceIndex, String filePath,
+			ClientHttpResponseCallback callback) {
+		getRestTemplate().execute(getUrl(urlPath), HttpMethod.GET, null, new ResponseExtractorWrapper(callback), app,
+				String.valueOf(instanceIndex), filePath);
 	}
 
 	protected String doGetFile(String urlPath, Object app, int instanceIndex, String filePath, int startPosition, int endPosition) {
@@ -1740,4 +1755,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return entity.containsKey(resourceKey) || entity.containsKey(resourceKey + "_url");
 	}
 	
+	private static class ResponseExtractorWrapper implements ResponseExtractor {
+
+		private ClientHttpResponseCallback callback;
+
+		public ResponseExtractorWrapper(ClientHttpResponseCallback callback) {
+			this.callback = callback;
+		}
+
+		public Object extractData(ClientHttpResponse clientHttpResponse) throws IOException {
+			callback.onClientHttpResponse(clientHttpResponse);
+			return null;
+		}
+
+	}
 }
