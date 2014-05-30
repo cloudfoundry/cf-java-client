@@ -29,7 +29,7 @@ class FlexibleTableOutput {
         sb.append('\n')
 
         columnSizes.each { name, size ->
-            sb.append("".padRight(size, '-')).append('  ')
+            sb.append('-' * size).append('  ')
         }
         sb.append('\n')
 

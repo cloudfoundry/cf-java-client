@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -354,7 +355,7 @@ public interface CloudFoundryOperations {
 	 * @param appName name of the application
 	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
 	 * the full content of the log file will be returned as a String value for the corresponding key.
-	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #streamRecentLogs(String, ApplicationLogListener)}
+	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getLogs(String appName);
 	
@@ -373,14 +374,12 @@ public interface CloudFoundryOperations {
 	/**
 	 * Stream recent log entries.
 	 * 
-	 * Stream logs that were recently produced for an app. Once recent log entries have been notified,
-	 * the listener will not be notified any more.
-	 * 
-     * @param appName the name of the application
-     * @param listener listener object to be notified
-     * @return token than can be used to cancel listening for logs
+	 * Stream logs that were recently produced for an app.
+	 *
+	 * @param appName the name of the application
+	 * @return the list of recent log entries
 	 */
-	StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener);
+	List<ApplicationLog> getRecentLogs(String appName);
 
 	/**
 	 * Get logs from most recent crash of the deployed application. The logs
@@ -390,6 +389,7 @@ public interface CloudFoundryOperations {
 	 * @param appName name of the application
 	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
 	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getCrashLogs(String appName);
 	

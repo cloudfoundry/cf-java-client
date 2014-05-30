@@ -16,14 +16,17 @@
 package org.cloudfoundry.maven.common;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
@@ -416,6 +419,30 @@ public final class UiUtils {
 		UiUtils.HORIZONTAL_LINE;
 
 		return cloudInfoMessage;
+	}
+
+	/**
+	 * Renders a line of application logging output.
+	 */
+	public static String renderApplicationLogEntry(ApplicationLog logEntry) {
+		StringBuilder logLine = new StringBuilder();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		logLine.append(dateFormat.format(logEntry.getTimestamp())).append(" ");
+
+		String source;
+		if (logEntry.getSourceName().equals("App")) {
+			source = String.format("[%s/%s]", logEntry.getSourceName(), logEntry.getSourceId());
+		} else {
+			source = String.format("[%s]", logEntry.getSourceName());
+		}
+		logLine.append(String.format("%-10s", source));
+
+		logLine.append(logEntry.getMessageType().name().substring("STD".length())).append(" ");
+
+		logLine.append(logEntry.getMessage());
+
+		return logLine.toString();
 	}
 
 	/**

@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -1006,23 +1007,18 @@ public class CloudFoundryClientTest {
 		boolean pass = getInstanceInfosWithTimeout(appName, 1, true);
 		assertTrue("Couldn't get the right application state", pass);
 
+		List<ApplicationLog> logs = doGetRecentLogs(appName);
+
+		for (int index = 0; index < logs.size() - 1; index++) {
+			int comparison = logs.get(index).getTimestamp().compareTo(logs.get(index + 1).getTimestamp());
+			assertTrue("Logs are not properly sorted", comparison <= 0);
+		}
+
 		AccumulatingApplicationLogListener testListener = new AccumulatingApplicationLogListener();
-		connectedClient.streamRecentLogs(appName, testListener);
-
-		int attempt = 0;
-		do {
-			if (testListener.logs.size() > 0) {
-				break;
-			}
-			Thread.sleep(1000);
-		} while (attempt < 20);
-		assertTrue("Failed to see recent logs", testListener.logs.size() > 0);
-
-		testListener.logs.clear();
 		connectedClient.streamLogs(appName, testListener);
 		String appUri = "http://" + app.getUris().get(0);
 		RestTemplate appTemplate = new RestTemplate();
-		attempt = 0;
+		int attempt = 0;
 		do {
 			// no need to sleep, visiting the app uri should be sufficient
 			try {
@@ -1033,8 +1029,22 @@ public class CloudFoundryClientTest {
 			if (testListener.logs.size() > 0) {
 				break;
 			}
-		} while (attempt < 20);
+		} while (attempt++ < 20);
 		assertTrue("Failed to stream normal log", testListener.logs.size() > 0);
+	}
+
+	private List<ApplicationLog> doGetRecentLogs(String appName) throws InterruptedException {
+		int attempt = 0;
+		do {
+			List<ApplicationLog> logs = connectedClient.getRecentLogs(appName);
+
+			if (logs.size() > 0) {
+				return logs;
+			}
+			Thread.sleep(1000);
+		} while (attempt++ < 20);
+		fail("Failed to see recent logs");
+		return null;
 	}
 
 	@Test
