@@ -18,13 +18,13 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
@@ -318,7 +318,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	/**
-	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #streamRecentLogs(String, ApplicationLogListener)}
+	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	public Map<String, String> getLogs(String appName) {
 		return cc.getLogs(appName);
@@ -328,10 +328,13 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	    return cc.streamLogs(appName, listener);
 	}
 
-    public StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener) {
-        return cc.streamRecentLogs(appName, listener);
-    }
-	
+	public List<ApplicationLog> getRecentLogs(String appName) {
+		return cc.getRecentLogs(appName);
+	}
+
+	/**
+	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
+	 */
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
 	}

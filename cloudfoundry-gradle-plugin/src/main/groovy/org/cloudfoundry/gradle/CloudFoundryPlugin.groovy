@@ -15,6 +15,7 @@
 
 package org.cloudfoundry.gradle
 
+import org.cloudfoundry.gradle.tasks.RecentLogsCloudFoundryTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -77,6 +78,7 @@ class CloudFoundryPlugin implements Plugin<Project> {
         createTask(project, 'Apps', AppsCloudFoundryTask)
         createTask(project, 'App', AppCloudFoundryTask)
         createTask(project, 'Logs', LogsCloudFoundryTask)
+        createTask(project, 'RecentLogs', RecentLogsCloudFoundryTask)
         createTask(project, 'Services', ServicesCloudFoundryTask)
         createTask(project, 'ServicePlans', ServiceOfferingsCloudFoundryTask)
         createTask(project, 'CreateService', CreateServiceCloudFoundryTask)

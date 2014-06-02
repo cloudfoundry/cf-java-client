@@ -55,6 +55,7 @@ import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -222,15 +223,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String instance = String.valueOf(0);
 		return doGetLogs(urlPath, appName, instance);
 	}
-	
-	public StreamingLogToken streamRecentLogs(String appName, ApplicationLogListener listener) {
-	    return streamLoggregatorLogs(appName, listener, true);
+
+	public List<ApplicationLog> getRecentLogs(String appName) {
+		AccumulatingApplicationLogListener listener = new AccumulatingApplicationLogListener();
+		streamLoggregatorLogs(appName, listener, true);
+		synchronized (listener) {
+			try {
+				listener.wait();
+			} catch (InterruptedException e) {
+				// return any captured logs
+			}
+		}
+		return listener.getLogs();
 	}
 
-    public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
-        return streamLoggregatorLogs(appName, listener, false);
-    }
-	
+	public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
+		return streamLoggregatorLogs(appName, listener, false);
+	}
+
 	public Map<String, String> getCrashLogs(String appName) {
 		String urlPath = getFileUrlPath();
 		CrashesInfo crashes = getCrashes(appName);
@@ -1613,31 +1623,56 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return guid;
 	}
 
-    private StreamingLogToken streamLoggregatorLogs(String appName, ApplicationLogListener listener, boolean recent) {
-        ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
-            public void beforeRequest(Map<String,List<String>> headers) {
-                if (token != null) {
-                    headers.put(AUTHORIZATION_HEADER_KEY, Arrays.asList(getAuthorizationHeader()));
-                }
-            }
-        };
-        
-        UUID appId = getAppId(appName);
-        CloudInfo cloudInfo = getInfo();
-        String mode = recent ? "dump" : "tail";
-        URI loggregatorUri = loggregatorUriTemplate.expand(cloudInfo.getLoggregatorEndpoint(), mode, appId);
-        try {
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
-            Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
-            return new StreamingLogTokenImpl(session);
-        } catch (DeploymentException e) {
-            throw new CloudOperationException(e);
-        } catch (IOException e) {
-            throw new CloudOperationException(e);
-        }
-    }
-	
+	private StreamingLogToken streamLoggregatorLogs(String appName, ApplicationLogListener listener, boolean recent) {
+		ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
+			public void beforeRequest(Map<String, List<String>> headers) {
+				if (token != null) {
+					headers.put(AUTHORIZATION_HEADER_KEY, Arrays.asList(getAuthorizationHeader()));
+				}
+			}
+		};
+
+		UUID appId = getAppId(appName);
+		CloudInfo cloudInfo = getInfo();
+		String mode = recent ? "dump" : "tail";
+		URI loggregatorUri = loggregatorUriTemplate.expand(cloudInfo.getLoggregatorEndpoint(), mode, appId);
+		try {
+			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+			ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
+			Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
+			return new StreamingLogTokenImpl(session);
+		} catch (DeploymentException e) {
+			throw new CloudOperationException(e);
+		} catch (IOException e) {
+			throw new CloudOperationException(e);
+		}
+	}
+
+	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
+		private List<ApplicationLog> logs = new ArrayList<ApplicationLog>();
+
+		public void onMessage(ApplicationLog log) {
+			logs.add(log);
+		}
+
+		public void onError(Throwable exception) {
+			synchronized (this) {
+				this.notify();
+			}
+		}
+
+		public void onComplete() {
+			synchronized (this) {
+				this.notify();
+			}
+		}
+
+		public List<ApplicationLog> getLogs() {
+			Collections.sort(logs);
+			return logs;
+		}
+	}
+
 	private Map<String, Object> findApplicationResource(UUID appGuid, boolean fetchServiceInfo) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/apps/{app}?inline-relations-depth=1";
