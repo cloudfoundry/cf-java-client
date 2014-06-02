@@ -28,7 +28,7 @@
 	<properties>
 		<spring.framework.version>3.2.2.RELEASE</spring.framework.version>
 		<spring.security.oauth.version>1.0.0.RELEASE</spring.security.oauth.version>
-		<tomcat.version>8.0-SNAPSHOT</tomcat.version>
+		<tomcat.version>8.0.8</tomcat.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
 		<byteman.version>2.1.3</byteman.version>
 	</properties>

@@ -64,9 +64,10 @@ public class CloudControllerClientFactory {
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
+		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
-		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials,
-				sessionSpace);
+		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
+				cloudCredentials, sessionSpace);
 	}
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
@@ -74,9 +75,10 @@ public class CloudControllerClientFactory {
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
+		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
-		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials,
-				orgName, spaceName);
+		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
+				cloudCredentials, orgName, spaceName);
 	}
 	
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {

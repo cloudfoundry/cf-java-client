@@ -1029,7 +1029,7 @@ public class CloudFoundryClientTest {
 			if (testListener.logs.size() > 0) {
 				break;
 			}
-		} while (attempt++ < 20);
+		} while (attempt++ < 30);
 		assertTrue("Failed to stream normal log", testListener.logs.size() > 0);
 	}
 
