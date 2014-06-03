@@ -316,13 +316,6 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>Apache-snapshot</id>
-			<url>https://repository.apache.org/content/repositories/snapshots</url>
-		</repository>
-	</repositories>
-	
 	<build>
 		<extensions>
 			<extension>
