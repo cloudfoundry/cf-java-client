@@ -1670,7 +1670,13 @@ public class CloudFoundryClientTest {
 	}
 
 	private static String defaultNamespace(String email) {
-		return email.substring(0, email.indexOf('@')).replaceAll("\\.", "-").replaceAll("\\+", "-");
+		String s;
+		if(email.contains("@")) {
+			s = email.substring(0, email.indexOf('@'));
+		} else {
+			s = email;
+		}
+		return s.replaceAll("\\.", "-").replaceAll("\\+", "-");
 	}
 
 	//
