@@ -36,10 +36,6 @@ import java.util.UUID;
 import java.util.zip.ZipFile;
 
 import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +43,6 @@ import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudOperationException;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.StreamingLogToken;
@@ -102,7 +97,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriTemplate;
 
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base.
@@ -131,13 +125,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private URL cloudControllerUrl;
 
+	private LoggregatorClient loggregatorClient;
+
 	protected CloudCredentials cloudCredentials;
 
 	protected OAuth2AccessToken token;
 
 	private final Log logger;
-
-	private static final UriTemplate loggregatorUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
 
 	/**
 	 * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
@@ -147,26 +141,29 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		logger = LogFactory.getLog(getClass().getName());
 	}
 
-	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate,
+	                                 OauthClient oauthClient, LoggregatorClient loggregatorClient,
 	                                 CloudCredentials cloudCredentials, CloudSpace sessionSpace) {
 		logger = LogFactory.getLog(getClass().getName());
 
-		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
+		initialize(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient, cloudCredentials);
 
 		this.sessionSpace = sessionSpace;
 	}
 
-	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate,
+	                                 OauthClient oauthClient, LoggregatorClient loggregatorClient,
 	                                 CloudCredentials cloudCredentials, String orgName, String spaceName) {
 		logger = LogFactory.getLog(getClass().getName());
 		CloudControllerClientImpl tempClient =
-				new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials, null);
+				new CloudControllerClientImpl(cloudControllerUrl, restTemplate,
+						oauthClient, loggregatorClient, cloudCredentials, null);
 
 		if (tempClient.token == null) {
 			tempClient.login();
 		}
 
-		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
+		initialize(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient, cloudCredentials);
 
 		this.sessionSpace = validateSpaceAndOrg(spaceName, orgName, tempClient);
 
@@ -174,7 +171,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	private void initialize(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
-	                        CloudCredentials cloudCredentials) {
+	                        LoggregatorClient loggregatorClient, CloudCredentials cloudCredentials) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restTemplate, "RestTemplate cannot be null");
 		Assert.notNull(oauthClient, "OauthClient cannot be null");
@@ -189,6 +186,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		configureCloudFoundryRequestFactory(restTemplate);
 
 		this.oauthClient = oauthClient;
+
+		this.loggregatorClient = loggregatorClient;
 	}
 
 	private CloudSpace validateSpaceAndOrg(String spaceName, String orgName, CloudControllerClientImpl client) {
@@ -1632,20 +1631,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			}
 		};
 
-		UUID appId = getAppId(appName);
-		CloudInfo cloudInfo = getInfo();
+		String endpoint = getInfo().getLoggregatorEndpoint();
 		String mode = recent ? "dump" : "tail";
-		URI loggregatorUri = loggregatorUriTemplate.expand(cloudInfo.getLoggregatorEndpoint(), mode, appId);
-		try {
-			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-			ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
-			Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
-			return new StreamingLogTokenImpl(session);
-		} catch (DeploymentException e) {
-			throw new CloudOperationException(e);
-		} catch (IOException e) {
-			throw new CloudOperationException(e);
-		}
+		UUID appId = getAppId(appName);
+		return loggregatorClient.connectToLoggregator(endpoint, mode, appId, listener, configurator);
 	}
 
 	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
