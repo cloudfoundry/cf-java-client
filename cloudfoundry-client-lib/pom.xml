@@ -52,6 +52,9 @@
 							<includes>
 								<include>**/CloudFoundryClientTest.java</include>
 							</includes>
+							<excludes>
+								<exclude>NONE</exclude>
+							</excludes>
 						</configuration>
 					</plugin>
 
