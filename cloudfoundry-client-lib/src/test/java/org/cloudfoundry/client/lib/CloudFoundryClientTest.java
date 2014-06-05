@@ -188,7 +188,6 @@ public class CloudFoundryClientTest {
 			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
 		}
 		if (!SKIP_INJVM_PROXY) {
-			new SocketDestHelper().setForbiddenOnCurrentThread();
 			startInJvmProxy();
 			httpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
 		}
@@ -222,6 +221,10 @@ public class CloudFoundryClientTest {
 		// connectedClient.registerRestLogListener(new RestLogger("CF_REST"));
 		if (nbInJvmProxyRcvReqs != null) {
 			nbInJvmProxyRcvReqs.set(0); //reset calls made in setup to leave a clean state for tests to assert
+		}
+
+		if (!SKIP_INJVM_PROXY) {
+			new SocketDestHelper().setForbiddenOnCurrentThread();
 		}
 	}
 
@@ -265,30 +268,25 @@ public class CloudFoundryClientTest {
 		assertTrue(SocketDestHelper.isSocketRestrictionFlagActive());
 
 		RestTemplate restTemplate = new RestTemplate();
-		ClientHttpRequestFactory requestFactory;
 
-		//when called directly without a proxy, and we configure byteman to detect them
-		//then we expect an exception to be thrown
+		// When called directly without a proxy, expect an exception to be thrown due to byteman rules
 		assertNetworkCallFails(restTemplate, new HttpComponentsClientHttpRequestFactory());
-		// Repeat that with different request factory used in the code as this exercise different byteman rules
+		// Repeat that with different request factory used in the code as this exercises different byteman rules
 		assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
-		//And with the actual one used by RestUtil
+		// And with the actual one used by RestUtil, without a proxy configured
 		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null, false));
 
-		//when called with a proxy
-		requestFactory = new HttpComponentsClientHttpRequestFactory();//avoid reusing keep alive connections
-		HttpComponentsClientHttpRequestFactory commonsFactory = (HttpComponentsClientHttpRequestFactory) requestFactory;
+		// Test with the in-JVM proxy configured
+		HttpProxyConfiguration localProxy = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
+		ClientHttpRequestFactory requestFactory = new RestUtil().createRequestFactory(localProxy, CCNG_API_SSL);
 
-		HttpHost proxy = new HttpHost("127.0.0.1", inJvmProxyPort);
-		commonsFactory.getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		restTemplate.setRequestFactory(requestFactory);
 		restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET, null, null);
 
-		//then executes fines, and the jetty proxy indeed received one request
+		// then executes fine, and the jetty proxy indeed received one request
 		assertEquals("expected network calls to make it through the inJvmProxy.", 1, nbInJvmProxyRcvReqs.get());
 		nbInJvmProxyRcvReqs.set(0); //reset for next test
 
-		//Make sure
 		assertTrue(SocketDestHelper.isActivated());
 		assertFalse("expected some installed rules, got:" + SocketDestHelper.getInstalledRules(), SocketDestHelper.getInstalledRules().isEmpty());
    }
@@ -994,14 +992,17 @@ public class CloudFoundryClientTest {
 		Thread.sleep(10000); // let's have some time to get some logs generated
 		Map<String, String> logs = connectedClient.getLogs(appName);
 		assertNotNull(logs);
-		assertTrue(logs.size() > 0);
-		for (String log : logs.keySet()) {
-			assertNotNull(logs.get(log));
-		}
+		assertTrue(logs.size() > 2);
+		assertNotNull(logs.get("logs/stdout.log"));
+		assertNotNull(logs.get("logs/env.log"));
 	}
 	
 	@Test
 	public void streamLogs() throws Exception {
+		// disable proxy validation for this test, since Loggregator websockets
+		// connectivity does not currently support proxies
+		new SocketDestHelper().setAllowedOnCurrentThread();
+
 		String appName = namespacedAppName("simple_logs");
 		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
 		boolean pass = getInstanceInfosWithTimeout(appName, 1, true);
@@ -1029,6 +1030,7 @@ public class CloudFoundryClientTest {
 			if (testListener.logs.size() > 0) {
 				break;
 			}
+			Thread.sleep(1000);
 		} while (attempt++ < 30);
 		assertTrue("Failed to stream normal log", testListener.logs.size() > 0);
 	}
