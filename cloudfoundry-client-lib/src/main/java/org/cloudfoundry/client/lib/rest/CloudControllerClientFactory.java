@@ -39,15 +39,15 @@ import org.springframework.web.client.RestTemplate;
  */
 public class CloudControllerClientFactory {
 
-	private final RestUtil restUtil;
-	private final RestTemplate restTemplate;
+	protected final RestUtil restUtil;
+	protected final RestTemplate restTemplate;
 
-	private final HttpProxyConfiguration httpProxyConfiguration;
-	private final boolean trustSelfSignedCerts;
+	protected final HttpProxyConfiguration httpProxyConfiguration;
+	protected final boolean trustSelfSignedCerts;
 
-	private ObjectMapper objectMapper;
+	protected ObjectMapper objectMapper;
 
-	private final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
+	protected final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
 
 	public CloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
 		this.restUtil = new RestUtil();
@@ -66,21 +66,38 @@ public class CloudControllerClientFactory {
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
-		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
-				cloudCredentials, sessionSpace);
+		return instantiateCloudControllerClient(cloudControllerUrl, cloudCredentials, sessionSpace, oauthClient, loggregatorClient);
 	}
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
-	                                                String orgName, String spaceName) {
+																									String orgName, String spaceName) {
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
+		return instantiateCloudControllerClient(cloudControllerUrl, cloudCredentials, orgName, spaceName, oauthClient, loggregatorClient);
+	}
+
+	protected CloudControllerClient instantiateCloudControllerClient(URL cloudControllerUrl,
+																																	 CloudCredentials cloudCredentials,
+																																	 CloudSpace sessionSpace,
+																																	 OauthClient oauthClient,
+																																	 LoggregatorClient loggregatorClient) {
+		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
+				cloudCredentials, sessionSpace);
+	}
+
+	protected CloudControllerClientImpl instantiateCloudControllerClient(URL cloudControllerUrl,
+																																			 CloudCredentials cloudCredentials,
+																																			 String orgName,
+																																			 String spaceName,
+																																			 OauthClient oauthClient,
+																																			 LoggregatorClient loggregatorClient) {
 		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
 				cloudCredentials, orgName, spaceName);
 	}
-	
+
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		if (infoCache.containsKey(cloudControllerUrl)) {
 			return infoCache.get(cloudControllerUrl);
