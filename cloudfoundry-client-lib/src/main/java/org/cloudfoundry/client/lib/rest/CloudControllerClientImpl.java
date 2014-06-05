@@ -867,7 +867,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
+	protected List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
 		List<Map<String, Object>> allResources = new ArrayList<Map<String, Object>>();
 		String resp;
 		if (urlVars != null) {
@@ -888,7 +888,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
+	protected String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
 		String resp = getRestTemplate().getForObject(getUrl(nextUrl), String.class);
 		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
