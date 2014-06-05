@@ -39,15 +39,15 @@ import org.springframework.web.client.RestTemplate;
  */
 public class CloudControllerClientFactory {
 
-	private final RestUtil restUtil;
-	private final RestTemplate restTemplate;
+	protected final RestUtil restUtil;
+	protected final RestTemplate restTemplate;
 
-	private final HttpProxyConfiguration httpProxyConfiguration;
-	private final boolean trustSelfSignedCerts;
+	protected final HttpProxyConfiguration httpProxyConfiguration;
+	protected final boolean trustSelfSignedCerts;
 
-	private ObjectMapper objectMapper;
+	protected ObjectMapper objectMapper;
 
-	private final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
+	protected final Map<URL, Map<String, Object>> infoCache = new HashMap<URL, Map<String, Object>>();
 
 	public CloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
 		this.restUtil = new RestUtil();
