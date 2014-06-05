@@ -155,11 +155,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		this.cc = newCloudControllerClient(credentials, cloudControllerUrl, orgName, spaceName);
 	}
 
-	private CloudControllerClientFactory newCloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
+	protected CloudControllerClientFactory newCloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
 		return new CloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
 	}
 
-	private CloudControllerClient newCloudControllerClient(CloudCredentials credentials, URL cloudControllerUrl, String orgName, String spaceName) {
+	protected CloudControllerClient newCloudControllerClient(CloudCredentials credentials, URL cloudControllerUrl, String orgName, String spaceName) {
 		return ccFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
 	}
 
