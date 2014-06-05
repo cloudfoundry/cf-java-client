@@ -66,21 +66,38 @@ public class CloudControllerClientFactory {
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
-		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
-				cloudCredentials, sessionSpace);
+		return instantiateCloudControllerClient(cloudControllerUrl, cloudCredentials, sessionSpace, oauthClient, loggregatorClient);
 	}
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
-	                                                String orgName, String spaceName) {
+																									String orgName, String spaceName) {
 		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
 		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
 		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
+		return instantiateCloudControllerClient(cloudControllerUrl, cloudCredentials, orgName, spaceName, oauthClient, loggregatorClient);
+	}
+
+	protected CloudControllerClient instantiateCloudControllerClient(URL cloudControllerUrl,
+																																	 CloudCredentials cloudCredentials,
+																																	 CloudSpace sessionSpace,
+																																	 OauthClient oauthClient,
+																																	 LoggregatorClient loggregatorClient) {
+		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
+				cloudCredentials, sessionSpace);
+	}
+
+	protected CloudControllerClientImpl instantiateCloudControllerClient(URL cloudControllerUrl,
+																																			 CloudCredentials cloudCredentials,
+																																			 String orgName,
+																																			 String spaceName,
+																																			 OauthClient oauthClient,
+																																			 LoggregatorClient loggregatorClient) {
 		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
 				cloudCredentials, orgName, spaceName);
 	}
-	
+
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		if (infoCache.containsKey(cloudControllerUrl)) {
 			return infoCache.get(cloudControllerUrl);
