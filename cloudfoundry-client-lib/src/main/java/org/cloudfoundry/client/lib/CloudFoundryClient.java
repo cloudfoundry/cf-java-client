@@ -56,10 +56,10 @@ import org.springframework.web.client.ResponseErrorHandler;
  */
 public class CloudFoundryClient implements CloudFoundryOperations {
 
-	private CloudControllerClient cc;
+	protected CloudControllerClient cc;
 
-	private CloudInfo info;
-	private CloudControllerClientFactory ccFactory;
+	protected CloudInfo info;
+	protected CloudControllerClientFactory ccFactory;
 
 	/**
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
