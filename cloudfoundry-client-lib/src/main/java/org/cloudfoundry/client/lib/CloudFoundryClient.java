@@ -56,9 +56,10 @@ import org.springframework.web.client.ResponseErrorHandler;
  */
 public class CloudFoundryClient implements CloudFoundryOperations {
 
-	private CloudControllerClient cc;
+	protected CloudControllerClient cc;
 
-	private CloudInfo info;
+	protected CloudInfo info;
+	protected CloudControllerClientFactory ccFactory;
 
 	/**
 	 * Construct client for anonymous user. Useful only to get to the '/info' endpoint.
@@ -125,9 +126,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, CloudSpace sessionSpace,
 	                          HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
-		CloudControllerClientFactory cloudControllerClientFactory =
-				new CloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
-		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
+		this.ccFactory = newCloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
+		this.cc = ccFactory.newCloudController(cloudControllerUrl, credentials, sessionSpace);
 	}
 
 	/**
@@ -151,9 +151,16 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public CloudFoundryClient(CloudCredentials credentials, URL cloudControllerUrl, String orgName, String spaceName,
 	                          HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
 		Assert.notNull(cloudControllerUrl, "URL for cloud controller cannot be null");
-		CloudControllerClientFactory cloudControllerClientFactory =
-				new CloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
-		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
+		this.ccFactory = newCloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
+		this.cc = newCloudControllerClient(credentials, cloudControllerUrl, orgName, spaceName);
+	}
+
+	protected CloudControllerClientFactory newCloudControllerClientFactory(HttpProxyConfiguration httpProxyConfiguration, boolean trustSelfSignedCerts) {
+		return new CloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
+	}
+
+	protected CloudControllerClient newCloudControllerClient(CloudCredentials credentials, URL cloudControllerUrl, String orgName, String spaceName) {
+		return ccFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
 	}
 
 	public void setResponseErrorHandler(ResponseErrorHandler errorHandler) {

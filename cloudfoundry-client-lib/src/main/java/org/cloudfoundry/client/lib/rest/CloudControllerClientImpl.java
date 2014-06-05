@@ -115,23 +115,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private static final String LOGS_LOCATION = "logs";
 	private static final int JOB_POLLING_PERIOD = 5000; // matches that of gcf
 
-	private OauthClient oauthClient;
+	protected OauthClient oauthClient;
 
-	private CloudSpace sessionSpace;
+	protected CloudSpace sessionSpace;
 
-	private CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
+	protected CloudEntityResourceMapper resourceMapper = new CloudEntityResourceMapper();
 
-	private RestTemplate restTemplate;
+	protected RestTemplate restTemplate;
 
-	private URL cloudControllerUrl;
+	protected URL cloudControllerUrl;
 
-	private LoggregatorClient loggregatorClient;
+	protected LoggregatorClient loggregatorClient;
 
 	protected CloudCredentials cloudCredentials;
 
 	protected OAuth2AccessToken token;
 
-	private final Log logger;
+	protected final Log logger;
 
 	/**
 	 * Only for unit tests. This works around the fact that the initialize method is called within the constructor and
@@ -867,7 +867,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
+	protected List<Map<String, Object>> getAllResources(String urlPath, Map<String, Object> urlVars) {
 		List<Map<String, Object>> allResources = new ArrayList<Map<String, Object>>();
 		String resp;
 		if (urlVars != null) {
@@ -888,7 +888,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
+	protected String addPageOfResources(String nextUrl, List<Map<String, Object>> allResources) {
 		String resp = getRestTemplate().getForObject(getUrl(nextUrl), String.class);
 		Map<String, Object> respMap = JsonUtil.convertJsonToMap(resp);
 		List<Map<String, Object>> newResources = (List<Map<String, Object>>) respMap.get("resources");
