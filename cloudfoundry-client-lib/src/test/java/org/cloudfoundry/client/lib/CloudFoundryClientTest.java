@@ -103,7 +103,6 @@ import org.springframework.web.client.RestTemplate;
 @RunWith(BMUnitRunner.class)
 @BMScript(value="trace", dir="target/test-classes")
 public class CloudFoundryClientTest {
-
 	private CloudFoundryClient connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
@@ -135,6 +134,8 @@ public class CloudFoundryClientTest {
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 
 	private static final boolean SKIP_INJVM_PROXY = Boolean.getBoolean("http.skipInJvmProxy");
+
+	public static final int STARTUP_TIMEOUT = Integer.getInteger("ccng.startup.timeout", 60000);
 
 	private static String defaultDomainName = null;
 
@@ -1838,7 +1839,7 @@ public class CloudFoundryClientTest {
 				return applicationInstances;
 			}
 
-			if (System.currentTimeMillis() - start > 60000) {
+			if (System.currentTimeMillis() - start > STARTUP_TIMEOUT) {
 				fail("Timed out waiting for startup");
 				break; // for the compiler
 			}
