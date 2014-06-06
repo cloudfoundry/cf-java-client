@@ -27,7 +27,7 @@ Following is a typical configuration example, which uses most of the available c
         <plugins>
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
-                <artifactId>maven-cf-plugin</artifactId>
+                <artifactId>cf-maven-plugin</artifactId>
                 <version>1.0.2</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
