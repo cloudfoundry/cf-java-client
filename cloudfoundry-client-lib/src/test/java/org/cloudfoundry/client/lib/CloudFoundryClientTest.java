@@ -127,8 +127,8 @@ public class CloudFoundryClientTest {
 
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
 
-	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "cleardb");
-	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "spark");
+	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "p-mysql");
+	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "100mb-dev");
 
 	private static final String DEFAULT_STACK_NAME = "lucid64";
 
