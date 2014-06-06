@@ -33,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -338,7 +339,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
 	}
-	
+
 	public String getStagingLogs(StartingInfo info, int offset) {
 		return cc.getStagingLogs(info, offset);
 	}
@@ -375,6 +376,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public List<CloudService> getServices() {
 		return cc.getServices();
+	}
+
+	public List<CloudServiceBroker> getServiceBrokers() {
+		return cc.getServiceBrokers();
 	}
 
 	public CloudService getService(String service) {
