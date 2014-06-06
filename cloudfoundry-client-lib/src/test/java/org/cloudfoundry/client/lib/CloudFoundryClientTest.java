@@ -33,8 +33,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
@@ -118,6 +116,8 @@ public class CloudFoundryClientTest {
 	private static final String CCNG_USER_EMAIL = System.getProperty("ccng.email", "java-authenticatedClient-test-user@vmware.com");
 
 	private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
+
+	private static final boolean CCNG_USER_IS_ADMIN = Boolean.getBoolean("ccng.admin");
 
 	private static final String CCNG_USER_ORG = System.getProperty("ccng.org", "gopivotal.com");
 
@@ -1158,6 +1158,8 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void getServiceBrokers() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
 		List<CloudServiceBroker> brokers = connectedClient.getServiceBrokers();
 		assertNotNull(brokers);
 		assertTrue(brokers.size() >= 1);
