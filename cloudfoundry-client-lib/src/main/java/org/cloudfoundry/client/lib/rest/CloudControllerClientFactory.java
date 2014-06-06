@@ -42,6 +42,8 @@ public class CloudControllerClientFactory {
 	private final RestUtil restUtil;
 	private final RestTemplate restTemplate;
 
+	private OauthClient oauthClient;
+
 	private final HttpProxyConfiguration httpProxyConfiguration;
 	private final boolean trustSelfSignedCerts;
 
@@ -61,9 +63,7 @@ public class CloudControllerClientFactory {
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
 	                                                CloudSpace sessionSpace) {
-		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
-		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
-		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
+		createOauthClient(cloudControllerUrl);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
 		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
@@ -72,15 +72,27 @@ public class CloudControllerClientFactory {
 
 	public CloudControllerClient newCloudController(URL cloudControllerUrl, CloudCredentials cloudCredentials,
 	                                                String orgName, String spaceName) {
-		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
-		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
-		OauthClient oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
+		createOauthClient(cloudControllerUrl);
 		LoggregatorClient loggregatorClient = new LoggregatorClient(trustSelfSignedCerts);
 
 		return new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient,
 				cloudCredentials, orgName, spaceName);
 	}
-	
+
+	public RestTemplate getRestTemplate() {
+		return restTemplate;
+	}
+
+	public OauthClient getOauthClient() {
+		return oauthClient;
+	}
+
+	private void createOauthClient(URL cloudControllerUrl) {
+		Map<String, Object> infoMap = getInfoMap(cloudControllerUrl);
+		URL authorizationEndpoint = getAuthorizationEndpoint(infoMap, cloudControllerUrl);
+		this.oauthClient = restUtil.createOauthClient(authorizationEndpoint, httpProxyConfiguration, trustSelfSignedCerts);
+	}
+
 	private Map<String, Object> getInfoMap(URL cloudControllerUrl) {
 		if (infoCache.containsKey(cloudControllerUrl)) {
 			return infoCache.get(cloudControllerUrl);

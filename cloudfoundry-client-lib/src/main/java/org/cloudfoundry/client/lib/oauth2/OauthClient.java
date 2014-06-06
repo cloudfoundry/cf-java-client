@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.springframework.http.HttpEntity;
@@ -52,12 +53,53 @@ public class OauthClient {
 
 	private RestTemplate restTemplate;
 
+	private OAuth2AccessToken token;
+	private CloudCredentials credentials;
+
 	public OauthClient(URL authorizationUrl, RestTemplate restTemplate) {
 		this.authorizationUrl = authorizationUrl;
 		this.restTemplate = restTemplate;
 	}
 
-	public OAuth2AccessToken getToken(String username, String password, String clientId, String clientSecret) {
+	public void init(CloudCredentials credentials) {
+		if (credentials != null) {
+			this.credentials = credentials;
+
+			if (credentials.getToken() != null) {
+				this.token = credentials.getToken();
+			} else {
+				this.token = createToken(credentials.getEmail(), credentials.getPassword(),
+						credentials.getClientId(), credentials.getClientSecret());
+			}
+		}
+	}
+
+	public void clear() {
+		this.token = null;
+		this.credentials = null;
+	}
+
+	public OAuth2AccessToken getToken() {
+		if (token == null) {
+			return null;
+		}
+
+		if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
+			token = refreshToken(token, credentials.getEmail(), credentials.getPassword(),
+					credentials.getClientId(), credentials.getClientSecret());
+		}
+
+		return token;
+	}
+
+	public String getAuthorizationHeader() {
+		if (token != null) {
+			return token.getTokenType() + " " + token.getValue();
+		}
+		return null;
+	}
+
+	private OAuth2AccessToken createToken(String username, String password, String clientId, String clientSecret) {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
@@ -73,7 +115,7 @@ public class OauthClient {
 		}
 	}
 
-	public OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
+	private OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
 		AccessTokenRequest request = createAccessTokenRequest(username, password);
 
@@ -83,7 +125,7 @@ public class OauthClient {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void changePassword(OAuth2AccessToken token, String oldPassword, String newPassword) {
+	public void changePassword(String oldPassword, String newPassword) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(AUTHORIZATION_HEADER_KEY, token.getTokenType() + " " + token.getValue());
 		HttpEntity info = new HttpEntity(headers);

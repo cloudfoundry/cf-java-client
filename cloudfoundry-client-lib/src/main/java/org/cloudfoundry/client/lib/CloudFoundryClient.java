@@ -157,6 +157,13 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
 	}
 
+	/**
+	 * Construct a client with a pre-configured CloudControllerClient
+	 */
+	public CloudFoundryClient(CloudControllerClient cc) {
+		this.cc = cc;
+	}
+
 	public void setResponseErrorHandler(ResponseErrorHandler errorHandler) {
 		cc.setResponseErrorHandler(errorHandler);
 	}
