@@ -60,6 +60,7 @@ import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -730,6 +731,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			serviceOfferings.add(serviceOffering);
 		}
 		return serviceOfferings;
+	}
+
+	public List<CloudServiceBroker> getServiceBrokers() {
+		String urlPath = "/v2/service_brokers?inline-relations-depth=1";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudServiceBroker> serviceBrokers = new ArrayList<CloudServiceBroker>();
+		for (Map<String, Object> resource : resourceList) {
+			CloudServiceBroker broker = resourceMapper.mapResource(resource, CloudServiceBroker.class);
+			serviceBrokers.add(broker);
+		}
+		return serviceBrokers;
 	}
 
 	public List<CloudApplication> getApplications() {

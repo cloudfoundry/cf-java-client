@@ -24,6 +24,7 @@ import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -75,6 +76,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudServiceOffering.class) {
 			return (T) mapServiceResource(resource);
+		}
+		if (targetClass == CloudServiceBroker.class) {
+			return (T) mapServiceBrokerResource(resource);
 		}
 		if (targetClass == CloudStack.class) {
 			return (T) mapStackResource(resource);
@@ -210,6 +214,13 @@ public class CloudEntityResourceMapper {
 			}
 		}
 		return cloudServiceOffering;
+	}
+
+	private CloudServiceBroker mapServiceBrokerResource(Map<String, Object> resource) {
+		return new CloudServiceBroker(getMeta(resource),
+			getEntityAttribute(resource, "name", String.class),
+			getEntityAttribute(resource, "broker_url", String.class),
+			getEntityAttribute(resource, "auth_username", String.class));
 	}
 
 	private CloudStack mapStackResource(Map<String, Object> resource) {

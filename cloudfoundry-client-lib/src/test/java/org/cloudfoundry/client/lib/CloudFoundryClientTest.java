@@ -44,6 +44,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -1153,6 +1154,18 @@ public class CloudFoundryClientTest {
 		for (CloudService expectedService : expectedServices) {
 			assertServiceMatching(expectedService, services);
 		}
+	}
+
+	@Test
+	public void getServiceBrokers() {
+		List<CloudServiceBroker> brokers = connectedClient.getServiceBrokers();
+		assertNotNull(brokers);
+		assertTrue(brokers.size() >= 1);
+		CloudServiceBroker broker0 = brokers.get(0);
+		assertNotNull(broker0.getMeta());
+		assertNotNull(broker0.getName());
+		assertNotNull(broker0.getUrl());
+		assertNotNull(broker0.getUsername());
 	}
 
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {

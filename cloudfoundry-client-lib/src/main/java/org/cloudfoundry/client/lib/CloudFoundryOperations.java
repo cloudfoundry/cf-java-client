@@ -31,6 +31,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -498,6 +499,13 @@ public interface CloudFoundryOperations {
 	 * @return list of service offerings
 	 */
 	List<CloudServiceOffering> getServiceOfferings();
+
+	/**
+	 * Get all service brokers.
+	 *
+	 * @return
+	 */
+	List<CloudServiceBroker> getServiceBrokers();
 
 	/**
 	 * Associate (provision) a service with an application.
