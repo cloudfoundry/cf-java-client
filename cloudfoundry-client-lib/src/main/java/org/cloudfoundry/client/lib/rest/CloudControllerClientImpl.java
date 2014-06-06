@@ -130,8 +130,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	protected CloudCredentials cloudCredentials;
 
-	protected OAuth2AccessToken token;
-
 	private final Log logger;
 
 	/**
@@ -160,15 +158,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				new CloudControllerClientImpl(cloudControllerUrl, restTemplate,
 						oauthClient, loggregatorClient, cloudCredentials, null);
 
-		if (tempClient.token == null) {
-			tempClient.login();
-		}
-
 		initialize(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient, cloudCredentials);
 
 		this.sessionSpace = validateSpaceAndOrg(spaceName, orgName, tempClient);
-
-		token = tempClient.token;
 	}
 
 	private void initialize(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
@@ -176,10 +168,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restTemplate, "RestTemplate cannot be null");
 		Assert.notNull(oauthClient, "OauthClient cannot be null");
+
+		oauthClient.init(cloudCredentials);
+
 		this.cloudCredentials = cloudCredentials;
-		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
-			this.token = cloudCredentials.getToken();
-		}
 
 		this.cloudControllerUrl = cloudControllerUrl;
 
@@ -349,14 +341,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
-    private String getAuthorizationHeader() {
-        if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
-            token = oauthClient.refreshToken(token, cloudCredentials.getEmail(), cloudCredentials.getPassword(),
-                    cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
-        }
-        return token.getTokenType() + " " + token.getValue();
-    }
-	
 	private class CloudFoundryClientHttpRequestFactory implements ClientHttpRequestFactory {
 
 		private ClientHttpRequestFactory delegate;
@@ -369,12 +353,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
-			if (token != null) {
-				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, getAuthorizationHeader());
+
+			String authorizationHeader = oauthClient.getAuthorizationHeader();
+			if (authorizationHeader != null) {
+				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, authorizationHeader);
 			}
+
 			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
 				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
 			}
+
 			return request;
 		}
 
@@ -536,8 +524,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return response;
 	}
 
-	
-
 	@SuppressWarnings("unchecked")
 	public CloudInfo getInfo() {
 		// info comes from two end points: /info and /v2/info
@@ -562,7 +548,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		CloudInfo.Limits limits = null;
 		CloudInfo.Usage usage = null;
 		boolean debug = false;
-		if (token != null) {
+		if (oauthClient.getToken() != null) {
 			limits = new CloudInfo.Limits(limitMap);
 			usage = new CloudInfo.Usage(usageMap);
 			debug = CloudUtil.parse(Boolean.class, infoMap.get("allow_debug"));
@@ -595,14 +581,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public OAuth2AccessToken login() {
-		token = oauthClient.getToken(cloudCredentials.getEmail(),
-				cloudCredentials.getPassword(), cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
-		
-		return token;
+		oauthClient.init(cloudCredentials);
+		return oauthClient.getToken();
 	}
 
 	public void logout() {
-		token = null;
+		oauthClient.clear();
 	}
 
 	public void register(String email, String password) {
@@ -610,7 +594,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public void updatePassword(CloudCredentials credentials, String newPassword) {
-		oauthClient.changePassword(token, credentials.getPassword(), newPassword);
+		oauthClient.changePassword(credentials.getPassword(), newPassword);
 		CloudCredentials newCloudCredentials = new CloudCredentials(credentials.getEmail(), newPassword);
 		if (cloudCredentials.getProxyUser() != null) {
 			cloudCredentials = newCloudCredentials.proxyForUser(cloudCredentials.getProxyUser());
@@ -1637,8 +1621,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private StreamingLogToken streamLoggregatorLogs(String appName, ApplicationLogListener listener, boolean recent) {
 		ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
 			public void beforeRequest(Map<String, List<String>> headers) {
-				if (token != null) {
-					headers.put(AUTHORIZATION_HEADER_KEY, Arrays.asList(getAuthorizationHeader()));
+				String authorizationHeader = oauthClient.getAuthorizationHeader();
+				if (authorizationHeader != null) {
+					headers.put(AUTHORIZATION_HEADER_KEY, Arrays.asList(authorizationHeader));
 				}
 			}
 		};
@@ -1734,8 +1719,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 //		return userInfo();
 		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
 		String userJson = "{}";
-		if (token != null) {
-			String tokenString = token.getValue();
+		OAuth2AccessToken accessToken = oauthClient.getToken();
+		if (accessToken != null) {
+			String tokenString = accessToken.getValue();
 			int x = tokenString.indexOf('.');
 			int y = tokenString.indexOf('.', x + 1);
 			String encodedString = tokenString.substring(x + 1, y);
