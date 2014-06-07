@@ -12,7 +12,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </plugin>
 ~~~
 
@@ -28,7 +28,7 @@ Following is a typical configuration example, which uses most of the available c
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>cf-maven-plugin</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
@@ -98,7 +98,8 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     <tr><th align="left">cf:start</th>            <td>Start an application.</td></tr>
     <tr><th align="left">cf:stop</th>             <td>Stop an application.</td></tr>
     <tr><th align="left">cf:target</th>           <td>Show information about the target Cloud Foundry service.</td></tr>
-    <tr><th align="left">cf:logs</th>             <td>Show log files (stdout and stderr).</td></tr>
+    <tr><th align="left">cf:logs</th>             <td>Tail application logs.</td></tr>
+    <tr><th align="left">cf:recentLogs</th>       <td>Show recent application logs.</td></tr>
     <tr><th align="left">cf:scale</th>            <td>Scale the application instances up or down.</td></tr>
     <tr><th align="left">cf:services</th>         <td>Show a list of provisioned services.</td></tr>
     <tr><th align="left">cf:service-plans</th>    <td>Show a list of available service plans.</td></tr>
@@ -178,6 +179,7 @@ Additional certain configuration parameter will fall back to using default value
 + `diskQuota`: Defaults to Cloud Controller value
 + `healthCheckTimeout`: Defaults to Cloud Controller value
 + `path`: Defaults to *${project.build.directory}/${project.build.finalName}.war*
++ `url`: Defaults to the appname and the default domain
 + `server`: Special parameter to tell Maven which server element in `settings.xml`
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
 
@@ -259,6 +261,12 @@ Some Cloud Foundry deployments, such as those deployed using Pivotal CF, use a s
 To instruct the Cloud Foundry Maven plugin to accept self-signed certificates from the Cloud Foundry target endpoint, add `<trustSelfSignedCerts>true</trustSelfSignedCerts>` to the plugin configuration block.
 
 # History
+
+## Changes from version 1.0.2 to 1.0.3
+
+* Changed `cf:logs` to tail logs from Loggregator
+* Added `cf:recentLogs`
+* Fixed defaulting of `url`
 
 ## Changes from version 1.0.0 to 1.0.2
 
