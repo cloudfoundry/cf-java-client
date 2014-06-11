@@ -26,6 +26,7 @@
 	</scm>
 
 	<properties>
+		<java.version>1.7</java.version>
 		<spring.framework.version>3.2.2.RELEASE</spring.framework.version>
 		<spring.security.oauth.version>1.0.0.RELEASE</spring.security.oauth.version>
 		<tomcat.version>8.0.8</tomcat.version>
@@ -120,7 +121,7 @@
 				<dependency>
 					<groupId>com.sun</groupId>
 					<artifactId>tools</artifactId>
-					<version>1.6</version>
+					<version>${java.version}</version>
 					<scope>system</scope>
 					<systemPath>${tools.jar}</systemPath>
 				</dependency>
@@ -329,8 +330,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -344,7 +345,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
