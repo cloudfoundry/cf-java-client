@@ -3,9 +3,7 @@ package com.springdeveloper.test;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

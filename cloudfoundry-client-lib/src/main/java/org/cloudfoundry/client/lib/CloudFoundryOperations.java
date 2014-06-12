@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -30,6 +31,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -354,8 +356,31 @@ public interface CloudFoundryOperations {
 	 * @param appName name of the application
 	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
 	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getLogs(String appName);
+	
+	/**
+	 * Stream application logs produced <em>after</em> this method is called.
+	 * 
+	 * This method has 'tail'-like behavior. Every time there is a new log entry,
+	 * it notifies the listener.
+	 * 
+	 * @param appName the name of the application
+	 * @param listener listener object to be notified
+	 * @return token than can be used to cancel listening for logs
+	 */
+	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+	
+	/**
+	 * Stream recent log entries.
+	 * 
+	 * Stream logs that were recently produced for an app.
+	 *
+	 * @param appName the name of the application
+	 * @return the list of recent log entries
+	 */
+	List<ApplicationLog> getRecentLogs(String appName);
 
 	/**
 	 * Get logs from most recent crash of the deployed application. The logs
@@ -365,6 +390,7 @@ public interface CloudFoundryOperations {
 	 * @param appName name of the application
 	 * @return a Map containing the logs. The logs will be returned with the path to the log file used as the key and
 	 * the full content of the log file will be returned as a String value for the corresponding key.
+	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getCrashLogs(String appName);
 	
@@ -475,6 +501,13 @@ public interface CloudFoundryOperations {
 	List<CloudServiceOffering> getServiceOfferings();
 
 	/**
+	 * Get all service brokers.
+	 *
+	 * @return
+	 */
+	List<CloudServiceBroker> getServiceBrokers();
+
+	/**
 	 * Associate (provision) a service with an application.
 	 *
 	 * @param appName the application name
@@ -547,6 +580,13 @@ public interface CloudFoundryOperations {
 	 * @return list of domains
 	 */
 	List<CloudDomain> getDomains();
+
+	/**
+	 * Gets the default domain for the current org, which is the first shared domain.
+	 *
+	 * @return the default domain
+	 */
+	CloudDomain getDefaultDomain();
 
 	/**
 	 * Add a private domain in the current organization.

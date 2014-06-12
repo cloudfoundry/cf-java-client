@@ -48,7 +48,7 @@ public class CloudResourcesTest {
 
     private static final String SHA = "677E1B9BCA206D6534054348511BF41129744839";
 
-    private static final String JSON = "[{\"fn\":\"index.html\",\"size\":93,\"sha1\":\"" + SHA + "\"}]";
+    private static final String JSON = "[{\"size\":93,\"sha1\":\"" + SHA + "\",\"fn\":\"index.html\"}]";
 
     private ObjectMapper mapper = new ObjectMapper();
 

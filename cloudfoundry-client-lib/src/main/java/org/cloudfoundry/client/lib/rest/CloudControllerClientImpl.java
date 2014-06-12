@@ -35,16 +35,22 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.zip.ZipFile;
 
+import javax.websocket.ClientEndpointConfig;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.cloudfoundry.client.lib.ApplicationLogListener;
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.StreamingLogToken;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -54,6 +60,7 @@ import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -119,9 +126,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private URL cloudControllerUrl;
 
-	protected CloudCredentials cloudCredentials;
+	private LoggregatorClient loggregatorClient;
 
-	protected OAuth2AccessToken token;
+	protected CloudCredentials cloudCredentials;
 
 	private final Log logger;
 
@@ -133,41 +140,38 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		logger = LogFactory.getLog(getClass().getName());
 	}
 
-	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate,
+	                                 OauthClient oauthClient, LoggregatorClient loggregatorClient,
 	                                 CloudCredentials cloudCredentials, CloudSpace sessionSpace) {
 		logger = LogFactory.getLog(getClass().getName());
 
-		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
+		initialize(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient, cloudCredentials);
 
 		this.sessionSpace = sessionSpace;
 	}
 
-	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
+	public CloudControllerClientImpl(URL cloudControllerUrl, RestTemplate restTemplate,
+	                                 OauthClient oauthClient, LoggregatorClient loggregatorClient,
 	                                 CloudCredentials cloudCredentials, String orgName, String spaceName) {
 		logger = LogFactory.getLog(getClass().getName());
 		CloudControllerClientImpl tempClient =
-				new CloudControllerClientImpl(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials, null);
+				new CloudControllerClientImpl(cloudControllerUrl, restTemplate,
+						oauthClient, loggregatorClient, cloudCredentials, null);
 
-		if (tempClient.token == null) {
-			tempClient.login();
-		}
-
-		initialize(cloudControllerUrl, restTemplate, oauthClient, cloudCredentials);
+		initialize(cloudControllerUrl, restTemplate, oauthClient, loggregatorClient, cloudCredentials);
 
 		this.sessionSpace = validateSpaceAndOrg(spaceName, orgName, tempClient);
-
-		token = tempClient.token;
 	}
 
 	private void initialize(URL cloudControllerUrl, RestTemplate restTemplate, OauthClient oauthClient,
-	                        CloudCredentials cloudCredentials) {
+	                        LoggregatorClient loggregatorClient, CloudCredentials cloudCredentials) {
 		Assert.notNull(cloudControllerUrl, "CloudControllerUrl cannot be null");
 		Assert.notNull(restTemplate, "RestTemplate cannot be null");
 		Assert.notNull(oauthClient, "OauthClient cannot be null");
+
+		oauthClient.init(cloudCredentials);
+
 		this.cloudCredentials = cloudCredentials;
-		if (cloudCredentials != null && cloudCredentials.getToken() != null) {
-			this.token = cloudCredentials.getToken();
-		}
 
 		this.cloudControllerUrl = cloudControllerUrl;
 
@@ -175,6 +179,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		configureCloudFoundryRequestFactory(restTemplate);
 
 		this.oauthClient = oauthClient;
+
+		this.loggregatorClient = loggregatorClient;
 	}
 
 	private CloudSpace validateSpaceAndOrg(String spaceName, String orgName, CloudControllerClientImpl client) {
@@ -210,6 +216,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return doGetLogs(urlPath, appName, instance);
 	}
 
+	public List<ApplicationLog> getRecentLogs(String appName) {
+		AccumulatingApplicationLogListener listener = new AccumulatingApplicationLogListener();
+		streamLoggregatorLogs(appName, listener, true);
+		synchronized (listener) {
+			try {
+				listener.wait();
+			} catch (InterruptedException e) {
+				// return any captured logs
+			}
+		}
+		return listener.getLogs();
+	}
+
+	public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
+		return streamLoggregatorLogs(appName, listener, false);
+	}
+
 	public Map<String, String> getCrashLogs(String appName) {
 		String urlPath = getFileUrlPath();
 		CrashesInfo crashes = getCrashes(appName);
@@ -228,6 +251,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String urlPath = getFileUrlPath();
 		Object appId = getFileAppId(appName);
 		return doGetFile(urlPath, appId, instanceIndex, filePath, startPosition, endPosition);
+	}
+
+
+	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
+		String urlPath = getFileUrlPath();
+		Object appId = getFileAppId(appName);
+		doOpenFile(urlPath, appId, instanceIndex, filePath, callback);
 	}
 
 	public void registerRestLogListener(RestLogCallback callBack) {
@@ -323,17 +353,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
-			if (token != null) {
-				if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
-					token = oauthClient.refreshToken(token, cloudCredentials.getEmail(), cloudCredentials.getPassword(),
-							cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
-				}
-				String header = token.getTokenType() + " " + token.getValue();
-				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, header);
+
+			String authorizationHeader = oauthClient.getAuthorizationHeader();
+			if (authorizationHeader != null) {
+				request.getHeaders().add(AUTHORIZATION_HEADER_KEY, authorizationHeader);
 			}
+
 			if (cloudCredentials != null && cloudCredentials.getProxyUser() != null) {
 				request.getHeaders().add(PROXY_USER_HEADER_KEY, cloudCredentials.getProxyUser());
 			}
+
 			return request;
 		}
 
@@ -397,6 +426,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return logs;
 	}
 
+	@SuppressWarnings("unchecked")
+	protected void doOpenFile(String urlPath, Object app, int instanceIndex, String filePath,
+			ClientHttpResponseCallback callback) {
+		getRestTemplate().execute(getUrl(urlPath), HttpMethod.GET, null, new ResponseExtractorWrapper(callback), app,
+				String.valueOf(instanceIndex), filePath);
+	}
+
 	protected String doGetFile(String urlPath, Object app, int instanceIndex, String filePath, int startPosition, int endPosition) {
 		return doGetFile(urlPath, app, String.valueOf(instanceIndex), filePath, startPosition, endPosition);
 	}
@@ -436,10 +472,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					},
 					new ResponseExtractor<Boolean>() {
 						public Boolean extractData(ClientHttpResponse response) throws IOException {
-							if (response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT)) {
-								return true;
-							}
-							return false;
+							return response.getStatusCode().equals(HttpStatus.PARTIAL_CONTENT);
 						}
 					},
 					app, instance, filePath);
@@ -487,8 +520,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return response;
 	}
 
-	
-
 	@SuppressWarnings("unchecked")
 	public CloudInfo getInfo() {
 		// info comes from two end points: /info and /v2/info
@@ -513,14 +544,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		CloudInfo.Limits limits = null;
 		CloudInfo.Usage usage = null;
 		boolean debug = false;
-		if (token != null) {
+		if (oauthClient.getToken() != null) {
 			limits = new CloudInfo.Limits(limitMap);
 			usage = new CloudInfo.Usage(usageMap);
 			debug = CloudUtil.parse(Boolean.class, infoMap.get("allow_debug"));
 		}
+		
+		String loggregatorEndpoint = CloudUtil.parse(String.class, infoV2Map.get("logging_endpoint"));
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
-				description, limits, usage, debug);
+				description, limits, usage, debug, loggregatorEndpoint);
 	}
 
 	public List<CloudSpace> getSpaces() {
@@ -544,14 +577,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public OAuth2AccessToken login() {
-		token = oauthClient.getToken(cloudCredentials.getEmail(),
-				cloudCredentials.getPassword(), cloudCredentials.getClientId(), cloudCredentials.getClientSecret());
-		
-		return token;
+		oauthClient.init(cloudCredentials);
+		return oauthClient.getToken();
 	}
 
 	public void logout() {
-		token = null;
+		oauthClient.clear();
 	}
 
 	public void register(String email, String password) {
@@ -559,7 +590,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	public void updatePassword(CloudCredentials credentials, String newPassword) {
-		oauthClient.changePassword(token, credentials.getPassword(), newPassword);
+		oauthClient.changePassword(credentials.getPassword(), newPassword);
 		CloudCredentials newCloudCredentials = new CloudCredentials(credentials.getEmail(), newPassword);
 		if (cloudCredentials.getProxyUser() != null) {
 			cloudCredentials = newCloudCredentials.proxyForUser(cloudCredentials.getProxyUser());
@@ -680,6 +711,17 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			serviceOfferings.add(serviceOffering);
 		}
 		return serviceOfferings;
+	}
+
+	public List<CloudServiceBroker> getServiceBrokers() {
+		String urlPath = "/v2/service_brokers?inline-relations-depth=1";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudServiceBroker> serviceBrokers = new ArrayList<CloudServiceBroker>();
+		for (Map<String, Object> resource : resourceList) {
+			CloudServiceBroker broker = resourceMapper.mapResource(resource, CloudServiceBroker.class);
+			serviceBrokers.add(broker);
+		}
+		return serviceBrokers;
 	}
 
 	public List<CloudApplication> getApplications() {
@@ -1348,6 +1390,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return doGetDomains("/v2/shared_domains");
 	}
 
+	public CloudDomain getDefaultDomain() {
+		List<CloudDomain> sharedDomains = getSharedDomains();
+		if (sharedDomains.isEmpty()) {
+			return null;
+		} else {
+			return sharedDomains.get(0);
+		}
+	}
+
 	public void addDomain(String domainName) {
 		assertSpaceProvided("add domain");
 		UUID domainGuid = getDomainGuid(domainName, false);
@@ -1563,6 +1614,47 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return guid;
 	}
 
+	private StreamingLogToken streamLoggregatorLogs(String appName, ApplicationLogListener listener, boolean recent) {
+		ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
+			public void beforeRequest(Map<String, List<String>> headers) {
+				String authorizationHeader = oauthClient.getAuthorizationHeader();
+				if (authorizationHeader != null) {
+					headers.put(AUTHORIZATION_HEADER_KEY, Arrays.asList(authorizationHeader));
+				}
+			}
+		};
+
+		String endpoint = getInfo().getLoggregatorEndpoint();
+		String mode = recent ? "dump" : "tail";
+		UUID appId = getAppId(appName);
+		return loggregatorClient.connectToLoggregator(endpoint, mode, appId, listener, configurator);
+	}
+
+	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
+		private List<ApplicationLog> logs = new ArrayList<ApplicationLog>();
+
+		public void onMessage(ApplicationLog log) {
+			logs.add(log);
+		}
+
+		public void onError(Throwable exception) {
+			synchronized (this) {
+				this.notify();
+			}
+		}
+
+		public void onComplete() {
+			synchronized (this) {
+				this.notify();
+			}
+		}
+
+		public List<ApplicationLog> getLogs() {
+			Collections.sort(logs);
+			return logs;
+		}
+	}
+
 	private Map<String, Object> findApplicationResource(UUID appGuid, boolean fetchServiceInfo) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/apps/{app}?inline-relations-depth=1";
@@ -1570,7 +1662,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
 
 		return processApplicationResource(JsonUtil.convertJsonToMap(resp), fetchServiceInfo);
-
 	}
 
 	
@@ -1624,8 +1715,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 //		return userInfo();
 		//TODO: remove this temporary hack once the /v2/users/ uri can be accessed by mere mortals
 		String userJson = "{}";
-		if (token != null) {
-			String tokenString = token.getValue();
+		OAuth2AccessToken accessToken = oauthClient.getToken();
+		if (accessToken != null) {
+			String tokenString = accessToken.getValue();
 			int x = tokenString.indexOf('.');
 			int y = tokenString.indexOf('.', x + 1);
 			String encodedString = tokenString.substring(x + 1, y);
@@ -1681,4 +1773,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return entity.containsKey(resourceKey) || entity.containsKey(resourceKey + "_url");
 	}
 	
+	private static class ResponseExtractorWrapper implements ResponseExtractor {
+
+		private ClientHttpResponseCallback callback;
+
+		public ResponseExtractorWrapper(ClientHttpResponseCallback callback) {
+			this.callback = callback;
+		}
+
+		public Object extractData(ClientHttpResponse clientHttpResponse) throws IOException {
+			callback.onClientHttpResponse(clientHttpResponse);
+			return null;
+		}
+
+	}
 }

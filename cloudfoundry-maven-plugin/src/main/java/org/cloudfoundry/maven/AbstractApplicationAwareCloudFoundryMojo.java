@@ -18,8 +18,8 @@ package org.cloudfoundry.maven;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,8 +253,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * If the application name was specified via the command line ({@link SystemProperties})
 	 * then that property is used. Otherwise return the appname.
 	 *
-	 * @return Returns the Cloud Foundry application url. Returns null in case
-	 * the target url cannot be used to determine a suitable default.
+	 * @return Returns the Cloud Foundry application url.
 	 */
 	public String getUrl() {
 
@@ -262,35 +261,10 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 		if (property != null) {
 			return property;
-		}
-		else if (this.url == null && this.urls == null) {
-			if (getTarget() != null) {
-
-				final URI targetUri = getTarget();
-				final String[] tokenizedTarget = targetUri.getSchemeSpecificPart().split("\\.");
-
-				if (tokenizedTarget.length >=2) {
-
-					String domain = tokenizedTarget[tokenizedTarget.length-2];
-
-					if (domain.startsWith("//")) {
-						domain = domain.substring(2);
-					}
-
-					return getAppname() + "." + domain
-											 + "." + tokenizedTarget[tokenizedTarget.length-1];
-				} else {
-					getLog().warn(String.format("Unable to derive a suitable " +
-													 "Url from the provided Target Url '%s'", targetUri.toString()));
-					return null;
-				}
-
-			} else {
-				return getAppname() + "." + "<undefined target>";
-			}
 		} else {
 			return this.url;
 		}
+
 	}
 
 	/**
@@ -754,18 +728,16 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	protected List<String> getAllUris() throws MojoExecutionException {
-		final List<String> uris = new ArrayList<String>(0);
-
 		Assert.configurationUrls(getUrl(), getUrls());
 
 		if (getUrl() != null) {
-			uris.add(getUrl());
+			return Arrays.asList(getUrl());
 		} else if (!getUrls().isEmpty()) {
-			for (String uri : getUrls()) {
-				uris.add(uri);
-			}
+			return getUrls();
+		} else {
+			String defaultUri = getAppname() + "." + getClient().getDefaultDomain().getName();
+			return Arrays.asList(defaultUri);
 		}
-		return uris;
 	}
 
 	private long getAppStartupExpiry() {

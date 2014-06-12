@@ -67,10 +67,7 @@ public class SocketClientTest {
 		when(inputStream.read(isA(byte[].class))).thenAnswer( new Answer<Integer>() {
 			public Integer answer(InvocationOnMock invocation) throws Throwable {
 				Object[] args = invocation.getArguments();
-				byte[] arg1 = (byte[]) args[0];
-				for (int i = 0; i < data.length; i++) {
-					arg1[i] = data[i];
-				}
+				System.arraycopy(data, 0, (byte[]) args[0], 0, data.length);
 				return data.length;
 			}
 		});

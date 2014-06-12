@@ -19,12 +19,15 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.stubs.StubArtifactRepository;
+import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.maven.common.SystemProperties;
 
 /**
@@ -46,108 +49,45 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 	/**
 	 * @throws Exception
 	 */
-	public void testGetUrl() throws Exception {
+	public void testGetUrlDefaultNoAppName() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		Push mojo = setupMojo();
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		setupClient(mojo);
 
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-		assertEquals("cf-maven-tests.cloudfoundry.com", mojo.getUrl());
+		List<String> uris = mojo.getAllUris();
+		assertEquals(1, uris.size());
+		assertEquals("cf-maven-tests.apps.cloudfoundry.com", uris.get(0));
 
 	}
 
-	public void testGetUrl2() throws Exception {
+	public void testGetUrlDefaultAppName() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+		Push mojo = setupMojo();
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		setupClient(mojo);
 
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
 		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-		assertEquals("myapp.cloudfoundry.com", mojo.getUrl());
+		List<String> uris = mojo.getAllUris();
+		assertEquals(1, uris.size());
+		assertEquals("myapp.apps.cloudfoundry.com", uris.get(0));
 
 	}
 
-	public void testGetUrl3() throws Exception {
+	public void testGetUrlSpecified() throws Exception {
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		Push mojo = setupMojo();
 
 		doReturn("custom.expliciturl.com").when(mojo).getCommandlineProperty(SystemProperties.URL);
-		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
 
-		assertEquals("custom.expliciturl.com", mojo.getUrl());
-
-	}
-
-	public void testGetUrlWithNullTarget() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-
-		assertEquals("myapp.<undefined target>", mojo.getUrl());
-
-	}
-
-	public void testGetUrlWithBadTarget() throws Exception {
-
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-
-		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.URL);
-		doReturn("http://badtarget").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
-		doReturn("myapp").when(mojo).getCommandlineProperty(SystemProperties.APP_NAME);
-
-		assertNull(mojo.getUrl());
+		List<String> uris = mojo.getAllUris();
+		assertEquals(1, uris.size());
+		assertEquals("custom.expliciturl.com", uris.get(0));
 
 	}
 
@@ -206,16 +146,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 	}
 	
 	public void testRepositoryArtifactResolution() throws Exception {
-		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		Push mojo = setupMojo();
 
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.PATH);
 		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
@@ -244,16 +175,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 	}
 	
 	public void testGAVProcessing() throws Exception {
-		File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
-
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
-
-		Push mojo = spy(unspiedMojo);
-
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+		Push mojo = setupMojo();
 
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.PATH);
 		doReturn("http://api.cloudfoundry.com").when(mojo).getCommandlineProperty(SystemProperties.TARGET);
@@ -295,6 +217,27 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 			assertEquals("classifier", artifact.getClassifier());
 		}
 
+	}
+
+	private Push setupMojo() throws Exception {
+		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+
+		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+
+		Push mojo = spy(unspiedMojo);
+
+		/**
+		 * Injecting some test values as expressions are not evaluated.
+		 */
+		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
+
+		return mojo;
+	}
+
+	private void setupClient(Push mojo) {
+		CloudFoundryClient client = mock(CloudFoundryClient.class);
+		doReturn(new CloudDomain(null, "apps.cloudfoundry.com", null)).when(client).getDefaultDomain();
+		doReturn(client).when(mojo).getClient();
 	}
 
 }

@@ -36,6 +36,8 @@ public class CloudControllerClientImplTest {
 	private ClientHttpRequestFactory clientHttpRequestFactory;
 	@Mock
 	private OauthClient oauthClient;
+	@Mock
+	private LoggregatorClient loggregatorClient;
 
 	private CloudControllerClientImpl controllerClient;
 
@@ -52,7 +54,8 @@ public class CloudControllerClientImplTest {
 		restUtil.createRestTemplate(null, false);
 		restUtil.createOauthClient(new URL(CCNG_API_URL), null, false);
 
-		controllerClient = new CloudControllerClientImpl(new URL("http://api.dummyendpoint.com/login"), restTemplate, oauthClient,
+		controllerClient = new CloudControllerClientImpl(new URL("http://api.dummyendpoint.com/login"),
+				restTemplate, oauthClient, loggregatorClient,
 				new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
 				CCNG_USER_ORG, CCNG_USER_SPACE);
 	}

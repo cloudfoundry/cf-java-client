@@ -55,6 +55,11 @@ public class CloudServiceOffering extends CloudEntity {
 		this.description = description;
 		this.active = active;
 		this.bindable = bindable;
+		this.url = url;
+		this.infoUrl = infoUrl;
+		this.uniqueId = uniqueId;
+		this.extra = extra;
+		this.docUrl = docUrl;
 	}
 
 	public String getLabel() {
@@ -76,31 +81,31 @@ public class CloudServiceOffering extends CloudEntity {
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	public boolean isBindable() {
 		return bindable;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}
-	
+
 	public String getInfoUrl() {
 		return infoUrl;
 	}
-	
+
 	public String getUniqueId() {
 		return uniqueId;
 	}
-	
+
 	public String getExtra() {
 		return extra;
 	}
-	
-	public String getDocumenationUrl() {
+
+	public String getDocumentationUrl() {
 		return docUrl;
 	}
-	
+
 	public List<CloudServicePlan> getCloudServicePlans() {
 		return cloudServicePlans;
 	}

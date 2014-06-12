@@ -15,18 +15,10 @@
  */
 package org.cloudfoundry.maven;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-
-import org.cloudfoundry.client.lib.CloudFoundryClient;
 
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 
-import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**

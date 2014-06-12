@@ -70,12 +70,7 @@ public class TunnelAcceptor implements Runnable {
 	}
 
 	public boolean isActive() {
-		if (handlers.size() > 0) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return handlers.size() > 0;
 	}
 
 	public void stop() {

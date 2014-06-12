@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
@@ -32,6 +33,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -40,7 +42,6 @@ import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
-import org.cloudfoundry.client.lib.util.RestUtil;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -154,6 +155,13 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		CloudControllerClientFactory cloudControllerClientFactory =
 				new CloudControllerClientFactory(httpProxyConfiguration, trustSelfSignedCerts);
 		this.cc = cloudControllerClientFactory.newCloudController(cloudControllerUrl, credentials, orgName, spaceName);
+	}
+
+	/**
+	 * Construct a client with a pre-configured CloudControllerClient
+	 */
+	public CloudFoundryClient(CloudControllerClient cc) {
+		this.cc = cc;
 	}
 
 	public void setResponseErrorHandler(ResponseErrorHandler errorHandler) {
@@ -317,14 +325,28 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateApplicationEnv(appName, env);
 	}
 
+	/**
+	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
+	 */
 	public Map<String, String> getLogs(String appName) {
 		return cc.getLogs(appName);
 	}
 
+	public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
+	    return cc.streamLogs(appName, listener);
+	}
+
+	public List<ApplicationLog> getRecentLogs(String appName) {
+		return cc.getRecentLogs(appName);
+	}
+
+	/**
+	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
+	 */
 	public Map<String, String> getCrashLogs(String appName) {
 		return cc.getCrashLogs(appName);
 	}
-	
+
 	public String getStagingLogs(StartingInfo info, int offset) {
 		return cc.getStagingLogs(info, offset);
 	}
@@ -348,6 +370,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getFile(appName, instanceIndex, filePath, startPosition, endPosition - 1);
 	}
 
+	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
+		cc.openFile(appName, instanceIndex, filePath, callback);
+	}
+
 	public String getFileTail(String appName, int instanceIndex, String filePath, int length) {
 		Assert.isTrue(length > 0, length + " is not a valid value for length, it should be 1 or greater.");
 		return cc.getFile(appName, instanceIndex, filePath, -1, length);
@@ -357,6 +383,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public List<CloudService> getServices() {
 		return cc.getServices();
+	}
+
+	public List<CloudServiceBroker> getServiceBrokers() {
+		return cc.getServiceBrokers();
 	}
 
 	public CloudService getService(String service) {
@@ -417,6 +447,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public List<CloudDomain> getDomains() {
 		return cc.getDomains();
+	}
+
+	public CloudDomain getDefaultDomain() {
+		return cc.getDefaultDomain();
 	}
 
 	public void addDomain(String domainName) {

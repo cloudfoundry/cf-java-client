@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.2'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.3'
     }
 }
 
@@ -27,33 +27,35 @@ apply plugin: 'cloudfoundry'
 The Cloud Foundry Gradle plugin adds several tasks to the build. Specify one or more of these tasks on the `gradle` command line:
 
 ~~~
-$ gradle cf-push
+$ gradle cfPush
 ~~~
 
 The plugin adds the following tasks:
 
-* cf-target - Displays information about the target Cloud Foundry platform
-* cf-app - Displays information about the application deployment
-* cf-apps - Lists applications running on the targeted Cloud Foundry platform
-* cf-push - Pushes an application
-* cf-delete - Deletes an application deployment
-* cf-start - Starts an application
-* cf-stop - Stops an application
-* cf-restart - Restarts an application
-* cf-scale - Scales application instances up or down
-* cf-services - Displays information about service instances
-* cf-service-plans - Displays information about available service offerings
-* cf-create-service - Creates a service, optionally binding it to an application
-* cf-delete-service - Deletes a service
-* cf-bind - Binds a service to an application
-* cf-unbind - Unbinds a service from an application
-* cf-env - List application environment variables
-* cf-set-env - Sets environment variables to an application
-* cf-unset-env - Deletes environment variables from an application
-* cf-map - Maps a URI to an application
-* cf-unmap - Unmaps a URI from application
-* cf-login - Logs in and saves authentication tokens
-* cf-logout - Logs out and removes authentication tokens
+* cfTarget - Displays information about the target Cloud Foundry platform
+* cfApp - Displays information about the application deployment
+* cfApps - Lists applications running on the targeted Cloud Foundry platform
+* cfPush - Pushes an application
+* cfDelete - Deletes an application deployment
+* cfStart - Starts an application
+* cfStop - Stops an application
+* cfRestart - Restarts an application
+* cfScale - Scales application instances up or down
+* cfLogs - Tails application logs
+* cfRecentLogs - Displays recent application logs
+* cfServices - Displays information about service instances
+* cfServicePlans - Displays information about available service offerings
+* cfCreateService - Creates a service, optionally binding it to an application
+* cfDeleteService - Deletes a service
+* cfBind - Binds a service to an application
+* cfUnbind - Unbinds a service from an application
+* cfEnv - List application environment variables
+* cfSetEnv - Sets environment variables to an application
+* cfUnsetEnv - Deletes environment variables from an application
+* cfMap - Maps a URI to an application
+* cfUnmap - Unmaps a URI from application
+* cfLogin - Logs in and saves authentication tokens
+* cfLogout - Logs out and removes authentication tokens
 
 ## Configuring the plugin
 
@@ -80,16 +82,16 @@ Configuration options are:
 * username - your username on the target platform
 * password - your password on the target platform
 * application - the name of your application (defaults to the Gradle project name)
-* file (type: File) - path to the JAR or WAR file to be deployed
+* file (type: File) - path to the JAR or WAR file to be deployed (defaults to the primary build artifact)
 * memory - amount of memory in megabytes to allocate to an application
 * diskQuota - amount of disk space in megabytes to allocate to an application
 * healthCheckTimeout - the amount of time in seconds that Cloud Foundry should wait for the application to start
 * instances - number of instances (defaults to 1)
 * uri - a URI to map to the application
 * uris (type: List) - a list of URIs to map to the application
-* host - combined with `domain` to specify a URI to map to the application
+* host - combined with `domain` to specify a URI to map to the application (defaults to application name)
 * hosts (type: List) - combined with `domain` to specify a list of URIs to map to the application
-* domain - the domain part of URIs to map to the application
+* domain - the domain part of URIs to map to the application (defaults to the default domain)
 * command - the command to run when the application is started
 * buildpack - the URL of a buildpack to use to stage the application
 * env (type: Map) - environment variables to set for the application
@@ -123,7 +125,7 @@ The configuration options for system-provisioned services are:
 * plan - the tier option of the service
 * bind (type: boolean) - bind the service to the application on push (defaults to true)
 
-Use the `cf-service-plans` task to see the valid values for service configuration.
+Use the `cfServicePlans` task to see the valid values for service configuration.
 
 The configuration can also contain information about user-provided service instances, where service credentials are
 specified by the user. In this case, the `label` must be `user-provided`.
@@ -156,7 +158,7 @@ properties. To set options from the command line, use the Gradle `-P` flag and p
 example, to set the username and password on the command line instead of having them visible in `build.gradle`:
 
 ~~~
-$ gradle cf-target -Pcf.username='user@example.com' -Pcf.password='s3cr3t'
+$ gradle cfTarget -PcfUsername='user@example.com' -PcfPassword='s3cr3t'
 ~~~
 
 ## Authentication
@@ -170,7 +172,7 @@ from storing login credentials in `build.gradle`.
 Login credentials can be passed as command-line properties with each invoked task, as show above:
 
 ~~~
-$ gradle cf-target -Pcf.username='user@example.com' -Pcf.password='s3cr3t' -Pcf.space='staging'
+$ gradle cfTarget -PcfUsername='user@example.com' -PcfPassword='s3cr3t' -PcfSpace='staging'
 ~~~
 
 ### Configuring credentials in `gradle.properties`
@@ -187,17 +189,17 @@ cf.password='s3cr3t'
 
 ### Using saved tokens
 
-The `cf-login` task can be used to log into Cloud Foundry and save the authentication tokens to a file. After logging in
-with `cf-login`, the username and password will not be required for other tasks.
+The `cfLogin` task can be used to log into Cloud Foundry and save the authentication tokens to a file. After logging in
+with `cfLogin`, the username and password will not be required for other tasks.
 
 ~~~
-$ gradle cf-login -Pcf.username='user@example.com' -Pcf.password='s3cr3t' -Pcf.space='staging'
+$ gradle cfLogin -PcfUsername='user@example.com' -PcfPassword='s3cr3t' -PcfSpace='staging'
 ~~~
 
-The `cf-logout` task can be used to clear the saved tokens:
+The `cfLogout` task can be used to clear the saved tokens:
 
 ~~~
-$ gradle cf-logout
+$ gradle cfLogout
 ~~~
 
 The tokens are saved in a way that is compatible with the `cf` command-line tool, so you can also use `cf login` and then
@@ -285,11 +287,64 @@ cloudfoundry {
 The organization and space would then be selected from the command line:
 
 ~~~
-$ gradle cf-push -Pdev
-$ gradle cf-push -Pprod
+$ gradle cfPush -Pdev
+$ gradle cfPush -Pprod
 ~~~
 
+### Zero-downtime deployment
+
+The Cloud Foundry Gradle plugin has support for zero-downtime deployments using the [blue-green deployment technique](http://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html). 
+
+These tasks should be considered *experimental*. Zero-downtime deployment features are planned for future versions of Cloud Foundry, at which time the semantics and behavior of these tasks will be adapted to the platform's capabilities as appropriate. 
+
+The zero-downtime deployment tasks rely on a `variants` field being configured in the CF Gradle plugin configuration: 
+
+~~~
+cloudfoundry {
+    target = "https://api.run.pivotal.io"
+    organization = "my-org"
+    space = "development"
+
+    file = file("${war.archivePath}")
+    host = "my-app"
+    domain = "cfapps.io"
+    memory = 512
+    instances = 1
+
+    variants = ['-blue', '-green']
+}
+~~~
+
+Three additional Gradle tasks can be used to manage the deployment: 
+
+* cfDeploy
+
+The plugin detects which `variant` is currently running and mapped to the canonical route (determined by combining `host` and `domain`), and pushes the app using the “other” variant. Both the application name and the route are decorated with the chosen variant string. If `my-app-blue` is running and mapped to the well-known route (e.g. `my-app.cfapps.io`) then the app is pushed with the name `my-app-green` and mapped to `my-app-green.cfapps.io`. If no version is currently running or mapped to the canonical route, the first variant in the list is used. 
+
+Multiple routes can be assigned to an application using the `hosts = [‘my-app’, ‘www-my-app’]` syntax. In this case, the decoration of routes and mapping/unmapping applies to each route.
+
+The plugin also allows setting routes using `uri` and `uris` fields. These fields can be used with the deployment tasks, but will not be decorated with the variant values. Using `host` and `domain` together with `uri` give a high degree of control over how routes are configured.
+
+After deployment, the new variant can then be tested using the decorated URL.
+
+* cfSwapDeployed
+
+Variants that are not currently mapped to the canonical `my-app.cfapps.io` route are mapped to it. Variants that are currently mapped to `my-app.cfapps.io` have that route removed from them. This effectively swaps the newer variant into service and the older variant out of service.
+
+* cfUndeploy
+
+All running variants that are not mapped to the canonical route are deleted. 
+
 # History
+
+## Changes in 1.0.3
+
+* Tasks were renamed to use the form "cfTask" instead of "cf-task"
+* Properties were changed to use the form "cfProperty" instead of "cf.property"
+* Changed "cfLogs" task to tail logs from Loggregator. Added "cfRecentLogs" task
+* The "host", "domain", and "url" configuration properties are now optional (defaults to a app name and default domain)
+* The "file" configuration property is not optional (defaults to the build artifact)
+* Plugin now supports uploading a directory or a single file
 
 ## Changes in 1.0.2
 

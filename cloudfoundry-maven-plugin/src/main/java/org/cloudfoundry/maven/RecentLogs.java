@@ -21,25 +21,23 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.maven.common.UiUtils;
 import org.springframework.http.HttpStatus;
 
-import java.util.Map;
+import java.util.List;
 
 import static org.cloudfoundry.maven.common.UiUtils.renderApplicationLogEntry;
 
 /**
- * Streams a tail of application logs
+ * Shows recent application logs
  *
- * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
+ * @since 1.0.3
 
- * @goal logs
+ * @goal recentLogs
  * @phase process-sources
  */
 
-public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
+public class RecentLogs extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
@@ -47,14 +45,9 @@ public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
 		try {
 			getLog().info(String.format("Getting logs for '%s'", getAppname()));
 
-			LoggingListener listener = new LoggingListener();
-			getClient().streamLogs(getAppname(), listener);
-			synchronized (listener) {
-				try {
-					listener.wait();
-				} catch (InterruptedException e) {
-					throw new MojoExecutionException("Interrupted while streaming logs", e);
-				}
+			List<ApplicationLog> logEntries = getClient().getRecentLogs(getAppname());
+			for (ApplicationLog logEntry : logEntries) {
+				getLog().info(renderApplicationLogEntry(logEntry));
 			}
 		} catch (CloudFoundryException e) {
 			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
@@ -63,24 +56,6 @@ public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
 			} else {
 				throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error message: '%s'. Description: '%s'",
 						getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-		}
-	}
-
-	private class LoggingListener implements ApplicationLogListener {
-		public void onMessage(ApplicationLog logEntry) {
-			getLog().info(renderApplicationLogEntry(logEntry));
-		}
-
-		public void onError(Throwable e) {
-			synchronized (this) {
-				this.notify();
-			}
-		}
-
-		public void onComplete() {
-			synchronized (this) {
-				this.notify();
 			}
 		}
 	}

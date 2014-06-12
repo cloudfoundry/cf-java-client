@@ -8,12 +8,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,8 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.http.HttpHost;
-import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.commons.io.IOUtils;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -40,7 +42,9 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
@@ -80,6 +84,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -97,7 +102,6 @@ import org.springframework.web.client.RestTemplate;
 @RunWith(BMUnitRunner.class)
 @BMScript(value="trace", dir="target/test-classes")
 public class CloudFoundryClientTest {
-
 	private CloudFoundryClient connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
@@ -113,6 +117,8 @@ public class CloudFoundryClientTest {
 
 	private static final String CCNG_USER_PASS = System.getProperty("ccng.passwd");
 
+	private static final boolean CCNG_USER_IS_ADMIN = Boolean.getBoolean("ccng.admin");
+
 	private static final String CCNG_USER_ORG = System.getProperty("ccng.org", "gopivotal.com");
 
 	private static final String CCNG_USER_SPACE = System.getProperty("ccng.space", "test");
@@ -121,14 +127,16 @@ public class CloudFoundryClientTest {
 
 	private static final  String TEST_DOMAIN = System.getProperty("vcap.test.domain", defaultNamespace(CCNG_USER_EMAIL) + ".com");
 
-	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "cleardb");
-	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "spark");
+	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "p-mysql");
+	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "100mb-dev");
 
 	private static final String DEFAULT_STACK_NAME = "lucid64";
 
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 
 	private static final boolean SKIP_INJVM_PROXY = Boolean.getBoolean("http.skipInJvmProxy");
+
+	public static final int STARTUP_TIMEOUT = Integer.getInteger("ccng.startup.timeout", 60000);
 
 	private static String defaultDomainName = null;
 
@@ -182,7 +190,6 @@ public class CloudFoundryClientTest {
 			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
 		}
 		if (!SKIP_INJVM_PROXY) {
-			new SocketDestHelper().setForbiddenOnCurrentThread();
 			startInJvmProxy();
 			httpProxyConfiguration = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
 		}
@@ -204,7 +211,7 @@ public class CloudFoundryClientTest {
 		connectedClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS),
 				cloudControllerUrl, CCNG_USER_ORG, CCNG_USER_SPACE, httpProxyConfiguration, CCNG_API_SSL);
 		connectedClient.login();
-		defaultDomainName = getDefaultDomain(connectedClient.getDomains()).getName();
+		defaultDomainName = connectedClient.getDefaultDomain().getName();
 
 		// Optimization to avoid redoing the work already done is tearDown()
 		if (!tearDownComplete) {
@@ -216,6 +223,10 @@ public class CloudFoundryClientTest {
 		// connectedClient.registerRestLogListener(new RestLogger("CF_REST"));
 		if (nbInJvmProxyRcvReqs != null) {
 			nbInJvmProxyRcvReqs.set(0); //reset calls made in setup to leave a clean state for tests to assert
+		}
+
+		if (!SKIP_INJVM_PROXY) {
+			new SocketDestHelper().setForbiddenOnCurrentThread();
 		}
 	}
 
@@ -259,30 +270,25 @@ public class CloudFoundryClientTest {
 		assertTrue(SocketDestHelper.isSocketRestrictionFlagActive());
 
 		RestTemplate restTemplate = new RestTemplate();
-		ClientHttpRequestFactory requestFactory;
 
-		//when called directly without a proxy, and we configure byteman to detect them
-		//then we expect an exception to be thrown
+		// When called directly without a proxy, expect an exception to be thrown due to byteman rules
 		assertNetworkCallFails(restTemplate, new HttpComponentsClientHttpRequestFactory());
-		// Repeat that with different request factory used in the code as this exercise different byteman rules
+		// Repeat that with different request factory used in the code as this exercises different byteman rules
 		assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
-		//And with the actual one used by RestUtil
+		// And with the actual one used by RestUtil, without a proxy configured
 		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null, false));
 
-		//when called with a proxy
-		requestFactory = new HttpComponentsClientHttpRequestFactory();//avoid reusing keep alive connections
-		HttpComponentsClientHttpRequestFactory commonsFactory = (HttpComponentsClientHttpRequestFactory) requestFactory;
+		// Test with the in-JVM proxy configured
+		HttpProxyConfiguration localProxy = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
+		ClientHttpRequestFactory requestFactory = new RestUtil().createRequestFactory(localProxy, CCNG_API_SSL);
 
-		HttpHost proxy = new HttpHost("127.0.0.1", inJvmProxyPort);
-		commonsFactory.getHttpClient().getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		restTemplate.setRequestFactory(requestFactory);
-		restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET,null, null);
+		restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET, null, null);
 
-		//then executes fines, and the jetty proxy indeed received one request
+		// then executes fine, and the jetty proxy indeed received one request
 		assertEquals("expected network calls to make it through the inJvmProxy.", 1, nbInJvmProxyRcvReqs.get());
 		nbInJvmProxyRcvReqs.set(0); //reset for next test
 
-		//Make sure
 		assertTrue(SocketDestHelper.isActivated());
 		assertFalse("expected some installed rules, got:" + SocketDestHelper.getInstalledRules(), SocketDestHelper.getInstalledRules().isEmpty());
    }
@@ -988,10 +994,61 @@ public class CloudFoundryClientTest {
 		Thread.sleep(10000); // let's have some time to get some logs generated
 		Map<String, String> logs = connectedClient.getLogs(appName);
 		assertNotNull(logs);
-		assertTrue(logs.size() > 0);
-		for (String log : logs.keySet()) {
-			assertNotNull(logs.get(log));
+		assertTrue(logs.size() > 2);
+		assertNotNull(logs.get("logs/stdout.log"));
+		assertNotNull(logs.get("logs/env.log"));
+	}
+	
+	@Test
+	public void streamLogs() throws Exception {
+		// disable proxy validation for this test, since Loggregator websockets
+		// connectivity does not currently support proxies
+		new SocketDestHelper().setAllowedOnCurrentThread();
+
+		String appName = namespacedAppName("simple_logs");
+		CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+		boolean pass = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("Couldn't get the right application state", pass);
+
+		List<ApplicationLog> logs = doGetRecentLogs(appName);
+
+		for (int index = 0; index < logs.size() - 1; index++) {
+			int comparison = logs.get(index).getTimestamp().compareTo(logs.get(index + 1).getTimestamp());
+			assertTrue("Logs are not properly sorted", comparison <= 0);
 		}
+
+		AccumulatingApplicationLogListener testListener = new AccumulatingApplicationLogListener();
+		connectedClient.streamLogs(appName, testListener);
+		String appUri = "http://" + app.getUris().get(0);
+		RestTemplate appTemplate = new RestTemplate();
+		int attempt = 0;
+		do {
+			// no need to sleep, visiting the app uri should be sufficient
+			try {
+				appTemplate.getForObject(appUri, String.class);
+			} catch (HttpClientErrorException ex) {
+				// ignore
+			}
+			if (testListener.logs.size() > 0) {
+				break;
+			}
+			Thread.sleep(1000);
+		} while (attempt++ < 30);
+		assertTrue("Failed to stream normal log", testListener.logs.size() > 0);
+	}
+
+	private List<ApplicationLog> doGetRecentLogs(String appName) throws InterruptedException {
+		int attempt = 0;
+		do {
+			List<ApplicationLog> logs = connectedClient.getRecentLogs(appName);
+
+			if (logs.size() > 0) {
+				return logs;
+			}
+			Thread.sleep(1000);
+		} while (attempt++ < 20);
+		fail("Failed to see recent logs");
+		return null;
 	}
 
 	@Test
@@ -1022,6 +1079,14 @@ public class CloudFoundryClientTest {
 		doGetFile(connectedClient, appName);
 	}
 
+	@Test
+	public void openFile() throws Exception {
+		String appName = namespacedAppName("simple_openFile");
+		createAndUploadAndStartSimpleSpringApp(appName);
+		boolean running = getInstanceInfosWithTimeout(appName, 1, true);
+		assertTrue("App failed to start", running);
+		doOpenFile(connectedClient, appName);
+	}
 
 	//
 	// Basic Services tests
@@ -1045,6 +1110,17 @@ public class CloudFoundryClientTest {
 		assertEquals(MYSQL_SERVICE_LABEL, offering.getLabel());
 		assertNotNull(offering.getCloudServicePlans());
 		assertTrue(offering.getCloudServicePlans().size() > 0);
+		assertNotNull(offering.getName());
+		assertNotNull(offering.getDescription());
+		assertNotNull(offering.getLabel());
+		assertNotNull(offering.getUniqueId());
+		assertNotNull(offering.getExtra());
+
+		CloudServicePlan plan = offering.getCloudServicePlans().get(0);
+		assertNotNull(plan.getName());
+		assertNotNull(plan.getUniqueId());
+		assertNotNull(plan.getDescription());
+		assertSame(offering, plan.getServiceOffering());
 	}
 
 	@Test
@@ -1078,6 +1154,20 @@ public class CloudFoundryClientTest {
 		for (CloudService expectedService : expectedServices) {
 			assertServiceMatching(expectedService, services);
 		}
+	}
+
+	@Test
+	public void getServiceBrokers() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		List<CloudServiceBroker> brokers = connectedClient.getServiceBrokers();
+		assertNotNull(brokers);
+		assertTrue(brokers.size() >= 1);
+		CloudServiceBroker broker0 = brokers.get(0);
+		assertNotNull(broker0.getMeta());
+		assertNotNull(broker0.getName());
+		assertNotNull(broker0.getUrl());
+		assertNotNull(broker0.getUsername());
 	}
 
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
@@ -1208,8 +1298,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void defaultDomainFound() throws Exception {
-		List<CloudDomain> domains = connectedClient.getSharedDomains();
-		assertNotNull(getDefaultDomain(domains));
+		assertNotNull(connectedClient.getDefaultDomain());
 	}
 
 	@Test
@@ -1218,7 +1307,7 @@ public class CloudFoundryClientTest {
 
 		List<CloudDomain> allDomains = connectedClient.getDomains();
 
-		assertNotNull(getDefaultDomain(allDomains));
+		assertNotNull(getDomainNamed(defaultDomainName, allDomains));
 		assertNotNull(getDomainNamed(TEST_DOMAIN, allDomains));
 	}
 
@@ -1243,7 +1332,6 @@ public class CloudFoundryClientTest {
 	}
 
 	private void assertDomainNotInList(List<CloudDomain> domains) {
-		assertTrue(domains.size() >= 1);
 		assertNull(getDomainNamed(TEST_DOMAIN, domains));
 	}
 
@@ -1299,7 +1387,7 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void infoAvailableWithoutLoggingIn() throws Exception {
-		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL), httpProxyConfiguration);
+		CloudFoundryClient infoClient = new CloudFoundryClient(new URL(CCNG_API_URL), httpProxyConfiguration, CCNG_API_SSL);
 		CloudInfo info = infoClient.getCloudInfo();
 		assertNotNull(info.getName());
 		assertNotNull(info.getSupport());
@@ -1466,6 +1554,45 @@ public class CloudFoundryClientTest {
 		return pass;
 	}
 
+	private void doOpenFile(CloudFoundryClient client, String appName) throws Exception {
+		String appDir = "app";
+		String fileName = appDir + "/WEB-INF/web.xml";
+		String emptyPropertiesFileName = appDir + "/WEB-INF/classes/empty.properties";
+
+		// File is often not available immediately after starting an app... so
+		// allow up to 60 seconds wait
+		for (int i = 0; i < 60; i++) {
+			try {
+				client.getFile(appName, 0, fileName);
+				break;
+			} catch (HttpServerErrorException ex) {
+				Thread.sleep(1000);
+			}
+		}
+		// Test open file
+
+		client.openFile(appName, 0, fileName, new ClientHttpResponseCallback() {
+
+			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+				InputStream in = clientHttpResponse.getBody();
+				assertNotNull(in);
+				byte[] fileContents = IOUtils.toByteArray(in);
+				assertTrue(fileContents.length > 5);
+			}
+		});
+
+		client.openFile(appName, 0, emptyPropertiesFileName, new ClientHttpResponseCallback() {
+
+			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+				InputStream in = clientHttpResponse.getBody();
+				assertNotNull(in);
+				byte[] fileContents = IOUtils.toByteArray(in);
+				assertTrue(fileContents.length == 0);
+			}
+		});
+
+	}
+
 	private void doGetFile(CloudFoundryClient client, String appName) throws Exception {
 		String appDir = "app";
 		String fileName = appDir + "/WEB-INF/web.xml";
@@ -1571,7 +1698,13 @@ public class CloudFoundryClientTest {
 	}
 
 	private static String defaultNamespace(String email) {
-		return email.substring(0, email.indexOf('@')).replaceAll("\\.", "-").replaceAll("\\+", "-");
+		String s;
+		if(email.contains("@")) {
+			s = email.substring(0, email.indexOf('@'));
+		} else {
+			s = email;
+		}
+		return s.replaceAll("\\.", "-").replaceAll("\\+", "-");
 	}
 
 	//
@@ -1721,7 +1854,7 @@ public class CloudFoundryClientTest {
 				return applicationInstances;
 			}
 
-			if (System.currentTimeMillis() - start > 60000) {
+			if (System.currentTimeMillis() - start > STARTUP_TIMEOUT) {
 				fail("Timed out waiting for startup");
 				break; // for the compiler
 			}
@@ -1753,15 +1886,6 @@ public class CloudFoundryClientTest {
 	private CloudDomain getDomainNamed(String domainName, List<CloudDomain> domains) {
 		for (CloudDomain domain : domains) {
 			if (domain.getName().equals(domainName)) {
-				return domain;
-			}
-		}
-		return null;
-	}
-
-	private CloudDomain getDefaultDomain(List<CloudDomain> domains) {
-		for (CloudDomain domain : domains) {
-			if (domain.getOwner().getName().equals("none")) {
 				return domain;
 			}
 		}
@@ -1812,4 +1936,19 @@ public class CloudFoundryClientTest {
 		}
 	}
 
+	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
+		private List<ApplicationLog> logs = new ArrayList<ApplicationLog>();
+
+		public void onMessage(ApplicationLog log) {
+			logs.add(log);
+		}
+
+		public void onError(Throwable exception) {
+			fail(exception.getMessage());
+		}
+
+		public void onComplete() {
+		}
+
+	}
 }

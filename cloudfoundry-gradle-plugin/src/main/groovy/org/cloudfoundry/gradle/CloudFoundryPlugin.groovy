@@ -15,6 +15,8 @@
 
 package org.cloudfoundry.gradle
 
+import org.cloudfoundry.gradle.tasks.RecentLogsCloudFoundryTask
+import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -58,37 +60,39 @@ class CloudFoundryPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create("cloudfoundry", CloudFoundryExtension, project)
         project.cloudfoundry.extensions.services = project.container(CloudFoundryServiceExtension)
-        // alias "services" to "serviceInfos" for backward compatibility
-        project.cloudfoundry.extensions.serviceInfos = project.cloudfoundry.extensions.services
 
         // register tasks
-        project.tasks.create('cf-target', InfoCloudFoundryTask)
-        project.tasks.create('cf-login', LoginCloudFoundryTask)
-        project.tasks.create('cf-logout', LogoutCloudFoundryTask)
-        project.tasks.create('cf-spaces', SpacesCloudFoundryTask)
-        project.tasks.create('cf-push', PushCloudFoundryTask)
-        project.tasks.create('cf-delete', DeleteApplicationCloudFoundryTask)
-        project.tasks.create('cf-start', StartApplicationCloudFoundryTask)
-        project.tasks.create('cf-restart', RestartApplicationCloudFoundryTask)
-        project.tasks.create('cf-stop', StopApplicationCloudFoundryTask)
-        project.tasks.create('cf-deploy', DeployCloudFoundryTask)
-        project.tasks.create('cf-undeploy', UndeployCloudFoundryTask)
-        project.tasks.create('cf-swap-deployed', SwapDeployedCloudFoundryTask)
-        project.tasks.create('cf-scale', ScaleCloudFoundryTask)
-        project.tasks.create('cf-apps', AppsCloudFoundryTask)
-        project.tasks.create('cf-app', AppCloudFoundryTask)
-        project.tasks.create('cf-logs', LogsCloudFoundryTask)
-        project.tasks.create('cf-services', ServicesCloudFoundryTask)
-        project.tasks.create('cf-service-plans', ServiceOfferingsCloudFoundryTask)
-        project.tasks.create('cf-create-service', CreateServiceCloudFoundryTask)
-        project.tasks.create('cf-delete-service', DeleteServiceCloudFoundryTask)
-        project.tasks.create('cf-bind', BindServiceCloudFoundryTask)
-        project.tasks.create('cf-unbind', UnbindServiceCloudFoundryTask)
-        project.tasks.create('cf-env', EnvCloudFoundryTask)
-        project.tasks.create('cf-set-env', SetEnvCloudFoundryTask)
-        project.tasks.create('cf-unset-env', UnsetEnvCloudFoundryTask)
-        project.tasks.create('cf-map', MapCloudFoundryTask)
-        project.tasks.create('cf-unmap', UnmapCloudFoundryTask)
+        createTask(project, 'Target', InfoCloudFoundryTask)
+        createTask(project, 'Login', LoginCloudFoundryTask)
+        createTask(project, 'Logout', LogoutCloudFoundryTask)
+        createTask(project, 'Spaces', SpacesCloudFoundryTask)
+        createTask(project, 'Push', PushCloudFoundryTask)
+        createTask(project, 'Delete', DeleteApplicationCloudFoundryTask)
+        createTask(project, 'Start', StartApplicationCloudFoundryTask)
+        createTask(project, 'Restart', RestartApplicationCloudFoundryTask)
+        createTask(project, 'Stop', StopApplicationCloudFoundryTask)
+        createTask(project, 'Deploy', DeployCloudFoundryTask)
+        createTask(project, 'Undeploy', UndeployCloudFoundryTask)
+        createTask(project, 'SwapDeployed', SwapDeployedCloudFoundryTask)
+        createTask(project, 'Scale', ScaleCloudFoundryTask)
+        createTask(project, 'Apps', AppsCloudFoundryTask)
+        createTask(project, 'App', AppCloudFoundryTask)
+        createTask(project, 'Logs', LogsCloudFoundryTask)
+        createTask(project, 'RecentLogs', RecentLogsCloudFoundryTask)
+        createTask(project, 'Services', ServicesCloudFoundryTask)
+        createTask(project, 'ServicePlans', ServiceOfferingsCloudFoundryTask)
+        createTask(project, 'CreateService', CreateServiceCloudFoundryTask)
+        createTask(project, 'DeleteService', DeleteServiceCloudFoundryTask)
+        createTask(project, 'Bind', BindServiceCloudFoundryTask)
+        createTask(project, 'Unbind', UnbindServiceCloudFoundryTask)
+        createTask(project, 'Env', EnvCloudFoundryTask)
+        createTask(project, 'SetEnv', SetEnvCloudFoundryTask)
+        createTask(project, 'UnsetEnv', UnsetEnvCloudFoundryTask)
+        createTask(project, 'Map', MapCloudFoundryTask)
+        createTask(project, 'Unmap', UnmapCloudFoundryTask)
     }
 
+    private void createTask(Project project, String name, Class<? extends DefaultTask> clazz) {
+        project.tasks.create("cf${name}", clazz)
+    }
 }

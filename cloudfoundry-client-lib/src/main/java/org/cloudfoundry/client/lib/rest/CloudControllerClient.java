@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.cloudfoundry.client.lib.ApplicationLogListener;
+import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
+import org.cloudfoundry.client.lib.StreamingLogToken;
 import org.cloudfoundry.client.lib.UploadStatusCallback;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -36,6 +39,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -92,6 +96,8 @@ public interface CloudControllerClient {
 
 	List<CloudServiceOffering> getServiceOfferings();
 
+	List<CloudServiceBroker> getServiceBrokers();
+
 	// App methods
 
 	List<CloudApplication> getApplications();
@@ -142,9 +148,15 @@ public interface CloudControllerClient {
 
 	Map<String, String> getLogs(String appName);
 
+	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+
+	List<ApplicationLog> getRecentLogs(String appName);
+
 	Map<String, String> getCrashLogs(String appName);
 
 	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
+
+	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
 
 	void bindService(String appName, String serviceName);
 
@@ -166,6 +178,7 @@ public interface CloudControllerClient {
 
 	// Domains and routes management
 
+
 	List<CloudDomain> getDomainsForOrg();
 
 	List<CloudDomain> getDomains();
@@ -173,6 +186,8 @@ public interface CloudControllerClient {
 	List<CloudDomain> getPrivateDomains();
 
 	List<CloudDomain> getSharedDomains();
+
+	CloudDomain getDefaultDomain();
 
 	void addDomain(String domainName);
 

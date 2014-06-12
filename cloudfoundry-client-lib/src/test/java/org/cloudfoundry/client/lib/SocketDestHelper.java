@@ -58,10 +58,12 @@ public class SocketDestHelper {
 		return isSocketRestrictingOnlyLocalHost.get();
 	}
 
-
-
-	public  void setForbiddenOnCurrentThread() {
+	public void setForbiddenOnCurrentThread() {
 		isSocketRestrictingOnlyLocalHost.set(true);
+	}
+
+	public void setAllowedOnCurrentThread() {
+		isSocketRestrictingOnlyLocalHost.set(false);
 	}
 
 	//helper methods for byteman rules
