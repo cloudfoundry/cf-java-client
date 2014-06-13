@@ -1,13 +1,13 @@
 package org.cloudfoundry.client.lib.rest;
 
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.CloudOperationException;
 import org.springframework.web.util.UriTemplate;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
@@ -15,10 +15,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -52,7 +49,7 @@ public class LoggregatorClient {
 		ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
 
 		if (trustSelfSignedCerts) {
-			SSLContext sslContext = createSslContext();
+			SSLContext sslContext = buildSslContext();
 			Map<String, Object> userProperties = config.getUserProperties();
 			userProperties.put(WsWebSocketContainer.SSL_CONTEXT_PROPERTY, sslContext);
 		}
@@ -60,25 +57,14 @@ public class LoggregatorClient {
 		return config;
 	}
 
-	private SSLContext createSslContext() {
+	private SSLContext buildSslContext() {
 		try {
-			TrustManager[] trustManagers = new TrustManager[] { new X509TrustManager() {
-				public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-				}
-				public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-				}
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-			}};
+			SSLContextBuilder contextBuilder = new SSLContextBuilder().
+					useTLS().
+					loadTrustMaterial(null, new TrustSelfSignedStrategy());
 
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustManagers, null);
-
-			return sslContext;
-		} catch (NoSuchAlgorithmException e) {
-			throw new CloudOperationException(e);
-		} catch (KeyManagementException e) {
+			return contextBuilder.build();
+		} catch (GeneralSecurityException e) {
 			throw new CloudOperationException(e);
 		}
 	}
