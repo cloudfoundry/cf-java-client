@@ -37,6 +37,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -206,4 +207,19 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
+	
+    // Quota operations
+	CloudOrganization getOrgByName(String orgName, boolean required);
+    
+    List<CloudQuota> getQuotas();
+    
+    CloudQuota getQuotaByName(String quotaName, boolean required);
+    
+    void createQuota(CloudQuota quota);
+    
+    void updateQuota(CloudQuota quota, String name);
+    
+    void deleteQuota(String quotaName);
+    
+    void setQuotaToOrg(String orgName, String quotaName);
 }

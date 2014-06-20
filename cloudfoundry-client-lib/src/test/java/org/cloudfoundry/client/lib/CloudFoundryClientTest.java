@@ -88,6 +88,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 
 /**
  * Note that this integration tests rely on other methods working correctly, so these tests aren't
@@ -149,6 +150,8 @@ public class CloudFoundryClientTest {
 	private static final int DEFAULT_DISK = 1024; // MB
 
 	private static final int FIVE_MINUTES = 300 * 1000;
+	
+	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
 
 	private static boolean tearDownComplete = false;
 
@@ -1502,6 +1505,88 @@ public class CloudFoundryClientTest {
 		assertNotNull(firstLine);
 		assertTrue(firstLine.length() > 0);
 	}
+	
+	 @Test
+	    public void quotasAvailable() throws Exception {
+	        List<CloudQuota> quotas = connectedClient.getQuotas();
+	        assertNotNull(quotas);
+	        assertTrue(quotas.size() > 0);
+	    }
+
+	    @Test
+	    public void CURDQuota() throws Exception{
+
+
+			boolean flag = true;
+
+			try {
+				// create quota
+				CloudQuota cloudQuota = new CloudQuota(null, CCNG_QUOTA_NAME_TEST);
+				connectedClient.createQuota(cloudQuota);
+			} catch (CloudFoundryException e) {
+				if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
+				    flag = false;
+				}
+			}
+			// check if we have right permission
+			assumeTrue(flag);
+	    	CloudQuota afterCreate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+	    	assertNotNull(afterCreate);
+	    	
+
+	    	// change quota mem to 10240
+	    	afterCreate.setMemoryLimit(10240);
+	    	connectedClient.updateQuota(afterCreate, CCNG_QUOTA_NAME_TEST);
+	    	CloudQuota afterUpdate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+	    	assertEquals(10240,afterUpdate.getMemoryLimit());
+
+	    	// delete the quota
+	    	connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
+	    	CloudQuota afterDelete = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, false);
+	    	assertNull(afterDelete);
+	    	
+	    }
+	    
+	    @Test
+	    public void setQuotaToOrg() throws Exception {
+
+			// get old quota to restore after test
+			CloudOrganization oldOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
+					true);
+			CloudQuota oldQuota = oldOrg.getQuota();
+
+
+			// create and set test_quota to org
+		    CloudQuota cloudQuota = new CloudQuota(null,CCNG_QUOTA_NAME_TEST);
+
+			boolean flag = true;
+
+			try {
+				// create quota
+				connectedClient.createQuota(cloudQuota);
+			} catch (CloudFoundryException e) {
+				if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
+				    flag = false;
+				}
+			}
+			// check if we have right permission
+			assumeTrue(flag);
+		    connectedClient.setQuotaToOrg(CCNG_USER_ORG, CCNG_QUOTA_NAME_TEST);
+
+
+			// get the binded quota of org
+			CloudOrganization newOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
+					true);
+			CloudQuota newQuota = newOrg.getQuota();
+
+		    // binded quota should be equals to test_quota
+		    assertEquals(CCNG_QUOTA_NAME_TEST, newQuota.getName());         
+
+		    // restore org to default quota
+			connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
+		    connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
+	         
+	    }
 
 	//
 	// Shared test methods
