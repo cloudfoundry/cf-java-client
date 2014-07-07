@@ -49,6 +49,7 @@ import org.springframework.web.client.ResponseErrorHandler;
  * @author Jennifer Hickey
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Alexander Orlov
  */
 public interface CloudFoundryOperations {
 
@@ -190,6 +191,11 @@ public interface CloudFoundryOperations {
 	 * @param credentials the user-provided service credentials
 	 */
 	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+
+	/**
+	 * Delete routes that do not have any application which is assigned to them.
+	 */
+	void deleteOrphanedRoutes();
 
 	/**
 	 * Upload an application.

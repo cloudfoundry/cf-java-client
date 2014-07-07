@@ -206,4 +206,6 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
+	List<CloudRoute> deleteOrphanedRoutes();
 }
