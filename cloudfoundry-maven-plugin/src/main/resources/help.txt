@@ -31,6 +31,9 @@ Currently available Cloud Foundry Maven Plugin Goals are:
     bind-services                               Bind services defined in the pom file to the application
     unbind-services                             Unbind services defined in the pom file to the application
 
+  Other
+    clone-env                                   Set all <env/> specified variables as local environment variables
+
   Help
     help                                        Get general help
 
