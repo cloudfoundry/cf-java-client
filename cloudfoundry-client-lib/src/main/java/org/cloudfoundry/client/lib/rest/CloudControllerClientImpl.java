@@ -744,12 +744,37 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
     @Override
     public void createServiceBroker(CloudServiceBroker serviceBroker) {
+        Assert.notNull(serviceBroker, "Service Broker must not be null");
+        Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
+        Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
+        Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
+        Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
 
+        HashMap<String, Object> serviceRequest = new HashMap<>();
+        serviceRequest.put("name", serviceBroker.getName());
+        serviceRequest.put("broker_url", serviceBroker.getUrl());
+        serviceRequest.put("auth_username", serviceBroker.getUsername());
+        serviceRequest.put("auth_password", serviceBroker.getPassword());
+        getRestTemplate().postForObject(getUrl("/v2/service_brokers"), serviceRequest, String.class);
     }
 
     @Override
     public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+        Assert.notNull(serviceBroker, "Service Broker must not be null");
+        Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
+        Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
+        Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
+        Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
 
+        CloudServiceBroker existingBroker = getServiceBroker(serviceBroker.getName());
+        Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
+
+        HashMap<String, Object> serviceRequest = new HashMap<>();
+        serviceRequest.put("name", serviceBroker.getName());
+        serviceRequest.put("broker_url", serviceBroker.getUrl());
+        serviceRequest.put("auth_username", serviceBroker.getUsername());
+        serviceRequest.put("auth_password", serviceBroker.getPassword());
+        getRestTemplate().put(getUrl("/v2/service_brokers/{guid}"), serviceRequest, existingBroker.getMeta().getGuid());
     }
 
     public List<CloudApplication> getApplications() {

@@ -234,9 +234,9 @@ public class CloudFoundryClientTest {
 	public void tearDown() throws Exception {
 		// Clean after ourselves so that there are no leftover apps, services, domains, and routes
 		if (connectedClient != null) { //may happen if setUp() fails
-			connectedClient.deleteAllApplications();
-			connectedClient.deleteAllServices();
-			clearTestDomainAndRoutes();
+//			connectedClient.deleteAllApplications();
+//			connectedClient.deleteAllServices();
+//			clearTestDomainAndRoutes();
 		}
 		tearDownComplete = true;
 	}
@@ -1180,6 +1180,23 @@ public class CloudFoundryClientTest {
         assertEquals("haash-broker", broker.getName());
         assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
         assertEquals("warreng", broker.getUsername());
+        assertNull(broker.getPassword());
+    }
+
+    @Test
+    public void createServiceBroker() {
+        assumeTrue(CCNG_USER_IS_ADMIN);
+
+        CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "natedogg");
+        connectedClient.createServiceBroker(newBroker);
+    }
+
+    @Test
+    public void updateServiceBroker() {
+        assumeTrue(CCNG_USER_IS_ADMIN);
+
+        CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+        connectedClient.updateServiceBroker(newBroker);
     }
 
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
