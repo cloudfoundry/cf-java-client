@@ -777,6 +777,32 @@ public class CloudControllerClientImpl implements CloudControllerClient {
         getRestTemplate().put(getUrl("/v2/service_brokers/{guid}"), serviceRequest, existingBroker.getMeta().getGuid());
     }
 
+    @Override
+    public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
+        CloudServiceBroker broker = getServiceBroker(name);
+
+        String urlPath = "/v2/services?q={q}";
+        Map<String, Object> urlVars = new HashMap<>();
+        urlVars.put("q", "service_broker_guid:" + broker.getMeta().getGuid());
+        List<Map<String, Object>> serviceResourceList = getAllResources(urlPath, urlVars);
+
+        for (Map<String, Object> serviceResource : serviceResourceList) {
+            String serviceGuid = (String) serviceResource.get("guid");
+
+            urlPath = "/v2/service_plans?q={q}";
+            urlVars = new HashMap<>();
+            urlVars.put("q", "service_guid:" + serviceGuid);
+            List<Map<String, Object>> planResourceList = getAllResources(urlPath, urlVars);
+            for (Map<String, Object> planResource : planResourceList) {
+                String planGuid = (String) planResource.get("guid");
+
+                HashMap<String, Object> planUpdateRequest = new HashMap<>();
+                planUpdateRequest.put("public", visibility);
+                getRestTemplate().put("/v2/service_plans/{guid}", planUpdateRequest, planGuid);
+            }
+        }
+    }
+
     public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";

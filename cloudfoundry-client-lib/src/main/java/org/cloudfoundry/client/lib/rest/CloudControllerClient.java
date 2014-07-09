@@ -104,7 +104,9 @@ public interface CloudControllerClient {
 
     void updateServiceBroker(CloudServiceBroker serviceBroker);
 
-	// App methods
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
+    // App methods
 
 	List<CloudApplication> getApplications();
 
@@ -212,6 +214,5 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
-
 
 }

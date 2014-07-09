@@ -401,6 +401,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
         cc.updateServiceBroker(serviceBroker);
     }
 
+    @Override
+    public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
+        cc.updateServicePlanVisibilityForBroker(name, visibility);
+    }
+
     public CloudService getService(String service) {
 		return cc.getService(service);
 	}

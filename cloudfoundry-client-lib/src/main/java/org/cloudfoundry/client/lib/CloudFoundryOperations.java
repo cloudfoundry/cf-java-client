@@ -529,6 +529,16 @@ public interface CloudFoundryOperations {
      */
     void updateServiceBroker(CloudServiceBroker serviceBroker);
 
+    /**
+     * Service plans are private by default when a service broker's catalog is
+     * fetched/updated. This method will update the visibility of all plans for
+     * a broker to either public or private.
+     *
+     * @param name the service broker name
+     * @param visibility true for public, false for private
+     */
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
 	/**
 	 * Associate (provision) a service with an application.
 	 *
