@@ -1506,87 +1506,85 @@ public class CloudFoundryClientTest {
 		assertTrue(firstLine.length() > 0);
 	}
 	
-	 @Test
-	    public void quotasAvailable() throws Exception {
-	        List<CloudQuota> quotas = connectedClient.getQuotas();
-	        assertNotNull(quotas);
-	        assertTrue(quotas.size() > 0);
+	@Test
+    public void quotasAvailable() throws Exception {
+        List<CloudQuota> quotas = connectedClient.getQuotas();
+        assertNotNull(quotas);
+        assertTrue(quotas.size() > 0);
+    }
+
+	@Test
+	public void CURDQuota() throws Exception{
+	    boolean flag = true;
+
+	    try {
+	        // create quota
+	        CloudQuota cloudQuota = new CloudQuota(null, CCNG_QUOTA_NAME_TEST);
+	        connectedClient.createQuota(cloudQuota);
+	    } catch (CloudFoundryException e) {
+	        if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
+	            flag = false;
+	        }
 	    }
+	    // check if we have right permission
+	    assumeTrue(flag);
+	    CloudQuota afterCreate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+	    assertNotNull(afterCreate);
 
-	    @Test
-	    public void CURDQuota() throws Exception{
+
+	    // change quota mem to 10240
+	    afterCreate.setMemoryLimit(10240);
+	    connectedClient.updateQuota(afterCreate, CCNG_QUOTA_NAME_TEST);
+	    CloudQuota afterUpdate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+	    assertEquals(10240,afterUpdate.getMemoryLimit());
+
+	    // delete the quota
+	    connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
+	    CloudQuota afterDelete = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, false);
+	    assertNull(afterDelete);
+
+	}
+
+	@Test
+	public void setQuotaToOrg() throws Exception {
+
+	    // get old quota to restore after test
+	    CloudOrganization oldOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
+	            true);
+	    CloudQuota oldQuota = oldOrg.getQuota();
 
 
-			boolean flag = true;
+	    // create and set test_quota to org
+	    CloudQuota cloudQuota = new CloudQuota(null,CCNG_QUOTA_NAME_TEST);
 
-			try {
-				// create quota
-				CloudQuota cloudQuota = new CloudQuota(null, CCNG_QUOTA_NAME_TEST);
-				connectedClient.createQuota(cloudQuota);
-			} catch (CloudFoundryException e) {
-				if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
-				    flag = false;
-				}
-			}
-			// check if we have right permission
-			assumeTrue(flag);
-	    	CloudQuota afterCreate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
-	    	assertNotNull(afterCreate);
-	    	
+	    boolean flag = true;
 
-	    	// change quota mem to 10240
-	    	afterCreate.setMemoryLimit(10240);
-	    	connectedClient.updateQuota(afterCreate, CCNG_QUOTA_NAME_TEST);
-	    	CloudQuota afterUpdate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
-	    	assertEquals(10240,afterUpdate.getMemoryLimit());
-
-	    	// delete the quota
-	    	connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
-	    	CloudQuota afterDelete = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, false);
-	    	assertNull(afterDelete);
-	    	
+	    try {
+	        // create quota
+	        connectedClient.createQuota(cloudQuota);
+	    } catch (CloudFoundryException e) {
+	        if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
+	            flag = false;
+	        }
 	    }
-	    
-	    @Test
-	    public void setQuotaToOrg() throws Exception {
-
-			// get old quota to restore after test
-			CloudOrganization oldOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
-					true);
-			CloudQuota oldQuota = oldOrg.getQuota();
+	    // check if we have right permission
+	    assumeTrue(flag);
+	    connectedClient.setQuotaToOrg(CCNG_USER_ORG, CCNG_QUOTA_NAME_TEST);
 
 
-			// create and set test_quota to org
-		    CloudQuota cloudQuota = new CloudQuota(null,CCNG_QUOTA_NAME_TEST);
+	    // get the binded quota of org
+	    CloudOrganization newOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
+	            true);
+	    CloudQuota newQuota = newOrg.getQuota();
 
-			boolean flag = true;
+	    // binded quota should be equals to test_quota
+	    assertEquals(CCNG_QUOTA_NAME_TEST, newQuota.getName());         
 
-			try {
-				// create quota
-				connectedClient.createQuota(cloudQuota);
-			} catch (CloudFoundryException e) {
-				if (HttpStatus.FORBIDDEN == e.getStatusCode()) {
-				    flag = false;
-				}
-			}
-			// check if we have right permission
-			assumeTrue(flag);
-		    connectedClient.setQuotaToOrg(CCNG_USER_ORG, CCNG_QUOTA_NAME_TEST);
+	    // restore org to default quota
+	    connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
+	    connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
 
-
-			// get the binded quota of org
-			CloudOrganization newOrg = connectedClient.getOrgByName(CCNG_USER_ORG,
-					true);
-			CloudQuota newQuota = newOrg.getQuota();
-
-		    // binded quota should be equals to test_quota
-		    assertEquals(CCNG_QUOTA_NAME_TEST, newQuota.getName());         
-
-		    // restore org to default quota
-			connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
-		    connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST); 
-	         
-	    }
+	}
 
 	//
 	// Shared test methods

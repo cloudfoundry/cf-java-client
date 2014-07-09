@@ -1249,7 +1249,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
      * @param quota
      */
     public void createQuota(CloudQuota quota){
-    	 String setPath = "/v2/quota_definitions";
+    	     String setPath = "/v2/quota_definitions";
          HashMap<String, Object> setRequest = new HashMap<String, Object>();
          setRequest.put("name", quota.getName());
          setRequest.put("memory_limit", quota.getMemoryLimit());
@@ -1260,9 +1260,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
     }
     
     public void updateQuota(CloudQuota quota, String name) {
-    	CloudQuota oldQuota = this.getQuotaByName(name, true);
+    	    CloudQuota oldQuota = this.getQuotaByName(name, true);
     	
-    	String setPath = "/v2/quota_definitions/{quotaGuid}";
+    	    String setPath = "/v2/quota_definitions/{quotaGuid}";
     	
         Map<String, Object> setVars = new HashMap<String, Object>();
         setVars.put("quotaGuid", oldQuota.getMeta().getGuid());
@@ -1275,12 +1275,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
         setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
         
         getRestTemplate().put(getUrl(setPath), setRequest, setVars);
-        
 	}
     
     public void deleteQuota(String quotaName){
-    	CloudQuota quota = this.getQuotaByName(quotaName, true);
-    	String setPath = "/v2/quota_definitions/{quotaGuid}";
+        	CloudQuota quota = this.getQuotaByName(quotaName, true);
+        	String setPath = "/v2/quota_definitions/{quotaGuid}";
         Map<String, Object> setVars = new HashMap<String, Object>();
         setVars.put("quotaGuid", quota.getMeta().getGuid());
         getRestTemplate().delete(getUrl(setPath), setVars);
@@ -1293,10 +1292,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
      * @param quotaName 
      */
     public void setQuotaToOrg(String orgName, String quotaName){
-    	CloudQuota quota = this.getQuotaByName(quotaName, true);
-    	CloudOrganization org = this.getOrgByName(orgName, true);
-    	
-    	doSetQuotaToOrg(org.getMeta().getGuid(), quota.getMeta().getGuid());
+        	CloudQuota quota = this.getQuotaByName(quotaName, true);
+        	CloudOrganization org = this.getOrgByName(orgName, true);
+        	
+        	doSetQuotaToOrg(org.getMeta().getGuid(), quota.getMeta().getGuid());
     }
     
     /**
@@ -1307,7 +1306,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
      * @return CloudOrganization instance
      */
     public CloudOrganization getOrgByName(String orgName, boolean required){
-    	Map<String, Object> urlVars = new HashMap<String, Object>();
+        Map<String, Object> urlVars = new HashMap<String, Object>();
         String urlPath = "/v2/organizations?inline-relations-depth=1&q=name:{name}";
         urlVars.put("name", orgName);
         CloudOrganization org = null;
@@ -1323,7 +1322,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
                     + "' not found.");
         }        
     	
-    	return org;
+    	    return org;
     }
     
     /**
@@ -1334,12 +1333,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
      * @return CloudQuota instance
      */
     public CloudQuota getQuotaByName(String quotaName, boolean required){
-    	Map<String, Object> urlVars = new HashMap<String, Object>();
+    	    Map<String, Object> urlVars = new HashMap<String, Object>();
         String urlPath = "/v2/quota_definitions?q=name:{name}";
         urlVars.put("name", quotaName);
         CloudQuota quota = null;
-        List<Map<String, Object>> resourceList = getAllResources(urlPath,
-                urlVars);
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
         if (resourceList.size() > 0) {
             Map<String, Object> resource = resourceList.get(0);
             quota = resourceMapper.mapResource(resource, CloudQuota.class);
@@ -1350,7 +1348,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
                     + "' not found.");
         }        
     	
-    	return quota;
+    	    return quota;
     }
    
     private void doSetQuotaToOrg(UUID orgGuid, UUID quotaGuid) {
