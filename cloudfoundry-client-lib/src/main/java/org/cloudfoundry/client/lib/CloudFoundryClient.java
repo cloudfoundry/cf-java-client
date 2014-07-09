@@ -389,7 +389,19 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getServiceBrokers();
 	}
 
-	public CloudService getService(String service) {
+    public CloudServiceBroker getServiceBroker(String name) {
+        return cc.getServiceBroker(name);
+    }
+
+    public void createServiceBroker(CloudServiceBroker serviceBroker) {
+        cc.createServiceBroker(serviceBroker);
+    }
+
+    public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+        cc.updateServiceBroker(serviceBroker);
+    }
+
+    public CloudService getService(String service) {
 		return cc.getService(service);
 	}
 

@@ -507,6 +507,28 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudServiceBroker> getServiceBrokers();
 
+    /**
+     * Get a service broker.
+     *
+     * @param name the service broker name
+     * @return the service broker
+     */
+    CloudServiceBroker getServiceBroker(String name);
+
+    /**
+     * Create a service broker.
+     *
+     * @param serviceBroker cloud service broker info
+     */
+    void createServiceBroker(CloudServiceBroker serviceBroker);
+
+    /**
+     * Update a service broker (unchanged forces catalog refresh).
+     *
+     * @param serviceBroker cloud service broker info
+     */
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
+
 	/**
 	 * Associate (provision) a service with an application.
 	 *

@@ -98,6 +98,12 @@ public interface CloudControllerClient {
 
 	List<CloudServiceBroker> getServiceBrokers();
 
+    CloudServiceBroker getServiceBroker(String name);
+
+    void createServiceBroker(CloudServiceBroker serviceBroker);
+
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
+
 	// App methods
 
 	List<CloudApplication> getApplications();
@@ -206,4 +212,6 @@ public interface CloudControllerClient {
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
+
 }

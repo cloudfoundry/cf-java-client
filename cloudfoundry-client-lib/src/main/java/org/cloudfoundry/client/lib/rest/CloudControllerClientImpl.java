@@ -728,7 +728,31 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return serviceBrokers;
 	}
 
-	public List<CloudApplication> getApplications() {
+    @Override
+    public CloudServiceBroker getServiceBroker(String name) {
+        String urlPath = "/v2/service_brokers?q={q}";
+        Map<String, Object> urlVars = new HashMap<>();
+        urlVars.put("q", "name:" + name);
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+        CloudServiceBroker serviceBroker = null;
+        if (resourceList.size() > 0) {
+            final Map<String, Object> resource = resourceList.get(0);
+            serviceBroker = resourceMapper.mapResource(resource, CloudServiceBroker.class);
+        }
+        return serviceBroker;
+    }
+
+    @Override
+    public void createServiceBroker(CloudServiceBroker serviceBroker) {
+
+    }
+
+    @Override
+    public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+
+    }
+
+    public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
 		if (sessionSpace != null) {

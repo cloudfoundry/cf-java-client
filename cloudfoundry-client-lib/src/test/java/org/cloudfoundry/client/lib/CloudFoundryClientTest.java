@@ -1170,6 +1170,18 @@ public class CloudFoundryClientTest {
 		assertNotNull(broker0.getUsername());
 	}
 
+    @Test
+    public void getServiceBroker() {
+        assumeTrue(CCNG_USER_IS_ADMIN);
+
+        CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
+        assertNotNull(broker);
+        assertNotNull(broker.getMeta());
+        assertEquals("haash-broker", broker.getName());
+        assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+        assertEquals("warreng", broker.getUsername());
+    }
+
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
 		for (CloudService service : services) {
 			if (service.getName().equals(expectedService.getName())) {
