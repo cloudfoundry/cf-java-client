@@ -56,6 +56,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
@@ -1231,6 +1232,134 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			doUnbindService(app.getMeta().getGuid(), serviceId);
 		}
 	}
+	
+	public List<CloudQuota> getQuotas() {
+        String urlPath = "/v2/quota_definitions";
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+        List<CloudQuota> quotas = new ArrayList<CloudQuota>();
+        for (Map<String, Object> resource : resourceList) {
+            quotas.add(resourceMapper.mapResource(resource, CloudQuota.class));
+        }
+        return quotas;
+    }
+    
+    /**
+     * Create quota from a CloudQuota instance (Quota Plan)
+     * 
+     * @param quota
+     */
+    public void createQuota(CloudQuota quota){
+    	     String setPath = "/v2/quota_definitions";
+         HashMap<String, Object> setRequest = new HashMap<String, Object>();
+         setRequest.put("name", quota.getName());
+         setRequest.put("memory_limit", quota.getMemoryLimit());
+         setRequest.put("total_routes", quota.getTotalRoutes());
+         setRequest.put("total_services", quota.getTotalServices());
+         setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
+         getRestTemplate().postForObject(getUrl(setPath), setRequest, String.class);
+    }
+    
+    public void updateQuota(CloudQuota quota, String name) {
+    	    CloudQuota oldQuota = this.getQuotaByName(name, true);
+    	
+    	    String setPath = "/v2/quota_definitions/{quotaGuid}";
+    	
+        Map<String, Object> setVars = new HashMap<String, Object>();
+        setVars.put("quotaGuid", oldQuota.getMeta().getGuid());
+        
+        HashMap<String, Object> setRequest = new HashMap<String, Object>();
+        setRequest.put("name", quota.getName());
+        setRequest.put("memory_limit", quota.getMemoryLimit());
+        setRequest.put("total_routes", quota.getTotalRoutes());
+        setRequest.put("total_services", quota.getTotalServices());
+        setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
+        
+        getRestTemplate().put(getUrl(setPath), setRequest, setVars);
+	}
+    
+    public void deleteQuota(String quotaName){
+        	CloudQuota quota = this.getQuotaByName(quotaName, true);
+        	String setPath = "/v2/quota_definitions/{quotaGuid}";
+        Map<String, Object> setVars = new HashMap<String, Object>();
+        setVars.put("quotaGuid", quota.getMeta().getGuid());
+        getRestTemplate().delete(getUrl(setPath), setVars);
+    }
+    
+    /**
+     * Set quota to organization
+     * 
+     * @param orgName
+     * @param quotaName 
+     */
+    public void setQuotaToOrg(String orgName, String quotaName){
+        	CloudQuota quota = this.getQuotaByName(quotaName, true);
+        	CloudOrganization org = this.getOrgByName(orgName, true);
+        	
+        	doSetQuotaToOrg(org.getMeta().getGuid(), quota.getMeta().getGuid());
+    }
+    
+    /**
+     * Get organization by given name.
+     * 
+     * @param orgName
+     * @param required
+     * @return CloudOrganization instance
+     */
+    public CloudOrganization getOrgByName(String orgName, boolean required){
+        Map<String, Object> urlVars = new HashMap<String, Object>();
+        String urlPath = "/v2/organizations?inline-relations-depth=1&q=name:{name}";
+        urlVars.put("name", orgName);
+        CloudOrganization org = null;
+        List<Map<String, Object>> resourceList = getAllResources(urlPath,
+                urlVars);
+        if (resourceList.size() > 0) {
+            Map<String, Object> resource = resourceList.get(0);
+            org = resourceMapper.mapResource(resource, CloudOrganization.class);
+        }
+        
+        if (org == null && required) {
+            throw new IllegalArgumentException("Organization '" + orgName
+                    + "' not found.");
+        }        
+    	
+    	    return org;
+    }
+    
+    /**
+     * Get quota by given name.
+     * 
+     * @param quotaName
+     * @param required
+     * @return CloudQuota instance
+     */
+    public CloudQuota getQuotaByName(String quotaName, boolean required){
+    	    Map<String, Object> urlVars = new HashMap<String, Object>();
+        String urlPath = "/v2/quota_definitions?q=name:{name}";
+        urlVars.put("name", quotaName);
+        CloudQuota quota = null;
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+        if (resourceList.size() > 0) {
+            Map<String, Object> resource = resourceList.get(0);
+            quota = resourceMapper.mapResource(resource, CloudQuota.class);
+        }
+        
+        if (quota == null && required) {
+            throw new IllegalArgumentException("Quota '" + quotaName
+                    + "' not found.");
+        }        
+    	
+    	    return quota;
+    }
+   
+    private void doSetQuotaToOrg(UUID orgGuid, UUID quotaGuid) {
+        String setPath = "/v2/organizations/{org}";
+        Map<String, Object> setVars = new HashMap<String, Object>();
+        setVars.put("org", orgGuid);
+        HashMap<String, Object> setRequest = new HashMap<String, Object>();
+        setRequest.put("quota_definition_guid", quotaGuid);
+        
+        getRestTemplate().put(getUrl(setPath), setRequest, setVars);
+    }
 
 	private void doBindService(UUID appId, UUID serviceId) {
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
