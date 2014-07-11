@@ -530,6 +530,14 @@ public interface CloudFoundryOperations {
     void updateServiceBroker(CloudServiceBroker serviceBroker);
 
     /**
+     * Delete a service broker.
+     *
+     * @param name the service broker name
+     */
+    void deleteServiceBroker(String name);
+
+
+    /**
      * Service plans are private by default when a service broker's catalog is
      * fetched/updated. This method will update the visibility of all plans for
      * a broker to either public or private.
@@ -679,4 +687,5 @@ public interface CloudFoundryOperations {
 	 * @param callBack the callback to be un-registered
 	 */
 	void unRegisterRestLogListener(RestLogCallback callBack);
+
 }

@@ -402,6 +402,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     }
 
     @Override
+    public void deleteServiceBroker(String name) {
+        cc.deleteServiceBroker(name);
+    }
+
+    @Override
     public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
         cc.updateServicePlanVisibilityForBroker(name, visibility);
     }

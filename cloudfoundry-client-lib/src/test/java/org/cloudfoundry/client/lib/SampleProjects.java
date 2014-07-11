@@ -95,6 +95,19 @@ public class SampleProjects {
     }
 
     /**
+     * Returns a sample CF service broker app.
+     *
+     * @return the haash-broker JAR file
+     * @throws IOException
+     */
+    public static File sampleServiceBrokerApp() throws IOException {
+        ClassPathResource cpr = new ClassPathResource("haash-broker.jar");
+        File file = cpr.getFile();
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
+    }
+
+    /**
      *
      * @return The directory containing a simple standalone Ruby script
      * @throws IOException

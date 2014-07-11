@@ -778,6 +778,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
     }
 
     @Override
+    public void deleteServiceBroker(String name) {
+        CloudServiceBroker existingBroker = getServiceBroker(name);
+        Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
+
+        getRestTemplate().delete(getUrl("/v2/service_brokers/{guid}"), existingBroker.getMeta().getGuid());
+    }
+
+    @Override
     public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
         CloudServiceBroker broker = getServiceBroker(name);
 

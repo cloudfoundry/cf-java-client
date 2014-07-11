@@ -104,6 +104,8 @@ public interface CloudControllerClient {
 
     void updateServiceBroker(CloudServiceBroker serviceBroker);
 
+    void deleteServiceBroker(String name);
+
     void updateServicePlanVisibilityForBroker(String name, boolean visibility);
 
     // App methods
