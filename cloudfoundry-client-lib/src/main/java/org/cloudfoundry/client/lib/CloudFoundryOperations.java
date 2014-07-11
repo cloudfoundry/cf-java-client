@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -687,5 +688,52 @@ public interface CloudFoundryOperations {
 	 * @param callBack the callback to be un-registered
 	 */
 	void unRegisterRestLogListener(RestLogCallback callBack);
+	
+	/**
+     * Get quota by name
+     * 
+     * @param quotaName
+     * @param required
+     * @return CloudQuota instance
+     */
+    CloudQuota getQuotaByName(String quotaName, boolean required);
+    
+
+    /**
+     * Set quota to organization
+     * 
+     * @param orgName
+     * @param quotaName
+     */
+    void setQuotaToOrg(String orgName, String quotaName) ;
+    
+    /**
+     * Create quota
+     * 
+     * @param quota
+     */
+    void createQuota(CloudQuota quota);
+    
+    /**
+     * Delete quota by name
+     * 
+     * @param quotaName
+     */
+    void deleteQuota(String quotaName);
+	
+	/**
+	 * Get quota definitions
+	 * 
+	 * @return List<CloudQuota>
+	 */
+	List<CloudQuota> getQuotas();
+	
+	/**
+	 * Update Quota definition
+	 * 
+	 * @param quota
+	 * @param name
+	 */
+    void updateQuota(CloudQuota quota, String name);
 
 }

@@ -31,6 +31,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -505,6 +506,35 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void unRegisterRestLogListener(RestLogCallback callBack) {
 		cc.unRegisterRestLogListener(callBack);
+	}
+	
+	public CloudOrganization getOrgByName(String orgName, boolean required){
+    	return cc.getOrgByName(orgName, required);
+    }
+	
+    public List<CloudQuota> getQuotas() {
+        return cc.getQuotas();
+    }
+
+    public CloudQuota getQuotaByName(String quotaName, boolean required){
+    	return cc.getQuotaByName(quotaName, required);
+    }
+    
+    public void setQuotaToOrg(String orgName, String quotaName) {
+        cc.setQuotaToOrg(orgName, quotaName);
+    }
+    
+    public void createQuota(CloudQuota quota){
+    	cc.createQuota(quota);
+    }
+    
+    public void deleteQuota(String quotaName){
+    	cc.deleteQuota(quotaName);
+    }
+    
+    public void updateQuota(CloudQuota quota, String name) {
+		cc.updateQuota(quota, name);
+
 	}
 
 }
