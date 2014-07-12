@@ -796,18 +796,20 @@ public class CloudControllerClientImpl implements CloudControllerClient {
         List<Map<String, Object>> serviceResourceList = getAllResources(urlPath, urlVars);
 
         for (Map<String, Object> serviceResource : serviceResourceList) {
-            String serviceGuid = (String) serviceResource.get("guid");
+            Map<String, Object> metadata = (Map<String, Object>) serviceResource.get("metadata");
+            String serviceGuid = (String) metadata.get("guid");
 
             urlPath = "/v2/service_plans?q={q}";
             urlVars = new HashMap<>();
             urlVars.put("q", "service_guid:" + serviceGuid);
             List<Map<String, Object>> planResourceList = getAllResources(urlPath, urlVars);
             for (Map<String, Object> planResource : planResourceList) {
-                String planGuid = (String) planResource.get("guid");
+                metadata = (Map<String, Object>) planResource.get("metadata");
+                String planGuid = (String) metadata.get("guid");
 
                 HashMap<String, Object> planUpdateRequest = new HashMap<>();
                 planUpdateRequest.put("public", visibility);
-                getRestTemplate().put("/v2/service_plans/{guid}", planUpdateRequest, planGuid);
+                getRestTemplate().put(getUrl("/v2/service_plans/{guid}"), planUpdateRequest, planGuid);
             }
         }
     }
