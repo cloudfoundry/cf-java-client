@@ -23,9 +23,7 @@ import org.gradle.api.tasks.TaskAction
  * @author Cedric Champeau
  * @author Scott Frederick
  */
-@Mixin(ServiceCloudFoundryHelper)
-@Mixin(PushCloudFoundryHelper)
-@Mixin(StartCloudFoundryHelper)
+@Mixin([ServiceCloudFoundryHelper, PushCloudFoundryHelper, StartCloudFoundryHelper])
 class PushCloudFoundryTask extends AbstractCloudFoundryTask {
     PushCloudFoundryTask() {
         super()

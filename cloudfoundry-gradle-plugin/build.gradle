@@ -28,7 +28,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.cloudfoundry:cloudfoundry-client-lib:1.0.3'
-    compile 'org.codehaus.groovy:groovy:2.1.6'
+    compile 'org.codehaus.groovy:groovy:2.3.6'
     testCompile 'junit:junit:4.8.2'
 }
 
