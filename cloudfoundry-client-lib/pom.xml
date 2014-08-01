@@ -109,6 +109,13 @@
 											<type>war</type>
 											<outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
 										</artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.cloudfoundry.test</groupId>
+                                            <artifactId>haash-broker</artifactId>
+                                            <version>0.1.0.BUILD-SNAPSHOT</version>
+                                            <type>jar</type>
+                                            <outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
+                                        </artifactItem>
 									</artifactItems>
 									<stripVersion>true</stripVersion>
 								</configuration>

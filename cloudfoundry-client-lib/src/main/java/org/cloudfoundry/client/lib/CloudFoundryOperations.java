@@ -514,6 +514,46 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudServiceBroker> getServiceBrokers();
 
+    /**
+     * Get a service broker.
+     *
+     * @param name the service broker name
+     * @return the service broker
+     */
+    CloudServiceBroker getServiceBroker(String name);
+
+    /**
+     * Create a service broker.
+     *
+     * @param serviceBroker cloud service broker info
+     */
+    void createServiceBroker(CloudServiceBroker serviceBroker);
+
+    /**
+     * Update a service broker (unchanged forces catalog refresh).
+     *
+     * @param serviceBroker cloud service broker info
+     */
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
+
+    /**
+     * Delete a service broker.
+     *
+     * @param name the service broker name
+     */
+    void deleteServiceBroker(String name);
+
+
+    /**
+     * Service plans are private by default when a service broker's catalog is
+     * fetched/updated. This method will update the visibility of all plans for
+     * a broker to either public or private.
+     *
+     * @param name the service broker name
+     * @param visibility true for public, false for private
+     */
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
 	/**
 	 * Associate (provision) a service with an application.
 	 *
