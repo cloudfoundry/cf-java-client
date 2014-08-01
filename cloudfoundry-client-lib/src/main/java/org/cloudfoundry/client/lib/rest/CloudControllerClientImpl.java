@@ -108,6 +108,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Jennifer Hickey
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Alexander Orlov
  */
 public class CloudControllerClientImpl implements CloudControllerClient {
 
@@ -199,24 +200,29 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		throw new IllegalArgumentException("No matching organization and space found for org: " + orgName + " space: " + spaceName);
 	}
 
+	@Override
 	public void setResponseErrorHandler(ResponseErrorHandler errorHandler) {
 		this.restTemplate.setErrorHandler(errorHandler);
 	}
 
+	@Override
 	public URL getCloudControllerUrl() {
 		return this.cloudControllerUrl;
 	}
 
+	@Override
 	public void updatePassword(String newPassword) {
 		updatePassword(cloudCredentials, newPassword);
 	}
 
+	@Override
 	public Map<String, String> getLogs(String appName) {
 		String urlPath = getFileUrlPath();
 		String instance = String.valueOf(0);
 		return doGetLogs(urlPath, appName, instance);
 	}
 
+	@Override
 	public List<ApplicationLog> getRecentLogs(String appName) {
 		AccumulatingApplicationLogListener listener = new AccumulatingApplicationLogListener();
 		streamLoggregatorLogs(appName, listener, true);
@@ -230,10 +236,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return listener.getLogs();
 	}
 
+	@Override
 	public StreamingLogToken streamLogs(String appName, ApplicationLogListener listener) {
 		return streamLoggregatorLogs(appName, listener, false);
 	}
 
+	@Override
 	public Map<String, String> getCrashLogs(String appName) {
 		String urlPath = getFileUrlPath();
 		CrashesInfo crashes = getCrashes(appName);
@@ -248,6 +256,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return doGetLogs(urlPath, appName, instance);
 	}
 
+	@Override
 	public String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition) {
 		String urlPath = getFileUrlPath();
 		Object appId = getFileAppId(appName);
@@ -255,23 +264,62 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 
+	@Override
 	public void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback) {
 		String urlPath = getFileUrlPath();
 		Object appId = getFileAppId(appName);
 		doOpenFile(urlPath, appId, instanceIndex, filePath, callback);
 	}
 
+	@Override
 	public void registerRestLogListener(RestLogCallback callBack) {
 		if (getRestTemplate() instanceof LoggingRestTemplate) {
 			((LoggingRestTemplate)getRestTemplate()).registerRestLogListener(callBack);
 		}
 	}
 
+	@Override
 	public void unRegisterRestLogListener(RestLogCallback callBack) {
 		if (getRestTemplate() instanceof LoggingRestTemplate) {
 			((LoggingRestTemplate)getRestTemplate()).unRegisterRestLogListener(callBack);
 		}
 	}
+
+	/**
+	 * Delete routes that do not have any application which is assigned to them.
+	 *
+	 * @return deleted routes or an empty list if no routes have been found
+	 */
+	@Override
+	public List<CloudRoute> deleteOrphanedRoutes() {
+		List<CloudRoute> orphanRoutes = new ArrayList<>();
+		for (CloudDomain cloudDomain : getDomainsForOrg()) {
+			orphanRoutes.addAll(fetchOrphanRoutes(cloudDomain.getName()));
+		}
+
+		List<CloudRoute> deletedCloudRoutes = new ArrayList<>();
+		for (CloudRoute orphanRoute : orphanRoutes) {
+			deleteRoute(orphanRoute.getHost(), orphanRoute.getDomain().getName());
+			deletedCloudRoutes.add(orphanRoute);
+		}
+
+		return deletedCloudRoutes;
+	}
+
+	private List<CloudRoute> fetchOrphanRoutes(String domainName) {
+		List<CloudRoute> orphanRoutes = new ArrayList<>();
+		for (CloudRoute cloudRoute : getRoutes(domainName)) {
+			if (isOrphanRoute(cloudRoute)) {
+				orphanRoutes.add(cloudRoute);
+			}
+		}
+
+    	return orphanRoutes;
+	}
+
+	private boolean isOrphanRoute(CloudRoute cloudRoute) {
+		return cloudRoute.getAppsUsingRoute() == 0;
+ 	}
 	
 	/**
 	 * Returns null if no further content is available. Two errors that will
@@ -285,8 +333,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	 * 
 	 * @return content if available, which may contain multiple lines, or null
 	 *         if no further content is available.
-	 * 
+	 *
 	 */
+	@Override
 	public String getStagingLogs(StartingInfo info, int offset) {
 		String stagingFile = info.getStagingFile();
 		if (stagingFile != null) {
@@ -352,6 +401,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			captureDefaultReadTimeout();
 		}
 
+		@Override
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
 			ClientHttpRequest request = delegate.createRequest(uri, httpMethod);
 
@@ -526,9 +576,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public CloudInfo getInfo() {
 		// info comes from two end points: /info and /v2/info
-		
+
 		String infoV2Json = getRestTemplate().getForObject(getUrl("/v2/info"), String.class);
 		Map<String, Object> infoV2Map = JsonUtil.convertJsonToMap(infoV2Json);
 
@@ -554,13 +605,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			usage = new CloudInfo.Usage(usageMap);
 			debug = CloudUtil.parse(Boolean.class, infoMap.get("allow_debug"));
 		}
-		
+
 		String loggregatorEndpoint = CloudUtil.parse(String.class, infoV2Map.get("logging_endpoint"));
 
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
 				description, limits, usage, debug, loggregatorEndpoint);
 	}
 
+	@Override
 	public List<CloudSpace> getSpaces() {
 		String urlPath = "/v2/spaces?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -571,6 +623,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return spaces;
 	}
 
+	@Override
 	public List<CloudOrganization> getOrganizations() {
 		String urlPath = "/v2/organizations?inline-relations-depth=0";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -581,19 +634,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return orgs;
 	}
 
+	@Override
 	public OAuth2AccessToken login() {
 		oauthClient.init(cloudCredentials);
 		return oauthClient.getToken();
 	}
 
+	@Override
 	public void logout() {
 		oauthClient.clear();
 	}
 
+	@Override
 	public void register(String email, String password) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	@Override
 	public void updatePassword(CloudCredentials credentials, String newPassword) {
 		oauthClient.changePassword(credentials.getPassword(), newPassword);
 		CloudCredentials newCloudCredentials = new CloudCredentials(credentials.getEmail(), newPassword);
@@ -604,10 +661,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public void unregister() {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	@Override
 	public List<CloudService> getServices() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -626,7 +685,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return services;
 	}
-	
+
+	@Override
 	public void createService(CloudService service) {
 		assertSpaceProvided("create service");
 		Assert.notNull(service, "Service must not be null");
@@ -657,6 +717,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		throw new IllegalArgumentException("Service plan " + service.getPlan() + " not found");
 	}
 
+	@Override
 	public void createUserProvidedService(CloudService service, Map<String, Object> credentials) {
 		assertSpaceProvided("create service");
 		Assert.notNull(credentials, "Service credentials must not be null");
@@ -674,6 +735,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().postForObject(getUrl("/v2/user_provided_service_instances"), serviceRequest, String.class);
 	}
 
+	@Override
 	public CloudService getService(String serviceName) {
 		String urlPath = "/v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
@@ -695,11 +757,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return cloudService;
 	}
 
+	@Override
 	public void deleteService(String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		doDeleteService(cloudService);
 	}
 
+	@Override
 	public void deleteAllServices() {
 		List<CloudService> cloudServices = getServices();
 		for (CloudService cloudService : cloudServices) {
@@ -707,6 +771,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public List<CloudServiceOffering> getServiceOfferings() {
 		String urlPath = "/v2/services?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -718,6 +783,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return serviceOfferings;
 	}
 
+	@Override
 	public List<CloudServiceBroker> getServiceBrokers() {
 		String urlPath = "/v2/service_brokers?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
@@ -729,6 +795,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return serviceBrokers;
 	}
 
+	@Override
 	public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -746,6 +813,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return apps;
 	}
 
+	@Override
 	public CloudApplication getApplication(String appName) {
 		Map<String, Object> resource = findApplicationResource(appName, true);
 		if (resource == null) {
@@ -754,6 +822,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return mapCloudApplication(resource);
 	}
 
+	@Override
 	public CloudApplication getApplication(UUID appGuid) {
 		Map<String, Object> resource = findApplicationResource(appGuid, true);
 		if (resource == null) {
@@ -790,6 +859,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return running;
 	}
 
+	@Override
 	public ApplicationStats getApplicationStats(String appName) {
 		CloudApplication app = getApplication(appName);
 		return doGetApplicationStats(app.getMeta().getGuid(), app.getState());
@@ -817,11 +887,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return JsonUtil.convertJsonToMap(resp);
 	}
 
+	@Override
 	public void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                              List<String> serviceNames) {
 		createApplication(appName, staging, null, memory, uris, serviceNames);
 	}
 
+	@Override
 	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
 	                              List<String> uris, List<String> serviceNames) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1029,6 +1101,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return CloudEntityResourceMapper.getMeta(routeEntity).getGuid();
 	}
 
+	@Override
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
 		Assert.notNull(file, "File must not be null");
 		if (file.isDirectory()) {
@@ -1045,6 +1118,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback)
 			throws IOException {
 		Assert.notNull(appName, "AppName must not be null");
@@ -1061,7 +1135,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
 		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
 		ResponseEntity<Map<String,Map<String,String>>> responseEntity =
-		            getRestTemplate().exchange(getUrl("/v2/apps/{guid}/bits?async=true"), HttpMethod.PUT, entity, 
+		            getRestTemplate().exchange(getUrl("/v2/apps/{guid}/bits?async=true"), HttpMethod.PUT, entity,
 		                                        new ParameterizedTypeReference<Map<String, Map<String,String>>>() {}, appId);
 		processAsyncJob(responseEntity, callback);
 	}
@@ -1089,7 +1163,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			jobEntity = jobProgressEntity.getBody().get("entity");
 		} while (!jobStatus.equals("finished"));
 	}
-	
+
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
 		CloudResources archiveResources = new CloudResources(archive);
 		String json = JsonUtil.convertToJson(archiveResources);
@@ -1114,6 +1188,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
 	}
 
+	@Override
 	public StartingInfo startApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		if (app.getState() != CloudApplication.AppState.STARTED) {
@@ -1148,10 +1223,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return null;
 	}
 
+	@Override
 	public void debugApplication(String appName, CloudApplication.DebugMode mode) {
 		throw new UnsupportedOperationException("Feature is not yet implemented.");
 	}
 
+	@Override
 	public void stopApplication(String appName) {
 		CloudApplication app = getApplication(appName);
 		if (app.getState() != CloudApplication.AppState.STOPPED) {
@@ -1161,16 +1238,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public StartingInfo restartApplication(String appName) {
 		stopApplication(appName);
 		return startApplication(appName);
 	}
 
+	@Override
 	public void deleteApplication(String appName) {
 		UUID appId = getAppId(appName);
 		doDeleteApplication(appId);
 	}
 
+	@Override
 	public void deleteAllApplications() {
 		List<CloudApplication> cloudApps = getApplications();
 		for (CloudApplication cloudApp : cloudApps) {
@@ -1178,6 +1258,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public void updateApplicationDiskQuota(String appName, int disk) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1185,6 +1266,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public void updateApplicationMemory(String appName, int memory) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1192,6 +1274,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public void updateApplicationInstances(String appName, int instances) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1199,6 +1282,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public void updateApplicationServices(String appName, List<String> services) {
 		CloudApplication app = getApplication(appName);
 		List<UUID> addServices = new ArrayList<UUID>();
@@ -1373,6 +1457,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().delete(getUrl("/v2/service_bindings/{guid}"), serviceBindingId);
 	}
 
+	@Override
 	public void updateApplicationStaging(String appName, Staging staging) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1380,6 +1465,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public void updateApplicationUris(String appName, List<String> uris) {
 		CloudApplication app = getApplication(appName);
 		List<String> newUris = new ArrayList<String>(uris);
@@ -1390,6 +1476,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		addUris(newUris, app.getMeta().getGuid());
 	}
 
+	@Override
 	public void updateApplicationEnv(String appName, Map<String, String> env) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1397,6 +1484,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public void updateApplicationEnv(String appName, List<String> env) {
 		Map<String, String> envHash = new HashMap<String, String>();
 		for (String s : env) {
@@ -1410,23 +1498,27 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		updateApplicationEnv(appName, envHash);
 	}
 
+	@Override
 	public void bindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
 		doBindService(appId, cloudService.getMeta().getGuid());
 	}
 
+	@Override
 	public void unbindService(String appName, String serviceName) {
 		CloudService cloudService = getService(serviceName);
 		UUID appId = getAppId(appName);
 		doUnbindService(appId, cloudService.getMeta().getGuid());
 	}
 
+	@Override
 	public InstancesInfo getApplicationInstances(String appName) {
 		CloudApplication app = getApplication(appName);
 		return getApplicationInstances(app);
 	}
 
+	@Override
 	public InstancesInfo getApplicationInstances(CloudApplication app) {
 		if (app.getState().equals(CloudApplication.AppState.STARTED)) {
 			return doGetApplicationInstances(app.getMeta().getGuid());
@@ -1464,6 +1556,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public CrashesInfo getCrashes(String appName) {
 		UUID appId = getAppId(appName);
 		if (appId == null) {
@@ -1477,6 +1570,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return new CrashesInfo(attributes);
 	}
 
+	@Override
 	public void rename(String appName, String newName) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
@@ -1484,6 +1578,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
 
+	@Override
 	public List<CloudStack> getStacks() {
 		String urlPath = "/v2/stacks";
 		List<Map<String, Object>> resources = getAllResources(urlPath, null);
@@ -1494,6 +1589,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return stacks;
 	}
 
+	@Override
 	public CloudStack getStack(String name) {
 		String urlPath = "/v2/stacks?q={q}";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
@@ -1506,23 +1602,28 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return null;
 	}
 
+	@Override
 	public List<CloudDomain> getDomainsForOrg() {
 		assertSpaceProvided("access organization domains");
 		return doGetDomains(sessionSpace.getOrganization());
 	}
 
+	@Override
 	public List<CloudDomain> getDomains() {
 		return doGetDomains((CloudOrganization) null);
 	}
 
+	@Override
 	public List<CloudDomain> getPrivateDomains() {
 		return doGetDomains("/v2/private_domains");
 	}
 
+	@Override
 	public List<CloudDomain> getSharedDomains() {
 		return doGetDomains("/v2/shared_domains");
 	}
 
+	@Override
 	public CloudDomain getDefaultDomain() {
 		List<CloudDomain> sharedDomains = getSharedDomains();
 		if (sharedDomains.isEmpty()) {
@@ -1532,6 +1633,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public void addDomain(String domainName) {
 		assertSpaceProvided("add domain");
 		UUID domainGuid = getDomainGuid(domainName, false);
@@ -1540,6 +1642,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
 	public void deleteDomain(String domainName) {
 		assertSpaceProvided("delete domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
@@ -1551,22 +1654,26 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		doDeleteDomain(domainGuid);
 	}
 
+	@Override
 	public void removeDomain(String domainName) {
 		deleteDomain(domainName);
 	}
 
+	@Override
 	public List<CloudRoute> getRoutes(String domainName) {
 		assertSpaceProvided("get routes for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		return doGetRoutes(domainGuid);
 	}
 
+	@Override
 	public void addRoute(String host, String domainName) {
 		assertSpaceProvided("add route for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
 		doAddRoute(host, domainGuid);
 	}
 
+	@Override
 	public void deleteRoute(String host, String domainName) {
 		assertSpaceProvided("delete route for domain");
 		UUID domainGuid = getDomainGuid(domainName, true);
@@ -1766,16 +1873,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private class AccumulatingApplicationLogListener implements ApplicationLogListener {
 		private List<ApplicationLog> logs = new ArrayList<ApplicationLog>();
 
+		@Override
 		public void onMessage(ApplicationLog log) {
 			logs.add(log);
 		}
 
+		@Override
 		public void onError(Throwable exception) {
 			synchronized (this) {
 				this.notify();
 			}
 		}
 
+		@Override
 		public void onComplete() {
 			synchronized (this) {
 				this.notify();
@@ -1797,7 +1907,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return processApplicationResource(JsonUtil.convertJsonToMap(resp), fetchServiceInfo);
 	}
 
-	
+
 	private Map<String, Object> findApplicationResource(String appName, boolean fetchServiceInfo) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -1814,7 +1924,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return null;
 	}
-	
+
 	private Map<String, Object> processApplicationResource(Map<String, Object> resource, boolean fetchServiceInfo) {
 		if (fetchServiceInfo) {
 			fillInEmbeddedResource(resource, "service_bindings", "service_instance");
@@ -1905,7 +2015,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
 		return entity.containsKey(resourceKey) || entity.containsKey(resourceKey + "_url");
 	}
-	
+
 	private static class ResponseExtractorWrapper implements ResponseExtractor {
 
 		private ClientHttpResponseCallback callback;
@@ -1914,6 +2024,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			this.callback = callback;
 		}
 
+		@Override
 		public Object extractData(ClientHttpResponse clientHttpResponse) throws IOException {
 			callback.onClientHttpResponse(clientHttpResponse);
 			return null;

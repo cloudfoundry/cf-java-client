@@ -202,12 +202,14 @@ public interface CloudControllerClient {
 
 	void deleteRoute(String host, String domainName);
 
+	List<CloudRoute> deleteOrphanedRoutes();
+
 	// Misc. utility methods
 
 	void registerRestLogListener(RestLogCallback callBack);
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
-	
+
     // Quota operations
 	CloudOrganization getOrgByName(String orgName, boolean required);
     
