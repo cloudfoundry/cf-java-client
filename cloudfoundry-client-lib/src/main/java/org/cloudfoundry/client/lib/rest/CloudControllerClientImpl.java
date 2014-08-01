@@ -286,42 +286,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	/**
-	 * Delete routes that do not have any application which is assigned to them.
-	 *
-	 * @return deleted routes or an empty list if no routes have been found
-	 */
-	@Override
-	public List<CloudRoute> deleteOrphanedRoutes() {
-		List<CloudRoute> orphanRoutes = new ArrayList<>();
-		for (CloudDomain cloudDomain : getDomainsForOrg()) {
-			orphanRoutes.addAll(fetchOrphanRoutes(cloudDomain.getName()));
-		}
-
-		List<CloudRoute> deletedCloudRoutes = new ArrayList<>();
-		for (CloudRoute orphanRoute : orphanRoutes) {
-			deleteRoute(orphanRoute.getHost(), orphanRoute.getDomain().getName());
-			deletedCloudRoutes.add(orphanRoute);
-		}
-
-		return deletedCloudRoutes;
-	}
-
-	private List<CloudRoute> fetchOrphanRoutes(String domainName) {
-		List<CloudRoute> orphanRoutes = new ArrayList<>();
-		for (CloudRoute cloudRoute : getRoutes(domainName)) {
-			if (isOrphanRoute(cloudRoute)) {
-				orphanRoutes.add(cloudRoute);
-			}
-		}
-
-    	return orphanRoutes;
-	}
-
-	private boolean isOrphanRoute(CloudRoute cloudRoute) {
-		return cloudRoute.getAppsUsingRoute() == 0;
- 	}
-	
-	/**
 	 * Returns null if no further content is available. Two errors that will
 	 * lead to a null value are 404 Bad Request errors, which are handled in the
 	 * implementation, meaning that no further log file contents are available,
@@ -1316,134 +1280,134 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			doUnbindService(app.getMeta().getGuid(), serviceId);
 		}
 	}
-	
+
 	public List<CloudQuota> getQuotas() {
-        String urlPath = "/v2/quota_definitions";
-        List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
-        List<CloudQuota> quotas = new ArrayList<CloudQuota>();
-        for (Map<String, Object> resource : resourceList) {
-            quotas.add(resourceMapper.mapResource(resource, CloudQuota.class));
-        }
-        return quotas;
-    }
-    
-    /**
-     * Create quota from a CloudQuota instance (Quota Plan)
-     * 
-     * @param quota
-     */
-    public void createQuota(CloudQuota quota){
-    	     String setPath = "/v2/quota_definitions";
-         HashMap<String, Object> setRequest = new HashMap<String, Object>();
-         setRequest.put("name", quota.getName());
-         setRequest.put("memory_limit", quota.getMemoryLimit());
-         setRequest.put("total_routes", quota.getTotalRoutes());
-         setRequest.put("total_services", quota.getTotalServices());
-         setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
-         getRestTemplate().postForObject(getUrl(setPath), setRequest, String.class);
-    }
-    
-    public void updateQuota(CloudQuota quota, String name) {
-    	    CloudQuota oldQuota = this.getQuotaByName(name, true);
-    	
-    	    String setPath = "/v2/quota_definitions/{quotaGuid}";
-    	
-        Map<String, Object> setVars = new HashMap<String, Object>();
-        setVars.put("quotaGuid", oldQuota.getMeta().getGuid());
-        
-        HashMap<String, Object> setRequest = new HashMap<String, Object>();
-        setRequest.put("name", quota.getName());
-        setRequest.put("memory_limit", quota.getMemoryLimit());
-        setRequest.put("total_routes", quota.getTotalRoutes());
-        setRequest.put("total_services", quota.getTotalServices());
-        setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
-        
-        getRestTemplate().put(getUrl(setPath), setRequest, setVars);
+		String urlPath = "/v2/quota_definitions";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudQuota> quotas = new ArrayList<CloudQuota>();
+		for (Map<String, Object> resource : resourceList) {
+			quotas.add(resourceMapper.mapResource(resource, CloudQuota.class));
+		}
+		return quotas;
 	}
-    
-    public void deleteQuota(String quotaName){
-        	CloudQuota quota = this.getQuotaByName(quotaName, true);
-        	String setPath = "/v2/quota_definitions/{quotaGuid}";
-        Map<String, Object> setVars = new HashMap<String, Object>();
-        setVars.put("quotaGuid", quota.getMeta().getGuid());
-        getRestTemplate().delete(getUrl(setPath), setVars);
-    }
-    
-    /**
-     * Set quota to organization
-     * 
-     * @param orgName
-     * @param quotaName 
-     */
-    public void setQuotaToOrg(String orgName, String quotaName){
-        	CloudQuota quota = this.getQuotaByName(quotaName, true);
-        	CloudOrganization org = this.getOrgByName(orgName, true);
-        	
-        	doSetQuotaToOrg(org.getMeta().getGuid(), quota.getMeta().getGuid());
-    }
-    
-    /**
-     * Get organization by given name.
-     * 
-     * @param orgName
-     * @param required
-     * @return CloudOrganization instance
-     */
-    public CloudOrganization getOrgByName(String orgName, boolean required){
-        Map<String, Object> urlVars = new HashMap<String, Object>();
-        String urlPath = "/v2/organizations?inline-relations-depth=1&q=name:{name}";
-        urlVars.put("name", orgName);
-        CloudOrganization org = null;
-        List<Map<String, Object>> resourceList = getAllResources(urlPath,
-                urlVars);
-        if (resourceList.size() > 0) {
-            Map<String, Object> resource = resourceList.get(0);
-            org = resourceMapper.mapResource(resource, CloudOrganization.class);
-        }
-        
-        if (org == null && required) {
-            throw new IllegalArgumentException("Organization '" + orgName
-                    + "' not found.");
-        }        
-    	
-    	    return org;
-    }
-    
-    /**
-     * Get quota by given name.
-     * 
-     * @param quotaName
-     * @param required
-     * @return CloudQuota instance
-     */
-    public CloudQuota getQuotaByName(String quotaName, boolean required){
-    	    Map<String, Object> urlVars = new HashMap<String, Object>();
-        String urlPath = "/v2/quota_definitions?q=name:{name}";
-        urlVars.put("name", quotaName);
-        CloudQuota quota = null;
-        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-        if (resourceList.size() > 0) {
-            Map<String, Object> resource = resourceList.get(0);
-            quota = resourceMapper.mapResource(resource, CloudQuota.class);
-        }
-        
-        if (quota == null && required) {
-            throw new IllegalArgumentException("Quota '" + quotaName
-                    + "' not found.");
-        }        
-    	
-    	    return quota;
-    }
-   
-    private void doSetQuotaToOrg(UUID orgGuid, UUID quotaGuid) {
-        String setPath = "/v2/organizations/{org}";
-        Map<String, Object> setVars = new HashMap<String, Object>();
-        setVars.put("org", orgGuid);
-        HashMap<String, Object> setRequest = new HashMap<String, Object>();
-        setRequest.put("quota_definition_guid", quotaGuid);
-        
-        getRestTemplate().put(getUrl(setPath), setRequest, setVars);
-    }
+
+	/**
+	 * Create quota from a CloudQuota instance (Quota Plan)
+	 *
+	 * @param quota
+	 */
+	public void createQuota(CloudQuota quota) {
+		String setPath = "/v2/quota_definitions";
+		HashMap<String, Object> setRequest = new HashMap<String, Object>();
+		setRequest.put("name", quota.getName());
+		setRequest.put("memory_limit", quota.getMemoryLimit());
+		setRequest.put("total_routes", quota.getTotalRoutes());
+		setRequest.put("total_services", quota.getTotalServices());
+		setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
+		getRestTemplate().postForObject(getUrl(setPath), setRequest, String.class);
+	}
+
+	public void updateQuota(CloudQuota quota, String name) {
+		CloudQuota oldQuota = this.getQuotaByName(name, true);
+
+		String setPath = "/v2/quota_definitions/{quotaGuid}";
+
+		Map<String, Object> setVars = new HashMap<String, Object>();
+		setVars.put("quotaGuid", oldQuota.getMeta().getGuid());
+
+		HashMap<String, Object> setRequest = new HashMap<String, Object>();
+		setRequest.put("name", quota.getName());
+		setRequest.put("memory_limit", quota.getMemoryLimit());
+		setRequest.put("total_routes", quota.getTotalRoutes());
+		setRequest.put("total_services", quota.getTotalServices());
+		setRequest.put("non_basic_services_allowed", quota.isNonBasicServicesAllowed());
+
+		getRestTemplate().put(getUrl(setPath), setRequest, setVars);
+	}
+
+	public void deleteQuota(String quotaName) {
+		CloudQuota quota = this.getQuotaByName(quotaName, true);
+		String setPath = "/v2/quota_definitions/{quotaGuid}";
+		Map<String, Object> setVars = new HashMap<String, Object>();
+		setVars.put("quotaGuid", quota.getMeta().getGuid());
+		getRestTemplate().delete(getUrl(setPath), setVars);
+	}
+
+	/**
+	 * Set quota to organization
+	 *
+	 * @param orgName
+	 * @param quotaName
+	 */
+	public void setQuotaToOrg(String orgName, String quotaName) {
+		CloudQuota quota = this.getQuotaByName(quotaName, true);
+		CloudOrganization org = this.getOrgByName(orgName, true);
+
+		doSetQuotaToOrg(org.getMeta().getGuid(), quota.getMeta().getGuid());
+	}
+
+	/**
+	 * Get organization by given name.
+	 *
+	 * @param orgName
+	 * @param required
+	 * @return CloudOrganization instance
+	 */
+	public CloudOrganization getOrgByName(String orgName, boolean required) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/organizations?inline-relations-depth=1&q=name:{name}";
+		urlVars.put("name", orgName);
+		CloudOrganization org = null;
+		List<Map<String, Object>> resourceList = getAllResources(urlPath,
+				urlVars);
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			org = resourceMapper.mapResource(resource, CloudOrganization.class);
+		}
+
+		if (org == null && required) {
+			throw new IllegalArgumentException("Organization '" + orgName
+					+ "' not found.");
+		}
+
+		return org;
+	}
+
+	/**
+	 * Get quota by given name.
+	 *
+	 * @param quotaName
+	 * @param required
+	 * @return CloudQuota instance
+	 */
+	public CloudQuota getQuotaByName(String quotaName, boolean required) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/quota_definitions?q=name:{name}";
+		urlVars.put("name", quotaName);
+		CloudQuota quota = null;
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			quota = resourceMapper.mapResource(resource, CloudQuota.class);
+		}
+
+		if (quota == null && required) {
+			throw new IllegalArgumentException("Quota '" + quotaName
+					+ "' not found.");
+		}
+
+		return quota;
+	}
+
+	private void doSetQuotaToOrg(UUID orgGuid, UUID quotaGuid) {
+		String setPath = "/v2/organizations/{org}";
+		Map<String, Object> setVars = new HashMap<String, Object>();
+		setVars.put("org", orgGuid);
+		HashMap<String, Object> setRequest = new HashMap<String, Object>();
+		setRequest.put("quota_definition_guid", quotaGuid);
+
+		getRestTemplate().put(getUrl(setPath), setRequest, setVars);
+	}
 
 	private void doBindService(UUID appId, UUID serviceId) {
 		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
@@ -1701,6 +1665,42 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String urlPath = "/v2/routes/{route}";
 		urlVars.put("route", routeGuid);
 		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	/**
+	 * Delete routes that do not have any application which is assigned to them.
+	 *
+	 * @return deleted routes or an empty list if no routes have been found
+	 */
+	@Override
+	public List<CloudRoute> deleteOrphanedRoutes() {
+		List<CloudRoute> orphanRoutes = new ArrayList<>();
+		for (CloudDomain cloudDomain : getDomainsForOrg()) {
+			orphanRoutes.addAll(fetchOrphanRoutes(cloudDomain.getName()));
+		}
+
+		List<CloudRoute> deletedCloudRoutes = new ArrayList<>();
+		for (CloudRoute orphanRoute : orphanRoutes) {
+			deleteRoute(orphanRoute.getHost(), orphanRoute.getDomain().getName());
+			deletedCloudRoutes.add(orphanRoute);
+		}
+
+		return deletedCloudRoutes;
+	}
+
+	private List<CloudRoute> fetchOrphanRoutes(String domainName) {
+		List<CloudRoute> orphanRoutes = new ArrayList<>();
+		for (CloudRoute cloudRoute : getRoutes(domainName)) {
+			if (isOrphanRoute(cloudRoute)) {
+				orphanRoutes.add(cloudRoute);
+			}
+		}
+
+		return orphanRoutes;
+	}
+
+	private boolean isOrphanRoute(CloudRoute cloudRoute) {
+		return cloudRoute.getAppsUsingRoute() == 0;
 	}
 
 	private List<CloudDomain> doGetDomains(CloudOrganization org) {

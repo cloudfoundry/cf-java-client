@@ -248,8 +248,8 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	@Override
-	public void deleteOrphanedRoutes() {
-    	cc.deleteOrphanedRoutes();
+	public List<CloudRoute> deleteOrphanedRoutes() {
+    	return cc.deleteOrphanedRoutes();
 	}
 
 	public void uploadApplication(String appName, String file) throws IOException {
