@@ -55,6 +55,7 @@ import org.springframework.web.client.ResponseErrorHandler;
  * @author Jennifer Hickey
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Alexander Orlov
  */
 public class CloudFoundryClient implements CloudFoundryOperations {
 
@@ -244,6 +245,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void createUserProvidedService(CloudService service, Map<String, Object> credentials) {
 		cc.createUserProvidedService(service, credentials);
+	}
+
+	@Override
+	public void deleteOrphanedRoutes() {
+    	cc.deleteOrphanedRoutes();
 	}
 
 	public void uploadApplication(String appName, String file) throws IOException {

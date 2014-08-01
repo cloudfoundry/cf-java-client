@@ -11,6 +11,7 @@ Currently available Cloud Foundry Maven Plugin Goals are:
   Applications
     apps                                        List deployed applications
     app                                         Show details of the application
+    delete-orphaned-routes                      Delete routes that do not have any application which is assigned to them
 
   Application Operations
     push                                        Create, push, map, and start a new application
