@@ -1,1 +1,4 @@
-/*.iml
+*.iml
+*.iws
+*.ipr
+out

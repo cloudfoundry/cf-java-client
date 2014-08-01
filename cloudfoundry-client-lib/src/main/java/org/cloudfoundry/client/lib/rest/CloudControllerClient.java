@@ -99,7 +99,17 @@ public interface CloudControllerClient {
 
 	List<CloudServiceBroker> getServiceBrokers();
 
-	// App methods
+    CloudServiceBroker getServiceBroker(String name);
+
+    void createServiceBroker(CloudServiceBroker serviceBroker);
+
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
+
+    void deleteServiceBroker(String name);
+
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
+    // App methods
 
 	List<CloudApplication> getApplications();
 
