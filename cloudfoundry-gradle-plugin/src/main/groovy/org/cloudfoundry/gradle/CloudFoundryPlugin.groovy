@@ -15,7 +15,6 @@
 
 package org.cloudfoundry.gradle
 
-import org.cloudfoundry.gradle.tasks.RecentLogsCloudFoundryTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -25,6 +24,7 @@ import org.cloudfoundry.gradle.tasks.AppsCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.BindServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.CreateServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeleteApplicationCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.DeleteOrphanedRoutesCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeleteServiceCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.DeployCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.EnvCloudFoundryTask
@@ -34,6 +34,7 @@ import org.cloudfoundry.gradle.tasks.LoginCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.LogoutCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.MapCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.PushCloudFoundryTask
+import org.cloudfoundry.gradle.tasks.RecentLogsCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.RestartApplicationCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ScaleCloudFoundryTask
 import org.cloudfoundry.gradle.tasks.ServicesCloudFoundryTask
@@ -90,6 +91,7 @@ class CloudFoundryPlugin implements Plugin<Project> {
         createTask(project, 'UnsetEnv', UnsetEnvCloudFoundryTask)
         createTask(project, 'Map', MapCloudFoundryTask)
         createTask(project, 'Unmap', UnmapCloudFoundryTask)
+        createTask(project, 'DeleteOrphanedRoutes', DeleteOrphanedRoutesCloudFoundryTask)
     }
 
     private void createTask(Project project, String name, Class<? extends DefaultTask> clazz) {
