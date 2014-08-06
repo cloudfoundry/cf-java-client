@@ -514,45 +514,45 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudServiceBroker> getServiceBrokers();
 
-    /**
-     * Get a service broker.
-     *
-     * @param name the service broker name
-     * @return the service broker
-     */
-    CloudServiceBroker getServiceBroker(String name);
+	/**
+	 * Get a service broker.
+	 *
+	 * @param name the service broker name
+	 * @return the service broker
+	 */
+	CloudServiceBroker getServiceBroker(String name);
 
-    /**
-     * Create a service broker.
-     *
-     * @param serviceBroker cloud service broker info
-     */
-    void createServiceBroker(CloudServiceBroker serviceBroker);
+	/**
+	 * Create a service broker.
+	 *
+	 * @param serviceBroker cloud service broker info
+	 */
+	void createServiceBroker(CloudServiceBroker serviceBroker);
 
-    /**
-     * Update a service broker (unchanged forces catalog refresh).
-     *
-     * @param serviceBroker cloud service broker info
-     */
-    void updateServiceBroker(CloudServiceBroker serviceBroker);
+	/**
+	 * Update a service broker (unchanged forces catalog refresh).
+	 *
+	 * @param serviceBroker cloud service broker info
+	 */
+	void updateServiceBroker(CloudServiceBroker serviceBroker);
 
-    /**
-     * Delete a service broker.
-     *
-     * @param name the service broker name
-     */
-    void deleteServiceBroker(String name);
+	/**
+	 * Delete a service broker.
+	 *
+	 * @param name the service broker name
+	 */
+	void deleteServiceBroker(String name);
 
 
-    /**
-     * Service plans are private by default when a service broker's catalog is
-     * fetched/updated. This method will update the visibility of all plans for
-     * a broker to either public or private.
-     *
-     * @param name the service broker name
-     * @param visibility true for public, false for private
-     */
-    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+	/**
+	 * Service plans are private by default when a service broker's catalog is
+	 * fetched/updated. This method will update the visibility of all plans for
+	 * a broker to either public or private.
+	 *
+	 * @param name       the service broker name
+	 * @param visibility true for public, false for private
+	 */
+	void updateServicePlanVisibilityForBroker(String name, boolean visibility);
 
 	/**
 	 * Associate (provision) a service with an application.
@@ -696,49 +696,49 @@ public interface CloudFoundryOperations {
 	void unRegisterRestLogListener(RestLogCallback callBack);
 	
 	/**
-     * Get quota by name
-     * 
-     * @param quotaName
-     * @param required
-     * @return CloudQuota instance
-     */
-    CloudQuota getQuotaByName(String quotaName, boolean required);
-    
+	 * Get quota by name
+	 *
+	 * @param quotaName
+	 * @param required
+	 * @return CloudQuota instance
+	 */
+	CloudQuota getQuotaByName(String quotaName, boolean required);
 
-    /**
-     * Set quota to organization
-     * 
-     * @param orgName
-     * @param quotaName
-     */
-    void setQuotaToOrg(String orgName, String quotaName) ;
-    
-    /**
-     * Create quota
-     * 
-     * @param quota
-     */
-    void createQuota(CloudQuota quota);
-    
-    /**
-     * Delete quota by name
-     * 
-     * @param quotaName
-     */
-    void deleteQuota(String quotaName);
-	
+
+	/**
+	 * Set quota to organization
+	 *
+	 * @param orgName
+	 * @param quotaName
+	 */
+	void setQuotaToOrg(String orgName, String quotaName);
+
+	/**
+	 * Create quota
+	 *
+	 * @param quota
+	 */
+	void createQuota(CloudQuota quota);
+
+	/**
+	 * Delete quota by name
+	 *
+	 * @param quotaName
+	 */
+	void deleteQuota(String quotaName);
+
 	/**
 	 * Get quota definitions
-	 * 
+	 *
 	 * @return List<CloudQuota>
 	 */
 	List<CloudQuota> getQuotas();
-	
+
 	/**
 	 * Update Quota definition
-	 * 
+	 *
 	 * @param quota
 	 * @param name
 	 */
-    void updateQuota(CloudQuota quota, String name);
+	void updateQuota(CloudQuota quota, String name);
 }

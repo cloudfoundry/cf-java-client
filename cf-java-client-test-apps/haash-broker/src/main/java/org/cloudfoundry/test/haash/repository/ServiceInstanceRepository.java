@@ -1,6 +1,6 @@
-package com.mattstine.cf.haash.repository;
+package org.cloudfoundry.test.haash.repository;
 
-import com.mattstine.cf.haash.model.ServiceInstance;
+import org.cloudfoundry.test.haash.model.ServiceInstance;
 import org.springframework.data.repository.CrudRepository;
 
 /**

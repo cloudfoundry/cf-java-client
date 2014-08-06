@@ -1,4 +1,4 @@
-package com.mattstine.cf.haash.model;
+package org.cloudfoundry.test.haash.model;
 
 import javax.persistence.*;
 

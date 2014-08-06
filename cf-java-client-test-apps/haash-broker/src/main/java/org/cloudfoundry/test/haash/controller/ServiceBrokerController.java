@@ -1,13 +1,13 @@
-package com.mattstine.cf.haash.controller;
+package org.cloudfoundry.test.haash.controller;
 
-import com.mattstine.cf.haash.haash.HaashService;
-import com.mattstine.cf.haash.model.Credentials;
-import com.mattstine.cf.haash.model.Service;
-import com.mattstine.cf.haash.model.ServiceBinding;
-import com.mattstine.cf.haash.model.ServiceInstance;
-import com.mattstine.cf.haash.repository.ServiceBindingRepository;
-import com.mattstine.cf.haash.repository.ServiceInstanceRepository;
-import com.mattstine.cf.haash.repository.ServiceRepository;
+import org.cloudfoundry.test.haash.haash.HaashService;
+import org.cloudfoundry.test.haash.model.Credentials;
+import org.cloudfoundry.test.haash.model.Service;
+import org.cloudfoundry.test.haash.model.ServiceBinding;
+import org.cloudfoundry.test.haash.model.ServiceInstance;
+import org.cloudfoundry.test.haash.repository.ServiceBindingRepository;
+import org.cloudfoundry.test.haash.repository.ServiceInstanceRepository;
+import org.cloudfoundry.test.haash.repository.ServiceRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1171,96 +1171,96 @@ public class CloudFoundryClientTest {
 		assertNotNull(broker0.getUsername());
 	}
 
-    @Test
-    public void serviceBrokerLifecycle() throws IOException {
-        assumeTrue(CCNG_USER_IS_ADMIN);
+	@Test
+	public void serviceBrokerLifecycle() throws IOException {
+		assumeTrue(CCNG_USER_IS_ADMIN);
 
-        createAndUploadAndStartSampleServiceBrokerApp("haash-broker");
+		createAndUploadAndStartSampleServiceBrokerApp("haash-broker");
 
-        boolean pass = ensureApplicationRunning("haash-broker");
-        assertTrue("haash-broker failed to start", pass);
+		boolean pass = ensureApplicationRunning("haash-broker");
+		assertTrue("haash-broker failed to start", pass);
 
-        CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
-        connectedClient.createServiceBroker(newBroker);
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.createServiceBroker(newBroker);
 
-        CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
-        assertNotNull(broker);
-        assertNotNull(broker.getMeta());
-        assertEquals("haash-broker", broker.getName());
-        assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
-        assertEquals("warreng", broker.getUsername());
-        assertNull(broker.getPassword());
+		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
+		assertNotNull(broker);
+		assertNotNull(broker.getMeta());
+		assertEquals("haash-broker", broker.getName());
+		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals("warreng", broker.getUsername());
+		assertNull(broker.getPassword());
 
-        newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
-        connectedClient.updateServiceBroker(newBroker);
+		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.updateServiceBroker(newBroker);
 
-        connectedClient.updateServicePlanVisibilityForBroker("haash-broker", true);
-        connectedClient.updateServicePlanVisibilityForBroker("haash-broker", false);
+		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", true);
+		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", false);
 
-        connectedClient.deleteServiceBroker("haash-broker");
-    }
+		connectedClient.deleteServiceBroker("haash-broker");
+	}
 
-    private boolean ensureApplicationRunning(String appName) {
-        InstancesInfo instances;
-        boolean pass = false;
-        for (int i = 0; i < 50; i++) {
-            try {
-                instances = getInstancesWithTimeout(connectedClient, appName);
-                assertNotNull(instances);
+	private boolean ensureApplicationRunning(String appName) {
+		InstancesInfo instances;
+		boolean pass = false;
+		for (int i = 0; i < 50; i++) {
+			try {
+				instances = getInstancesWithTimeout(connectedClient, appName);
+				assertNotNull(instances);
 
-                List<InstanceInfo> infos = instances.getInstances();
-                assertEquals(1, infos.size());
+				List<InstanceInfo> infos = instances.getInstances();
+				assertEquals(1, infos.size());
 
-                int passCount = 0;
-                for (InstanceInfo info : infos) {
-                        if (InstanceState.RUNNING.equals(info.getState())) {
-                            passCount++;
-                        }
-                }
-                if (passCount == infos.size()) {
-                    pass = true;
-                    break;
-                }
-            } catch (CloudFoundryException ex) {
-                // ignore (we may get this when staging is still ongoing)
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-        }
-        return pass;
-    }
+				int passCount = 0;
+				for (InstanceInfo info : infos) {
+					if (InstanceState.RUNNING.equals(info.getState())) {
+						passCount++;
+					}
+				}
+				if (passCount == infos.size()) {
+					pass = true;
+					break;
+				}
+			} catch (CloudFoundryException ex) {
+				// ignore (we may get this when staging is still ongoing)
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+		return pass;
+	}
 
-    /*@Test
-    public void getServiceBroker() {
-        assumeTrue(CCNG_USER_IS_ADMIN);
+	/*@Test
+	public void getServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
 
-        CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
-        assertNotNull(broker);
-        assertNotNull(broker.getMeta());
-        assertEquals("haash-broker", broker.getName());
-        assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
-        assertEquals("warreng", broker.getUsername());
-        assertNull(broker.getPassword());
-    }
+		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
+		assertNotNull(broker);
+		assertNotNull(broker.getMeta());
+		assertEquals("haash-broker", broker.getName());
+		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals("warreng", broker.getUsername());
+		assertNull(broker.getPassword());
+	}
 
-    @Test
-    public void createServiceBroker() {
-        assumeTrue(CCNG_USER_IS_ADMIN);
+	@Test
+	public void createServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
 
-        CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "natedogg");
-        connectedClient.createServiceBroker(newBroker);
-    }
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "natedogg");
+		connectedClient.createServiceBroker(newBroker);
+	}
 
-    @Test
-    public void updateServiceBroker() {
-        assumeTrue(CCNG_USER_IS_ADMIN);
+	@Test
+	public void updateServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
 
-        CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
-        connectedClient.updateServiceBroker(newBroker);
-    }*/
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.updateServiceBroker(newBroker);
+	}*/
 
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
 		for (CloudService service : services) {

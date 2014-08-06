@@ -1,4 +1,4 @@
-package com.mattstine.cf.haash.haash;
+package org.cloudfoundry.test.haash.haash;
 
 
 import org.springframework.stereotype.Component;

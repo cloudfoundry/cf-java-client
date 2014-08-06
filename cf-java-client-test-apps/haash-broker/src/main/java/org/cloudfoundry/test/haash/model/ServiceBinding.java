@@ -1,20 +1,21 @@
-package com.mattstine.cf.haash.model;
+package org.cloudfoundry.test.haash.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="service_instances")
+@Table(name = "service_bindings")
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class ServiceInstance {
+public class ServiceBinding {
+
     @Id
     private String id;
+
+    @Column(nullable = false)
+    private String instanceId;
 
     @JsonSerialize
     @JsonProperty("service_id")
@@ -27,14 +28,13 @@ public class ServiceInstance {
     private String planId;
 
     @JsonSerialize
-    @JsonProperty("organization_guid")
+    @JsonProperty("app_guid")
     @Column(nullable = false)
-    private String organizationGuid;
+    private String appGuid;
 
-    @JsonSerialize
-    @JsonProperty("space_guid")
-    @Column(nullable = false)
-    private String spaceGuid;
+    @OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "service_binding_id")
+    private Credentials credentials;
 
     public String getId() {
         return id;
@@ -42,6 +42,14 @@ public class ServiceInstance {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public String getServiceId() {
@@ -60,20 +68,20 @@ public class ServiceInstance {
         this.planId = planId;
     }
 
-    public String getOrganizationGuid() {
-        return organizationGuid;
+    public String getAppGuid() {
+        return appGuid;
     }
 
-    public void setOrganizationGuid(String organizationGuid) {
-        this.organizationGuid = organizationGuid;
+    public void setAppGuid(String appGuid) {
+        this.appGuid = appGuid;
     }
 
-    public String getSpaceGuid() {
-        return spaceGuid;
+    public Credentials getCredentials() {
+        return credentials;
     }
 
-    public void setSpaceGuid(String spaceGuid) {
-        this.spaceGuid = spaceGuid;
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
     @Override
@@ -81,13 +89,13 @@ public class ServiceInstance {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ServiceInstance that = (ServiceInstance) o;
+        ServiceBinding that = (ServiceBinding) o;
 
+        if (!appGuid.equals(that.appGuid)) return false;
         if (!id.equals(that.id)) return false;
-        if (!organizationGuid.equals(that.organizationGuid)) return false;
+        if (!instanceId.equals(that.instanceId)) return false;
         if (!planId.equals(that.planId)) return false;
         if (!serviceId.equals(that.serviceId)) return false;
-        if (!spaceGuid.equals(that.spaceGuid)) return false;
 
         return true;
     }
@@ -95,10 +103,10 @@ public class ServiceInstance {
     @Override
     public int hashCode() {
         int result = id.hashCode();
+        result = 31 * result + instanceId.hashCode();
         result = 31 * result + serviceId.hashCode();
         result = 31 * result + planId.hashCode();
-        result = 31 * result + organizationGuid.hashCode();
-        result = 31 * result + spaceGuid.hashCode();
+        result = 31 * result + appGuid.hashCode();
         return result;
     }
 }

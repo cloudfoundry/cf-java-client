@@ -396,27 +396,27 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getServiceBrokers();
 	}
 
-    public CloudServiceBroker getServiceBroker(String name) {
-        return cc.getServiceBroker(name);
-    }
+	public CloudServiceBroker getServiceBroker(String name) {
+		return cc.getServiceBroker(name);
+	}
 
-    public void createServiceBroker(CloudServiceBroker serviceBroker) {
-        cc.createServiceBroker(serviceBroker);
-    }
+	public void createServiceBroker(CloudServiceBroker serviceBroker) {
+		cc.createServiceBroker(serviceBroker);
+	}
 
-    public void updateServiceBroker(CloudServiceBroker serviceBroker) {
-        cc.updateServiceBroker(serviceBroker);
-    }
+	public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+		cc.updateServiceBroker(serviceBroker);
+	}
 
-    @Override
-    public void deleteServiceBroker(String name) {
-        cc.deleteServiceBroker(name);
-    }
+	@Override
+	public void deleteServiceBroker(String name) {
+		cc.deleteServiceBroker(name);
+	}
 
-    @Override
-    public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
-        cc.updateServicePlanVisibilityForBroker(name, visibility);
-    }
+	@Override
+	public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
+		cc.updateServicePlanVisibilityForBroker(name, visibility);
+	}
 
     public CloudService getService(String service) {
 		return cc.getService(service);
@@ -517,30 +517,29 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public CloudOrganization getOrgByName(String orgName, boolean required){
     	return cc.getOrgByName(orgName, required);
     }
-	
-    public List<CloudQuota> getQuotas() {
-        return cc.getQuotas();
-    }
 
-    public CloudQuota getQuotaByName(String quotaName, boolean required){
-    	return cc.getQuotaByName(quotaName, required);
-    }
-    
-    public void setQuotaToOrg(String orgName, String quotaName) {
-        cc.setQuotaToOrg(orgName, quotaName);
-    }
-    
-    public void createQuota(CloudQuota quota){
-    	cc.createQuota(quota);
-    }
-    
-    public void deleteQuota(String quotaName){
-    	cc.deleteQuota(quotaName);
-    }
-    
-    public void updateQuota(CloudQuota quota, String name) {
+	public List<CloudQuota> getQuotas() {
+		return cc.getQuotas();
+	}
+
+	public CloudQuota getQuotaByName(String quotaName, boolean required) {
+		return cc.getQuotaByName(quotaName, required);
+	}
+
+	public void setQuotaToOrg(String orgName, String quotaName) {
+		cc.setQuotaToOrg(orgName, quotaName);
+	}
+
+	public void createQuota(CloudQuota quota) {
+		cc.createQuota(quota);
+	}
+
+	public void deleteQuota(String quotaName) {
+		cc.deleteQuota(quotaName);
+	}
+
+	public void updateQuota(CloudQuota quota, String name) {
 		cc.updateQuota(quota, name);
-
 	}
 
 }

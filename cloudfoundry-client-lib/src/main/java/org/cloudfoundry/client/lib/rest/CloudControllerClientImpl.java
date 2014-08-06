@@ -759,90 +759,90 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return serviceBrokers;
 	}
 
-    @Override
-    public CloudServiceBroker getServiceBroker(String name) {
-        String urlPath = "/v2/service_brokers?q={q}";
-        Map<String, Object> urlVars = new HashMap<>();
-        urlVars.put("q", "name:" + name);
-        List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-        CloudServiceBroker serviceBroker = null;
-        if (resourceList.size() > 0) {
-            final Map<String, Object> resource = resourceList.get(0);
-            serviceBroker = resourceMapper.mapResource(resource, CloudServiceBroker.class);
-        }
-        return serviceBroker;
-    }
+	@Override
+	public CloudServiceBroker getServiceBroker(String name) {
+		String urlPath = "/v2/service_brokers?q={q}";
+		Map<String, Object> urlVars = new HashMap<>();
+		urlVars.put("q", "name:" + name);
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		CloudServiceBroker serviceBroker = null;
+		if (resourceList.size() > 0) {
+			final Map<String, Object> resource = resourceList.get(0);
+			serviceBroker = resourceMapper.mapResource(resource, CloudServiceBroker.class);
+		}
+		return serviceBroker;
+	}
 
-    @Override
-    public void createServiceBroker(CloudServiceBroker serviceBroker) {
-        Assert.notNull(serviceBroker, "Service Broker must not be null");
-        Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
-        Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
-        Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
-        Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
+	@Override
+	public void createServiceBroker(CloudServiceBroker serviceBroker) {
+		Assert.notNull(serviceBroker, "Service Broker must not be null");
+		Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
+		Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
+		Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
+		Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
 
-        HashMap<String, Object> serviceRequest = new HashMap<>();
-        serviceRequest.put("name", serviceBroker.getName());
-        serviceRequest.put("broker_url", serviceBroker.getUrl());
-        serviceRequest.put("auth_username", serviceBroker.getUsername());
-        serviceRequest.put("auth_password", serviceBroker.getPassword());
-        getRestTemplate().postForObject(getUrl("/v2/service_brokers"), serviceRequest, String.class);
-    }
+		HashMap<String, Object> serviceRequest = new HashMap<>();
+		serviceRequest.put("name", serviceBroker.getName());
+		serviceRequest.put("broker_url", serviceBroker.getUrl());
+		serviceRequest.put("auth_username", serviceBroker.getUsername());
+		serviceRequest.put("auth_password", serviceBroker.getPassword());
+		getRestTemplate().postForObject(getUrl("/v2/service_brokers"), serviceRequest, String.class);
+	}
 
-    @Override
-    public void updateServiceBroker(CloudServiceBroker serviceBroker) {
-        Assert.notNull(serviceBroker, "Service Broker must not be null");
-        Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
-        Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
-        Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
-        Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
+	@Override
+	public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+		Assert.notNull(serviceBroker, "Service Broker must not be null");
+		Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");
+		Assert.notNull(serviceBroker.getUrl(), "Service Broker URL must not be null");
+		Assert.notNull(serviceBroker.getUsername(), "Service Broker username must not be null");
+		Assert.notNull(serviceBroker.getPassword(), "Service Broker password must not be null");
 
-        CloudServiceBroker existingBroker = getServiceBroker(serviceBroker.getName());
-        Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
+		CloudServiceBroker existingBroker = getServiceBroker(serviceBroker.getName());
+		Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
 
-        HashMap<String, Object> serviceRequest = new HashMap<>();
-        serviceRequest.put("name", serviceBroker.getName());
-        serviceRequest.put("broker_url", serviceBroker.getUrl());
-        serviceRequest.put("auth_username", serviceBroker.getUsername());
-        serviceRequest.put("auth_password", serviceBroker.getPassword());
-        getRestTemplate().put(getUrl("/v2/service_brokers/{guid}"), serviceRequest, existingBroker.getMeta().getGuid());
-    }
+		HashMap<String, Object> serviceRequest = new HashMap<>();
+		serviceRequest.put("name", serviceBroker.getName());
+		serviceRequest.put("broker_url", serviceBroker.getUrl());
+		serviceRequest.put("auth_username", serviceBroker.getUsername());
+		serviceRequest.put("auth_password", serviceBroker.getPassword());
+		getRestTemplate().put(getUrl("/v2/service_brokers/{guid}"), serviceRequest, existingBroker.getMeta().getGuid());
+	}
 
-    @Override
-    public void deleteServiceBroker(String name) {
-        CloudServiceBroker existingBroker = getServiceBroker(name);
-        Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
+	@Override
+	public void deleteServiceBroker(String name) {
+		CloudServiceBroker existingBroker = getServiceBroker(name);
+		Assert.notNull(existingBroker, "Cannot update broker if it does not first exist");
 
-        getRestTemplate().delete(getUrl("/v2/service_brokers/{guid}"), existingBroker.getMeta().getGuid());
-    }
+		getRestTemplate().delete(getUrl("/v2/service_brokers/{guid}"), existingBroker.getMeta().getGuid());
+	}
 
-    @Override
-    public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
-        CloudServiceBroker broker = getServiceBroker(name);
+	@Override
+	public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
+		CloudServiceBroker broker = getServiceBroker(name);
 
-        String urlPath = "/v2/services?q={q}";
-        Map<String, Object> urlVars = new HashMap<>();
-        urlVars.put("q", "service_broker_guid:" + broker.getMeta().getGuid());
-        List<Map<String, Object>> serviceResourceList = getAllResources(urlPath, urlVars);
+		String urlPath = "/v2/services?q={q}";
+		Map<String, Object> urlVars = new HashMap<>();
+		urlVars.put("q", "service_broker_guid:" + broker.getMeta().getGuid());
+		List<Map<String, Object>> serviceResourceList = getAllResources(urlPath, urlVars);
 
-        for (Map<String, Object> serviceResource : serviceResourceList) {
-            Map<String, Object> metadata = (Map<String, Object>) serviceResource.get("metadata");
-            String serviceGuid = (String) metadata.get("guid");
+		for (Map<String, Object> serviceResource : serviceResourceList) {
+			Map<String, Object> metadata = (Map<String, Object>) serviceResource.get("metadata");
+			String serviceGuid = (String) metadata.get("guid");
 
-            urlPath = "/v2/service_plans?q={q}";
-            urlVars = new HashMap<>();
-            urlVars.put("q", "service_guid:" + serviceGuid);
-            List<Map<String, Object>> planResourceList = getAllResources(urlPath, urlVars);
-            for (Map<String, Object> planResource : planResourceList) {
-                metadata = (Map<String, Object>) planResource.get("metadata");
-                String planGuid = (String) metadata.get("guid");
+			urlPath = "/v2/service_plans?q={q}";
+			urlVars = new HashMap<>();
+			urlVars.put("q", "service_guid:" + serviceGuid);
+			List<Map<String, Object>> planResourceList = getAllResources(urlPath, urlVars);
+			for (Map<String, Object> planResource : planResourceList) {
+				metadata = (Map<String, Object>) planResource.get("metadata");
+				String planGuid = (String) metadata.get("guid");
 
-                HashMap<String, Object> planUpdateRequest = new HashMap<>();
-                planUpdateRequest.put("public", visibility);
-                getRestTemplate().put(getUrl("/v2/service_plans/{guid}"), planUpdateRequest, planGuid);
-            }
-        }
-    }
+				HashMap<String, Object> planUpdateRequest = new HashMap<>();
+				planUpdateRequest.put("public", visibility);
+				getRestTemplate().put(getUrl("/v2/service_plans/{guid}"), planUpdateRequest, planGuid);
+			}
+		}
+	}
 
 	@Override
 	public List<CloudApplication> getApplications() {

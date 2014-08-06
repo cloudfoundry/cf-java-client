@@ -1,6 +1,6 @@
-package com.mattstine.cf.haash.controller;
+package org.cloudfoundry.test.haash.controller;
 
-import com.mattstine.cf.haash.haash.HaashService;
+import org.cloudfoundry.test.haash.haash.HaashService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
