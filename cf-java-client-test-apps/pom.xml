@@ -11,6 +11,7 @@
 	<modules>
 		<module>non-ascii-file-name</module>
 		<module>simple-spring-app</module>
+		<module>haash-broker</module>
 	</modules>
 
 	<build>

@@ -22,6 +22,7 @@ package org.cloudfoundry.client.lib.domain;
 public class CloudOrganization extends CloudEntity {
 
 	private boolean billingEnabled = false;
+	private CloudQuota quota;
 
 	public CloudOrganization(Meta meta, String name) {
 		this(meta, name, false);
@@ -32,7 +33,21 @@ public class CloudOrganization extends CloudEntity {
 		this.billingEnabled = billingEnabled;
 	}
 
+	public CloudOrganization(Meta meta, String name, CloudQuota quota, boolean billingEnabled) {
+		super(meta, name);
+		this.quota=quota;
+		this.billingEnabled = billingEnabled;
+	}
+
 	public boolean isBillingEnabled() {
 		return billingEnabled;
+	}
+
+	public CloudQuota getQuota() {
+		return quota;
+	}
+
+	public void setQuota(CloudQuota quota) {
+		this.quota = quota;
 	}
 }

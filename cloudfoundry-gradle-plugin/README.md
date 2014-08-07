@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.3'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.4'
     }
 }
 
@@ -54,6 +54,7 @@ The plugin adds the following tasks:
 * cfUnsetEnv - Deletes environment variables from an application
 * cfMap - Maps a URI to an application
 * cfUnmap - Unmaps a URI from application
+* cfDeleteOrphanedRoutes - Deletes all routes that are not assigned to any applications
 * cfLogin - Logs in and saves authentication tokens
 * cfLogout - Logs out and removes authentication tokens
 
@@ -336,6 +337,11 @@ Variants that are not currently mapped to the canonical `my-app.cfapps.io` route
 All running variants that are not mapped to the canonical route are deleted. 
 
 # History
+
+## Changes in 1.0.4
+
+* Added `cfDeleteOrphanedRoutes` goal
+* Added a `currentVariant` property to expose the variant being used in a zero-downtime deployment  
 
 ## Changes in 1.0.3
 

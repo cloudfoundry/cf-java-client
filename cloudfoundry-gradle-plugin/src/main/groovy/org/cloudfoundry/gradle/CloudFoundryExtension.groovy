@@ -50,6 +50,7 @@ class CloudFoundryExtension {
     Map<String, String> env = [:]
 
     List<String> variants = []
+    String currentVariant = ""
 
     // plugin configuration
     Integer appStartupTimeout

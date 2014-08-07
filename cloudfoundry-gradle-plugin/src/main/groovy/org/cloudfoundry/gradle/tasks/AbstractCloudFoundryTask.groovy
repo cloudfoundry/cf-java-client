@@ -36,7 +36,6 @@ import org.gradle.api.GradleException
 abstract class AbstractCloudFoundryTask extends DefaultTask {
     protected CloudFoundryOperations client
     protected WarningBypassingResponseErrorHandler errorHandler
-    protected String currentVariantSuffix
 
     AbstractCloudFoundryTask() {
         super()
@@ -217,11 +216,11 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     protected void applyVariantSuffix(String variant) {
-        currentVariantSuffix = variant
+        project.cloudfoundry.currentVariant = variant
     }
 
     protected void removeVariantSuffix() {
-        currentVariantSuffix = null
+        project.cloudfoundry.currentVariant = ""
     }
 
     // extension accessors
@@ -246,9 +245,13 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         propertyOrExtension('password')
     }
 
+    String getRawApplication() {
+        propertyOrExtension('application')
+    }
+
     String getApplication() {
         def appName = propertyOrExtension('application')
-        appName + (currentVariantSuffix ?: "")
+        appName + (project.cloudfoundry.currentVariant ?: "")
     }
 
     String getCommand() {
@@ -296,13 +299,13 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
                 domain = client.defaultDomain.name
             }
             if (!hosts && !host) {
-                host = application
+                host = rawApplication
             }
         }
 
         def allUris = []
 
-        if (!currentVariantSuffix) {
+        if (!project.cloudfoundry.currentVariant) {
             allUris += uris.collect { it.toString() }
             if (uri) {
                 allUris << uri.toString()
@@ -310,10 +313,10 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
         if (domain) {
             if (host) {
-                allUris << "${host}${(currentVariantSuffix ?: "")}.${domain}".toString()
+                allUris << "${host}${project.cloudfoundry.currentVariant}.${domain}".toString()
             }
             if (hosts) {
-                allUris += hosts.collect { "${it}${(currentVariantSuffix ?: "")}.${domain}".toString() }
+                allUris += hosts.collect { "${it}${project.cloudfoundry.currentVariant}.${domain}".toString() }
             }
         }
 
@@ -331,7 +334,9 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     Map<String, String> getEnv() {
-        project.cloudfoundry.env.collectEntries { key, value -> [(key.toString()): value.toString()] }
+        project.cloudfoundry.env.collectEntries { key, value ->
+            [(key.toString()): (value instanceof Closure ? value.call().toString() : value.toString())]
+        }
     }
 
     List<String> getVariants() {

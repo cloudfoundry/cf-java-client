@@ -20,6 +20,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -83,6 +84,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudStack.class) {
 			return (T) mapStackResource(resource);
 		}
+		if (targetClass == CloudQuota.class) {
+            return (T) mapQuotaResource(resource);
+        }
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
 	}
@@ -96,10 +100,34 @@ public class CloudEntityResourceMapper {
 		return new CloudSpace(getMeta(resource), getNameOfResource(resource), organization);
 	}
 
-	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {
-		Boolean billingEnabled = getEntityAttribute(resource, "billing_enabled", Boolean.class);
-		return new CloudOrganization(getMeta(resource), getNameOfResource(resource), billingEnabled);
-	}
+	private CloudOrganization mapOrganizationResource(
+            Map<String, Object> resource) {
+        Boolean billingEnabled = getEntityAttribute(resource,
+                "billing_enabled", Boolean.class);
+		Map<String, Object> quotaDefinition = getEmbeddedResource(resource,
+                "quota_definition");
+		CloudQuota quota = null;
+		if (quotaDefinition != null) {
+			quota = mapQuotaResource(quotaDefinition);
+        }
+        return new CloudOrganization(getMeta(resource),
+                getNameOfResource(resource), quota,billingEnabled);
+    }
+
+    private CloudQuota mapQuotaResource(Map<String, Object> resource) {
+        Boolean nonBasicServicesAllowed = getEntityAttribute(resource,
+                "non_basic_services_allowed", Boolean.class);
+        int totalServices = getEntityAttribute(resource, "total_services",
+                Integer.class);
+        int totalRoutes = getEntityAttribute(resource, "total_routes",
+                Integer.class);
+        long memoryLimit = getEntityAttribute(resource, "memory_limit",
+                Long.class);
+
+        return new CloudQuota(getMeta(resource), getNameOfResource(resource),
+                nonBasicServicesAllowed, totalServices, totalRoutes,
+                memoryLimit);
+    }
 
 	private CloudDomain mapDomainResource(Map<String, Object> resource) {
 		@SuppressWarnings("unchecked")
@@ -268,6 +296,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == String.class) {
 			return (T) String.valueOf(attributeValue);
 		}
+		if (targetClass == Long.class) {
+            return (T) Long.valueOf(String.valueOf(attributeValue));
+        }
 		if (targetClass == Integer.class || targetClass == Boolean.class || targetClass == Map.class || targetClass == List.class) {
 			return (T) attributeValue;
 		}

@@ -31,6 +31,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -54,6 +55,7 @@ import org.springframework.web.client.ResponseErrorHandler;
  * @author Jennifer Hickey
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Alexander Orlov
  */
 public class CloudFoundryClient implements CloudFoundryOperations {
 
@@ -245,6 +247,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createUserProvidedService(service, credentials);
 	}
 
+	@Override
+	public List<CloudRoute> deleteOrphanedRoutes() {
+    	return cc.deleteOrphanedRoutes();
+	}
+
 	public void uploadApplication(String appName, String file) throws IOException {
 		cc.uploadApplication(appName, new File(file), null);
 	}
@@ -389,7 +396,29 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getServiceBrokers();
 	}
 
-	public CloudService getService(String service) {
+	public CloudServiceBroker getServiceBroker(String name) {
+		return cc.getServiceBroker(name);
+	}
+
+	public void createServiceBroker(CloudServiceBroker serviceBroker) {
+		cc.createServiceBroker(serviceBroker);
+	}
+
+	public void updateServiceBroker(CloudServiceBroker serviceBroker) {
+		cc.updateServiceBroker(serviceBroker);
+	}
+
+	@Override
+	public void deleteServiceBroker(String name) {
+		cc.deleteServiceBroker(name);
+	}
+
+	@Override
+	public void updateServicePlanVisibilityForBroker(String name, boolean visibility) {
+		cc.updateServicePlanVisibilityForBroker(name, visibility);
+	}
+
+    public CloudService getService(String service) {
 		return cc.getService(service);
 	}
 
@@ -483,6 +512,34 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void unRegisterRestLogListener(RestLogCallback callBack) {
 		cc.unRegisterRestLogListener(callBack);
+	}
+	
+	public CloudOrganization getOrgByName(String orgName, boolean required){
+    	return cc.getOrgByName(orgName, required);
+    }
+
+	public List<CloudQuota> getQuotas() {
+		return cc.getQuotas();
+	}
+
+	public CloudQuota getQuotaByName(String quotaName, boolean required) {
+		return cc.getQuotaByName(quotaName, required);
+	}
+
+	public void setQuotaToOrg(String orgName, String quotaName) {
+		cc.setQuotaToOrg(orgName, quotaName);
+	}
+
+	public void createQuota(CloudQuota quota) {
+		cc.createQuota(quota);
+	}
+
+	public void deleteQuota(String quotaName) {
+		cc.deleteQuota(quotaName);
+	}
+
+	public void updateQuota(CloudQuota quota, String name) {
+		cc.updateQuota(quota, name);
 	}
 
 }

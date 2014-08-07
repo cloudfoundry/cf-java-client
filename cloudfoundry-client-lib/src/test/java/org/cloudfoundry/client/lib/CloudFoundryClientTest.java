@@ -88,6 +88,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 
 /**
  * Note that this integration tests rely on other methods working correctly, so these tests aren't
@@ -149,6 +150,8 @@ public class CloudFoundryClientTest {
 	private static final int DEFAULT_DISK = 1024; // MB
 
 	private static final int FIVE_MINUTES = 300 * 1000;
+	
+	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
 
 	private static boolean tearDownComplete = false;
 
@@ -994,9 +997,7 @@ public class CloudFoundryClientTest {
 		Thread.sleep(10000); // let's have some time to get some logs generated
 		Map<String, String> logs = connectedClient.getLogs(appName);
 		assertNotNull(logs);
-		assertTrue(logs.size() > 2);
-		assertNotNull(logs.get("logs/stdout.log"));
-		assertNotNull(logs.get("logs/env.log"));
+		assertTrue(logs.size() > 0);
 	}
 	
 	@Test
@@ -1169,6 +1170,97 @@ public class CloudFoundryClientTest {
 		assertNotNull(broker0.getUrl());
 		assertNotNull(broker0.getUsername());
 	}
+
+	@Test
+	public void serviceBrokerLifecycle() throws IOException {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		createAndUploadAndStartSampleServiceBrokerApp("haash-broker");
+
+		boolean pass = ensureApplicationRunning("haash-broker");
+		assertTrue("haash-broker failed to start", pass);
+
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.createServiceBroker(newBroker);
+
+		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
+		assertNotNull(broker);
+		assertNotNull(broker.getMeta());
+		assertEquals("haash-broker", broker.getName());
+		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals("warreng", broker.getUsername());
+		assertNull(broker.getPassword());
+
+		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.updateServiceBroker(newBroker);
+
+		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", true);
+		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", false);
+
+		connectedClient.deleteServiceBroker("haash-broker");
+	}
+
+	private boolean ensureApplicationRunning(String appName) {
+		InstancesInfo instances;
+		boolean pass = false;
+		for (int i = 0; i < 50; i++) {
+			try {
+				instances = getInstancesWithTimeout(connectedClient, appName);
+				assertNotNull(instances);
+
+				List<InstanceInfo> infos = instances.getInstances();
+				assertEquals(1, infos.size());
+
+				int passCount = 0;
+				for (InstanceInfo info : infos) {
+					if (InstanceState.RUNNING.equals(info.getState())) {
+						passCount++;
+					}
+				}
+				if (passCount == infos.size()) {
+					pass = true;
+					break;
+				}
+			} catch (CloudFoundryException ex) {
+				// ignore (we may get this when staging is still ongoing)
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+		}
+		return pass;
+	}
+
+	/*@Test
+	public void getServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
+		assertNotNull(broker);
+		assertNotNull(broker.getMeta());
+		assertEquals("haash-broker", broker.getName());
+		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals("warreng", broker.getUsername());
+		assertNull(broker.getPassword());
+	}
+
+	@Test
+	public void createServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "natedogg");
+		connectedClient.createServiceBroker(newBroker);
+	}
+
+	@Test
+	public void updateServiceBroker() {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		connectedClient.updateServiceBroker(newBroker);
+	}*/
 
 	private void assertServiceMatching(CloudService expectedService, List<CloudService> services) {
 		for (CloudService service : services) {
@@ -1361,6 +1453,29 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void deleteOrphanedRoutes() {
+		connectedClient.addDomain(TEST_DOMAIN);
+		connectedClient.addRoute("unbound_route", TEST_DOMAIN);
+
+		List<CloudRoute> routes = connectedClient.getRoutes(TEST_DOMAIN);
+		CloudRoute unboundRoute = getRouteWithHost("unbound_route", routes);
+		assertNotNull(unboundRoute);
+		assertEquals(0, unboundRoute.getAppsUsingRoute());
+
+		List<CloudRoute> deletedRoutes = connectedClient.deleteOrphanedRoutes();
+		assertNull(getRouteWithHost("unbound_route", connectedClient.getRoutes(TEST_DOMAIN)));
+
+		assertTrue(deletedRoutes.size() > 0);
+		boolean found = false;
+		for (CloudRoute route : deletedRoutes) {
+			if (route.getHost().equals("unbound_route")) {
+				found = true;
+			}
+		}
+		assertTrue(found);
+	}
+
+	@Test
 	public void appsWithRoutesAreCounted() throws IOException {
 		String appName = namespacedAppName("my_route3");
 		CloudApplication app = createAndUploadSimpleTestApp(appName);
@@ -1501,6 +1616,61 @@ public class CloudFoundryClientTest {
 		assertNotNull(startingInfo.getStagingFile());
 		assertNotNull(firstLine);
 		assertTrue(firstLine.length() > 0);
+	}
+
+	@Test
+	public void quotasAvailable() throws Exception {
+		List<CloudQuota> quotas = connectedClient.getQuotas();
+		assertNotNull(quotas);
+		assertTrue(quotas.size() > 0);
+	}
+
+	@Test
+	public void CRUDQuota() throws Exception {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// create quota
+		CloudQuota cloudQuota = new CloudQuota(null, CCNG_QUOTA_NAME_TEST);
+		connectedClient.createQuota(cloudQuota);
+
+		CloudQuota afterCreate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+		assertNotNull(afterCreate);
+
+		// change quota mem to 10240
+		afterCreate.setMemoryLimit(10240);
+		connectedClient.updateQuota(afterCreate, CCNG_QUOTA_NAME_TEST);
+		CloudQuota afterUpdate = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, true);
+		assertEquals(10240, afterUpdate.getMemoryLimit());
+
+		// delete the quota
+		connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST);
+		CloudQuota afterDelete = connectedClient.getQuotaByName(CCNG_QUOTA_NAME_TEST, false);
+		assertNull(afterDelete);
+	}
+
+	@Test
+	public void setQuotaToOrg() throws Exception {
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// get old quota to restore after test
+		CloudOrganization org = connectedClient.getOrgByName(CCNG_USER_ORG, true);
+		CloudQuota oldQuota = org.getQuota();
+
+		// create and set test_quota to org
+		CloudQuota cloudQuota = new CloudQuota(null, CCNG_QUOTA_NAME_TEST);
+		connectedClient.createQuota(cloudQuota);
+		connectedClient.setQuotaToOrg(CCNG_USER_ORG, CCNG_QUOTA_NAME_TEST);
+
+		// get the bound quota of org
+		org = connectedClient.getOrgByName(CCNG_USER_ORG, true);
+		CloudQuota newQuota = org.getQuota();
+
+		// bound quota should be equals to test_quota
+		assertEquals(CCNG_QUOTA_NAME_TEST, newQuota.getName());
+
+		// restore org to default quota
+		connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
+		connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST);
 	}
 
 	//
@@ -1735,6 +1905,14 @@ public class CloudFoundryClientTest {
 		connectedClient.uploadApplication(appName, explodedDir.getCanonicalPath());
 		return connectedClient.getApplication(appName);
 	}
+
+    private CloudApplication createAndUploadAndStartSampleServiceBrokerApp(String appName) throws IOException {
+        createSpringApplication(appName);
+        File jar = SampleProjects.sampleServiceBrokerApp();
+        connectedClient.uploadApplication(appName, jar.getCanonicalPath());
+        connectedClient.startApplication(appName);
+        return connectedClient.getApplication(appName);
+    }
 
 	private CloudApplication createAndUploadAndStartSimpleSpringApp(String appName) throws IOException {
 		createAndUploadSimpleSpringApp(appName);

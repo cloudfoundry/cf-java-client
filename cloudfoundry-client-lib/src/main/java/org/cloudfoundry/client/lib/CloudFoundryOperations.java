@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -49,6 +50,7 @@ import org.springframework.web.client.ResponseErrorHandler;
  * @author Jennifer Hickey
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Alexander Orlov
  */
 public interface CloudFoundryOperations {
 
@@ -190,6 +192,11 @@ public interface CloudFoundryOperations {
 	 * @param credentials the user-provided service credentials
 	 */
 	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+
+	/**
+	 * Delete routes that do not have any application which is assigned to them.
+	 */
+	List<CloudRoute> deleteOrphanedRoutes();
 
 	/**
 	 * Upload an application.
@@ -508,6 +515,46 @@ public interface CloudFoundryOperations {
 	List<CloudServiceBroker> getServiceBrokers();
 
 	/**
+	 * Get a service broker.
+	 *
+	 * @param name the service broker name
+	 * @return the service broker
+	 */
+	CloudServiceBroker getServiceBroker(String name);
+
+	/**
+	 * Create a service broker.
+	 *
+	 * @param serviceBroker cloud service broker info
+	 */
+	void createServiceBroker(CloudServiceBroker serviceBroker);
+
+	/**
+	 * Update a service broker (unchanged forces catalog refresh).
+	 *
+	 * @param serviceBroker cloud service broker info
+	 */
+	void updateServiceBroker(CloudServiceBroker serviceBroker);
+
+	/**
+	 * Delete a service broker.
+	 *
+	 * @param name the service broker name
+	 */
+	void deleteServiceBroker(String name);
+
+
+	/**
+	 * Service plans are private by default when a service broker's catalog is
+	 * fetched/updated. This method will update the visibility of all plans for
+	 * a broker to either public or private.
+	 *
+	 * @param name       the service broker name
+	 * @param visibility true for public, false for private
+	 */
+	void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
+	/**
 	 * Associate (provision) a service with an application.
 	 *
 	 * @param appName the application name
@@ -647,4 +694,51 @@ public interface CloudFoundryOperations {
 	 * @param callBack the callback to be un-registered
 	 */
 	void unRegisterRestLogListener(RestLogCallback callBack);
+	
+	/**
+	 * Get quota by name
+	 *
+	 * @param quotaName
+	 * @param required
+	 * @return CloudQuota instance
+	 */
+	CloudQuota getQuotaByName(String quotaName, boolean required);
+
+
+	/**
+	 * Set quota to organization
+	 *
+	 * @param orgName
+	 * @param quotaName
+	 */
+	void setQuotaToOrg(String orgName, String quotaName);
+
+	/**
+	 * Create quota
+	 *
+	 * @param quota
+	 */
+	void createQuota(CloudQuota quota);
+
+	/**
+	 * Delete quota by name
+	 *
+	 * @param quotaName
+	 */
+	void deleteQuota(String quotaName);
+
+	/**
+	 * Get quota definitions
+	 *
+	 * @return List<CloudQuota>
+	 */
+	List<CloudQuota> getQuotas();
+
+	/**
+	 * Update Quota definition
+	 *
+	 * @param quota
+	 * @param name
+	 */
+	void updateQuota(CloudQuota quota, String name);
 }

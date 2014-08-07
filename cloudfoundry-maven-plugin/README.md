@@ -12,7 +12,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </plugin>
 ~~~
 
@@ -28,7 +28,7 @@ Following is a typical configuration example, which uses most of the available c
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>cf-maven-plugin</artifactId>
-                <version>1.0.3</version>
+                <version>1.0.4</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
@@ -107,6 +107,7 @@ The following Maven *goals* are available for the Cloud Foundry Maven Plugin:
     <tr><th align="left">cf:delete-services</th>  <td>Delete services defined in the pom.</td></tr>
     <tr><th align="left">cf:bind-services</th>    <td>Bind services to an application.</td></tr>
     <tr><th align="left">cf:unbind-services</th>  <td>Unbind services from an application.</td></tr>
+    <tr><th align="left">cf:delete-orphaned-routes</th>  <td>Delete all routes that are not bound to any application.</td></tr>
     <tr><th align="left">cf:login</th>            <td>Log in to the target Cloud Foundry service and save access tokens.</td></tr>
     <tr><th align="left">cf:logout</th>           <td>Log out of the target Cloud Foundry service and remove access tokens.</td></tr>
 </table>
@@ -261,6 +262,10 @@ Some Cloud Foundry deployments, such as those deployed using Pivotal CF, use a s
 To instruct the Cloud Foundry Maven plugin to accept self-signed certificates from the Cloud Foundry target endpoint, add `<trustSelfSignedCerts>true</trustSelfSignedCerts>` to the plugin configuration block.
 
 # History
+
+## Changes from version 1.0.3 to 1.0.4
+
+* Added `cf:delete-orphaned-routes`
 
 ## Changes from version 1.0.2 to 1.0.3
 

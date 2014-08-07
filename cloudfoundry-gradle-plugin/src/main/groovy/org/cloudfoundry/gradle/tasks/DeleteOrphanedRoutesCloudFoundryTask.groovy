@@ -15,34 +15,25 @@
 
 package org.cloudfoundry.gradle.tasks
 
+import org.cloudfoundry.client.lib.domain.CloudRoute
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Tasks used to push an application to a Cloud Foundry cloud.
- *
- * @author Cedric Champeau
- * @author Scott Frederick
+ * Task used to delete orphaned routes.
  */
-@Mixin([ServiceCloudFoundryHelper, PushCloudFoundryHelper, StartCloudFoundryHelper])
-class PushCloudFoundryTask extends AbstractCloudFoundryTask {
-    PushCloudFoundryTask() {
+class DeleteOrphanedRoutesCloudFoundryTask extends AbstractCloudFoundryTask {
+    DeleteOrphanedRoutesCloudFoundryTask() {
         super()
-        description = 'Pushes an application'
+        description = 'Deletes all orphaned routes'
     }
 
     @TaskAction
-    void push() {
+    void deleteOrphanedRoutes() {
         withCloudFoundryClient {
-            validateApplicationConfig()
-
-            createServices(serviceInfos)
-
-            createApplication()
-
-            uploadApplication()
-
-            if (startApp) {
-                startApplication()
+            log "Getting routes"
+            List<CloudRoute> routes = client.deleteOrphanedRoutes()
+            routes.each { route ->
+                log "Deleted route ${route.name}"
             }
         }
     }
