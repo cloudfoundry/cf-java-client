@@ -12,3 +12,4 @@ build/
 Servers
 /*.DS_Store
 /*.iml
+!cloudfoundry-client-lib/src/test/resources/apps/app-with-scm-metadata/*.svn
