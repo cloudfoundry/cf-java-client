@@ -26,6 +26,9 @@ package org.cloudfoundry.client.lib.domain;
  *
  */
 public class Staging {
+    
+    public static final Integer DEFAULT_HEALTH_CHECK_TIMEOUT = 60;
+    
 	private String command;
 	private String buildpackUrl;
 	private String stack;

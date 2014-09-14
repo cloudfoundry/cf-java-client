@@ -1510,9 +1510,37 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public void updateApplicationStaging(String appName, Staging staging) {
 		UUID appId = getAppId(appName);
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
-		addStagingToRequest(staging, appRequest);
+		addUpdatedStagingToRequest(staging, appRequest);
 		getRestTemplate().put(getUrl("/v2/apps/{guid}"), appRequest, appId);
 	}
+
+    private void addUpdatedStagingToRequest(Staging staging, HashMap<String, Object> appRequest) {
+        // When a attribute is null, we need to have the Cloud Controller treat it at null.
+        // With the current Jackson configuration, null values in Maps aren't being sent.
+        // The Cloud Controller treats an empty string as null so we exploit that.
+        if(staging.getBuildpackUrl() == null){
+            appRequest.put("buildpack", "");
+        }else{
+            appRequest.put("buildpack", staging.getBuildpackUrl());
+        }
+        if(staging.getCommand() == null){
+            appRequest.put("command", "");
+        }else{
+            appRequest.put("command", staging.getCommand());
+        }
+        if(staging.getStack() == null){
+            appRequest.put("stack_guid", "");
+        }else{
+            appRequest.put("stack_guid", getStack(staging.getStack()).getMeta().getGuid());
+        }
+        if(staging.getHealthCheckTimeout() == null){
+            // But an empty string is not a valid number so we explicitly set the timeout
+            // to the default. This isn't same as a null value for timeout, but is close. 
+            appRequest.put("health_check_timeout", Staging.DEFAULT_HEALTH_CHECK_TIMEOUT);
+        }else{
+            appRequest.put("health_check_timeout", staging.getHealthCheckTimeout());
+        }
+    }
 
 	@Override
 	public void updateApplicationUris(String appName, List<String> uris) {
