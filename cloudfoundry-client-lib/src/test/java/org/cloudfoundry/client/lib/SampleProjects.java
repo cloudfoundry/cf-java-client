@@ -139,6 +139,49 @@ public class SampleProjects {
     public static File springTravelUnpacked(TemporaryFolder temporaryFolder) throws IOException {
         return explodeTestApp(springTravel(), temporaryFolder);
     }
+    
+    
+    public static File appWithScmMetaData(TemporaryFolder temporaryFolder) throws IOException {
+        File appDirectory = new File(TEST_APP_DIR + "/app-with-scm-metadata");
+        File tmpAppDirectory = copyAppToTempDir(temporaryFolder, appDirectory);
+        addExampleGitRepo(tmpAppDirectory);
+        
+        // For the scenario of having a repo in a subdirectory
+        File subProject = new File(tmpAppDirectory, "sub-project");
+        subProject.mkdir();
+        addExampleGitRepo(subProject);
+        
+        return tmpAppDirectory;
+    }
+
+    private static File copyAppToTempDir(TemporaryFolder temporaryFolder,
+            File file) throws IOException {
+        File tmpDir = temporaryFolder.newFolder(file.getName());
+        if (tmpDir.exists()) {
+            FileUtils.forceDelete(tmpDir);
+        }
+        tmpDir.mkdirs();
+        FileUtils.copyDirectory(file, tmpDir);
+        return tmpDir;
+    }
+
+    private static void addExampleGitRepo(File directory) throws IOException {
+        // You can't add a Git repository to a Git repo so we have to create 
+        // files that look like a repo on the fly.
+        File repo =  new File(directory, ".git");
+        repo.mkdir();
+        new File(repo, "HEAD").createNewFile();
+        new File(repo, "branches").mkdir();
+        new File(repo, "config").createNewFile();
+        new File(repo, "description").createNewFile();
+        new File(repo, "hooks").mkdir();
+        new File(repo, "index").createNewFile();
+        new File(repo, "info").mkdir();
+        new File(repo, "logs").mkdir();
+        new File(repo, "objects").mkdir();
+        new File(repo, "packed-refs").createNewFile();
+        new File(repo, "refs").mkdir();
+    }
 
     private static File explodeTestApp(File file, TemporaryFolder temporaryFolder) throws IOException {
         File unpackDir = temporaryFolder.newFolder(file.getName());

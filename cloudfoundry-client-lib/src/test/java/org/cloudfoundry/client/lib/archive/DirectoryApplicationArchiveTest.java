@@ -16,10 +16,15 @@
 
 package org.cloudfoundry.client.lib.archive;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.cloudfoundry.client.lib.SampleProjects;
+import org.cloudfoundry.client.lib.archive.ApplicationArchive.Entry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,5 +60,55 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("File must reference a directory");
         new DirectoryApplicationArchive(temporaryFolder.newFile("noadirectory"));
+    }
+    
+    @Test
+    public void archiveShouldNotIncludeScmMetadataDirectories() throws IOException{
+      ApplicationArchive archive = new DirectoryApplicationArchive(SampleProjects.appWithScmMetaData(temporaryFolder));
+      assertNoScmDirectories(archive);
+      assertContainsAppFiles(archive);
+    }
+
+    private void assertNoScmDirectories(ApplicationArchive archive) {
+        boolean containsGit = false;
+        boolean containsSvn = false;
+        for (Entry entry : archive.getEntries()) {
+            if (entry.getName().contains(".svn/")) {
+                containsSvn = true;
+            }
+            if (entry.getName().contains(".git/")) {
+                containsGit = true;
+            }
+        }
+        assertFalse("The archive should not contain Git metadata", containsGit);
+        assertFalse("The archive should not contain SVN metadata", containsSvn);
+    }
+
+    private void assertContainsAppFiles(ApplicationArchive archive) {
+        int fileCount = 0;
+        boolean containsApp = false;
+        boolean containsPackage = false;
+        boolean containsSubproject = false;
+        boolean containsExample = false;
+        for (Entry entry : archive.getEntries()) {
+            fileCount++;
+            if (entry.getName().equals("app.js")) {
+                containsApp = true;
+            }
+            if (entry.getName().equals("package.json")) {
+                containsPackage = true;
+            }
+            if (entry.getName().equals("sub-project/")) {
+                containsSubproject = true;
+            }
+            if (entry.getName().equals("sub-project/example.txt")) {
+                containsExample = true;
+            }
+        }
+        assertEquals("The archive should not contain any extraneous files", 4, fileCount);
+        assertTrue("The archive should contain 'app.js'", containsApp);
+        assertTrue("The archive should contain 'package.json'", containsPackage);
+        assertTrue("The archive should contain 'sub-project/'", containsSubproject);
+        assertTrue("The archive should contain 'sub-project/example.txt'", containsExample);
     }
 }
