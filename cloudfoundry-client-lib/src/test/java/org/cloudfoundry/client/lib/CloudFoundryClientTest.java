@@ -672,6 +672,29 @@ public class CloudFoundryClientTest {
 		assertEquals(originalUris, app.getUris());
 	}
 
+    @Test
+    public void updateApplicationStaging() throws IOException {
+        String appName = namespacedAppName("updateStaging");
+        
+        // Given an app with custom Staging
+        Staging staging = new Staging("java -cp . com.gopivotal.SampleClass", "https://github.com/cloudfoundry/java-buildpack.git", "lucid64", 100);
+        createTestApp(appName, null, staging);
+        CloudApplication app = connectedClient.getApplication(appName);
+        assertEquals(staging.getBuildpackUrl(), app.getStaging().getBuildpackUrl());
+        assertEquals(staging.getCommand(), app.getStaging().getCommand());
+        assertEquals(staging.getHealthCheckTimeout(), app.getStaging().getHealthCheckTimeout());
+        
+        // When staging is updated with defaults
+        Staging updatedStaging = new Staging();
+        connectedClient.updateApplicationStaging(appName, updatedStaging);
+        
+        // Then it is reflected in the app
+        app = connectedClient.getApplication(appName);
+        assertEquals(updatedStaging.getBuildpackUrl(), app.getStaging().getBuildpackUrl());
+        assertEquals(updatedStaging.getCommand(), app.getStaging().getCommand());
+        assertEquals(Staging.DEFAULT_HEALTH_CHECK_TIMEOUT, app.getStaging().getHealthCheckTimeout());
+        assertEquals("lucid64", app.getStaging().getStack());
+    }
 
 	//
 	// Advanced Application tests
