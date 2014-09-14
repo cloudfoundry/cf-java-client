@@ -50,11 +50,19 @@ public class DirectoryApplicationArchive implements ApplicationArchive {
 
     private void collectEntries(List<Entry> entries, File directory) {
         for (File child : directory.listFiles()) {
-            entries.add(new EntryAdapter(child));
-            if (child.isDirectory()) {
-                collectEntries(entries, child);
+            if(!exclude(child)){
+                entries.add(new EntryAdapter(child));
+                if (child.isDirectory()) {
+                    collectEntries(entries, child);
+                }
             }
         }
+    }
+
+    private boolean exclude(File file) {
+        return file.getName().startsWith(".git") || 
+               file.getName().startsWith(".svn") || 
+               file.getName().startsWith(".darcs");
     }
 
     public String getFilename() {
