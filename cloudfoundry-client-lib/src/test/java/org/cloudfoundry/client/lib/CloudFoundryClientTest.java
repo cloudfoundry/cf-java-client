@@ -111,6 +111,10 @@ public class CloudFoundryClientTest {
 	private static final String CCNG_API_PROXY_HOST = System.getProperty("http.proxyHost", null);
 
 	private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
+	
+	private static final String CCNG_API_PROXY_USER = System.getProperty("http.proxyUsername", null);
+
+	private static final String CCNG_API_PROXY_PASSWD = System.getProperty("http.proxyPassword", null);
 
 	private static final boolean CCNG_API_SSL = Boolean.getBoolean("ccng.ssl");
 
@@ -190,7 +194,11 @@ public class CloudFoundryClientTest {
 		}
 
 		if (CCNG_API_PROXY_HOST != null) {
-			httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+			if (CCNG_API_PROXY_USER != null) {
+			    httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT, true, CCNG_API_PROXY_USER, CCNG_API_PROXY_PASSWD);
+			} else {
+			    httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+			}
 		}
 		if (!SKIP_INJVM_PROXY) {
 			startInJvmProxy();
