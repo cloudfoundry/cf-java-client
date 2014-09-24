@@ -20,7 +20,7 @@ package org.cloudfoundry.client.lib;
 /**
  * Class that encapsulates http proxy information
  *
- * @author: Thomas Risberg
+ * @author Thomas Risberg
  */
 public class HttpProxyConfiguration {
 
@@ -29,22 +29,22 @@ public class HttpProxyConfiguration {
 	private int proxyPort;
 
 	private boolean authRequired;
-	
+
 	private String username;
-	
+
 	private String password;
 
 	public HttpProxyConfiguration(String proxyHost, int proxyPort) {
 		this(proxyHost, proxyPort, false, null, null);
 	}
-	
+
 	public HttpProxyConfiguration(String proxyHost, int proxyPort,
 		boolean authRequired, String username, String password) {
-	    this.proxyHost = proxyHost;
-	    this.proxyPort = proxyPort;
-	    this.authRequired = authRequired;
-	    this.username = username;
-	    this.password = password;
+		this.proxyHost = proxyHost;
+		this.proxyPort = proxyPort;
+		this.authRequired = authRequired;
+		this.username = username;
+		this.password = password;
 	}
 
 	public String getProxyHost() {
@@ -58,11 +58,11 @@ public class HttpProxyConfiguration {
 	public boolean isAuthRequired() {
 	    return authRequired;
 	}
-	
+
 	public String getUsername() {
 	    return username;
 	}
-	
+
 	public String getPassword() {
 	    return password;
 	}

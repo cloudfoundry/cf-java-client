@@ -195,9 +195,9 @@ public class CloudFoundryClientTest {
 
 		if (CCNG_API_PROXY_HOST != null) {
 			if (CCNG_API_PROXY_USER != null) {
-			    httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT, true, CCNG_API_PROXY_USER, CCNG_API_PROXY_PASSWD);
+				httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT, true, CCNG_API_PROXY_USER, CCNG_API_PROXY_PASSWD);
 			} else {
-			    httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
+				httpProxyConfiguration = new HttpProxyConfiguration(CCNG_API_PROXY_HOST, CCNG_API_PROXY_PORT);
 			}
 		}
 		if (!SKIP_INJVM_PROXY) {
@@ -896,27 +896,27 @@ public class CloudFoundryClientTest {
 
 	@Test
 	public void uploadAppWithNonUnsubscribingCallback() throws IOException {
-	    String appName = namespacedAppName("upload-non-unsubscribing-callback");
-	    createSpringApplication(appName);
-        File file = SampleProjects.springTravel();
-        NonUnsubscribingUploadStatusCallback callback = new NonUnsubscribingUploadStatusCallback();
-        connectedClient.uploadApplication(appName, file, callback);
-        CloudApplication env = connectedClient.getApplication(appName);
-        assertEquals(CloudApplication.AppState.STOPPED, env.getState());
-        assertTrue(callback.progressCount > 1); // must have taken at least 10 seconds
+		String appName = namespacedAppName("upload-non-unsubscribing-callback");
+		createSpringApplication(appName);
+		File file = SampleProjects.springTravel();
+		NonUnsubscribingUploadStatusCallback callback = new NonUnsubscribingUploadStatusCallback();
+		connectedClient.uploadApplication(appName, file, callback);
+		CloudApplication env = connectedClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STOPPED, env.getState());
+		assertTrue(callback.progressCount > 1); // must have taken at least 10 seconds
 	}
-	
-    @Test
-    public void uploadAppWithUnsubscribingCallback() throws IOException {
-        String appName = namespacedAppName("upload-unsubscribing-callback");
-        createSpringApplication(appName);
-        File file = SampleProjects.springTravel();
-        UnsubscribingUploadStatusCallback callback = new UnsubscribingUploadStatusCallback();
-        connectedClient.uploadApplication(appName, file, callback);
-        CloudApplication env = connectedClient.getApplication(appName);
-        assertEquals(CloudApplication.AppState.STOPPED, env.getState());
-        assertTrue(callback.progressCount == 1);
-    }
+
+	@Test
+	public void uploadAppWithUnsubscribingCallback() throws IOException {
+		String appName = namespacedAppName("upload-unsubscribing-callback");
+		createSpringApplication(appName);
+		File file = SampleProjects.springTravel();
+		UnsubscribingUploadStatusCallback callback = new UnsubscribingUploadStatusCallback();
+		connectedClient.uploadApplication(appName, file, callback);
+		CloudApplication env = connectedClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STOPPED, env.getState());
+		assertTrue(callback.progressCount == 1);
+	}
 
     @Test
 	public void uploadSinatraApp() throws IOException {
