@@ -15,14 +15,11 @@
  */
 package org.cloudfoundry.maven;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.cloudfoundry.maven.common.Assert;
@@ -74,7 +71,7 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("healthCheckTimeout", getHealthCheckTimeout() != null ? String.valueOf(getHealthCheckTimeout()) : NOT_AVAILABLE);
 		parameterMap.put("url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
 		parameterMap.put("urls", getUrls().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(getUrls()));
-		parameterMap.put("path", getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE);
+		parameterMap.put("path", getArtifactPath());
 
 		parameterMap.put("env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
 		parameterMap.put("services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
@@ -82,8 +79,8 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 
 		parameterMap.put("server", getServer());
 		parameterMap.put("target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);
-		parameterMap.put("org", getOrg() != null ? getOrg() : NOT_AVAILABLE);
-		parameterMap.put("space", getSpace() != null ? getSpace() : NOT_AVAILABLE);
+		parameterMap.put("org", getOrg(false) != null ? getOrg() : NOT_AVAILABLE);
+		parameterMap.put("space", getSpace(false) != null ? getSpace() : NOT_AVAILABLE);
 		parameterMap.put("username", getUsername() != null ? getUsername() : NOT_AVAILABLE);
 		parameterMap.put("password", getPassword() != null ? CommonUtils.maskPassword(getPassword()) : NOT_AVAILABLE);
 
@@ -94,8 +91,6 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
-
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append("\n" + UiUtils.HORIZONTAL_LINE);
@@ -134,4 +129,14 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 
 		getLog().info(sb);
 	}
+
+    private String getArtifactPath() {
+        String path;
+        try {
+            path = getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE;
+        } catch(MojoExecutionException ex){
+            path = NOT_AVAILABLE;
+        }
+        return path;
+    }
 }
