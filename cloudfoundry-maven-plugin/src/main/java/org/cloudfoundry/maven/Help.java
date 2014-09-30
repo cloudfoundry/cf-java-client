@@ -19,12 +19,9 @@ import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.CommonUtils;
-import org.cloudfoundry.maven.common.SystemProperties;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
@@ -57,7 +54,6 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	private Map<String, String> getParameterMap() throws MojoExecutionException {
@@ -130,13 +126,13 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		getLog().info(sb);
 	}
 
-    private String getArtifactPath() {
-        String path;
-        try {
-            path = getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE;
-        } catch(MojoExecutionException ex){
-            path = NOT_AVAILABLE;
-        }
-        return path;
-    }
+	private String getArtifactPath() {
+		String path;
+		try {
+			path = getPath() != null ? getPath().getAbsolutePath() : NOT_AVAILABLE;
+		} catch (MojoExecutionException ex) {
+			path = NOT_AVAILABLE;
+		}
+		return path;
+	}
 }
