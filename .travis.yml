@@ -2,38 +2,18 @@
 language: java
 
 before_install:
- - ./bin/install-protoc.sh
+ - ./bin/install-protoc-apt.sh
 
 before_script:
 - protoc --version
 
-script: mvn install -DskipTests=true -B -V && cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
-  -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE -Dsurefire.useFile=false
+script: mvn install -DskipTests=true -B -V --quiet && cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
+  -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE -Dsurefire.useFile=false --quiet
 
 env:
   global:
-  - secure: ! 'CEnlffjCZBVHaO9yXS6Q1cWdorIovujdzAeRuAXBD9MFGnqWxJkACRyfTC2o
-
-      kTamcocisznrI1IPcQajLvNBQhVjgut/vV1Dpneuy1/xySmhNG3bF+CV7GQf
-
-      /3FrS4yd7Uylpv9SMd3VM+EClDGQ3mR7OT4216+Q+vyE5Lh09WA='
-  - secure: ! 'nzRzsqc+3dN9ts10T9SFveaW/hWmzByi81QyMn5LhbmGjU95D3fibgyd/aU3
-
-      OQPCTR2mTh/Ri7ROb5Bne+6elqPCu99CFoML3QWOSm8cHt2bbwbbbtzDtTC1
-
-      ZEIyXjUrz5wcvrXWMbYTbxEPVDrHUvK0vjE9gjl2pTK87fd5v+8='
-  - secure: ! 'QDCvbb1T+DwyoLhoK1omwhRXBaHz/iYMCcI/miKlExwjCqHsPmnoy4HGe0vq
-
-      Ej+Nm6WraYPkDC7GGmt3i7tNOgMFssxTm0qh62zzIlf1oQC/FQuPK4rQL+D/
-
-      BOZJB7rFBcko9ONKNTubUfomk3NLuf65/S+GbsSWshXohon4JWU='
-  - secure: ! 'gGknileQIFfu2598k93xb/t4EvMvauthat+jVZAqztbnxOopEBgjoSixQG7R
-
-      DAHs6YbbzoJZYuFH0XyyxtNwJ/kYbN3pBn43bIoK0NNZw7cPwew8zkjbBDcw
-
-      Hqg8Qt88FYbZWMepMZre0eN8tMJyjO9YqlpnLX0YFVRJD28wga0='
-  - secure: ! 'oEsQwUVp6SCxI0jpPYpYH7cRW/M8GtOFLEuU5ZKlgXANeU8t1AoKeFHIMKww
-
-      5vLs5J+AqNYyGODeSMZ7EwgmGRVqzHckQUKfMNzkwyFN4Uj0nmRwGXnzSKk6
-
-      OgG+XFxHZ/RKlCUSwKYwxdMbTon6MlTBCjxDmQIPk/HfoRUVGOc='
+  - secure: ! 'CEnlffjCZBVHaO9yXS6Q1cWdorIovujdzAeRuAXBD9MFGnqWxJkACRyfTC2okTamcocisznrI1IPcQajLvNBQhVjgut/vV1Dpneuy1/xySmhNG3bF+CV7GQf/3FrS4yd7Uylpv9SMd3VM+EClDGQ3mR7OT4216+Q+vyE5Lh09WA='
+  - secure: ! 'nzRzsqc+3dN9ts10T9SFveaW/hWmzByi81QyMn5LhbmGjU95D3fibgyd/aU3OQPCTR2mTh/Ri7ROb5Bne+6elqPCu99CFoML3QWOSm8cHt2bbwbbbtzDtTC1ZEIyXjUrz5wcvrXWMbYTbxEPVDrHUvK0vjE9gjl2pTK87fd5v+8='
+  - secure: ! 'QDCvbb1T+DwyoLhoK1omwhRXBaHz/iYMCcI/miKlExwjCqHsPmnoy4HGe0vqEj+Nm6WraYPkDC7GGmt3i7tNOgMFssxTm0qh62zzIlf1oQC/FQuPK4rQL+D/BOZJB7rFBcko9ONKNTubUfomk3NLuf65/S+GbsSWshXohon4JWU='
+  - secure: ! 'gGknileQIFfu2598k93xb/t4EvMvauthat+jVZAqztbnxOopEBgjoSixQG7RDAHs6YbbzoJZYuFH0XyyxtNwJ/kYbN3pBn43bIoK0NNZw7cPwew8zkjbBDcwHqg8Qt88FYbZWMepMZre0eN8tMJyjO9YqlpnLX0YFVRJD28wga0='
+  - secure: ! 'oEsQwUVp6SCxI0jpPYpYH7cRW/M8GtOFLEuU5ZKlgXANeU8t1AoKeFHIMKww5vLs5J+AqNYyGODeSMZ7EwgmGRVqzHckQUKfMNzkwyFN4Uj0nmRwGXnzSKk6OgG+XFxHZ/RKlCUSwKYwxdMbTon6MlTBCjxDmQIPk/HfoRUVGOc='

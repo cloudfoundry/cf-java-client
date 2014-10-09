@@ -441,13 +441,26 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 
 	}
 
+
 	public String getOrg() {
-		Assert.notNull(org, "The org is not set.");
+		return getOrg(true);
+	}
+
+	protected String getOrg(boolean assertExistence) {
+		if (assertExistence) {
+			Assert.notNull(org, "The org is not set.");
+		}
 		return org;
 	}
 
 	public String getSpace() {
-		Assert.notNull(space, "The space is not set.");
+		return getSpace(true);
+	}
+
+	protected String getSpace(boolean assertExistence) {
+		if (assertExistence) {
+			Assert.notNull(space, "The space is not set.");
+		}
 		return space;
 	}
 
