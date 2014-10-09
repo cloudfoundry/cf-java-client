@@ -184,8 +184,8 @@ file can be placed in a user's home directory (e.g. `~/.gradle/gradle.properties
 An example `gradle.properties` file might look like this:
 
 ~~~
-cf.username='user@example.com'
-cf.password='s3cr3t'
+cfUsername='user@example.com'
+cfPassword='s3cr3t'
 ~~~
 
 ### Using saved tokens
