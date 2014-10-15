@@ -5,10 +5,12 @@ import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTN
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientImpl;
@@ -58,6 +60,8 @@ public class RestUtil {
 			HttpHost proxy = new HttpHost(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort());
 			RequestConfig requestConfig = RequestConfig.custom().setProxy(proxy).build();
 			httpClientBuilder.setDefaultRequestConfig(requestConfig);
+			HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+			httpClientBuilder.setRoutePlanner(routePlanner);
 		}
 
 		HttpClient httpClient = httpClientBuilder.build();
