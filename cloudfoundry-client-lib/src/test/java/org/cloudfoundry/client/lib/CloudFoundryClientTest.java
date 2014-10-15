@@ -40,6 +40,7 @@ import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -88,7 +89,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
 
 /**
  * Note that this integration tests rely on other methods working correctly, so these tests aren't
@@ -272,20 +272,20 @@ public class CloudFoundryClientTest {
 		}
 		assertTrue(SocketDestHelper.isSocketRestrictionFlagActive());
 
-		RestTemplate restTemplate = new RestTemplate();
+		RestUtil restUtil = new RestUtil();
+		RestTemplate restTemplateNoProxy = restUtil.createRestTemplate(null, CCNG_API_SSL);
 
 		// When called directly without a proxy, expect an exception to be thrown due to byteman rules
-		assertNetworkCallFails(restTemplate, new HttpComponentsClientHttpRequestFactory());
+		assertNetworkCallFails(restTemplateNoProxy, new HttpComponentsClientHttpRequestFactory());
 		// Repeat that with different request factory used in the code as this exercises different byteman rules
-		assertNetworkCallFails(restTemplate, new SimpleClientHttpRequestFactory());
+		assertNetworkCallFails(restTemplateNoProxy, new SimpleClientHttpRequestFactory());
 		// And with the actual one used by RestUtil, without a proxy configured
-		assertNetworkCallFails(restTemplate, new RestUtil().createRequestFactory(null, false));
+		assertNetworkCallFails(restTemplateNoProxy, restUtil.createRequestFactory(null, CCNG_API_SSL));
 
 		// Test with the in-JVM proxy configured
 		HttpProxyConfiguration localProxy = new HttpProxyConfiguration("127.0.0.1", inJvmProxyPort);
-		ClientHttpRequestFactory requestFactory = new RestUtil().createRequestFactory(localProxy, CCNG_API_SSL);
+		RestTemplate restTemplate = restUtil.createRestTemplate(localProxy, CCNG_API_SSL);
 
-		restTemplate.setRequestFactory(requestFactory);
 		restTemplate.execute(CCNG_API_URL + "/info", HttpMethod.GET, null, null);
 
 		// then executes fine, and the jetty proxy indeed received one request
