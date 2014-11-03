@@ -15,12 +15,16 @@
  */
 package org.cloudfoundry.maven;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -89,6 +93,18 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		assertEquals(1, uris.size());
 		assertEquals("custom.expliciturl.com", uris.get(0));
 
+	}
+	
+	public void testGetUrlSpecifiedRandomWord() throws Exception {
+	  Push mojo = setupMojo();
+
+	  doReturn("custom-${randomWord}.expliciturl.com").when(mojo).getCommandlineProperty(SystemProperties.URL);
+
+	  List<String> uris = mojo.getAllUris();
+	  assertEquals(1, uris.size());
+	  Pattern p = Pattern.compile("^custom-[a-zA-Z]{5,5}.expliciturl.com$");
+	  Matcher m = p.matcher(uris.get(0));
+	  assertTrue(m.matches());
 	}
 
 	public void testGetNoStart() throws Exception {
