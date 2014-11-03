@@ -93,8 +93,9 @@ public class OauthClient {
 	}
 
 	public String getAuthorizationHeader() {
-		if (token != null) {
-			return token.getTokenType() + " " + token.getValue();
+		OAuth2AccessToken accessToken = getToken();
+		if (accessToken != null) {
+			return accessToken.getTokenType() + " " + accessToken.getValue();
 		}
 		return null;
 	}

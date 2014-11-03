@@ -2,11 +2,19 @@ package org.cloudfoundry.client.lib.util;
 
 import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
 
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
@@ -23,12 +31,6 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Some helper utilities for creating classes used for the REST support.
@@ -56,8 +58,15 @@ public class RestUtil {
 
 		if (httpProxyConfiguration != null) {
 			HttpHost proxy = new HttpHost(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort());
-			RequestConfig requestConfig = RequestConfig.custom().setProxy(proxy).build();
-			httpClientBuilder.setDefaultRequestConfig(requestConfig);
+			httpClientBuilder.setProxy(proxy);
+
+			if (httpProxyConfiguration.isAuthRequired()) {
+				BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+				credentialsProvider.setCredentials(
+						new AuthScope(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort()),
+						new UsernamePasswordCredentials(httpProxyConfiguration.getUsername(), httpProxyConfiguration.getPassword()));
+				httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+			}
 		}
 
 		HttpClient httpClient = httpClientBuilder.build();

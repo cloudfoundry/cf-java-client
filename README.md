@@ -47,13 +47,9 @@ The `cloudfoundry-client-lib` uses Protocol Buffers to get logs from the Cloud F
 component. A `protoc` Protocol Buffer compiler is required at build time to compile message specifications. `protoc` version
 2.5.0 is required.
 
-On Linux with `apt`, run the [install-protoc.sh](./bin/install-protoc.sh) script in this repository to compile `protoc` 2.5.0 from source.
+On Linux with `apt`, run the [install-protoc-apt.sh](./bin/install-protoc-apt.sh) script in this repository to compile `protoc` 2.5.0 from source.
 
-On OSX with [homebrew](http://brew.sh/), install `protoc` with this command:
-
-```
-$ brew install protobuf
-```
+On OSX with [homebrew](http://brew.sh/), run the [install-protoc-brew.sh](./bin/install-protoc-brew.sh) script to install `protoc` 2.5.0. This script unlinks any newer `protobuf` installed by homebrew and installs the older 2.5.0 version.
 
 On Windows, download the [`protoc` binary](https://code.google.com/p/protobuf/downloads/detail?name=protoc-2.5.0-win32.zip),
 unzip it, and put `protoc.exe` in the path.
