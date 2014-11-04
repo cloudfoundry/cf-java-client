@@ -51,6 +51,7 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
+import org.cloudfoundry.client.lib.domain.ApplicationLogs;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -224,16 +225,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public List<ApplicationLog> getRecentLogs(String appName) {
-		AccumulatingApplicationLogListener listener = new AccumulatingApplicationLogListener();
-		streamLoggregatorLogs(appName, listener, true);
-		synchronized (listener) {
-			try {
-				listener.wait();
-			} catch (InterruptedException e) {
-				// return any captured logs
-			}
-		}
-		return listener.getLogs();
+		UUID appId = getAppId(appName);
+
+		String endpoint = getInfo().getLoggregatorEndpoint();
+		String uri = loggregatorClient.getRecentHttpEndpoint(endpoint);
+
+		ApplicationLogs logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
+
+		return logs;
 	}
 
 	@Override

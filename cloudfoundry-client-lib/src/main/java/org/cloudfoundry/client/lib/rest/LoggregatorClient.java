@@ -15,6 +15,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -23,7 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class LoggregatorClient {
-	private static final UriTemplate loggregatorUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
+	private static final UriTemplate loggregatorStreamUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
+	private static final UriTemplate loggregatorRecentUriTemplate = new UriTemplate("{scheme}://{host}/recent");
 
 	private boolean trustSelfSignedCerts;
 
@@ -31,10 +33,33 @@ public class LoggregatorClient {
 		this.trustSelfSignedCerts = trustSelfSignedCerts;
 	}
 
+	public String getRecentHttpEndpoint(String endpoint) {
+		URI uri = stringToUri(endpoint);
+
+		String scheme = uri.getScheme();
+		String host = uri.getHost();
+
+		if ("wss".equals(scheme)) {
+			scheme = "https";
+		} else {
+			scheme = "http";
+		}
+
+		return loggregatorRecentUriTemplate.expand(scheme, host).toString();
+	}
+
+	private URI stringToUri(String endPoint) {
+		try {
+			return new URI(endPoint);
+		} catch (URISyntaxException e) {
+			throw new CloudOperationException("Unable to parse Loggregator endpoint " + endPoint);
+		}
+	}
+
 	public StreamingLogTokenImpl connectToLoggregator(String endpoint, String mode, UUID appId,
 	                                                  ApplicationLogListener listener,
 	                                                  ClientEndpointConfig.Configurator configurator) {
-		URI loggregatorUri = loggregatorUriTemplate.expand(endpoint, mode, appId);
+		URI loggregatorUri = loggregatorStreamUriTemplate.expand(endpoint, mode, appId);
 
 		try {
 			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
