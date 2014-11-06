@@ -90,7 +90,6 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -412,16 +411,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 							.setReadTimeout(defaultSocketTimeout);
 				}
 			}
-		}
-	}
-
-	public static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
-		@Override
-		protected String getFilename(Object part) {
-			if (part instanceof UploadApplicationPayload) {
-				return ((UploadApplicationPayload) part).getArchive().getFilename();
-			}
-			return super.getFilename(part);
 		}
 	}
 

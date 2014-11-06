@@ -13,6 +13,11 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * An HttpMessageConverter for parsing and constructing ApplicationLog entries from a Loggregator response.
+ *
+ * @author Scott Frederick
+ */
 public class LoggregatorHttpMessageConverter extends AbstractHttpMessageConverter<ApplicationLogs> {
 
 	private LoggregatorMessageParser messageParser = new LoggregatorMessageParser();
@@ -24,6 +29,11 @@ public class LoggregatorHttpMessageConverter extends AbstractHttpMessageConverte
 	@Override
 	protected boolean supports(Class<?> clazz) {
 		return ApplicationLogs.class.equals(clazz);
+	}
+
+	@Override
+	public boolean canWrite(MediaType mediaType) {
+		return false;
 	}
 
 	@Override

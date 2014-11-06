@@ -19,10 +19,11 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
-import org.cloudfoundry.client.lib.rest.CloudControllerClientImpl;
 import org.cloudfoundry.client.lib.rest.CloudControllerResponseErrorHandler;
+import org.cloudfoundry.client.lib.rest.CloudFoundryFormHttpMessageConverter;
 import org.cloudfoundry.client.lib.rest.LoggingRestTemplate;
 import org.cloudfoundry.client.lib.rest.LoggregatorHttpMessageConverter;
+import org.cloudfoundry.client.lib.rest.UploadApplicationPayloadHttpMessageConverter;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -97,7 +98,7 @@ public class RestUtil {
 	}
 
 	private FormHttpMessageConverter getFormHttpMessageConverter() {
-		FormHttpMessageConverter formPartsMessageConverter = new CloudControllerClientImpl.CloudFoundryFormHttpMessageConverter();
+		FormHttpMessageConverter formPartsMessageConverter = new CloudFoundryFormHttpMessageConverter();
 		formPartsMessageConverter.setPartConverters(getFormPartsMessageConverters());
 		return formPartsMessageConverter;
 	}

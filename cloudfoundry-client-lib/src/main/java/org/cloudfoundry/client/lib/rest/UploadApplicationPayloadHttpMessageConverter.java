@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib.util;
+package org.cloudfoundry.client.lib.rest;
 
 import java.io.IOException;
 import java.util.Collections;
