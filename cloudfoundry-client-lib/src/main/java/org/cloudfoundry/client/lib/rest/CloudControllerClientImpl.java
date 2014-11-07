@@ -231,6 +231,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		ApplicationLogs logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
 
+		Collections.sort(logs);
+
 		return logs;
 	}
 
