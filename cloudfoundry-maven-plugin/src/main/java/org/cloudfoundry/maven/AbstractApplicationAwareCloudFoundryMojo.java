@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -32,18 +33,16 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.cloudfoundry.client.lib.CloudFoundryClient;
+import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.maven.common.Assert;
-import org.cloudfoundry.client.lib.CloudFoundryClient;
-
-import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudService;
-
 import org.cloudfoundry.maven.common.CommonUtils;
 import org.cloudfoundry.maven.common.DefaultConstants;
 import org.cloudfoundry.maven.common.SystemProperties;
@@ -250,7 +249,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	/**
-	 * If the application name was specified via the command line ({@link SystemProperties})
+	 * If the URL was specified via the command line ({@link SystemProperties})
 	 * then that property is used. Otherwise return the appname.
 	 *
 	 * @return Returns the Cloud Foundry application url.
@@ -726,18 +725,32 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		}
 		return count;
 	}
+	
+	private List<String> replaceRandomWords(List<String> uris) {
+	  List<String> finalUris = new ArrayList<String>(uris.size());
+	  for(String uri : uris) {
+	    if(uri.contains("${randomWord}")) {
+	      finalUris.add(uri.replace("${randomWord}", RandomStringUtils.randomAlphabetic(5)));
+	    } else {
+	      finalUris.add(uri);
+	    }
+	  }
+	  return finalUris;
+	}
 
 	protected List<String> getAllUris() throws MojoExecutionException {
 		Assert.configurationUrls(getUrl(), getUrls());
-
+		List<String> uris;
 		if (getUrl() != null) {
-			return Arrays.asList(getUrl());
+			uris = Arrays.asList(getUrl());
 		} else if (!getUrls().isEmpty()) {
-			return getUrls();
+			uris = getUrls();
 		} else {
 			String defaultUri = getAppname() + "." + getClient().getDefaultDomain().getName();
-			return Arrays.asList(defaultUri);
+			uris = Arrays.asList(defaultUri);
 		}
+		
+	  return replaceRandomWords(uris);
 	}
 
 	private long getAppStartupExpiry() {

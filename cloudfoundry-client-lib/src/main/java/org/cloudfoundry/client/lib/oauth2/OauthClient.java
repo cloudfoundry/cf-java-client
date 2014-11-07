@@ -148,11 +148,7 @@ public class OauthClient {
 	}
 
 	private AccessTokenRequest createAccessTokenRequest(String username, String password) {
-		Map<String, String> parameters = new LinkedHashMap<String, String>();
-		parameters.put("credentials", String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password));
 		AccessTokenRequest request = new DefaultAccessTokenRequest();
-		request.setAll(parameters);
-
 		return request;
 	}
 

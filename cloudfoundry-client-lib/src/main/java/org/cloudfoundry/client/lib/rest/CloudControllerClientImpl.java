@@ -51,6 +51,7 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
+import org.cloudfoundry.client.lib.domain.ApplicationLogs;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
@@ -89,7 +90,6 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -224,16 +224,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public List<ApplicationLog> getRecentLogs(String appName) {
-		AccumulatingApplicationLogListener listener = new AccumulatingApplicationLogListener();
-		streamLoggregatorLogs(appName, listener, true);
-		synchronized (listener) {
-			try {
-				listener.wait();
-			} catch (InterruptedException e) {
-				// return any captured logs
-			}
-		}
-		return listener.getLogs();
+		UUID appId = getAppId(appName);
+
+		String endpoint = getInfo().getLoggregatorEndpoint();
+		String uri = loggregatorClient.getRecentHttpEndpoint(endpoint);
+
+		ApplicationLogs logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
+
+		Collections.sort(logs);
+
+		return logs;
 	}
 
 	@Override
@@ -409,16 +409,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 							.setReadTimeout(defaultSocketTimeout);
 				}
 			}
-		}
-	}
-
-	public static class CloudFoundryFormHttpMessageConverter extends FormHttpMessageConverter {
-		@Override
-		protected String getFilename(Object part) {
-			if (part instanceof UploadApplicationPayload) {
-				return ((UploadApplicationPayload) part).getArchive().getFilename();
-			}
-			return super.getFilename(part);
 		}
 	}
 

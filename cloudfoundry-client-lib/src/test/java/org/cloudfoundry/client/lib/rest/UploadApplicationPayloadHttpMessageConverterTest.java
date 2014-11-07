@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.lib;
+package org.cloudfoundry.client.lib.rest;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -28,7 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
-import org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter;
+import org.cloudfoundry.client.lib.rest.UploadApplicationPayloadHttpMessageConverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -39,7 +39,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 
 /**
- * Tests for {@link org.cloudfoundry.client.lib.util.UploadApplicationPayloadHttpMessageConverter}.
+ * Tests for {@link org.cloudfoundry.client.lib.rest.UploadApplicationPayloadHttpMessageConverter}.
  *
  * @author Phillip Webb
  */

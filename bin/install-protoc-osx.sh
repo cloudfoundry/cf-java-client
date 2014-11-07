@@ -1,6 +1,5 @@
 #!/bin/sh
 VERSION=2.6.1
-sudo apt-get -y install build-essential
 wget https://github.com/google/protobuf/releases/download/$VERSION/protobuf-$VERSION.tar.gz
 tar xvfz protobuf-$VERSION.tar.gz
 cd protobuf-$VERSION

@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,120 +33,129 @@ import org.springframework.util.Assert;
  */
 public class DynamicZipInputStream extends DynamicInputStream {
 
-    private static final int BUFFER_SIZE = 4096;
+	private static final int BUFFER_SIZE = 4096;
 
-    private static InputStream EMPTY_STREAM = new InputStream() {
+	private static InputStream EMPTY_STREAM = new InputStream() {
 
-        @Override
-        public int read() throws IOException {
-            return -1;
-        }
-    };
+		@Override
+		public int read() throws IOException {
+			return -1;
+		}
+	};
 
-    /**
-     * The underlying ZIP stream.
-     */
-    private ZipOutputStream zipStream;
+	/**
+	 * The underlying ZIP stream.
+	 */
+	private ZipOutputStream zipStream;
 
-    /**
-     * Entries to be written.
-     */
-    private Iterator<Entry> entries;
+	/**
+	 * Entries to be written.
+	 */
+	private Iterator<Entry> entries;
 
-    /**
-     * The current entry {@link InputStream}.
-     */
-    private InputStream entryStream = EMPTY_STREAM;
+	/**
+	 * The current entry {@link InputStream}.
+	 */
+	private InputStream entryStream = EMPTY_STREAM;
 
-    /**
-     * Buffer for reading stream contents.
-     */
-    private byte[] buffer = new byte[BUFFER_SIZE];
+	/**
+	 * Buffer for reading stream contents.
+	 */
+	private byte[] buffer = new byte[BUFFER_SIZE];
 
-    /**
-    * File counter used for detecting empty archives.
-    */
-    private long fileCount = 0;
+	/**
+	 * File counter used for detecting empty archives.
+	 */
+	private long fileCount = 0;
 
-    /**
-     * Create a new {@link DynamicZipInputStream} instance.
-     *
-     * @param entries the zip entries that should be written to the stream
-     */
-    public DynamicZipInputStream(Iterable<Entry> entries) {
-        Assert.notNull(entries, "Entries must not be null");
-        this.zipStream = new ZipOutputStream(getOutputStream());
-        this.entries = entries.iterator();
-    }
+	private final int utcOffset;
 
-    @Override
-    protected boolean writeMoreData() throws IOException {
+	/**
+	 * Create a new {@link DynamicZipInputStream} instance.
+	 *
+	 * @param entries the zip entries that should be written to the stream
+	 */
+	public DynamicZipInputStream(Iterable<Entry> entries) {
+		Assert.notNull(entries, "Entries must not be null");
+		this.zipStream = new ZipOutputStream(getOutputStream());
+		this.entries = entries.iterator();
+		this.utcOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
+	}
 
-        // Write data from the current stream if possible
-        int count = entryStream.read(buffer);
-        if (count != -1) {
-            zipStream.write(buffer, 0, count);
-            return true;
-        }
+	@Override
+	protected boolean writeMoreData() throws IOException {
 
-        // Close any open entry
-        if (entryStream != EMPTY_STREAM) {
-            zipStream.closeEntry();
-            entryStream.close();
-            entryStream = EMPTY_STREAM;
-        }
+		// Write data from the current stream if possible
+		int count = entryStream.read(buffer);
+		if (count != -1) {
+			zipStream.write(buffer, 0, count);
+			return true;
+		}
 
-        // Move to the next entry if there is one (no need to write data as returning true causes another call)
-        if (entries.hasNext()) {
-            fileCount++;
-            Entry entry = entries.next();
-            zipStream.putNextEntry(new ZipEntry(entry.getName()));
-            entryStream = entry.getInputStream();
-            if(entryStream == null) {
-                entryStream = EMPTY_STREAM;
-            }
-            return true;
-        }
+		// Close any open entry
+		if (entryStream != EMPTY_STREAM) {
+			zipStream.closeEntry();
+			entryStream.close();
+			entryStream = EMPTY_STREAM;
+		}
 
-        // If no files were added to the archive add an empty one
-        if (fileCount == 0) {
-            fileCount++;
-            zipStream.putNextEntry(new ZipEntry("__empty__"));
-            entryStream = EMPTY_STREAM;
-            return true;
-         }
+		// Move to the next entry if there is one (no need to write data as returning true causes another call)
+		if (entries.hasNext()) {
+			fileCount++;
+			Entry entry = entries.next();
+			zipStream.putNextEntry(createZipEntry(entry.getName()));
+			entryStream = entry.getInputStream();
+			if (entryStream == null) {
+				entryStream = EMPTY_STREAM;
+			}
+			return true;
+		}
 
-        // No more entries, close and flush the stream
-        zipStream.flush();
-        zipStream.close();
-        return false;
-    }
+		// If no files were added to the archive add an empty one
+		if (fileCount == 0) {
+			fileCount++;
+			zipStream.putNextEntry(new ZipEntry("__empty__"));
+			entryStream = EMPTY_STREAM;
+			return true;
+		}
 
-    @Override
-    public void close() throws IOException {
-        super.close();
-        zipStream.close();
-    }
+		// No more entries, close and flush the stream
+		zipStream.flush();
+		zipStream.close();
+		return false;
+	}
 
-    /**
-     * Represents a single entry from a ZIP files.
-     */
-    public static interface Entry {
+	@Override
+	public void close() throws IOException {
+		super.close();
+		zipStream.close();
+	}
 
-        /**
-         * Returns the name of the entry complete with path, equivalent to {@link ZipEntry#getName()}.
-         *
-         * @return the name of the entry
-         */
-        String getName();
+	private ZipEntry createZipEntry(String name) {
+		ZipEntry zipEntry = new ZipEntry(name);
+		zipEntry.setTime(System.currentTimeMillis() - utcOffset);
+		return zipEntry;
+	}
 
-        /**
-         * Opens a new stream that can be used to read the contents of the entry. The steam will be closed by the
-         * caller.
-         *
-         * @return the entry input stream
-         * @throws IOException
-         */
-        InputStream getInputStream() throws IOException;
-    }
+	/**
+	 * Represents a single entry from a ZIP files.
+	 */
+	public static interface Entry {
+
+		/**
+		 * Returns the name of the entry complete with path, equivalent to {@link ZipEntry#getName()}.
+		 *
+		 * @return the name of the entry
+		 */
+		String getName();
+
+		/**
+		 * Opens a new stream that can be used to read the contents of the entry. The steam will be closed by the
+		 * caller.
+		 *
+		 * @return the entry input stream
+		 * @throws IOException
+		 */
+		InputStream getInputStream() throws IOException;
+	}
 }

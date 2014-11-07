@@ -45,13 +45,13 @@ The `cloudfoundry-gradle-plugin` component is built with [Gradle](http://www.gra
 
 The `cloudfoundry-client-lib` uses Protocol Buffers to get logs from the Cloud Foundry [loggregator](https://github.com/cloudfoundry/loggregator)
 component. A `protoc` Protocol Buffer compiler is required at build time to compile message specifications. `protoc` version
-2.5.0 is required.
+2.6.1 is required.
 
-On Linux with `apt`, run the [install-protoc-apt.sh](./bin/install-protoc-apt.sh) script in this repository to compile `protoc` 2.5.0 from source.
+On Linux with `apt`, run the [install-protoc-apt.sh](./bin/install-protoc-apt.sh) script in this repository to compile `protoc` from source.
 
-On OSX with [homebrew](http://brew.sh/), run the [install-protoc-brew.sh](./bin/install-protoc-brew.sh) script to install `protoc` 2.5.0. This script unlinks any newer `protobuf` installed by homebrew and installs the older 2.5.0 version.
+On OSX, run the [install-protoc-osx.sh](./bin/install-protoc-osx.sh) script to install `protoc`. Alternatively you can install `protobuf` using [homebrew](http://brew.sh/) if homebrew supports the appropriate version.
 
-On Windows, download the [`protoc` binary](https://code.google.com/p/protobuf/downloads/detail?name=protoc-2.5.0-win32.zip),
+On Windows, download the `protoc` binary zip file from the [releases page](https://github.com/google/protobuf/releases),
 unzip it, and put `protoc.exe` in the path.
 
 After installing, run this command and check the output to make sure it is similar to the following:
