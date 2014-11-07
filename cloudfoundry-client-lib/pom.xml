@@ -30,7 +30,7 @@
 		<spring.framework.version>3.2.9.RELEASE</spring.framework.version>
 		<spring.security.oauth.version>1.0.5.RELEASE</spring.security.oauth.version>
 		<jackson.version>1.9.3</jackson.version>
-		<tomcat.version>8.0.8</tomcat.version>
+		<tomcat.version>8.0.15</tomcat.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
 		<byteman.version>2.1.3</byteman.version>
 	</properties>
