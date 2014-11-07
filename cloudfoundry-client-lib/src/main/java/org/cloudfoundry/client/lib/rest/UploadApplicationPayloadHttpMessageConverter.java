@@ -16,7 +16,11 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,13 +54,22 @@ public class UploadApplicationPayloadHttpMessageConverter implements HttpMessage
 		return Collections.singletonList(MediaType.ALL);
 	}
 
-	public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage) throws IOException,
-		HttpMessageNotReadableException {
+	public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage)
+		throws IOException, HttpMessageNotReadableException {
 		throw new UnsupportedOperationException();
 	}
 
-	public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage) throws IOException,
-		HttpMessageNotWritableException {
+	public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage)
+		throws IOException, HttpMessageNotWritableException {
+		setOutputContentType(contentType, outputMessage);
+
+		FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
+		outputMessage.getBody().flush();
+
+		writeApplicationZipToFile(t.getInputStream());
+	}
+
+	private void setOutputContentType(MediaType contentType, HttpOutputMessage outputMessage) {
 		HttpHeaders headers = outputMessage.getHeaders();
 		if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
 			contentType = MediaType.APPLICATION_OCTET_STREAM;
@@ -64,8 +77,22 @@ public class UploadApplicationPayloadHttpMessageConverter implements HttpMessage
 		if (contentType != null) {
 			headers.setContentType(contentType);
 		}
-		FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
-		outputMessage.getBody().flush();
+	}
+
+	private void writeApplicationZipToFile(InputStream inputStream) {
+		// for testing/debugging purposes, write the zip file being uploaded to a path specified
+		// in the following environment variable
+		String uploadFilePath = System.getenv("CF_APP_UPLOAD_FILE");
+		if (uploadFilePath != null) {
+			try {
+				File outputFile = new File(uploadFilePath);
+				BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+				FileCopyUtils.copy(inputStream, outputStream);
+				outputStream.close();
+			} catch (IOException e) {
+				System.err.println("Error writing application upload to file: " + e);
+			}
+		}
 	}
 
 }
