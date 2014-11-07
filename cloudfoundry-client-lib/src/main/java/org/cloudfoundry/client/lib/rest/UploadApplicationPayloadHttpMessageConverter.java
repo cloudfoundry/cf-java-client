@@ -38,34 +38,34 @@ import org.springframework.util.FileCopyUtils;
  */
 public class UploadApplicationPayloadHttpMessageConverter implements HttpMessageConverter<UploadApplicationPayload> {
 
-    public boolean canRead(Class<?> clazz, MediaType mediaType) {
-        return false;
-    }
+	public boolean canRead(Class<?> clazz, MediaType mediaType) {
+		return false;
+	}
 
-    public boolean canWrite(Class<?> clazz, MediaType mediaType) {
-        return UploadApplicationPayload.class.isAssignableFrom(clazz);
-    }
+	public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+		return UploadApplicationPayload.class.isAssignableFrom(clazz);
+	}
 
-    public List<MediaType> getSupportedMediaTypes() {
-        return Collections.singletonList(MediaType.ALL);
-    }
+	public List<MediaType> getSupportedMediaTypes() {
+		return Collections.singletonList(MediaType.ALL);
+	}
 
-    public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage) throws IOException,
-        HttpMessageNotReadableException {
-        throw new UnsupportedOperationException();
-    }
+	public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage) throws IOException,
+		HttpMessageNotReadableException {
+		throw new UnsupportedOperationException();
+	}
 
-    public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage) throws IOException,
-        HttpMessageNotWritableException {
-        HttpHeaders headers = outputMessage.getHeaders();
-        if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
-            contentType = MediaType.APPLICATION_OCTET_STREAM;
-        }
-        if (contentType != null) {
-            headers.setContentType(contentType);
-        }
-        FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
-        outputMessage.getBody().flush();
-    }
+	public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage) throws IOException,
+		HttpMessageNotWritableException {
+		HttpHeaders headers = outputMessage.getHeaders();
+		if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
+			contentType = MediaType.APPLICATION_OCTET_STREAM;
+		}
+		if (contentType != null) {
+			headers.setContentType(contentType);
+		}
+		FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
+		outputMessage.getBody().flush();
+	}
 
 }
