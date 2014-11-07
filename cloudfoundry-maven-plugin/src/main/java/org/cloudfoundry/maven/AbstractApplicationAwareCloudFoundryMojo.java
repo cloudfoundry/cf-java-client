@@ -249,7 +249,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	/**
-	 * If the application name was specified via the command line ({@link SystemProperties})
+	 * If the URL was specified via the command line ({@link SystemProperties})
 	 * then that property is used. Otherwise return the appname.
 	 *
 	 * @return Returns the Cloud Foundry application url.
