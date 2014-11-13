@@ -33,7 +33,7 @@ dependencies {
 }
 
 group = 'org.cloudfoundry'
-version = '1.0.5'
+version = '1.0.6.BUILD-SNAPSHOT'
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {
