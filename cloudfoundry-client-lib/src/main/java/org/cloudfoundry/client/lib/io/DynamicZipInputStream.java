@@ -19,7 +19,6 @@ package org.cloudfoundry.client.lib.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -68,8 +67,6 @@ public class DynamicZipInputStream extends DynamicInputStream {
 	 */
 	private long fileCount = 0;
 
-	private final int utcOffset;
-
 	/**
 	 * Create a new {@link DynamicZipInputStream} instance.
 	 *
@@ -79,7 +76,6 @@ public class DynamicZipInputStream extends DynamicInputStream {
 		Assert.notNull(entries, "Entries must not be null");
 		this.zipStream = new ZipOutputStream(getOutputStream());
 		this.entries = entries.iterator();
-		this.utcOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
 	}
 
 	@Override
@@ -103,7 +99,7 @@ public class DynamicZipInputStream extends DynamicInputStream {
 		if (entries.hasNext()) {
 			fileCount++;
 			Entry entry = entries.next();
-			zipStream.putNextEntry(createZipEntry(entry.getName()));
+			zipStream.putNextEntry(new UtcAdjustedZipEntry(entry.getName()));
 			entryStream = entry.getInputStream();
 			if (entryStream == null) {
 				entryStream = EMPTY_STREAM;
@@ -114,7 +110,7 @@ public class DynamicZipInputStream extends DynamicInputStream {
 		// If no files were added to the archive add an empty one
 		if (fileCount == 0) {
 			fileCount++;
-			zipStream.putNextEntry(new ZipEntry("__empty__"));
+			zipStream.putNextEntry(new UtcAdjustedZipEntry("__empty__"));
 			entryStream = EMPTY_STREAM;
 			return true;
 		}
@@ -129,12 +125,6 @@ public class DynamicZipInputStream extends DynamicInputStream {
 	public void close() throws IOException {
 		super.close();
 		zipStream.close();
-	}
-
-	private ZipEntry createZipEntry(String name) {
-		ZipEntry zipEntry = new ZipEntry(name);
-		zipEntry.setTime(System.currentTimeMillis() - utcOffset);
-		return zipEntry;
 	}
 
 	/**

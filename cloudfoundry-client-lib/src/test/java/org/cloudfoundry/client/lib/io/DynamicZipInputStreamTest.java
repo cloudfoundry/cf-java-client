@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.cloudfoundry.client.lib.io.DynamicZipInputStream.Entry;
@@ -50,12 +49,12 @@ public class DynamicZipInputStreamTest {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(bos);
-        zipOutputStream.putNextEntry(new ZipEntry("a/b/c"));
+        zipOutputStream.putNextEntry(new UtcAdjustedZipEntry("a/b/c"));
         zipOutputStream.write(f1);
         zipOutputStream.closeEntry();
-        zipOutputStream.putNextEntry(new ZipEntry("a/b/c/d/"));
+        zipOutputStream.putNextEntry(new UtcAdjustedZipEntry("a/b/c/d/"));
         zipOutputStream.closeEntry();
-        zipOutputStream.putNextEntry(new ZipEntry("d/e/f"));
+        zipOutputStream.putNextEntry(new UtcAdjustedZipEntry("d/e/f"));
         zipOutputStream.write(f2);
         zipOutputStream.closeEntry();
         zipOutputStream.flush();
