@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.4'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.5'
     }
 }
 
@@ -337,6 +337,12 @@ Variants that are not currently mapped to the canonical `my-app.cfapps.io` route
 All running variants that are not mapped to the canonical route are deleted. 
 
 # History
+
+## Changes in 1.0.5
+
+* Changed `cfRecentLogs` task to use Loggregator HTTP endpoint instead of deprecated WebSockets endpoint
+* Updated `tomcat-embed-websockets` library to address a problem tailing logs on some platforms
+* Added support for authenticated HTTP proxies
 
 ## Changes in 1.0.4
 

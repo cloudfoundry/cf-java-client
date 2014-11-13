@@ -58,7 +58,7 @@ After installing, run this command and check the output to make sure it is simil
 
 ```
 $ protoc --version
-libprotoc 2.5.0
+libprotoc 2.6.1
 ```
 
 ## Compiling and Packaging
