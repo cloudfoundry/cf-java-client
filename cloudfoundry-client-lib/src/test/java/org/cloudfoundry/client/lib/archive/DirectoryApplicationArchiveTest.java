@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
@@ -73,10 +74,10 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
         boolean containsGit = false;
         boolean containsSvn = false;
         for (Entry entry : archive.getEntries()) {
-            if (entry.getName().contains(".svn/")) {
+            if (entry.getName().contains(".svn"+File.separator)) {
                 containsSvn = true;
             }
-            if (entry.getName().contains(".git/")) {
+            if (entry.getName().contains(".git"+File.separator)) {
                 containsGit = true;
             }
         }
@@ -85,6 +86,7 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
     }
 
     private void assertContainsAppFiles(ApplicationArchive archive) {
+    	final String subProjectPath = "sub-project"+File.separator;
         int fileCount = 0;
         boolean containsApp = false;
         boolean containsPackage = false;
@@ -98,17 +100,17 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
             if (entry.getName().equals("package.json")) {
                 containsPackage = true;
             }
-            if (entry.getName().equals("sub-project/")) {
+			if (entry.getName().equals(subProjectPath)) {
                 containsSubproject = true;
             }
-            if (entry.getName().equals("sub-project/example.txt")) {
+            if (entry.getName().equals(subProjectPath+"example.txt")) {
                 containsExample = true;
             }
         }
         assertEquals("The archive should not contain any extraneous files", 4, fileCount);
         assertTrue("The archive should contain 'app.js'", containsApp);
         assertTrue("The archive should contain 'package.json'", containsPackage);
-        assertTrue("The archive should contain 'sub-project/'", containsSubproject);
-        assertTrue("The archive should contain 'sub-project/example.txt'", containsExample);
+        assertTrue("The archive should contain '"+subProjectPath+"'", containsSubproject);
+        assertTrue("The archive should contain '"+subProjectPath+"example.txt'", containsExample);
     }
 }
