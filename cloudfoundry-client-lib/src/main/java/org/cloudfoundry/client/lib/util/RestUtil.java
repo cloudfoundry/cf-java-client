@@ -12,11 +12,13 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.cloudfoundry.client.lib.HttpProxyConfiguration;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerResponseErrorHandler;
@@ -69,6 +71,9 @@ public class RestUtil {
 						new UsernamePasswordCredentials(httpProxyConfiguration.getUsername(), httpProxyConfiguration.getPassword()));
 				httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 			}
+
+			HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+			httpClientBuilder.setRoutePlanner(routePlanner);
 		}
 
 		HttpClient httpClient = httpClientBuilder.build();
