@@ -541,5 +541,19 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void updateQuota(CloudQuota quota, String name) {
 		cc.updateQuota(quota, name);
 	}
+	@Override
+	public void createSpace(String spaceName) {
+		cc.createSpace(spaceName);
+	}
 
+	@Override
+	public void deleteSpace(String spaceName) {
+		cc.deleteSpace(spaceName);
+	}
+
+	
+	@Override
+	public CloudSpace getSpace(String spaceName) {
+		return cc.getSpace(spaceName);
+	}
 }

@@ -187,6 +187,14 @@ public interface CloudControllerClient {
 
 	CloudStack getStack(String name);
 
+	// Space management	
+	
+	void createSpace(String spaceName);
+	
+	CloudSpace getSpace(String spaceName);
+	
+	void deleteSpace(String spaceName);
+	
 	// Domains and routes management
 
 
