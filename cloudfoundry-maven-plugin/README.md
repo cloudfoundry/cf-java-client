@@ -12,7 +12,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
     </plugin>
 ~~~
 
@@ -28,7 +28,7 @@ Following is a typical configuration example, which uses most of the available c
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>cf-maven-plugin</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
@@ -262,6 +262,14 @@ Some Cloud Foundry deployments, such as those deployed using Pivotal CF, use a s
 To instruct the Cloud Foundry Maven plugin to accept self-signed certificates from the Cloud Foundry target endpoint, add `<trustSelfSignedCerts>true</trustSelfSignedCerts>` to the plugin configuration block.
 
 # History
+
+## Changes from version 1.0.4 to 1.0.5
+
+* Added support for `${randomWord}` keyword in `url` configuration parameter for randomizing part of an application route
+* Removed the need for plugin configuration when running `cf:help` goal
+* Changed `cf:recentLogs` task to use Loggregator HTTP endpoint instead of deprecated WebSockets endpoint
+* Updated `tomcat-embed-websockets` library to address a problem tailing logs on some platforms
+* Added support for authenticated HTTP proxies
 
 ## Changes from version 1.0.3 to 1.0.4
 

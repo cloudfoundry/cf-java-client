@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,8 @@ public interface CloudControllerClient {
 
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
+	void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException;
+
 	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
 
 	StartingInfo startApplication(String appName);
@@ -220,18 +223,18 @@ public interface CloudControllerClient {
 
 	void unRegisterRestLogListener(RestLogCallback callBack);
 
-    // Quota operations
+	// Quota operations
 	CloudOrganization getOrgByName(String orgName, boolean required);
-    
-    List<CloudQuota> getQuotas();
-    
-    CloudQuota getQuotaByName(String quotaName, boolean required);
-    
-    void createQuota(CloudQuota quota);
-    
-    void updateQuota(CloudQuota quota, String name);
-    
-    void deleteQuota(String quotaName);
-    
-    void setQuotaToOrg(String orgName, String quotaName);
+
+	List<CloudQuota> getQuotas();
+
+	CloudQuota getQuotaByName(String quotaName, boolean required);
+
+	void createQuota(CloudQuota quota);
+
+	void updateQuota(CloudQuota quota, String name);
+
+	void deleteQuota(String quotaName);
+
+	void setQuotaToOrg(String orgName, String quotaName);
 }

@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -262,6 +263,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
 		cc.uploadApplication(appName, file, callback);
+	}
+
+	public void uploadApplication(String appName, String fileName, InputStream inputStream) throws IOException {
+		cc.uploadApplication(appName, fileName, inputStream, null);
+	}
+
+	public void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException {
+		cc.uploadApplication(appName, fileName, inputStream, callback);
 	}
 
 	public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
