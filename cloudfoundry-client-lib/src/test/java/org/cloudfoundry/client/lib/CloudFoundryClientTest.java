@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -892,6 +893,18 @@ public class CloudFoundryClientTest {
 
 		ApplicationStats stats = connectedClient.getApplicationStats(appName);
 		assertTrue(stats.getRecords().isEmpty());
+	}
+
+	@Test
+	public void uploadAppFromInputStream() throws IOException {
+		String appName = namespacedAppName("upload-from-input-stream");
+		createSpringApplication(appName);
+		File file = SampleProjects.springTravel();
+		FileInputStream inputStream = new FileInputStream(file);
+		connectedClient.uploadApplication(appName, appName, inputStream);
+		connectedClient.startApplication(appName);
+		CloudApplication env = connectedClient.getApplication(appName);
+		assertEquals(CloudApplication.AppState.STARTED, env.getState());
 	}
 
 	@Test

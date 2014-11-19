@@ -18,6 +18,7 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +200,7 @@ public interface CloudFoundryOperations {
 	List<CloudRoute> deleteOrphanedRoutes();
 
 	/**
-	 * Upload an application.
+	 * Upload an application to Cloud Foundry.
 	 *
 	 * @param appName application name
 	 * @param file path to the application archive or folder
@@ -208,7 +209,8 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, String file) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to Cloud Foundry.
+	 *
 	 * @param appName the application name
 	 * @param file the application archive or folder
 	 * @throws java.io.IOException
@@ -216,7 +218,8 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, File file) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to Cloud Foundry.
+	 *
 	 * @param appName the application name
 	 * @param file the application archive
 	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
@@ -225,7 +228,35 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to Cloud Foundry.
+	 *
+	 * This form of <tt>uploadApplication</tt> will read the passed <tt>InputStream</tt> and copy the contents to a
+	 * temporary file for upload.
+	 *
+	 * @param appName the application name
+	 * @param fileName the logical name of the application file
+	 * @param inputStream the InputStream to read from
+	 * @throws java.io.IOException
+	 */
+	void uploadApplication(String appName, String fileName, InputStream inputStream) throws IOException;
+
+	/**
+	 * Upload an application to Cloud Foundry.
+	 *
+	 * This form of <tt>uploadApplication</tt> will read the passed <tt>InputStream</tt> and copy the contents to a
+	 * temporary file for upload.
+	 *
+	 * @param appName the application name
+	 * @param fileName the logical name of the application file
+	 * @param inputStream the InputStream to read from
+	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
+	 * @throws java.io.IOException
+	 */
+	void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException;
+
+	/**
+	 * Upload an application to Cloud Foundry.
+	 *
 	 * @param appName the application name
 	 * @param archive the application archive
 	 * @throws java.io.IOException
@@ -233,7 +264,8 @@ public interface CloudFoundryOperations {
 	void uploadApplication(String appName, ApplicationArchive archive) throws IOException;
 
 	/**
-	 * Upload an application to cloud foundry.
+	 * Upload an application to Cloud Foundry.
+	 *
 	 * @param appName the application name
 	 * @param archive the application archive
 	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
