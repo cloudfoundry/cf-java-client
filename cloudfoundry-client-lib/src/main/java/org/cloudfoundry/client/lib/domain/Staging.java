@@ -28,6 +28,7 @@ package org.cloudfoundry.client.lib.domain;
 public class Staging {
 	private String command;
 	private String buildpackUrl;
+	private String detectedBuildpackUrl;
 	private String stack;
 	private Integer healthCheckTimeout;
 
@@ -52,11 +53,13 @@ public class Staging {
 	 *
 	 * @param command the application command; may be null
 	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
+	 * @param detectedBuildpackUrl the buildpack url that was detected at deployment time (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
 	 * @param stack the stack to use when staging the application; may be null
 	 * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
 	 */
-	public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout) {
+	public Staging(String command, String buildpackUrl, String detectedBuildpackUrl, String stack, Integer healthCheckTimeout) {
 		this(command, buildpackUrl);
+		this.detectedBuildpackUrl = detectedBuildpackUrl;
 		this.stack = stack;
 		this.healthCheckTimeout = healthCheckTimeout;
 	}
@@ -76,6 +79,15 @@ public class Staging {
 	 */
 	public String getBuildpackUrl() {
 		return buildpackUrl;
+	}
+	
+	/**
+	 *
+	 * @return The detectedBuildpack url, or null to use the default
+	 *         buildpack detected based on application content
+	 */
+	public String getDetectedBuildpackUrl() {
+		return detectedBuildpackUrl;
 	}
 
 	/**

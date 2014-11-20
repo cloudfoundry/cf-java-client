@@ -17,9 +17,7 @@
 package org.cloudfoundry.client.lib.rest;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -94,7 +92,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.util.Assert;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RequestCallback;
@@ -590,7 +587,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return orgs;
 	}
-
+	
 	@Override
 	public OAuth2AccessToken login() {
 		oauthClient.init(cloudCredentials);
@@ -713,6 +710,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return cloudService;
 	}
+	
+	@Override
+	public CloudService getService(UUID guid) { 
+		String urlPath = "/v2/service_instances/{service}";
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("service", guid);
+
+		String routeResp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> serviceEntity = JsonUtil.convertJsonToMap(routeResp);
+		return resourceMapper.mapResource(serviceEntity, CloudService.class);		
+	}
+
 
 	@Override
 	public void deleteService(String serviceName) {
@@ -845,6 +854,22 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			urlVars.put("space", sessionSpace.getMeta().getGuid());
 			urlPath = urlPath + "/spaces/{space}";
 		}
+		urlPath = urlPath + "/apps?inline-relations-depth=1";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		List<CloudApplication> apps = new ArrayList<CloudApplication>();
+		for (Map<String, Object> resource : resourceList) {
+			processApplicationResource(resource, true);
+			apps.add(mapCloudApplication(resource));
+		}
+		return apps;
+	}
+	
+	@Override
+	public List<CloudApplication> getApplicationsForSpace(UUID spaceGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2";
+		urlVars.put("space", spaceGuid);
+		urlPath = urlPath + "/spaces/{space}";		
 		urlPath = urlPath + "/apps?inline-relations-depth=1";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
 		List<CloudApplication> apps = new ArrayList<CloudApplication>();
@@ -1150,23 +1175,13 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			ApplicationArchive archive = new DirectoryApplicationArchive(file);
 			uploadApplication(appName, archive, callback);
 		} else {
-			try (ZipFile zipFile = new ZipFile(file)) {
+			ZipFile zipFile = new ZipFile(file);
+			try {
 				ApplicationArchive archive = new ZipApplicationArchive(zipFile);
 				uploadApplication(appName, archive, callback);
+			} finally {
+				zipFile.close();
 			}
-		}
-	}
-
-	@Override
-	public void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException {
-		Assert.notNull(fileName, "FileName must not be null");
-		Assert.notNull(inputStream, "InputStream must not be null");
-
-		File file = createTemporaryUploadFile(inputStream);
-
-		try (ZipFile zipFile = new ZipFile(file)) {
-			ApplicationArchive archive = new ZipApplicationArchive(zipFile);
-			uploadApplication(appName, archive, callback);
 		}
 	}
 
@@ -1238,15 +1253,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		return new HttpEntity<MultiValueMap<String, ?>>(body, headers);
-	}
-
-	private File createTemporaryUploadFile(InputStream inputStream) throws IOException {
-		File file = File.createTempFile("cfjava", null);
-		file.deleteOnExit();
-		FileOutputStream outputStream = new FileOutputStream(file);
-		FileCopyUtils.copy(inputStream, outputStream);
-		outputStream.close();
-		return file;
 	}
 
 	@Override
