@@ -28,7 +28,7 @@
 	<properties>
 		<java.version>1.7</java.version>
 		<spring.framework.version>4.0.5.RELEASE</spring.framework.version>
-		<spring.security.oauth.version>2.0.1.RELEASE</spring.security.oauth.version>
+		<spring.security.oauth.version>2.0.4.RELEASE</spring.security.oauth.version>
 		<jackson.version>2.3.3</jackson.version>
 		<tomcat.version>8.0.15</tomcat.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
@@ -260,8 +260,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>juli</artifactId>
-			<version>6.0.39</version>
+			<artifactId>tomcat-juli</artifactId>
+			<version>${tomcat.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
