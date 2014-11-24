@@ -195,6 +195,15 @@ public interface CloudFoundryOperations {
 	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
 
 	/**
+	 * Create a user-provided service for logging.
+	 *
+	 * @param service cloud service info
+	 * @param credentials the user-provided service credentials
+	 * @param syslogDrainUrl for a logging service
+	 */
+	void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl);
+
+	/**
 	 * Delete routes that do not have any application which is assigned to them.
 	 */
 	List<CloudRoute> deleteOrphanedRoutes();
