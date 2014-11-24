@@ -248,6 +248,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.createUserProvidedService(service, credentials);
 	}
 
+	public void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl) {
+		cc.createUserProvidedService(service, credentials, syslogDrainUrl);
+	}
+
 	@Override
 	public List<CloudRoute> deleteOrphanedRoutes() {
     	return cc.deleteOrphanedRoutes();

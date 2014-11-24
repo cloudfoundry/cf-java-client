@@ -6,9 +6,18 @@ import java.util.Map;
 
 public class CloudServiceWithUserProvided extends CloudService {
 	private Map<String, Object> userProvidedCredentials;
+	private String syslogDrainUrl;
 
 	public CloudServiceWithUserProvided() {
 		super();
+	}
+
+	public String getSyslogDrainUrl() {
+		return syslogDrainUrl;
+	}
+
+	public void setSyslogDrainUrl(String syslogDrainUrl) {
+		this.syslogDrainUrl = syslogDrainUrl;
 	}
 
 	public Map<String, Object> getUserProvidedCredentials() {

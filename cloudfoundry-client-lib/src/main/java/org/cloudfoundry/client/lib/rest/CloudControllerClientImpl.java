@@ -676,6 +676,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public void createUserProvidedService(CloudService service, Map<String, Object> credentials) {
+		createUserProvidedServiceDelegate(service, credentials, "");
+	}
+
+	@Override
+	public void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl) {
+		createUserProvidedServiceDelegate(service, credentials, syslogDrainUrl);
+	}
+
+	private void createUserProvidedServiceDelegate(CloudService service, Map<String, Object> credentials, String syslogDrainUrl) {
 		assertSpaceProvided("create service");
 		Assert.notNull(credentials, "Service credentials must not be null");
 		Assert.notNull(service, "Service must not be null");
@@ -685,10 +694,14 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		Assert.isNull(service.getVersion(), "Service version is not valid for user-provided services");
 		Assert.isNull(service.getPlan(), "Service plan is not valid for user-provided services");
 
-		HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+		HashMap<String, Object> serviceRequest = new HashMap<>();
 		serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		serviceRequest.put("name", service.getName());
 		serviceRequest.put("credentials", credentials);
+		if (syslogDrainUrl != null && !syslogDrainUrl.equals("")) {
+			serviceRequest.put("syslog_drain_url", syslogDrainUrl);
+		}
+
 		getRestTemplate().postForObject(getUrl("/v2/user_provided_service_instances"), serviceRequest, String.class);
 	}
 
