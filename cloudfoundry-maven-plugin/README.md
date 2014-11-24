@@ -56,6 +56,12 @@ Following is a typical configuration example, which uses most of the available c
                                 <accessKey>abc123</accessKey>
                             </userProvidedCredentials>
                         </service>
+                        <service>
+                                <name>logger-web-console</name>
+                                <label>user-provided</label>
+                                <syslogDrainUrl>syslog://log.example.com:5000</syslogDrainUrl>
+                                <userProvidedCredentials/>
+                        </service>
                     </services>
                 </configuration>
             </plugin>
