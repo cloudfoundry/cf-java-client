@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
@@ -82,6 +83,53 @@ public interface CloudFoundryOperations {
 	 * @return List of CloudSpace objects containing the space info
 	 */
 	List<CloudSpace> getSpaces();
+
+	
+	/**
+	 * Get list of space manager UUID  for the space.
+	 *
+	 * @param spaceName name of the space
+	 * @return List of space manager UUID
+	 */
+	List<UUID> listSpaceManagers(String spaceName);
+
+	/**
+	 * Get list of space developer UUID  for the space.
+	 *
+	 * @param spaceName name of the space
+	 * @return List of space developer UUID
+	 */
+	List<UUID> listSpaceDevelopers(String spaceName);
+
+	/**
+	 * Get list of space auditor UUID  for the space.
+	 *
+	 * @param spaceName name of the space
+	 * @return List of space auditor UUID
+	 */
+	List<UUID> listSpaceAuditors(String spaceName);
+
+
+	/**
+	 * Associate current user to the space auditors role 
+	 *
+	 * @param spaceName name of the space 
+	 */
+	void associateAuditorWithSpace(String spaceName);
+
+	/**
+	 * Associate current user to the space developer role 
+	 *
+	 * @param spaceName name of the space 
+	 */
+	void associateDeveloperWithSpace(String spaceName);
+
+	/**
+	 * Associate current user to the space managers role 
+	 *
+	 * @param spaceName name of the space 
+	 */
+	void associateManagerWithSpace(String spaceName);
 
 	/**
 	 * Create a space with the specified name 
@@ -805,4 +853,5 @@ public interface CloudFoundryOperations {
 	 * @param name
 	 */
 	void updateQuota(CloudQuota quota, String name);
+
 }

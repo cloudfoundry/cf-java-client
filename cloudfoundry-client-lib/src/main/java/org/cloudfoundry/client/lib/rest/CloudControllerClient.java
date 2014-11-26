@@ -200,6 +200,8 @@ public interface CloudControllerClient {
 	
 	void deleteSpace(String spaceName);
 	
+	List<UUID> listSpaceManagers(String spaceName);
+
 	// Domains and routes management
 
 
@@ -247,4 +249,15 @@ public interface CloudControllerClient {
 	void deleteQuota(String quotaName);
 
 	void setQuotaToOrg(String orgName, String quotaName);
+
+	List<UUID> listSpaceDevelopers(String spaceName);
+
+	List<UUID> listSpaceAuditors(String spaceName);
+
+	void associateManagerWithSpace(String spaceName);
+
+	void associateDeveloperWithSpace(String spaceName);
+
+	void associateAuditorWithSpace(String spaceName);
+
 }
