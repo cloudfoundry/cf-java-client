@@ -18,7 +18,6 @@ package org.cloudfoundry.client.lib;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -221,6 +220,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public CloudApplication getApplication(String appName) {
 		return cc.getApplication(appName);
 	}
+	
+	public List<CloudApplication> getApplicationsForSpace(UUID spaceGuid) {
+		return cc.getApplicationsForSpace(spaceGuid);
+	}
 
 	public CloudApplication getApplication(UUID appGuid) {
 		return cc.getApplication(appGuid);
@@ -267,14 +270,6 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException {
 		cc.uploadApplication(appName, file, callback);
-	}
-
-	public void uploadApplication(String appName, String fileName, InputStream inputStream) throws IOException {
-		cc.uploadApplication(appName, fileName, inputStream, null);
-	}
-
-	public void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException {
-		cc.uploadApplication(appName, fileName, inputStream, callback);
 	}
 
 	public void uploadApplication(String appName, ApplicationArchive archive) throws IOException {
@@ -434,6 +429,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     public CloudService getService(String service) {
 		return cc.getService(service);
 	}
+    
+    public CloudService getService(UUID guid) {
+		return cc.getService(guid);
+	}
 
 	public void deleteService(String service) {
 		cc.deleteService(service);
@@ -554,5 +553,5 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void updateQuota(CloudQuota quota, String name) {
 		cc.updateQuota(quota, name);
 	}
-
+	
 }
