@@ -547,7 +547,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 				try {
 					if (service.getLabel().equals("user-provided")) {
 						service.setLabel(null);
-						client.createUserProvidedService(service, service.getUserProvidedCredentials());
+						client.createUserProvidedService(service, service.getUserProvidedCredentials(), service.getSyslogDrainUrl());
 					} else {
 						client.createService(service);
 					}
