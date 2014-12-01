@@ -125,6 +125,7 @@ The configuration options for system-provisioned services are:
 * label - the type of the service
 * plan - the tier option of the service
 * bind (type: boolean) - bind the service to the application on push (defaults to true)
+* syslogDrainUrl - the URL to external syslog server
 
 Use the `cfServicePlans` task to see the valid values for service configuration.
 
@@ -147,6 +148,7 @@ cloudfoundry {
                 'accessKey': 'abc123'
             ]
             bind = true
+            syslogDrainUrl = 'syslog://log.example.com:5000'
         }
     }
 }

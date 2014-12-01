@@ -42,7 +42,7 @@ class ServiceCloudFoundryHelper {
         if (service.label == 'user-provided') {
             log "Creating service ${service.name}"
             CloudService cloudService = new CloudService(name: service.name)
-            client.createUserProvidedService(cloudService, service.userProvidedCredentials as Map<String, Object>)
+            client.createUserProvidedService(cloudService, service.userProvidedCredentials as Map<String, Object>, service.syslogDrainUrl)
         } else {
             List<CloudServiceOffering> offerings = client.serviceOfferings
             CloudServiceOffering offering = offerings.find {
