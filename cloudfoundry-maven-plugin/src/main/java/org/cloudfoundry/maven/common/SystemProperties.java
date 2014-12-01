@@ -34,6 +34,7 @@ public enum SystemProperties {
 	HEALTH_CHECK_TIMEOUT("healthCheckTimeout"),
 	INSTANCES("instances"),
 	MEMORY("memory"),
+	MERGE_ENV("merge-env"),
 	NO_START("no-start"),
 	ORG("org"),
 	PASSWORD("password"),

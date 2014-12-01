@@ -78,16 +78,7 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 		getLog().info(String.format("Creating application '%s'", appname));
 
-		createApplication(appname, command, buildpack, stack, healthCheckTimeout, disk, memory, uris, serviceNames);
-
-		getLog().debug("Updating application env...");
-
-		try {
-			getClient().updateApplicationEnv(appname, env);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(String.format("Error while updating application env '%s'. Error message: '%s'. Description: '%s'",
-					getAppname(), e.getMessage(), e.getDescription()), e);
-		}
+		createApplication(appname, command, buildpack, stack, healthCheckTimeout, disk, memory, uris, serviceNames, env);
 
 		getLog().info(String.format("Uploading '%s'", path));
 
@@ -127,15 +118,12 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 	}
 
 	private void createApplication(String appname, String command, String buildpack, String stack, Integer healthCheckTimeout,
-								   Integer diskQuota, Integer memory, List<String> uris, List<String> serviceNames) throws MojoExecutionException {
-		boolean found;
+	                               Integer diskQuota, Integer memory, List<String> uris, List<String> serviceNames, Map<String, String> env) throws MojoExecutionException {
+		CloudApplication application = null;
 		try {
-			getClient().getApplication(appname);
-			found = true;
+			application = client.getApplication(appname);
 		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				found = false;
-			} else {
+			if (!HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
 				throw new MojoExecutionException(String.format("Error while checking for existing application '%s'. Error message: '%s'. Description: '%s'",
 						appname, e.getMessage(), e.getDescription()), e);
 			}
@@ -143,8 +131,9 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 
 		try {
 			final Staging staging = new Staging(command, buildpack, stack, healthCheckTimeout);
-			if (!found) {
-				getClient().createApplication(appname, staging, diskQuota, memory, uris, serviceNames);
+			if (application == null) {
+				client.createApplication(appname, staging, diskQuota, memory, uris, serviceNames);
+				client.updateApplicationEnv(appname, env);
 			} else {
 				client.stopApplication(appname);
 				client.updateApplicationStaging(appname, staging);
@@ -156,11 +145,23 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 				}
 				client.updateApplicationUris(appname, uris);
 				client.updateApplicationServices(appname, serviceNames);
+				client.updateApplicationEnv(appname, getMergedEnv(application, env));
 			}
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
 					getAppname(), e.getMessage(), e.getDescription()), e);
 		}
+	}
+
+	private Map<String, String> getMergedEnv(CloudApplication application, Map<String, String> env) {
+		if (!isMergeEnv()) {
+			return env;
+		}
+
+		Map<String, String> mergedEnv = application.getEnvAsMap();
+		mergedEnv.putAll(env);
+
+		return mergedEnv;
 	}
 
 	private List<String> getServiceNames() {

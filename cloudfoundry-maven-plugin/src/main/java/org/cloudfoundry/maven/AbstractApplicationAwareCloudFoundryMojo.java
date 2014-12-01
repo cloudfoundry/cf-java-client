@@ -178,6 +178,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private Map<String, String> env = new HashMap<String, String>();
 
 	/**
+	 * Merge existing env vars when updating the application
+	 *
+	 * @parameter expression="${cf.mergeEnv}"
+	 */
+	private Boolean mergeEnv;
+
+	/**
 	 * Do not auto-start the application
 	 *
 	 * @parameter expression="${cf.no-start}"
@@ -249,6 +256,16 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	}
 
 	/**
+	 * If true, merge the application's existing env vars with those set in the plugin configuration when updating
+	 * an application. If not set, this property defaults to <code>false</code>
+	 *
+	 * @return Never null
+	 */
+	public Boolean isMergeEnv() {
+		return getBooleanValue(SystemProperties.MERGE_ENV, this.mergeEnv, DefaultConstants.MERGE_ENV);
+	}
+
+	/**
 	 * If the URL was specified via the command line ({@link SystemProperties})
 	 * then that property is used. Otherwise return the appname.
 	 *
@@ -293,8 +310,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the configured disk quota choice
 	 */
 	public Integer getDiskQuota() {
-		final String property = getCommandlineProperty(SystemProperties.DISK_QUOTA);
-		return property != null ? Integer.valueOf(property) : this.diskQuota;
+		return getIntegerValue(SystemProperties.DISK_QUOTA, this.diskQuota);
 	}
 
 	/**
@@ -310,8 +326,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the configured memory choice
 	 */
 	public Integer getMemory() {
-		final String property = getCommandlineProperty(SystemProperties.MEMORY);
-		return property != null ? Integer.valueOf(property) : this.memory;
+		return getIntegerValue(SystemProperties.MEMORY, this.memory);
 	}
 
 	/**
@@ -340,10 +355,10 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Provides the File to deploy based on the GAV set in the "artifact" property.
-	 * 
+	 *
 	 * @return Returns null of no artifact specified.
 	 */
 	private File getArtifact() throws MojoExecutionException {
@@ -396,8 +411,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the command or null
 	 */
 	public String getCommand() {
-		final String property = getCommandlineProperty(SystemProperties.COMMAND);
-		return property != null ? property : this.command;
+		return getStringValue(SystemProperties.COMMAND, this.command);
 	}
 
 	/**
@@ -411,8 +425,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the buildpack or null
 	 */
 	public String getBuildpack() {
-		final String property = getCommandlineProperty(SystemProperties.BUILDPACK);
-		return property != null ? property : this.buildpack;
+		return getStringValue(SystemProperties.BUILDPACK, this.buildpack);
 	}
 
 	/**
@@ -426,8 +439,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the stack or null
 	 */
 	public String getStack() {
-		final String property = getCommandlineProperty(SystemProperties.STACK);
-		return property != null ? property : this.stack;
+		return getStringValue(SystemProperties.STACK, this.stack);
 	}
 
 	/**
@@ -441,8 +453,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the health check timeout or null
 	 */
 	public Integer getHealthCheckTimeout() {
-		final String property = getCommandlineProperty(SystemProperties.HEALTH_CHECK_TIMEOUT);
-		return property != null ? Integer.valueOf(property) : this.healthCheckTimeout;
+		return getIntegerValue(SystemProperties.HEALTH_CHECK_TIMEOUT, this.healthCheckTimeout);
 	}
 
 	/**
@@ -456,8 +467,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the app startup timeout or null
 	 */
 	public Integer getAppStartupTimeout() {
-		final String property = getCommandlineProperty(SystemProperties.APP_STARTUP_TIMEOUT);
-		return property != null ? Integer.valueOf(property) : this.appStartupTimeout;
+		return getIntegerValue(SystemProperties.APP_STARTUP_TIMEOUT, this.appStartupTimeout);
 	}
 
 	/**
@@ -471,15 +481,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the number of configured instance or null
 	 */
 	public Integer getInstances() {
-		final String property = getCommandlineProperty(SystemProperties.INSTANCES);
-
-		if (property != null) {
-			return Integer.valueOf(property);
-		} else if (this.instances == null) {
-			return DefaultConstants.DEFAULT_INSTANCE;
-		} else {
-			return this.instances;
-		}
+		return getIntegerValue(SystemProperties.INSTANCES, this.instances, DefaultConstants.DEFAULT_INSTANCE);
 	}
 
 	/**
@@ -516,16 +518,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Never null
 	 */
 	public Boolean isNoStart() {
-		final String property = getCommandlineProperty(SystemProperties.NO_START);
-
-		if (property != null) {
-			return Boolean.valueOf(property);
-		}
-		else if (this.noStart == null) {
-			return DefaultConstants.NO_START;
-		} else {
-			return this.noStart;
-		}
+		return getBooleanValue(SystemProperties.NO_START, this.noStart, DefaultConstants.NO_START);
 	}
 
 	public void createServices() throws MojoExecutionException {
@@ -581,6 +574,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			throw new IllegalStateException("Error while uploading application.", e);
 		}
 	}
+
+
 
 	protected void showStagingStatus(StartingInfo startingInfo) {
 		if (startingInfo != null) {
@@ -772,5 +767,34 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 	private long secondsToMillis(Integer duration) {
 		return TimeUnit.SECONDS.toMillis(duration);
+	}
+
+	private String getStringValue(SystemProperties propertyName, String configValue) {
+		final String property = getCommandlineProperty(propertyName);
+		return property != null ? property : configValue;
+	}
+
+	private Integer getIntegerValue(SystemProperties propertyName, Integer configValue) {
+		final String property = getCommandlineProperty(propertyName);
+		return property != null ? Integer.valueOf(property) : configValue;
+	}
+
+	private Integer getIntegerValue(SystemProperties propertyName, Integer configValue, Integer defaultValue) {
+		final Integer value = getIntegerValue(propertyName, configValue);
+		return value != null ? value : defaultValue;
+	}
+
+	private Boolean getBooleanValue(SystemProperties propertyName, Boolean configValue, Boolean defaultValue) {
+		final String property = getCommandlineProperty(propertyName);
+
+		if (property != null) {
+			return Boolean.valueOf(property);
+		}
+
+		if (configValue != null) {
+			return configValue;
+		}
+
+		return defaultValue;
 	}
 }

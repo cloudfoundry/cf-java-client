@@ -77,26 +77,27 @@ cloudfoundry {
 ~~~
 
 Configuration options are:
-* target - the URL of the target API (defaults to http://api.run.pivotal.io)
-* organization - the name of the Cloud Foundry organization to target
-* space - the name of the Cloud Foundry space to target
-* username - your username on the target platform
-* password - your password on the target platform
-* application - the name of your application (defaults to the Gradle project name)
-* file (type: File) - path to the JAR or WAR file to be deployed (defaults to the primary build artifact)
-* memory - amount of memory in megabytes to allocate to an application
-* diskQuota - amount of disk space in megabytes to allocate to an application
-* healthCheckTimeout - the amount of time in seconds that Cloud Foundry should wait for the application to start
-* instances - number of instances (defaults to 1)
-* uri - a URI to map to the application
-* uris (type: List) - a list of URIs to map to the application
-* host - combined with `domain` to specify a URI to map to the application (defaults to application name)
-* hosts (type: List) - combined with `domain` to specify a list of URIs to map to the application
-* domain - the domain part of URIs to map to the application (defaults to the default domain)
-* command - the command to run when the application is started
-* buildpack - the URL of a buildpack to use to stage the application
-* env (type: Map) - environment variables to set for the application
-* startApp (type: boolean) - start the application on push (defaults to true)
+* `target` - the URL of the target API (defaults to http://api.run.pivotal.io)
+* `organization` - the name of the Cloud Foundry organization to target
+* `space` - the name of the Cloud Foundry space to target
+* `username` - your username on the target platform
+* `password` - your password on the target platform
+* `application` - the name of your application (defaults to the Gradle project name)
+* `file` (type: File) - path to the JAR or WAR file to be deployed (defaults to the primary build artifact)
+* `memory` - amount of memory in megabytes to allocate to an application
+* `diskQuota` - amount of disk space in megabytes to allocate to an application
+* `healthCheckTimeout` - the amount of time in seconds that Cloud Foundry should wait for the application to start
+* `instances` - number of instances (defaults to 1)
+* `uri` - a URI to map to the application
+* `uris` (type: List) - a list of URIs to map to the application
+* `host` - combined with `domain` to specify a URI to map to the application (defaults to application name)
+* `hosts` (type: List) - combined with `domain` to specify a list of URIs to map to the application
+* `domain` - the domain part of URIs to map to the application (defaults to the default domain)
+* `command` - the command to run when the application is started
+* `buildpack` - the URL of a buildpack to use to stage the application
+* `env` (type: Map) - environment variables to set for the application
+* `mergeEnv` (type: boolean) - if true, merge plugin-configured environment variables with existing environment variables on app update; if false overwrite app environment variables
+* `startApp` (type: boolean) - start the application on push (defaults to true)
 
 ### Configuring services
 

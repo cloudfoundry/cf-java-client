@@ -36,7 +36,7 @@ class DeleteApplicationCloudFoundryTask extends AbstractCloudFoundryTask {
                 client.deleteAllApplications()
                 log "Deleted successfully"
             } else {
-                if (applicationExists(application)) {
+                if (getApplication(application)) {
                     log "Deleting application ${application}"
                     client.deleteApplication(application)
                     log "Deleted successfully"
