@@ -1410,6 +1410,28 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void shouldCreateGetAndDeleteSpaceOnCurrentOrg() throws Exception {
+		String spaceName = "dummy space";
+		CloudSpace newSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '"+spaceName+  "' should not exist before creation",newSpace);
+		connectedClient.createSpace(spaceName);
+		newSpace = connectedClient.getSpace(spaceName);
+		assertNotNull("newSpace should not be null",newSpace);
+		assertEquals(spaceName,newSpace.getName());
+		boolean foundSpaceInCurrentOrg = false;
+		for (CloudSpace aSpace : connectedClient.getSpaces()) {
+			if (spaceName.equals(aSpace.getName())){
+				foundSpaceInCurrentOrg = true;
+			}
+		}
+		assertTrue(foundSpaceInCurrentOrg);
+		connectedClient.deleteSpace(spaceName);
+		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '"+spaceName+  "' should not exist after deletion",deletedSpace);
+
+	}
+
+	@Test
 	public void defaultDomainFound() throws Exception {
 		assertNotNull(connectedClient.getDefaultDomain());
 	}
