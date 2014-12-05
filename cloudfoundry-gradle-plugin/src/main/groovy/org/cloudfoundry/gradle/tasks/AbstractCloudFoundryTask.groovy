@@ -339,6 +339,10 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         }
     }
 
+    boolean getMergeEnv() {
+        propertyOrExtension('mergeEnv')
+    }
+
     List<String> getVariants() {
         project.cloudfoundry.variants
     }

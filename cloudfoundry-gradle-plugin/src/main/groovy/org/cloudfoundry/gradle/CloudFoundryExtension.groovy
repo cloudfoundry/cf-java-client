@@ -48,11 +48,13 @@ class CloudFoundryExtension {
     String domain
     File file
     Map<String, String> env = [:]
+    boolean mergeEnv = false
 
     List<String> variants = []
     String currentVariant = ""
 
     // plugin configuration
+
     Integer appStartupTimeout
 
     boolean useSystemProxy = true

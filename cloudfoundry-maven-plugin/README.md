@@ -42,6 +42,7 @@ Following is a typical configuration example, which uses most of the available c
                     <env>
                         <ENV-VAR-NAME>env-var-value</ENV-VAR-NAME>
                     </env>
+                    <mergeEnv>true</mergeEnv>
                     <services>
                         <service>
                             <name>postgres-test</name>
@@ -187,6 +188,7 @@ Additional certain configuration parameter will fall back to using default value
 + `healthCheckTimeout`: Defaults to Cloud Controller value
 + `path`: Defaults to *${project.build.directory}/${project.build.finalName}.war*
 + `url`: Defaults to the appname and the default domain
++ `mergeEnv`: Defaults to *false*, meaning application environment variables are overwritten by plugin configuration
 + `server`: Special parameter to tell Maven which server element in `settings.xml`
   holds the credentials for Cloud Foundry. Defaults to *cloud-foundry-credentials*
 

@@ -70,8 +70,9 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("path", getArtifactPath());
 
 		parameterMap.put("env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
+		parameterMap.put("mergeEnv", String.valueOf(isMergeEnv()));
 		parameterMap.put("services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
-		parameterMap.put("noStart", isNoStart() != null ? String.valueOf(isNoStart()) : NOT_AVAILABLE);
+		parameterMap.put("noStart", String.valueOf(isNoStart()));
 
 		parameterMap.put("server", getServer());
 		parameterMap.put("target", getTarget() != null ? getTarget().toString() : NOT_AVAILABLE);

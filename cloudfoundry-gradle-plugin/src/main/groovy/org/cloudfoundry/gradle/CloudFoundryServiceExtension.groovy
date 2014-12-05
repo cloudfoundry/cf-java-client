@@ -24,6 +24,7 @@ class CloudFoundryServiceExtension {
     String provider
     String plan
     String version
+    String syslogDrainUrl
     Map<String, Object> userProvidedCredentials = [:]
     boolean bind = true
 

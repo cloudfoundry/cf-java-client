@@ -16,6 +16,7 @@
 package org.cloudfoundry.gradle.tasks
 
 import org.cloudfoundry.client.lib.CloudFoundryException
+import org.cloudfoundry.client.lib.domain.CloudApplication
 import org.cloudfoundry.client.lib.domain.Staging
 import org.gradle.api.GradleException
 import org.springframework.http.HttpStatus
@@ -26,7 +27,8 @@ class PushCloudFoundryHelper {
         Staging staging = new Staging(command, buildpack, stack, healthCheckTimeout)
         List<String> serviceNames = serviceInfos.collect { it.name }
 
-        if (applicationExists(application)) {
+        CloudApplication app = getApplication(application)
+        if (app) {
             log "Updating application ${application}"
             client.stopApplication(application)
             client.updateApplicationStaging(application, staging)
@@ -38,29 +40,43 @@ class PushCloudFoundryHelper {
             }
             client.updateApplicationUris(application, allUris)
             client.updateApplicationServices(application, serviceNames)
+
+            if (env) {
+                client.updateApplicationEnv(application, getMergedEnv(app))
+            }
         } else {
             log "Creating application ${application}"
             client.createApplication(application, staging, diskQuota, memory, allUris, serviceNames)
-        }
 
-        if (env) {
-            client.updateApplicationEnv(application, env)
+            if (env) {
+                client.updateApplicationEnv(application, env)
+            }
         }
 
         client.updateApplicationInstances(application, instances)
     }
 
-    boolean applicationExists(String appName) {
+    CloudApplication getApplication(String appName) {
         try {
-            client.getApplication(appName)
-            return true
+            return client.getApplication(appName)
         } catch (CloudFoundryException e) {
             if (e.statusCode == HttpStatus.NOT_FOUND) {
-                return false
+                return null
             } else {
                 throw e
             }
         }
+    }
+
+    def getMergedEnv(CloudApplication app) {
+        if (!mergeEnv) {
+            return env
+        }
+
+        def mergedEnv = app.getEnvAsMap()
+        mergedEnv << env
+
+        mergedEnv
     }
 
     void uploadApplication() {
