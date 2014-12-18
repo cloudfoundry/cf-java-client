@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.0.5'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.1.0'
     }
 }
 
@@ -340,6 +340,15 @@ Variants that are not currently mapped to the canonical `my-app.cfapps.io` route
 All running variants that are not mapped to the canonical route are deleted. 
 
 # History
+
+## Changes in 1.1.0
+
+* Updated cloudfoundry-client-lib dependency
+
+## Changes in 1.0.6
+
+* Added the ability to specify a syslog drain URL with a user-provided service
+* Added `mergeEnv` configuration option to control whether environment variables configured in the plugins overwrite or add to existing app environment variables
 
 ## Changes in 1.0.5
 

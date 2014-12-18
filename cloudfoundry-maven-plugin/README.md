@@ -12,7 +12,7 @@ In order to get started you must as a minimum add the **cf-maven-plugin** to you
     <plugin>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cf-maven-plugin</artifactId>
-        <version>1.0.5</version>
+        <version>1.1.0</version>
     </plugin>
 ~~~
 
@@ -28,7 +28,7 @@ Following is a typical configuration example, which uses most of the available c
             <plugin>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>cf-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.1.0</version>
                 <configuration>
                     <server>mycloudfoundry-instance</server>
                     <target>http://api.run.pivotal.io</target>
@@ -208,7 +208,7 @@ Plugin configuration in `pom.xml`:
     <plugin>
       <groupId>org.cloudfoundry</groupId>
       <artifactId>cf-maven-plugin</artifactId>
-      <version>1.0.2</version>
+      <version>1.1.0</version>
       <configuration>
           <server>mycloudfoundry-instance</server>
           <target>http://api.run.pivotal.io</target>
@@ -270,6 +270,15 @@ Some Cloud Foundry deployments, such as those deployed using Pivotal CF, use a s
 To instruct the Cloud Foundry Maven plugin to accept self-signed certificates from the Cloud Foundry target endpoint, add `<trustSelfSignedCerts>true</trustSelfSignedCerts>` to the plugin configuration block.
 
 # History
+
+## Changes from version 1.0.6 to 1.1.0
+
+* Updated cloudfoundry-client-lib dependency
+
+## Changes from version 1.0.5 to 1.0.6
+
+* Added the ability to specify a syslog drain URL with a user-provided service
+* Added `mergeEnv` configuration option to control whether environment variables configured in the plugins overwrite or add to existing app environment variables
 
 ## Changes from version 1.0.4 to 1.0.5
 
