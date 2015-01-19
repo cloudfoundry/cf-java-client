@@ -20,11 +20,14 @@ package org.cloudfoundry.client.lib.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.domain.CloudResource;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,4 +102,19 @@ public class JsonUtil {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public static List<Map<String, Object>> convertToJsonList(InputStream jsonInputStream){
+		try {
+			return mapper.readValue(jsonInputStream, List.class);
+		} catch (JsonParseException e) {
+			logger.error("Unable to parse JSON from InputStream", e);
+			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+		} catch (JsonMappingException e) {
+			logger.error("Unable to parse JSON from InputStream", e);
+			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+		} catch (IOException e) {
+			logger.error("Unable to process InputStream", e);
+			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+		}
+	}
 }

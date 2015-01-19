@@ -63,6 +63,7 @@ import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudResource;
 import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -74,6 +75,7 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
@@ -619,6 +621,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			spaceGuid = resourceMapper.getGuidOfResource(resource);
 		}
 		return spaceGuid;
+	}
+	
+	private UUID getSpaceGuid(String orgName, String spaceName) {
+		CloudOrganization org = getOrgByName(orgName, true);
+		return getSpaceGuid(spaceName, org.getMeta().getGuid());
 	}
 
 	private void doDeleteSpace(UUID spaceGuid) {
@@ -2197,4 +2204,244 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 
 	}
+
+	// Security Group operations
+	
+	@Override
+	public List<CloudSecurityGroup> getSecurityGroups() {
+		String urlPath = "/v2/security_groups";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudSecurityGroup> groups = new ArrayList<CloudSecurityGroup>();
+		for (Map<String, Object> resource : resourceList) {
+			groups.add(resourceMapper.mapResource(resource,
+					CloudSecurityGroup.class));
+		}
+		return groups;
+	}
+
+	@Override
+	public CloudSecurityGroup getSecurityGroup(String securityGroupName) {
+		return doGetSecurityGroup(securityGroupName, false);
+	}
+	
+	private CloudSecurityGroup doGetSecurityGroup(String securityGroupName, boolean required) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/security_groups?q=name:{name}";
+		urlVars.put("name", securityGroupName);
+		CloudSecurityGroup securityGroup = null;
+		List<Map<String, Object>> resourceList = getAllResources(urlPath,
+				urlVars);
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			securityGroup = resourceMapper.mapResource(resource,
+					CloudSecurityGroup.class);
+		}else if(required && resourceList.size() == 0){
+			throw new IllegalArgumentException("Security group named '" + securityGroupName 
+					+ "' not found.");
+		}
+
+		return securityGroup;
+	}
+
+	@Override
+	public void createSecurityGroup(CloudSecurityGroup securityGroup) {
+		doCreateSecurityGroup(securityGroup.getName(),
+				convertToList(securityGroup.getRules()));
+	}
+
+	private List<Map<String, Object>> convertToList(
+			List<SecurityGroupRule> rules) {
+		List<Map<String, Object>> ruleList = new ArrayList<Map<String, Object>>();
+		for (SecurityGroupRule rule : rules) {
+			Map<String, Object> ruleMap = new HashMap<String, Object>();
+			ruleMap.put("protocol", rule.getProtocol());
+			ruleMap.put("destination", rule.getDestination());
+			if (rule.getPorts() != null) {
+				ruleMap.put("ports", rule.getPorts());
+			}
+			if(rule.getLog() != null){
+				ruleMap.put("log", rule.getLog());
+			}
+			if(rule.getType() != null){
+				ruleMap.put("type", rule.getType());
+			}
+			if(rule.getCode() != null){
+				ruleMap.put("code", rule.getCode());
+			}
+			ruleList.add(ruleMap);
+		}
+		return ruleList;
+	}
+
+	@Override
+	public void createSecurityGroup(String name, InputStream jsonRulesFile) {
+		doCreateSecurityGroup(name, JsonUtil.convertToJsonList(jsonRulesFile));
+	}
+
+	private void doCreateSecurityGroup(String name, List<Map<String, Object>> rules) {
+		String path = "/v2/security_groups";
+		HashMap<String, Object> request = new HashMap<String, Object>();
+		request.put("name", name);
+		request.put("rules", rules);
+		getRestTemplate().postForObject(getUrl(path), request, String.class);
+	}
+
+	@Override
+	public void updateSecurityGroup(CloudSecurityGroup securityGroup) {
+		CloudSecurityGroup oldGroup = doGetSecurityGroup(securityGroup.getName(), true);
+		doUpdateSecurityGroup(oldGroup, securityGroup.getName(), convertToList(securityGroup.getRules()));
+	}
+
+	@Override
+	public void updateSecurityGroup(String name, InputStream jsonRulesFile) {
+		CloudSecurityGroup oldGroup = doGetSecurityGroup(name, true);
+		doUpdateSecurityGroup(oldGroup, name, JsonUtil.convertToJsonList(jsonRulesFile));
+	}
+	
+	private void doUpdateSecurityGroup(CloudSecurityGroup currentGroup, String name, List<Map<String, Object>> rules){
+		String path = "/v2/security_groups/{guid}";
+
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("guid", currentGroup.getMeta().getGuid());
+
+		HashMap<String, Object> request = new HashMap<String, Object>();
+		request.put("name", name);
+		request.put("rules", rules);
+		// Updates of bindings to spaces and default staging/running groups must be done
+		// through explicit calls to those methods and not through this generic update
+
+		getRestTemplate().put(getUrl(path), request, pathVariables);
+	}
+
+	@Override
+	public void deleteSecurityGroup(String securityGroupName) {
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		String path = "/v2/security_groups/{guid}";
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("guid", group.getMeta().getGuid());
+
+		getRestTemplate().delete(getUrl(path), pathVariables);
+	}
+
+	@Override
+	public void bindStagingSecurityGroup(String securityGroupName) {
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		String path = "/v2/config/staging_security_groups/{guid}";
+
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("guid", group.getMeta().getGuid());
+
+		getRestTemplate().put(getUrl(path), null, pathVariables);
+	}
+
+	@Override
+	public List<CloudSecurityGroup> getStagingSecurityGroups() {
+		String urlPath = "/v2/config/staging_security_groups";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudSecurityGroup> groups = new ArrayList<CloudSecurityGroup>();
+		for (Map<String, Object> resource : resourceList) {
+			groups.add(resourceMapper.mapResource(resource,
+					CloudSecurityGroup.class));
+		}
+		return groups;
+	}
+
+	@Override
+	public void unbindStagingSecurityGroup(String securityGroupName) {
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/config/staging_security_groups/{guid}";
+		urlVars.put("guid", group.getMeta().getGuid());
+		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	@Override
+	public List<CloudSecurityGroup> getRunningSecurityGroups() {
+		String urlPath = "/v2/config/running_security_groups";
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+		List<CloudSecurityGroup> groups = new ArrayList<CloudSecurityGroup>();
+		for (Map<String, Object> resource : resourceList) {
+			groups.add(resourceMapper.mapResource(resource,
+					CloudSecurityGroup.class));
+		}
+		return groups;
+	}
+
+	@Override
+	public void bindRunningSecurityGroup(String securityGroupName) {
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		String path = "/v2/config/running_security_groups/{guid}";
+
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("guid", group.getMeta().getGuid());
+
+		getRestTemplate().put(getUrl(path), null, pathVariables);
+	}
+
+	@Override
+	public void unbindRunningSecurityGroup(String securityGroupName) {
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/config/running_security_groups/{guid}";
+		urlVars.put("guid", group.getMeta().getGuid());
+		getRestTemplate().delete(getUrl(urlPath), urlVars);
+	}
+
+	@Override
+	public List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		// Need to go a few levels out to get the Organization that Spaces needs
+		String urlPath = "/v2/security_groups?q=name:{name}&inline-relations-depth=2";
+		urlVars.put("name", securityGroupName);
+		List<Map<String, Object>> resourceList = getAllResources(urlPath,
+				urlVars);
+		List<CloudSpace> spaces = new ArrayList<CloudSpace>();
+		if (resourceList.size() > 0) {
+			Map<String, Object> resource = resourceList.get(0);
+			
+			Map<String, Object> securityGroupResource = CloudEntityResourceMapper.getEntity(resource);
+			List<Map<String, Object>> spaceResources = CloudEntityResourceMapper.getEmbeddedResourceList(securityGroupResource, "spaces");
+			for(Map<String, Object> spaceResource: spaceResources){
+				spaces.add(resourceMapper.mapResource(spaceResource, CloudSpace.class));
+			}
+		}else {
+			throw new IllegalArgumentException("Security group named '" + securityGroupName 
+					+ "' not found.");
+		}
+		return spaces;
+	}
+	
+	@Override
+	public void bindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
+		UUID spaceGuid = getSpaceGuid(orgName, spaceName);
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		String path = "/v2/security_groups/{group_guid}/spaces/{space_guid}";
+
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("group_guid", group.getMeta().getGuid());
+		pathVariables.put("space_guid", spaceGuid);
+
+		getRestTemplate().put(getUrl(path), null, pathVariables);
+	}
+
+	@Override
+	public void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
+		UUID spaceGuid = getSpaceGuid(orgName, spaceName);
+		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
+		
+		String path = "/v2/security_groups/{group_guid}/spaces/{space_guid}";
+
+		Map<String, Object> pathVariables = new HashMap<String, Object>();
+		pathVariables.put("group_guid", group.getMeta().getGuid());
+		pathVariables.put("space_guid", spaceGuid);
+
+		getRestTemplate().delete(getUrl(path), pathVariables);
+	}
+
 }

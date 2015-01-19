@@ -29,6 +29,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
@@ -568,5 +569,85 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public CloudSpace getSpace(String spaceName) {
 		return cc.getSpace(spaceName);
+	}
+	
+	@Override
+	public List<CloudSecurityGroup> getSecurityGroups(){
+		return cc.getSecurityGroups();
+	}
+
+	@Override
+	public CloudSecurityGroup getSecurityGroup(String securityGroupName) {
+		return cc.getSecurityGroup(securityGroupName);
+	}
+	
+	@Override
+	public void createSecurityGroup(CloudSecurityGroup securityGroup){
+		cc.createSecurityGroup(securityGroup);
+	}
+
+	@Override
+	public void createSecurityGroup(String name, InputStream jsonRulesFile) {
+		cc.createSecurityGroup(name, jsonRulesFile);
+	}
+
+	@Override
+	public void updateSecurityGroup(CloudSecurityGroup securityGroup) {
+		cc.updateSecurityGroup(securityGroup);
+	}
+
+	@Override
+	public void updateSecurityGroup(String name, InputStream jsonRulesFile) {
+		cc.updateSecurityGroup(name, jsonRulesFile);
+	}
+	
+	@Override
+	public void deleteSecurityGroup(String securityGroupName) {
+		cc.deleteSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public List<CloudSecurityGroup> getStagingSecurityGroups() {
+		return cc.getStagingSecurityGroups();
+	}
+
+	@Override
+	public void bindStagingSecurityGroup(String securityGroupName) {
+		cc.bindStagingSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public void unbindStagingSecurityGroup(String securityGroupName) {
+		cc.unbindStagingSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public List<CloudSecurityGroup> getRunningSecurityGroups() {
+		return cc.getRunningSecurityGroups();
+	}
+
+	@Override
+	public void bindRunningSecurityGroup(String securityGroupName) {
+		cc.bindRunningSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public void unbindRunningSecurityGroup(String securityGroupName) {
+		cc.unbindRunningSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public void bindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
+		cc.bindSecurityGroup(orgName, spaceName, securityGroupName);
+	}
+
+	@Override
+	public void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
+		cc.unbindSecurityGroup(orgName, spaceName, securityGroupName);
+	}
+
+	@Override
+	public List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName) {
+		return cc.getSpacesBoundToSecurityGroup(securityGroupName);
 	}
 }
