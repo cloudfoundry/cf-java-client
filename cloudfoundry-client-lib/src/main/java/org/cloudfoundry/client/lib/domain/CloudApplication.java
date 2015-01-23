@@ -195,10 +195,10 @@ public class CloudApplication extends CloudEntity {
 	}
 
 	public Map<String, String> getEnvAsMap() {
-		Map<String,String> envMap = new HashMap<String, String>();
+		Map<String, String> envMap = new HashMap<String, String>();
 		for (String nameAndValue : env) {
-			String[] parts = nameAndValue.split("=");
-			envMap.put(parts[0], parts.length == 2 ? parts[1] : null);
+			String[] parts = nameAndValue.split("=", 2);
+			envMap.put(parts[0], parts.length == 2 && parts[1].length() > 0 ? parts[1] : null);
 		}
 		return envMap;
 	}

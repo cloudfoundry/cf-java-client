@@ -617,8 +617,33 @@ public class CloudFoundryClientTest {
 		env2.put("baz", "bong");
 		connectedClient.updateApplicationEnv(appName, env2);
 		app = connectedClient.getApplication(app.getName());
-		assertEquals(env2, app.getEnvAsMap());
+		
+		// Test the unparsed list first
 		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+
+		assertEquals(env2, app.getEnvAsMap());
+
+		connectedClient.updateApplicationEnv(appName, new HashMap<String, String>());
+		app = connectedClient.getApplication(app.getName());
+		assertTrue(app.getEnv().isEmpty());
+		assertTrue(app.getEnvAsMap().isEmpty());
+	}
+	
+	@Test
+	public void setEnvironmentThroughMapEqualsInValue() throws IOException {
+		String appName = createSpringTravelApp("env4");
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertTrue(app.getEnv().isEmpty());
+
+		Map<String, String> env1 = new HashMap<String, String>();
+		env1.put("JAVA_OPTS", "-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n");
+		connectedClient.updateApplicationEnv(appName, env1);
+		app = connectedClient.getApplication(app.getName());
+		
+		// Test the unparsed list first
+		assertEquals(new HashSet<String>(asList("JAVA_OPTS=-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n")), new HashSet<String>(app.getEnv()));
+
+		assertEquals(env1, app.getEnvAsMap());
 
 		connectedClient.updateApplicationEnv(appName, new HashMap<String, String>());
 		app = connectedClient.getApplication(app.getName());
