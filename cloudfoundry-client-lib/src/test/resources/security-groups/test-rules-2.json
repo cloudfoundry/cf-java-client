@@ -1,0 +1,8 @@
+[
+  {
+    "protocol": "tcp",
+    "destination": "205.158.11.57",
+    "ports": "80, 443",
+    "log": true
+  }
+]
