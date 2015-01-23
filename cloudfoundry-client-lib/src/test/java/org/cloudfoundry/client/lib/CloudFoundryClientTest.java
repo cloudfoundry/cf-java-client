@@ -1430,6 +1430,38 @@ public class CloudFoundryClientTest {
 		assertNull("Space '"+spaceName+  "' should not exist after deletion",deletedSpace);
 
 	}
+	
+	@Test
+	public void shouldAssignDefaultUserRolesToASpace(){
+		String spaceName = "dummy space";
+		connectedClient.createSpace(spaceName);
+		
+		List<UUID> spaceManagers=connectedClient.listSpaceManagers(spaceName);
+		assertEquals("Space should have no manager when created", 0,spaceManagers.size());
+		connectedClient.associateManagerWithSpace(spaceName);
+		spaceManagers=connectedClient.listSpaceManagers(spaceName);
+		assertEquals("Space should have one manager", 1,spaceManagers.size());
+
+
+		List<UUID> spaceDevelopers=connectedClient.listSpaceDevelopers(spaceName);
+		assertEquals("Space should have no developer when created",0, spaceDevelopers.size());
+		connectedClient.associateDeveloperWithSpace(spaceName);
+		spaceDevelopers=connectedClient.listSpaceDevelopers(spaceName);
+		assertEquals("Space should have one developer", 1,spaceDevelopers.size());
+
+		List<UUID> spaceAuditors=connectedClient.listSpaceAuditors(spaceName);
+		assertEquals("Space should have no auditor when created", 0,spaceAuditors.size());
+
+		connectedClient.associateAuditorWithSpace(spaceName);
+
+		spaceAuditors=connectedClient.listSpaceAuditors(spaceName);
+		assertEquals("Space should have one auditor ", 1,spaceAuditors.size());
+
+		connectedClient.deleteSpace(spaceName);
+		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '"+spaceName+  "' should not exist after deletion",deletedSpace);
+		
+	}
 
 	@Test
 	public void defaultDomainFound() throws Exception {

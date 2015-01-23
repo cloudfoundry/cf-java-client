@@ -637,6 +637,81 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
+	public List<UUID> listSpaceManagers(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/managers";
+		return getSpaceUserGuids(spaceName, urlPath);
+	}
+
+	@Override
+	public List<UUID> listSpaceDevelopers(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/developers";
+		return getSpaceUserGuids(spaceName, urlPath);
+	}
+
+	@Override
+	public List<UUID> listSpaceAuditors(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/auditors";
+		return getSpaceUserGuids(spaceName, urlPath);
+	}
+
+	private List<UUID> getSpaceUserGuids(String spaceName, String urlPath) {
+		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
+		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", spaceGuid);
+
+		List<UUID> managersGuid = new ArrayList<UUID>();
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		for (Map<String, Object> resource : resourceList) {
+			UUID userGuid = resourceMapper.getGuidOfResource(resource);
+			managersGuid.add(userGuid);
+		}
+		return managersGuid;
+	}
+
+	@Override
+	public void associateManagerWithSpace(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/managers/{userGuid}";
+		
+		associateRoleWithSpace(spaceName, urlPath);
+	}
+
+	@Override
+	public void associateDeveloperWithSpace(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/developers/{userGuid}";
+		
+		associateRoleWithSpace(spaceName, urlPath);
+		
+	}
+
+	@Override
+	public void associateAuditorWithSpace(String spaceName) {
+		String urlPath = "/v2/spaces/{guid}/auditors/{userGuid}";
+		
+		associateRoleWithSpace(spaceName, urlPath);
+		
+	}
+
+	private void associateRoleWithSpace(String spaceName, String urlPath) {
+		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
+		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();
+		spaceRequest.put("guid", spaceGuid);
+
+		String userId = getCurrentUserId();
+		
+		getRestTemplate().put(getUrl(urlPath), spaceRequest,spaceGuid,userId);
+	}
+
+	private String getCurrentUserId() {
+		String username = getInfo().getUser();
+		Map<String, Object> userMap = getUserInfo(username);
+		String userId= (String) userMap.get("user_id");
+		return userId;
+	}
+	
+	@Override
 	public List<CloudOrganization> getOrganizations() {
 		String urlPath = "/v2/organizations?inline-relations-depth=0";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
