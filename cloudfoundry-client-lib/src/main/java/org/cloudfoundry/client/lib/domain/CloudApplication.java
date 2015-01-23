@@ -207,21 +207,12 @@ public class CloudApplication extends CloudEntity {
 		return env;
 	}
 
-	public void setEnv(Map<String, String> env) {
+	public void setEnv(Map<Object, Object> env) {
 		List<String> joined = new ArrayList<String>();
-		for (Map.Entry<String, String> entry : env.entrySet()) {
-			joined.add(entry.getKey() + '=' + entry.getValue());
+		for (Map.Entry<Object, Object> entry : env.entrySet()) {
+			joined.add(entry.getKey().toString() + '=' + entry.getValue().toString());
 		}
 		this.env = joined;
-	}
-
-	public void setEnv(List<String> env) {
-		for (String s : env) {
-			if (!s.contains("=")) {
-				throw new IllegalArgumentException("Environment setting without '=' is invalid: " + s);
-			}
-		}
-		this.env = env;
 	}
 
 	@Override

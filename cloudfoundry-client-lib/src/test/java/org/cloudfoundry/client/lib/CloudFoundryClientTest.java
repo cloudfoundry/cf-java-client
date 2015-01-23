@@ -585,11 +585,11 @@ public class CloudFoundryClientTest {
 
 		connectedClient.updateApplicationEnv(appName, asList("foo=bar", "bar=baz"));
 		app = connectedClient.getApplication(app.getName());
-		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=bar", "bar=baz"), listToHashSet(app.getEnv()));
 
 		connectedClient.updateApplicationEnv(appName, asList("foo=baz", "baz=bong"));
 		app = connectedClient.getApplication(app.getName());
-		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=baz", "baz=bong"), listToHashSet(app.getEnv()));
 
 		connectedClient.updateApplicationEnv(appName, new ArrayList<String>());
 		app = connectedClient.getApplication(app.getName());
@@ -617,7 +617,7 @@ public class CloudFoundryClientTest {
 		connectedClient.updateApplicationEnv(appName, env1);
 		app = connectedClient.getApplication(app.getName());
 		assertEquals(env1, app.getEnvAsMap());
-		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=bar", "bar=baz"), listToHashSet(app.getEnv()));
 
 		Map<String, String> env2 = new HashMap<String, String>();
 		env2.put("foo", "baz");
@@ -626,7 +626,7 @@ public class CloudFoundryClientTest {
 		app = connectedClient.getApplication(app.getName());
 		
 		// Test the unparsed list first
-		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=baz", "baz=bong"), listToHashSet(app.getEnv()));
 
 		assertEquals(env2, app.getEnvAsMap());
 
@@ -635,7 +635,7 @@ public class CloudFoundryClientTest {
 		assertTrue(app.getEnv().isEmpty());
 		assertTrue(app.getEnvAsMap().isEmpty());
 	}
-	
+
 	@Test
 	public void setEnvironmentThroughMapEqualsInValue() throws IOException {
 		String appName = createSpringTravelApp("env4");
@@ -643,12 +643,12 @@ public class CloudFoundryClientTest {
 		assertTrue(app.getEnv().isEmpty());
 
 		Map<String, String> env1 = new HashMap<String, String>();
-		env1.put("JAVA_OPTS", "-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n");
+		env1.put("key", "foo=bar,fu=baz");
 		connectedClient.updateApplicationEnv(appName, env1);
 		app = connectedClient.getApplication(app.getName());
-		
+
 		// Test the unparsed list first
-		assertEquals(new HashSet<String>(asList("JAVA_OPTS=-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("key=foo=bar,fu=baz"), listToHashSet(app.getEnv()));
 
 		assertEquals(env1, app.getEnvAsMap());
 
@@ -656,6 +656,14 @@ public class CloudFoundryClientTest {
 		app = connectedClient.getApplication(app.getName());
 		assertTrue(app.getEnv().isEmpty());
 		assertTrue(app.getEnvAsMap().isEmpty());
+	}
+
+	private HashSet<String> arrayToHashSet(String... array) {
+		return listToHashSet(asList(array));
+	}
+
+	private HashSet<String> listToHashSet(List<String> list) {
+		return new HashSet<String>(list);
 	}
 
 	@Test
