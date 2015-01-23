@@ -92,7 +92,7 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 * @return List of space manager UUID
 	 */
-	List<UUID> listSpaceManagers(String spaceName);
+	List<UUID> getSpaceManagers(String spaceName);
 
 	/**
 	 * Get list of space developer UUID  for the space.
@@ -100,7 +100,7 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 * @return List of space developer UUID
 	 */
-	List<UUID> listSpaceDevelopers(String spaceName);
+	List<UUID> getSpaceDevelopers(String spaceName);
 
 	/**
 	 * Get list of space auditor UUID  for the space.
@@ -108,8 +108,7 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 * @return List of space auditor UUID
 	 */
-	List<UUID> listSpaceAuditors(String spaceName);
-
+	List<UUID> getSpaceAuditors(String spaceName);
 
 	/**
 	 * Associate current user to the space auditors role 

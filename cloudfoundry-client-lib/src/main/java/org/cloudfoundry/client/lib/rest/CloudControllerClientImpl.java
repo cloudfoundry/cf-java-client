@@ -644,19 +644,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public List<UUID> listSpaceManagers(String spaceName) {
+	public List<UUID> getSpaceManagers(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/managers";
 		return getSpaceUserGuids(spaceName, urlPath);
 	}
 
 	@Override
-	public List<UUID> listSpaceDevelopers(String spaceName) {
+	public List<UUID> getSpaceDevelopers(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/developers";
 		return getSpaceUserGuids(spaceName, urlPath);
 	}
 
 	@Override
-	public List<UUID> listSpaceAuditors(String spaceName) {
+	public List<UUID> getSpaceAuditors(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/auditors";
 		return getSpaceUserGuids(spaceName, urlPath);
 	}
@@ -680,24 +680,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void associateManagerWithSpace(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/managers/{userGuid}";
-		
 		associateRoleWithSpace(spaceName, urlPath);
 	}
 
 	@Override
 	public void associateDeveloperWithSpace(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/developers/{userGuid}";
-		
 		associateRoleWithSpace(spaceName, urlPath);
-		
 	}
 
 	@Override
 	public void associateAuditorWithSpace(String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/auditors/{userGuid}";
-		
 		associateRoleWithSpace(spaceName, urlPath);
-		
 	}
 
 	private void associateRoleWithSpace(String spaceName, String urlPath) {

@@ -572,18 +572,18 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	@Override
-	public List<UUID> listSpaceManagers(String spaceName) {
-		return cc.listSpaceManagers(spaceName);
+	public List<UUID> getSpaceManagers(String spaceName) {
+		return cc.getSpaceManagers(spaceName);
 	}
 
 	@Override
-	public List<UUID> listSpaceDevelopers(String spaceName) {
-		return cc.listSpaceDevelopers(spaceName);
+	public List<UUID> getSpaceDevelopers(String spaceName) {
+		return cc.getSpaceDevelopers(spaceName);
 	}
 
 	@Override
-	public List<UUID> listSpaceAuditors(String spaceName) {
-		return cc.listSpaceAuditors(spaceName);
+	public List<UUID> getSpaceAuditors(String spaceName) {
+		return cc.getSpaceAuditors(spaceName);
 	}
 
 	@Override

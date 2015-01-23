@@ -249,11 +249,11 @@ public interface CloudControllerClient {
 
 	void setQuotaToOrg(String orgName, String quotaName);
 
-	List<UUID> listSpaceManagers(String spaceName);
+	List<UUID> getSpaceManagers(String spaceName);
 
-	List<UUID> listSpaceDevelopers(String spaceName);
+	List<UUID> getSpaceDevelopers(String spaceName);
 
-	List<UUID> listSpaceAuditors(String spaceName);
+	List<UUID> getSpaceAuditors(String spaceName);
 
 	void associateManagerWithSpace(String spaceName);
 
