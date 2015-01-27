@@ -35,6 +35,7 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
@@ -250,4 +251,50 @@ public interface CloudControllerClient {
 	void deleteQuota(String quotaName);
 
 	void setQuotaToOrg(String orgName, String quotaName);
+
+	List<UUID> getSpaceManagers(String spaceName);
+
+	List<UUID> getSpaceDevelopers(String spaceName);
+
+	List<UUID> getSpaceAuditors(String spaceName);
+
+	void associateManagerWithSpace(String spaceName);
+
+	void associateDeveloperWithSpace(String spaceName);
+
+	void associateAuditorWithSpace(String spaceName);
+
+	// Security Group Operations
+	
+	List<CloudSecurityGroup> getSecurityGroups();
+
+	CloudSecurityGroup getSecurityGroup(String securityGroupName);
+	
+	void createSecurityGroup(CloudSecurityGroup securityGroup);
+
+	void createSecurityGroup(String name, InputStream jsonRulesFile);
+
+	void updateSecurityGroup(CloudSecurityGroup securityGroup);
+
+	void updateSecurityGroup(String name, InputStream jsonRulesFile);
+
+	void deleteSecurityGroup(String securityGroupName);
+
+	List<CloudSecurityGroup> getStagingSecurityGroups();
+
+	void bindStagingSecurityGroup(String securityGroupName);
+
+	void unbindStagingSecurityGroup(String securityGroupName);
+
+	List<CloudSecurityGroup> getRunningSecurityGroups();
+
+	void bindRunningSecurityGroup(String securityGroupName);
+
+	void unbindRunningSecurityGroup(String securityGroupName);
+
+	List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName);
+
+	void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+
+	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 }

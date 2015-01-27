@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.util;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
@@ -29,6 +30,7 @@ import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 
 import java.text.SimpleDateFormat;
@@ -90,6 +92,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudQuota.class) {
             return (T) mapQuotaResource(resource);
+        }
+		if (targetClass == CloudSecurityGroup.class) {
+            return (T) mapApplicationSecurityGroupResource(resource);
         }
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
@@ -280,6 +285,30 @@ public class CloudEntityResourceMapper {
 				getEntityAttribute(resource, "description", String.class));
 	}
 
+	private CloudSecurityGroup mapApplicationSecurityGroupResource(Map<String, Object> resource) {
+		return new CloudSecurityGroup(getMeta(resource),
+				getNameOfResource(resource),
+				getSecurityGroupRules(resource),
+				getEntityAttribute(resource, "running_default", Boolean.class),
+				getEntityAttribute(resource, "staging_default", Boolean.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<SecurityGroupRule> getSecurityGroupRules(Map<String, Object> resource){
+		List<SecurityGroupRule> rules = new ArrayList<SecurityGroupRule>();
+		List<Map<String, Object>> jsonRules = getEntityAttribute(resource, "rules", List.class);
+		for(Map<String, Object> jsonRule : jsonRules){
+			rules.add(new SecurityGroupRule(
+					(String) jsonRule.get("protocol"), 
+					(String) jsonRule.get("ports"), 
+					(String) jsonRule.get("destination"), 
+					(Boolean) jsonRule.get("log"), 
+					(Integer) jsonRule.get("type"), 
+					(Integer) jsonRule.get("code")));
+		}
+		return rules;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static CloudEntity.Meta getMeta(Map<String, Object> resource) {
 		Map<String, Object> metadata = (Map<String, Object>) resource.get("metadata");

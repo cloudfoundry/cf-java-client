@@ -9,12 +9,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -44,6 +46,7 @@ import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -56,6 +59,7 @@ import org.cloudfoundry.client.lib.domain.InstanceInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.eclipse.jetty.server.Server;
@@ -158,6 +162,8 @@ public class CloudFoundryClientTest {
 	private static final int FIVE_MINUTES = 300 * 1000;
 	
 	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
+	
+	private static final String CCNG_SECURITY_GROUP_NAME_TEST = System.getProperty("ccng.securityGroup", "test_security_group");
 
 	private static boolean tearDownComplete = false;
 
@@ -250,6 +256,7 @@ public class CloudFoundryClientTest {
 			connectedClient.deleteAllApplications();
 			connectedClient.deleteAllServices();
 			clearTestDomainAndRoutes();
+			deleteAnyOrphanedTestSecurityGroups();
 		}
 		tearDownComplete = true;
 	}
@@ -599,11 +606,11 @@ public class CloudFoundryClientTest {
 
 		connectedClient.updateApplicationEnv(appName, asList("foo=bar", "bar=baz"));
 		app = connectedClient.getApplication(app.getName());
-		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=bar", "bar=baz"), listToHashSet(app.getEnv()));
 
 		connectedClient.updateApplicationEnv(appName, asList("foo=baz", "baz=bong"));
 		app = connectedClient.getApplication(app.getName());
-		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=baz", "baz=bong"), listToHashSet(app.getEnv()));
 
 		connectedClient.updateApplicationEnv(appName, new ArrayList<String>());
 		app = connectedClient.getApplication(app.getName());
@@ -631,20 +638,53 @@ public class CloudFoundryClientTest {
 		connectedClient.updateApplicationEnv(appName, env1);
 		app = connectedClient.getApplication(app.getName());
 		assertEquals(env1, app.getEnvAsMap());
-		assertEquals(new HashSet<String>(asList("foo=bar", "bar=baz")), new HashSet<String>(app.getEnv()));
+		assertEquals(arrayToHashSet("foo=bar", "bar=baz"), listToHashSet(app.getEnv()));
 
 		Map<String, String> env2 = new HashMap<String, String>();
 		env2.put("foo", "baz");
 		env2.put("baz", "bong");
 		connectedClient.updateApplicationEnv(appName, env2);
 		app = connectedClient.getApplication(app.getName());
+		
+		// Test the unparsed list first
+		assertEquals(arrayToHashSet("foo=baz", "baz=bong"), listToHashSet(app.getEnv()));
+
 		assertEquals(env2, app.getEnvAsMap());
-		assertEquals(new HashSet<String>(asList("foo=baz", "baz=bong")), new HashSet<String>(app.getEnv()));
 
 		connectedClient.updateApplicationEnv(appName, new HashMap<String, String>());
 		app = connectedClient.getApplication(app.getName());
 		assertTrue(app.getEnv().isEmpty());
 		assertTrue(app.getEnvAsMap().isEmpty());
+	}
+
+	@Test
+	public void setEnvironmentThroughMapEqualsInValue() throws IOException {
+		String appName = createSpringTravelApp("env4");
+		CloudApplication app = connectedClient.getApplication(appName);
+		assertTrue(app.getEnv().isEmpty());
+
+		Map<String, String> env1 = new HashMap<String, String>();
+		env1.put("key", "foo=bar,fu=baz");
+		connectedClient.updateApplicationEnv(appName, env1);
+		app = connectedClient.getApplication(app.getName());
+
+		// Test the unparsed list first
+		assertEquals(arrayToHashSet("key=foo=bar,fu=baz"), listToHashSet(app.getEnv()));
+
+		assertEquals(env1, app.getEnvAsMap());
+
+		connectedClient.updateApplicationEnv(appName, new HashMap<String, String>());
+		app = connectedClient.getApplication(app.getName());
+		assertTrue(app.getEnv().isEmpty());
+		assertTrue(app.getEnvAsMap().isEmpty());
+	}
+
+	private HashSet<String> arrayToHashSet(String... array) {
+		return listToHashSet(asList(array));
+	}
+
+	private HashSet<String> listToHashSet(List<String> list) {
+		return new HashSet<String>(list);
 	}
 
 	@Test
@@ -1457,6 +1497,38 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void shouldAssignDefaultUserRolesToASpace() {
+		String spaceName = "dummy space";
+		connectedClient.createSpace(spaceName);
+
+		List<UUID> spaceManagers = connectedClient.getSpaceManagers(spaceName);
+		assertEquals("Space should have no manager when created", 0, spaceManagers.size());
+		connectedClient.associateManagerWithSpace(spaceName);
+		spaceManagers = connectedClient.getSpaceManagers(spaceName);
+		assertEquals("Space should have one manager", 1, spaceManagers.size());
+
+
+		List<UUID> spaceDevelopers = connectedClient.getSpaceDevelopers(spaceName);
+		assertEquals("Space should have no developer when created", 0, spaceDevelopers.size());
+		connectedClient.associateDeveloperWithSpace(spaceName);
+		spaceDevelopers = connectedClient.getSpaceDevelopers(spaceName);
+		assertEquals("Space should have one developer", 1, spaceDevelopers.size());
+
+		List<UUID> spaceAuditors = connectedClient.getSpaceAuditors(spaceName);
+		assertEquals("Space should have no auditor when created", 0, spaceAuditors.size());
+
+		connectedClient.associateAuditorWithSpace(spaceName);
+
+		spaceAuditors = connectedClient.getSpaceAuditors(spaceName);
+		assertEquals("Space should have one auditor ", 1, spaceAuditors.size());
+
+		connectedClient.deleteSpace(spaceName);
+		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '" + spaceName + "' should not exist after deletion", deletedSpace);
+
+	}
+
+	@Test
 	public void defaultDomainFound() throws Exception {
 		assertNotNull(connectedClient.getDefaultDomain());
 	}
@@ -1740,7 +1812,256 @@ public class CloudFoundryClientTest {
 		connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
 		connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST);
 	}
+	
+	@Test
+	public void crudSecurityGroups() throws Exception {
+		assumeTrue(CCNG_USER_IS_ADMIN);
 
+		List<SecurityGroupRule> rules = new ArrayList<SecurityGroupRule>();
+		SecurityGroupRule rule = new SecurityGroupRule("tcp", "80, 443", "205.158.11.29");
+		rules.add(rule);
+		rule = new SecurityGroupRule("all", null, "0.0.0.0-255.255.255.255");
+		rules.add(rule);
+		rule = new SecurityGroupRule("icmp", null, "0.0.0.0/0", true, 0, 1);
+		rules.add(rule);
+		CloudSecurityGroup securityGroup = new CloudSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, rules);
+		
+		// Create
+		connectedClient.createSecurityGroup(securityGroup);
+		
+		// Verify created
+		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		assertNotNull(securityGroup);
+		assertThat(securityGroup.getRules().size(), is(3));
+		assertRulesMatchTestData(securityGroup);
+		
+		// Update group
+		rules = new ArrayList<SecurityGroupRule>();
+		rule = new SecurityGroupRule("all", null, "0.0.0.0-255.255.255.255");
+		rules.add(rule);
+		securityGroup = new CloudSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, rules);
+		connectedClient.updateSecurityGroup(securityGroup);
+		
+		// Verify update
+		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		assertThat(securityGroup.getRules().size(), is(1));
+		
+		// Delete group
+		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		// Verify deleted
+		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		assertNull(securityGroup);
+	}
+	
+	private void assertRulesMatchTestData(CloudSecurityGroup securityGroup) {
+		// This asserts against the test data defined in the crudSecurityGroups method
+		// Rule ordering is preserved so we can depend on it here
+		SecurityGroupRule rule = securityGroup.getRules().get(0);
+		assertThat(rule.getProtocol(), is("tcp"));
+		assertThat(rule.getPorts(), is("80, 443"));
+		assertThat(rule.getDestination(), is("205.158.11.29"));
+		assertNull(rule.getLog());
+		assertNull(rule.getType());
+		assertNull(rule.getCode());
+		
+		rule = securityGroup.getRules().get(1);
+		assertThat(rule.getProtocol(), is("all"));
+		assertNull(rule.getPorts());
+		assertThat(rule.getDestination(), is("0.0.0.0-255.255.255.255"));
+		assertNull(rule.getLog());
+		assertNull(rule.getType());
+		assertNull(rule.getCode());
+
+		rule = securityGroup.getRules().get(2);
+		assertThat(rule.getProtocol(), is("icmp"));
+		assertNull(rule.getPorts());
+		assertThat(rule.getDestination(), is("0.0.0.0/0"));
+		assertTrue(rule.getLog());
+		assertThat(rule.getType(), is(0));
+		assertThat(rule.getCode(), is(1));
+	}
+
+	@Test
+	public void securityGroupsCanBeCreatedAndUpdatedFromJsonFiles() throws FileNotFoundException{
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// Create
+		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-1.json")));
+		
+		// Verify created
+		CloudSecurityGroup securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		assertNotNull(securityGroup);
+		assertThat(securityGroup.getRules().size(), is(4));
+		assertRulesMatchThoseInJsonFile1(securityGroup);
+		
+		// Update group
+		connectedClient.updateSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
+		
+		// Verify update
+		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		assertThat(securityGroup.getRules().size(), is(1));
+		
+		// Clean up after ourselves
+		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+	}
+	
+	private void assertRulesMatchThoseInJsonFile1(CloudSecurityGroup securityGroup) {
+		// Rule ordering is preserved so we can depend on it here
+
+		SecurityGroupRule rule = securityGroup.getRules().get(0);
+		assertThat(rule.getProtocol(), is("icmp"));
+		assertNull(rule.getPorts());
+		assertThat(rule.getDestination(), is("0.0.0.0/0"));
+		assertNull(rule.getLog());
+		assertThat(rule.getType(), is(0));
+		assertThat(rule.getCode(), is(1));
+		
+		rule = securityGroup.getRules().get(1);
+		assertThat(rule.getProtocol(), is("tcp"));
+		assertThat(rule.getPorts(), is("2048-3000"));
+		assertThat(rule.getDestination(), is("1.0.0.0/0"));
+		assertTrue(rule.getLog());
+		assertNull(rule.getType());
+		assertNull(rule.getCode());
+
+		rule = securityGroup.getRules().get(2);
+		assertThat(rule.getProtocol(), is("udp"));
+		assertThat(rule.getPorts(), is("53, 5353"));
+		assertThat(rule.getDestination(), is("2.0.0.0/0"));
+		assertNull(rule.getLog());
+		assertNull(rule.getType());
+		assertNull(rule.getCode());
+
+		rule = securityGroup.getRules().get(3);
+		assertThat(rule.getProtocol(), is("all"));
+		assertNull(rule.getPorts());
+		assertThat(rule.getDestination(), is("3.0.0.0/0"));
+		assertNull(rule.getLog());
+		assertNull(rule.getType());
+		assertNull(rule.getCode());
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void attemptingToDeleteANonExistentSecurityGroupThrowsAnIllegalArgumentException(){
+		assumeTrue(CCNG_USER_IS_ADMIN);
+		
+		connectedClient.deleteSecurityGroup(randomSecurityGroupName());
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void attemptingToUpdateANonExistentSecurityGroupThrowsAnIllegalArgumentException() throws FileNotFoundException{
+		assumeTrue(CCNG_USER_IS_ADMIN);
+		
+		connectedClient.updateSecurityGroup(randomSecurityGroupName(), new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
+	}
+
+	private String randomSecurityGroupName() {
+		return UUID.randomUUID().toString();
+	}
+	
+	@Test
+	public void bindingAndUnbindingSecurityGroupToDefaultStagingSet() throws FileNotFoundException{
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// Given
+		assertFalse(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
+		
+		// When
+		connectedClient.bindStagingSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		
+		// Then
+		assertTrue(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+
+		// When
+		connectedClient.unbindStagingSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		
+		// Then
+		assertFalse(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+		
+		// Cleanup
+		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+	}
+	
+	@Test
+	public void bindingAndUnbindingSecurityGroupToDefaultRunningSet() throws FileNotFoundException{
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// Given
+		assertFalse(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
+		
+		// When
+		connectedClient.bindRunningSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		
+		// Then
+		assertTrue(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+
+		// When
+		connectedClient.unbindRunningSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+		
+		// Then
+		assertFalse(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
+		
+		// Cleanup
+		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+	}
+	
+	@Test
+	public void bindingAndUnbindingSecurityGroupToSpaces() throws FileNotFoundException{
+		assumeTrue(CCNG_USER_IS_ADMIN);
+
+		// Given
+		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
+		
+		// When
+		connectedClient.bindSecurityGroup(CCNG_USER_ORG, CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST);
+		// Then
+		assertTrue(isSpaceBoundToSecurityGroup(CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST));
+
+		// When
+		connectedClient.unbindSecurityGroup(CCNG_USER_ORG, CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST);
+		//Then
+		assertFalse(isSpaceBoundToSecurityGroup(CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST));
+		
+		// Cleanup
+		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+	}
+
+	private boolean isSpaceBoundToSecurityGroup(String spaceName, String securityGroupName) {
+		List<CloudSpace> boundSpaces = connectedClient.getSpacesBoundToSecurityGroup(securityGroupName);
+		for(CloudSpace space: boundSpaces){
+			if(spaceName.equals(space.getName())){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsSecurityGroupNamed(List<CloudSecurityGroup> groups, String groupName) {
+		for(CloudSecurityGroup group: groups){
+			if(groupName.equalsIgnoreCase(group.getName())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Try to clean up any security group test data left behind in the case of assertions failing and
+	 * test security groups not being deleted as part of test logic.
+	 */
+	private void deleteAnyOrphanedTestSecurityGroups(){
+		try{
+			CloudSecurityGroup securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+			if(securityGroup != null){
+				connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
+			}
+		} catch(Exception e){
+			// Nothing we can do at this point except protect other teardown logic from not running
+		}
+	}
+	
 	//
 	// Shared test methods
 	//
