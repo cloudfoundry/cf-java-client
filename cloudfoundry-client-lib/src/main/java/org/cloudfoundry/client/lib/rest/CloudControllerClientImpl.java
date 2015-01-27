@@ -57,6 +57,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationLogs;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
@@ -905,6 +906,28 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			}
 		}
 	}
+
+    @Override
+    public List<CloudEvent> getEvents() {
+        String urlPath = "/v2";
+        urlPath = urlPath + "/events?inline-relations-depth=1";
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+        List<CloudEvent> events = new ArrayList<CloudEvent>();
+        for (Map<String, Object> resource : resourceList) {
+            events.add(mapCloudEvent(resource));
+        }
+        return events;
+    }
+
+    @SuppressWarnings("unchecked")
+    private CloudEvent mapCloudEvent(Map<String, Object> resource) {
+        UUID eventId = resourceMapper.getGuidOfResource(resource);
+        CloudEvent event = null;
+        if (resource != null) {
+            event = resourceMapper.mapResource(resource, CloudEvent.class);
+        }
+        return event;
+    }
 
 	@Override
 	public List<CloudApplication> getApplications() {

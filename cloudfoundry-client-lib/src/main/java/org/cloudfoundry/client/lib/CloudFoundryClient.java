@@ -30,6 +30,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
@@ -345,6 +346,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateApplicationEnv(appName, env);
 	}
 
+
+    public List<CloudEvent> getEvents() {
+        return cc.getEvents();
+    }
 	/**
 	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */

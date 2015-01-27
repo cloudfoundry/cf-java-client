@@ -36,6 +36,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
@@ -65,6 +66,8 @@ public interface CloudControllerClient {
 	URL getCloudControllerUrl();
 
 	CloudInfo getInfo();
+
+    List<CloudEvent> getEvents();
 
 	List<CloudSpace> getSpaces();
 

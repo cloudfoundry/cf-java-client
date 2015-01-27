@@ -38,6 +38,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
@@ -377,6 +378,26 @@ public class CloudFoundryClientTest {
 		assertNotNull(orgs);
 		assertTrue(orgs.size() > 0);
 	}
+
+    @Test
+    public void eventsAvailable() throws Exception {
+        List<CloudEvent> events = connectedClient.getEvents();
+        if (events.size() > 0) {
+            for (int i = 0; i < events.size(); i++) {
+                System.out.println("--------NEW EVENT---------");
+                System.out.println(events.get(i).getType());
+                System.out.println(events.get(i).getActeeName());
+                System.out.println(events.get(i).getActor().toString());
+                System.out.println(events.get(i).getActee().toString());
+                System.out.println(events.get(i).getActeeType());
+                System.out.println(events.get(i).getTimestamp().toString());
+                System.out.println(events.get(i).getActorType());
+                System.out.println(events.get(i).getActorName());
+            }
+        } else {
+            System.out.println("no events found");
+        }
+     }
 
 	//
 	// Basic Application tests
@@ -1065,6 +1086,10 @@ public class CloudFoundryClientTest {
 			List<ApplicationLog> logs = connectedClient.getRecentLogs(appName);
 
 			if (logs.size() > 0) {
+                for (int i=0; i<logs.size(); i++)
+                {
+                    System.out.println(logs.get(i).toString());
+                }
 				return logs;
 			}
 			Thread.sleep(1000);
