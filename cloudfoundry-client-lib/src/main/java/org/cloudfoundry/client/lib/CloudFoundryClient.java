@@ -351,6 +351,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     public List<CloudEvent> getEvents() {
         return cc.getEvents();
     }
+
+    public List<CloudEvent> getApplicationEvents(String appName) {
+        return cc.getApplicationEvents(appName);
+    }
 	/**
 	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */

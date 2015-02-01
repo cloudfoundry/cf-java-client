@@ -70,6 +70,8 @@ public interface CloudControllerClient {
 
     List<CloudEvent> getEvents();
 
+    List<CloudEvent> getApplicationEvents(String appName);
+
 	List<CloudSpace> getSpaces();
 
 	List<CloudOrganization> getOrganizations();
