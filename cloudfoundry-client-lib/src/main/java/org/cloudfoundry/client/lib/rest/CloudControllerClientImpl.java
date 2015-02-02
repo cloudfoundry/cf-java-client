@@ -1009,14 +1009,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
     @Override
     public List<CloudEvent> getApplicationEvents(String appName) {
         UUID appId = getAppId(appName);
-        System.out.println("got into function");
-        System.out.println("app guid is " + appId.toString());
-
         Map<String, Object> urlVars = new HashMap<String, Object>();
         urlVars.put("appId", appId);
         String urlPath = "/v2/events?q=actee:{appId}";
         List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-        System.out.println("got past get resources");
         List<CloudEvent> events = new ArrayList<CloudEvent>();
         for (Map<String, Object> resource : resourceList) {
             events.add(mapCloudEvent(resource));
