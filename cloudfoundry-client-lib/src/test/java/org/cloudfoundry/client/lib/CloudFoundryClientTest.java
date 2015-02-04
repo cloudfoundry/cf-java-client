@@ -393,42 +393,16 @@ public class CloudFoundryClientTest {
     @Test
     public void eventsAvailable() throws Exception {
         List<CloudEvent> events = connectedClient.getEvents();
-        if (events.size() > 0) {
-            for (int i = 0; i < events.size(); i++) {
-                System.out.println("--------NEW EVENT---------");
-                System.out.println(events.get(i).getType());
-                System.out.println(events.get(i).getActeeName());
-                System.out.println(events.get(i).getActor().toString());
-                System.out.println(events.get(i).getActee().toString());
-                System.out.println(events.get(i).getActeeType());
-                System.out.println(events.get(i).getTimestamp().toString());
-                System.out.println(events.get(i).getActorType());
-                System.out.println(events.get(i).getActorName());
-            }
-        } else {
-            System.out.println("no events found");
-        }
+        assertNotNull(events);
+        assertTrue(events.size() > 0);
     }
 
     @Test
     public void appEventsAvailable() throws Exception {
         String appName = createSpringTravelApp("appEvents");
         List<CloudEvent> events = connectedClient.getApplicationEvents(appName);
-        if (events.size() > 0) {
-            for (int i = 0; i < events.size(); i++) {
-                System.out.println("--------Getting APP Specific events---------");
-                System.out.println(events.get(i).getType());
-                System.out.println(events.get(i).getActeeName());
-                System.out.println(events.get(i).getActor().toString());
-                System.out.println(events.get(i).getActee().toString());
-                System.out.println(events.get(i).getActeeType());
-                System.out.println(events.get(i).getTimestamp().toString());
-                System.out.println(events.get(i).getActorType());
-                System.out.println(events.get(i).getActorName());
-            }
-        } else {
-            System.out.println("no app events found");
-        }
+        assertNotNull(events);
+        assertTrue(events.size() > 0);
     }
 
 
