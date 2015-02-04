@@ -24,38 +24,10 @@ public class CloudEvent extends CloudEntity {
     private String actee_type;
     private String actee_name;
     private Date timestamp;
-//    private String instance;
-//    private int index;
-//    private int exit_status;
-//    private String exit_description;
-//    private String reason;
-//    private String space_guid;
-//    private String organization_guid;
-
 
     public CloudEvent(Meta meta, String name) {
         super(meta, name);
     }
-
-//    public CloudEvent(String type, UUID actor, String actor_type, String actor_name,
-//                      String actee, String actee_type, String actee_name, String timestamp,
-//                      String instance, int index, int exit_status, String exit_description,
-//                      String reason) {
-//        super(CloudEntity.Meta.defaultMeta(), name);
-//        this.type = type;
-//        this.actor = actor;
-//        this.actor_type = actor_type;
-//        this.actor_name = actor_name;
-//        this.actee = actee;
-//        this.actee_type = actee_type;
-//        this.actee_name = actee_name;
-//        this.timestamp = timestamp;
-//        this.instance = instance;
-//        this.index = index;
-//        this.exit_status = exit_status;
-//        this.exit_description = exit_description;
-//        this.reason = reason;
-//    }
 
     @SuppressWarnings("unchecked")
     public CloudEvent(Map<String, Object> attributes) {
@@ -133,25 +105,5 @@ public class CloudEvent extends CloudEntity {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
-//
-//    public String getInstance() {
-//        return instance;
-//    }
-//
-//    public int getIndex() {
-//        return index;
-//    }
-//
-//    public int getExitStatus() {
-//        return exit_status;
-//    }
-//
-//    public String getExitDescription() {
-//        return exit_description;
-//    }
-//
-//    public String getReason() {
-//        return reason;
-//    }
 
 }
