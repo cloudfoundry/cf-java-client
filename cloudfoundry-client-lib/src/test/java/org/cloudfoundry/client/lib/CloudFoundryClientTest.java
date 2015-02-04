@@ -1126,10 +1126,6 @@ public class CloudFoundryClientTest {
 			List<ApplicationLog> logs = connectedClient.getRecentLogs(appName);
 
 			if (logs.size() > 0) {
-                for (int i=0; i<logs.size(); i++)
-                {
-                    System.out.println(logs.get(i).toString());
-                }
 				return logs;
 			}
 			Thread.sleep(1000);

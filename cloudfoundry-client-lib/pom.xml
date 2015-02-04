@@ -418,18 +418,18 @@
 		</testResources>
 	</build>
 
-        <distributionManagement>
-            <repository>
-                <id>sonatype-ossrh-staging</id>
-                <name>Sonatype OSSRH</name>
-                <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-            </repository>
-            <snapshotRepository>
-                <id>spring-snapshot</id>
-                <name>Spring Snapshot Repository</name>
-                <url>s3://maven.springframework.org/snapshot</url>
-            </snapshotRepository>
-        </distributionManagement>
+       <distributionManagement>
+           <repository>
+               <id>sonatype-ossrh-staging</id>
+               <name>Sonatype OSSRH</name>
+               <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+           </repository>
+           <snapshotRepository>
+               <id>spring-snapshot</id>
+               <name>Spring Snapshot Repository</name>
+               <url>s3://maven.springframework.org/snapshot</url>
+           </snapshotRepository>
+       </distributionManagement>
 
 	<developers>
 		<developer>
