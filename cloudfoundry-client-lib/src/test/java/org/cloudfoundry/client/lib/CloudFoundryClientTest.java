@@ -474,6 +474,7 @@ public class CloudFoundryClientTest {
 
 		assertEquals(1, app.getServices().size());
 		assertEquals(serviceName, app.getServices().get(0));
+		assertEquals(CCNG_USER_SPACE, app.getSpace().getName());
 
 		assertEquals(1, app.getInstances());
 		assertEquals(DEFAULT_MEMORY, app.getMemory());
