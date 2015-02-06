@@ -27,13 +27,13 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.cloudfoundry:cloudfoundry-client-lib:1.1.0'
+    compile 'org.cloudfoundry:cloudfoundry-client-lib:1.1.1'
     compile 'org.codehaus.groovy:groovy:2.3.6'
     testCompile 'junit:junit:4.8.2'
 }
 
 group = 'org.cloudfoundry'
-version = '1.1.1.BUILD-SNAPSHOT'
+version = '1.1.1'
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {

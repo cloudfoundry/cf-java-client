@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.1.0'
+        classpath group: 'org.cloudfoundry', name: 'cf-gradle-plugin', version: '1.1.1'
     }
 }
 
@@ -340,6 +340,10 @@ Variants that are not currently mapped to the canonical `my-app.cfapps.io` route
 All running variants that are not mapped to the canonical route are deleted. 
 
 # History
+
+## Changes in 1.1.1
+
+* Updated cloudfoundry-client-lib dependency
 
 ## Changes in 1.1.0
 
