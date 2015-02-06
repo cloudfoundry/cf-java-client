@@ -1,6 +1,60 @@
 Cloud Foundry Client Library
 ============================
 
+Changes in version 1.1.1
+------------------------
+
+* Upgraded the Apache HttpClient library to version 4.3.6 to address a security vulnerability in HttpClient (http://www.openwall.com/lists/oss-security/2014/08/18/8)
+* Added operations for managing security groups
+* Added the ability to assign space roles to a user
+* Added setting the space when retrieving and application 
+* Fixed bugs in parsing application environment variables 
+
+Changes in version 1.1.0
+------------------------
+
+* Updated Spring Framework, Apache HttpClient, and Jackson dependendencies to Spring 4.x, HttpComponents 4.3.x, and Jackson 2.x 
+
+Changes in version 1.0.6
+------------------------
+
+* Added the ability to specify a syslog drain URL with a user-provided service
+* Added space management operations
+* Added the ability to upload an application from an InputStream
+
+Changes in version 1.0.5
+------------------------
+
+* Changed retrieval of “recent logs” from Loggregator to use the HTTP endpoint instead of the deprecated WebSockets endpoint (tailing logs from Loggregator continues to use WebSockets).
+* Updated tomcat-embed-websockets library to address a problem tailing logs from Loggregator on some platforms
+* Added support for authenticated HTTP proxies
+* Changed uploading of application bits to always use UTC time for “last modified” timestamp of files to match CLI behavior
+
+Changes in version 1.0.4
+------------------------
+
+* Added service broker management operations
+* Added quota management operations 
+* Added method for removal of orphaned application routes
+
+Changes in version 1.0.3
+------------------------
+
+* `streamLogs()` and `getRecentLogs()` methods were added to retrieve logs from Loggregator 
+* An `openFile()` method was added to stream the contents of a file
+* A `getServiceBrokers()` method was added to retrieve a list of available service brokers
+
+------------------------
+
+Changes in version 1.0.2
+------------------------
+
+* Added support for user-provided servicess.
+* Added support for "healthCheckTimeout" and "diskQuota" parameters on application creation in the Client Library.
+* Removed validation of application memory settings, since memory values are no longer constrained to a fixed set of options.
+* Improved support for async file uploads.
+* Added support for accepting self-signed SSL certificates from the Cloud Foundry target endpoint.
+
 API Changes for version 0.8.6:
 ------------------------------
 
