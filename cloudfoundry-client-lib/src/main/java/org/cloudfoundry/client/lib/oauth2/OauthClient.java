@@ -18,7 +18,6 @@ package org.cloudfoundry.client.lib.oauth2;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.cloudfoundry.client.lib.CloudCredentials;

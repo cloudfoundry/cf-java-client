@@ -60,6 +60,9 @@ import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.oauth2.OauthClient;
+import org.cloudfoundry.client.lib.rest.CloudControllerClient;
+import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.cloudfoundry.client.lib.util.RestUtil;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ConnectHandler;
@@ -90,6 +93,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
@@ -1662,16 +1667,33 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	@Ignore("This test takes, by design, at least 10 minutes. Enable this only when dealing with authentication issues "
-			+ "or a change in the client side OAuth implementation")
-	public void dealingWithExpiredToken() throws Exception {
-		// The current token expiration time is 10 minutes. If we can still make authenticated calls past that,
-		// then the transparent token refresh scheme working as expected.
-		for (int i = 0; i < 30; i++) {
-			System.out.println("Elapsed time since the last login (at least) " + i/2 + " minutes");
-			getServiceOfferings();
-			Thread.sleep(30 * 1000);
+	public void refreshTokenOnExpiration() throws Exception {
+		URL cloudControllerUrl = new URL(CCNG_API_URL);
+		CloudCredentials credentials = new CloudCredentials(CCNG_USER_EMAIL, CCNG_USER_PASS);
+
+		CloudControllerClientFactory factory =
+			new CloudControllerClientFactory(httpProxyConfiguration, CCNG_API_SSL);
+		CloudControllerClient client = factory.newCloudController(cloudControllerUrl, credentials, CCNG_USER_ORG, CCNG_USER_SPACE);
+
+		client.login();
+
+		validateClientAccess(client);
+
+		OauthClient oauthClient = factory.getOauthClient();
+		OAuth2AccessToken token = oauthClient.getToken();
+		if (token instanceof DefaultOAuth2AccessToken) {
+			// set the token expiration to "now", forcing the access token to be refreshed
+			((DefaultOAuth2AccessToken) token).setExpiration(new Date());
+			validateClientAccess(client);
+		} else {
+			fail("Error forcing expiration of access token");
 		}
+	}
+
+	private void validateClientAccess(CloudControllerClient client) {
+		List<CloudServiceOffering> offerings = client.getServiceOfferings();
+		assertNotNull(offerings);
+		assertTrue(offerings.size() >= 2);
 	}
 
 	@Test
