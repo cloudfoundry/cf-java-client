@@ -83,10 +83,12 @@ public class OauthClient {
 			return null;
 		}
 
-		if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
-			token = refreshToken(token, credentials.getEmail(), credentials.getPassword(),
-					credentials.getClientId(), credentials.getClientSecret());
-		}
+        if(this.credentials.isRefreshable()) {
+            if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
+                token = refreshToken(token, credentials.getEmail(), credentials.getPassword(),
+                        credentials.getClientId(), credentials.getClientSecret());
+            }
+        }
 
 		return token;
 	}

@@ -25,7 +25,9 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
  */
 public class CloudCredentials {
 
-	private String email;
+    private boolean refreshable = true;
+
+    private String email;
 
 	private String password;
 
@@ -83,6 +85,18 @@ public class CloudCredentials {
 	public CloudCredentials(OAuth2AccessToken token) {
 		this.token = token;
 	}
+
+    /**
+     * Create credentials using a token and indicates if the token is
+     * refreshable or not.
+     *
+     * @param token token to use for authorization
+     * @param refreshable indicates if the token can be refreshed or not
+     */
+    public CloudCredentials(OAuth2AccessToken token, boolean refreshable) {
+        this.token = token;
+        this.refreshable=refreshable;
+    }
 
 	/**
 	 * Create credentials using a token.
@@ -195,4 +209,16 @@ public class CloudCredentials {
 	public CloudCredentials proxyForUser(String user) {
 		return new CloudCredentials(this, user);
 	}
+
+    /**
+     * Indicates weather the token stored in the cloud credentials can be
+     * refreshed or not. This is useful when the token stored in this
+     * object was obtained via implicit OAuth2 authentication and therefore
+     * can not be refreshed.
+     *
+     * @return weather the token can be refreshed
+     */
+    public boolean isRefreshable() {
+        return refreshable;
+    }
 }
