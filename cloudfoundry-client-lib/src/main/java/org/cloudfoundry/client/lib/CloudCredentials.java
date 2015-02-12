@@ -25,9 +25,9 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
  */
 public class CloudCredentials {
 
-    private boolean refreshable = true;
+	private boolean refreshable = true;
 
-    private String email;
+	private String email;
 
 	private String password;
 
@@ -210,15 +210,15 @@ public class CloudCredentials {
 		return new CloudCredentials(this, user);
 	}
 
-    /**
-     * Indicates weather the token stored in the cloud credentials can be
-     * refreshed or not. This is useful when the token stored in this
-     * object was obtained via implicit OAuth2 authentication and therefore
-     * can not be refreshed.
-     *
-     * @return weather the token can be refreshed
-     */
-    public boolean isRefreshable() {
-        return refreshable;
-    }
+	/**
+	 * Indicates weather the token stored in the cloud credentials can be
+	 * refreshed or not. This is useful when the token stored in this
+	 * object was obtained via implicit OAuth2 authentication and therefore
+	 * can not be refreshed.
+	 *
+	 * @return weather the token can be refreshed
+	 */
+	public boolean isRefreshable() {
+		return refreshable;
+	}
 }
