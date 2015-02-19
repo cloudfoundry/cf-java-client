@@ -1,0 +1,23 @@
+[
+  {
+    "protocol": "icmp",
+    "destination": "0.0.0.0/0",
+    "type": 0,
+    "code": 1
+  },
+  {
+    "protocol": "tcp",
+    "destination": "1.0.0.0/0",
+    "ports": "2048-3000",
+    "log": true
+  },
+  {
+    "protocol": "udp",
+    "destination": "2.0.0.0/0",
+    "ports": "53, 5353"
+  },
+  {
+    "protocol": "all",
+    "destination": "3.0.0.0/0"
+  }
+]

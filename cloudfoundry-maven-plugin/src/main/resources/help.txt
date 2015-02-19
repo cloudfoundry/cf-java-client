@@ -1,0 +1,37 @@
+
+Usage: mvn cf:command [command_options]
+
+Currently available Cloud Foundry Maven Plugin Goals are:
+
+  Getting Started
+    target                                      Show information about the target Cloud Foundry service
+    login                                       Log into the Cloud Foundry service
+    logout                                      Log out of the Cloud Foundry service
+
+  Applications
+    apps                                        List deployed applications
+    app                                         Show details of the application
+    delete-orphaned-routes                      Delete routes that do not have any application which is assigned to them
+
+  Application Operations
+    push                                        Create, push, map, and start a new application
+    push-only                                   Create, push, map, and start a new application (without packaging the app first)
+    start                                       Start the application
+    stop                                        Stop the application
+    restart                                     Restart the application
+    delete                                      Delete the application
+    scale                                       Scale the application instances up or down
+    logs                                        Show application logs
+    env                                         Show application environment variables
+
+  Services
+    services                                    List the provisioned services
+    service-plans                               List the available services plans
+    create-services                             Create services defined in the pom file
+    delete-services                             Delete services defined in the pom file
+    bind-services                               Bind services defined in the pom file to the application
+    unbind-services                             Unbind services defined in the pom file to the application
+
+  Help
+    help                                        Get general help
+

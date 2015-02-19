@@ -1,0 +1,13 @@
+Java client for Caldecott
+
+This library is intended to be used from a Java application when tunneling into Cloud Foundry data services using the server side Caldecott application. It is similar to the tunnel feature of the command line client vmc. Once the tunnel is started you can connect with a local data client application using the appropriate connection parameters. This library provides functionality to run as a server for a specific Cloud Foundry data service. This server will listen for local connections on a specific port to provide tunneling via the server side Caldecott application.
+
+There is a Java class (JavaTunnel.java) under the src/test directory that starts up a tunnel server and will prompt for connection information needed. It offers equivalent functionality as 'vmc tunnel'. Currently such usage is intended for testing purpose. This JavaTunnel.java class also shows how to setup and start a tunnel so it can be used as a guide when building your own client code.
+
+How to run this Java tunnel program:
+
+You can use the 'tunnel.sh' shell script that uses the mvn exec target. You can provide the email to log in with using a system variable called vcap.email (example: -Dvcap.email=me@mycompany.com). Optionally override the VCAP target using vcap.target with a specific cloud url to run against a local cloud (example: -Dvcap.target=http://api.vcap.me).
+
+To build and run using Maven simply use:
+  mvn clean install
+  mvn --quiet exec:java -Dexec.mainClass="org.cloudfoundry.caldecott.JavaTunnel" -Dexec.classpathScope="test"

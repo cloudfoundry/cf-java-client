@@ -1,0 +1,4 @@
+  name    status   instances  memory  disk  url                                                         
+  ------  -------  ---------  ------  ----  ------------------------------------------------------------
+  first   0%       0/1        512M    0M    cf-rocks.api.run.pivotal.io, spring-rocks.api.run.pivotal.io
+  second  stopped  0/2        1024M   0M    cf-rocks.api.run.pivotal.io, spring-rocks.api.run.pivotal.io

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.cloudfoundry</groupId>
+	<artifactId>cf-java-client</artifactId>
+	<packaging>pom</packaging>
+	<name>Cloud Foundry Java Client Parent</name>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>cf-java-client-test-apps</module>
+				<module>cloudfoundry-client-lib</module>
+				<module>cloudfoundry-maven-plugin</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>integration-test</id>
+			<modules>
+				<module>cf-java-client-test-apps</module>
+				<module>cloudfoundry-client-lib</module>
+				<module>cloudfoundry-maven-plugin</module>
+			</modules>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
