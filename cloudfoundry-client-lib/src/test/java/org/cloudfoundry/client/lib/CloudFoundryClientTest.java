@@ -40,6 +40,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
@@ -389,6 +390,26 @@ public class CloudFoundryClientTest {
 		assertNotNull(orgs);
 		assertTrue(orgs.size() > 0);
 	}
+
+    ///
+    /// Basic Event Tests
+    ///
+
+    @Test
+    public void eventsAvailable() throws Exception {
+        List<CloudEvent> events = connectedClient.getEvents();
+        assertNotNull(events);
+        assertTrue(events.size() > 0);
+    }
+
+    @Test
+    public void appEventsAvailable() throws Exception {
+        String appName = createSpringTravelApp("appEvents");
+        List<CloudEvent> events = connectedClient.getApplicationEvents(appName);
+        assertNotNull(events);
+        assertTrue(events.size() > 0);
+    }
+
 
 	//
 	// Basic Application tests

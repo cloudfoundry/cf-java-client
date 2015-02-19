@@ -19,6 +19,7 @@ package org.cloudfoundry.client.lib.util;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
@@ -74,6 +75,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudApplication.class) {
 			return (T) mapApplicationResource(resource);
 		}
+        if (targetClass == CloudEvent.class) {
+            return (T) mapEventResource(resource);
+        }
 		if (targetClass == CloudService.class) {
 			return (T) mapServiceInstanceResource(resource);
 		}
@@ -199,6 +203,25 @@ public class CloudEntityResourceMapper {
 		app.setServices(serviceList);
 		return app;
 	}
+
+    private CloudEvent mapEventResource(Map<String, Object> resource) {
+        CloudEvent event = new CloudEvent(
+                getMeta(resource),
+                getNameOfResource(resource));
+        event.setType(getEntityAttribute(resource, "type", String.class));
+        UUID actor = UUID.fromString(String.valueOf(getEntityAttribute(resource, "actor", String.class)));
+        event.setActor(actor);
+        event.setActorType(getEntityAttribute(resource, "actor_type", String.class));
+        event.setActorName(getEntityAttribute(resource, "actor_name", String.class));
+        UUID actee = UUID.fromString(String.valueOf(getEntityAttribute(resource,"actee", String.class)));
+        event.setActee(actee);
+        event.setActeeType(getEntityAttribute(resource, "actee_type", String.class));
+        event.setActeeName(getEntityAttribute(resource, "actee_name", String.class));
+        Date timestamp = parseDate(getEntityAttribute(resource, "timestamp", String.class));
+        event.setTimestamp(timestamp);
+
+        return event;
+    }
 
 	private CloudService mapServiceInstanceResource(Map<String, Object> resource) {
 		CloudService cloudService = new CloudService(
