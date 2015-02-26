@@ -123,7 +123,9 @@ public interface CloudControllerClient {
 
 	ApplicationStats getApplicationStats(String appName);
 
-	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
+   Map<String, Object> getApplicationEnvironment(UUID appGuid);
+
+   void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                       List<String> serviceNames);
 
 	void createApplication(String appName, Staging staging, Integer disk, Integer memory,
@@ -294,4 +296,5 @@ public interface CloudControllerClient {
 	void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+
 }

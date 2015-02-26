@@ -223,6 +223,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplication(appName);
 	}
 
+   public Map<String, Object> getApplicationEnvironment(UUID appGuid) {
+      return cc.getApplicationEnvironment(appGuid);
+   }
+
 	public CloudApplication getApplication(UUID appGuid) {
 		return cc.getApplication(appGuid);
 	}

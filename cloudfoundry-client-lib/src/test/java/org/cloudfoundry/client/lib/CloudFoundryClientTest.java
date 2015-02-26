@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -404,7 +405,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
 
-		assertNotNull(app.getMeta().getGuid());
+      assertNotNull(app.getMeta().getGuid());
 
 		final Calendar now = Calendar.getInstance();
 		now.setTime(new Date());
@@ -506,6 +507,33 @@ public class CloudFoundryClientTest {
 		String appName = namespacedAppName("non_existent");
 		connectedClient.getApplication(appName);
 	}
+
+   @Test
+   public void getApplicationEnvironment() {
+      String appName = namespacedAppName("simple-app");
+      List<String> uris = Arrays.asList(computeAppUrl(appName));
+      Staging staging =  new Staging();
+      connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+      CloudApplication app = connectedClient.getApplication(appName);
+      Map<String, Object> env = connectedClient.getApplicationEnvironment(app.getMeta().getGuid());
+      assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
+      assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
+      assertTrue(env.get("environment_json") instanceof LinkedHashMap);
+      assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
+      assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
+      LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
+      LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
+      LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
+      LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
+      LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
+      assertTrue(stagingEnvMap.size() == 0);
+      assertTrue(runningEnvMap.size() == 0);
+      assertTrue(environmentMap.size() == 0);
+      assertTrue(systemEnvMap.size() == 1);
+      assertTrue(applicationEnvMap.size() == 1);
+      assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
+      assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
+   }
 
 	@Test
 	public void getApplications() {
@@ -999,7 +1027,7 @@ public class CloudFoundryClientTest {
 		List<String> serviceNames = new ArrayList<String>();
 
 		connectedClient.createApplication(appName, new Staging(),
-				DEFAULT_MEMORY, uris, serviceNames);
+              DEFAULT_MEMORY, uris, serviceNames);
 		connectedClient.uploadApplication(appName, war.getCanonicalPath());
 
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -2130,13 +2158,13 @@ public class CloudFoundryClientTest {
 
 		client.openFile(appName, 0, fileName, new ClientHttpResponseCallback() {
 
-			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
-				InputStream in = clientHttpResponse.getBody();
-				assertNotNull(in);
-				byte[] fileContents = IOUtils.toByteArray(in);
-				assertTrue(fileContents.length > 5);
-			}
-		});
+         public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+            InputStream in = clientHttpResponse.getBody();
+            assertNotNull(in);
+            byte[] fileContents = IOUtils.toByteArray(in);
+            assertTrue(fileContents.length > 5);
+         }
+      });
 
 		client.openFile(appName, 0, emptyPropertiesFileName, new ClientHttpResponseCallback() {
 
@@ -2354,8 +2382,8 @@ public class CloudFoundryClientTest {
 			}
 		}
 		connectedClient.createApplication(appName, staging,
-				DEFAULT_MEMORY,
-				uris, serviceNames);
+              DEFAULT_MEMORY,
+              uris, serviceNames);
 	}
 
 	private CloudService createMySqlServiceWithVersionAndProvider(String serviceName) {
@@ -2367,7 +2395,7 @@ public class CloudFoundryClientTest {
 		service.setVersion(databaseServiceOffering.getVersion());
 		service.setPlan(MYSQL_SERVICE_PLAN);
 
-		connectedClient.createService(service);
+      connectedClient.createService(service);
 
 		return service;
 	}
@@ -2468,7 +2496,7 @@ public class CloudFoundryClientTest {
 	private void assertTimeWithinRange(String message, long actual, int timeTolerance) {
 		// Allow more time deviations due to local clock being out of sync with cloud
 		assertTrue(message,
-				Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
+              Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
 	}
 
 	private static abstract class NoOpUploadStatusCallback implements UploadStatusCallback {

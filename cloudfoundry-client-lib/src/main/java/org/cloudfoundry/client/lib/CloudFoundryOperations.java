@@ -225,6 +225,14 @@ public interface CloudFoundryOperations {
 	 */
 	ApplicationStats getApplicationStats(String appName);
 
+   /**
+    * Get application environment variables for the app with the specified name.
+    *
+    * @param appGuid UUID of the app
+    * @return the cloud application environment variables
+    */
+   Map<String, Object> getApplicationEnvironment(UUID appGuid);
+
 	/**
 	 * Create application.
 	 *

@@ -1019,6 +1019,15 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return mapCloudApplication(resource);
 	}
 
+   @Override
+   public Map<String, Object> getApplicationEnvironment(UUID appGuid) {
+      String url = getUrl("/v2/apps/{guid}/env");
+      Map<String, Object> urlVars = new HashMap();
+      urlVars.put("guid", appGuid);
+      String resp = restTemplate.getForObject(url, String.class, urlVars);
+      return JsonUtil.convertJsonToMap(resp);
+   }
+
 	@SuppressWarnings("unchecked")
 	private CloudApplication mapCloudApplication(Map<String, Object> resource) {
 		UUID appId = resourceMapper.getGuidOfResource(resource);
