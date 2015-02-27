@@ -122,7 +122,7 @@ public class CloudFoundryClientTest {
 	private static final String CCNG_API_PROXY_HOST = System.getProperty("http.proxyHost", null);
 
 	private static final int CCNG_API_PROXY_PORT = Integer.getInteger("http.proxyPort", 80);
-	
+
 	private static final String CCNG_API_PROXY_USER = System.getProperty("http.proxyUsername", null);
 
 	private static final String CCNG_API_PROXY_PASSWD = System.getProperty("http.proxyPassword", null);
@@ -165,9 +165,9 @@ public class CloudFoundryClientTest {
 	private static final int DEFAULT_DISK = 1024; // MB
 
 	private static final int FIVE_MINUTES = 300 * 1000;
-	
+
 	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
-	
+
 	private static final String CCNG_SECURITY_GROUP_NAME_TEST = System.getProperty("ccng.securityGroup", "test_security_group");
 
 	private static boolean tearDownComplete = false;
@@ -405,7 +405,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(app);
 		assertEquals(appName, app.getName());
 
-      assertNotNull(app.getMeta().getGuid());
+      	assertNotNull(app.getMeta().getGuid());
 
 		final Calendar now = Calendar.getInstance();
 		now.setTime(new Date());
@@ -508,31 +508,59 @@ public class CloudFoundryClientTest {
 		connectedClient.getApplication(appName);
 	}
 
-   @Test
-   public void getApplicationEnvironment() {
-      String appName = namespacedAppName("simple-app");
-      List<String> uris = Arrays.asList(computeAppUrl(appName));
-      Staging staging =  new Staging();
-      connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
-      CloudApplication app = connectedClient.getApplication(appName);
-      Map<String, Object> env = connectedClient.getApplicationEnvironment(app.getMeta().getGuid());
-      assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
-      assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
-      assertTrue(env.get("environment_json") instanceof LinkedHashMap);
-      assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
-      assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
-      LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
-      LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
-      LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
-      LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
-      LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
-      assertTrue(stagingEnvMap.size() == 0);
-      assertTrue(runningEnvMap.size() == 0);
-      assertTrue(environmentMap.size() == 0);
-      assertTrue(systemEnvMap.size() == 1);
-      assertTrue(applicationEnvMap.size() == 1);
-      assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
-      assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
+	@Test
+	public void getApplicationEnvironmentByGuid() {
+		String appName = namespacedAppName("simple-app");
+		List<String> uris = Arrays.asList(computeAppUrl(appName));
+		Staging staging =  new Staging();
+		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		CloudApplication app = connectedClient.getApplication(appName);
+		Map<String, Object> env = connectedClient.getApplicationEnvironment(app.getMeta().getGuid());
+		assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("environment_json") instanceof LinkedHashMap);
+		assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
+		LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
+		LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
+		LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
+		LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
+		LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
+		assertTrue(stagingEnvMap.size() == 0);
+		assertTrue(runningEnvMap.size() == 0);
+		assertTrue(environmentMap.size() == 0);
+		assertTrue(systemEnvMap.size() == 1);
+		assertTrue(applicationEnvMap.size() == 1);
+		assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
+		assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
+		assertTrue(((Map) applicationEnvMap.get("VCAP_APPLICATION")).get("application_name").equals(appName));
+	}
+
+	@Test
+	public void getApplicationEnvironmentByName() {
+		String appName = namespacedAppName("simple-app");
+		List<String> uris = Arrays.asList(computeAppUrl(appName));
+		Staging staging =  new Staging();
+		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		Map<String, Object> env = connectedClient.getApplicationEnvironment(appName);
+		assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("environment_json") instanceof LinkedHashMap);
+		assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
+		assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
+		LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
+		LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
+		LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
+		LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
+		LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
+		assertTrue(stagingEnvMap.size() == 0);
+		assertTrue(runningEnvMap.size() == 0);
+		assertTrue(environmentMap.size() == 0);
+		assertTrue(systemEnvMap.size() == 1);
+		assertTrue(applicationEnvMap.size() == 1);
+		assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
+		assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
+		assertTrue(((Map) applicationEnvMap.get("VCAP_APPLICATION")).get("application_name").equals(appName));
    }
 
 	@Test
@@ -658,7 +686,7 @@ public class CloudFoundryClientTest {
 		env2.put("baz", "bong");
 		connectedClient.updateApplicationEnv(appName, env2);
 		app = connectedClient.getApplication(app.getName());
-		
+
 		// Test the unparsed list first
 		assertEquals(arrayToHashSet("foo=baz", "baz=bong"), listToHashSet(app.getEnv()));
 
@@ -1094,7 +1122,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(logs);
 		assertTrue(logs.size() > 0);
 	}
-	
+
 	@Test
 	public void streamLogs() throws Exception {
 		// disable proxy validation for this test, since Loggregator websockets
@@ -1228,7 +1256,7 @@ public class CloudFoundryClientTest {
 		assertNotNull(service);
 		assertEquals(serviceName, service.getName());
 		assertTimeWithinRange("Creation time should be very recent",
-				service.getMeta().getCreated().getTime(), FIVE_MINUTES);
+              service.getMeta().getCreated().getTime(), FIVE_MINUTES);
 
 		connectedClient.deleteService(serviceName);
 		List<CloudService> services = connectedClient.getServices();
@@ -1490,8 +1518,8 @@ public class CloudFoundryClientTest {
 		assertNull("Space '"+spaceName+  "' should not exist before creation",newSpace);
 		connectedClient.createSpace(spaceName);
 		newSpace = connectedClient.getSpace(spaceName);
-		assertNotNull("newSpace should not be null",newSpace);
-		assertEquals(spaceName,newSpace.getName());
+		assertNotNull("newSpace should not be null", newSpace);
+		assertEquals(spaceName, newSpace.getName());
 		boolean foundSpaceInCurrentOrg = false;
 		for (CloudSpace aSpace : connectedClient.getSpaces()) {
 			if (spaceName.equals(aSpace.getName())){
@@ -1838,7 +1866,7 @@ public class CloudFoundryClientTest {
 		connectedClient.setQuotaToOrg(CCNG_USER_ORG, oldQuota.getName());
 		connectedClient.deleteQuota(CCNG_QUOTA_NAME_TEST);
 	}
-	
+
 	@Test
 	public void crudSecurityGroups() throws Exception {
 		assumeTrue(CCNG_USER_IS_ADMIN);
@@ -1851,34 +1879,34 @@ public class CloudFoundryClientTest {
 		rule = new SecurityGroupRule("icmp", null, "0.0.0.0/0", true, 0, 1);
 		rules.add(rule);
 		CloudSecurityGroup securityGroup = new CloudSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, rules);
-		
+
 		// Create
 		connectedClient.createSecurityGroup(securityGroup);
-		
+
 		// Verify created
 		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		assertNotNull(securityGroup);
 		assertThat(securityGroup.getRules().size(), is(3));
 		assertRulesMatchTestData(securityGroup);
-		
+
 		// Update group
 		rules = new ArrayList<SecurityGroupRule>();
 		rule = new SecurityGroupRule("all", null, "0.0.0.0-255.255.255.255");
 		rules.add(rule);
 		securityGroup = new CloudSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, rules);
 		connectedClient.updateSecurityGroup(securityGroup);
-		
+
 		// Verify update
 		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		assertThat(securityGroup.getRules().size(), is(1));
-		
+
 		// Delete group
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		// Verify deleted
 		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		assertNull(securityGroup);
 	}
-	
+
 	private void assertRulesMatchTestData(CloudSecurityGroup securityGroup) {
 		// This asserts against the test data defined in the crudSecurityGroups method
 		// Rule ordering is preserved so we can depend on it here
@@ -1889,7 +1917,7 @@ public class CloudFoundryClientTest {
 		assertNull(rule.getLog());
 		assertNull(rule.getType());
 		assertNull(rule.getCode());
-		
+
 		rule = securityGroup.getRules().get(1);
 		assertThat(rule.getProtocol(), is("all"));
 		assertNull(rule.getPorts());
@@ -1913,24 +1941,24 @@ public class CloudFoundryClientTest {
 
 		// Create
 		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-1.json")));
-		
+
 		// Verify created
 		CloudSecurityGroup securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		assertNotNull(securityGroup);
 		assertThat(securityGroup.getRules().size(), is(4));
 		assertRulesMatchThoseInJsonFile1(securityGroup);
-		
+
 		// Update group
 		connectedClient.updateSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
-		
+
 		// Verify update
 		securityGroup = connectedClient.getSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 		assertThat(securityGroup.getRules().size(), is(1));
-		
+
 		// Clean up after ourselves
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 	}
-	
+
 	private void assertRulesMatchThoseInJsonFile1(CloudSecurityGroup securityGroup) {
 		// Rule ordering is preserved so we can depend on it here
 
@@ -1941,7 +1969,7 @@ public class CloudFoundryClientTest {
 		assertNull(rule.getLog());
 		assertThat(rule.getType(), is(0));
 		assertThat(rule.getCode(), is(1));
-		
+
 		rule = securityGroup.getRules().get(1);
 		assertThat(rule.getProtocol(), is("tcp"));
 		assertThat(rule.getPorts(), is("2048-3000"));
@@ -1970,21 +1998,21 @@ public class CloudFoundryClientTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void attemptingToDeleteANonExistentSecurityGroupThrowsAnIllegalArgumentException(){
 		assumeTrue(CCNG_USER_IS_ADMIN);
-		
+
 		connectedClient.deleteSecurityGroup(randomSecurityGroupName());
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void attemptingToUpdateANonExistentSecurityGroupThrowsAnIllegalArgumentException() throws FileNotFoundException{
 		assumeTrue(CCNG_USER_IS_ADMIN);
-		
+
 		connectedClient.updateSecurityGroup(randomSecurityGroupName(), new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
 	}
 
 	private String randomSecurityGroupName() {
 		return UUID.randomUUID().toString();
 	}
-	
+
 	@Test
 	public void bindingAndUnbindingSecurityGroupToDefaultStagingSet() throws FileNotFoundException{
 		assumeTrue(CCNG_USER_IS_ADMIN);
@@ -1992,23 +2020,23 @@ public class CloudFoundryClientTest {
 		// Given
 		assertFalse(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
 		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
-		
+
 		// When
 		connectedClient.bindStagingSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
-		
+
 		// Then
 		assertTrue(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
 
 		// When
 		connectedClient.unbindStagingSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
-		
+
 		// Then
 		assertFalse(containsSecurityGroupNamed(connectedClient.getStagingSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
-		
+
 		// Cleanup
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 	}
-	
+
 	@Test
 	public void bindingAndUnbindingSecurityGroupToDefaultRunningSet() throws FileNotFoundException{
 		assumeTrue(CCNG_USER_IS_ADMIN);
@@ -2016,30 +2044,30 @@ public class CloudFoundryClientTest {
 		// Given
 		assertFalse(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
 		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
-		
+
 		// When
 		connectedClient.bindRunningSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
-		
+
 		// Then
 		assertTrue(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
 
 		// When
 		connectedClient.unbindRunningSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
-		
+
 		// Then
 		assertFalse(containsSecurityGroupNamed(connectedClient.getRunningSecurityGroups(), CCNG_SECURITY_GROUP_NAME_TEST));
-		
+
 		// Cleanup
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 	}
-	
+
 	@Test
 	public void bindingAndUnbindingSecurityGroupToSpaces() throws FileNotFoundException{
 		assumeTrue(CCNG_USER_IS_ADMIN);
 
 		// Given
 		connectedClient.createSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST, new FileInputStream(new File("src/test/resources/security-groups/test-rules-2.json")));
-		
+
 		// When
 		connectedClient.bindSecurityGroup(CCNG_USER_ORG, CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST);
 		// Then
@@ -2049,7 +2077,7 @@ public class CloudFoundryClientTest {
 		connectedClient.unbindSecurityGroup(CCNG_USER_ORG, CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST);
 		//Then
 		assertFalse(isSpaceBoundToSecurityGroup(CCNG_USER_SPACE, CCNG_SECURITY_GROUP_NAME_TEST));
-		
+
 		// Cleanup
 		connectedClient.deleteSecurityGroup(CCNG_SECURITY_GROUP_NAME_TEST);
 	}
@@ -2072,7 +2100,7 @@ public class CloudFoundryClientTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Try to clean up any security group test data left behind in the case of assertions failing and
 	 * test security groups not being deleted as part of test logic.
@@ -2087,7 +2115,7 @@ public class CloudFoundryClientTest {
 			// Nothing we can do at this point except protect other teardown logic from not running
 		}
 	}
-	
+
 	//
 	// Shared test methods
 	//
@@ -2158,13 +2186,13 @@ public class CloudFoundryClientTest {
 
 		client.openFile(appName, 0, fileName, new ClientHttpResponseCallback() {
 
-         public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
-            InputStream in = clientHttpResponse.getBody();
-            assertNotNull(in);
-            byte[] fileContents = IOUtils.toByteArray(in);
-            assertTrue(fileContents.length > 5);
-         }
-      });
+			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
+            	InputStream in = clientHttpResponse.getBody();
+            	assertNotNull(in);
+            	byte[] fileContents = IOUtils.toByteArray(in);
+            	assertTrue(fileContents.length > 5);
+         	}
+      	});
 
 		client.openFile(appName, 0, emptyPropertiesFileName, new ClientHttpResponseCallback() {
 
@@ -2382,8 +2410,8 @@ public class CloudFoundryClientTest {
 			}
 		}
 		connectedClient.createApplication(appName, staging,
-              DEFAULT_MEMORY,
-              uris, serviceNames);
+              			DEFAULT_MEMORY,
+              			uris, serviceNames);
 	}
 
 	private CloudService createMySqlServiceWithVersionAndProvider(String serviceName) {
@@ -2395,7 +2423,7 @@ public class CloudFoundryClientTest {
 		service.setVersion(databaseServiceOffering.getVersion());
 		service.setPlan(MYSQL_SERVICE_PLAN);
 
-      connectedClient.createService(service);
+		connectedClient.createService(service);
 
 		return service;
 	}
@@ -2496,7 +2524,7 @@ public class CloudFoundryClientTest {
 	private void assertTimeWithinRange(String message, long actual, int timeTolerance) {
 		// Allow more time deviations due to local clock being out of sync with cloud
 		assertTrue(message,
-              Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
+						Math.abs(System.currentTimeMillis() - actual) < timeTolerance);
 	}
 
 	private static abstract class NoOpUploadStatusCallback implements UploadStatusCallback {

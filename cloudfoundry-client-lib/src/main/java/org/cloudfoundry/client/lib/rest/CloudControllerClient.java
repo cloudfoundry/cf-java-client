@@ -35,12 +35,12 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
@@ -118,14 +118,16 @@ public interface CloudControllerClient {
 	List<CloudApplication> getApplications();
 
 	CloudApplication getApplication(String appName);
-	
+
 	CloudApplication getApplication(UUID appGuid);
 
 	ApplicationStats getApplicationStats(String appName);
 
-   Map<String, Object> getApplicationEnvironment(UUID appGuid);
+	Map<String, Object> getApplicationEnvironment(UUID appGuid);
 
-   void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
+	Map<String, Object> getApplicationEnvironment(String appName);
+
+    void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                       List<String> serviceNames);
 
 	void createApplication(String appName, Staging staging, Integer disk, Integer memory,
@@ -195,14 +197,14 @@ public interface CloudControllerClient {
 
 	CloudStack getStack(String name);
 
-	// Space management	
-	
+	// Space management
+
 	void createSpace(String spaceName);
-	
+
 	CloudSpace getSpace(String spaceName);
-	
+
 	void deleteSpace(String spaceName);
-	
+
 	// Domains and routes management
 
 
@@ -264,11 +266,11 @@ public interface CloudControllerClient {
 	void associateAuditorWithSpace(String spaceName);
 
 	// Security Group Operations
-	
+
 	List<CloudSecurityGroup> getSecurityGroups();
 
 	CloudSecurityGroup getSecurityGroup(String securityGroupName);
-	
+
 	void createSecurityGroup(CloudSecurityGroup securityGroup);
 
 	void createSecurityGroup(String name, InputStream jsonRulesFile);

@@ -85,7 +85,7 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudSpace> getSpaces();
 
-	
+
 	/**
 	 * Get list of space manager UUID  for the space.
 	 *
@@ -111,32 +111,32 @@ public interface CloudFoundryOperations {
 	List<UUID> getSpaceAuditors(String spaceName);
 
 	/**
-	 * Associate current user to the space auditors role 
+	 * Associate current user to the space auditors role
 	 *
-	 * @param spaceName name of the space 
+	 * @param spaceName name of the space
 	 */
 	void associateAuditorWithSpace(String spaceName);
 
 	/**
-	 * Associate current user to the space developer role 
+	 * Associate current user to the space developer role
 	 *
-	 * @param spaceName name of the space 
+	 * @param spaceName name of the space
 	 */
 	void associateDeveloperWithSpace(String spaceName);
 
 	/**
-	 * Associate current user to the space managers role 
+	 * Associate current user to the space managers role
 	 *
-	 * @param spaceName name of the space 
+	 * @param spaceName name of the space
 	 */
 	void associateManagerWithSpace(String spaceName);
 
 	/**
-	 * Create a space with the specified name 
+	 * Create a space with the specified name
 	 * @param spaceName
 	 */
 	void createSpace(String spaceName);
-	
+
 	/**
 	 * Get space name with the specified name.
 	 *
@@ -144,16 +144,16 @@ public interface CloudFoundryOperations {
 	 * @return the cloud space
 	 */
 	CloudSpace getSpace(String spaceName);
-	
+
 	/**
 	 * Delete a space with the specified name
-	 * 
+	 *
 	 * @param spaceName name of the space
 	 */
 	void deleteSpace(String spaceName);
 
-	
-	
+
+
 	/**
 	 * Get list of CloudOrganizations for the current cloud.
 	 *
@@ -225,13 +225,13 @@ public interface CloudFoundryOperations {
 	 */
 	ApplicationStats getApplicationStats(String appName);
 
-   /**
-    * Get application environment variables for the app with the specified name.
-    *
-    * @param appGuid UUID of the app
-    * @return the cloud application environment variables
-    */
-   Map<String, Object> getApplicationEnvironment(UUID appGuid);
+	/**
+	 * Get application environment variables for the app with the specified name.
+	 *
+	 * @param appName name of the app
+	 * @return the cloud application environment variables
+	 */
+	Map<String, Object> getApplicationEnvironment(String appName);
 
 	/**
 	 * Create application.
@@ -486,22 +486,22 @@ public interface CloudFoundryOperations {
 	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getLogs(String appName);
-	
+
 	/**
 	 * Stream application logs produced <em>after</em> this method is called.
-	 * 
+	 *
 	 * This method has 'tail'-like behavior. Every time there is a new log entry,
 	 * it notifies the listener.
-	 * 
+	 *
 	 * @param appName the name of the application
 	 * @param listener listener object to be notified
 	 * @return token than can be used to cancel listening for logs
 	 */
 	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
-	
+
 	/**
 	 * Stream recent log entries.
-	 * 
+	 *
 	 * Stream logs that were recently produced for an app.
 	 *
 	 * @param appName the name of the application
@@ -520,12 +520,12 @@ public interface CloudFoundryOperations {
 	 * @deprecated Use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
 	 */
 	Map<String, String> getCrashLogs(String appName);
-	
+
 	/**
 	 * Get the staging log while an application is starting. A null
 	 * value indicates that no further checks for staging logs should occur as
 	 * staging logs are no longer available.
-	 * 
+	 *
 	 * @param info
 	 *            starting information containing staging log file URL. Obtained
 	 *            after starting an application.
@@ -814,7 +814,7 @@ public interface CloudFoundryOperations {
 	 * @param callBack the callback to be un-registered
 	 */
 	void unRegisterRestLogListener(RestLogCallback callBack);
-	
+
 	/**
 	 * Get quota by name
 	 *
@@ -866,27 +866,27 @@ public interface CloudFoundryOperations {
 	 * Get a List of all application security groups.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @return a list of all the {@link CloudSecurityGroup}s in the system
 	 */
 	List<CloudSecurityGroup> getSecurityGroups();
-	
+
 	/**
 	 * Get a specific security group by name.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param securityGroupName The name of the security group
-	 * @return the CloudSecurityGroup or <code>null</code> if no security groups exist with the 
+	 * @return the CloudSecurityGroup or <code>null</code> if no security groups exist with the
 	 * given name
 	 */
 	CloudSecurityGroup getSecurityGroup(String securityGroupName);
-	
+
 	/**
 	 * Create a new CloudSecurityGroup.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param securityGroup
 	 */
 	void createSecurityGroup(CloudSecurityGroup securityGroup);
@@ -914,23 +914,23 @@ public interface CloudFoundryOperations {
 	 * </pre>
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param name the name for the security group
 	 * @param jsonRulesFile An input stream that has a single array with JSON objects inside describing the rules
 	 * @see http://docs.cloudfoundry.org/adminguide/app-sec-groups.html
 	 */
 	void createSecurityGroup(String name, InputStream jsonRulesFile);
-	
+
 	/**
 	 * Update an existing security group.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param securityGroup
 	 * @throws IllegalArgumentException if a security group does not exist with the name of the given CloudSecurityGroup
 	 */
 	void updateSecurityGroup(CloudSecurityGroup securityGroup);
-	
+
 	/**
 	 * Updates a existing CloudSecurityGroup using a JSON rules file. This is equivalent to <code>cf update-security-group SECURITY-GROUP PATH-TO-RULES-FILE</code>
 	 * when using the cf command line. See the Application Security Group documentation for more details.
@@ -954,22 +954,22 @@ public interface CloudFoundryOperations {
 	 * </pre>
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param jsonRulesFile An input stream that has a single array with JSON objects inside describing the rules
 	 * @throws IllegalArgumentException if a security group does not exist with the given name
 	 * @see http://docs.cloudfoundry.org/adminguide/app-sec-groups.html
 	 */
 	void updateSecurityGroup(String name, InputStream jsonRulesFile);
-	
+
 	/**
 	 * Deletes the security group with the given name.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param securityGroupName
 	 * @throws IllegalArgumentException if a security group does not exist with the given name
 	 */
-	void deleteSecurityGroup(String securityGroupName); 
+	void deleteSecurityGroup(String securityGroupName);
 
 	/**
 	 * Lists security groups in the staging set for applications.
@@ -977,28 +977,28 @@ public interface CloudFoundryOperations {
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
 	List<CloudSecurityGroup> getStagingSecurityGroups();
-	
+
 	/**
 	 * Bind a security group to the list of security groups to be used for staging applications.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
 	void bindStagingSecurityGroup(String securityGroupName);
-	
+
 	/**
 	 * Unbind a security group from the set of security groups for staging applications.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
 	void unbindStagingSecurityGroup(String securityGroupName);
-	
+
 	/**
 	 * List security groups in the set of security groups for running applications.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
-	List<CloudSecurityGroup> getRunningSecurityGroups(); 
-	
+	List<CloudSecurityGroup> getRunningSecurityGroups();
+
 	/**
 	 * Bind a security group to the list of security groups to be used for running applications.
 	 * <p/>
@@ -1012,36 +1012,36 @@ public interface CloudFoundryOperations {
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
 	void unbindRunningSecurityGroup(String securityGroupName);
-	
+
 	/**
 	 * Gets all the spaces that are bound to the given security group.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
 	 */
-	List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName); 
-	
+	List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName);
+
 	/**
 	 * Bind a security group to a space.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 * 
+	 *
 	 * @param orgName The name of the organization that the space is in.
 	 * @param spaceName The name of the space
 	 * @param securityGroupName The name of the security group to bind to the space
 	 * @throws IllegalArgumentException if the org, space, or security group do not exist
 	 */
 	void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
-	
+
 	/**
 	 * Unbind a security group from a space.
 	 * <p/>
 	 * This method requires the logged in user to have admin permissions in the cloud controller.
-	 *  
+	 *
 	 * @param orgName The name of the organization that the space is in.
 	 * @param spaceName The name of the space
 	 * @param securityGroupName The name of the security group to bind to the space
 	 * @throws IllegalArgumentException if the org, space, or security group do not exist
 	 */
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
-	
+
 }
