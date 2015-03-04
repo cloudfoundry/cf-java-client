@@ -228,6 +228,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getApplication(appGuid);
 	}
 
+	public Map<String, Object> getApplicationEnvironment(UUID appGuid) {
+		return cc.getApplicationEnvironment(appGuid);
+	}
+
+   	public Map<String, Object> getApplicationEnvironment(String appName) {
+    	return cc.getApplicationEnvironment(appName);
+	}
+
 	public ApplicationStats getApplicationStats(String appName) {
 		return cc.getApplicationStats(appName);
 	}
@@ -536,7 +544,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void unRegisterRestLogListener(RestLogCallback callBack) {
 		cc.unRegisterRestLogListener(callBack);
 	}
-	
+
 	public CloudOrganization getOrgByName(String orgName, boolean required){
     	return cc.getOrgByName(orgName, required);
     }
@@ -574,7 +582,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteSpace(spaceName);
 	}
 
-	
+
 	@Override
 	public CloudSpace getSpace(String spaceName) {
 		return cc.getSpace(spaceName);
@@ -619,7 +627,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public CloudSecurityGroup getSecurityGroup(String securityGroupName) {
 		return cc.getSecurityGroup(securityGroupName);
 	}
-	
+
 	@Override
 	public void createSecurityGroup(CloudSecurityGroup securityGroup){
 		cc.createSecurityGroup(securityGroup);
@@ -639,7 +647,7 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void updateSecurityGroup(String name, InputStream jsonRulesFile) {
 		cc.updateSecurityGroup(name, jsonRulesFile);
 	}
-	
+
 	@Override
 	public void deleteSecurityGroup(String securityGroupName) {
 		cc.deleteSecurityGroup(securityGroupName);

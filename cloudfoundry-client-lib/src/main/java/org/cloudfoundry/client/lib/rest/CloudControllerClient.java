@@ -119,12 +119,16 @@ public interface CloudControllerClient {
 	List<CloudApplication> getApplications();
 
 	CloudApplication getApplication(String appName);
-	
+
 	CloudApplication getApplication(UUID appGuid);
 
 	ApplicationStats getApplicationStats(String appName);
 
-	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
+	Map<String, Object> getApplicationEnvironment(UUID appGuid);
+
+	Map<String, Object> getApplicationEnvironment(String appName);
+
+    void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
 	                       List<String> serviceNames);
 
 	void createApplication(String appName, Staging staging, Integer disk, Integer memory,
@@ -198,14 +202,14 @@ public interface CloudControllerClient {
 
 	CloudStack getStack(String name);
 
-	// Space management	
-	
+	// Space management
+
 	void createSpace(String spaceName);
-	
+
 	CloudSpace getSpace(String spaceName);
-	
+
 	void deleteSpace(String spaceName);
-	
+
 	// Domains and routes management
 
 
@@ -267,11 +271,11 @@ public interface CloudControllerClient {
 	void associateAuditorWithSpace(String spaceName);
 
 	// Security Group Operations
-	
+
 	List<CloudSecurityGroup> getSecurityGroups();
 
 	CloudSecurityGroup getSecurityGroup(String securityGroupName);
-	
+
 	void createSecurityGroup(CloudSecurityGroup securityGroup);
 
 	void createSecurityGroup(String name, InputStream jsonRulesFile);
@@ -299,4 +303,5 @@ public interface CloudControllerClient {
 	void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+
 }
