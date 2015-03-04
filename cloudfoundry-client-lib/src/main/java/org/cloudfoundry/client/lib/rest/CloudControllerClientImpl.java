@@ -67,6 +67,7 @@ import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -115,6 +116,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Alexander Orlov
+ * @author Scott Frederick
  */
 public class CloudControllerClientImpl implements CloudControllerClient {
 
@@ -840,6 +842,27 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public CloudService getService(String serviceName) {
+		Map<String, Object> resource = doGetServiceInstance(serviceName, 0);
+
+		if (resource == null) {
+			return null;
+		}
+
+		return resourceMapper.mapResource(resource, CloudService.class);
+	}
+
+	@Override
+	public CloudServiceInstance getServiceInstance(String serviceName) {
+		Map<String, Object> resource = doGetServiceInstance(serviceName, 1);
+
+		if (resource == null) {
+			return null;
+		}
+
+		return resourceMapper.mapResource(resource, CloudServiceInstance.class);
+	}
+
+	private Map<String, Object> doGetServiceInstance(String serviceName, int inlineDepth) {
 		String urlPath = "/v2";
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		if (sessionSpace != null) {
@@ -848,16 +871,20 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		urlVars.put("q", "name:" + serviceName);
 		urlPath = urlPath + "/service_instances?q={q}&return_user_provided_service_instances=true";
-		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-		CloudService cloudService = null;
-		if (resourceList.size() > 0) {
-			final Map<String, Object> resource = resourceList.get(0);
-			if (hasEmbeddedResource(resource, "service_plan")) {
-				fillInEmbeddedResource(resource, "service_plan", "service");
-			}
-			cloudService = resourceMapper.mapResource(resource, CloudService.class);
+		if (inlineDepth > 0) {
+			urlPath = urlPath + "&inline-relations-depth=" + inlineDepth;
 		}
-		return cloudService;
+
+		List<Map<String, Object>> resources = getAllResources(urlPath, urlVars);
+
+		if (resources.size() > 0) {
+			Map<String, Object> serviceResource = resources.get(0);
+			if (hasEmbeddedResource(serviceResource, "service_plan")) {
+				fillInEmbeddedResource(serviceResource, "service_plan", "service");
+			}
+			return serviceResource;
+		}
+		return null;
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class CloudEvent extends CloudEntity {
 		return actor;
 	}
 
-	public UUID getActorUuid() {
+	public UUID getActorGuid() {
 		try {
 			return UUID.fromString(actor);
 		} catch (IllegalArgumentException e) {
@@ -69,7 +69,7 @@ public class CloudEvent extends CloudEntity {
 		return actee;
 	}
 
-	public UUID getActeeUuid() {
+	public UUID getActeeGuid() {
 		try {
 			return UUID.fromString(actee);
 		} catch (IllegalArgumentException e) {

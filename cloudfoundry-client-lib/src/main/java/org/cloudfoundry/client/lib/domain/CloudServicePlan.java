@@ -30,16 +30,18 @@ public class CloudServicePlan extends CloudEntity {
 	public CloudServicePlan() {
 	}
 
+	public CloudServicePlan(Meta meta, String name) {
+		super(meta, name);
+	}
+
 	public CloudServicePlan(Meta meta, String name, String description, boolean free,
-							boolean _public, String extra, String uniqueId,
-							CloudServiceOffering serviceOffering) {
+							boolean _public, String extra, String uniqueId) {
 		super(meta, name);
 		this.description = description;
 		this.free = free;
 		this._public = _public;
 		this.extra = extra;
 		this.uniqueId = uniqueId;
-		this.serviceOffering = serviceOffering;
 	}
 
 	public boolean isFree() {

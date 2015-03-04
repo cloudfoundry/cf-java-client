@@ -48,7 +48,9 @@ import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBinding;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
@@ -419,7 +421,6 @@ public class CloudFoundryClientTest {
 			assertNotNull(event.getActor());
 			assertNotNull(event.getActorType());
 			assertNotNull(event.getActorName());
-			assertNotNull(event.getTimestamp());
 		}
 	}
 
@@ -1288,6 +1289,7 @@ public class CloudFoundryClientTest {
               service.getMeta().getCreated().getTime(), FIVE_MINUTES);
 
 		connectedClient.deleteService(serviceName);
+
 		List<CloudService> services = connectedClient.getServices();
 		assertNotNull(services);
 		assertEquals(0, services.size());
@@ -1464,6 +1466,41 @@ public class CloudFoundryClientTest {
 		assertEquals(expectedService.getLabel(), service.getLabel());
 		assertEquals(expectedService.getPlan(), service.getPlan());
 		assertEquals(expectedService.isUserProvided(), service.isUserProvided());
+	}
+
+	@Test
+	public void getServiceInstance() {
+		String serviceName = "mysql-instance-test";
+		String appName = createSpringTravelApp("service-instance-app", Collections.singletonList(serviceName));
+
+		CloudApplication application = connectedClient.getApplication(appName);
+
+		CloudServiceInstance serviceInstance = connectedClient.getServiceInstance(serviceName);
+		assertNotNull(serviceInstance);
+		assertEquals(serviceName, serviceInstance.getName());
+		assertNotNull(serviceInstance.getDashboardUrl());
+		assertNotNull(serviceInstance.getType());
+		assertNotNull(serviceInstance.getCredentials());
+
+		CloudService service = serviceInstance.getService();
+		assertNotNull(service);
+		assertEquals(MYSQL_SERVICE_LABEL, service.getLabel());
+		assertEquals(MYSQL_SERVICE_PLAN, service.getPlan());
+
+		CloudServicePlan servicePlan = serviceInstance.getServicePlan();
+		assertNotNull(servicePlan);
+		assertEquals(MYSQL_SERVICE_PLAN, servicePlan.getName());
+
+		List<CloudServiceBinding> bindings = serviceInstance.getBindings();
+		assertNotNull(bindings);
+		assertEquals(1, bindings.size());
+		CloudServiceBinding binding = bindings.get(0);
+		assertEquals(application.getMeta().getGuid(), binding.getAppGuid());
+		assertNotNull(binding.getCredentials());
+		assertTrue(binding.getCredentials().size() > 0);
+		assertNotNull(binding.getBindingOptions());
+		assertEquals(0, binding.getBindingOptions().size());
+		assertNull(binding.getSyslogDrainUrl());
 	}
 
 	//

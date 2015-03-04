@@ -38,6 +38,7 @@ import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -449,8 +450,12 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.updateServicePlanVisibilityForBroker(name, visibility);
 	}
 
-    public CloudService getService(String service) {
+	public CloudService getService(String service) {
 		return cc.getService(service);
+	}
+
+    public CloudServiceInstance getServiceInstance(String service) {
+		return cc.getServiceInstance(service);
 	}
 
 	public void deleteService(String service) {

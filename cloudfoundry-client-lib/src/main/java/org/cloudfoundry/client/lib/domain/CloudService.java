@@ -18,7 +18,7 @@ package org.cloudfoundry.client.lib.domain;
 
 
 /**
- * Class representing an instance of a service created for a space.
+ * Class representing service plan info for a service instance.
  *
  * @author Thomas Risberg
  */

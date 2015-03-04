@@ -25,6 +25,8 @@ import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBinding;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
@@ -46,6 +48,7 @@ import java.util.UUID;
  * @author Thomas Risberg
  */
 //TODO: use some more advanced JSON mapping framework?
+@SuppressWarnings("ConstantConditions")
 public class CloudEntityResourceMapper {
 
 	private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -76,14 +79,16 @@ public class CloudEntityResourceMapper {
 			return (T) mapApplicationResource(resource);
 		}
 		if (targetClass == CloudEvent.class) {
-            		return (T) mapEventResource(resource);
-        	}
+			return (T) mapEventResource(resource);
+		}
 		if (targetClass == CloudService.class) {
-
+			return (T) mapServiceResource(resource);
+		}
+		if (targetClass == CloudServiceInstance.class) {
 			return (T) mapServiceInstanceResource(resource);
 		}
 		if (targetClass == CloudServiceOffering.class) {
-			return (T) mapServiceResource(resource);
+			return (T) mapServiceOfferingResource(resource);
 		}
 		if (targetClass == CloudServiceBroker.class) {
 			return (T) mapServiceBrokerResource(resource);
@@ -92,11 +97,11 @@ public class CloudEntityResourceMapper {
 			return (T) mapStackResource(resource);
 		}
 		if (targetClass == CloudQuota.class) {
-            return (T) mapQuotaResource(resource);
-        }
+			return (T) mapQuotaResource(resource);
+		}
 		if (targetClass == CloudSecurityGroup.class) {
-            return (T) mapApplicationSecurityGroupResource(resource);
-        }
+			return (T) mapApplicationSecurityGroupResource(resource);
+		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
 	}
@@ -110,34 +115,26 @@ public class CloudEntityResourceMapper {
 		return new CloudSpace(getMeta(resource), getNameOfResource(resource), organization);
 	}
 
-	private CloudOrganization mapOrganizationResource(
-            Map<String, Object> resource) {
-        Boolean billingEnabled = getEntityAttribute(resource,
-                "billing_enabled", Boolean.class);
-		Map<String, Object> quotaDefinition = getEmbeddedResource(resource,
-                "quota_definition");
+	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {
+		Boolean billingEnabled = getEntityAttribute(resource, "billing_enabled", Boolean.class);
+		Map<String, Object> quotaDefinition = getEmbeddedResource(resource, "quota_definition");
 		CloudQuota quota = null;
 		if (quotaDefinition != null) {
 			quota = mapQuotaResource(quotaDefinition);
-        }
-        return new CloudOrganization(getMeta(resource),
-                getNameOfResource(resource), quota,billingEnabled);
-    }
+		}
+		return new CloudOrganization(getMeta(resource), getNameOfResource(resource), quota, billingEnabled);
+	}
 
-    private CloudQuota mapQuotaResource(Map<String, Object> resource) {
-        Boolean nonBasicServicesAllowed = getEntityAttribute(resource,
-                "non_basic_services_allowed", Boolean.class);
-        int totalServices = getEntityAttribute(resource, "total_services",
-                Integer.class);
-        int totalRoutes = getEntityAttribute(resource, "total_routes",
-                Integer.class);
-        long memoryLimit = getEntityAttribute(resource, "memory_limit",
-                Long.class);
+	private CloudQuota mapQuotaResource(Map<String, Object> resource) {
+		Boolean nonBasicServicesAllowed = getEntityAttribute(resource, "non_basic_services_allowed", Boolean.class);
+		int totalServices = getEntityAttribute(resource, "total_services", Integer.class);
+		int totalRoutes = getEntityAttribute(resource, "total_routes", Integer.class);
+		long memoryLimit = getEntityAttribute(resource, "memory_limit", Long.class);
 
-        return new CloudQuota(getMeta(resource), getNameOfResource(resource),
-                nonBasicServicesAllowed, totalServices, totalRoutes,
-                memoryLimit);
-    }
+		return new CloudQuota(getMeta(resource), getNameOfResource(resource),
+			nonBasicServicesAllowed, totalServices, totalRoutes,
+			memoryLimit);
+	}
 
 	private CloudDomain mapDomainResource(Map<String, Object> resource) {
 		@SuppressWarnings("unchecked")
@@ -222,17 +219,14 @@ public class CloudEntityResourceMapper {
 		return event;
 	}
 
-	private CloudService mapServiceInstanceResource(Map<String, Object> resource) {
-		CloudService cloudService = new CloudService(
-				getMeta(resource),
-				getNameOfResource(resource));
+	private CloudService mapServiceResource(Map<String, Object> resource) {
+		CloudService cloudService = new CloudService(getMeta(resource), getNameOfResource(resource));
 		Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
 		if (servicePlanResource != null) {
 			cloudService.setPlan(getEntityAttribute(servicePlanResource, "name", String.class));
 
 			Map<String, Object> serviceResource = getEmbeddedResource(servicePlanResource, "service");
 			if (serviceResource != null) {
-				//TODO: assuming vendor corresponds to the service.provider and not service_instance.vendor_data
 				cloudService.setLabel(getEntityAttribute(serviceResource, "label", String.class));
 				cloudService.setProvider(getEntityAttribute(serviceResource, "provider", String.class));
 				cloudService.setVersion(getEntityAttribute(serviceResource, "version", String.class));
@@ -241,7 +235,44 @@ public class CloudEntityResourceMapper {
 		return cloudService;
 	}
 
-	private CloudServiceOffering mapServiceResource(Map<String, Object> resource) {
+	@SuppressWarnings("unchecked")
+	private CloudServiceInstance mapServiceInstanceResource(Map<String, Object> resource) {
+		CloudServiceInstance serviceInstance = new CloudServiceInstance(getMeta(resource), getNameOfResource(resource));
+
+		serviceInstance.setType(getEntityAttribute(resource, "type", String.class));
+		serviceInstance.setDashboardUrl(getEntityAttribute(resource, "dashboard_url", String.class));
+		serviceInstance.setCredentials(getEntityAttribute(resource, "credentials", Map.class));
+
+		Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
+		serviceInstance.setServicePlan(mapServicePlanResource(servicePlanResource));
+
+		CloudService service = mapServiceResource(resource);
+		serviceInstance.setService(service);
+
+		List<Map<String, Object>> bindingsResource = getEmbeddedResourceList(getEntity(resource), "service_bindings");
+		List<CloudServiceBinding> bindings = new ArrayList<>(bindingsResource.size());
+		for (Map<String, Object> bindingResource : bindingsResource) {
+			bindings.add(mapServiceBinding(bindingResource));
+		}
+		serviceInstance.setBindings(bindings);
+
+		return serviceInstance;
+	}
+
+	@SuppressWarnings("unchecked")
+	private CloudServiceBinding mapServiceBinding(Map<String, Object> resource) {
+		CloudServiceBinding binding = new CloudServiceBinding(getMeta(resource),
+			getNameOfResource(resource));
+
+		binding.setAppGuid(UUID.fromString(getEntityAttribute(resource, "app_guid", String.class)));
+		binding.setSyslogDrainUrl(getEntityAttribute(resource, "syslog_drain_url", String.class));
+		binding.setCredentials(getEntityAttribute(resource, "credentials", Map.class));
+		binding.setBindingOptions(getEntityAttribute(resource, "binding_options", Map.class));
+
+		return binding;
+	}
+
+	private CloudServiceOffering mapServiceOfferingResource(Map<String, Object> resource) {
 		CloudServiceOffering cloudServiceOffering = new CloudServiceOffering(
 				getMeta(resource),
 				getEntityAttribute(resource, "label", String.class),
@@ -258,21 +289,25 @@ public class CloudEntityResourceMapper {
 		List<Map<String, Object>> servicePlanList = getEmbeddedResourceList(getEntity(resource), "service_plans");
 		if (servicePlanList != null) {
 			for (Map<String, Object> servicePlanResource : servicePlanList) {
-				Boolean publicPlan = getEntityAttribute(servicePlanResource, "public", Boolean.class);
-				CloudServicePlan servicePlan =
-						new CloudServicePlan(
-								getMeta(servicePlanResource),
-								getEntityAttribute(servicePlanResource, "name", String.class),
-								getEntityAttribute(servicePlanResource, "description", String.class),
-								getEntityAttribute(servicePlanResource, "free", Boolean.class),
-								publicPlan == null ? true : publicPlan,
-								getEntityAttribute(servicePlanResource, "extra", String.class),
-								getEntityAttribute(servicePlanResource, "unique_id", String.class),
-								cloudServiceOffering);
+				CloudServicePlan servicePlan = mapServicePlanResource(servicePlanResource);
+				servicePlan.setServiceOffering(cloudServiceOffering);
 				cloudServiceOffering.addCloudServicePlan(servicePlan);
 			}
 		}
 		return cloudServiceOffering;
+	}
+
+	private CloudServicePlan mapServicePlanResource(Map<String, Object> servicePlanResource) {
+		Boolean publicPlan = getEntityAttribute(servicePlanResource, "public", Boolean.class);
+
+		return new CloudServicePlan(
+				getMeta(servicePlanResource),
+				getEntityAttribute(servicePlanResource, "name", String.class),
+				getEntityAttribute(servicePlanResource, "description", String.class),
+				getEntityAttribute(servicePlanResource, "free", Boolean.class),
+				publicPlan == null ? true : publicPlan,
+				getEntityAttribute(servicePlanResource, "extra", String.class),
+				getEntityAttribute(servicePlanResource, "unique_id", String.class));
 	}
 
 	private CloudServiceBroker mapServiceBrokerResource(Map<String, Object> resource) {
@@ -352,8 +387,8 @@ public class CloudEntityResourceMapper {
 			return (T) String.valueOf(attributeValue);
 		}
 		if (targetClass == Long.class) {
-            return (T) Long.valueOf(String.valueOf(attributeValue));
-        }
+			return (T) Long.valueOf(String.valueOf(attributeValue));
+		}
 		if (targetClass == Integer.class || targetClass == Boolean.class || targetClass == Map.class || targetClass == List.class) {
 			return (T) attributeValue;
 		}

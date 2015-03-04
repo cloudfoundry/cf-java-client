@@ -37,6 +37,7 @@ import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -635,6 +636,15 @@ public interface CloudFoundryOperations {
 	 * @return the cloud service info
 	 */
 	CloudService getService(String service);
+
+
+	/**
+	 * Get a service instance.
+	 *
+	 * @param service name of the service instance
+	 * @return the service instance info
+	 */
+	CloudServiceInstance getServiceInstance(String service);
 
 	/**
 	 * Delete cloud service.
