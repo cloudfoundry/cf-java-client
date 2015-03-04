@@ -28,6 +28,7 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
@@ -467,6 +468,20 @@ public interface CloudFoundryOperations {
 	 */
 	void updateApplicationEnv(String appName, List<String> env);
 
+	/**
+	 * Get system events.
+	 *
+	 * @return all system events
+	 */
+	List<CloudEvent> getEvents();
+
+	/**
+	 * Get application events.
+	 *
+	 * @param appName name of application
+	 * @return application events
+	 */
+	List<CloudEvent> getApplicationEvents(String appName);
 
 	/**
 	 * Get logs from the deployed application. The logs

@@ -68,12 +68,7 @@ public interface CloudControllerClient {
 
 	CloudInfo getInfo();
 
-	List<CloudEvent> getEvents();
-
-    	List<CloudEvent> getApplicationEvents(String appName);
-
 	List<CloudSpace> getSpaces();
-
 
 	List<CloudOrganization> getOrganizations();
 
@@ -168,6 +163,10 @@ public interface CloudControllerClient {
 	void updateApplicationEnv(String appName, Map<String, String> env);
 
 	void updateApplicationEnv(String appName, List<String> env);
+
+	List<CloudEvent> getEvents();
+
+	List<CloudEvent> getApplicationEvents(String appName);
 
 	Map<String, String> getLogs(String appName);
 

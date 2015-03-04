@@ -395,20 +395,33 @@ public class CloudFoundryClientTest {
 	// Basic Event Tests
 	//
 
-    	@Test
-    	public void eventsAvailable() throws Exception {
-        	List<CloudEvent> events = connectedClient.getEvents();
-       		assertNotNull(events);
-        	assertTrue(events.size() > 0);
-    	}
+	@Test
+	public void eventsAvailable() throws Exception {
+		List<CloudEvent> events = connectedClient.getEvents();
+		assertEvents(events);
+	}
 
-    	@Test
-    	public void appEventsAvailable() throws Exception {
-        	String appName = createSpringTravelApp("appEvents");
-        	List<CloudEvent> events = connectedClient.getApplicationEvents(appName);
-        	assertNotNull(events);
-        	assertTrue(events.size() > 0);
-    	}
+	@Test
+	public void appEventsAvailable() throws Exception {
+		String appName = createSpringTravelApp("appEvents");
+		List<CloudEvent> events = connectedClient.getApplicationEvents(appName);
+		assertEvents(events);
+	}
+
+	private void assertEvents(List<CloudEvent> events) {
+		assertNotNull(events);
+		assertTrue(events.size() > 0);
+
+		for (CloudEvent event : events) {
+			assertNotNull(event.getActee());
+			assertNotNull(event.getActeeType());
+			assertNotNull(event.getActeeName());
+			assertNotNull(event.getActor());
+			assertNotNull(event.getActorType());
+			assertNotNull(event.getActorName());
+			assertNotNull(event.getTimestamp());
+		}
+	}
 
 	//
 	// Basic Application tests

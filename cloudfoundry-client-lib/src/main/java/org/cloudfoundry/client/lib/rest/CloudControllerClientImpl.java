@@ -704,7 +704,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		String userId = getCurrentUserId();
 		
-		getRestTemplate().put(getUrl(urlPath), spaceRequest,spaceGuid,userId);
+		getRestTemplate().put(getUrl(urlPath), spaceRequest, spaceGuid, userId);
 	}
 
 	private String getCurrentUserId() {
@@ -985,42 +985,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-    	public List<CloudEvent> getEvents() {
-        	String urlPath = "/v2";
-        	urlPath = urlPath + "/events?inline-relations-depth=1";
-        	List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
-        	List<CloudEvent> events = new ArrayList<CloudEvent>();
-        	for (Map<String, Object> resource : resourceList) {
-        	    events.add(mapCloudEvent(resource));
-        	}
-        	return events;
-    	}
-
-    	@SuppressWarnings("unchecked")
-    	private CloudEvent mapCloudEvent(Map<String, Object> resource) {
-        	UUID eventId = resourceMapper.getGuidOfResource(resource);
-        	CloudEvent event = null;
-        	if (resource != null) {
-        	    event = resourceMapper.mapResource(resource, CloudEvent.class);
-        	}
-        	return event;
-    	}
-
-    	@Override
-    	public List<CloudEvent> getApplicationEvents(String appName) {
-        	UUID appId = getAppId(appName);
-        	Map<String, Object> urlVars = new HashMap<String, Object>();
-        	urlVars.put("appId", appId);
-        	String urlPath = "/v2/events?q=actee:{appId}";
-        	List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-        	List<CloudEvent> events = new ArrayList<CloudEvent>();
-        	for (Map<String, Object> resource : resourceList) {
-        	    events.add(mapCloudEvent(resource));
-        	}
-        	return events;
-    	}
-
-	@Override
 	public List<CloudApplication> getApplications() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2";
@@ -1062,8 +1026,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		CloudApplication cloudApp = null;
 		if (resource != null) {
 			int running = getRunningInstances(appId,
-					CloudApplication.AppState.valueOf(
-							CloudEntityResourceMapper.getEntityAttribute(resource, "state", String.class)));
+				CloudApplication.AppState.valueOf(
+					CloudEntityResourceMapper.getEntityAttribute(resource, "state", String.class)));
 			((Map<String, Object>)resource.get("entity")).put("running_instances", running);
 			cloudApp = resourceMapper.mapResource(resource, CloudApplication.class);
 			cloudApp.setUris(findApplicationUris(cloudApp.getMeta().getGuid()));
@@ -1740,6 +1704,32 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			envHash.put(key, value);
 		}
 		updateApplicationEnv(appName, envHash);
+	}
+
+	@Override
+	public List<CloudEvent> getEvents() {
+		String urlPath = "/v2/events";
+		return doGetEvents(urlPath, null);
+	}
+
+	@Override
+	public List<CloudEvent> getApplicationEvents(String appName) {
+		UUID appId = getAppId(appName);
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("appId", appId);
+		String urlPath = "/v2/events?q=actee:{appId}";
+		return doGetEvents(urlPath, urlVars);
+	}
+
+	private List<CloudEvent> doGetEvents(String urlPath, Map<String, Object> urlVars) {
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		List<CloudEvent> events = new ArrayList<CloudEvent>();
+		for (Map<String, Object> resource : resourceList) {
+			if (resource != null) {
+				events.add(resourceMapper.mapResource(resource, CloudEvent.class));
+			}
+		}
+		return events;
 	}
 
 	@Override

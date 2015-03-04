@@ -206,22 +206,20 @@ public class CloudEntityResourceMapper {
 	}
 
 	private CloudEvent mapEventResource(Map<String, Object> resource) {
-        	CloudEvent event = new CloudEvent(
-                		getMeta(resource),
-				getNameOfResource(resource));
-        	event.setType(getEntityAttribute(resource, "type", String.class));
-        	UUID actor = UUID.fromString(String.valueOf(getEntityAttribute(resource, "actor", String.class)));
-        	event.setActor(actor);
-        	event.setActorType(getEntityAttribute(resource, "actor_type", String.class));
-        	event.setActorName(getEntityAttribute(resource, "actor_name", String.class));
-        	UUID actee = UUID.fromString(String.valueOf(getEntityAttribute(resource,"actee", String.class)));
-        	event.setActee(actee);
-        	event.setActeeType(getEntityAttribute(resource, "actee_type", String.class));
-        	event.setActeeName(getEntityAttribute(resource, "actee_name", String.class));
-        	Date timestamp = parseDate(getEntityAttribute(resource, "timestamp", String.class));
-        	event.setTimestamp(timestamp);
+		CloudEvent event = new CloudEvent(
+			getMeta(resource),
+			getNameOfResource(resource));
+		event.setType(getEntityAttribute(resource, "type", String.class));
+		event.setActor(getEntityAttribute(resource, "actor", String.class));
+		event.setActorType(getEntityAttribute(resource, "actor_type", String.class));
+		event.setActorName(getEntityAttribute(resource, "actor_name", String.class));
+		event.setActee(getEntityAttribute(resource, "actee", String.class));
+		event.setActeeType(getEntityAttribute(resource, "actee_type", String.class));
+		event.setActeeName(getEntityAttribute(resource, "actee_name", String.class));
+		Date timestamp = parseDate(getEntityAttribute(resource, "timestamp", String.class));
+		event.setTimestamp(timestamp);
 
-        	return event;
+		return event;
 	}
 
 	private CloudService mapServiceInstanceResource(Map<String, Object> resource) {
