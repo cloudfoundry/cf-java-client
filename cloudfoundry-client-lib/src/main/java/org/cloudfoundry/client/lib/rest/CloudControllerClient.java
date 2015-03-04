@@ -37,6 +37,7 @@ import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
@@ -67,7 +68,12 @@ public interface CloudControllerClient {
 
 	CloudInfo getInfo();
 
+	List<CloudEvent> getEvents();
+
+    	List<CloudEvent> getApplicationEvents(String appName);
+
 	List<CloudSpace> getSpaces();
+
 
 	List<CloudOrganization> getOrganizations();
 
