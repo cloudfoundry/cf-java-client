@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -431,7 +430,7 @@ public class CloudFoundryClientTest {
 	@Test
 	public void createApplication() {
 		String appName = namespacedAppName("travel_test-0");
-		List<String> uris = Arrays.asList(computeAppUrl(appName));
+		List<String> uris = Collections.singletonList(computeAppUrl(appName));
 		Staging staging =  new Staging();
 		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
 		CloudApplication app = connectedClient.getApplication(appName);
@@ -490,7 +489,7 @@ public class CloudFoundryClientTest {
 		String appName = namespacedAppName("travel_test-tld");
 
 		connectedClient.addDomain(TEST_DOMAIN);
-		List<String> uris = Arrays.asList(TEST_DOMAIN);
+		List<String> uris = Collections.singletonList(TEST_DOMAIN);
 
 		Staging staging =  new Staging();
 		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
@@ -544,57 +543,54 @@ public class CloudFoundryClientTest {
 	@Test
 	public void getApplicationEnvironmentByGuid() {
 		String appName = namespacedAppName("simple-app");
-		List<String> uris = Arrays.asList(computeAppUrl(appName));
-		Staging staging =  new Staging();
+		List<String> uris = Collections.singletonList(computeAppUrl(appName));
+		Staging staging = new Staging();
 		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		connectedClient.updateApplicationEnv(appName, Collections.singletonMap("testKey", "testValue"));
 		CloudApplication app = connectedClient.getApplication(appName);
 		Map<String, Object> env = connectedClient.getApplicationEnvironment(app.getMeta().getGuid());
-		assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("environment_json") instanceof LinkedHashMap);
-		assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
-		LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
-		LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
-		LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
-		LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
-		LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
-		assertTrue(stagingEnvMap.size() == 0);
-		assertTrue(runningEnvMap.size() == 0);
-		assertTrue(environmentMap.size() == 0);
-		assertTrue(systemEnvMap.size() == 1);
-		assertTrue(applicationEnvMap.size() == 1);
-		assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
-		assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
-		assertTrue(((Map) applicationEnvMap.get("VCAP_APPLICATION")).get("application_name").equals(appName));
+		assertAppEnvironment(env);
 	}
 
 	@Test
 	public void getApplicationEnvironmentByName() {
 		String appName = namespacedAppName("simple-app");
-		List<String> uris = Arrays.asList(computeAppUrl(appName));
-		Staging staging =  new Staging();
+		List<String> uris = Collections.singletonList(computeAppUrl(appName));
+		Staging staging = new Staging();
 		connectedClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		connectedClient.updateApplicationEnv(appName, Collections.singletonMap("testKey", "testValue"));
 		Map<String, Object> env = connectedClient.getApplicationEnvironment(appName);
-		assertTrue(env.get("staging_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("running_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("environment_json") instanceof LinkedHashMap);
-		assertTrue(env.get("system_env_json") instanceof LinkedHashMap);
-		assertTrue(env.get("application_env_json") instanceof LinkedHashMap);
-		LinkedHashMap stagingEnvMap = (LinkedHashMap) env.get("staging_env_json");
-		LinkedHashMap runningEnvMap = (LinkedHashMap) env.get("running_env_json");
-		LinkedHashMap environmentMap = (LinkedHashMap) env.get("environment_json");
-		LinkedHashMap systemEnvMap = (LinkedHashMap) env.get("system_env_json");
-		LinkedHashMap applicationEnvMap = (LinkedHashMap) env.get("application_env_json");
-		assertTrue(stagingEnvMap.size() == 0);
-		assertTrue(runningEnvMap.size() == 0);
-		assertTrue(environmentMap.size() == 0);
-		assertTrue(systemEnvMap.size() == 1);
-		assertTrue(applicationEnvMap.size() == 1);
-		assertTrue(systemEnvMap.containsKey("VCAP_SERVICES"));
-		assertTrue(applicationEnvMap.containsKey("VCAP_APPLICATION"));
-		assertTrue(((Map) applicationEnvMap.get("VCAP_APPLICATION")).get("application_name").equals(appName));
+		assertAppEnvironment(env);
    }
+
+	private void assertAppEnvironment(Map<String, Object> env) {
+		assertMapInEnv(env, "staging_env_json", true);
+		assertMapInEnv(env, "running_env_json", true);
+		assertMapInEnv(env, "environment_json", true, "testKey");
+		assertMapInEnv(env, "system_env_json", true, "VCAP_SERVICES");
+		// this value is not present in Pivotal CF < 1.4
+		assertMapInEnv(env, "application_env_json", false, "VCAP_APPLICATION");
+	}
+
+	private void assertMapInEnv(Map<String, Object> env, String key, boolean alwaysPresent, String... expectedKeys) {
+		Object value = env.get(key);
+
+		if (value == null) {
+			if (alwaysPresent) {
+				fail("Expected key " + key + " was not found");
+			} else {
+				return;
+			}
+		}
+
+		assertTrue(value.getClass().getName(), value instanceof Map);
+		Map map = (Map) value;
+		assertTrue(map.size() >= expectedKeys.length);
+
+		for (String expectedKey : expectedKeys) {
+			assertTrue(map.containsKey(expectedKey));
+		}
+	}
 
 	@Test
 	public void getApplications() {
