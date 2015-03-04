@@ -300,7 +300,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	 * that any other CloudFoundryException or RestClientException exception not
 	 * related to the two errors mentioned above may still be thrown (e.g. 500
 	 * level errors, Unauthorized or Forbidden exceptions, etc..)
-	 * 
+	 *
 	 * @return content if available, which may contain multiple lines, or null
 	 *         if no further content is available.
 	 *
@@ -331,7 +331,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					throw e;
 				}
 			} catch (ResourceAccessException e) {
-				// Likely read timeout, the directory server won't serve 
+				// Likely read timeout, the directory server won't serve
 				// the content again
 				logger.debug("Caught exception while fetching staging logs. Aborting. Caught:" + e,
 						e);
@@ -567,7 +567,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return new CloudInfo(name, support, authorizationEndpoint, build, version, (String)userMap.get("user_name"),
 				description, limits, usage, debug, loggregatorEndpoint);
 	}
-	
+
 	@Override
 	public void createSpace(String spaceName) {
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
@@ -623,7 +623,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return spaceGuid;
 	}
-	
+
 	private UUID getSpaceGuid(String orgName, String spaceName) {
 		CloudOrganization org = getOrgByName(orgName, true);
 		return getSpaceGuid(spaceName, org.getMeta().getGuid());
@@ -632,7 +632,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private void doDeleteSpace(UUID spaceGuid) {
 		getRestTemplate().delete(getUrl("/v2/spaces/{guid}?async=false"), spaceGuid);
 	}
-	
+
 	@Override
 	public List<CloudSpace> getSpaces() {
 		String urlPath = "/v2/spaces?inline-relations-depth=1";
@@ -703,7 +703,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		spaceRequest.put("guid", spaceGuid);
 
 		String userId = getCurrentUserId();
-		
 		getRestTemplate().put(getUrl(urlPath), spaceRequest, spaceGuid, userId);
 	}
 
@@ -713,7 +712,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		String userId= (String) userMap.get("user_id");
 		return userId;
 	}
-	
+
 	@Override
 	public List<CloudOrganization> getOrganizations() {
 		String urlPath = "/v2/organizations?inline-relations-depth=0";
@@ -1018,6 +1017,21 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			throw new CloudFoundryException(HttpStatus.NOT_FOUND, "Not Found", "Application not found");
 		}
 		return mapCloudApplication(resource);
+	}
+
+	@Override
+	public Map<String, Object> getApplicationEnvironment(UUID appGuid) {
+    	String url = getUrl("/v2/apps/{guid}/env");
+		Map<String, Object> urlVars = new HashMap();
+		urlVars.put("guid", appGuid);
+		String resp = restTemplate.getForObject(url, String.class, urlVars);
+		return JsonUtil.convertJsonToMap(resp);
+	}
+
+	@Override
+	public Map<String, Object> getApplicationEnvironment(String appName) {
+		UUID appId = getAppId(appName);
+		return getApplicationEnvironment(appId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2303,7 +2317,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	// Security Group operations
-	
+
 	@Override
 	public List<CloudSecurityGroup> getSecurityGroups() {
 		String urlPath = "/v2/security_groups";
@@ -2320,7 +2334,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public CloudSecurityGroup getSecurityGroup(String securityGroupName) {
 		return doGetSecurityGroup(securityGroupName, false);
 	}
-	
+
 	private CloudSecurityGroup doGetSecurityGroup(String securityGroupName, boolean required) {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/security_groups?q=name:{name}";
@@ -2333,7 +2347,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			securityGroup = resourceMapper.mapResource(resource,
 					CloudSecurityGroup.class);
 		}else if(required && resourceList.size() == 0){
-			throw new IllegalArgumentException("Security group named '" + securityGroupName 
+			throw new IllegalArgumentException("Security group named '" + securityGroupName
 					+ "' not found.");
 		}
 
@@ -2394,7 +2408,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		CloudSecurityGroup oldGroup = doGetSecurityGroup(name, true);
 		doUpdateSecurityGroup(oldGroup, name, JsonUtil.convertToJsonList(jsonRulesFile));
 	}
-	
+
 	private void doUpdateSecurityGroup(CloudSecurityGroup currentGroup, String name, List<Map<String, Object>> rules){
 		String path = "/v2/security_groups/{guid}";
 
@@ -2413,7 +2427,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void deleteSecurityGroup(String securityGroupName) {
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		String path = "/v2/security_groups/{guid}";
 		Map<String, Object> pathVariables = new HashMap<String, Object>();
 		pathVariables.put("guid", group.getMeta().getGuid());
@@ -2424,7 +2438,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void bindStagingSecurityGroup(String securityGroupName) {
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		String path = "/v2/config/staging_security_groups/{guid}";
 
 		Map<String, Object> pathVariables = new HashMap<String, Object>();
@@ -2448,7 +2462,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void unbindStagingSecurityGroup(String securityGroupName) {
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/config/staging_security_groups/{guid}";
 		urlVars.put("guid", group.getMeta().getGuid());
@@ -2470,7 +2484,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void bindRunningSecurityGroup(String securityGroupName) {
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		String path = "/v2/config/running_security_groups/{guid}";
 
 		Map<String, Object> pathVariables = new HashMap<String, Object>();
@@ -2482,7 +2496,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public void unbindRunningSecurityGroup(String securityGroupName) {
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		String urlPath = "/v2/config/running_security_groups/{guid}";
 		urlVars.put("guid", group.getMeta().getGuid());
@@ -2500,24 +2514,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		List<CloudSpace> spaces = new ArrayList<CloudSpace>();
 		if (resourceList.size() > 0) {
 			Map<String, Object> resource = resourceList.get(0);
-			
+
 			Map<String, Object> securityGroupResource = CloudEntityResourceMapper.getEntity(resource);
 			List<Map<String, Object>> spaceResources = CloudEntityResourceMapper.getEmbeddedResourceList(securityGroupResource, "spaces");
 			for(Map<String, Object> spaceResource: spaceResources){
 				spaces.add(resourceMapper.mapResource(spaceResource, CloudSpace.class));
 			}
 		}else {
-			throw new IllegalArgumentException("Security group named '" + securityGroupName 
+			throw new IllegalArgumentException("Security group named '" + securityGroupName
 					+ "' not found.");
 		}
 		return spaces;
 	}
-	
+
 	@Override
 	public void bindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
 		UUID spaceGuid = getSpaceGuid(orgName, spaceName);
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		String path = "/v2/security_groups/{group_guid}/spaces/{space_guid}";
 
 		Map<String, Object> pathVariables = new HashMap<String, Object>();
@@ -2531,7 +2545,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	public void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
 		UUID spaceGuid = getSpaceGuid(orgName, spaceName);
 		CloudSecurityGroup group = doGetSecurityGroup(securityGroupName, true);
-		
+
 		String path = "/v2/security_groups/{group_guid}/spaces/{space_guid}";
 
 		Map<String, Object> pathVariables = new HashMap<String, Object>();
