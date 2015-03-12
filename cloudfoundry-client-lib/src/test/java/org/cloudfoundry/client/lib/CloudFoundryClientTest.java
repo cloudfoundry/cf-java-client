@@ -39,6 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
@@ -1716,6 +1717,27 @@ public class CloudFoundryClientTest {
 			}
 		}
 		assertTrue(found);
+	}
+	
+	@Test
+	public void detectedBuildpack() throws Exception {
+		String appName = createSpringTravelApp("detectedBuildpack");
+
+		File file = SampleProjects.springTravel();
+		connectedClient.uploadApplication(appName, file.getCanonicalPath());
+		connectedClient.startApplication(appName);
+
+		CloudApplication app = connectedClient.getApplication(appName);
+
+		for (int i = 0; i < 100
+				&& (app.getState() != AppState.STARTED || app.getStaging()
+						.getDetectedBuildpack() == null); i++) {
+			Thread.sleep(1000);
+			app = connectedClient.getApplication(appName);
+		}
+
+		Staging staging = app.getStaging();
+		assertNotNull(staging.getDetectedBuildpack());
 	}
 
 	@Test
