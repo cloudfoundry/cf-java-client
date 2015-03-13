@@ -32,6 +32,7 @@ public class CloudApplication extends CloudEntity {
 
 	private static final String COMMAND_KEY = "command";
 	private static final String BUILDPACK_URL_KEY = "buildpack";
+	private static final String DETECTED_BUILDPACK_KEY = "detected_buildpack";
 	private static final String MEMORY_KEY = "memory";
 	private static final String DISK_KEY = "disk_quota";
 
@@ -101,8 +102,12 @@ public class CloudApplication extends CloudEntity {
 			if (metaValue.containsKey(BUILDPACK_URL_KEY)) {
 				buildpackUrl = (String) metaValue.get(BUILDPACK_URL_KEY);
 			}
+			String detectedBuildpack = null;
+			if (metaValue.containsKey(DETECTED_BUILDPACK_KEY)) {
+				detectedBuildpack = (String) metaValue.get(DETECTED_BUILDPACK_KEY);
+			}
 			
-			setStaging(new Staging(command, buildpackUrl));
+			setStaging(new Staging(command, buildpackUrl, detectedBuildpack));
 		}
 	}
 

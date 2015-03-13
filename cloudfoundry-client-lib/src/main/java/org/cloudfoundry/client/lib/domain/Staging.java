@@ -28,6 +28,7 @@ package org.cloudfoundry.client.lib.domain;
 public class Staging {
 	private String command;
 	private String buildpackUrl;
+	private String detectedBuildpack;
 	private String stack;
 	private Integer healthCheckTimeout;
 
@@ -47,6 +48,17 @@ public class Staging {
 		this.command = command;
 		this.buildpackUrl = buildpackUrl;
 	}
+	
+	/**
+	 *
+	 * @param command the application command; may be null
+	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
+	 * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property, and should not be set except when parsing a response. May be null.
+	 */
+	public Staging(String command, String buildpackUrl, String detectedBuildpack) {
+		this(command, buildpackUrl);
+		this.detectedBuildpack = detectedBuildpack;
+	}
 
 	/**
 	 *
@@ -59,6 +71,19 @@ public class Staging {
 		this(command, buildpackUrl);
 		this.stack = stack;
 		this.healthCheckTimeout = healthCheckTimeout;
+	}
+	
+	/**
+	 *
+	 * @param command the application command; may be null
+	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
+	 * @param stack the stack to use when staging the application; may be null
+	 * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
+	 * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property, and should not be set except when parsing a response. May be null.
+	 */
+	public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout, String detectedBuildpack) {
+		this(command, buildpackUrl, stack, healthCheckTimeout);
+		this.detectedBuildpack = detectedBuildpack;
 	}
 
 	/**
@@ -78,6 +103,16 @@ public class Staging {
 		return buildpackUrl;
 	}
 
+	/**
+	 *
+	 * @return Raw, free-form information regarding a detected buildpack, or
+	 *         null if no detected buildpack was resolved. For example, if the
+	 *         application is stopped, the detected buildpack may be null.
+	 */
+	public String getDetectedBuildpack() {
+		return detectedBuildpack;
+	}
+	
 	/**
 	 *
 	 * @return the stack to use when staging the application, or null to use the default stack
