@@ -408,6 +408,7 @@ public class CloudFoundryClientTest {
 		String appName = createSpringTravelApp("appEvents");
 		List<CloudEvent> events = connectedClient.getApplicationEvents(appName);
 		assertEvents(events);
+		assertEventTimestamps(events);
 	}
 
 	private void assertEvents(List<CloudEvent> events) {
@@ -421,6 +422,14 @@ public class CloudFoundryClientTest {
 			assertNotNull(event.getActor());
 			assertNotNull(event.getActorType());
 			assertNotNull(event.getActorName());
+		}
+	}
+
+	private void assertEventTimestamps(List<CloudEvent> events) {
+		for (CloudEvent event : events) {
+			if (event.getTimestamp() != null) {
+				assertTimeWithinRange("Event time should be very recent", event.getTimestamp().getTime(), FIVE_MINUTES);
+			}
 		}
 	}
 
