@@ -39,7 +39,6 @@ import org.apache.commons.io.IOUtils;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
@@ -460,6 +459,22 @@ public class CloudFoundryClientTest {
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 
 		assertEquals(buildpackUrl, app.getStaging().getBuildpackUrl());
+		assertNull(app.getStaging().getDetectedBuildpack());
+	}
+
+	@Test
+	public void createApplicationWithDetectedBuildpack() throws Exception {
+		String appName = createSpringTravelApp("detectedBuildpack");
+
+		File file = SampleProjects.springTravel();
+		connectedClient.uploadApplication(appName, file.getCanonicalPath());
+		connectedClient.startApplication(appName);
+
+		ensureApplicationRunning(appName);
+
+		CloudApplication app = connectedClient.getApplication(appName);
+		Staging staging = app.getStaging();
+		assertNotNull(staging.getDetectedBuildpack());
 	}
 
 	@Test
@@ -1582,7 +1597,7 @@ public class CloudFoundryClientTest {
 	public void shouldCreateGetAndDeleteSpaceOnCurrentOrg() throws Exception {
 		String spaceName = "dummy space";
 		CloudSpace newSpace = connectedClient.getSpace(spaceName);
-		assertNull("Space '"+spaceName+  "' should not exist before creation",newSpace);
+		assertNull("Space '" + spaceName + "' should not exist before creation", newSpace);
 		connectedClient.createSpace(spaceName);
 		newSpace = connectedClient.getSpace(spaceName);
 		assertNotNull("newSpace should not be null", newSpace);
@@ -1596,7 +1611,7 @@ public class CloudFoundryClientTest {
 		assertTrue(foundSpaceInCurrentOrg);
 		connectedClient.deleteSpace(spaceName);
 		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
-		assertNull("Space '"+spaceName+  "' should not exist after deletion",deletedSpace);
+		assertNull("Space '" + spaceName + "' should not exist after deletion", deletedSpace);
 
 	}
 
@@ -1720,27 +1735,6 @@ public class CloudFoundryClientTest {
 	}
 	
 	@Test
-	public void detectedBuildpack() throws Exception {
-		String appName = createSpringTravelApp("detectedBuildpack");
-
-		File file = SampleProjects.springTravel();
-		connectedClient.uploadApplication(appName, file.getCanonicalPath());
-		connectedClient.startApplication(appName);
-
-		CloudApplication app = connectedClient.getApplication(appName);
-
-		for (int i = 0; i < 100
-				&& (app.getState() != AppState.STARTED || app.getStaging()
-						.getDetectedBuildpack() == null); i++) {
-			Thread.sleep(1000);
-			app = connectedClient.getApplication(appName);
-		}
-
-		Staging staging = app.getStaging();
-		assertNotNull(staging.getDetectedBuildpack());
-	}
-
-	@Test
 	public void appsWithRoutesAreCounted() throws IOException {
 		String appName = namespacedAppName("my_route3");
 		CloudApplication app = createAndUploadSimpleTestApp(appName);
@@ -1759,7 +1753,6 @@ public class CloudFoundryClientTest {
 		assertEquals(1, getRouteWithHost(appName, defaultDomainRoutes).getAppsUsingRoute());
 		assertTrue(getRouteWithHost(appName, defaultDomainRoutes).inUse());
 	}
-
 
 	//
 	// Configuration/Metadata tests
