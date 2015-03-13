@@ -362,7 +362,7 @@ public class CloudEntityResourceMapper {
 			try {
 				// if the time zone part of the dateString contains a colon (e.g. 2013-09-19T21:56:36+00:00)
 				// then remove it before parsing
-				String isoDateString = dateString.replaceFirst(":(?=[0-9]{2}$)", "");
+				String isoDateString = dateString.replaceFirst(":(?=[0-9]{2}$)", "").replaceFirst("Z$", "+0000");
 				return dateFormatter.parse(isoDateString);
 			} catch (Exception ignore) {}
 		}
