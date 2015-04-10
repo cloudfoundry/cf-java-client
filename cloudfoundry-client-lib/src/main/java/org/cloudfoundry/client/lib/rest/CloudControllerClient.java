@@ -261,17 +261,17 @@ public interface CloudControllerClient {
 
 	void setQuotaToOrg(String orgName, String quotaName);
 
-	List<UUID> getSpaceManagers(String spaceName);
+	List<UUID> getSpaceManagers(String orgName, String spaceName);
 
-	List<UUID> getSpaceDevelopers(String spaceName);
+	List<UUID> getSpaceDevelopers(String orgName, String spaceName);
 
-	List<UUID> getSpaceAuditors(String spaceName);
+	List<UUID> getSpaceAuditors(String orgName, String spaceName);
 
-	void associateManagerWithSpace(String spaceName);
+	void associateManagerWithSpace(String orgName, String spaceName);
 
-	void associateDeveloperWithSpace(String spaceName);
+	void associateDeveloperWithSpace(String orgName, String spaceName);
 
-	void associateAuditorWithSpace(String spaceName);
+	void associateAuditorWithSpace(String orgName, String spaceName);
 
 	// Security Group Operations
 

@@ -87,7 +87,6 @@ public interface CloudFoundryOperations {
 	 */
 	List<CloudSpace> getSpaces();
 
-
 	/**
 	 * Get list of space manager UUID  for the space.
 	 *
@@ -113,6 +112,33 @@ public interface CloudFoundryOperations {
 	List<UUID> getSpaceAuditors(String spaceName);
 
 	/**
+	 * Get list of space manager UUID  for the space.
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @return List of space manager UUID
+	 */
+	List<UUID> getSpaceManagers(String orgName, String spaceName);
+
+	/**
+	 * Get list of space developer UUID  for the space.
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @return List of space developer UUID
+	 */
+	List<UUID> getSpaceDevelopers(String orgName, String spaceName);
+
+	/**
+	 * Get list of space auditor UUID  for the space.
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @return List of space auditor UUID
+	 */
+	List<UUID> getSpaceAuditors(String orgName, String spaceName);
+
+	/**
 	 * Associate current user to the space auditors role
 	 *
 	 * @param spaceName name of the space
@@ -132,6 +158,30 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 */
 	void associateManagerWithSpace(String spaceName);
+
+	/**
+	 * Associate current user to the space auditors role
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 */
+	void associateAuditorWithSpace(String orgName, String spaceName);
+
+	/**
+	 * Associate current user to the space developer role
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 */
+	void associateDeveloperWithSpace(String orgName, String spaceName);
+
+	/**
+	 * Associate current user to the space managers role
+	 *
+	 * @param orgName name of the organization containing the space
+	 * @param spaceName name of the space
+	 */
+	void associateManagerWithSpace(String orgName, String spaceName);
 
 	/**
 	 * Create a space with the specified name
@@ -154,14 +204,21 @@ public interface CloudFoundryOperations {
 	 */
 	void deleteSpace(String spaceName);
 
-
-
 	/**
 	 * Get list of CloudOrganizations for the current cloud.
 	 *
 	 * @return List of CloudOrganizations objects containing the organization info
 	 */
 	List<CloudOrganization> getOrganizations();
+
+	/**
+	 * Get the organization with the specified name.
+	 *
+	 * @param orgName name of organization
+	 * @param required if true, and organization is not found, throw an exception
+	 * @return
+	 */
+	CloudOrganization getOrgByName(String orgName, boolean required);
 
 	/**
 	 * Register new user account with the provided credentials.
@@ -218,6 +275,14 @@ public interface CloudFoundryOperations {
 	 * @return the cloud application
 	 */
 	CloudApplication getApplication(String appName);
+
+	/**
+	 * Get cloud application with the specified GUID.
+	 *
+	 * @param guid GUID of the app
+	 * @return the cloud application
+	 */
+	CloudApplication getApplication(UUID guid);
 
 	/**
 	 * Get application stats for the app with the specified name.
@@ -621,6 +686,16 @@ public interface CloudFoundryOperations {
 	 * @return the contents of the file
 	 */
 	String getFileTail(String appName, int instanceIndex, String filePath, int length);
+
+	/**
+	 * Provide the content of a file from the deployed application via callbacks.
+	 *
+	 * @param appName name of the application
+	 * @param instanceIndex instance index
+	 * @param filePath path to the file
+	 * @param clientHttpResponseCallback callback object to receive file contents
+	 */
+	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback clientHttpResponseCallback);
 
 	/**
 	 * Get list of cloud services.
@@ -1076,5 +1151,4 @@ public interface CloudFoundryOperations {
 	 * @throws IllegalArgumentException if the org, space, or security group do not exist
 	 */
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
-
 }

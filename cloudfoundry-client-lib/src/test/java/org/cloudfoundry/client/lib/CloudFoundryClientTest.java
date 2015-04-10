@@ -116,7 +116,7 @@ import org.springframework.web.client.RestTemplate;
 @RunWith(BMUnitRunner.class)
 @BMScript(value="trace", dir="target/test-classes")
 public class CloudFoundryClientTest {
-	private CloudFoundryClient connectedClient;
+	private CloudFoundryOperations connectedClient;
 
 	// Pass -Dccng.target=http://api.cloudfoundry.com, vcap.me, or your own cloud -- must point to a v2 cloud controller
 	private static final String CCNG_API_URL = System.getProperty("ccng.target", "http://api.run.pivotal.io");
@@ -1603,7 +1603,7 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void shouldCreateGetAndDeleteSpaceOnCurrentOrg() throws Exception {
+	public void createGetAndDeleteSpaceOnCurrentOrg() throws Exception {
 		String spaceName = "dummy space";
 		CloudSpace newSpace = connectedClient.getSpace(spaceName);
 		assertNull("Space '" + spaceName + "' should not exist before creation", newSpace);
@@ -1625,8 +1625,8 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void assignDefaultUserRolesToASpace() {
-		String spaceName = "dummy space";
+	public void assignDefaultUserRolesInSpace() {
+		String spaceName = "assignDefaultUserRolesInSpace";
 		connectedClient.createSpace(spaceName);
 
 		List<UUID> spaceManagers = connectedClient.getSpaceManagers(spaceName);
@@ -1634,7 +1634,6 @@ public class CloudFoundryClientTest {
 		connectedClient.associateManagerWithSpace(spaceName);
 		spaceManagers = connectedClient.getSpaceManagers(spaceName);
 		assertEquals("Space should have one manager", 1, spaceManagers.size());
-
 
 		List<UUID> spaceDevelopers = connectedClient.getSpaceDevelopers(spaceName);
 		assertEquals("Space should have no developer when created", 0, spaceDevelopers.size());
@@ -1644,16 +1643,42 @@ public class CloudFoundryClientTest {
 
 		List<UUID> spaceAuditors = connectedClient.getSpaceAuditors(spaceName);
 		assertEquals("Space should have no auditor when created", 0, spaceAuditors.size());
-
 		connectedClient.associateAuditorWithSpace(spaceName);
-
 		spaceAuditors = connectedClient.getSpaceAuditors(spaceName);
 		assertEquals("Space should have one auditor ", 1, spaceAuditors.size());
 
 		connectedClient.deleteSpace(spaceName);
 		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
 		assertNull("Space '" + spaceName + "' should not exist after deletion", deletedSpace);
+	}
 
+	@Test
+	public void assignDefaultUserRolesInSpaceWithOrg() {
+		String orgName = CCNG_USER_ORG;
+		String spaceName = "assignDefaultUserRolesInSpaceWithOrg";
+		connectedClient.createSpace(spaceName);
+
+		List<UUID> spaceManagers = connectedClient.getSpaceManagers(orgName, spaceName);
+		assertEquals("Space should have no manager when created", 0, spaceManagers.size());
+		connectedClient.associateManagerWithSpace(orgName, spaceName);
+		spaceManagers = connectedClient.getSpaceManagers(orgName, spaceName);
+		assertEquals("Space should have one manager", 1, spaceManagers.size());
+
+		List<UUID> spaceDevelopers = connectedClient.getSpaceDevelopers(orgName, spaceName);
+		assertEquals("Space should have no developer when created", 0, spaceDevelopers.size());
+		connectedClient.associateDeveloperWithSpace(orgName, spaceName);
+		spaceDevelopers = connectedClient.getSpaceDevelopers(orgName, spaceName);
+		assertEquals("Space should have one developer", 1, spaceDevelopers.size());
+
+		List<UUID> spaceAuditors = connectedClient.getSpaceAuditors(orgName, spaceName);
+		assertEquals("Space should have no auditor when created", 0, spaceAuditors.size());
+		connectedClient.associateAuditorWithSpace(orgName, spaceName);
+		spaceAuditors = connectedClient.getSpaceAuditors(orgName, spaceName);
+		assertEquals("Space should have one auditor ", 1, spaceAuditors.size());
+
+		connectedClient.deleteSpace(spaceName);
+		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '" + spaceName + "' should not exist after deletion", deletedSpace);
 	}
 
 	@Test
@@ -2257,7 +2282,7 @@ public class CloudFoundryClientTest {
 		return pass;
 	}
 
-	private void doOpenFile(CloudFoundryClient client, String appName) throws Exception {
+	private void doOpenFile(CloudFoundryOperations client, String appName) throws Exception {
 		String appDir = "app";
 		String fileName = appDir + "/WEB-INF/web.xml";
 		String emptyPropertiesFileName = appDir + "/WEB-INF/classes/empty.properties";
@@ -2277,12 +2302,12 @@ public class CloudFoundryClientTest {
 		client.openFile(appName, 0, fileName, new ClientHttpResponseCallback() {
 
 			public void onClientHttpResponse(ClientHttpResponse clientHttpResponse) throws IOException {
-            	InputStream in = clientHttpResponse.getBody();
-            	assertNotNull(in);
-            	byte[] fileContents = IOUtils.toByteArray(in);
-            	assertTrue(fileContents.length > 5);
-         	}
-      	});
+				InputStream in = clientHttpResponse.getBody();
+				assertNotNull(in);
+				byte[] fileContents = IOUtils.toByteArray(in);
+				assertTrue(fileContents.length > 5);
+			}
+		});
 
 		client.openFile(appName, 0, emptyPropertiesFileName, new ClientHttpResponseCallback() {
 
@@ -2296,7 +2321,7 @@ public class CloudFoundryClientTest {
 
 	}
 
-	private void doGetFile(CloudFoundryClient client, String appName) throws Exception {
+	private void doGetFile(CloudFoundryOperations client, String appName) throws Exception {
 		String appDir = "app";
 		String fileName = appDir + "/WEB-INF/web.xml";
 		String emptyPropertiesFileName = appDir + "/WEB-INF/classes/empty.properties";
@@ -2551,7 +2576,7 @@ public class CloudFoundryClientTest {
 		throw new IllegalStateException("No CloudServiceOffering found with label " + label + ".");
 	}
 
-	private InstancesInfo getInstancesWithTimeout(CloudFoundryClient client, String appName) {
+	private InstancesInfo getInstancesWithTimeout(CloudFoundryOperations client, String appName) {
 		long start = System.currentTimeMillis();
 		while (true) {
 			try {

@@ -595,32 +595,62 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	@Override
 	public List<UUID> getSpaceManagers(String spaceName) {
-		return cc.getSpaceManagers(spaceName);
+		return cc.getSpaceManagers(null, spaceName);
 	}
 
 	@Override
 	public List<UUID> getSpaceDevelopers(String spaceName) {
-		return cc.getSpaceDevelopers(spaceName);
+		return cc.getSpaceDevelopers(null, spaceName);
 	}
 
 	@Override
 	public List<UUID> getSpaceAuditors(String spaceName) {
-		return cc.getSpaceAuditors(spaceName);
+		return cc.getSpaceAuditors(null, spaceName);
+	}
+
+	@Override
+	public List<UUID> getSpaceManagers(String orgName, String spaceName) {
+		return cc.getSpaceManagers(orgName, spaceName);
+	}
+
+	@Override
+	public List<UUID> getSpaceDevelopers(String orgName, String spaceName) {
+		return cc.getSpaceDevelopers(orgName, spaceName);
+	}
+
+	@Override
+	public List<UUID> getSpaceAuditors(String orgName, String spaceName) {
+		return cc.getSpaceAuditors(orgName, spaceName);
 	}
 
 	@Override
 	public void associateManagerWithSpace(String spaceName) {
-		cc.associateManagerWithSpace(spaceName);
+		cc.associateManagerWithSpace(null, spaceName);
 	}
 
 	@Override
 	public void associateDeveloperWithSpace(String spaceName) {
-		cc.associateDeveloperWithSpace(spaceName);
+		cc.associateDeveloperWithSpace(null, spaceName);
 	}
 
 	@Override
 	public void associateAuditorWithSpace(String spaceName) {
-		cc.associateAuditorWithSpace(spaceName);
+		cc.associateAuditorWithSpace(null, spaceName);
+	}
+
+	@Override
+	public void associateManagerWithSpace(String orgName, String spaceName) {
+		cc.associateManagerWithSpace(orgName, spaceName);
+	}
+
+	@Override
+	public void associateDeveloperWithSpace(String orgName, String spaceName) {
+		cc.associateDeveloperWithSpace(orgName, spaceName);
+	}
+
+	@Override
+	public void associateAuditorWithSpace(String orgName, String spaceName) {
+		cc.associateAuditorWithSpace(orgName, spaceName);
 	}
 
 	@Override

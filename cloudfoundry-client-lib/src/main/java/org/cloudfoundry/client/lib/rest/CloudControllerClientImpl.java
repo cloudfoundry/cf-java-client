@@ -572,6 +572,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public void createSpace(String spaceName) {
+		assertSpaceProvided("create a new space");
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
 		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
 		if (spaceGuid == null) {
@@ -595,6 +596,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	@Override
 	public void deleteSpace(String spaceName) {
+		assertSpaceProvided("delete a space");
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
 		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
 		if (spaceGuid != null) {
@@ -618,12 +620,11 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		urlVars.put("orgGuid", orgGuid);
 		urlVars.put("name", spaceName);
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-		UUID spaceGuid = null;
 		if (resourceList.size() > 0) {
 			Map<String, Object> resource = resourceList.get(0);
-			spaceGuid = resourceMapper.getGuidOfResource(resource);
+			return resourceMapper.getGuidOfResource(resource);
 		}
-		return spaceGuid;
+		return null;
 	}
 
 	private UUID getSpaceGuid(String orgName, String spaceName) {
@@ -647,28 +648,35 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public List<UUID> getSpaceManagers(String spaceName) {
+	public List<UUID> getSpaceManagers(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/managers";
-		return getSpaceUserGuids(spaceName, urlPath);
+		return getSpaceUserGuids(orgName, spaceName, urlPath);
 	}
 
 	@Override
-	public List<UUID> getSpaceDevelopers(String spaceName) {
+	public List<UUID> getSpaceDevelopers(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/developers";
-		return getSpaceUserGuids(spaceName, urlPath);
+		return getSpaceUserGuids(orgName, spaceName, urlPath);
 	}
 
 	@Override
-	public List<UUID> getSpaceAuditors(String spaceName) {
+	public List<UUID> getSpaceAuditors(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/auditors";
-		return getSpaceUserGuids(spaceName, urlPath);
+		return getSpaceUserGuids(orgName, spaceName, urlPath);
 	}
 
-	private List<UUID> getSpaceUserGuids(String spaceName, String urlPath) {
-		assertSpaceProvided("get space users");
+	private List<UUID> getSpaceUserGuids(String orgName, String spaceName, String urlPath) {
+		if (orgName == null || spaceName == null) {
+			assertSpaceProvided("get space users");
+		}
 
-		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
-		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+		UUID spaceGuid;
+		if (spaceName == null) {
+			spaceGuid = sessionSpace.getMeta().getGuid();
+		} else {
+			CloudOrganization organization = (orgName == null ? sessionSpace.getOrganization() : getOrgByName(orgName, true));
+			spaceGuid = getSpaceGuid(spaceName, organization.getMeta().getGuid());
+		}
 
 		Map<String, Object> urlVars = new HashMap<String, Object>();
 		urlVars.put("guid", spaceGuid);
@@ -683,24 +691,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public void associateManagerWithSpace(String spaceName) {
+	public void associateManagerWithSpace(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/managers/{userGuid}";
-		associateRoleWithSpace(spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, urlPath);
 	}
 
 	@Override
-	public void associateDeveloperWithSpace(String spaceName) {
+	public void associateDeveloperWithSpace(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/developers/{userGuid}";
-		associateRoleWithSpace(spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, urlPath);
 	}
 
 	@Override
-	public void associateAuditorWithSpace(String spaceName) {
+	public void associateAuditorWithSpace(String orgName, String spaceName) {
 		String urlPath = "/v2/spaces/{guid}/auditors/{userGuid}";
-		associateRoleWithSpace(spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, urlPath);
 	}
 
-	private void associateRoleWithSpace(String spaceName, String urlPath) {
+	private void associateRoleWithSpace(String orgName, String spaceName, String urlPath) {
 		assertSpaceProvided("associate roles");
 
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
