@@ -1625,7 +1625,7 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void shouldAssignDefaultUserRolesToASpace() {
+	public void assignDefaultUserRolesToASpace() {
 		String spaceName = "dummy space";
 		connectedClient.createSpace(spaceName);
 

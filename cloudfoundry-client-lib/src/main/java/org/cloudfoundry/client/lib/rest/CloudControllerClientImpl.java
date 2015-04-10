@@ -665,6 +665,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	private List<UUID> getSpaceUserGuids(String spaceName, String urlPath) {
+		assertSpaceProvided("get space users");
+
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
 		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
 
@@ -699,6 +701,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	private void associateRoleWithSpace(String spaceName, String urlPath) {
+		assertSpaceProvided("associate roles");
+
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
 		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
 		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();
