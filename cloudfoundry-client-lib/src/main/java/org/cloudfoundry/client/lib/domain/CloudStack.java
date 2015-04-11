@@ -4,8 +4,7 @@ public class CloudStack  extends CloudEntity {
 	private String description;
 
 	public CloudStack(Meta meta, String name, String description) {
-		setMeta(meta);
-		setName(name);
+		super(meta, name);
 		this.description = description;
 	}
 

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipFile;
 
 import javax.websocket.ClientEndpointConfig;
@@ -45,6 +46,7 @@ import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryException;
+import org.cloudfoundry.client.lib.CloudOperationException;
 import org.cloudfoundry.client.lib.RestLogCallback;
 import org.cloudfoundry.client.lib.StartingInfo;
 import org.cloudfoundry.client.lib.StreamingLogToken;
@@ -59,6 +61,7 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
+import org.cloudfoundry.client.lib.domain.CloudJob;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudResource;
@@ -124,7 +127,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private static final String PROXY_USER_HEADER_KEY = "Proxy-User";
 
 	private static final String LOGS_LOCATION = "logs";
-	private static final int JOB_POLLING_PERIOD = 5000; // matches that of gcf
+	private static final long JOB_POLLING_PERIOD = TimeUnit.SECONDS.toMillis(5);
+	private static final long JOB_TIMEOUT = TimeUnit.MINUTES.toMillis(3);
 
 	private OauthClient oauthClient;
 
@@ -1386,34 +1390,36 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		UploadApplicationPayload payload = new UploadApplicationPayload(archive, knownRemoteResources);
 		callback.onProcessMatchedResources(payload.getTotalUncompressedSize());
 		HttpEntity<?> entity = generatePartialResourceRequest(payload, knownRemoteResources);
-		ResponseEntity<Map<String,Map<String,String>>> responseEntity =
-		            getRestTemplate().exchange(getUrl("/v2/apps/{guid}/bits?async=true"), HttpMethod.PUT, entity,
-		                                        new ParameterizedTypeReference<Map<String, Map<String,String>>>() {}, appId);
-		processAsyncJob(responseEntity, callback);
+		ResponseEntity<Map<String, Object>> responseEntity =
+			getRestTemplate().exchange(getUrl("/v2/apps/{guid}/bits?async=true"),
+				HttpMethod.PUT, entity,
+				new ParameterizedTypeReference<Map<String, Object>>() {}, appId);
+		processAsyncJob(responseEntity.getBody(), callback);
 	}
 
-	private void processAsyncJob(ResponseEntity<Map<String,Map<String,String>>> jobCreationEntity, UploadStatusCallback callback) {
-		Map<String, String> jobEntity = jobCreationEntity.getBody().get("entity");
-		String jobStatus;
+	private void processAsyncJob(Map<String, Object> jobResource, UploadStatusCallback callback) {
+		CloudJob job = resourceMapper.mapResource(jobResource, CloudJob.class);
 		do {
-			jobStatus = jobEntity.get("status");
-			boolean unsubscribe = callback.onProgress(jobStatus);
+			boolean unsubscribe = callback.onProgress(job.getStatus().toString());
 			if (unsubscribe) {
 				return;
-			} else {
-				try {
-					Thread.sleep(JOB_POLLING_PERIOD);
-				} catch (InterruptedException ex) {
-					return;
-				}
 			}
-			String jobId = jobEntity.get("guid");
-			ResponseEntity<Map<String, Map<String, String>>> jobProgressEntity =
-					getRestTemplate().exchange(getUrl("/v2/jobs/{guid}"), HttpMethod.GET, HttpEntity.EMPTY,
-							new ParameterizedTypeReference<Map<String, Map<String, String>>>() {
-							}, jobId);
-			jobEntity = jobProgressEntity.getBody().get("entity");
-		} while (!jobStatus.equals("finished"));
+			if (job.getStatus() == CloudJob.Status.FAILED) {
+				return;
+			}
+
+			try {
+				Thread.sleep(JOB_POLLING_PERIOD);
+			} catch (InterruptedException ex) {
+				return;
+			}
+
+			ResponseEntity<Map<String, Object>> jobProgressEntity =
+					getRestTemplate().exchange(getUrl(job.getMeta().getUrl()),
+						HttpMethod.GET, HttpEntity.EMPTY,
+						new ParameterizedTypeReference<Map<String, Object>>() {});
+			job = resourceMapper.mapResource(jobProgressEntity.getBody(), CloudJob.class);
+		} while (job.getStatus() != CloudJob.Status.FINISHED);
 	}
 
 	private CloudResources getKnownRemoteResources(ApplicationArchive archive) throws IOException {
@@ -2098,7 +2104,37 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 				doUnbindService(appId, cloudService.getMeta().getGuid());
 			}
 		}
-		getRestTemplate().delete(getUrl("/v2/service_instances/{guid}"), cloudService.getMeta().getGuid());
+		ResponseEntity<Map<String, Object>> response =
+			getRestTemplate().exchange(getUrl("/v2/service_instances/{guid}?async=true"),
+				HttpMethod.DELETE, HttpEntity.EMPTY,
+				new ParameterizedTypeReference<Map<String, Object>>() {},
+				cloudService.getMeta().getGuid());
+		waitForAsyncJobCompletion(response.getBody());
+	}
+
+	private void waitForAsyncJobCompletion(Map<String, Object> jobResponse) {
+		long timeout = System.currentTimeMillis() + JOB_TIMEOUT;
+		while (System.currentTimeMillis() < timeout) {
+			CloudJob job = resourceMapper.mapResource(jobResponse, CloudJob.class);
+
+			if (job.getStatus() == CloudJob.Status.FINISHED) {
+				return;
+			}
+
+			if (job.getStatus() == CloudJob.Status.FAILED) {
+				throw new CloudOperationException(job.getErrorDetails().getDescription());
+			}
+
+			try {
+				Thread.sleep(JOB_POLLING_PERIOD);
+			} catch (InterruptedException e) {
+				return;
+			}
+
+			jobResponse = getRestTemplate().exchange(getUrl(job.getMeta().getUrl()),
+				HttpMethod.GET, HttpEntity.EMPTY,
+				new ParameterizedTypeReference<Map<String, Object>>() {}).getBody();
+		}
 	}
 
 	@SuppressWarnings("unchecked")

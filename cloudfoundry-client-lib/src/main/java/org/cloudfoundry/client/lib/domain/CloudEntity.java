@@ -34,6 +34,10 @@ public class CloudEntity {
 	public CloudEntity() {
 	}
 
+	public CloudEntity(Meta meta) {
+		this(meta, null);
+	}
+
 	public CloudEntity(Meta meta, String name) {
 		if (meta != null) {
 			this.meta = meta;
@@ -72,11 +76,19 @@ public class CloudEntity {
 		private UUID guid;
 		private Date created;
 		private Date updated;
+		private String url;
 
 		public Meta(UUID guid, Date created, Date updated) {
 			this.guid = guid;
 			this.created = created;
 			this.updated = updated;
+		}
+
+		public Meta(UUID guid, Date created, Date updated, String url) {
+			this.guid = guid;
+			this.created = created;
+			this.updated = updated;
+			this.url = url;
 		}
 
 		public UUID getGuid() {
@@ -89,6 +101,10 @@ public class CloudEntity {
 
 		public Date getUpdated() {
 			return updated;
+		}
+
+		public String getUrl() {
+			return url;
 		}
 
 		public static Meta defaultMeta() {

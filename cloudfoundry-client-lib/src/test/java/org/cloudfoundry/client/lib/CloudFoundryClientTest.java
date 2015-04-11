@@ -1073,7 +1073,7 @@ public class CloudFoundryClientTest {
 		connectedClient.uploadApplication(appName, file, callback);
 		CloudApplication env = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STOPPED, env.getState());
-		assertTrue(callback.progressCount > 1); // must have taken at least 10 seconds
+		assertTrue(callback.progressCount >= 1); // must have taken at least 10 seconds
 	}
 
 	@Test

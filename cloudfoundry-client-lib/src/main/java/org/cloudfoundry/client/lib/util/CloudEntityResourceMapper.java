@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.lib.util;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudJob;
 import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEntity;
@@ -101,6 +102,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudSecurityGroup.class) {
 			return (T) mapApplicationSecurityGroupResource(resource);
+		}
+		if (targetClass == CloudJob.class) {
+			return (T) mapJobResource(resource);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
@@ -347,14 +351,34 @@ public class CloudEntityResourceMapper {
 		}
 		return rules;
 	}
-	
+
+	private CloudJob mapJobResource(Map<String, Object> resource) {
+		String status = getEntityAttribute(resource, "status", String.class);
+		Map<String, Object> errorDetailsResource = (Map<String, Object>) resource.get("error_details");
+		CloudJob.ErrorDetails errorDetails = null;
+		if (errorDetailsResource != null) {
+			Long code = getEntityAttribute(errorDetailsResource, "code", Long.class);
+			String description = getEntityAttribute(errorDetailsResource, "description", String.class);
+			String errorCode = getEntityAttribute(errorDetailsResource, "error_code", String.class);
+			errorDetails = new CloudJob.ErrorDetails(code, description, errorCode);
+		}
+
+		return new CloudJob(getMeta(resource), CloudJob.Status.getEnum(status), errorDetails);
+	}
+
 	@SuppressWarnings("unchecked")
 	public static CloudEntity.Meta getMeta(Map<String, Object> resource) {
 		Map<String, Object> metadata = (Map<String, Object>) resource.get("metadata");
-		UUID guid = UUID.fromString(String.valueOf(metadata.get("guid")));
+		UUID guid;
+		try {
+			guid = UUID.fromString(String.valueOf(metadata.get("guid")));
+		} catch (IllegalArgumentException e) {
+			guid = null;
+		}
 		Date createdDate = parseDate(String.valueOf(metadata.get("created_at")));
 		Date updatedDate = parseDate(String.valueOf(metadata.get("updated_at")));
-		return new CloudEntity.Meta(guid, createdDate, updatedDate);
+		String url = String.valueOf(metadata.get("url"));
+		return new CloudEntity.Meta(guid, createdDate, updatedDate, url);
 	}
 
 	private static Date parseDate(String dateString) {
