@@ -1,6 +1,17 @@
 Cloud Foundry Client Library
 ============================
 
+Changes in version 1.1.2
+------------------------
+
+* Changed `deleteService()` method to delete the service asynchronously and poll for completion on the client. 
+* Added forms of `getSpaceRole()` methods and `associateRoleWithSpace()` methods that take an organization parameter.
+* Added populating `detected_buildpack` field of app metadata when retrieving applications.
+* Added `getApplicationEnvironment()` methods for retrieving user and system environment variables.
+* Added `getEvents()` and `getApplicationEvents()` methods.
+* Added support for providing implicit-grant tokens in credentials.
+* Fixed parsing of UTC Z dates.
+
 Changes in version 1.1.1
 ------------------------
 

@@ -271,6 +271,10 @@ To instruct the Cloud Foundry Maven plugin to accept self-signed certificates fr
 
 # History
 
+## Changes from version 1.1.1 to 1.1.2
+
+* Updated cloudfoundry-client-lib dependency
+
 ## Changes from version 1.1.0 to 1.1.1
 
 * Updated cloudfoundry-client-lib dependency

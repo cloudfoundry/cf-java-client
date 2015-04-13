@@ -341,6 +341,10 @@ All running variants that are not mapped to the canonical route are deleted.
 
 # History
 
+## Changes in 1.1.2
+
+* Updated cloudfoundry-client-lib dependency
+
 ## Changes in 1.1.1
 
 * Updated cloudfoundry-client-lib dependency
