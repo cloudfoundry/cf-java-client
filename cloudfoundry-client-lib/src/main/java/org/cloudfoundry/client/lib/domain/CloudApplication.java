@@ -225,7 +225,23 @@ public class CloudApplication extends CloudEntity {
 		List<String> joined = new ArrayList<String>();
 		for (Map.Entry<Object, Object> entry : env.entrySet()) {
 			joined.add(entry.getKey().toString() + '=' + entry.getValue().toString());
+
+			// skip this environment variable if the key is null
+			if (null == entry.getKey()) {
+				continue;
+			}
+
+			String value;
+			// check that there is a value. If it is null, the value should be an empty string
+			if(null == entry.getValue()) {
+				value = "";
+			} else {
+				value = entry.getValue().toString();
+			}
+
+			joined.add(entry.getKey().toString() + '=' + value);
 		}
+
 		this.env = joined;
 	}
 
