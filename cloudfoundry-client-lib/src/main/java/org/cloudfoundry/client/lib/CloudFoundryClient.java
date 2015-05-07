@@ -554,6 +554,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     	return cc.getOrgByName(orgName, required);
     }
 
+	public CloudOrganization getOrgByGuid(UUID uuid){
+    	return cc.getOrgByGuid(uuid);
+    }
+
 	public List<CloudQuota> getQuotas() {
 		return cc.getQuotas();
 	}
@@ -591,6 +595,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public CloudSpace getSpace(String spaceName) {
 		return cc.getSpace(spaceName);
+	}
+
+	@Override
+	public CloudSpace getSpace(UUID guid) {
+		return cc.getSpace(guid);
 	}
 
 	@Override
