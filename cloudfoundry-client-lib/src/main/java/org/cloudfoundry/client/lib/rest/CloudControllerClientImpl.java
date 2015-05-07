@@ -599,6 +599,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
+	public CloudSpace getSpace(UUID guid) {
+		String urlPath = "/v2/spaces/{guid}?inline-relations-depth=1";
+		HashMap<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", guid.toString());
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> resource = JsonUtil.convertJsonToMap(resp);
+		return resourceMapper.mapResource(resource, CloudSpace.class);
+	}
+
+	@Override
 	public void deleteSpace(String spaceName) {
 		assertSpaceProvided("delete a space");
 		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
@@ -1674,6 +1684,21 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 
 		return org;
+	}
+
+	/**
+	 * Get organization by given name.
+	 *
+	 * @param orgGuid
+	 * @return CloudOrganization instance
+	 */
+	public CloudOrganization getOrgByGuid(UUID orgGuid) {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/organizations/{guid}?inline-relations-depth=1";
+		urlVars.put("guid", orgGuid.toString());
+		String resp = getRestTemplate().getForObject(getUrl(urlPath), String.class, urlVars);
+		Map<String, Object> resource = JsonUtil.convertJsonToMap(resp);
+		return resourceMapper.mapResource(resource, CloudOrganization.class);
 	}
 
 	/**

@@ -211,6 +211,8 @@ public interface CloudControllerClient {
 
 	CloudSpace getSpace(String spaceName);
 
+	CloudSpace getSpace(UUID guid);
+
 	void deleteSpace(String spaceName);
 
 	// Domains and routes management
@@ -248,6 +250,8 @@ public interface CloudControllerClient {
 
 	// Quota operations
 	CloudOrganization getOrgByName(String orgName, boolean required);
+
+	CloudOrganization getOrgByGuid(UUID uuid);
 
 	List<CloudQuota> getQuotas();
 

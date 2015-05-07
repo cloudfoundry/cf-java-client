@@ -198,6 +198,15 @@ public interface CloudFoundryOperations {
 	CloudSpace getSpace(String spaceName);
 
 	/**
+	 * Get space name with the specified name.
+	 *
+	 * @param guid guid of the space
+	 * @return the cloud space
+	 */
+	CloudSpace getSpace(UUID guid);
+
+
+	/**
 	 * Delete a space with the specified name
 	 *
 	 * @param spaceName name of the space
