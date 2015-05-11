@@ -51,6 +51,7 @@ import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -267,11 +268,11 @@ public interface CloudControllerClient {
 
 	List<UUID> getSpaceAuditors(String orgName, String spaceName);
 
-	void associateManagerWithSpace(String orgName, String spaceName);
+	void associateManagerWithSpace(String orgName, String spaceName, String userGuid);
 
-	void associateDeveloperWithSpace(String orgName, String spaceName);
+	void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid);
 
-	void associateAuditorWithSpace(String orgName, String spaceName);
+	void associateAuditorWithSpace(String orgName, String spaceName, String userGuid);
 
 	// Security Group Operations
 
@@ -307,4 +308,5 @@ public interface CloudControllerClient {
 
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
+	Map<String, CloudUser> getOrganizationUsers(String orgName);
 }

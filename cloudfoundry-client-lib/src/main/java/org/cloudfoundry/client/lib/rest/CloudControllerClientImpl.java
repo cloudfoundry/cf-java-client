@@ -83,6 +83,7 @@ import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
@@ -695,32 +696,35 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
-	public void associateManagerWithSpace(String orgName, String spaceName) {
+	public void associateManagerWithSpace(String orgName, String spaceName, String userGuid) {
 		String urlPath = "/v2/spaces/{guid}/managers/{userGuid}";
-		associateRoleWithSpace(orgName, spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, userGuid, urlPath);
 	}
 
 	@Override
-	public void associateDeveloperWithSpace(String orgName, String spaceName) {
+	public void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid) {
 		String urlPath = "/v2/spaces/{guid}/developers/{userGuid}";
-		associateRoleWithSpace(orgName, spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, userGuid, urlPath);
 	}
 
 	@Override
-	public void associateAuditorWithSpace(String orgName, String spaceName) {
+	public void associateAuditorWithSpace(String orgName, String spaceName, String userGuid) {
 		String urlPath = "/v2/spaces/{guid}/auditors/{userGuid}";
-		associateRoleWithSpace(orgName, spaceName, urlPath);
+		associateRoleWithSpace(orgName, spaceName, userGuid, urlPath);
 	}
 
-	private void associateRoleWithSpace(String orgName, String spaceName, String urlPath) {
+	private void associateRoleWithSpace(String orgName, String spaceName, String userGuid, String urlPath) {
 		assertSpaceProvided("associate roles");
 
-		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
+		CloudOrganization organization = (orgName == null ? sessionSpace.getOrganization() : getOrgByName(orgName, true));
+		UUID orgGuid = organization.getMeta().getGuid();
+
 		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
 		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();
 		spaceRequest.put("guid", spaceGuid);
 
-		String userId = getCurrentUserId();
+		String userId = (userGuid==null?getCurrentUserId():userGuid);
+
 		getRestTemplate().put(getUrl(urlPath), spaceRequest, spaceGuid, userId);
 	}
 
@@ -729,6 +733,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		Map<String, Object> userMap = getUserInfo(username);
 		String userId= (String) userMap.get("user_id");
 		return userId;
+	}
+
+	@Override
+	public Map<String, CloudUser> getOrganizationUsers(String orgName) {
+		String urlPath = "/v2/organizations/{guid}/users";
+		CloudOrganization organization = getOrgByName(orgName, true);
+
+		UUID orgGuid=organization.getMeta().getGuid();
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		urlVars.put("guid", orgGuid);
+
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		Map<String,CloudUser> orgUsers = new HashMap<String,CloudUser>();
+		for (Map<String, Object> resource : resourceList) {
+			CloudUser user = resourceMapper.mapResource(resource, CloudUser.class);
+			orgUsers.put(user.getUsername(),user);
+		}
+		return orgUsers;
 	}
 
 	@Override
@@ -2629,5 +2651,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		getRestTemplate().delete(getUrl(path), pathVariables);
 	}
+
+
 
 }

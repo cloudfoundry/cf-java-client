@@ -45,6 +45,7 @@ import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -625,32 +626,48 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	@Override
 	public void associateManagerWithSpace(String spaceName) {
-		cc.associateManagerWithSpace(null, spaceName);
+		cc.associateManagerWithSpace(null, spaceName, null);
 	}
 
 	@Override
 	public void associateDeveloperWithSpace(String spaceName) {
-		cc.associateDeveloperWithSpace(null, spaceName);
+		cc.associateDeveloperWithSpace(null, spaceName, null);
 	}
 
 	@Override
 	public void associateAuditorWithSpace(String spaceName) {
-		cc.associateAuditorWithSpace(null, spaceName);
+		cc.associateAuditorWithSpace(null, spaceName, null);
 	}
 
 	@Override
 	public void associateManagerWithSpace(String orgName, String spaceName) {
-		cc.associateManagerWithSpace(orgName, spaceName);
+		cc.associateManagerWithSpace(orgName, spaceName, null);
 	}
 
 	@Override
 	public void associateDeveloperWithSpace(String orgName, String spaceName) {
-		cc.associateDeveloperWithSpace(orgName, spaceName);
+		cc.associateDeveloperWithSpace(orgName, spaceName, null);
 	}
 
 	@Override
 	public void associateAuditorWithSpace(String orgName, String spaceName) {
-		cc.associateAuditorWithSpace(orgName, spaceName);
+		cc.associateAuditorWithSpace(orgName, spaceName, null);
+	}
+
+
+	@Override
+	public void associateManagerWithSpace(String orgName, String spaceName, String userGuid) {
+		cc.associateManagerWithSpace(orgName, spaceName, userGuid);
+	}
+
+	@Override
+	public void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid) {
+		cc.associateDeveloperWithSpace(orgName, spaceName, userGuid);
+	}
+
+	@Override
+	public void associateAuditorWithSpace(String orgName, String spaceName, String userGuid) {
+		cc.associateAuditorWithSpace(orgName, spaceName, userGuid);
 	}
 
 	@Override
@@ -726,6 +743,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName) {
 		cc.unbindSecurityGroup(orgName, spaceName, securityGroupName);
+	}
+
+	@Override
+	public Map<String, CloudUser> getOrganizationUsers(String orgName) {
+		return cc.getOrganizationUsers(orgName);
 	}
 
 	@Override
