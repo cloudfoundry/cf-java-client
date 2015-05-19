@@ -31,6 +31,11 @@ public class CloudServiceInstance extends CloudEntity {
 
 	private String type;
 	private String dashboardUrl;
+	/**
+	 * The status of the last operation requested on the service instance.
+	 */
+	private ServiceInstanceLastOperation lastOperation;
+
 	private Map<String, Object> credentials;
 	private List<CloudServiceBinding> bindings;
 
@@ -88,5 +93,13 @@ public class CloudServiceInstance extends CloudEntity {
 
 	public void setServicePlan(CloudServicePlan servicePlan) {
 		this.servicePlan = servicePlan;
+	}
+
+	public ServiceInstanceLastOperation getLastOperation() {
+		return lastOperation;
+	}
+
+	public void setLastOperation(ServiceInstanceLastOperation lastOperation) {
+		this.lastOperation = lastOperation;
 	}
 }
