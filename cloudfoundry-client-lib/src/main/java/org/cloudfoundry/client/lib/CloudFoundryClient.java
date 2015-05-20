@@ -44,6 +44,7 @@ import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.RawServicePlan;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
@@ -189,7 +190,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getSpaces();
 	}
 
-	public List<CloudOrganization> getOrganizations() {
+    public List<RawServicePlan> getServicePlans() {
+        return cc.getServicePlans();
+    }
+
+    public List<CloudOrganization> getOrganizations() {
 		return cc.getOrganizations();
 	}
 
@@ -742,3 +747,4 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getSpacesBoundToSecurityGroup(securityGroupName);
 	}
 }
+

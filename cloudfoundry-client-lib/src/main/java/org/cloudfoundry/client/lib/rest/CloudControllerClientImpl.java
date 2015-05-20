@@ -80,6 +80,8 @@ import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
 import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
+import org.cloudfoundry.client.lib.domain.RawServiceInstance;
+import org.cloudfoundry.client.lib.domain.RawServicePlan;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
@@ -660,6 +662,30 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return spaces;
 	}
+
+    @Override
+    public List<RawServicePlan> getServicePlans() {
+        String urlPath = "/v2/service_plans?inline-relations-depth=1";
+        List<RawServicePlan> result = new ArrayList<>();
+        List<Map<String, Object>> resourceList = getAllResources(urlPath, null);
+        for (Map<String, Object> resource : resourceList) {
+            String servicePlanName = CloudEntityResourceMapper.getEntityAttribute(resource, "name", String.class);
+            RawServicePlan servicePlan = new RawServicePlan(CloudEntityResourceMapper.getMeta(resource), servicePlanName);
+            Map<String, Object> service = CloudEntityResourceMapper.getEmbeddedResource(resource, "service");
+            servicePlan.setServiceGuid(CloudEntityResourceMapper.getMeta(service).getGuid());
+            servicePlan.setServiceName(CloudEntityResourceMapper.getEntityAttribute(service, "label", String.class));
+            List<Map<String, Object>> serviceInstances =
+                    CloudEntityResourceMapper.getEmbeddedResourceList(CloudEntityResourceMapper.getEntity(resource), "service_instances");
+            for (Map<String, Object> serviceInstance: serviceInstances) {
+                String serviceInstanceName = CloudEntityResourceMapper.getEntityAttribute(serviceInstance, "name", String.class);
+                RawServiceInstance instance = new RawServiceInstance(CloudEntityResourceMapper.getMeta(serviceInstance), serviceInstanceName);
+                instance.setSpaceGuid(CloudEntityResourceMapper.getEntityAttribute(serviceInstance, "space_guid", UUID.class));
+                servicePlan.getInstances().add(instance);
+            }
+            result.add(servicePlan);
+        }
+        return result;
+    }
 
 	@Override
 	public List<UUID> getSpaceManagers(String orgName, String spaceName) {
