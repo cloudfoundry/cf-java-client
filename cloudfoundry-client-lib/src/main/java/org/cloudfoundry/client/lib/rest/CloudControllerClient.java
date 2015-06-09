@@ -311,4 +311,40 @@ public interface CloudControllerClient {
 
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
+	List<CloudApplication> getApplications(CloudSpace space);
+
+	CloudApplication getApplication(CloudSpace space, String appName);
+
+	ApplicationStats getApplicationStats(CloudSpace space, String appName);
+
+	Map<String,Object> getApplicationEnvironment(CloudSpace space, String appName);
+
+	void createApplication(CloudSpace space, String appName, Staging staging, Integer memory, List<String> uris, List<String> serviceNames);
+
+	void createApplication(CloudSpace space, String appName, Staging staging, Integer disk, Integer memory, List<String> uris, List<String> serviceNames);
+
+	void uploadApplication(CloudSpace space, String appName, File file, UploadStatusCallback callback) throws IOException;
+
+	void deleteApplication(CloudSpace space, String appName);
+
+	void deleteApplication(UUID appGuid);
+
+	List<CloudService> getServices(CloudSpace space);
+
+	CloudService getService(CloudSpace space, String service);
+
+	CloudService getService(UUID serviceId);
+
+	CloudServiceInstance getServiceInstance(CloudSpace space, String service);
+
+	List<CloudServiceInstance> getServiceInstances(CloudSpace space);
+
+	CloudServiceInstance getServiceInstance(UUID serviceId);
+
+	void switchCurrentSpace(UUID spaceGuid);
+
+	void switchCurrentSpace(CloudSpace space);
+
+	void switchCurrentSpace(String orgName, String spaceName);
+
 }
