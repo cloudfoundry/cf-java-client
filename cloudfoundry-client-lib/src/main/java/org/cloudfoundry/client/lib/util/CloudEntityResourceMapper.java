@@ -116,7 +116,12 @@ public class CloudEntityResourceMapper {
 		if (organizationMap != null) {
 			organization = mapOrganizationResource(organizationMap);
 		}
-		return new CloudSpace(getMeta(resource), getNameOfResource(resource), organization);
+		Map<String, Object> quotaMap = getEmbeddedResource(resource, "space_quota_definition");
+		CloudQuota quota = null;
+		if (quotaMap != null) {
+			quota = mapQuotaResource(quotaMap);
+		}
+		return new CloudSpace(getMeta(resource), getNameOfResource(resource), organization, quota);
 	}
 
 	private CloudOrganization mapOrganizationResource(Map<String, Object> resource) {

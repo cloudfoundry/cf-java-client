@@ -454,7 +454,17 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		return cc.getService(service);
 	}
 
-    public CloudServiceInstance getServiceInstance(String service) {
+	@Override
+	public CloudService getService(UUID serviceId) {
+		return cc.getService(serviceId);
+	}
+
+	@Override
+	public CloudService getService(CloudSpace space, String service) {
+		return cc.getService(space, service);
+	}
+
+	public CloudServiceInstance getServiceInstance(String service) {
 		return cc.getServiceInstance(service);
 	}
 
@@ -554,6 +564,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     	return cc.getOrgByName(orgName, required);
     }
 
+	public CloudOrganization getOrgByGuid(UUID uuid){
+    	return cc.getOrgByGuid(uuid);
+    }
+
 	public List<CloudQuota> getQuotas() {
 		return cc.getQuotas();
 	}
@@ -591,6 +605,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public CloudSpace getSpace(String spaceName) {
 		return cc.getSpace(spaceName);
+	}
+
+	@Override
+	public CloudSpace getSpace(UUID guid) {
+		return cc.getSpace(guid);
 	}
 
 	@Override
@@ -731,5 +750,97 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName) {
 		return cc.getSpacesBoundToSecurityGroup(securityGroupName);
+	}
+
+	@Override
+	public List<CloudApplication> getApplications(CloudSpace space) {
+		return cc.getApplications(space);
+	}
+
+	@Override
+	public CloudApplication getApplication(CloudSpace space, String appName) {
+		return cc.getApplication(space, appName);
+	}
+
+	@Override
+	public ApplicationStats getApplicationStats(CloudSpace space, String appName) {
+		return cc.getApplicationStats(space, appName);
+	}
+
+	@Override
+	public Map<String, Object> getApplicationEnvironment(CloudSpace space, String appName) {
+		return cc.getApplicationEnvironment(space, appName);
+	}
+
+	@Override
+	public void createApplication(CloudSpace space, String appName, Staging staging, Integer memory, List<String> uris, List<String> serviceNames) {
+		cc.createApplication(space, appName, staging, memory, uris, serviceNames);
+
+	}
+
+	@Override
+	public void createApplication(CloudSpace space, String appName, Staging staging, Integer disk, Integer memory, List<String> uris, List<String> serviceNames) {
+		cc.createApplication(space, appName, staging, disk, memory, uris, serviceNames);
+
+	}
+
+	@Override
+	public void uploadApplication(CloudSpace space, String appName, String file) throws IOException {
+		cc.uploadApplication(space, appName, new File(file), null);
+	}
+
+	@Override
+	public void uploadApplication(CloudSpace space, String appName, File file) throws IOException {
+		cc.uploadApplication(space, appName, file, null);
+	}
+
+	@Override
+	public void uploadApplication(CloudSpace space, String appName, File file, UploadStatusCallback callback) throws IOException {
+		cc.uploadApplication(space, appName, file, callback);
+	}
+
+	@Override
+	public void deleteApplication(CloudSpace space, String appName) {
+		cc.deleteApplication(space, appName);
+	}
+
+	@Override
+	public void deleteApplication(UUID appGuid) {
+		cc.deleteApplication(appGuid);
+	}
+
+	@Override
+	public List<CloudService> getServices(CloudSpace space) {
+		return cc.getServices(space);
+	}
+
+	@Override
+	public CloudServiceInstance getServiceInstance(CloudSpace space, String service) {
+		return cc.getServiceInstance(space, service);
+	}
+
+	@Override
+	public List<CloudServiceInstance> getServiceInstances(CloudSpace space) {
+		return cc.getServiceInstances(space);
+	}
+
+	@Override
+	public CloudServiceInstance getServiceInstance(UUID serviceId) {
+		return cc.getServiceInstance(serviceId);
+	}
+
+	@Override
+	public void switchCurrentSpace(UUID spaceGuid) {
+		cc.switchCurrentSpace(spaceGuid);
+	}
+
+	@Override
+	public void switchCurrentSpace(CloudSpace space) {
+		cc.switchCurrentSpace(space);
+	}
+
+	@Override
+	public void switchCurrentSpace(String orgName, String spaceName) {
+		cc.switchCurrentSpace(orgName, spaceName);
 	}
 }

@@ -25,25 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
-import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.client.lib.domain.ApplicationStats;
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudEvent;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
-import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.domain.CloudStack;
-import org.cloudfoundry.client.lib.domain.CrashesInfo;
-import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.*;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -198,6 +180,15 @@ public interface CloudFoundryOperations {
 	CloudSpace getSpace(String spaceName);
 
 	/**
+	 * Get space name with the specified name.
+	 *
+	 * @param guid guid of the space
+	 * @return the cloud space
+	 */
+	CloudSpace getSpace(UUID guid);
+
+
+	/**
 	 * Delete a space with the specified name
 	 *
 	 * @param spaceName name of the space
@@ -269,6 +260,13 @@ public interface CloudFoundryOperations {
 	List<CloudApplication> getApplications();
 
 	/**
+	 * Get all cloud applications by space.
+	 * @param space space.
+	 * @return list of cloud applications
+	 */
+	List<CloudApplication> getApplications(CloudSpace space);
+
+	/**
 	 * Get cloud application with the specified name.
 	 *
 	 * @param appName name of the app
@@ -300,6 +298,34 @@ public interface CloudFoundryOperations {
 	 */
 	Map<String, Object> getApplicationEnvironment(String appName);
 
+
+	/**
+	 * Get cloud application with the specified name.
+	 *
+	 * @param appName name of the app
+	 * @param space space
+	 * @return the cloud application
+	 */
+	CloudApplication getApplication(CloudSpace space, String appName);
+
+	/**
+	 * Get application stats for the app with the specified name.
+	 *
+	 * @param appName name of the app
+	 * @param space space
+	 * @return the cloud application stats
+	 */
+	ApplicationStats getApplicationStats(CloudSpace space, String appName);
+
+	/**
+	 * Get application environment variables for the app with the specified name.
+	 *
+	 * @param space space
+	 * @param appName name of the app
+	 * @return the cloud application environment variables
+	 */
+	Map<String, Object> getApplicationEnvironment(CloudSpace space, String appName);
+
 	/**
 	 * Get application environment variables for the app with the specified GUID.
 	 *
@@ -330,8 +356,35 @@ public interface CloudFoundryOperations {
 	 * @param uris         list of URIs for the app
 	 * @param serviceNames list of service names to bind to app
 	 */
-	public void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
+	void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
 	                              List<String> serviceNames);
+
+	/**
+	 * Create application.
+	 *
+	 * @param space space
+	 * @param appName application name
+	 * @param staging staging info
+	 * @param memory memory to use in MB
+	 * @param uris list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 */
+	void createApplication(CloudSpace space, String appName, Staging staging, Integer memory, List<String> uris,
+						   List<String> serviceNames);
+
+	/**
+	 * Create application.
+	 *
+   	 * @param space 	   space
+	 * @param appName      application name
+	 * @param staging      staging info
+	 * @param disk         disk quota to use in MB
+	 * @param memory       memory to use in MB
+	 * @param uris         list of URIs for the app
+	 * @param serviceNames list of service names to bind to app
+	 */
+	void createApplication(CloudSpace space, String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
+						   List<String> serviceNames);
 
 	/**
 	 * Create a service.
@@ -389,6 +442,37 @@ public interface CloudFoundryOperations {
 	 * @throws java.io.IOException
 	 */
 	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
+
+	/**
+	 * Upload an application to Cloud Foundry.
+	 *
+	 * @param space space
+	 * @param appName application name
+	 * @param file path to the application archive or folder
+	 * @throws java.io.IOException
+	 */
+	void uploadApplication(CloudSpace space, String appName, String file) throws IOException;
+
+	/**
+	 * Upload an application to Cloud Foundry.
+	 *
+	 * @param space space
+	 * @param appName the application name
+	 * @param file the application archive or folder
+	 * @throws java.io.IOException
+	 */
+	void uploadApplication(CloudSpace space, String appName, File file) throws IOException;
+
+	/**
+	 * Upload an application to Cloud Foundry.
+	 *
+	 * @param space space
+	 * @param appName the application name
+	 * @param file the application archive
+	 * @param callback a callback interface used to provide progress information or <tt>null</tt>
+	 * @throws java.io.IOException
+	 */
+	void uploadApplication(CloudSpace space, String appName, File file, UploadStatusCallback callback) throws IOException;
 
 	/**
 	 * Upload an application to Cloud Foundry.
@@ -474,6 +558,21 @@ public interface CloudFoundryOperations {
 	 * @param appName name of application
 	 */
 	void deleteApplication(String appName);
+
+	/**
+	 * Delete application.
+	 *
+	 * @param space space
+	 * @param appName name of application
+	 */
+	void deleteApplication(CloudSpace space, String appName);
+
+	/**
+	 * Delete application.
+	 *
+	 * @param appGuid app guid.
+	 */
+	void deleteApplication(UUID appGuid);
 
 	/**
 	 * Delete all applications.
@@ -705,6 +804,14 @@ public interface CloudFoundryOperations {
 	List<CloudService> getServices();
 
 	/**
+	 * Get list of cloud services by space.
+	 * @param space space
+	 *
+	 * @return list of cloud services
+	 */
+	List<CloudService> getServices(CloudSpace space);
+
+	/**
 	 * Get cloud service.
 	 *
 	 * @param service name of service
@@ -712,6 +819,22 @@ public interface CloudFoundryOperations {
 	 */
 	CloudService getService(String service);
 
+	/**
+	 * Get cloud service.
+	 *
+	 * @param serviceId id of service
+	 * @return the cloud service info
+	 */
+	CloudService getService(UUID serviceId);
+
+	/**
+	 * Get cloud service.
+	 *
+	 * @param space space
+	 * @param service name of service
+	 * @return the cloud service info
+	 */
+	CloudService getService(CloudSpace space, String service);
 
 	/**
 	 * Get a service instance.
@@ -720,6 +843,31 @@ public interface CloudFoundryOperations {
 	 * @return the service instance info
 	 */
 	CloudServiceInstance getServiceInstance(String service);
+
+	/**
+	 * Get a service instance.
+	 *
+	 * @param space space
+	 * @param service name of the service instance
+	 * @return the service instance info
+	 */
+	CloudServiceInstance getServiceInstance(CloudSpace space, String service);
+
+	/**
+	 * Get a service instance.
+	 *
+	 * @param space space
+	 * @return the service instance info
+	 */
+	List<CloudServiceInstance> getServiceInstances(CloudSpace space);
+
+	/**
+	 * Get a service instance.
+	 *
+	 * @param serviceId id of the service instance
+	 * @return the service instance info
+	 */
+	CloudServiceInstance getServiceInstance(UUID serviceId);
 
 	/**
 	 * Delete cloud service.
@@ -1151,4 +1299,26 @@ public interface CloudFoundryOperations {
 	 * @throws IllegalArgumentException if the org, space, or security group do not exist
 	 */
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+
+	/**
+	 * Switch the current instance to another space.
+	 *
+ 	 * @param spaceGuid space guid.
+	 */
+	void switchCurrentSpace(UUID spaceGuid);
+
+	/**
+	 * Switch the current instance to another space.
+	 *
+	 * @param space space
+	 */
+	void switchCurrentSpace(CloudSpace space);
+
+	/**
+	 * Switch the current instance to another space.
+	 *
+	 * @param orgName organization name
+	 * @param spaceName space name
+	 */
+	void switchCurrentSpace(String orgName, String spaceName);
 }
