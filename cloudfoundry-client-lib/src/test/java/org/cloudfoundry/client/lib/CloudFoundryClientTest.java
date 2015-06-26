@@ -63,6 +63,7 @@ import org.cloudfoundry.client.lib.domain.InstanceStats;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
@@ -1625,6 +1626,16 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void getCurrentOrganizationUsersAndEnsureCurrentUserIsAMember(){
+		String orgName = CCNG_USER_ORG;
+		Map<String,CloudUser> orgUsers=connectedClient.getOrganizationUsers(orgName);
+		assertNotNull(orgUsers);
+		assertTrue("Org " + orgName + " should at least contain 1 user", orgUsers.size() > 0);
+		String username=CCNG_USER_EMAIL;
+		assertTrue("Organization user list should contain current user",orgUsers.containsKey(username));
+	}
+
+	@Test
 	public void assignDefaultUserRolesInSpace() {
 		String spaceName = "assignDefaultUserRolesInSpace";
 		connectedClient.createSpace(spaceName);
@@ -1653,26 +1664,32 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
-	public void assignDefaultUserRolesInSpaceWithOrg() {
+	public void assignAllUserRolesInSpaceWithOrgToCurrentUser() {
 		String orgName = CCNG_USER_ORG;
-		String spaceName = "assignDefaultUserRolesInSpaceWithOrg";
+		String spaceName = "assignAllUserRolesInSpaceWithOrgToCurrentUser";
 		connectedClient.createSpace(spaceName);
+
+		Map<String, CloudUser> orgUsers = connectedClient.getOrganizationUsers(orgName);
+		String username=CCNG_USER_EMAIL;
+		CloudUser user = orgUsers.get(username);
+		assertNotNull("Retrieved user should not be null",user);
+		String userGuid = user.getMeta().getGuid().toString();
 
 		List<UUID> spaceManagers = connectedClient.getSpaceManagers(orgName, spaceName);
 		assertEquals("Space should have no manager when created", 0, spaceManagers.size());
-		connectedClient.associateManagerWithSpace(orgName, spaceName);
+		connectedClient.associateManagerWithSpace(orgName, spaceName, userGuid);
 		spaceManagers = connectedClient.getSpaceManagers(orgName, spaceName);
 		assertEquals("Space should have one manager", 1, spaceManagers.size());
 
 		List<UUID> spaceDevelopers = connectedClient.getSpaceDevelopers(orgName, spaceName);
 		assertEquals("Space should have no developer when created", 0, spaceDevelopers.size());
-		connectedClient.associateDeveloperWithSpace(orgName, spaceName);
+		connectedClient.associateDeveloperWithSpace(orgName, spaceName, userGuid);
 		spaceDevelopers = connectedClient.getSpaceDevelopers(orgName, spaceName);
 		assertEquals("Space should have one developer", 1, spaceDevelopers.size());
 
 		List<UUID> spaceAuditors = connectedClient.getSpaceAuditors(orgName, spaceName);
 		assertEquals("Space should have no auditor when created", 0, spaceAuditors.size());
-		connectedClient.associateAuditorWithSpace(orgName, spaceName);
+		connectedClient.associateAuditorWithSpace(orgName, spaceName, userGuid);
 		spaceAuditors = connectedClient.getSpaceAuditors(orgName, spaceName);
 		assertEquals("Space should have one auditor ", 1, spaceAuditors.size());
 

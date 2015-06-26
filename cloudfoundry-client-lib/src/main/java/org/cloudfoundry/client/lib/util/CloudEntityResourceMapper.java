@@ -35,6 +35,7 @@ import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -106,11 +107,23 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudJob.class) {
 			return (T) mapJobResource(resource);
 		}
+		if (targetClass == CloudUser.class){
+            return (T) mapUserResource(resource);
+        }
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
 	}
 
-	private CloudSpace mapSpaceResource(Map<String, Object> resource) {
+    private CloudUser mapUserResource(Map<String, Object> resource) {
+        boolean isActiveUser = getEntityAttribute(resource, "active", Boolean.class);
+        boolean isAdminUser = getEntityAttribute(resource, "admin", Boolean.class);
+        String defaultSpaceGuid = getEntityAttribute(resource, "default_space_guid", String.class);
+        String username = getEntityAttribute(resource, "username", String.class);
+
+        return new CloudUser(getMeta(resource), username,isAdminUser,isActiveUser,defaultSpaceGuid);
+    }
+
+    private CloudSpace mapSpaceResource(Map<String, Object> resource) {
 		Map<String, Object> organizationMap = getEmbeddedResource(resource, "organization");
 		CloudOrganization organization = null;
 		if (organizationMap != null) {

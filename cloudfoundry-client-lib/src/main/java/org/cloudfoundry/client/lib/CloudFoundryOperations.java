@@ -44,6 +44,7 @@ import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -182,6 +183,33 @@ public interface CloudFoundryOperations {
 	 * @param spaceName name of the space
 	 */
 	void associateManagerWithSpace(String orgName, String spaceName);
+
+	/**
+	 * Associate a user to the space auditors role
+	 *
+	 * @param orgName   name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @param userGuid  guid of the user. If null, use current user. To retrieve user guid, use {@link #getOrganizationUsers(String) getOrganizationUsers } and search for username
+	 */
+	void associateAuditorWithSpace(String orgName, String spaceName, String userGuid);
+
+	/**
+	 * Associate a user to the space developer role
+	 *
+	 * @param orgName   name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @param userGuid  guid of the user. If null, use current user. To retrieve user guid, use {@link #getOrganizationUsers(String) getOrganizationUsers } and search for username
+	 */
+	void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid);
+
+	/**
+	 * Associate a user to the space managers role
+	 *
+	 * @param orgName   name of the organization containing the space
+	 * @param spaceName name of the space
+	 * @param userGuid  guid of the user. If null, use current user. To retrieve user guid, use {@link #getOrganizationUsers(String) getOrganizationUsers } and search for username
+	 */
+	void associateManagerWithSpace(String orgName, String spaceName, String userGuid);
 
 	/**
 	 * Create a space with the specified name
@@ -1151,4 +1179,14 @@ public interface CloudFoundryOperations {
 	 * @throws IllegalArgumentException if the org, space, or security group do not exist
 	 */
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+
+    /**
+     * Get all users in the specified organization
+     *
+     * @param orgName organization name
+     * @return a Map CloudUser with username as key
+     * @throws IllegalArgumentException if the org do not exist
+     */
+    Map<String, CloudUser> getOrganizationUsers(String orgName);
+
 }
