@@ -1394,6 +1394,8 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			ApplicationArchive archive = new ZipApplicationArchive(zipFile);
 			uploadApplication(appName, archive, callback);
 		}
+
+		file.delete();
 	}
 
 	@Override
@@ -1470,7 +1472,6 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private File createTemporaryUploadFile(InputStream inputStream) throws IOException {
 		File file = File.createTempFile("cfjava", null);
-		file.deleteOnExit();
 		FileOutputStream outputStream = new FileOutputStream(file);
 		FileCopyUtils.copy(inputStream, outputStream);
 		outputStream.close();
