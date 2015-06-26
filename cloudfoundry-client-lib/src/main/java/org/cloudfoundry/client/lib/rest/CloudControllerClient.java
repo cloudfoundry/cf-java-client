@@ -307,4 +307,5 @@ public interface CloudControllerClient {
 
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
+	void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris, List<String> serviceNames, String buildPack);
 }
