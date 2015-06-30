@@ -189,12 +189,13 @@ public class CloudEntityResourceMapper {
 			app.setRunningInstances(runningInstancesAttribute);
 		}
 		String command = getEntityAttribute(resource, "command", String.class);
+        String detectedStartCommand = getEntityAttribute(resource, "detected_start_command", String.class);
 		String buildpack = getEntityAttribute(resource, "buildpack", String.class);
 		String detectedBuildpack = getEntityAttribute(resource, "detected_buildpack", String.class);
 		Map<String, Object> stackResource = getEmbeddedResource(resource, "stack");
 		CloudStack stack = mapStackResource(stackResource);
 		Integer healthCheckTimeout = getEntityAttribute(resource, "health_check_timeout", Integer.class);
-		Staging staging = new Staging(command, buildpack, stack.getName(), healthCheckTimeout, detectedBuildpack);
+		Staging staging = new Staging(command, buildpack, stack.getName(), healthCheckTimeout, detectedBuildpack, detectedStartCommand);
 		app.setStaging(staging);
 
 		Map<String, Object> spaceResource = getEmbeddedResource(resource, "space");
