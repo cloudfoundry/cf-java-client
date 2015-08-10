@@ -33,4 +33,11 @@
     <name>Cloud Foundry Java Client</name>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxjava</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

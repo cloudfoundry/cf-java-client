@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2014-2015 the original author or authors.
+  ~ Copyright 2013-2015 the original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -29,21 +29,8 @@
         <version>2.0.0.BUILD-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cloudfoundry-gradle-plugin</artifactId>
-    <name>Cloud Foundry Gradle Plugin</name>
+    <artifactId>integration-test</artifactId>
+    <name>Integration Test</name>
     <packaging>jar</packaging>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.cloudfoundry</groupId>
-            <artifactId>cloudfoundry-client-spring</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.cloudfoundry</groupId>
-            <artifactId>cloudfoundry-resources</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 
 </project>

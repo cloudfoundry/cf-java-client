@@ -8,5 +8,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="cloudfoundry-client-spring" />
+    <orderEntry type="module" module-name="cloudfoundry-client" />
+    <orderEntry type="library" name="Maven: io.reactivex:rxjava:1.0.13" level="project" />
+    <orderEntry type="module" module-name="cloudfoundry-resources" />
   </component>
 </module>
