@@ -47,6 +47,7 @@
     </profiles>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rxjava.version>1.0.13</rxjava.version>
         <spring-platform.version>1.1.3.RELEASE</spring-platform.version>
     </properties>
@@ -89,6 +90,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.10.3</version>
+                    <configuration>
+                        <links>
+                            <link>http://reactivex.io/RxJava/javadoc/</link>
+                        </links>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -123,7 +129,6 @@
                         <goals>
                             <goal>aggregate-jar</goal>
                         </goals>
-                        <phase>package</phase>
                     </execution>
                 </executions>
             </plugin>

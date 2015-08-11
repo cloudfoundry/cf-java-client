@@ -21,29 +21,23 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public final class SpringCloudFoundryClientBuilderTest {
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
+public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest {
 
     private final SpringCloudFoundryClientBuilder builder = new SpringCloudFoundryClientBuilder(this.restTemplate);
 
     @Test
     public void test() {
         this.mockServer
-                .expect(requestTo("https://api.test.host/info"))
+                .expect(requestTo("https://api.run.pivotal.io/info"))
                 .andRespond(withSuccess(new ClassPathResource("info.json"), MediaType.APPLICATION_JSON));
 
         SpringCloudFoundryClient client = (SpringCloudFoundryClient) this.builder
-                .withApi("api.test.host")
+                .withApi("api.run.pivotal.io")
                 .withCredentials("test-username", "test-password")
                 .build();
 
@@ -52,7 +46,7 @@ public final class SpringCloudFoundryClientBuilderTest {
 
         assertEquals("cf", details.getClientId());
         assertEquals("", details.getClientSecret());
-        assertEquals("https://uaa.test.host/oauth/token", details.getAccessTokenUri());
+        assertEquals("https://uaa.run.pivotal.io/oauth/token", details.getAccessTokenUri());
         this.mockServer.verify();
     }
 }

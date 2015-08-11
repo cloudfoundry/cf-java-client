@@ -17,17 +17,43 @@
 package org.cloudfoundry.v3.client.spring;
 
 import org.cloudfoundry.v3.client.CloudFoundryClient;
+import org.cloudfoundry.v3.client.InfoResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import rx.Observable;
+import rx.subjects.BehaviorSubject;
+
+import java.net.URI;
+
+import static org.springframework.http.HttpStatus.OK;
 
 final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final RestOperations restOperations;
 
-    SpringCloudFoundryClient(RestOperations restOperations) {
+    private final URI root;
+
+    SpringCloudFoundryClient(RestOperations restOperations, URI root) {
         this.restOperations = restOperations;
+        this.root = root;
     }
 
     RestOperations getRestOperations() {
         return this.restOperations;
+    }
+
+    @Override
+    public Observable<InfoResponse> info() {
+        return BehaviorSubject.create(subscriber -> {
+            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "info").build().toUri();
+            ResponseEntity<InfoResponse> response = this.restOperations.getForEntity(uri, InfoResponse.class);
+
+            if (response.getStatusCode() == OK) {
+                subscriber.onNext(response.getBody());
+            }
+
+            subscriber.onCompleted();
+        });
     }
 }

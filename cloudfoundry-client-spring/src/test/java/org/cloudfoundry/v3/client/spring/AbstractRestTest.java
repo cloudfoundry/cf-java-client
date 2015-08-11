@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.v3.client;
+package org.cloudfoundry.v3.client.spring;
 
-import rx.Observable;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-/**
- * Main entry point to the Cloud Foundry Client API
- */
-public interface CloudFoundryClient {
+import java.net.URI;
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
-     *
-     * @return the response from the Get Info request
-     */
-    Observable<InfoResponse> info();
-
+class AbstractRestTest {
+    protected final RestTemplate restTemplate = new RestTemplate();
+    protected final URI root = UriComponentsBuilder.newInstance().scheme("https").host("api.run.pivotal.io").build().toUri();
+    protected final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
 }

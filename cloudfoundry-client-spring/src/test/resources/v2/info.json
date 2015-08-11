@@ -1,0 +1,16 @@
+{
+  "name": "vcap",
+  "build": "2222",
+  "support": "http://support.cloudfoundry.com",
+  "version": 2,
+  "description": "Cloud Foundry sponsored by Pivotal",
+  "authorization_endpoint": "https://login.run.pivotal.io",
+  "token_endpoint": "https://uaa.run.pivotal.io",
+  "min_cli_version": null,
+  "min_recommended_cli_version": null,
+  "api_version": "2.33.0",
+  "app_ssh_endpoint": "ssh.run.pivotal.io:2222",
+  "app_ssh_host_key_fingerprint": null,
+  "logging_endpoint": "wss://loggregator.run.pivotal.io:4443",
+  "doppler_logging_endpoint": "wss://doppler.run.pivotal.io:443"
+}

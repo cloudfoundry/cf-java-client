@@ -1,3 +1,10 @@
 {
-  "token_endpoint": "https://uaa.test.host"
+  "name": "vcap",
+  "build": "2222",
+  "support": "http://support.cloudfoundry.com",
+  "version": 2,
+  "description": "Cloud Foundry sponsored by Pivotal",
+  "authorization_endpoint": "https://login.run.pivotal.io",
+  "token_endpoint": "https://uaa.run.pivotal.io",
+  "allow_debug": true
 }
