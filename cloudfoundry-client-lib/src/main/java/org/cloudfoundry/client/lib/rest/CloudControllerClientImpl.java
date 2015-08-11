@@ -73,8 +73,10 @@ import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudServicePlan;
+import org.cloudfoundry.client.lib.domain.CloudServiceUsageEvent;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUsageEvent;
 import org.cloudfoundry.client.lib.domain.CrashInfo;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstanceState;
@@ -1047,6 +1049,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			}
 		}
 	}
+	
+	@Override
+	public List<CloudServiceUsageEvent> getServiceUsageEvents() {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/app_usage_events";
+		return doGetServiceUsageEvents(urlPath, urlVars);
+	}
+	
+	protected List<CloudServiceUsageEvent> doGetServiceUsageEvents(String urlPath, Map<String, Object> urlVars) {
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		List<CloudServiceUsageEvent> events = new ArrayList<CloudServiceUsageEvent>();
+		for (Map<String, Object> resource : resourceList) {
+			if (resource != null) {
+				events.add(resourceMapper.mapResource(resource, CloudServiceUsageEvent.class));
+			}
+		}
+		return events;
+	}
 
 	@Override
 	public List<CloudApplication> getApplications() {
@@ -1809,6 +1829,24 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		for (Map<String, Object> resource : resourceList) {
 			if (resource != null) {
 				events.add(resourceMapper.mapResource(resource, CloudEvent.class));
+			}
+		}
+		return events;
+	}
+	
+	@Override
+	public List<CloudUsageEvent> getApplicationUsageEvents() {
+		Map<String, Object> urlVars = new HashMap<String, Object>();
+		String urlPath = "/v2/app_usage_events";
+		return doGetUsageEvents(urlPath, urlVars);
+	}
+	
+	protected List<CloudUsageEvent> doGetUsageEvents(String urlPath, Map<String, Object> urlVars) {
+		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+		List<CloudUsageEvent> events = new ArrayList<CloudUsageEvent>();
+		for (Map<String, Object> resource : resourceList) {
+			if (resource != null) {
+				events.add(resourceMapper.mapResource(resource, CloudUsageEvent.class));
 			}
 		}
 		return events;

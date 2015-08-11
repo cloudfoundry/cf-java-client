@@ -39,8 +39,10 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServiceUsageEvent;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUsageEvent;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -592,6 +594,20 @@ public interface CloudFoundryOperations {
 	 * @return application events
 	 */
 	List<CloudEvent> getApplicationEvents(String appName);
+	
+	/**
+	 * Get application usage events.
+	 *
+	 * @return application usage events
+	 */
+	List<CloudUsageEvent> getApplicationUsageEvents();
+	
+	/**
+	 * Get service usage events.
+	 *
+	 * @return service usage events
+	 */
+	List<CloudServiceUsageEvent> getServiceUsageEvents();
 
 	/**
 	 * Get logs from the deployed application. The logs
