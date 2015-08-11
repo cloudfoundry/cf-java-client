@@ -27,6 +27,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -113,7 +114,8 @@ public final class SpringCloudFoundryClientBuilder {
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
         RestOperations restOperations = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
 
-        return new SpringCloudFoundryClient(restOperations);
+        URI root = UriComponentsBuilder.newInstance().scheme("https").host(this.host).build().toUri();
+        return new SpringCloudFoundryClient(restOperations, root);
     }
 
     private OAuth2ClientContext getOAuth2ClientContext() {
