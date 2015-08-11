@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.v3.client.spring;
+package org.cloudfoundry.v3.client;
 
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import java.util.Map;
 
-import java.net.URI;
+/**
+ * Interface for types that have {@code _link} payloads
+ */
+public interface LinkBased {
 
-public abstract class AbstractRestTest {
+    /**
+     * Returns a link for a specified rel
+     *
+     * @param rel the rel for the link
+     * @return a link for a specified rel or {@code null} if the rel does not exist
+     */
+    Link getLink(String rel);
 
-    protected final RestTemplate restTemplate = new RestTemplate();
-
-    protected final URI root = UriComponentsBuilder.newInstance()
-            .scheme("https").host("api.run.pivotal.io")
-            .build().toUri();
-
-    protected final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
+    /**
+     * Returns all links
+     *
+     * @return all links
+     */
+    Map<String, Link> getLinks();
 
 }

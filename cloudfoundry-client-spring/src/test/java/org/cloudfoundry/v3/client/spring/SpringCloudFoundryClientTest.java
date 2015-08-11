@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.v3.client.spring;
 
-import org.cloudfoundry.v3.client.InfoResponse;
+import org.cloudfoundry.v3.client.GetInfoResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -31,12 +31,13 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
 
     @Test
-    public void info() {
+    public void get() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v2/info"))
-                .andRespond(withSuccess(new ClassPathResource("v2/info.json"), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(new ClassPathResource("v2/info_GET_RESPONSE.json"),
+                        MediaType.APPLICATION_JSON));
 
-        InfoResponse response = this.client.info().toBlocking().single();
+        GetInfoResponse response = this.client.info().toBlocking().single();
 
         assertEquals("2.33.0", response.getApiVersion());
         assertEquals("ssh.run.pivotal.io:2222", response.getAppSshEndpoint());

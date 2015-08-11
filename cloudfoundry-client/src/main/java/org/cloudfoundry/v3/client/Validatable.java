@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.v3.client.spring;
+package org.cloudfoundry.v3.client;
 
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+/**
+ * Interface for types that are able to be validated
+ */
+public interface Validatable {
 
-import java.net.URI;
-
-public abstract class AbstractRestTest {
-
-    protected final RestTemplate restTemplate = new RestTemplate();
-
-    protected final URI root = UriComponentsBuilder.newInstance()
-            .scheme("https").host("api.run.pivotal.io")
-            .build().toUri();
-
-    protected final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
-
+    ValidationResult isValid();
 }

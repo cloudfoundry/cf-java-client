@@ -16,26 +16,26 @@
 
 package org.cloudfoundry.v3.client;
 
-import org.cloudfoundry.v3.client.application.Application;
-import rx.Observable;
+import java.util.stream.Collectors;
 
 /**
- * Main entry point to the Cloud Foundry Client API
+ * An exception indicating that a request was invalid
  */
-public interface CloudFoundryClient {
+public final class RequestValidationException extends Exception {
+
+    private static final long serialVersionUID = 5101072880821629068L;
 
     /**
-     * Main entry point to the Cloud Foundry Application Client API
+     * Creates a new instance
      *
-     * @return the Cloud Foundry Application Client API
+     * @param validationResult the {@link ValidationResult} to read messages from
      */
-    Application application();
+    public RequestValidationException(ValidationResult validationResult) {
+        super(getMessage(validationResult));
+    }
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
-     *
-     * @return the response from the Get Info request
-     */
-    Observable<GetInfoResponse> info();
+    private static String getMessage(ValidationResult validationResult) {
+        return "Request is invalid: " + validationResult.getMessages().stream().collect(Collectors.joining(", "));
+    }
 
 }

@@ -20,11 +20,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public final class InfoResponseTest {
+public final class GetInfoResponseTest {
 
     @Test
-    public void name() {
-        InfoResponse response = new InfoResponse()
+    public void test() {
+        GetInfoResponse response = new GetInfoResponse()
                 .withApiVersion("test-api-version")
                 .withAppSshEndpoint("test-app-ssh-endpoint")
                 .withAppSshHostKeyFingerprint("test-app-ssh-host-key-fingerprint")

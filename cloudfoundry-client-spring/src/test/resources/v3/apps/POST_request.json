@@ -1,0 +1,8 @@
+{
+  "name": "my_app",
+  "space_guid": "31627bdc-5bc4-4c4d-a883-c7b2f53db249",
+  "environment_variables": {
+    "open": "source"
+  },
+  "buildpack": "name-410"
+}
