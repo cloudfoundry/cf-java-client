@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The response payload for the Info operation
+ *
+ * <p><b>This class is NOT threadsafe.</b>
  */
-public final class InfoResponse {
+public final class GetInfoResponse {
 
     private volatile String apiVersion;
 
@@ -67,7 +69,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("api_version")
-    public InfoResponse withApiVersion(String apiVersion) {
+    public GetInfoResponse withApiVersion(String apiVersion) {
         this.apiVersion = apiVersion;
         return this;
     }
@@ -88,7 +90,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("app_ssh_endpoint")
-    public InfoResponse withAppSshEndpoint(String appSshEndpoint) {
+    public GetInfoResponse withAppSshEndpoint(String appSshEndpoint) {
         this.appSshEndpoint = appSshEndpoint;
         return this;
     }
@@ -109,7 +111,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("app_ssh_host_key_fingerprint")
-    public InfoResponse withAppSshHostKeyFingerprint(String appSshHostKeyFingerprint) {
+    public GetInfoResponse withAppSshHostKeyFingerprint(String appSshHostKeyFingerprint) {
         this.appSshHostKeyFingerprint = appSshHostKeyFingerprint;
         return this;
     }
@@ -130,7 +132,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("authorization_endpoint")
-    public InfoResponse withAuthorizationEndpoint(String authorizationEndpoint) {
+    public GetInfoResponse withAuthorizationEndpoint(String authorizationEndpoint) {
         this.authorizationEndpoint = authorizationEndpoint;
         return this;
     }
@@ -151,7 +153,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("build")
-    public InfoResponse withBuild(String build) {
+    public GetInfoResponse withBuild(String build) {
         this.build = build;
         return this;
     }
@@ -172,7 +174,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("description")
-    public InfoResponse withDescription(String description) {
+    public GetInfoResponse withDescription(String description) {
         this.description = description;
         return this;
     }
@@ -193,7 +195,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("doppler_logging_endpoint")
-    public InfoResponse withDopplerLoggingEndpoint(String dopplerLoggingEndpoint) {
+    public GetInfoResponse withDopplerLoggingEndpoint(String dopplerLoggingEndpoint) {
         this.dopplerLoggingEndpoint = dopplerLoggingEndpoint;
         return this;
     }
@@ -214,7 +216,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("logging_endpoint")
-    public InfoResponse withLoggingEndpoint(String loggingEndpoint) {
+    public GetInfoResponse withLoggingEndpoint(String loggingEndpoint) {
         this.loggingEndpoint = loggingEndpoint;
         return this;
     }
@@ -235,7 +237,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("min_cli_version")
-    public InfoResponse withMinCliVersion(String minCliVersion) {
+    public GetInfoResponse withMinCliVersion(String minCliVersion) {
         this.minCliVersion = minCliVersion;
         return this;
     }
@@ -256,7 +258,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("min_recommended_cli_version")
-    public InfoResponse withMinRecommendedCliVersion(String minRecommendedCliVersion) {
+    public GetInfoResponse withMinRecommendedCliVersion(String minRecommendedCliVersion) {
         this.minRecommendedCliVersion = minRecommendedCliVersion;
         return this;
     }
@@ -277,7 +279,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("name")
-    public InfoResponse withName(String name) {
+    public GetInfoResponse withName(String name) {
         this.name = name;
         return this;
     }
@@ -298,7 +300,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("support")
-    public InfoResponse withSupport(String support) {
+    public GetInfoResponse withSupport(String support) {
         this.support = support;
         return this;
     }
@@ -319,7 +321,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("token_endpoint")
-    public InfoResponse withTokenEndpoint(String tokenEndpoint) {
+    public GetInfoResponse withTokenEndpoint(String tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
         return this;
     }
@@ -340,7 +342,7 @@ public final class InfoResponse {
      * @return {@code this}
      */
     @JsonProperty("version")
-    public InfoResponse withVersion(Integer version) {
+    public GetInfoResponse withVersion(Integer version) {
         this.version = version;
         return this;
     }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.v3.client.spring;
+package org.cloudfoundry.v3.client.spring.application;
 
-import org.cloudfoundry.v3.client.CloudFoundryClient;
-import org.cloudfoundry.v3.client.GetInfoResponse;
+import org.cloudfoundry.v3.client.RequestValidationException;
+import org.cloudfoundry.v3.client.ValidationResult;
 import org.cloudfoundry.v3.client.application.Application;
-import org.cloudfoundry.v3.client.spring.application.SpringApplication;
+import org.cloudfoundry.v3.client.application.CreateApplicationRequest;
+import org.cloudfoundry.v3.client.application.CreateApplicationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,10 @@ import rx.subjects.BehaviorSubject;
 
 import java.net.URI;
 
-import static org.springframework.http.HttpStatus.OK;
+import static org.cloudfoundry.v3.client.ValidationResult.Status.INVALID;
+import static org.springframework.http.HttpStatus.CREATED;
 
-final class SpringCloudFoundryClient implements CloudFoundryClient {
+public final class SpringApplication implements Application {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -40,32 +42,31 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final URI root;
 
-    SpringCloudFoundryClient(RestOperations restOperations, URI root) {
+    public SpringApplication(RestOperations restOperations, URI root) {
         this.restOperations = restOperations;
         this.root = root;
     }
 
-    RestOperations getRestOperations() {
-        return this.restOperations;
-    }
-
     @Override
-    public Application application() {
-        return new SpringApplication(this.restOperations, this.root);
-    }
-
-    @Override
-    public Observable<GetInfoResponse> info() {
+    public Observable<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return BehaviorSubject.create(subscriber -> {
-            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "info").build().toUri();
-            this.logger.debug("Requesting Get Info at {}", uri);
+            ValidationResult validationResult = request.isValid();
+            if (validationResult.getStatus() == INVALID) {
+                subscriber.onError(new RequestValidationException(validationResult));
+                return;
+            }
 
-            ResponseEntity<GetInfoResponse> response = this.restOperations.getForEntity(uri, GetInfoResponse.class);
-            if (response.getStatusCode() == OK) {
+            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v3", "apps").build().toUri();
+            this.logger.debug("Requesting Create Application at {}", uri);
+
+            ResponseEntity<CreateApplicationResponse> response = this.restOperations.postForEntity(uri, request,
+                    CreateApplicationResponse.class);
+            if (response.getStatusCode() == CREATED) {
                 subscriber.onNext(response.getBody());
             }
 
             subscriber.onCompleted();
         });
     }
+
 }

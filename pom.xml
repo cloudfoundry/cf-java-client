@@ -91,6 +91,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.10.3</version>
                     <configuration>
+                        <excludePackageNames>org.cloudfoundry.v3.client.spring.*</excludePackageNames>
                         <links>
                             <link>http://reactivex.io/RxJava/javadoc/</link>
                         </links>

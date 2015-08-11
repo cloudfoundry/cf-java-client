@@ -16,26 +16,27 @@
 
 package org.cloudfoundry.v3.client;
 
-import org.cloudfoundry.v3.client.application.Application;
-import rx.Observable;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
-/**
- * Main entry point to the Cloud Foundry Client API
- */
-public interface CloudFoundryClient {
+public final class LinkMatcher {
 
-    /**
-     * Main entry point to the Cloud Foundry Application Client API
-     *
-     * @return the Cloud Foundry Application Client API
-     */
-    Application application();
+    public static Matcher<Link> linkMatches(Link expectedValue) {
+        return new TypeSafeMatcher<Link>() {
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
-     *
-     * @return the response from the Get Info request
-     */
-    Observable<GetInfoResponse> info();
+            @Override
+            public void describeTo(Description description) {
+                description.appendValue(expectedValue);
+            }
+
+            @Override
+            protected boolean matchesSafely(Link item) {
+                return expectedValue.getHref().equals(item.getHref()) &&
+                        expectedValue.getMethod().equals(item.getMethod());
+            }
+
+        };
+    }
 
 }
