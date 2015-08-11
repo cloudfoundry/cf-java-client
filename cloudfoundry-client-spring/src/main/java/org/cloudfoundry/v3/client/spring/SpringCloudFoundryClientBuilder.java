@@ -32,8 +32,8 @@ import java.util.Map;
 /**
  * A builder API for creating a Spring-backed implementation of the {@link CloudFoundryClient}.  By default it uses
  * {@code cf} and an empty string for the {@code clientId} and {@code clientSecret} respectively.
- * <p/>
- * <b>This class is NOT threadsafe.  The {@link CloudFoundryClient} created by it, is threadsafe.</b>
+ *
+ * <p><b>This class is NOT threadsafe.  The {@link CloudFoundryClient} created by it, is threadsafe.</b>
  */
 public final class SpringCloudFoundryClientBuilder {
 
@@ -49,6 +49,9 @@ public final class SpringCloudFoundryClientBuilder {
 
     private volatile String password;
 
+    /**
+     * Creates a new instance of the builder
+     */
     public SpringCloudFoundryClientBuilder() {
         this(new RestTemplate());
     }
