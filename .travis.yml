@@ -1,4 +1,9 @@
----
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
+notifications:
+  slack:
+    secure: jJ/aqM9/M+2mmfJGLQ09Htmp6iUE4aRkckWbH++VsLcigAr7nXdziWn9LcxqXmjlT7dm6xLFgU+Li9mYUDvW1T2Fy32KoCn/O/MSOC20JDobTClcbB3H1vtuUWfPOs5C7SVDzA3AsjhKLDRGmO5DaePIcxIEhfwLYxBQm2Pjc+g=
+cache:
+  directories:
+  - $HOME/.m2
