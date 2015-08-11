@@ -26,4 +26,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     SpringCloudFoundryClient(RestOperations restOperations) {
         this.restOperations = restOperations;
     }
+
+    RestOperations getRestOperations() {
+        return this.restOperations;
+    }
 }

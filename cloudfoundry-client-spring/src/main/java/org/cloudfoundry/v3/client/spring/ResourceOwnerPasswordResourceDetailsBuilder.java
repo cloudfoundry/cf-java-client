@@ -37,9 +37,13 @@ final class ResourceOwnerPasswordResourceDetailsBuilder {
         return this;
     }
 
-    ResourceOwnerPasswordResourceDetailsBuilder withCredentials(String username, String password) {
-        this.details.setUsername(username);
+    ResourceOwnerPasswordResourceDetailsBuilder withPassword(String password) {
         this.details.setPassword(password);
+        return this;
+    }
+
+    ResourceOwnerPasswordResourceDetailsBuilder withUsername(String username) {
+        this.details.setUsername(username);
         return this;
     }
 

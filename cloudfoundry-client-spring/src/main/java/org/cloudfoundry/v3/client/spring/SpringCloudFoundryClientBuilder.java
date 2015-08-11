@@ -30,11 +30,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
 
 /**
- * A builder API for creating a Spring-backed implementation of the {@link CloudFoundryClient}.
+ * A builder API for creating a Spring-backed implementation of the {@link CloudFoundryClient}.  By default it uses
+ * {@code cf} and an empty string for the {@code clientId} and {@code clientSecret} respectively.
  * <p/>
  * <b>This class is NOT threadsafe.  The {@link CloudFoundryClient} created by it, is threadsafe.</b>
  */
 public final class SpringCloudFoundryClientBuilder {
+
+    private final RestOperations restOperations;
 
     private volatile String clientId = "cf";
 
@@ -46,6 +49,14 @@ public final class SpringCloudFoundryClientBuilder {
 
     private volatile String password;
 
+    public SpringCloudFoundryClientBuilder() {
+        this(new RestTemplate());
+    }
+
+    SpringCloudFoundryClientBuilder(RestOperations restOperations) {
+        this.restOperations = restOperations;
+    }
+
     /**
      * Configure the API endpoint to connect to
      *
@@ -54,6 +65,19 @@ public final class SpringCloudFoundryClientBuilder {
      */
     public SpringCloudFoundryClientBuilder withApi(String host) {
         this.host = host;
+        return this;
+    }
+
+    /**
+     * Configure the OAuth2 client information to use when connecting
+     *
+     * @param clientId     the client id to use. Defaults to {@code cf}.
+     * @param clientSecret the client secret to use.  Defaults to {@code ''}.
+     * @return {@code this}
+     */
+    public SpringCloudFoundryClientBuilder withClient(String clientId, String clientSecret) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
         return this;
     }
 
@@ -98,7 +122,8 @@ public final class SpringCloudFoundryClientBuilder {
                 .withClientId(this.clientId)
                 .withClientSecret(this.clientSecret)
                 .withAccessTokenUri(getAccessTokenUri())
-                .withCredentials(this.username, this.password)
+                .withUsername(this.username)
+                .withPassword(this.password)
                 .build();
     }
 
@@ -108,7 +133,7 @@ public final class SpringCloudFoundryClientBuilder {
                 .scheme("https").host(this.host).pathSegment("info")
                 .build().toUriString();
 
-        Map<String, String> results = new RestTemplate().getForObject(infoUri, Map.class);
+        Map<String, String> results = this.restOperations.getForObject(infoUri, Map.class);
 
         return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
                 .pathSegment("oauth", "token")
