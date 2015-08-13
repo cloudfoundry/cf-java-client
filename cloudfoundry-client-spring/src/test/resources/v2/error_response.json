@@ -1,0 +1,5 @@
+{
+  "code": 10008,
+  "description": "The request is semantically invalid: space_guid and name unique",
+  "error_code": "CF-UnprocessableEntity"
+}
