@@ -609,6 +609,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
+	public void deleteSpaceRecursively(String spaceName) {
+		assertSpaceProvided("delete a space recursively");
+		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
+		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+		if (spaceGuid != null) {
+			doDeleteSpaceRecursively(spaceGuid);
+		}
+	}
+
 	private UUID doCreateSpace(String spaceName, UUID orgGuid) {
 		String urlPath = "/v2/spaces";
 		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();
@@ -639,6 +649,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private void doDeleteSpace(UUID spaceGuid) {
 		getRestTemplate().delete(getUrl("/v2/spaces/{guid}?async=false"), spaceGuid);
+	}
+
+	private void doDeleteSpaceRecursively(UUID spaceGuid) {
+		getRestTemplate().delete(getUrl("/v2/spaces/{guid}?async=false&recursive=true"), spaceGuid);
 	}
 
 	@Override

@@ -233,6 +233,14 @@ public interface CloudFoundryOperations {
 	void deleteSpace(String spaceName);
 
 	/**
+	 * Delete a space with the specified name recursively, deleting all resources contained in the space
+	 * as well as the space itself
+	 *
+	 * @param spaceName name of the space
+	 */
+	void deleteSpaceRecursively(String spaceName);
+
+	/**
 	 * Get list of CloudOrganizations for the current cloud.
 	 *
 	 * @return List of CloudOrganizations objects containing the organization info
