@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.v2;
+package org.cloudfoundry.client.spring;
 
-/**
- * A builder for less than filters
- */
-public interface LessThanFilterBuilder {
+import rx.Subscriber;
 
-    /**
-     * Builds a new instance of the filter
-     *
-     * @return a new instance of the filter
-     */
-    String build();
+import static org.junit.Assert.fail;
 
+public class ExpectedExceptionSubscriber extends Subscriber<Object> {
+
+    @Override
+    public void onCompleted() {
+        fail();
+    }
+
+    @Override
+    public void onError(Throwable e) {
+    }
+
+    @Override
+    public void onNext(Object object) {
+        fail();
+    }
 }

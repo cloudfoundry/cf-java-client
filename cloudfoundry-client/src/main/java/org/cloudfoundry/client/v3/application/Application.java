@@ -32,4 +32,13 @@ public interface Application {
      */
     Observable<CreateApplicationResponse> create(CreateApplicationRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List
+     * Applications</a> request
+     *
+     * @param request the List Applications request
+     * @return the response from the List Applications request
+     */
+    Observable<ListApplicationsResponse> list(ListApplicationsRequest request);
+
 }

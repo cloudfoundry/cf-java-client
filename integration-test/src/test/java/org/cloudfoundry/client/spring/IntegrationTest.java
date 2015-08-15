@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.space.ListSpacesRequest;
 import org.cloudfoundry.client.v2.space.ListSpacesResponse;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import rx.Observable;
-import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 public final class IntegrationTest {
 
@@ -58,28 +60,48 @@ public final class IntegrationTest {
 
     @Test
     public void test() {
+        listApplications()
+                .flatMap(this::split)
+                .subscribe(this::deleteApplication, this::handleError,
+                        () -> this.logger.info("All existing applications deleted"));
+
         listSpaces()
                 .flatMap(this::createApplication)
-                .doOnError(exception -> {
-                    this.logger.error("Error encountered: {}", exception.getMessage());
-                })
-                .toBlocking()
-                .forEach(response -> {
+                .subscribe(response -> {
                     this.logger.info("Name: {}", response.getName());
                     this.logger.info("Id:   {}", response.getId());
 
                     response.getLinks().entrySet().stream().forEach(entry -> {
                         this.logger.info("Link: {}/{}", entry.getKey(), entry.getValue().getHref());
                     });
-                });
+
+                }, this::handleError);
+    }
+
+    private void handleError(Throwable exception) {
+        this.logger.error("Error encountered: {}", exception.getMessage());
+    }
+
+    private Observable<ListApplicationsResponse> listApplications() {
+        return this.client.application().list(new ListApplicationsRequest());
+    }
+
+    private Observable<ListApplicationsResponse.Resource> split(ListApplicationsResponse response) {
+        return BehaviorSubject.create(subscriber -> {
+            response.getResources().forEach(subscriber::onNext);
+            subscriber.onCompleted();
+        });
+    }
+
+    private void deleteApplication(ListApplicationsResponse.Resource resource) {
+        this.logger.info("Application: {}/{}", resource.getName(), resource.getId());
     }
 
     private Observable<ListSpacesResponse> listSpaces() {
         ListSpacesRequest request = new ListSpacesRequest()
                 .filterByName(this.space);
 
-        return this.client.space().list(request)
-                .subscribeOn(Schedulers.io());
+        return this.client.space().list(request);
     }
 
     private Observable<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
@@ -92,9 +114,7 @@ public final class IntegrationTest {
                 .withSpaceId(metadata.getId())
                 .withName(this.application);
 
-        return this.client.application().create(request)
-                .subscribeOn(Schedulers.io());
+        return this.client.application().create(request);
     }
-
 
 }

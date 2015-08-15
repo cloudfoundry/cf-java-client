@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.spring;
 
-import org.cloudfoundry.client.v2.GetInfoResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -43,24 +42,24 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
                 .andRespond(withSuccess(new ClassPathResource("v2/info_GET_response.json"),
                         MediaType.APPLICATION_JSON));
 
-        GetInfoResponse response = this.client.info().toBlocking().single();
+        this.client.info().subscribe(response -> {
+            assertEquals("2.33.0", response.getApiVersion());
+            assertEquals("ssh.run.pivotal.io:2222", response.getAppSshEndpoint());
+            assertNull(response.getAppSshHostKeyFingerprint());
+            assertEquals("https://login.run.pivotal.io", response.getAuthorizationEndpoint());
+            assertEquals("2222", response.getBuild());
+            assertEquals("Cloud Foundry sponsored by Pivotal", response.getDescription());
+            assertEquals("wss://doppler.run.pivotal.io:443", response.getDopplerLoggingEndpoint());
+            assertEquals("wss://loggregator.run.pivotal.io:4443", response.getLoggingEndpoint());
+            assertEquals("vcap", response.getName());
+            assertNull(response.getMinCliVersion());
+            assertNull(response.getMinRecommendedCliVersion());
+            assertEquals("http://support.cloudfoundry.com", response.getSupport());
+            assertEquals("https://uaa.run.pivotal.io", response.getTokenEndpoint());
+            assertEquals(Integer.valueOf(2), response.getVersion());
 
-        assertEquals("2.33.0", response.getApiVersion());
-        assertEquals("ssh.run.pivotal.io:2222", response.getAppSshEndpoint());
-        assertNull(response.getAppSshHostKeyFingerprint());
-        assertEquals("https://login.run.pivotal.io", response.getAuthorizationEndpoint());
-        assertEquals("2222", response.getBuild());
-        assertEquals("Cloud Foundry sponsored by Pivotal", response.getDescription());
-        assertEquals("wss://doppler.run.pivotal.io:443", response.getDopplerLoggingEndpoint());
-        assertEquals("wss://loggregator.run.pivotal.io:4443", response.getLoggingEndpoint());
-        assertEquals("vcap", response.getName());
-        assertNull(response.getMinCliVersion());
-        assertNull(response.getMinRecommendedCliVersion());
-        assertEquals("http://support.cloudfoundry.com", response.getSupport());
-        assertEquals("https://uaa.run.pivotal.io", response.getTokenEndpoint());
-        assertEquals(Integer.valueOf(2), response.getVersion());
-
-        this.mockServer.verify();
+            this.mockServer.verify();
+        });
     }
 
     @Test
