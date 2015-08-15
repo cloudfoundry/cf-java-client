@@ -1,0 +1,92 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "first": {
+      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=1&per_page=2"
+    },
+    "last": {
+      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2"
+    },
+    "next": {
+      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "guid-acfbae75-7d3a-45b1-b730-ca3cc4263045",
+      "name": "my_app3",
+      "desired_state": "STOPPED",
+      "total_desired_instances": 0,
+      "buildpack": "name-383",
+      "created_at": "1970-01-01T00:00:03Z",
+      "updated_at": null,
+      "environment_variables": {
+        "magic": "beautiful"
+      },
+      "_links": {
+        "self": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045"
+        },
+        "processes": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/processes"
+        },
+        "packages": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/packages"
+        },
+        "space": {
+          "href": "/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62"
+        },
+        "start": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/start",
+          "method": "PUT"
+        },
+        "stop": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/stop",
+          "method": "PUT"
+        },
+        "assign_current_droplet": {
+          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/current_droplet",
+          "method": "PUT"
+        }
+      }
+    },
+    {
+      "guid": "guid-f2e97073-86d2-473e-8d03-76742f16bf6e",
+      "name": "my_app2",
+      "desired_state": "STOPPED",
+      "total_desired_instances": 0,
+      "buildpack": null,
+      "created_at": "1970-01-01T00:00:02Z",
+      "updated_at": null,
+      "environment_variables": {
+      },
+      "_links": {
+        "self": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e"
+        },
+        "processes": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/processes"
+        },
+        "packages": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/packages"
+        },
+        "space": {
+          "href": "/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62"
+        },
+        "start": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/start",
+          "method": "PUT"
+        },
+        "stop": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/stop",
+          "method": "PUT"
+        },
+        "assign_current_droplet": {
+          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/current_droplet",
+          "method": "PUT"
+        }
+      }
+    }
+  ]
+}

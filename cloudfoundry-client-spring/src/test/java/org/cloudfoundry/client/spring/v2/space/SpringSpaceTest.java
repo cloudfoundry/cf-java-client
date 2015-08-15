@@ -17,11 +17,10 @@
 package org.cloudfoundry.client.spring.v2.space;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.space.ListSpacesRequest;
 import org.cloudfoundry.client.v2.space.ListSpacesResponse;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -41,64 +40,66 @@ public final class SpringSpaceTest extends AbstractRestTest {
     @Test
     public void list() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name-1,test-name-2"))
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name&page=-1"))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v2/spaces/GET_response.json"))
                         .contentType(APPLICATION_JSON));
 
         ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName("test-name-1")
-                .filterByName("test-name-2");
+                .filterByName("test-name")
+                .withPage(-1);
 
-        ListSpacesResponse response = this.space.list(request).toBlocking().single();
+        this.space.list(request).subscribe(response -> {
+            assertNull(response.getNextUrl());
+            assertNull(response.getPreviousUrl());
+            assertEquals(Integer.valueOf(1), response.getTotalPages());
+            assertEquals(Integer.valueOf(1), response.getTotalResults());
 
-        assertNull(response.getNextUrl());
-        assertNull(response.getPreviousUrl());
-        assertEquals(Integer.valueOf(1), response.getTotalPages());
-        assertEquals(Integer.valueOf(1), response.getTotalResults());
+            assertEquals(1, response.getResources().size());
+            Resource<ListSpacesResponse.Entity> resource = response.getResources().get(0);
 
-        assertEquals(1, response.getResources().size());
-        Resource<ListSpacesResponse.Entity> resource = response.getResources().get(0);
+            Resource.Metadata metadata = resource.getMetadata();
+            assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
+            assertEquals("b4293b09-8316-472c-a29a-6468a3adff59", metadata.getId());
+            assertNull(metadata.getUpdatedAt());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
 
-        Resource.Metadata metadata = resource.getMetadata();
-        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-        assertEquals("b4293b09-8316-472c-a29a-6468a3adff59", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
+            ListSpacesResponse.Entity entity = resource.getEntity();
+            assertTrue(entity.getAllowSsh());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events", entity.getApplicationEventsUrl
+                    ());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains", entity.getDomainsUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events", entity.getEventsUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers", entity.getManagersUrl());
+            assertEquals("name-111", entity.getName());
+            assertEquals("3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationId());
+            assertEquals("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes", entity.getRoutesUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups", entity
+                    .getSecurityGroupsUrl());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances",
+                    entity.getServiceInstancesUrl());
+            assertNull(entity.getSpaceQuotaDefinitionId());
 
-        ListSpacesResponse.Entity entity = resource.getEntity();
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers", entity.getManagersUrl());
-        assertEquals("name-111", entity.getName());
-        assertEquals("3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationId());
-        assertEquals("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
-
-        this.mockServer.verify();
+            this.mockServer.verify();
+        });
     }
 
-    @Test(expected = CloudFoundryException.class)
+    @Test
     public void listError() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name-1,test-name-2"))
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name&page=-1"))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
         ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName("test-name-1")
-                .filterByName("test-name-2");
+                .filterByName("test-name")
+                .withPage(-1);
 
-        this.space.list(request).toBlocking().single();
+        this.space.list(request).subscribe(new ExpectedExceptionSubscriber());
     }
 }

@@ -48,13 +48,31 @@ public final class CreateApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result1 = new CreateApplicationRequest().isValid();
-        assertEquals(ValidationResult.Status.INVALID, result1.getStatus());
-        assertEquals(2, result1.getMessages().size());
-
-        ValidationResult result2 = new CreateApplicationRequest()
+        ValidationResult result = new CreateApplicationRequest()
                 .withName("test-name")
-                .withSpaceId("test-space-id").isValid();
-        assertEquals(ValidationResult.Status.VALID, result2.getStatus());
+                .withSpaceId("test-space-id")
+                .isValid();
+
+        assertEquals(ValidationResult.Status.VALID, result.getStatus());
+    }
+
+    @Test
+    public void isValidNoName() {
+        ValidationResult result = new CreateApplicationRequest()
+                .withSpaceId("test-space-id")
+                .isValid();
+
+        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
+        assertEquals("name must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoSpaceId() {
+        ValidationResult result = new CreateApplicationRequest()
+                .withName("test-name")
+                .isValid();
+
+        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
+        assertEquals("spaceId must be specified", result.getMessages().get(0));
     }
 }

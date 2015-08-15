@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.v2;
+package org.cloudfoundry.client.spring.v3;
 
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
-/**
- * A builder for Cloud Foundry V2 filters
- */
 public final class FilterBuilder {
 
     private FilterBuilder() {
@@ -41,6 +37,7 @@ public final class FilterBuilder {
      * @param builder  the builder to augment
      * @param instance the instance to inspect and invoke
      */
+    @SuppressWarnings("unchecked")
     public static void augment(UriComponentsBuilder builder, Object instance) {
         Arrays.stream(ReflectionUtils.getAllDeclaredMethods(instance.getClass()))
                 .sorted((a, b) -> a.getName().compareTo(b.getName()))
@@ -51,39 +48,26 @@ public final class FilterBuilder {
                     }
 
                     Object value = getValue(method, instance);
-
-                    if (value != null) {
-                        builder.queryParam("q", getFilter(filterParameter) + filterParameter.operation() + value);
+                    if (value == null) {
+                        return;
                     }
+
+                    if (!(value instanceof Collection)) {
+                        builder.queryParam(filterParameter.value(), value);
+                        return;
+                    }
+
+                    String name = String.format("%s[]", filterParameter.value());
+                    ((Collection) value).stream().forEach(item -> {
+                        builder.queryParam(name, item);
+                    });
                 });
-    }
-
-    private static String getFilter(FilterParameter filterParameter) {
-        String name = filterParameter.value();
-
-        if (!StringUtils.hasText(name)) {
-            name = filterParameter.name();
-        }
-
-        return name;
     }
 
     @SuppressWarnings("unchecked")
     private static Object getValue(Method method, Object instance) {
         ReflectionUtils.makeAccessible(method);
-        Object value = ReflectionUtils.invokeMethod(method, instance);
-
-        if (!(value instanceof Collection)) {
-            return value;
-        }
-
-        Collection collection = (Collection) value;
-
-        if (collection.isEmpty()) {
-            return null;
-        }
-
-        return collection.stream().collect(Collectors.joining(","));
+        return ReflectionUtils.invokeMethod(method, instance);
     }
 
 }

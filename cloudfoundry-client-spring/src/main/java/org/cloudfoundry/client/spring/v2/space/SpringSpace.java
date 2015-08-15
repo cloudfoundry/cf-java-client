@@ -18,8 +18,9 @@ package org.cloudfoundry.client.spring.v2.space;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.space.ListSpacesRequest;
 import org.cloudfoundry.client.v2.space.ListSpacesResponse;
 import org.cloudfoundry.client.v2.space.Space;
@@ -67,27 +68,8 @@ public final class SpringSpace implements Space {
             }
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "spaces");
-
-            if (!request.getApplicationIds().isEmpty()) {
-                String filter = new FilterBuilder("app_guid").in(request.getApplicationIds()).build();
-                builder.queryParam("q", filter);
-            }
-
-            if (!request.getDeveloperIds().isEmpty()) {
-                String filter = new FilterBuilder("developer_guid").in(request.getDeveloperIds()).build();
-                builder.queryParam("q", filter);
-            }
-
-            if (!request.getNames().isEmpty()) {
-                String filter = new FilterBuilder("name").in(request.getNames()).build();
-                builder.queryParam("q", filter);
-            }
-
-            if (!request.getOrganizationIds().isEmpty()) {
-                String filter = new FilterBuilder("organization_guid").in(request.getOrganizationIds()).build();
-                builder.queryParam("q", filter);
-            }
-
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
             URI uri = builder.build().toUri();
             this.logger.debug("Requesting List Spaces at {}", uri);
 
@@ -96,7 +78,7 @@ public final class SpringSpace implements Space {
                 subscriber.onNext(response);
                 subscriber.onCompleted();
             } catch (HttpStatusCodeException e) {
-                throw CloudFoundryExceptionBuilder.build(e);
+                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
             }
         });
     }

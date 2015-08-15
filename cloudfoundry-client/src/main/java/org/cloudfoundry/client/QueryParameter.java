@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.v2;
+package org.cloudfoundry.client;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A builder for less than or equal to filters
+ * An annotation indicating that a method represents a query parameter
  */
-public interface LessThanOrEqualToFilterBuilder {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface QueryParameter {
 
     /**
-     * Builds a new instance of the filter
+     * Returns the name of the query parameter
      *
-     * @return a new instance of the filter
+     * @return the name of the query parameter
      */
-    String build();
+    String value();
 
 }

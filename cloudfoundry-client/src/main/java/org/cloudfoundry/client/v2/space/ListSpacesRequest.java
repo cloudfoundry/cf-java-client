@@ -18,10 +18,13 @@ package org.cloudfoundry.client.v2.space;
 
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
 
 /**
  * The request payload for the List Spaces operation
@@ -43,6 +46,7 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
      *
      * @return the application ids to filter by
      */
+    @FilterParameter("app_guid")
     public List<String> getApplicationIds() {
         return this.applicationIds;
     }
@@ -63,6 +67,7 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
      *
      * @return the developer ids to filter by
      */
+    @FilterParameter("developer_guid")
     public List<String> getDeveloperIds() {
         return this.developerIds;
     }
@@ -83,6 +88,7 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
      *
      * @return the names to filter by
      */
+    @FilterParameter("name")
     public List<String> getNames() {
         return this.names;
     }
@@ -103,6 +109,7 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
      *
      * @return the organization ids to filter by
      */
+    @FilterParameter("organization_guid")
     public List<String> getOrganizationIds() {
         return this.organizationIds;
     }

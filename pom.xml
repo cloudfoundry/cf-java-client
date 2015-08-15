@@ -28,6 +28,7 @@
     <name>Cloud Foundry Java Client Parent</name>
     <version>2.0.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <url>https://github.com/cloudfoundry/cf-java-client</url>
 
     <modules>
       <module>cloudfoundry-client</module>
@@ -130,6 +131,18 @@
                         <goals>
                             <goal>aggregate-jar</goal>
                         </goals>
+                        <configuration>
+                            <groups>
+                                <group>
+                                    <title>Core API</title>
+                                    <packages>org.cloudfoundry.client*</packages>
+                                </group>
+                                <group>
+                                    <title>Spring-Based Implementation</title>
+                                    <packages>org.cloudfoundry.client.spring</packages>
+                                </group>
+                            </groups>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

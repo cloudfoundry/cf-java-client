@@ -24,7 +24,7 @@ public interface Validatable {
     /**
      * Returns whether an instance is valid
      *
-     * @return a result indicating whether an instance is valid, and messages about what is wrong if it is invalid.
+     * @return a result indicating whether an instance is valid, and messages about what is wrong if it is invalid
      */
     ValidationResult isValid();
 }

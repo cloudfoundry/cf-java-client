@@ -14,36 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.v2;
+package org.cloudfoundry.client.v3;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A builder for in filters
+ * An annotation indicating that a method represents a Cloud Foundry V3 filter parameter
  */
-public interface InFilterBuilder {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FilterParameter {
 
     /**
-     * Add in filter
+     * Returns the name of the parameter
      *
-     * @param in the in filter
-     * @return {@code this}
+     * @return the name of the parameter
      */
-    InFilterBuilder in(String in);
-
-    /**
-     * Add in filters
-     *
-     * @param ins the ins filters
-     * @return {@code this}
-     */
-    InFilterBuilder in(List<String> ins);
-
-    /**
-     * Builds a new instance of the filter
-     *
-     * @return a new instance of the filter
-     */
-    String build();
+    String value() default "";
 
 }

@@ -30,4 +30,5 @@ public interface Space {
      * @return the response from the List Spaces request
      */
     Observable<ListSpacesResponse> list(ListSpacesRequest request);
+
 }

@@ -18,10 +18,14 @@ package org.cloudfoundry.client.spring.v3.application;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.client.spring.v3.FilterBuilder;
 import org.cloudfoundry.client.v3.application.Application;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -77,4 +81,29 @@ public final class SpringApplication implements Application {
         });
     }
 
+    @Override
+    public Observable<ListApplicationsResponse> list(ListApplicationsRequest request) {
+        return BehaviorSubject.create(subscriber -> {
+            ValidationResult validationResult = request.isValid();
+            if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                subscriber.onError(new RequestValidationException(validationResult));
+                return;
+            }
+
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root).pathSegment("v3", "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+            URI uri = builder.build().toUri();
+            this.logger.debug("Requesting List Applications at {}", uri);
+
+            try {
+                ListApplicationsResponse response = this.restOperations.getForObject(uri,
+                        ListApplicationsResponse.class);
+                subscriber.onNext(response);
+                subscriber.onCompleted();
+            } catch (HttpStatusCodeException e) {
+                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
+            }
+        });
+    }
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2;
+package org.cloudfoundry.client.v3;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.QueryParameter;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
  * Base class for requests that are paginated
@@ -28,33 +28,9 @@ import org.cloudfoundry.client.QueryParameter;
  */
 public abstract class PaginatedRequest<T extends PaginatedRequest<T>> {
 
-    private volatile OrderDirection orderDirection;
-
     private volatile Integer page;
 
-    private volatile Integer resultsPerPage;
-
-    /**
-     * Returns the order direction
-     *
-     * @return the order direction
-     */
-    @QueryParameter("order-direction")
-    public final OrderDirection getOrderDirection() {
-        return this.orderDirection;
-    }
-
-    /**
-     * Configure the order direction
-     *
-     * @param orderDirection the order direction
-     * @return {@code this}
-     */
-    @SuppressWarnings("unchecked")
-    public final T withOrderDirection(OrderDirection orderDirection) {
-        this.orderDirection = orderDirection;
-        return (T) this;
-    }
+    private volatile Integer perPage;
 
     /**
      * Returns the page
@@ -79,46 +55,44 @@ public abstract class PaginatedRequest<T extends PaginatedRequest<T>> {
     }
 
     /**
-     * Returns the results per page
+     * Returns the per page
      *
-     * @return the results per page
+     * @return the per page
      */
-    @QueryParameter("results-per-page")
-    public final Integer getResultsPerPage() {
-        return this.resultsPerPage;
+    @QueryParameter("per_page")
+    public final Integer getPerPage() {
+        return this.perPage;
     }
 
     /**
-     * Configure the results per page
+     * Configure the per page
      *
-     * @param resultsPerPage the results per page
+     * @param perPage the per page
      * @return {@code this}
      */
     @SuppressWarnings("unchecked")
-    public final T withResultsPerPage(Integer resultsPerPage) {
-        this.resultsPerPage = resultsPerPage;
+    public final T withPerPage(Integer perPage) {
+        this.perPage = perPage;
         return (T) this;
     }
 
     /**
-     * The order direction of the {@link PaginatedRequest}
+     * Returns whether a {@link PaginatedRequest} instance is valid
+     *
+     * @return a result indicating whether an instance is valid, and messages about what is wrong if it is invalid
      */
-    public enum OrderDirection {
+    protected final ValidationResult isPaginatedRequestValid() {
+        ValidationResult result = new ValidationResult();
 
-        /**
-         * Indicates that order should be ascending
-         */
-        ASC,
-
-        /**
-         * Indicates that order should be descending
-         */
-        DESC;
-
-        @Override
-        public String toString() {
-            return name().toLowerCase();
+        if (this.page != null && this.page < 1) {
+            result.invalid("page must be greater than or equal to 1");
         }
 
+        if (this.perPage != null && (this.perPage < 1 || this.perPage > 5_000)) {
+            result.invalid("perPage must be between 1 and 5000 inclusive");
+        }
+
+        return result;
     }
+
 }
