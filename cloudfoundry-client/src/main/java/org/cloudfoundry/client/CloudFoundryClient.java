@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client;
 
-import org.cloudfoundry.client.v2.GetInfoResponse;
+import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.space.Space;
 import org.cloudfoundry.client.v3.application.Application;
-import rx.Observable;
 
 /**
  * Main entry point to the Cloud Foundry Client API
@@ -34,11 +33,11 @@ public interface CloudFoundryClient {
     Application application();
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
+     * Main entry point to the Cloud Foundry Info Client API
      *
-     * @return the response from the Get Info request
+     * @return the Cloud Foundry Info Client API
      */
-    Observable<GetInfoResponse> info();
+    Info info();
 
     /**
      * Main entry point to the Cloud Foundry Space Client API

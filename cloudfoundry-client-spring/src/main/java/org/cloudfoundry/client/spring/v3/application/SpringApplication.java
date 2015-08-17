@@ -78,7 +78,7 @@ public final class SpringApplication implements Application {
                 subscriber.onNext(response);
                 subscriber.onCompleted();
             } catch (HttpStatusCodeException e) {
-                throw CloudFoundryExceptionBuilder.build(e);
+                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
             }
         });
     }
@@ -101,7 +101,7 @@ public final class SpringApplication implements Application {
                 subscriber.onNext(new DeleteApplicationResponse());
                 subscriber.onCompleted();
             } catch (HttpStatusCodeException e) {
-                throw CloudFoundryExceptionBuilder.build(e);
+                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
             }
         });
     }
@@ -131,4 +131,5 @@ public final class SpringApplication implements Application {
             }
         });
     }
+
 }

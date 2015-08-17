@@ -203,4 +203,5 @@ public final class SpringApplicationTest extends AbstractRestTest {
     public void listInvalidRequest() {
         this.application.list(new ListApplicationsRequest().withPage(-1)).subscribe(new ExpectedExceptionSubscriber());
     }
+
 }

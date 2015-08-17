@@ -17,25 +17,17 @@
 package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.space.SpringSpace;
 import org.cloudfoundry.client.spring.v3.application.SpringApplication;
-import org.cloudfoundry.client.v2.GetInfoResponse;
+import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.space.Space;
 import org.cloudfoundry.client.v3.application.Application;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 import java.net.URI;
 
 final class SpringCloudFoundryClient implements CloudFoundryClient {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final RestOperations restOperations;
 
@@ -56,19 +48,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public Observable<GetInfoResponse> info() {
-        return BehaviorSubject.create(subscriber -> {
-            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "info").build().toUri();
-            this.logger.debug("Requesting Get Info at {}", uri);
-
-            try {
-                GetInfoResponse response = this.restOperations.getForObject(uri, GetInfoResponse.class);
-                subscriber.onNext(response);
-                subscriber.onCompleted();
-            } catch (HttpStatusCodeException e) {
-                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
-            }
-        });
+    public Info info() {
+        return new SpringInfo(this.restOperations, this.root);
     }
 
     @Override

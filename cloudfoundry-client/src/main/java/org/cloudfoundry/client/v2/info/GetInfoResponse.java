@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2;
+package org.cloudfoundry.client.v2.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

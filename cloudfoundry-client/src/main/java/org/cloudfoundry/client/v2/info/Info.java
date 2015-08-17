@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring;
+package org.cloudfoundry.client.v2.info;
 
-import org.junit.Test;
+import rx.Observable;
 
-import static org.junit.Assert.assertNotNull;
+/**
+ * Main entry point to the Cloud Foundry Info Client API
+ */
+public interface Info {
 
-public final class SpringCloudFoundryClientTest extends AbstractRestTest {
-
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
-
-    @Test
-    public void application() {
-        assertNotNull(this.client.application());
-    }
-
-    @Test
-    public void info() {
-        assertNotNull(this.client.info());
-    }
-
-    @Test
-    public void space() {
-        assertNotNull(this.client.space());
-    }
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
+     *
+     * @return the response from the Get Info request
+     */
+    Observable<GetInfoResponse> get();
 
 }
