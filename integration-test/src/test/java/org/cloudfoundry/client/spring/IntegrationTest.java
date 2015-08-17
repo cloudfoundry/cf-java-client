@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.space.ListSpacesRequest;
 import org.cloudfoundry.client.v2.space.ListSpacesResponse;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.application.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.application.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
 import org.junit.Before;
@@ -59,23 +61,22 @@ public final class IntegrationTest {
     }
 
     @Test
-    public void test() {
+    public void test() throws InterruptedException {
         listApplications()
                 .flatMap(this::split)
-                .subscribe(this::deleteApplication, this::handleError,
+                .flatMap(this::deleteApplication)
+                .subscribe(response -> {
+                        },
+                        this::handleError,
                         () -> this.logger.info("All existing applications deleted"));
 
         listSpaces()
                 .flatMap(this::createApplication)
+                .doOnNext(this::printApplication)
+                .flatMap(this::deleteApplication)
                 .subscribe(response -> {
-                    this.logger.info("Name: {}", response.getName());
-                    this.logger.info("Id:   {}", response.getId());
-
-                    response.getLinks().entrySet().stream().forEach(entry -> {
-                        this.logger.info("Link: {}/{}", entry.getKey(), entry.getValue().getHref());
-                    });
-
-                }, this::handleError);
+                        }, this::handleError,
+                        () -> this.logger.info("Application deleted"));
     }
 
     private void handleError(Throwable exception) {
@@ -93,8 +94,18 @@ public final class IntegrationTest {
         });
     }
 
-    private void deleteApplication(ListApplicationsResponse.Resource resource) {
-        this.logger.info("Application: {}/{}", resource.getName(), resource.getId());
+    private Observable<DeleteApplicationResponse> deleteApplication(ListApplicationsResponse.Resource resource) {
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId(resource.getId());
+
+        return this.client.application().delete(request);
+    }
+
+    private Observable<DeleteApplicationResponse> deleteApplication(CreateApplicationResponse response) {
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId(response.getId());
+
+        return this.client.application().delete(request);
     }
 
     private Observable<ListSpacesResponse> listSpaces() {
@@ -115,6 +126,15 @@ public final class IntegrationTest {
                 .withName(this.application);
 
         return this.client.application().create(request);
+    }
+
+    private void printApplication(CreateApplicationResponse response) {
+        this.logger.info("Application Created");
+        this.logger.info("  {}/{}", response.getName(), response.getId());
+
+        response.getLinks().entrySet().stream().forEach(entry -> {
+            this.logger.info("    {} {}", entry.getKey(), entry.getValue().getHref());
+        });
     }
 
 }

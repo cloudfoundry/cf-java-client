@@ -24,6 +24,8 @@ import org.cloudfoundry.client.spring.v3.FilterBuilder;
 import org.cloudfoundry.client.v3.application.Application;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.application.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.application.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
 import org.slf4j.Logger;
@@ -74,6 +76,29 @@ public final class SpringApplication implements Application {
                 CreateApplicationResponse response = this.restOperations.postForObject(uri, request,
                         CreateApplicationResponse.class);
                 subscriber.onNext(response);
+                subscriber.onCompleted();
+            } catch (HttpStatusCodeException e) {
+                throw CloudFoundryExceptionBuilder.build(e);
+            }
+        });
+    }
+
+    @Override
+    public Observable<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
+        return BehaviorSubject.create(subscriber -> {
+            ValidationResult validationResult = request.isValid();
+            if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                subscriber.onError(new RequestValidationException(validationResult));
+                return;
+            }
+
+            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v3", "apps", request.getId())
+                    .build().toUri();
+            this.logger.debug("Requesting Delete Application at {}", uri);
+
+            try {
+                this.restOperations.delete(uri);
+                subscriber.onNext(new DeleteApplicationResponse());
                 subscriber.onCompleted();
             } catch (HttpStatusCodeException e) {
                 throw CloudFoundryExceptionBuilder.build(e);

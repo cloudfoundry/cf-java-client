@@ -18,8 +18,8 @@ package org.cloudfoundry.client.spring.v3.application;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
-import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.application.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsResponse.Resource;
 import org.junit.Test;
@@ -28,13 +28,13 @@ import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -108,6 +108,42 @@ public final class SpringApplicationTest extends AbstractRestTest {
     @Test
     public void createInvalidRequest() throws Throwable {
         this.application.create(new CreateApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void delete() {
+
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(OK));
+
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId("test-id");
+
+        this.application.delete(request).subscribe(response -> {
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void deleteError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId("test-id");
+
+        this.application.delete(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void deleteInvalidRequest() {
+        this.application.delete(new DeleteApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
     }
 
     @Test
