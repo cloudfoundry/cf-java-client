@@ -10,7 +10,7 @@ import java.util.UUID;
  *
  */
 public class CloudServiceUsageEvent extends CloudEntity {
-	private InstanceState state;
+	private ServiceState state;
 	private UUID orgGUID;
 	private UUID spaceGUID;
 	private String spaceName;
@@ -21,9 +21,21 @@ public class CloudServiceUsageEvent extends CloudEntity {
 	private String servicePlanName;
 	private UUID serviceGUID;
 	private String serviceLabel;
-	
+
 	public CloudServiceUsageEvent(Meta meta, String name) {
 		super(meta, name);
+	}
+
+	public static enum ServiceState {
+		CREATED, DELETED, UPDATED, UNKNOWN;
+
+		public static ServiceState valueOfWithDefault(String type) {
+			try {
+				return ServiceState.valueOf(type);
+			} catch (IllegalArgumentException e) {
+				return UNKNOWN;
+			}
+		}
 	}
 
 	public static enum ServiceInstanceType {
@@ -31,18 +43,18 @@ public class CloudServiceUsageEvent extends CloudEntity {
 
 		public static ServiceInstanceType valueOfWithDefault(String type) {
 			try {
-				return ServiceInstanceType.valueOf(type);
+				return ServiceInstanceType.valueOf(type.toUpperCase());
 			} catch (IllegalArgumentException e) {
-				return ServiceInstanceType.UNKNOWN;
+				return UNKNOWN;
 			}
 		}
 	}
 
-	public InstanceState getState() {
+	public ServiceState getState() {
 		return state;
 	}
 
-	public void setState(InstanceState state) {
+	public void setState(ServiceState state) {
 		this.state = state;
 	}
 

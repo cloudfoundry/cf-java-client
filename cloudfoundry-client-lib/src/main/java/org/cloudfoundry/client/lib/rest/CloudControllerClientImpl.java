@@ -1053,7 +1053,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	@Override
 	public List<CloudServiceUsageEvent> getServiceUsageEvents() {
 		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "/v2/app_usage_events";
+		String urlPath = "/v2/service_usage_events";
 		return doGetServiceUsageEvents(urlPath, urlVars);
 	}
 	
