@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateApplicationRequestTest {
@@ -53,7 +54,7 @@ public final class CreateApplicationRequestTest {
                 .withSpaceId("test-space-id")
                 .isValid();
 
-        assertEquals(ValidationResult.Status.VALID, result.getStatus());
+        assertEquals(VALID, result.getStatus());
     }
 
     @Test

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.QueryParameter;
 
 /**

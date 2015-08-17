@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;

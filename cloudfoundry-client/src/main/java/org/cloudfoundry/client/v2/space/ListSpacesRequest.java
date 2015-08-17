@@ -24,8 +24,6 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
-
 /**
  * The request payload for the List Spaces operation
  *

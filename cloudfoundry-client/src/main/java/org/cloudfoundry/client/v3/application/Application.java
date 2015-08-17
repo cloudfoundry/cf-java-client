@@ -33,6 +33,15 @@ public interface Application {
     Observable<CreateApplicationResponse> create(CreateApplicationRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/delete_an_app.html">Delete
+     * Application</a> request
+     *
+     * @param request the Delete Application request
+     * @return the response from the Delete Application request
+     */
+    Observable<DeleteApplicationResponse> delete(DeleteApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List
      * Applications</a> request
      *

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
