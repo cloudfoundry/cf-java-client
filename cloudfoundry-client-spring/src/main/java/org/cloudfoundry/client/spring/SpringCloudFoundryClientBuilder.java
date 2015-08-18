@@ -16,7 +16,14 @@
 
 package org.cloudfoundry.client.spring;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -27,6 +34,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
@@ -37,6 +45,8 @@ import java.util.Map;
  * <p><b>This class is NOT threadsafe.  The {@link CloudFoundryClient} created by it, is threadsafe.</b>
  */
 public final class SpringCloudFoundryClientBuilder {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final RestOperations restOperations;
 
@@ -110,12 +120,8 @@ public final class SpringCloudFoundryClientBuilder {
         Assert.hasText(this.username, "username must be set");
         Assert.hasText(this.password, "password must be set");
 
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails();
-        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
-        RestOperations restOperations = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-
         URI root = UriComponentsBuilder.newInstance().scheme("https").host(this.host).build().toUri();
-        return new SpringCloudFoundryClient(restOperations, root);
+        return new SpringCloudFoundryClient(getRestOperations(), root);
     }
 
     private OAuth2ClientContext getOAuth2ClientContext() {
@@ -132,6 +138,23 @@ public final class SpringCloudFoundryClientBuilder {
                 .build();
     }
 
+    private RestTemplate getRestOperations() {
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails();
+        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
+
+        RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+        restTemplate.getMessageConverters().stream()
+                .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+                .map(converter -> (MappingJackson2HttpMessageConverter) converter)
+                .findFirst()
+                .ifPresent(converter -> {
+                    this.logger.debug("Modifying ObjectMapper configuration");
+                    converter.getObjectMapper().addHandler(new LoggingDeserializationProblemHandler());
+                });
+
+        return restTemplate;
+    }
+
     @SuppressWarnings("unchecked")
     private String getAccessTokenUri() {
         String infoUri = UriComponentsBuilder.newInstance()
@@ -145,4 +168,18 @@ public final class SpringCloudFoundryClientBuilder {
                 .build().toUriString();
     }
 
+    private static final class LoggingDeserializationProblemHandler extends DeserializationProblemHandler {
+
+        private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+        @Override
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp,
+                                             JsonDeserializer<?> deserializer, Object beanOrClass,
+                                             String propertyName) throws IOException {
+            this.logger.warn("Found unexpected property {} in payload for {}",
+                    propertyName, beanOrClass.getClass().getSimpleName());
+            return true;
+        }
+
+    }
 }

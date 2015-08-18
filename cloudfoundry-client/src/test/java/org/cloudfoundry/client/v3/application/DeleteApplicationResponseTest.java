@@ -24,4 +24,5 @@ public final class DeleteApplicationResponseTest {
     public void test() {
         new DeleteApplicationResponse();
     }
+
 }

@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.space;
-
-import rx.Observable;
+package org.cloudfoundry.client.v3.application;
 
 /**
- * Main entry point to the Cloud Foundry Space Client API
+ * The response payload for the Get Application operation
+ *
+ * <p><b>This class is NOT threadsafe.</b>
  */
-public interface Space {
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_spaces.html">List Spaces</a> request
-     *
-     * @param request the List Spaces request
-     * @return the response from the List Spaces request
-     */
-    Observable<ListSpacesResponse> list(ListSpacesRequest request);
-
+public final class GetApplicationResponse extends Application<GetApplicationResponse> {
 }

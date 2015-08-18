@@ -18,14 +18,13 @@ package org.cloudfoundry.client.spring.v2.space;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.space.ListSpacesRequest;
 import org.cloudfoundry.client.v2.space.ListSpacesResponse;
-import org.cloudfoundry.client.v2.space.Space;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.cloudfoundry.client.v2.space.Spaces;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,15 +36,9 @@ import java.net.URI;
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 
 /**
- * The Spring-based implementation of {@link Space}
+ * The Spring-based implementation of {@link Spaces}
  */
-public final class SpringSpace implements Space {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private final RestOperations restOperations;
-
-    private final URI root;
+public final class SpringSpaces extends AbstractSpringOperations implements Spaces {
 
     /**
      * Creates an instance
@@ -53,34 +46,18 @@ public final class SpringSpace implements Space {
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      */
-    public SpringSpace(RestOperations restOperations, URI root) {
-        this.restOperations = restOperations;
-        this.root = root;
+    public SpringSpaces(RestOperations restOperations, URI root) {
+        super(restOperations, root);
     }
 
     @Override
     public Observable<ListSpacesResponse> list(ListSpacesRequest request) {
-        return BehaviorSubject.create(subscriber -> {
-            ValidationResult validationResult = request.isValid();
-            if (validationResult.getStatus() == INVALID) {
-                subscriber.onError(new RequestValidationException(validationResult));
-                return;
-            }
-
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "spaces");
+        return get(request, ListSpacesResponse.class, builder -> {
+            builder.pathSegment("v2", "spaces");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
-            URI uri = builder.build().toUri();
-            this.logger.debug("Requesting List Spaces at {}", uri);
-
-            try {
-                ListSpacesResponse response = this.restOperations.getForObject(uri, ListSpacesResponse.class);
-                subscriber.onNext(response);
-                subscriber.onCompleted();
-            } catch (HttpStatusCodeException e) {
-                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
-            }
         });
+
     }
 
 }

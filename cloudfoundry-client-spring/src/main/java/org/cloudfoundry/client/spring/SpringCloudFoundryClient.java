@@ -18,11 +18,11 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
-import org.cloudfoundry.client.spring.v2.space.SpringSpace;
-import org.cloudfoundry.client.spring.v3.application.SpringApplication;
+import org.cloudfoundry.client.spring.v2.space.SpringSpaces;
+import org.cloudfoundry.client.spring.v3.application.SpringApplications;
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.client.v2.space.Space;
-import org.cloudfoundry.client.v3.application.Application;
+import org.cloudfoundry.client.v2.space.Spaces;
+import org.cloudfoundry.client.v3.application.Applications;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;
@@ -43,8 +43,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public Application application() {
-        return new SpringApplication(this.restOperations, this.root);
+    public Applications applications() {
+        return new SpringApplications(this.restOperations, this.root);
     }
 
     @Override
@@ -53,8 +53,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public Space space() {
-        return new SpringSpace(this.restOperations, this.root);
+    public Spaces spaces() {
+        return new SpringSpaces(this.restOperations, this.root);
     }
 
 }
