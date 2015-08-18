@@ -17,29 +17,18 @@
 package org.cloudfoundry.client.spring.v2.info;
 
 
-import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 import java.net.URI;
 
 /**
  * The Spring-based implementation of {@link Info}
  */
-public final class SpringInfo implements Info {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private final RestOperations restOperations;
-
-    private final URI root;
+public final class SpringInfo extends AbstractSpringOperations implements Info {
 
     /**
      * Creates an instance
@@ -48,24 +37,12 @@ public final class SpringInfo implements Info {
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      */
     public SpringInfo(RestOperations restOperations, URI root) {
-        this.restOperations = restOperations;
-        this.root = root;
+        super(restOperations, root);
     }
 
     @Override
     public Observable<GetInfoResponse> get() {
-        return BehaviorSubject.create(subscriber -> {
-            URI uri = UriComponentsBuilder.fromUri(this.root).pathSegment("v2", "info").build().toUri();
-            this.logger.debug("Requesting Get Info at {}", uri);
-
-            try {
-                GetInfoResponse response = this.restOperations.getForObject(uri, GetInfoResponse.class);
-                subscriber.onNext(response);
-                subscriber.onCompleted();
-            } catch (HttpStatusCodeException e) {
-                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
-            }
-        });
+        return get(null, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"));
     }
 
 }

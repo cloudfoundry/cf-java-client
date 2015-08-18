@@ -33,9 +33,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-public final class SpringSpaceTest extends AbstractRestTest {
+public final class SpringSpacesTest extends AbstractRestTest {
 
-    private final SpringSpace space = new SpringSpace(this.restTemplate, this.root);
+    private final SpringSpaces space = new SpringSpaces(this.restTemplate, this.root);
 
     @Test
     public void list() {

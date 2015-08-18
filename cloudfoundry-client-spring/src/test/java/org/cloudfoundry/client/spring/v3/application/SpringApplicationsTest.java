@@ -20,6 +20,7 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.application.GetApplicationRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsResponse.Resource;
 import org.junit.Test;
@@ -43,9 +44,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-public final class SpringApplicationTest extends AbstractRestTest {
+public final class SpringApplicationsTest extends AbstractRestTest {
 
-    private final SpringApplication application = new SpringApplication(this.restTemplate, this.root);
+    private final SpringApplications application = new SpringApplications(this.restTemplate, this.root);
 
     @Test
     public void create() throws IOException {
@@ -111,8 +112,63 @@ public final class SpringApplicationTest extends AbstractRestTest {
     }
 
     @Test
-    public void delete() {
+    public void get() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
 
+        GetApplicationRequest request = new GetApplicationRequest()
+                .withId("test-id");
+
+        this.application.get(request).subscribe(response -> {
+            assertEquals("name-2068", response.getBuildpack());
+            assertEquals("2015-08-06T00:36:52Z", response.getCreatedAt());
+            assertEquals("STOPPED", response.getDesiredState());
+            assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
+            assertEquals("guid-a2ea0b27-971f-4f59-a9e4-d299e96c3f20", response.getId());
+
+            assertEquals(10, response.getLinks().size());
+            assertNotNull(response.getLink("self"));
+            assertNotNull(response.getLink("processes"));
+            assertNotNull(response.getLink("routes"));
+            assertNotNull(response.getLink("packages"));
+            assertNotNull(response.getLink("droplet"));
+            assertNotNull(response.getLink("droplets"));
+            assertNotNull(response.getLink("space"));
+            assertNotNull(response.getLink("start"));
+            assertNotNull(response.getLink("stop"));
+            assertNotNull(response.getLink("assign_current_droplet"));
+
+            assertEquals("my_app", response.getName());
+            assertEquals(Integer.valueOf(3), response.getTotalDesiredInstances());
+            assertNull(response.getUpdatedAt());
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void getError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetApplicationRequest request = new GetApplicationRequest()
+                .withId("test-id");
+
+        this.application.get(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void getInvalidRequest() {
+        this.application.get(new GetApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void delete() {
         this.mockServer
                 .expect(method(DELETE))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))

@@ -17,8 +17,8 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.client.v2.space.Space;
-import org.cloudfoundry.client.v3.application.Application;
+import org.cloudfoundry.client.v2.space.Spaces;
+import org.cloudfoundry.client.v3.application.Applications;
 
 /**
  * Main entry point to the Cloud Foundry Client API
@@ -26,11 +26,11 @@ import org.cloudfoundry.client.v3.application.Application;
 public interface CloudFoundryClient {
 
     /**
-     * Main entry point to the Cloud Foundry Application Client API
+     * Main entry point to the Cloud Foundry Applications Client API
      *
      * @return the Cloud Foundry Application Client API
      */
-    Application application();
+    Applications applications();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API
@@ -40,10 +40,10 @@ public interface CloudFoundryClient {
     Info info();
 
     /**
-     * Main entry point to the Cloud Foundry Space Client API
+     * Main entry point to the Cloud Foundry Spaces Client API
      *
      * @return the Cloud Foundry Space Client API
      */
-    Space space();
+    Spaces spaces();
 
 }

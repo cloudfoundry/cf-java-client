@@ -84,7 +84,7 @@ public final class IntegrationTest {
     }
 
     private Observable<ListApplicationsResponse> listApplications() {
-        return this.client.application().list(new ListApplicationsRequest());
+        return this.client.applications().list(new ListApplicationsRequest());
     }
 
     private Observable<ListApplicationsResponse.Resource> split(ListApplicationsResponse response) {
@@ -98,21 +98,21 @@ public final class IntegrationTest {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId(resource.getId());
 
-        return this.client.application().delete(request);
+        return this.client.applications().delete(request);
     }
 
     private Observable<DeleteApplicationResponse> deleteApplication(CreateApplicationResponse response) {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId(response.getId());
 
-        return this.client.application().delete(request);
+        return this.client.applications().delete(request);
     }
 
     private Observable<ListSpacesResponse> listSpaces() {
         ListSpacesRequest request = new ListSpacesRequest()
                 .filterByName(this.space);
 
-        return this.client.space().list(request);
+        return this.client.spaces().list(request);
     }
 
     private Observable<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
@@ -125,7 +125,7 @@ public final class IntegrationTest {
                 .withSpaceId(metadata.getId())
                 .withName(this.application);
 
-        return this.client.application().create(request);
+        return this.client.applications().create(request);
     }
 
     private void printApplication(CreateApplicationResponse response) {
