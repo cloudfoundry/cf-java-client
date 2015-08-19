@@ -57,7 +57,6 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
-
     }
 
 }
