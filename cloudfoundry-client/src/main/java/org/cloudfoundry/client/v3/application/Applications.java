@@ -59,4 +59,13 @@ public interface Applications {
      */
     Observable<ListApplicationsResponse> list(ListApplicationsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start
+     * Application</a> request
+     *
+     * @param request the Start Application request
+     * @return the response from the Start Application request
+     */
+    Observable<StartApplicationResponse> start(StartApplicationRequest request);
+
 }

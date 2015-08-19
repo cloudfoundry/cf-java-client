@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v3.application;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v3.FilterBuilder;
+import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.application.Applications;
 import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
@@ -28,10 +29,13 @@ import org.cloudfoundry.client.v3.application.GetApplicationRequest;
 import org.cloudfoundry.client.v3.application.GetApplicationResponse;
 import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.application.StartApplicationRequest;
+import org.cloudfoundry.client.v3.application.StartApplicationResponse;
 import org.springframework.web.client.RestOperations;
 import rx.Observable;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * The Spring-based implementation of {@link Applications}
@@ -71,6 +75,19 @@ public final class SpringApplications extends AbstractSpringOperations implement
             builder.pathSegment("v3", "apps");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
+        });
+    }
+
+    @Override
+    public Observable<StartApplicationResponse> start(StartApplicationRequest request) {
+        return put(request, StartApplicationResponse.class, builder -> {
+            Optional<Link> link = Optional.ofNullable(request.getLink());
+
+            if (link.isPresent()) {
+                builder.path(link.get().getHref());
+            } else {
+                builder.pathSegment("v3", "apps", request.getId(), "start");
+            }
         });
     }
 

@@ -22,6 +22,7 @@ import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.RequestEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,6 +32,8 @@ import rx.subjects.BehaviorSubject;
 import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.springframework.http.HttpMethod.PUT;
 
 public abstract class AbstractSpringOperations {
 
@@ -46,10 +49,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Observable<T> get(Validatable request, Class<T> responseType,
-                                          Consumer<UriComponentsBuilder> uriBuilder) {
+                                          Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            uriBuilder.accept(builder);
+            builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("GET {}", uri);
@@ -58,10 +61,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Observable<T> delete(Validatable request, T response,
-                                             Consumer<UriComponentsBuilder> uriBuilder) {
+                                             Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            uriBuilder.accept(builder);
+            builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("DELETE {}", uri);
@@ -71,15 +74,28 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Observable<T> post(Validatable request, Class<T> responseType,
-                                           Consumer<UriComponentsBuilder> uriBuilder) {
+                                           Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            uriBuilder.accept(builder);
+            builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("POST {}", uri);
             return this.restOperations.postForObject(uri, request, responseType);
         });
+    }
+
+    protected final <T> Observable<T> put(Validatable request, Class<T> responseType,
+                                          Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, () -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
+
+            this.logger.debug("PUT {}", uri);
+            return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
+        });
+
     }
 
     private <T> Observable<T> exchange(Validatable request, Supplier<T> exchange) {
