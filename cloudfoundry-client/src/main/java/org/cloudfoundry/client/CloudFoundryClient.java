@@ -17,8 +17,8 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.client.v2.space.Spaces;
-import org.cloudfoundry.client.v3.application.Applications;
+import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v3.applications.Applications;
 
 /**
  * Main entry point to the Cloud Foundry Client API

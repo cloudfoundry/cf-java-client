@@ -18,14 +18,15 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.space.ListSpacesRequest;
-import org.cloudfoundry.client.v2.space.ListSpacesResponse;
-import org.cloudfoundry.client.v3.application.CreateApplicationRequest;
-import org.cloudfoundry.client.v3.application.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.application.DeleteApplicationRequest;
-import org.cloudfoundry.client.v3.application.DeleteApplicationResponse;
-import org.cloudfoundry.client.v3.application.ListApplicationsRequest;
-import org.cloudfoundry.client.v3.application.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,7 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+
+import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.BITS;
 
 public final class IntegrationTest {
 
@@ -72,7 +74,7 @@ public final class IntegrationTest {
 
         listSpaces()
                 .flatMap(this::createApplication)
-                .doOnNext(this::printApplication)
+                .flatMap(this::createPackage)
                 .flatMap(this::deleteApplication)
                 .subscribe(response -> {
                         }, this::handleError,
@@ -88,10 +90,7 @@ public final class IntegrationTest {
     }
 
     private Observable<ListApplicationsResponse.Resource> split(ListApplicationsResponse response) {
-        return BehaviorSubject.create(subscriber -> {
-            response.getResources().forEach(subscriber::onNext);
-            subscriber.onCompleted();
-        });
+        return Observable.from(response.getResources());
     }
 
     private Observable<DeleteApplicationResponse> deleteApplication(ListApplicationsResponse.Resource resource) {
@@ -128,12 +127,17 @@ public final class IntegrationTest {
         return this.client.applications().create(request);
     }
 
-    private void printApplication(CreateApplicationResponse response) {
-        this.logger.info("Application Created");
-        this.logger.info("  {}/{}", response.getName(), response.getId());
+    private Observable<CreateApplicationResponse> createPackage(CreateApplicationResponse response) {
+        return Observable.create(subscriber -> {
+            CreatePackageRequest request = new CreatePackageRequest()
+                    .withLink(response)
+                    .withType(BITS);
 
-        response.getLinks().entrySet().stream().forEach(entry -> {
-            this.logger.info("    {} {}", entry.getKey(), entry.getValue().getHref());
+            this.client.applications().packages().create(request)
+                    .subscribe(createPackageResponse -> {
+                            },
+                            this::handleError,
+                            subscriber::onCompleted);
         });
     }
 
