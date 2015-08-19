@@ -27,9 +27,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+import rx.Subscriber;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -39,9 +40,9 @@ public abstract class AbstractSpringOperations {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final RestOperations restOperations;
+    protected final RestOperations restOperations;
 
-    private final URI root;
+    protected final URI root;
 
     protected AbstractSpringOperations(RestOperations restOperations, URI root) {
         this.restOperations = restOperations;
@@ -98,8 +99,18 @@ public abstract class AbstractSpringOperations {
 
     }
 
+    protected final <T> void optional(T value, Consumer<T> ifPresent, Runnable ifNotPresent) {
+        Optional<T> optional = Optional.ofNullable(value);
+
+        if (optional.isPresent()) {
+            ifPresent.accept(optional.get());
+        } else {
+            ifNotPresent.run();
+        }
+    }
+
     private <T> Observable<T> exchange(Validatable request, Supplier<T> exchange) {
-        return BehaviorSubject.create(subscriber -> {
+        return Observable.create(subscriber -> {
             if (request != null) {
                 ValidationResult validationResult = request.isValid();
                 if (validationResult.getStatus() == ValidationResult.Status.INVALID) {

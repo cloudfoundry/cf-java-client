@@ -1,0 +1,4 @@
+{
+  "type": "docker",
+  "url": "docker://cloudfoundry/runtime-ci"
+}

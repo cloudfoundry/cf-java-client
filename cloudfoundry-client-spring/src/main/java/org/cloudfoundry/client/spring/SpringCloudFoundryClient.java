@@ -18,11 +18,11 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
-import org.cloudfoundry.client.spring.v2.space.SpringSpaces;
-import org.cloudfoundry.client.spring.v3.application.SpringApplications;
+import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
+import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
 import org.cloudfoundry.client.v2.info.Info;
-import org.cloudfoundry.client.v2.space.Spaces;
-import org.cloudfoundry.client.v3.application.Applications;
+import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v3.applications.Applications;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;

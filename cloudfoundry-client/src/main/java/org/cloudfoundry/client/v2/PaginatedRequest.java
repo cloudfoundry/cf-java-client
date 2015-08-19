@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v2;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.cloudfoundry.client.QueryParameter;
 
 /**
@@ -114,6 +115,7 @@ public abstract class PaginatedRequest<T extends PaginatedRequest<T>> {
          */
         DESC;
 
+        @JsonValue
         @Override
         public String toString() {
             return name().toLowerCase();

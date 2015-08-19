@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -100,7 +101,7 @@ public abstract class PaginatedAndSortedRequest<T extends PaginatedAndSortedRequ
          */
         UPDATED_AT;
 
-
+        @JsonValue
         @Override
         public String toString() {
             return name().toLowerCase();
@@ -122,6 +123,7 @@ public abstract class PaginatedAndSortedRequest<T extends PaginatedAndSortedRequ
          */
         DESC;
 
+        @JsonValue
         @Override
         public String toString() {
             return name().toLowerCase();
