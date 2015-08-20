@@ -18,14 +18,17 @@ package org.cloudfoundry.client.spring.v3.packages;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
@@ -159,6 +162,71 @@ public final class SpringPackagesTest extends AbstractRestTest {
     @Test
     public void getInvalidRequest() {
         this.packages.get(new GetPackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void stage() {
+        this.mockServer
+                .expect(method(POST))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/droplets"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_{id}_droplets_request.json")))
+                .andRespond(withStatus(CREATED)
+                        .body(new ClassPathResource("v3/packages/POST_{id}_droplets_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        StagePackageRequest request = new StagePackageRequest()
+                .withBuildpack("http://github.com/myorg/awesome-buildpack")
+                .withEnvironmentVariable("CUSTOM_ENV_VAR", "hello")
+                .withId("test-id")
+                .withStack("cflinuxfs2");
+
+        this.packages.stage(request).subscribe(response -> {
+            assertEquals("http://buildpack.git.url.com", response.getBuildpack());
+            assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
+            assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
+            assertEquals("example error", response.getError());
+
+            Hash hash = response.getHash();
+            assertEquals("sha1", hash.getType());
+            assertNull(hash.getValue());
+
+            assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
+
+            assertEquals(4, response.getLinks().size());
+            assertNotNull(response.getLink("self"));
+            assertNotNull(response.getLink("package"));
+            assertNotNull(response.getLink("app"));
+            assertNotNull(response.getLink("assign_current_droplet"));
+
+            assertNull(response.getProcfile());
+            assertEquals("STAGED", response.getState());
+            assertNull(response.getUpdatedAt());
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void stageError() {
+        this.mockServer
+                .expect(method(POST))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/droplets"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_{id}_droplets_request.json")))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        StagePackageRequest request = new StagePackageRequest()
+                .withBuildpack("http://github.com/myorg/awesome-buildpack")
+                .withEnvironmentVariable("CUSTOM_ENV_VAR", "hello")
+                .withId("test-id")
+                .withStack("cflinuxfs2");
+
+        this.packages.stage(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void stageInvalidRequest() {
+        this.packages.stage(new StagePackageRequest()).subscribe(new ExpectedExceptionSubscriber());
     }
 
     @Test

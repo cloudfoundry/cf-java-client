@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.Packages;
+import org.cloudfoundry.client.v3.packages.StagePackageRequest;
+import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.slf4j.Logger;
@@ -63,6 +65,12 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     public Observable<GetPackageResponse> get(GetPackageRequest request) {
         return get(request, GetPackageResponse.class,
                 builder -> builder.pathSegment("v3", "packages", request.getId()));
+    }
+
+    @Override
+    public Observable<StagePackageResponse> stage(StagePackageRequest request) {
+        return post(request, StagePackageResponse.class,
+                builder -> builder.pathSegment("v3", "packages", request.getId(), "droplets"));
     }
 
     @Override

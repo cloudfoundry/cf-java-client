@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 /**
  * A builder API for creating a Spring-backed implementation of the {@link CloudFoundryClient}.  By default it uses
  * {@code cf} and an empty string for the {@code clientId} and {@code clientSecret} respectively.
@@ -149,7 +151,9 @@ public final class SpringCloudFoundryClientBuilder {
                 .findFirst()
                 .ifPresent(converter -> {
                     this.logger.debug("Modifying ObjectMapper configuration");
-                    converter.getObjectMapper().addHandler(new LoggingDeserializationProblemHandler());
+                    converter.getObjectMapper()
+                            .addHandler(new LoggingDeserializationProblemHandler())
+                            .setSerializationInclusion(NON_NULL);
                 });
 
         return restTemplate;

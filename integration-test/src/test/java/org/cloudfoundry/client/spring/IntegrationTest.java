@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.StagePackageRequest;
+import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.junit.Before;
@@ -83,9 +85,15 @@ public final class IntegrationTest {
 
         listSpaces()
                 .flatMap(this::createApplication)
+                .doOnNext(response -> this.logger.info("Application created"))
                 .flatMap(this::createPackage)
+                .doOnNext(response -> this.logger.info("Package created"))
                 .flatMap(this::uploadBits)
+                .doOnNext(response -> this.logger.info("Package uploading"))
                 .flatMap(this::waitForUploadProcessing)
+                .doOnNext(response -> this.logger.info("Package uploaded"))
+                .flatMap(this::stagePackage)
+                .doOnNext(response -> this.logger.info("Package staging"))
                 .first()
                 .subscribe(response -> {
                     this.logger.info(response.getState());
@@ -120,29 +128,6 @@ public final class IntegrationTest {
         return this.client.applications().delete(request);
     }
 
-    private Observable<GetPackageResponse> waitForUploadProcessing(UploadPackageResponse uploadPackageResponse) {
-        return Observable.<GetPackageResponse>create(subscriber -> {
-            for (; ; ) {
-                GetPackageRequest request = new GetPackageRequest()
-                        .withId(uploadPackageResponse.getId());
-
-                this.client.packages().get(request)
-                        .subscribe(subscriber::onNext);
-
-                if (subscriber.isUnsubscribed()) {
-                    subscriber.onCompleted();
-                    break;
-                }
-
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).filter(getPackageResponse -> "READY".equals(getPackageResponse.getState()));
-    }
-
     private void handleError(Throwable exception) {
         this.logger.error("Error encountered: {}", exception.getMessage());
     }
@@ -162,12 +147,44 @@ public final class IntegrationTest {
         return Observable.from(response.getResources());
     }
 
+    private Observable<StagePackageResponse> stagePackage(GetPackageResponse response) {
+        StagePackageRequest request = new StagePackageRequest()
+                .withId(response.getId())
+                .withBuildpack("https://github.com/cloudfoundry/java-buildpack.git");
+
+        return this.client.packages().stage(request);
+    }
+
     private Observable<UploadPackageResponse> uploadBits(CreatePackageResponse response) {
         UploadPackageRequest request = new UploadPackageRequest()
                 .withId(response.getId())
                 .withFile(this.bits);
 
         return this.client.packages().upload(request);
+    }
+
+    private Observable<GetPackageResponse> waitForUploadProcessing(UploadPackageResponse uploadPackageResponse) {
+        return Observable.<GetPackageResponse>create(subscriber -> {
+            for (; ; ) {
+                GetPackageRequest request = new GetPackageRequest()
+                        .withId(uploadPackageResponse.getId());
+
+                this.client.packages().get(request)
+                        .doOnNext(response -> this.logger.info("Waiting for package upload processing"))
+                        .subscribe(subscriber::onNext);
+
+                if (subscriber.isUnsubscribed()) {
+                    subscriber.onCompleted();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).filter(getPackageResponse -> "READY".equals(getPackageResponse.getState()));
     }
 
 }

@@ -33,10 +33,10 @@ public final class ContentMatchers {
         return request -> {
             MockClientHttpRequest mockRequest = (MockClientHttpRequest) request;
 
-            Map actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
             Map expected = OBJECT_MAPPER.readValue(resource.getInputStream(), Map.class);
+            Map actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
 
-            assertEquals(actual, expected);
+            assertEquals(expected, actual);
         };
     }
 

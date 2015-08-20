@@ -42,6 +42,15 @@ public interface Packages {
     Observable<GetPackageResponse> get(GetPackageRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage
+     * Package</a> request
+     *
+     * @param request the Stage Package request
+     * @return the response from the StagePackage request
+     */
+    Observable<StagePackageResponse> stage(StagePackageRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)
      * /upload_bits_for_a_package_of_type_bits.html">Upload Package</a> request
      *
