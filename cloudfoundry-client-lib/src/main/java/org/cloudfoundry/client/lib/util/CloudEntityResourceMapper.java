@@ -367,12 +367,12 @@ public class CloudEntityResourceMapper {
 
 	private CloudJob mapJobResource(Map<String, Object> resource) {
 		String status = getEntityAttribute(resource, "status", String.class);
-		Map<String, Object> errorDetailsResource = (Map<String, Object>) resource.get("error_details");
+		Map<String, Object> errorDetailsResource = getEntityAttribute(resource, "error_details", Map.class);
 		CloudJob.ErrorDetails errorDetails = null;
 		if (errorDetailsResource != null) {
-			Long code = getEntityAttribute(errorDetailsResource, "code", Long.class);
-			String description = getEntityAttribute(errorDetailsResource, "description", String.class);
-			String errorCode = getEntityAttribute(errorDetailsResource, "error_code", String.class);
+			Long code = Long.valueOf(String.valueOf(errorDetailsResource.get("code")));
+			String description = (String) errorDetailsResource.get("description");
+			String errorCode = (String) errorDetailsResource.get("error_code");
 			errorDetails = new CloudJob.ErrorDetails(code, description, errorCode);
 		}
 
