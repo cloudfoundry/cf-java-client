@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.CollectionUtils;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
@@ -55,6 +57,12 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     public Observable<CreatePackageResponse> create(CreatePackageRequest request) {
         return post(request, CreatePackageResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+    }
+
+    @Override
+    public Observable<GetPackageResponse> get(GetPackageRequest request) {
+        return get(request, GetPackageResponse.class,
+                builder -> builder.pathSegment("v3", "packages", request.getId()));
     }
 
     @Override

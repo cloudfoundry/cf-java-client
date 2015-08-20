@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.junit.Before;
@@ -76,17 +78,18 @@ public final class IntegrationTest {
                 .flatMap(this::split)
                 .flatMap(this::deleteApplication)
                 .subscribe(response -> {
-                        },
-                        this::handleError,
+                        }, this::handleError,
                         () -> this.logger.info("All existing applications deleted"));
 
         listSpaces()
                 .flatMap(this::createApplication)
                 .flatMap(this::createPackage)
                 .flatMap(this::uploadBits)
+                .flatMap(this::waitForUploadProcessing)
+                .first()
                 .subscribe(response -> {
-                        }, this::handleError,
-                        () -> this.logger.info("Application deleted"));
+                    this.logger.info(response.getState());
+                }, this::handleError);
     }
 
     private Observable<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
@@ -115,6 +118,29 @@ public final class IntegrationTest {
                 .withId(resource.getId());
 
         return this.client.applications().delete(request);
+    }
+
+    private Observable<GetPackageResponse> waitForUploadProcessing(UploadPackageResponse uploadPackageResponse) {
+        return Observable.<GetPackageResponse>create(subscriber -> {
+            for (; ; ) {
+                GetPackageRequest request = new GetPackageRequest()
+                        .withId(uploadPackageResponse.getId());
+
+                this.client.packages().get(request)
+                        .subscribe(subscriber::onNext);
+
+                if (subscriber.isUnsubscribed()) {
+                    subscriber.onCompleted();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).filter(getPackageResponse -> "READY".equals(getPackageResponse.getState()));
     }
 
     private void handleError(Throwable exception) {

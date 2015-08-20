@@ -19,30 +19,23 @@ package org.cloudfoundry.client.v3.packages;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.io.File;
-
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class UploadPackageRequestTest {
+public final class GetPackageRequestTest {
 
     @Test
     public void test() {
-        File file = new File("");
-
-        UploadPackageRequest request = new UploadPackageRequest()
-                .withFile(file)
+        GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
 
-        assertEquals(file, request.getFile());
         assertEquals("test-id", request.getId());
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = new UploadPackageRequest()
-                .withFile(new File(""))
+        ValidationResult result = new GetPackageRequest()
                 .withId("test-id")
                 .isValid();
 
@@ -51,22 +44,11 @@ public final class UploadPackageRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new UploadPackageRequest()
-                .withFile(new File(""))
+        ValidationResult result = new GetPackageRequest()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoFile() {
-        ValidationResult result = new UploadPackageRequest()
-                .withId("-id")
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("file must be specified", result.getMessages().get(0));
     }
 
 }

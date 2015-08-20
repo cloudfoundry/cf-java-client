@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v3.packages;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -106,6 +108,60 @@ public final class SpringPackagesTest extends AbstractRestTest {
     }
 
     @Test
+    public void get() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/packages/GET_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetPackageRequest request = new GetPackageRequest()
+                .withId("test-id");
+
+        this.packages.get(request).subscribe(response -> {
+            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+            assertNull(response.getError());
+
+            assertEquals("sha1", response.getHash().getType());
+            assertNull(response.getHash().getValue());
+
+            assertEquals("guid-9067cc41-b832-4de9-89a2-0987dab65e8e", response.getId());
+
+            assertEquals(5, response.getLinks().size());
+            assertNotNull(response.getLink("self"));
+            assertNotNull(response.getLink("upload"));
+            assertNotNull(response.getLink("download"));
+            assertNotNull(response.getLink("stage"));
+            assertNotNull(response.getLink("app"));
+
+            assertEquals("AWAITING_UPLOAD", response.getState());
+            assertEquals("bits", response.getType());
+            assertNull(response.getUpdatedAt());
+            assertNull(response.getUrl());
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void getError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetPackageRequest request = new GetPackageRequest()
+                .withId("test-id");
+
+        this.packages.get(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void getInvalidRequest() {
+        this.packages.get(new GetPackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
     public void upload() throws IOException {
         this.mockServer
                 .expect(method(POST))
@@ -164,4 +220,5 @@ public final class SpringPackagesTest extends AbstractRestTest {
     public void uploadInvalidRequest() {
         this.packages.upload(new UploadPackageRequest()).subscribe(new ExpectedExceptionSubscriber());
     }
+
 }
