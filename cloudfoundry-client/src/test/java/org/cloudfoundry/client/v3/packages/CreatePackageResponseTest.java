@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.packages.Package.Hash;
 import org.junit.Test;
 
 import java.util.Collections;

@@ -1,0 +1,31 @@
+{
+  "guid": "guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9",
+  "state": "STAGED",
+  "hash": {
+    "type": "sha1",
+    "value": null
+  },
+  "buildpack": "http://buildpack.git.url.com",
+  "error": "example error",
+  "procfile": null,
+  "environment_variables": {
+    "cloud": "foundry"
+  },
+  "created_at": "2015-07-27T22:43:30Z",
+  "updated_at": null,
+  "_links": {
+    "self": {
+      "href": "/v3/droplets/guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9"
+    },
+    "package": {
+      "href": "/v3/packages/guid-1df1d953-ef12-4604-a746-d6e047314c12"
+    },
+    "app": {
+      "href": "/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8"
+    },
+    "assign_current_droplet": {
+      "href": "/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8/current_droplet",
+      "method": "PUT"
+    }
+  }
+}

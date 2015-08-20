@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public final class UploadPackageResponseTest {
 
     @Test
     public void test() {
-        Package.Hash hash = new Package.Hash()
+        Hash hash = new Hash()
                 .withType("test-type")
                 .withValue("test-value");
 

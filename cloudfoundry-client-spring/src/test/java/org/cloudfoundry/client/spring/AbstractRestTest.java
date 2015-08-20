@@ -16,15 +16,29 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 public abstract class AbstractRestTest {
 
     protected final RestTemplate restTemplate = new RestTemplate();
+
+    {
+        this.restTemplate.getMessageConverters().stream()
+                .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+                .map(converter -> (MappingJackson2HttpMessageConverter) converter)
+                .findFirst()
+                .ifPresent(converter -> {
+                    converter.getObjectMapper()
+                            .setSerializationInclusion(NON_NULL);
+                });
+    }
 
     protected final URI root = UriComponentsBuilder.newInstance()
             .scheme("https").host("api.run.pivotal.io")

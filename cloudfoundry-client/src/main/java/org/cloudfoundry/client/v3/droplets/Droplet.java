@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.droplets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.v3.Hash;
@@ -24,9 +24,20 @@ import org.cloudfoundry.client.v3.LinkBased;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class Package<T extends Package<T>> implements LinkBased {
+/**
+ * Base class for responses that are droplets
+ *
+ * <p><b>This class is NOT threadsafe.</b>
+ *
+ * @param <T> the "self" type.  Used to ensure the appropriate type is returned from builder APIs.
+ */
+public abstract class Droplet<T extends Droplet<T>> implements LinkBased {
+
+    private volatile String buildpack;
 
     private volatile String createdAt;
+
+    private final Map<String, Object> environmentVariables = new HashMap<>();
 
     private volatile String error;
 
@@ -36,13 +47,33 @@ abstract class Package<T extends Package<T>> implements LinkBased {
 
     private final Map<String, Link> links = new HashMap<>();
 
-    private volatile String state;
+    private volatile String procfile;
 
-    private volatile String type;
+    private volatile String state;
 
     private volatile String updatedAt;
 
-    private volatile String url;
+    /**
+     * Returns the buildpack
+     *
+     * @return the buildpack
+     */
+    public final String getBuildpack() {
+        return this.buildpack;
+    }
+
+    /**
+     * Configure the buildpack
+     *
+     * @param buildpack the buildpack
+     * @return {@code this}
+     */
+    @JsonProperty("buildpack")
+    @SuppressWarnings("unchecked")
+    public final T withBuildpack(String buildpack) {
+        this.buildpack = buildpack;
+        return (T) this;
+    }
 
     /**
      * Returns the created at
@@ -63,6 +94,41 @@ abstract class Package<T extends Package<T>> implements LinkBased {
     @SuppressWarnings("unchecked")
     public final T withCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+        return (T) this;
+    }
+
+    /**
+     * Returns the environment variables
+     *
+     * @return the environment variables
+     */
+    public final Map<String, Object> getEnvironmentVariables() {
+        return this.environmentVariables;
+    }
+
+    /**
+     * Add an environment variable
+     *
+     * @param key   the environment variable key
+     * @param value the environment variable value
+     * @return {@code this}
+     */
+    @SuppressWarnings("unchecked")
+    public final T withEnvironmentVariable(String key, Object value) {
+        this.environmentVariables.put(key, value);
+        return (T) this;
+    }
+
+    /**
+     * Add environment variables
+     *
+     * @param environmentVariables the environment variables
+     * @return {@code this}
+     */
+    @JsonProperty("environment_variables")
+    @SuppressWarnings("unchecked")
+    public final T withEnvironmentVariables(Map<String, Object> environmentVariables) {
+        this.environmentVariables.putAll(environmentVariables);
         return (T) this;
     }
 
@@ -174,6 +240,28 @@ abstract class Package<T extends Package<T>> implements LinkBased {
     }
 
     /**
+     * Returns the procfile
+     *
+     * @return the procfile
+     */
+    public final String getProcfile() {
+        return this.procfile;
+    }
+
+    /**
+     * Configure the procfile
+     *
+     * @param procfile the procfile
+     * @return {@code this}
+     */
+    @JsonProperty("procfile")
+    @SuppressWarnings("unchecked")
+    public final T withProcfile(String procfile) {
+        this.procfile = procfile;
+        return (T) this;
+    }
+
+    /**
      * Returns the state
      *
      * @return the state
@@ -196,22 +284,6 @@ abstract class Package<T extends Package<T>> implements LinkBased {
     }
 
     /**
-     * Returns the type
-     *
-     * @return the type
-     */
-    public final String getType() {
-        return this.type;
-    }
-
-    @JsonProperty("type")
-    @SuppressWarnings("unchecked")
-    public final T withType(String type) {
-        this.type = type;
-        return (T) this;
-    }
-
-    /**
      * Returns the updated at
      *
      * @return the updated at
@@ -230,28 +302,6 @@ abstract class Package<T extends Package<T>> implements LinkBased {
     @SuppressWarnings("unchecked")
     public final T withUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
-        return (T) this;
-    }
-
-    /**
-     * Returns the url
-     *
-     * @return the url
-     */
-    public final String getUrl() {
-        return this.url;
-    }
-
-    /**
-     * Configure the url
-     *
-     * @param url the url
-     * @return {@code this}
-     */
-    @JsonProperty("url")
-    @SuppressWarnings("unchecked")
-    public final T withUrl(String url) {
-        this.url = url;
         return (T) this;
     }
 
