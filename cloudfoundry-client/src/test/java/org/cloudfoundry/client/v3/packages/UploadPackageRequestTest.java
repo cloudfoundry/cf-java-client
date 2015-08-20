@@ -14,30 +14,35 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.packages;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class StartApplicationRequestTest {
+public final class UploadPackageRequestTest {
 
     @Test
     public void test() {
-        StartApplicationRequest request = new StartApplicationRequest()
+        File file = new File("");
+
+        UploadPackageRequest request = new UploadPackageRequest()
+                .withFile(file)
                 .withId("test-id");
 
+        assertEquals(file, request.getFile());
         assertEquals("test-id", request.getId());
     }
 
     @Test
-    public void isValidId() {
-        ValidationResult result = new StartApplicationRequest()
+    public void isValid() {
+        ValidationResult result = new UploadPackageRequest()
+                .withFile(new File(""))
                 .withId("test-id")
                 .isValid();
 
@@ -46,11 +51,21 @@ public final class StartApplicationRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new StartApplicationRequest()
+        ValidationResult result = new UploadPackageRequest()
+                .withFile(new File(""))
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
     }
 
+    @Test
+    public void isValidNoFile() {
+        ValidationResult result = new UploadPackageRequest()
+                .withId("-id")
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("file must be specified", result.getMessages().get(0));
+    }
 }

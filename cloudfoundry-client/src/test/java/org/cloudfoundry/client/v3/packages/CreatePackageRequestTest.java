@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications.packages;
+package org.cloudfoundry.client.v3.packages;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
-import org.cloudfoundry.client.v3.StubLinkBased;
-import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.BITS;
-import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.DOCKER;
+import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
+import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.junit.Assert.assertEquals;
 
 public final class CreatePackageRequestTest {
-
-    private final Link link = new Link();
-
-    private final LinkBased linkBased = new StubLinkBased("packages", this.link);
 
     @Test
     public void test() {
         CreatePackageRequest request = new CreatePackageRequest()
                 .withApplicationId("test-application-id")
-                .withLink(this.linkBased)
                 .withType(DOCKER)
                 .withUrl("test-url");
 
         assertEquals("test-application-id", request.getApplicationId());
-        assertEquals(this.link, request.getLink());
         assertEquals(DOCKER, request.getType());
         assertEquals("test-url", request.getUrl());
     }
@@ -92,36 +82,15 @@ public final class CreatePackageRequestTest {
         assertEquals("url must be specified if type is DOCKER", result.getMessages().get(0));
     }
 
-    @Test
-    public void isValidLink() {
-        ValidationResult result = new CreatePackageRequest()
-                .withLink(this.linkBased)
-                .withType(BITS)
-                .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
 
     @Test
-    public void isValidApplicationIdAndLink() {
-        ValidationResult result = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withLink(this.linkBased)
-                .withType(BITS)
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("exactly one of applicationId or link must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoIdNoLink() {
+    public void isValidNoId() {
         ValidationResult result = new CreatePackageRequest()
                 .withType(BITS)
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("exactly one of applicationId or link must be specified", result.getMessages().get(0));
+        assertEquals("applicationId must be specified", result.getMessages().get(0));
     }
 
 }

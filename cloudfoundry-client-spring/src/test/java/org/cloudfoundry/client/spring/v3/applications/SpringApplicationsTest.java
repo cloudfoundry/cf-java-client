@@ -265,7 +265,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     }
 
     @Test
-    public void startId() {
+    public void start() {
         this.mockServer
                 .expect(method(PUT))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/start"))
@@ -275,42 +275,6 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
-
-        this.applications.start(request).subscribe(response -> {
-            assertNull(response.getBuildpack());
-            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-            assertEquals("STARTED", response.getDesiredState());
-            assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-            assertEquals("guid-40460094-d035-4663-b58c-cdf4c802a2c6", response.getId());
-
-            assertEquals(8, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("droplet"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
-
-            assertEquals("original_name", response.getName());
-            assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-            assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-            this.mockServer.verify();
-        });
-    }
-
-    @Test
-    public void startLink() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/test-link"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PUT_{id}_start_response.json"))
-                        .contentType(APPLICATION_JSON));
-
-        StartApplicationRequest request = new StartApplicationRequest()
-                .withLink(new StubLinkBased("start", new Link().withHref("test-link")));
 
         this.applications.start(request).subscribe(response -> {
             assertNull(response.getBuildpack());

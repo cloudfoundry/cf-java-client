@@ -14,22 +14,43 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.packages;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
+
+import java.io.File;
 
 /**
- * The request payload for the Start Application operation
+ * The request payload for the Upload Package operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class StartApplicationRequest implements Validatable {
+public final class UploadPackageRequest implements Validatable {
+
+    private volatile File file;
 
     private volatile String id;
+
+    /**
+     * Returns the file
+     *
+     * @return the file
+     */
+    public File getFile() {
+        return this.file;
+    }
+
+    /**
+     * Configure the file
+     *
+     * @param file the file
+     * @return {@code this}
+     */
+    public UploadPackageRequest withFile(File file) {
+        this.file = file;
+        return this;
+    }
 
     /**
      * Returns the id
@@ -46,7 +67,7 @@ public final class StartApplicationRequest implements Validatable {
      * @param id the id
      * @return {@code this}
      */
-    public StartApplicationRequest withId(String id) {
+    public UploadPackageRequest withId(String id) {
         this.id = id;
         return this;
     }
@@ -55,10 +76,15 @@ public final class StartApplicationRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult result = new ValidationResult();
 
+        if (this.file == null) {
+            result.invalid("file must be specified");
+        }
+
         if (this.id == null) {
             result.invalid("id must be specified");
         }
 
         return result;
     }
+
 }

@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.packages;
 
-import java.util.Collections;
-import java.util.Map;
-
-public final class StubLinkBased implements LinkBased {
-
-    private final Map<String, Link> links;
-
-    public StubLinkBased(String rel, Link link) {
-        this.links = Collections.singletonMap(rel, link);
-    }
-
-    @Override
-    public Link getLink(String rel) {
-        return this.links.get(rel);
-    }
-
-    @Override
-    public Map<String, Link> getLinks() {
-        return this.links;
-    }
-
+/**
+ * The response payload for the Create Package operation
+ *
+ * <p><b>This class is NOT threadsafe.</b>
+ */
+public final class CreatePackageResponse extends Package<CreatePackageResponse> {
 }
