@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.cloudfoundry.client.v3.applications.packages.Packages;
 import rx.Observable;
 
 /**
@@ -59,13 +58,6 @@ public interface Applications {
      * @return the response from the List Applications request
      */
     Observable<ListApplicationsResponse> list(ListApplicationsRequest request);
-
-    /**
-     * Main entry point to the Cloud Foundry Packages Client API
-     *
-     * @return the Cloud Foundry Packages Client API
-     */
-    Packages packages();
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start

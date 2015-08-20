@@ -20,9 +20,11 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
+import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.packages.Packages;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;
@@ -50,6 +52,11 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Info info() {
         return new SpringInfo(this.restOperations, this.root);
+    }
+
+    @Override
+    public Packages packages() {
+        return new SpringPackages(this.restOperations, this.root);
     }
 
     @Override

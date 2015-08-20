@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications.packages;
+package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
 
-import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.BITS;
-import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.DOCKER;
+import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
+import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 
 /**
  * The request payload for the Create Package operation
@@ -35,8 +33,6 @@ import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequ
 public final class CreatePackageRequest implements Validatable {
 
     private volatile String applicationId;
-
-    private volatile Link link;
 
     private volatile PackageType type;
 
@@ -60,27 +56,6 @@ public final class CreatePackageRequest implements Validatable {
      */
     public CreatePackageRequest withApplicationId(String applicationId) {
         this.applicationId = applicationId;
-        return this;
-    }
-
-    /**
-     * Returns the start link
-     *
-     * @return the start link
-     */
-    @JsonIgnore
-    public Link getLink() {
-        return this.link;
-    }
-
-    /**
-     * Configure the link
-     *
-     * @param linkBased the object with a {@code start} link
-     * @return {@code this}
-     */
-    public CreatePackageRequest withLink(LinkBased linkBased) {
-        this.link = linkBased.getLink("packages");
         return this;
     }
 
@@ -130,6 +105,10 @@ public final class CreatePackageRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult result = new ValidationResult();
 
+        if (this.applicationId == null) {
+            result.invalid("applicationId must be specified");
+        }
+
         if (this.type == null) {
             result.invalid("type must be specified");
         }
@@ -140,14 +119,6 @@ public final class CreatePackageRequest implements Validatable {
 
         if (this.type == DOCKER && this.url == null) {
             result.invalid("url must be specified if type is DOCKER");
-        }
-
-        if (this.applicationId == null && this.link == null) {
-            result.invalid("exactly one of applicationId or link must be specified");
-        }
-
-        if (this.applicationId != null && this.link != null) {
-            result.invalid("exactly one of applicationId or link must be specified");
         }
 
         return result;

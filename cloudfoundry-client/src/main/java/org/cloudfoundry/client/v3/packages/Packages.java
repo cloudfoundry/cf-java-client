@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications.packages;
+package org.cloudfoundry.client.v3.packages;
 
 import rx.Observable;
 
@@ -31,4 +31,14 @@ public interface Packages {
      * @return the response from the Create Package request
      */
     Observable<CreatePackageResponse> create(CreatePackageRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)
+     * /upload_bits_for_a_package_of_type_bits.html">Upload Package</a> request
+     *
+     * @param request the Upload Package request
+     * @return the response from the Upload Package request
+     */
+    Observable<UploadPackageResponse> upload(UploadPackageRequest request);
+
 }

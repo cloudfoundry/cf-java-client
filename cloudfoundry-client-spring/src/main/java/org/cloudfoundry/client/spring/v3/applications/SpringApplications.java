@@ -19,7 +19,6 @@ package org.cloudfoundry.client.spring.v3.applications;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v3.FilterBuilder;
-import org.cloudfoundry.client.spring.v3.applications.packages.SpringPackages;
 import org.cloudfoundry.client.v3.applications.Applications;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
@@ -31,7 +30,6 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
-import org.cloudfoundry.client.v3.applications.packages.Packages;
 import org.springframework.web.client.RestOperations;
 import rx.Observable;
 
@@ -79,17 +77,9 @@ public final class SpringApplications extends AbstractSpringOperations implement
     }
 
     @Override
-    public Packages packages() {
-        return new SpringPackages(this.restOperations, this.root);
-    }
-
-    @Override
     public Observable<StartApplicationResponse> start(StartApplicationRequest request) {
-        return put(request, StartApplicationResponse.class, builder -> {
-            optional(request.getLink(),
-                    link -> builder.path(link.getHref()),
-                    () -> builder.pathSegment("v3", "apps", request.getId(), "start"));
-        });
+        return put(request, StartApplicationResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "start"));
     }
 
 }

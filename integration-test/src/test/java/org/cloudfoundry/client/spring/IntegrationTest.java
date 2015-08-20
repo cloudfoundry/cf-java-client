@@ -26,7 +26,10 @@ import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,13 +38,17 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import rx.Observable;
 
-import static org.cloudfoundry.client.v3.applications.packages.CreatePackageRequest.PackageType.BITS;
+import java.io.File;
+
+import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
 
 public final class IntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private volatile String application;
+
+    private volatile File bits;
 
     private volatile CloudFoundryClient client;
 
@@ -52,6 +59,7 @@ public final class IntegrationTest {
         RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(new StandardEnvironment(), null);
 
         this.application = resolver.getRequiredProperty("test.application");
+        this.bits = resolver.getRequiredProperty("test.bits", File.class);
         this.space = resolver.getRequiredProperty("test.space");
 
         this.client = new SpringCloudFoundryClientBuilder()
@@ -75,43 +83,10 @@ public final class IntegrationTest {
         listSpaces()
                 .flatMap(this::createApplication)
                 .flatMap(this::createPackage)
-                .flatMap(this::deleteApplication)
+                .flatMap(this::uploadBits)
                 .subscribe(response -> {
                         }, this::handleError,
                         () -> this.logger.info("Application deleted"));
-    }
-
-    private void handleError(Throwable exception) {
-        this.logger.error("Error encountered: {}", exception.getMessage());
-    }
-
-    private Observable<ListApplicationsResponse> listApplications() {
-        return this.client.applications().list(new ListApplicationsRequest());
-    }
-
-    private Observable<ListApplicationsResponse.Resource> split(ListApplicationsResponse response) {
-        return Observable.from(response.getResources());
-    }
-
-    private Observable<DeleteApplicationResponse> deleteApplication(ListApplicationsResponse.Resource resource) {
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId(resource.getId());
-
-        return this.client.applications().delete(request);
-    }
-
-    private Observable<DeleteApplicationResponse> deleteApplication(CreateApplicationResponse response) {
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId(response.getId());
-
-        return this.client.applications().delete(request);
-    }
-
-    private Observable<ListSpacesResponse> listSpaces() {
-        ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName(this.space);
-
-        return this.client.spaces().list(request);
     }
 
     private Observable<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
@@ -127,18 +102,46 @@ public final class IntegrationTest {
         return this.client.applications().create(request);
     }
 
-    private Observable<CreateApplicationResponse> createPackage(CreateApplicationResponse response) {
-        return Observable.create(subscriber -> {
-            CreatePackageRequest request = new CreatePackageRequest()
-                    .withLink(response)
-                    .withType(BITS);
+    private Observable<CreatePackageResponse> createPackage(CreateApplicationResponse response) {
+        CreatePackageRequest request = new CreatePackageRequest()
+                .withApplicationId(response.getId())
+                .withType(BITS);
 
-            this.client.applications().packages().create(request)
-                    .subscribe(createPackageResponse -> {
-                            },
-                            this::handleError,
-                            subscriber::onCompleted);
-        });
+        return this.client.packages().create(request);
+    }
+
+    private Observable<DeleteApplicationResponse> deleteApplication(ListApplicationsResponse.Resource resource) {
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId(resource.getId());
+
+        return this.client.applications().delete(request);
+    }
+
+    private void handleError(Throwable exception) {
+        this.logger.error("Error encountered: {}", exception.getMessage());
+    }
+
+    private Observable<ListApplicationsResponse> listApplications() {
+        return this.client.applications().list(new ListApplicationsRequest());
+    }
+
+    private Observable<ListSpacesResponse> listSpaces() {
+        ListSpacesRequest request = new ListSpacesRequest()
+                .filterByName(this.space);
+
+        return this.client.spaces().list(request);
+    }
+
+    private Observable<ListApplicationsResponse.Resource> split(ListApplicationsResponse response) {
+        return Observable.from(response.getResources());
+    }
+
+    private Observable<UploadPackageResponse> uploadBits(CreatePackageResponse response) {
+        UploadPackageRequest request = new UploadPackageRequest()
+                .withId(response.getId())
+                .withFile(this.bits);
+
+        return this.client.packages().upload(request);
     }
 
 }

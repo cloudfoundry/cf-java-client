@@ -1,0 +1,33 @@
+{
+  "guid": "guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50",
+  "type": "bits",
+  "hash": {
+    "type": "sha1",
+    "value": null
+  },
+  "url": null,
+  "state": "PROCESSING_UPLOAD",
+  "error": null,
+  "created_at": "2015-08-06T00:36:54Z",
+  "updated_at": "2015-08-06T00:36:55Z",
+  "_links": {
+    "self": {
+      "href": "/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50"
+    },
+    "upload": {
+      "href": "/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/upload",
+      "method": "POST"
+    },
+    "download": {
+      "href": "/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/download",
+      "method": "GET"
+    },
+    "stage": {
+      "href": "/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/droplets",
+      "method": "POST"
+    },
+    "app": {
+      "href": "/v3/apps/guid-06761177-23bb-4dbc-a9da-90cd993d495f"
+    }
+  }
+}

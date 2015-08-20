@@ -74,6 +74,25 @@ public abstract class AbstractSpringOperations {
         });
     }
 
+    protected final <T> Observable<T> exchange(Validatable request, Supplier<T> exchange) {
+        return Observable.create(subscriber -> {
+            if (request != null) {
+                ValidationResult validationResult = request.isValid();
+                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                    subscriber.onError(new RequestValidationException(validationResult));
+                    return;
+                }
+            }
+
+            try {
+                subscriber.onNext(exchange.get());
+                subscriber.onCompleted();
+            } catch (HttpStatusCodeException e) {
+                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
+            }
+        });
+    }
+
     protected final <T> Observable<T> post(Validatable request, Class<T> responseType,
                                            Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
@@ -97,35 +116,6 @@ public abstract class AbstractSpringOperations {
             return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
         });
 
-    }
-
-    protected final <T> void optional(T value, Consumer<T> ifPresent, Runnable ifNotPresent) {
-        Optional<T> optional = Optional.ofNullable(value);
-
-        if (optional.isPresent()) {
-            ifPresent.accept(optional.get());
-        } else {
-            ifNotPresent.run();
-        }
-    }
-
-    private <T> Observable<T> exchange(Validatable request, Supplier<T> exchange) {
-        return Observable.create(subscriber -> {
-            if (request != null) {
-                ValidationResult validationResult = request.isValid();
-                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                    subscriber.onError(new RequestValidationException(validationResult));
-                    return;
-                }
-            }
-
-            try {
-                subscriber.onNext(exchange.get());
-                subscriber.onCompleted();
-            } catch (HttpStatusCodeException e) {
-                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
-            }
-        });
     }
 
 }

@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications.packages;
+package org.cloudfoundry.client.spring.util;
 
-/**
- * The response payload for the Create Package operation
- *
- * <p><b>This class is NOT threadsafe.</b>
- */
-public final class CreatePackageResponse extends Package<CreatePackageResponse> {
+import org.junit.Test;
+import org.springframework.util.MultiValueMap;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+
+public final class CollectionUtilsTest {
+
+    @Test
+    public void singletonMultiValueMap() {
+        MultiValueMap<String, String> map = CollectionUtils.singletonMultiValueMap("test-key",
+                "test-value-1", "test-value-2");
+
+        assertEquals(Arrays.asList("test-value-1", "test-value-2"), map.get("test-key"));
+    }
+
 }
