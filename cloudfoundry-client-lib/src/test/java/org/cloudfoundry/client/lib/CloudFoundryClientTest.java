@@ -1626,6 +1626,41 @@ public class CloudFoundryClientTest {
 	}
 
 	@Test
+	public void createGetAndDeleteSpaceRecursivelyOnCurrentOrg() throws Exception {
+		String spaceName = "dummy space";
+		CloudSpace newSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '" + spaceName + "' should not exist before creation", newSpace);
+		connectedClient.createSpace(spaceName);
+		newSpace = connectedClient.getSpace(spaceName);
+		assertNotNull("newSpace should not be null", newSpace);
+		assertEquals(spaceName, newSpace.getName());
+		boolean foundSpaceInCurrentOrg = false;
+		for (CloudSpace aSpace : connectedClient.getSpaces()) {
+			if (spaceName.equals(aSpace.getName())){
+				foundSpaceInCurrentOrg = true;
+			}
+		}
+		assertTrue(foundSpaceInCurrentOrg);
+		String appName = namespacedAppName("travel_test-0");
+		URL cloudControllerUrl = new URL(CCNG_API_URL);
+		CloudFoundryOperations spaceClient = new CloudFoundryClient(new CloudCredentials(CCNG_USER_EMAIL,
+				CCNG_USER_PASS), cloudControllerUrl, CCNG_USER_ORG, spaceName, httpProxyConfiguration, CCNG_API_SSL);
+		spaceClient.login();
+		List<String> uris = Collections.singletonList(computeAppUrl(appName));
+		Staging staging =  new Staging();
+		spaceClient.createApplication(appName, staging, DEFAULT_MEMORY, uris, null);
+		CloudApplication app = spaceClient.getApplication(appName);
+		assertNotNull(app);
+		assertEquals(appName, app.getName());
+
+		assertNotNull(app.getMeta().getGuid());
+		connectedClient.deleteSpaceRecursively(spaceName);
+		CloudSpace deletedSpace = connectedClient.getSpace(spaceName);
+		assertNull("Space '" + spaceName + "' should not exist after deletion", deletedSpace);
+
+	}
+
+	@Test
 	public void getCurrentOrganizationUsersAndEnsureCurrentUserIsAMember(){
 		String orgName = CCNG_USER_ORG;
 		Map<String,CloudUser> orgUsers=connectedClient.getOrganizationUsers(orgName);

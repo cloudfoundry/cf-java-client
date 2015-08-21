@@ -609,6 +609,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 	}
 
+	@Override
+	public void deleteSpaceRecursively(String spaceName) {
+		assertSpaceProvided("delete a space recursively");
+		UUID orgGuid = sessionSpace.getOrganization().getMeta().getGuid();
+		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+		if (spaceGuid != null) {
+			doDeleteSpaceRecursively(spaceGuid);
+		}
+	}
+
 	private UUID doCreateSpace(String spaceName, UUID orgGuid) {
 		String urlPath = "/v2/spaces";
 		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();
@@ -639,6 +649,10 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private void doDeleteSpace(UUID spaceGuid) {
 		getRestTemplate().delete(getUrl("/v2/spaces/{guid}?async=false"), spaceGuid);
+	}
+
+	private void doDeleteSpaceRecursively(UUID spaceGuid) {
+		getRestTemplate().delete(getUrl("/v2/spaces/{guid}?async=false&recursive=true"), spaceGuid);
 	}
 
 	@Override
@@ -1160,16 +1174,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	                              List<String> serviceNames) {
 		createApplication(appName, staging, null, memory, uris, serviceNames);
 	}
-
 	@Override
 	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
-	                              List<String> uris, List<String> serviceNames) {
+								  List<String> uris, List<String> serviceNames) {
+		createApplication(appName, staging, null, memory, uris, serviceNames, null);
+	}
+
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
+	                              List<String> uris, List<String> serviceNames, String buildPack) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
 		if (disk != null) {
 			appRequest.put("disk_quota", disk);
+		}
+		if (buildPack != null) {
+			appRequest.put("buildpack", buildPack);
 		}
 		appRequest.put("instances", 1);
 		addStagingToRequest(staging, appRequest);

@@ -25,27 +25,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
-import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.client.lib.domain.ApplicationStats;
-import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.*;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudEvent;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
-import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.domain.CloudStack;
-import org.cloudfoundry.client.lib.domain.CrashesInfo;
-import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -251,7 +232,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 								  List<String> serviceNames) {
 		cc.createApplication(appName, staging, disk, memory, uris, serviceNames);
 	}
-
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory, List<String> uris,
+								  List<String> serviceNames, String buildPack) {
+		cc.createApplication(appName, staging, disk, memory, uris, serviceNames, buildPack);
+	}
 	public void createService(CloudService service) {
 		cc.createService(service);
 	}
@@ -586,6 +570,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	@Override
 	public void deleteSpace(String spaceName) {
 		cc.deleteSpace(spaceName);
+	}
+
+	@Override
+	public void deleteSpaceRecursively(String spaceName) {
+		cc.deleteSpaceRecursively(spaceName);
 	}
 
 
