@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
+import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
@@ -94,6 +96,8 @@ public final class IntegrationTest {
                 .doOnNext(response -> this.logger.info("Package uploaded"))
                 .flatMap(this::stagePackage)
                 .doOnNext(response -> this.logger.info("Package staging"))
+                .flatMap(this::waitForStaging)
+                .doOnNext(response -> this.logger.info("Package staged"))
                 .first()
                 .subscribe(response -> {
                     this.logger.info(response.getState());
@@ -163,6 +167,35 @@ public final class IntegrationTest {
         return this.client.packages().upload(request);
     }
 
+    private Observable<GetDropletResponse> waitForStaging(StagePackageResponse stagePackageResponse) {
+        return Observable.<GetDropletResponse>create(subscriber -> {
+            for (; ; ) {
+                GetDropletRequest request = new GetDropletRequest()
+                        .withId(stagePackageResponse.getId());
+
+                this.client.droplets().get(request)
+                        .doOnNext(response -> this.logger.debug("Package staging: {}", response.getState()))
+                        .doOnNext(response -> this.logger.info("Waiting for package staging"))
+                        .subscribe(subscriber::onNext);
+
+                if (subscriber.isUnsubscribed()) {
+                    subscriber.onCompleted();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).doOnNext(getPackageResponse -> {
+            if ("FAILED".equals(getPackageResponse.getState())) {
+                throw new IllegalStateException(getPackageResponse.getError());
+            }
+        }).filter(getDropletResponse -> "STAGED".equals(getDropletResponse.getState()));
+    }
+
     private Observable<GetPackageResponse> waitForUploadProcessing(UploadPackageResponse uploadPackageResponse) {
         return Observable.<GetPackageResponse>create(subscriber -> {
             for (; ; ) {
@@ -170,6 +203,7 @@ public final class IntegrationTest {
                         .withId(uploadPackageResponse.getId());
 
                 this.client.packages().get(request)
+                        .doOnNext(response -> this.logger.debug("Package upload processing: {}", response.getState()))
                         .doOnNext(response -> this.logger.info("Waiting for package upload processing"))
                         .subscribe(subscriber::onNext);
 
@@ -183,6 +217,10 @@ public final class IntegrationTest {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }).doOnNext(getPackageResponse -> {
+            if ("FAILED".equals(getPackageResponse.getState())) {
+                throw new IllegalStateException(getPackageResponse.getError());
             }
         }).filter(getPackageResponse -> "READY".equals(getPackageResponse.getState()));
     }

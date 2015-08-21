@@ -20,10 +20,12 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
+import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
 import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.springframework.web.client.RestOperations;
 
@@ -31,13 +33,26 @@ import java.net.URI;
 
 final class SpringCloudFoundryClient implements CloudFoundryClient {
 
+    private final Applications applications;
+
+    private final Droplets droplets;
+
+    private final Info info;
+
+    private final Packages packages;
+
     private final RestOperations restOperations;
 
-    private final URI root;
+    private final Spaces spaces;
 
     SpringCloudFoundryClient(RestOperations restOperations, URI root) {
+        this.applications = new SpringApplications(restOperations, root);
+        this.droplets = new SpringDroplets(restOperations, root);
+        this.info = new SpringInfo(restOperations, root);
+        this.packages = new SpringPackages(restOperations, root);
+        this.spaces = new SpringSpaces(restOperations, root);
+
         this.restOperations = restOperations;
-        this.root = root;
     }
 
     RestOperations getRestOperations() {
@@ -46,22 +61,27 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     public Applications applications() {
-        return new SpringApplications(this.restOperations, this.root);
+        return this.applications;
+    }
+
+    @Override
+    public Droplets droplets() {
+        return this.droplets;
     }
 
     @Override
     public Info info() {
-        return new SpringInfo(this.restOperations, this.root);
+        return this.info;
     }
 
     @Override
     public Packages packages() {
-        return new SpringPackages(this.restOperations, this.root);
+        return this.packages;
     }
 
     @Override
     public Spaces spaces() {
-        return new SpringSpaces(this.restOperations, this.root);
+        return this.spaces;
     }
 
 }
