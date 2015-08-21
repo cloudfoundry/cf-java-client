@@ -19,6 +19,7 @@ package org.cloudfoundry.client;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 
 /**
@@ -32,6 +33,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application Client API
      */
     Applications applications();
+
+    /**
+     * Main entry point to the Cloud Foundry Applications Droplets API
+     *
+     * @return the Cloud Foundry Application Droplets API
+     */
+    Droplets droplets();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API
