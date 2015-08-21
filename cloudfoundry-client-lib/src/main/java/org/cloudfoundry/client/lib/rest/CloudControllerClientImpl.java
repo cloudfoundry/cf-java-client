@@ -1174,16 +1174,23 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	                              List<String> serviceNames) {
 		createApplication(appName, staging, null, memory, uris, serviceNames);
 	}
-
 	@Override
 	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
-	                              List<String> uris, List<String> serviceNames) {
+								  List<String> uris, List<String> serviceNames) {
+		createApplication(appName, staging, null, memory, uris, serviceNames, null);
+	}
+
+	public void createApplication(String appName, Staging staging, Integer disk, Integer memory,
+	                              List<String> uris, List<String> serviceNames, String buildPack) {
 		HashMap<String, Object> appRequest = new HashMap<String, Object>();
 		appRequest.put("space_guid", sessionSpace.getMeta().getGuid());
 		appRequest.put("name", appName);
 		appRequest.put("memory", memory);
 		if (disk != null) {
 			appRequest.put("disk_quota", disk);
+		}
+		if (buildPack != null) {
+			appRequest.put("buildpack", buildPack);
 		}
 		appRequest.put("instances", 1);
 		addStagingToRequest(staging, appRequest);
