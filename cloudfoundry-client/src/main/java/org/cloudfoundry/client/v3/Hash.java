@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * A hash payload
  *
@@ -42,6 +44,7 @@ public final class Hash {
      * @param type the type
      * @return {@code this}
      */
+    @JsonProperty("type")
     public Hash withType(String type) {
         this.type = type;
         return this;
@@ -62,6 +65,7 @@ public final class Hash {
      * @param value the value
      * @return {@code this}
      */
+    @JsonProperty("value")
     public Hash withValue(String value) {
         this.value = value;
         return this;

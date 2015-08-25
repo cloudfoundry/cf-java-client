@@ -52,6 +52,7 @@ public final class SpringInfoTest extends AbstractRestTest {
             assertNull(response.getMinRecommendedCliVersion());
             assertEquals("http://support.cloudfoundry.com", response.getSupport());
             assertEquals("https://uaa.run.pivotal.io", response.getTokenEndpoint());
+            assertNull(response.getUser());
             assertEquals(Integer.valueOf(2), response.getVersion());
 
             this.mockServer.verify();

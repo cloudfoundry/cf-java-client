@@ -32,6 +32,9 @@ import org.springframework.core.env.StandardEnvironment;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.cloudfoundry.client.v2.events.Events.APP_CRASH;
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_CREATE;
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_DELETE_REQUEST;
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_START;
@@ -53,10 +55,10 @@ import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_INSTANCE_UP
 
 public final class ApplicationEvents {
 
-    private static final List<String> EVENT_TYPES = Arrays.asList(APP_CRASH, AUDIT_APP_CREATE,
-            AUDIT_APP_DELETE_REQUEST, AUDIT_APP_START, AUDIT_APP_STOP, AUDIT_APP_UPDATE,
-            AUDIT_SERVICE_BINDING_CREATE, AUDIT_SERVICE_BINDING_DELETE, AUDIT_SERVICE_INSTANCE_CREATE,
-            AUDIT_SERVICE_INSTANCE_DELETE, AUDIT_SERVICE_INSTANCE_UPDATE);
+    private static final List<String> EVENT_TYPES = Arrays.asList(AUDIT_APP_CREATE, AUDIT_APP_DELETE_REQUEST,
+            AUDIT_APP_START, AUDIT_APP_STOP, AUDIT_APP_UPDATE, AUDIT_SERVICE_BINDING_CREATE,
+            AUDIT_SERVICE_BINDING_DELETE, AUDIT_SERVICE_INSTANCE_CREATE, AUDIT_SERVICE_INSTANCE_DELETE,
+            AUDIT_SERVICE_INSTANCE_UPDATE);
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -76,7 +78,7 @@ public final class ApplicationEvents {
 
 
     @Test
-    public void applicationEvents() {
+    public void applicationEvents() throws IOException {
         Map<String, String> organizations = new HashMap<>();
 
         listOrganizations()
@@ -91,26 +93,37 @@ public final class ApplicationEvents {
 
         this.logger.info("{} Organizations Found", organizations.size());
 
-        getAllPages(page -> new ListEventsRequest()
-                        .withTypes(EVENT_TYPES)
-                        .withTimestamp("2015-09-14T00:00:00Z")
-                        .withResultsPerPage(100)
-                        .withPage(page),
-                request -> this.client.events().list(request))
-                .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
-//                .observe(r -> this.logger.info(r.getEntity().getOrganizationId()))
-                .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
-                .multiConsume(25, r -> {
-                            EventEntity entity = r.getEntity();
+        try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
+            getAllPages(page -> new ListEventsRequest()
+                            .withTypes(EVENT_TYPES)
+                            .withTimestamp("2015-09-29T00:00:00Z")
+                            .withResultsPerPage(100)
+                            .withPage(page),
+                    request -> this.client.events().list(request))
+                    .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
+                    .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
+                    .map(r -> {
+                        EventEntity entity = r.getEntity();
 
-                            String timestamp = entity.getTimestamp();
-                            String organization = organizations.get(entity.getOrganizationId());
-                            String type = entity.getType();
+                        String id = r.getMetadata().getId();
+                        String timestamp = entity.getTimestamp();
+                        String organization = organizations.get(entity.getOrganizationId());
+                        String type = entity.getType();
 
-                            System.out.printf("%s,%s,%s%n", timestamp, organization, type);
-                        },
-                        System.out::println,
-                        r -> this.logger.info("Finished"));
+                        return String.format("%s,%s,%s,%s%n", id, organization, timestamp, type);
+                    })
+                    .consume(m -> {
+                                try {
+                                    writer.write(m);
+                                    writer.flush();
+                                    System.out.print(m);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            },
+                            System.out::println,
+                            r -> this.logger.info("Finished"));
+        }
 
     }
 
