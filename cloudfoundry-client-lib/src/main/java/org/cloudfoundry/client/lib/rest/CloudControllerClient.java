@@ -46,6 +46,7 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
 import org.cloudfoundry.client.lib.domain.CloudServiceUsageEvent;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
@@ -101,6 +102,8 @@ public interface CloudControllerClient {
 	CloudService getService(String service);
 
 	CloudServiceInstance getServiceInstance(String serviceName);
+	
+	CloudServiceInstance getServiceInstance(UUID serviceGuid);
 
 	void deleteService(String service);
 
@@ -251,6 +254,8 @@ public interface CloudControllerClient {
 
 	// Quota operations
 	CloudOrganization getOrgByName(String orgName, boolean required);
+	
+	CloudOrganization getOrgByGuid(UUID orgGuid, boolean required);
 
 	List<CloudQuota> getQuotas();
 
@@ -314,5 +319,14 @@ public interface CloudControllerClient {
 
 	List<CloudUsageEvent> getApplicationUsageEvents();
 
+	List<CloudUsageEvent> getApplicationUsageEventsAfter(UUID after);
+
 	List<CloudServiceUsageEvent>  getServiceUsageEvents();
+
+	List<CloudServiceUsageEvent> getServiceUsageEventsAfter(UUID after);
+
+	CloudServicePlan getServicePlan(UUID servicePlanGuid);
+
+
+
 }

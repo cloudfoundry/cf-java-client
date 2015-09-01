@@ -119,6 +119,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudUser.class){
             return (T) mapUserResource(resource);
         }
+		if (targetClass ==  CloudServicePlan.class){
+			return (T) mapServicePlanResource(resource);
+		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
 	}
@@ -250,7 +253,7 @@ public class CloudEntityResourceMapper {
 		CloudUsageEvent event = new CloudUsageEvent(
 			getMeta(resource),
 			getNameOfResource(resource));
-		event.setState(getEntityAttribute(resource, "state", CloudApplication.AppState.class));
+		event.setState(getEntityAttribute(resource, "state", CloudUsageEvent.AppState.class));
 		event.setMemoryInMBPerInstance(getEntityAttribute(resource, "memory_in_mb_per_instance", Integer.class));
 		event.setInstanceCount(getEntityAttribute(resource, "instance_count", Integer.class));
 		event.setAppGUID(getEntityAttribute(resource, "app_guid", UUID.class));
@@ -477,8 +480,8 @@ public class CloudEntityResourceMapper {
 		if (targetClass == UUID.class && attributeValue instanceof String) {
 			return (T) UUID.fromString((String)attributeValue);
 		}
-		if (targetClass == CloudApplication.AppState.class && attributeValue instanceof String) {
-			return (T) CloudApplication.AppState.valueOfWithDefault((String)attributeValue);
+		if (targetClass == CloudUsageEvent.AppState.class && attributeValue instanceof String) {
+			return (T) CloudUsageEvent.AppState.valueOfWithDefault((String)attributeValue);
 		}
 		if (targetClass == CloudServiceUsageEvent.ServiceState.class && attributeValue instanceof String) {
 			return (T) CloudServiceUsageEvent.ServiceState.valueOfWithDefault((String)attributeValue);

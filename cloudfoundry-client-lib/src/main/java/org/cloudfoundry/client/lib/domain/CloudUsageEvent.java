@@ -5,6 +5,7 @@ package org.cloudfoundry.client.lib.domain;
 
 import java.util.UUID;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication.AppState;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
@@ -14,7 +15,7 @@ import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
 public class CloudUsageEvent extends CloudEntity{
-	private CloudApplication.AppState state;
+	private AppState state;
 	private int memoryInMBPerInstance;
 	private int instanceCount;
 	private UUID appGUID;
@@ -26,12 +27,24 @@ public class CloudUsageEvent extends CloudEntity{
 	public CloudUsageEvent(Meta meta, String name) {
 		super(meta, name);
 	}
+	
+	public enum AppState {
+		BUILDPACK_SET, STARTED, STOPPED, UNKNOWN;
+		
+		public static AppState valueOfWithDefault(String s) {
+			try {
+				return AppState.valueOf(s);
+			} catch (IllegalArgumentException e) {
+				return AppState.UNKNOWN;
+			}
+		}
+	}
 
-	public CloudApplication.AppState getState() {
+	public AppState getState() {
 		return state;
 	}
 
-	public void setState(CloudApplication.AppState state) {
+	public void setState(AppState state) {
 		this.state = state;
 	}
 
