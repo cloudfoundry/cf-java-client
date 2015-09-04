@@ -586,6 +586,20 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
+	public void createSpace(String orgName, String spaceName) {
+		Assert.notNull(orgName, "Unable to create new space without specifying organization to use.");
+		Assert.notNull(spaceName, "Unable to create new space without specifying the name of he new space.");
+		
+		CloudOrganization org = this.getOrgByName(orgName, true);
+		UUID orgGuid = org.getMeta().getGuid();
+		UUID spaceGuid = getSpaceGuid(spaceName, orgGuid);
+		if (spaceGuid == null) {
+			doCreateSpace(spaceName, orgGuid);
+		}
+	}
+
+	
+	@Override
 	public CloudSpace getSpace(String spaceName) {
 		String urlPath = "/v2/spaces?inline-relations-depth=1&q=name:{name}";
 		HashMap<String, Object> spaceRequest = new HashMap<String, Object>();

@@ -584,6 +584,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	@Override
+	public void createSpace(String orgName, String spaceName) {
+		cc.createSpace(orgName, spaceName);
+	}
+	
+	@Override
 	public void deleteSpace(String spaceName) {
 		cc.deleteSpace(spaceName);
 	}

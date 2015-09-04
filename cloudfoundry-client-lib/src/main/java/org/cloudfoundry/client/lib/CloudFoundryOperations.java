@@ -218,6 +218,13 @@ public interface CloudFoundryOperations {
 	void createSpace(String spaceName);
 
 	/**
+	 * Create a space with the specified name in the specified org
+	 * @param orgName
+	 * @param spaceName
+	 */
+	void createSpace(String orgName, String spaceName);
+	
+	/**
 	 * Get space name with the specified name.
 	 *
 	 * @param spaceName name of the space
