@@ -754,4 +754,9 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName) {
 		return cc.getSpacesBoundToSecurityGroup(securityGroupName);
 	}
+
+	@Override
+	public int getOrganizationMemoryUsage(CloudOrganization org) {
+		return cc.getOrganizationMemoryUsage(org);
+	}
 }

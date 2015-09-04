@@ -763,6 +763,22 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		}
 		return orgs;
 	}
+	
+	@Override
+	public int getOrganizationMemoryUsage(CloudOrganization org) {
+		UUID orgUuid = org.getMeta().getGuid();
+
+		String path = "/v2/organizations/{org_guid}/memory_usage";
+
+		Map<String, Object> pathVariables = 
+				Collections.<String, Object> singletonMap("org_guid", orgUuid);
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Integer> usageMap = 
+		getRestTemplate().getForObject(getUrl(path), Map.class, pathVariables);
+		
+		return usageMap.get("memory_usage_in_mb");
+	}
 
 	@Override
 	public OAuth2AccessToken login() {

@@ -393,6 +393,14 @@ public class CloudFoundryClientTest {
 		assertNotNull(orgs);
 		assertTrue(orgs.size() > 0);
 	}
+	
+	@Test
+	public void orgUsage() throws Exception {
+		createAndUploadAndStartSimpleSpringApp("org-usage-test");
+		CloudOrganization org = connectedClient.getOrgByName(CCNG_USER_ORG, true);
+		long mem = connectedClient.getOrganizationMemoryUsage(org);
+		assertTrue(mem > 0);
+	}
 
 	//
 	// Basic Event Tests
