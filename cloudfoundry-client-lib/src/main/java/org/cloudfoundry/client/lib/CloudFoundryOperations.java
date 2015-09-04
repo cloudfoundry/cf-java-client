@@ -1189,4 +1189,11 @@ public interface CloudFoundryOperations {
      */
     Map<String, CloudUser> getOrganizationUsers(String orgName);
 
+	/**
+	 * Get the memory usage
+	 * @param org An org
+	 * @return the total used memory in MB
+	 */
+	int getOrganizationMemoryUsage(CloudOrganization org);
+
 }
