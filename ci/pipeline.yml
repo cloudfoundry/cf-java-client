@@ -1,0 +1,22 @@
+---
+jobs:
+- name: unit-test
+  plan:
+  - get: cf-java-client
+    trigger: true
+  - task: maven
+    file: cf-java-client/ci/unit-test.yml
+- name: integration-test
+  plan:
+  - get: cf-java-client
+    trigger: true
+    passed: [unit-test]
+  - task: maven
+    file: cf-java-client/ci/integration-test.yml
+
+resources:
+- name: cf-java-client
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-java-client.git
+    branch: concourse

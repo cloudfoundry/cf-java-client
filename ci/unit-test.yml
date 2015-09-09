@@ -1,0 +1,9 @@
+---
+platform: linux
+image: docker:///maven#3-jdk-8
+
+inputs:
+- name: cf-java-client
+
+run:
+  path: cf-java-client/ci/scripts/unit-test
