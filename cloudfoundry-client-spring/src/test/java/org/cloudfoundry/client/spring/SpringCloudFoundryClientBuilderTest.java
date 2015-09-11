@@ -16,19 +16,30 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClientBuilder builder = new SpringCloudFoundryClientBuilder(this.restTemplate);
+    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
+
+    private final SpringCloudFoundryClientBuilder builder = new SpringCloudFoundryClientBuilder(this.restTemplate,
+            this.sslCertificateTruster);
 
     @Test
     public void test() {
@@ -52,7 +63,37 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
     }
 
     @Test
+    public void skipSslValidationTrue() throws GeneralSecurityException, IOException {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/info"))
+                .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
+
+        this.builder
+                .withApi("api.run.pivotal.io")
+                .withCredentials("test-username", "test-password")
+                .withSkipSslValidation(true)
+                .build();
+
+        verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
+    }
+
+    @Test
+    public void skipSslValidationFalse() throws GeneralSecurityException, IOException {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/info"))
+                .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
+
+        this.builder
+                .withApi("api.run.pivotal.io")
+                .withCredentials("test-username", "test-password")
+                .build();
+
+        verifyZeroInteractions(this.sslCertificateTruster);
+    }
+
+    @Test
     public void defaultConstructor() {
         new SpringCloudFoundryClientBuilder();
     }
+
 }

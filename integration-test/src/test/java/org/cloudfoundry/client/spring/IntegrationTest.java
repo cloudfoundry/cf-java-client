@@ -73,6 +73,7 @@ public final class IntegrationTest {
                 .withCredentials(
                         resolver.getRequiredProperty("test.username"),
                         resolver.getRequiredProperty("test.password"))
+                .withSkipSslValidation(resolver.getProperty("test.skipSslValidation", Boolean.class, false))
                 .build();
     }
 

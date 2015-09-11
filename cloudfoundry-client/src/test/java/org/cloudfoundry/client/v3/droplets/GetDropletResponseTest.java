@@ -18,14 +18,13 @@ package org.cloudfoundry.client.v3.droplets;
 
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public final class GetDropletResponseTest {
 

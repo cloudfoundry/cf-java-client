@@ -17,8 +17,6 @@
 package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;

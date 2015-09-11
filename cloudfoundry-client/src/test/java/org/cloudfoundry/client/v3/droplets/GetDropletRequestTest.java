@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3.droplets;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;

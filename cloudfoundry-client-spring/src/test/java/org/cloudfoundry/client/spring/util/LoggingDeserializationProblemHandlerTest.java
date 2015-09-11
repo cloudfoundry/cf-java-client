@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.droplets;
+package org.cloudfoundry.client.spring.util;
 
-import rx.Observable;
+import org.junit.Test;
 
-/**
- * Main entry point to the Cloud Foundry Droplets Client API
- */
-public interface Droplets {
+import java.io.IOException;
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/get_a_droplet.html">Get
-     * Droplet</a> request
-     *
-     * @param request the Get Droplet request
-     * @return the response from the Get Droplet request
-     */
-    Observable<GetDropletResponse> get(GetDropletRequest request);
+import static org.junit.Assert.assertTrue;
+
+public final class LoggingDeserializationProblemHandlerTest {
+
+    private final LoggingDeserializationProblemHandler handler = new LoggingDeserializationProblemHandler();
+
+    @Test
+    public void test() throws IOException {
+        assertTrue(this.handler.handleUnknownProperty(null, null, null, Object.class, "test-property-name"));
+    }
 
 }
