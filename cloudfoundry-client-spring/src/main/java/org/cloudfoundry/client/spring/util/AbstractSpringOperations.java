@@ -27,10 +27,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
-import rx.Subscriber;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 

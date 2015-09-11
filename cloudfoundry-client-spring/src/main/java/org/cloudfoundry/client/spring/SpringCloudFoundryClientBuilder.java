@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.client.spring;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
+import org.cloudfoundry.client.spring.util.LoggingDeserializationProblemHandler;
+import org.cloudfoundry.client.spring.util.ResourceOwnerPasswordResourceDetailsBuilder;
+import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -30,15 +30,16 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.util.Assert;
-import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * A builder API for creating a Spring-backed implementation of the {@link CloudFoundryClient}.  By default it uses
@@ -50,7 +51,9 @@ public final class SpringCloudFoundryClientBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final RestOperations restOperations;
+    private final RestTemplate restTemplate;
+
+    private final SslCertificateTruster sslCertificateTruster;
 
     private volatile String clientId = "cf";
 
@@ -62,15 +65,18 @@ public final class SpringCloudFoundryClientBuilder {
 
     private volatile String password;
 
+    private volatile Boolean skipSslValidation;
+
     /**
      * Creates a new instance of the builder
      */
     public SpringCloudFoundryClientBuilder() {
-        this(new RestTemplate());
+        this(new RestTemplate(), new CertificateCollectingSslCertificateTruster());
     }
 
-    SpringCloudFoundryClientBuilder(RestTemplate restTemplate) {
-        this.restOperations = restTemplate;
+    SpringCloudFoundryClientBuilder(RestTemplate restTemplate, SslCertificateTruster sslCertificateTruster) {
+        this.restTemplate = restTemplate;
+        this.sslCertificateTruster = sslCertificateTruster;
     }
 
     /**
@@ -111,6 +117,17 @@ public final class SpringCloudFoundryClientBuilder {
     }
 
     /**
+     * Configure whether to skip SSL validation
+     *
+     * @param skipSslValidation whether to skip SSL validation
+     * @return {@code this}
+     */
+    public SpringCloudFoundryClientBuilder withSkipSslValidation(Boolean skipSslValidation) {
+        this.skipSslValidation = skipSslValidation;
+        return this;
+    }
+
+    /**
      * Builds a new instance of a Spring-backed implementation of the {@link CloudFoundryClient} using the information
      * provided
      *
@@ -121,6 +138,14 @@ public final class SpringCloudFoundryClientBuilder {
         Assert.notNull(this.host, "host must be set");
         Assert.hasText(this.username, "username must be set");
         Assert.hasText(this.password, "password must be set");
+
+        if (this.skipSslValidation != null && this.skipSslValidation) {
+            try {
+                this.sslCertificateTruster.trust(this.host, 443, 5, SECONDS);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         URI root = UriComponentsBuilder.newInstance().scheme("https").host(this.host).build().toUri();
         return new SpringCloudFoundryClient(getRestOperations(), root);
@@ -165,25 +190,11 @@ public final class SpringCloudFoundryClientBuilder {
                 .scheme("https").host(this.host).pathSegment("info")
                 .build().toUriString();
 
-        Map<String, String> results = this.restOperations.getForObject(infoUri, Map.class);
+        Map<String, String> results = this.restTemplate.getForObject(infoUri, Map.class);
 
         return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
                 .pathSegment("oauth", "token")
                 .build().toUriString();
     }
 
-    private static final class LoggingDeserializationProblemHandler extends DeserializationProblemHandler {
-
-        private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-        @Override
-        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp,
-                                             JsonDeserializer<?> deserializer, Object beanOrClass,
-                                             String propertyName) throws IOException {
-            this.logger.warn("Found unexpected property {} in payload for {}",
-                    propertyName, beanOrClass.getClass().getSimpleName());
-            return true;
-        }
-
-    }
 }

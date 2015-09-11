@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.droplets;
+package org.cloudfoundry.client.spring.util;
 
-import rx.Observable;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Main entry point to the Cloud Foundry Droplets Client API
+ * A utility that trusts certificates provided by connections
  */
-public interface Droplets {
+public interface SslCertificateTruster {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/get_a_droplet.html">Get
-     * Droplet</a> request
+     * Trust the certificate provided by a connection
      *
-     * @param request the Get Droplet request
-     * @return the response from the Get Droplet request
+     * @param host     the host
+     * @param port     the port
+     * @param timeout  the maximum time to wait
+     * @param timeUnit the time unit of the {@code timeout} argument
      */
-    Observable<GetDropletResponse> get(GetDropletRequest request);
-
+    void trust(String host, int port, int timeout, TimeUnit timeUnit) throws GeneralSecurityException, IOException;
 }

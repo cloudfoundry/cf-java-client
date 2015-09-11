@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.droplets;
 
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 
 /**
  * The request payload for the Get Droplet operation

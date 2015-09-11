@@ -18,8 +18,6 @@ package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
-import org.cloudfoundry.client.spring.v3.StubLinkBased;
-import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;

@@ -9,6 +9,8 @@
       <w>guids</w>
       <w>procfile</w>
       <w>springapps</w>
+      <w>truster</w>
+      <w>truststore</w>
     </words>
   </dictionary>
 </component>

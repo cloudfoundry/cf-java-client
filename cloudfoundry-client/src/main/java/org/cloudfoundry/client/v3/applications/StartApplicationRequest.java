@@ -16,11 +16,8 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.LinkBased;
 
 /**
  * The request payload for the Start Application operation

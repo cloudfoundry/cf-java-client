@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.cloudfoundry.client.v3.packages.StagePackageResponse;
-
 /**
  * The response payload for the Get Droplet operation
  *
