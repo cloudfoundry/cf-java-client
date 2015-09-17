@@ -316,6 +316,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public void deleteApplication(String appName) {
 		cc.deleteApplication(appName);
 	}
+	
+	public void deleteApplicationInstance(String appName, int index) {
+            cc.deleteApplicationInstance(appName, index);
+        }
 
 	public void deleteAllApplications() {
 		cc.deleteAllApplications();

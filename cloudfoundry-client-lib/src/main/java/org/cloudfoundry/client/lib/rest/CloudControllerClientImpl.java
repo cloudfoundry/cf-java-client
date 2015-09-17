@@ -1539,6 +1539,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		UUID appId = getAppId(appName);
 		doDeleteApplication(appId);
 	}
+	
+	@Override
+        public void deleteApplicationInstance(String appName, int index) {
+               UUID appId = getAppId(appName);
+               doDeleteApplicationInstance(appId, index);
+        }
 
 	@Override
 	public void deleteAllApplications() {
@@ -2189,6 +2195,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	private void doDeleteApplication(UUID appId) {
 		getRestTemplate().delete(getUrl("/v2/apps/{guid}?recursive=true"), appId);
 	}
+	
+	private void doDeleteApplicationInstance(UUID appId, int index) {
+            String path = "/v2/apps/{guid}/instances/{index}";
+
+            Map<String, Object> pathVariables = new HashMap<String, Object>();
+            pathVariables.put("guid", appId);
+            pathVariables.put("index", index);
+
+            getRestTemplate().delete(getUrl(path), pathVariables);
+        }
 
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
 		Assert.notNull(label, "Service label must not be null");
