@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import reactor.rx.Streams;
 
 import java.util.Collections;
 
@@ -49,7 +50,7 @@ public final class SpringDropletsTest extends AbstractRestTest {
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
 
-        this.droplets.get(request).subscribe(response -> {
+        Streams.wrap(this.droplets.get(request)).consume(response -> {
             assertEquals("http://buildpack.git.url.com", response.getBuildpack());
             assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
             assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());

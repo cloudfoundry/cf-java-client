@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import rx.Observable;
+import org.reactivestreams.Publisher;
 
 /**
  * Main entry point to the Cloud Foundry Packages Client API
@@ -30,7 +30,7 @@ public interface Packages {
      * @param request the Create Package request
      * @return the response from the Create Package request
      */
-    Observable<CreatePackageResponse> create(CreatePackageRequest request);
+    Publisher<CreatePackageResponse> create(CreatePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/get_a_package.html">Get
@@ -39,7 +39,7 @@ public interface Packages {
      * @param request the Get Package request
      * @return the response from the Get Package request
      */
-    Observable<GetPackageResponse> get(GetPackageRequest request);
+    Publisher<GetPackageResponse> get(GetPackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage
@@ -48,7 +48,7 @@ public interface Packages {
      * @param request the Stage Package request
      * @return the response from the StagePackage request
      */
-    Observable<StagePackageResponse> stage(StagePackageRequest request);
+    Publisher<StagePackageResponse> stage(StagePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
@@ -57,6 +57,6 @@ public interface Packages {
      * @param request the Upload Package request
      * @return the response from the Upload Package request
      */
-    Observable<UploadPackageResponse> upload(UploadPackageRequest request);
+    Publisher<UploadPackageResponse> upload(UploadPackageRequest request);
 
 }

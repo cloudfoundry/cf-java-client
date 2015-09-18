@@ -16,19 +16,15 @@
 
 package org.cloudfoundry.client.spring;
 
-import rx.Subscriber;
+import reactor.core.subscriber.BaseSubscriber;
 
 import static org.junit.Assert.fail;
 
-public class ExpectedExceptionSubscriber extends Subscriber<Object> {
+public class ExpectedExceptionSubscriber extends BaseSubscriber<Object> {
 
     @Override
-    public void onCompleted() {
+    public void onComplete() {
         fail();
-    }
-
-    @Override
-    public void onError(Throwable e) {
     }
 
     @Override

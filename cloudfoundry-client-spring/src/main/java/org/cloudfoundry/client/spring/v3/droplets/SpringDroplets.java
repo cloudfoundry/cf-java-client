@@ -20,8 +20,8 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import rx.Observable;
 
 import java.net.URI;
 
@@ -41,7 +41,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Observable<GetDropletResponse> get(GetDropletRequest request) {
+    public Publisher<GetDropletResponse> get(GetDropletRequest request) {
         return get(request, GetDropletResponse.class,
                 builder -> builder.pathSegment("v3", "droplets", request.getId()));
     }

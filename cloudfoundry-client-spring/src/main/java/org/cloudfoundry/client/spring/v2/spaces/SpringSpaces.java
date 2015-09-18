@@ -22,8 +22,8 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import rx.Observable;
 
 import java.net.URI;
 
@@ -43,7 +43,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Observable<ListSpacesResponse> list(ListSpacesRequest request) {
+    public Publisher<ListSpacesResponse> list(ListSpacesRequest request) {
         return get(request, ListSpacesResponse.class, builder -> {
             builder.pathSegment("v2", "spaces");
             FilterBuilder.augment(builder, request);

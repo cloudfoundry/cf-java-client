@@ -20,8 +20,8 @@ package org.cloudfoundry.client.spring.v2.info;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import rx.Observable;
 
 import java.net.URI;
 
@@ -41,7 +41,7 @@ public final class SpringInfo extends AbstractSpringOperations implements Info {
     }
 
     @Override
-    public Observable<GetInfoResponse> get() {
+    public Publisher<GetInfoResponse> get() {
         return get(null, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"));
     }
 

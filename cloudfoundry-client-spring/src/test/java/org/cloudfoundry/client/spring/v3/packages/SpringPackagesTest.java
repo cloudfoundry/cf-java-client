@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import reactor.rx.Streams;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -65,7 +66,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withType(DOCKER)
                 .withUrl("docker://cloudfoundry/runtime-ci");
 
-        this.packages.create(request).subscribe(response -> {
+        Streams.wrap(this.packages.create(request)).consume(response -> {
             assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
             assertNull(response.getError());
 
@@ -120,7 +121,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
         GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
 
-        this.packages.get(request).subscribe(response -> {
+        Streams.wrap(this.packages.get(request)).consume(response -> {
             assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
             assertNull(response.getError());
 
@@ -179,7 +180,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withId("test-id")
                 .withStack("cflinuxfs2");
 
-        this.packages.stage(request).subscribe(response -> {
+        Streams.wrap(this.packages.stage(request)).consume(response -> {
             assertEquals("http://buildpack.git.url.com", response.getBuildpack());
             assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
             assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
@@ -242,7 +243,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withFile(new ClassPathResource("v3/packages/test-file").getFile())
                 .withId("test-id");
 
-        this.packages.upload(request).subscribe(response -> {
+        Streams.wrap(this.packages.upload(request)).consume(response -> {
             assertEquals("2015-08-06T00:36:54Z", response.getCreatedAt());
             assertNull(response.getError());
 

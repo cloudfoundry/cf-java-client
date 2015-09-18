@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import rx.Observable;
+import org.reactivestreams.Publisher;
 
 /**
  * Main entry point to the Cloud Foundry Droplets Client API
@@ -30,6 +30,6 @@ public interface Droplets {
      * @param request the Get Droplet request
      * @return the response from the Get Droplet request
      */
-    Observable<GetDropletResponse> get(GetDropletRequest request);
+    Publisher<GetDropletResponse> get(GetDropletRequest request);
 
 }

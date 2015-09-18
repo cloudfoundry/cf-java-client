@@ -20,6 +20,7 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -37,7 +38,7 @@ public final class SpringInfoTest extends AbstractRestTest {
                 .andRespond(withSuccess(new ClassPathResource("v2/info/GET_response.json"),
                         MediaType.APPLICATION_JSON));
 
-        this.info.get().subscribe(response -> {
+        Streams.wrap(this.info.get()).consume(response -> {
             assertEquals("2.33.0", response.getApiVersion());
             assertEquals("ssh.run.pivotal.io:2222", response.getAppSshEndpoint());
             assertNull(response.getAppSshHostKeyFingerprint());

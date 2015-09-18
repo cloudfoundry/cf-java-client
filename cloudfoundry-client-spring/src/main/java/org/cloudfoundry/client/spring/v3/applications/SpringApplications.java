@@ -30,8 +30,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import rx.Observable;
 
 import java.net.URI;
 
@@ -51,24 +51,24 @@ public final class SpringApplications extends AbstractSpringOperations implement
     }
 
     @Override
-    public Observable<CreateApplicationResponse> create(CreateApplicationRequest request) {
+    public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
     }
 
     @Override
-    public Observable<GetApplicationResponse> get(GetApplicationRequest request) {
+    public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId()));
     }
 
     @Override
-    public Observable<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
+    public Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
         return delete(request, new DeleteApplicationResponse(),
                 builder -> builder.pathSegment("v3", "apps", request.getId()));
     }
 
     @Override
-    public Observable<ListApplicationsResponse> list(ListApplicationsRequest request) {
+    public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, builder -> {
             builder.pathSegment("v3", "apps");
             FilterBuilder.augment(builder, request);
@@ -77,7 +77,7 @@ public final class SpringApplications extends AbstractSpringOperations implement
     }
 
     @Override
-    public Observable<StartApplicationResponse> start(StartApplicationRequest request) {
+    public Publisher<StartApplicationResponse> start(StartApplicationRequest request) {
         return put(request, StartApplicationResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId(), "start"));
     }

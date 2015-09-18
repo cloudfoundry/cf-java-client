@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -49,7 +50,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .filterByName("test-name")
                 .withPage(-1);
 
-        this.spaces.list(request).subscribe(response -> {
+        Streams.wrap(this.spaces.list(request)).consume(response -> {
             assertNull(response.getNextUrl());
             assertNull(response.getPreviousUrl());
             assertEquals(Integer.valueOf(1), response.getTotalPages());

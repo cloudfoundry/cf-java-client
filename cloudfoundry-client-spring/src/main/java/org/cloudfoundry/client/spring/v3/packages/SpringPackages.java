@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -34,7 +35,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import rx.Observable;
 
 import java.net.URI;
 
@@ -56,25 +56,25 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Observable<CreatePackageResponse> create(CreatePackageRequest request) {
+    public Publisher<CreatePackageResponse> create(CreatePackageRequest request) {
         return post(request, CreatePackageResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
-    public Observable<GetPackageResponse> get(GetPackageRequest request) {
+    public Publisher<GetPackageResponse> get(GetPackageRequest request) {
         return get(request, GetPackageResponse.class,
                 builder -> builder.pathSegment("v3", "packages", request.getId()));
     }
 
     @Override
-    public Observable<StagePackageResponse> stage(StagePackageRequest request) {
+    public Publisher<StagePackageResponse> stage(StagePackageRequest request) {
         return post(request, StagePackageResponse.class,
                 builder -> builder.pathSegment("v3", "packages", request.getId(), "droplets"));
     }
 
     @Override
-    public Observable<UploadPackageResponse> upload(UploadPackageRequest request) {
+    public Publisher<UploadPackageResponse> upload(UploadPackageRequest request) {
         return exchange(request, () -> {
             URI uri = UriComponentsBuilder.fromUri(this.root)
                     .pathSegment("v3", "packages", request.getId(), "upload")
