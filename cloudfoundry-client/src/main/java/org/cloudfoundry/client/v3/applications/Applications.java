@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import rx.Observable;
+import org.reactivestreams.Publisher;
 
 /**
  * Main entry point to the Cloud Foundry Applications Client API
@@ -30,7 +30,7 @@ public interface Applications {
      * @param request the Create Application request
      * @return the response from the Create Application request
      */
-    Observable<CreateApplicationResponse> create(CreateApplicationRequest request);
+    Publisher<CreateApplicationResponse> create(CreateApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/delete_an_app.html">Delete
@@ -39,7 +39,7 @@ public interface Applications {
      * @param request the Delete Application request
      * @return the response from the Delete Application request
      */
-    Observable<DeleteApplicationResponse> delete(DeleteApplicationRequest request);
+    Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/apps_(experimental)/get_an_app.html">Get Application</a>
@@ -48,7 +48,7 @@ public interface Applications {
      * @param request the Get Application request
      * @return the response from the Get Application request
      */
-    Observable<GetApplicationResponse> get(GetApplicationRequest request);
+    Publisher<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List
@@ -57,7 +57,7 @@ public interface Applications {
      * @param request the List Applications request
      * @return the response from the List Applications request
      */
-    Observable<ListApplicationsResponse> list(ListApplicationsRequest request);
+    Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start
@@ -66,6 +66,6 @@ public interface Applications {
      * @param request the Start Application request
      * @return the response from the Start Application request
      */
-    Observable<StartApplicationResponse> start(StartApplicationRequest request);
+    Publisher<StartApplicationResponse> start(StartApplicationRequest request);
 
 }

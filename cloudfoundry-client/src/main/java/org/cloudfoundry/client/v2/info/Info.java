@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.info;
 
-import rx.Observable;
+import org.reactivestreams.Publisher;
 
 /**
  * Main entry point to the Cloud Foundry Info Client API
@@ -28,6 +28,6 @@ public interface Info {
      *
      * @return the response from the Get Info request
      */
-    Observable<GetInfoResponse> get();
+    Publisher<GetInfoResponse> get();
 
 }

@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
+import reactor.rx.Streams;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withEnvironmentVariable("open", "source")
                 .withBuildpack("name-410");
 
-        this.applications.create(request).subscribe(response -> {
+        Streams.wrap(this.applications.create(request)).consume(response -> {
             assertEquals("name-410", response.getBuildpack());
             assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
             assertEquals("STOPPED", response.getDesiredState());
@@ -124,7 +125,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
 
-        this.applications.get(request).subscribe(response -> {
+        Streams.wrap(this.applications.get(request)).consume(response -> {
             assertEquals("name-2068", response.getBuildpack());
             assertEquals("2015-08-06T00:36:52Z", response.getCreatedAt());
             assertEquals("STOPPED", response.getDesiredState());
@@ -179,7 +180,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
 
-        this.applications.delete(request).subscribe(response -> {
+        Streams.wrap(this.applications.delete(request)).consume(response -> {
             this.mockServer.verify();
         });
     }
@@ -217,7 +218,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withOrderBy(CREATED_AT)
                 .withName("test-name");
 
-        this.applications.list(request).subscribe(response -> {
+        Streams.wrap(this.applications.list(request)).consume(response -> {
             Resource resource = response.getResources().get(0);
 
             assertEquals("name-383", resource.getBuildpack());
@@ -274,7 +275,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
 
-        this.applications.start(request).subscribe(response -> {
+        Streams.wrap(this.applications.start(request)).consume(response -> {
             assertNull(response.getBuildpack());
             assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
             assertEquals("STARTED", response.getDesiredState());

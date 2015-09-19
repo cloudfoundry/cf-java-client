@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import rx.Observable;
+import org.reactivestreams.Publisher;
 
 /**
  * Main entry point to the Cloud Foundry Spaces Client API
@@ -29,6 +29,6 @@ public interface Spaces {
      * @param request the List Spaces request
      * @return the response from the List Spaces request
      */
-    Observable<ListSpacesResponse> list(ListSpacesRequest request);
+    Publisher<ListSpacesResponse> list(ListSpacesRequest request);
 
 }

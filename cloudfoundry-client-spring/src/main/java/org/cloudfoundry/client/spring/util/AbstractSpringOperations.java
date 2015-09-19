@@ -20,13 +20,14 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.RequestEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import rx.Observable;
+import reactor.Publishers;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -47,7 +48,7 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final <T> Observable<T> get(Validatable request, Class<T> responseType,
+    protected final <T> Publisher<T> get(Validatable request, Class<T> responseType,
                                           Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
@@ -59,7 +60,7 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Observable<T> delete(Validatable request, T response,
+    protected final <T> Publisher<T> delete(Validatable request, T response,
                                              Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
@@ -72,8 +73,8 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Observable<T> exchange(Validatable request, Supplier<T> exchange) {
-        return Observable.create(subscriber -> {
+    protected final <T> Publisher<T> exchange(Validatable request, Supplier<T> exchange) {
+        return Publishers.create(subscriber -> {
             if (request != null) {
                 ValidationResult validationResult = request.isValid();
                 if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
@@ -84,14 +85,14 @@ public abstract class AbstractSpringOperations {
 
             try {
                 subscriber.onNext(exchange.get());
-                subscriber.onCompleted();
+                subscriber.onComplete();
             } catch (HttpStatusCodeException e) {
                 subscriber.onError(CloudFoundryExceptionBuilder.build(e));
             }
         });
     }
 
-    protected final <T> Observable<T> post(Validatable request, Class<T> responseType,
+    protected final <T> Publisher<T> post(Validatable request, Class<T> responseType,
                                            Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
@@ -103,7 +104,7 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Observable<T> put(Validatable request, Class<T> responseType,
+    protected final <T> Publisher<T> put(Validatable request, Class<T> responseType,
                                           Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
