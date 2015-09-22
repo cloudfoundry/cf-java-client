@@ -103,7 +103,7 @@ public class OauthClient {
 
 	private OAuth2AccessToken createToken(String username, String password, String clientId, String clientSecret) {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
-		AccessTokenRequest request = createAccessTokenRequest(username, password);
+		AccessTokenRequest request = createAccessTokenRequest();
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
 		try {
@@ -119,7 +119,7 @@ public class OauthClient {
 
 	private OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
 		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
-		AccessTokenRequest request = createAccessTokenRequest(username, password);
+		AccessTokenRequest request = createAccessTokenRequest();
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
 
@@ -148,7 +148,7 @@ public class OauthClient {
 		return resourceOwnerPasswordAccessTokenProvider;
 	}
 
-	private AccessTokenRequest createAccessTokenRequest(String username, String password) {
+	private AccessTokenRequest createAccessTokenRequest() {
 		AccessTokenRequest request = new DefaultAccessTokenRequest();
 		return request;
 	}
