@@ -331,9 +331,9 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     def File getCommandLineFile() {
-        def fileName = propertyOrExtension('file')
+        String fileName = propertyOrExtension('file')
         if(fileName) {
-            File commandLineFile = new File(propertyOrExtension('file'))
+            File commandLineFile = new File(fileName)
             commandLineFile.exists() ? commandLineFile : null
         }
         null
