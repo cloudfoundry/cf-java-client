@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
@@ -30,24 +31,32 @@ public final class ListOrganizationsRequestTest {
     @Test
     public void name() {
         ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .filterByAuditorId("test-auditor-id")
-                .filterByBillingManagerId("test-billing-manager-id")
-                .filterByManagerId("test-manager-id")
-                .filterByName("test-name")
-                .filterBySpaceId("test-space-id")
-                .filterByStatus("test-status")
-                .filterByUserId("test-user-id")
+                .withAuditorId("test-auditor-id-1")
+                .withAuditorIds(Collections.singletonList("test-auditor-id-2"))
+                .withBillingManagerId("test-billing-manager-id-1")
+                .withBillingManagerIds(Collections.singletonList("test-billing-manager-id-2"))
+                .withManagerId("test-manager-id-1")
+                .withManagerIds(Collections.singletonList("test-manager-id-2"))
+                .withName("test-name-1")
+                .withNames(Collections.singletonList("test-name-2"))
+                .withSpaceId("test-space-id-1")
+                .withSpaceIds(Collections.singletonList("test-space-id-2"))
+                .withStatus("test-status-1")
+                .withStatuses(Collections.singletonList("test-status-2"))
+                .withUserId("test-user-id-1")
+                .withUserIds(Collections.singletonList("test-user-id-2"))
                 .withOrderDirection(PaginatedRequest.OrderDirection.ASC)
                 .withPage(-1)
                 .withResultsPerPage(-2);
 
-        assertEquals(Collections.singletonList("test-auditor-id"), request.getAuditorIds());
-        assertEquals(Collections.singletonList("test-billing-manager-id"), request.getBillingManagerIds());
-        assertEquals(Collections.singletonList("test-manager-id"), request.getManagerIds());
-        assertEquals(Collections.singletonList("test-name"), request.getNames());
-        assertEquals(Collections.singletonList("test-space-id"), request.getSpaceIds());
-        assertEquals(Collections.singletonList("test-status"), request.getStatuses());
-        assertEquals(Collections.singletonList("test-user-id"), request.getUserIds());
+        assertEquals(Arrays.asList("test-auditor-id-1", "test-auditor-id-2"), request.getAuditorIds());
+        assertEquals(Arrays.asList("test-billing-manager-id-1", "test-billing-manager-id-2"), request
+                .getBillingManagerIds());
+        assertEquals(Arrays.asList("test-manager-id-1", "test-manager-id-2"), request.getManagerIds());
+        assertEquals(Arrays.asList("test-name-1", "test-name-2"), request.getNames());
+        assertEquals(Arrays.asList("test-space-id-1", "test-space-id-2"), request.getSpaceIds());
+        assertEquals(Arrays.asList("test-status-1", "test-status-2"), request.getStatuses());
+        assertEquals(Arrays.asList("test-user-id-1", "test-user-id-2"), request.getUserIds());
         Assert.assertEquals(PaginatedRequest.OrderDirection.ASC, request.getOrderDirection());
         assertEquals(Integer.valueOf(-1), request.getPage());
         assertEquals(Integer.valueOf(-2), request.getResultsPerPage());

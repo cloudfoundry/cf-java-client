@@ -18,26 +18,47 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.events.ListEventsRequest;
+import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
-import reactor.fn.tuple.Tuple;
-import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
+import static org.cloudfoundry.client.v2.events.Events.APP_CRASH;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_CREATE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_DELETE_REQUEST;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_START;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_STOP;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_UPDATE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_BINDING_CREATE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_BINDING_DELETE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_INSTANCE_CREATE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_INSTANCE_DELETE;
+import static org.cloudfoundry.client.v2.events.Events.AUDIT_SERVICE_INSTANCE_UPDATE;
+
 public final class ApplicationEvents {
+
+    private static final List<String> EVENT_TYPES = Arrays.asList(APP_CRASH, AUDIT_APP_CREATE,
+            AUDIT_APP_DELETE_REQUEST, AUDIT_APP_START, AUDIT_APP_STOP, AUDIT_APP_UPDATE,
+            AUDIT_SERVICE_BINDING_CREATE, AUDIT_SERVICE_BINDING_DELETE, AUDIT_SERVICE_INSTANCE_CREATE,
+            AUDIT_SERVICE_INSTANCE_DELETE, AUDIT_SERVICE_INSTANCE_UPDATE);
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private volatile CloudFoundryClient client;
 
@@ -56,11 +77,41 @@ public final class ApplicationEvents {
 
     @Test
     public void applicationEvents() {
+        Map<String, String> organizations = new HashMap<>();
+
         listOrganizations()
-                .flatMap(organizationsPage -> Streams.from(organizationsPage.getResources()))
-                .filter(organizationResource -> organizationResource.getEntity().getName().startsWith("s1-scs-demo-"))
-                .flatMap(this::listSpaces)
-                .consume(this::printLine);
+                .flatMap(p -> Streams.from(p.getResources()))
+                .filter(r -> r.getEntity().getName().startsWith("s1-scs-demo-"))
+                .consume(r -> {
+                            String key = r.getMetadata().getId();
+                            String value = r.getEntity().getName();
+                            organizations.put(key, value);
+                        },
+                        System.out::println);
+
+        this.logger.info("{} Organizations Found", organizations.size());
+
+        getAllPages(page -> new ListEventsRequest()
+                        .withTypes(EVENT_TYPES)
+                        .withTimestamp("2015-09-14T00:00:00Z")
+                        .withResultsPerPage(100)
+                        .withPage(page),
+                request -> this.client.events().list(request))
+                .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
+//                .observe(r -> this.logger.info(r.getEntity().getOrganizationId()))
+                .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
+                .consume(r -> {
+                            ListEventsResponse.Entity entity = r.getEntity();
+
+                            String timestamp = entity.getTimestamp();
+                            String organization = organizations.get(entity.getOrganizationId());
+                            String type = entity.getType();
+
+                            System.out.printf("%s,%s,%s%n", timestamp, organization, type);
+                        },
+                        System.out::println,
+                        r -> this.logger.info("Finished"));
+
     }
 
     private <T extends PaginatedResponse, U> Stream<T> getAllPages(Function<Integer, U> requestProvider,
@@ -84,27 +135,5 @@ public final class ApplicationEvents {
         return getAllPages(page -> new ListOrganizationsRequest().withPage(page),
                 request -> this.client.organizations().list(request));
     }
-
-    private Publisher<Tuple2<Resource<ListOrganizationsResponse.Entity>, Resource<ListSpacesResponse.Entity>>>
-    listSpaces(Resource<ListOrganizationsResponse.Entity> organizationResource) {
-
-        return getAllPages(
-                page -> new ListSpacesRequest().filterByOrganizationId(organizationResource.getMetadata()
-                        .getId()).withPage(page),
-                request -> this.client.spaces().list(request))
-
-                .flatMap(spacesPage -> Streams.from(spacesPage.getResources()))
-                .map(spaceResource -> Tuple.of(organizationResource, spaceResource));
-    }
-
-    private void printLine(Tuple2<Resource<ListOrganizationsResponse.Entity>,
-            Resource<ListSpacesResponse.Entity>> tuple) {
-
-        String organizationName = tuple.getT1().getEntity().getName();
-        String spaceName = tuple.getT2().getEntity().getName();
-
-        System.out.printf("%s/%s%n", organizationName, spaceName);
-    }
-
 
 }

@@ -17,12 +17,14 @@
 package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
 import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
 import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
+import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -39,6 +41,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Droplets droplets;
 
+    private final Events events;
+
     private final Info info;
 
     private final Organizations organizations;
@@ -52,6 +56,7 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     SpringCloudFoundryClient(RestOperations restOperations, URI root) {
         this.applications = new SpringApplications(restOperations, root);
         this.droplets = new SpringDroplets(restOperations, root);
+        this.events = new SpringEvents(restOperations, root);
         this.info = new SpringInfo(restOperations, root);
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
@@ -72,6 +77,11 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Droplets droplets() {
         return this.droplets;
+    }
+
+    @Override
+    public Events events() {
+        return this.events;
     }
 
     @Override

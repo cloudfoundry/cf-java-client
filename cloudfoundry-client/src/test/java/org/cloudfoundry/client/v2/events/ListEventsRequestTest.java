@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.events;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.PaginatedRequest;
@@ -26,27 +26,24 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListSpacesRequestTest {
+public final class ListEventsRequestTest {
 
     @Test
     public void name() {
-        ListSpacesRequest request = new ListSpacesRequest()
-                .withApplicationId("test-application-id-1")
-                .withApplicationIds(Collections.singletonList("test-application-id-2"))
-                .withDeveloperId("test-developer-id-1")
-                .withDeveloperIds(Collections.singletonList("test-developer-id-2"))
-                .withName("test-name-1")
-                .withNames(Collections.singletonList("test-name-2"))
-                .withOrganizationId("test-organization-id-1")
-                .withOrganizationIds(Collections.singletonList("test-organization-id-2"))
+        ListEventsRequest request = new ListEventsRequest()
+                .withActee("test-actee-1")
+                .withActees(Collections.singletonList("test-actee-2"))
+                .withTimestamp("test-timestamp-1")
+                .withTimestamps(Collections.singletonList("test-timestamp-2"))
+                .withType("test-type-1")
+                .withTypes(Collections.singletonList("test-type-2"))
                 .withOrderDirection(PaginatedRequest.OrderDirection.ASC)
                 .withPage(-1)
                 .withResultsPerPage(-2);
 
-        assertEquals(Arrays.asList("test-application-id-1", "test-application-id-2"), request.getApplicationIds());
-        assertEquals(Arrays.asList("test-developer-id-1", "test-developer-id-2"), request.getDeveloperIds());
-        assertEquals(Arrays.asList("test-name-1", "test-name-2"), request.getNames());
-        assertEquals(Arrays.asList("test-organization-id-1", "test-organization-id-2"), request.getOrganizationIds());
+        assertEquals(Arrays.asList("test-actee-1", "test-actee-2"), request.getActees());
+        assertEquals(Arrays.asList("test-timestamp-1", "test-timestamp-2"), request.getTimestamps());
+        assertEquals(Arrays.asList("test-type-1", "test-type-2"), request.getTypes());
         Assert.assertEquals(PaginatedRequest.OrderDirection.ASC, request.getOrderDirection());
         assertEquals(Integer.valueOf(-1), request.getPage());
         assertEquals(Integer.valueOf(-2), request.getResultsPerPage());
@@ -54,7 +51,7 @@ public final class ListSpacesRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, new ListSpacesRequest().isValid().getStatus());
+        assertEquals(ValidationResult.Status.VALID, new ListEventsRequest().isValid().getStatus());
     }
 
 }

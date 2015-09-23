@@ -144,8 +144,7 @@ public final class IntegrationTest {
     }
 
     private Publisher<ListSpacesResponse> listSpaces() {
-        ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName(this.space);
+        ListSpacesRequest request = new ListSpacesRequest().withName(this.space);
 
         return this.client.spaces().list(request);
     }

@@ -45,11 +45,10 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
 
     private final List<String> userIds = new ArrayList<>();
 
-
     /**
-     * Returns the auditor ids to filter by
+     * Returns the auditor ids
      *
-     * @return the auditor ids to filter by
+     * @return the auditor ids
      */
     @FilterParameter("auditor_guid")
     public List<String> getAuditorIds() {
@@ -57,20 +56,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add an auditor id to filter by
+     * Configure the auditor id
      *
-     * @param auditorId the auditor id to filter by
+     * @param auditorId the auditor id
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByAuditorId(String auditorId) {
+    public ListOrganizationsRequest withAuditorId(String auditorId) {
         this.auditorIds.add(auditorId);
         return this;
     }
 
     /**
-     * Returns the billing manager ids to filter by
+     * Configure the auditor ids
      *
-     * @return the billing manager ids to filter by
+     * @param auditorIds the auditor ids
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withAuditorIds(List<String> auditorIds) {
+        this.auditorIds.addAll(auditorIds);
+        return this;
+    }
+
+    /**
+     * Returns the billing manager ids
+     *
+     * @return the billing manager ids
      */
     @FilterParameter("billing_manager_guid")
     public List<String> getBillingManagerIds() {
@@ -78,20 +88,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a billing manager id to filter by
+     * Configure the billing manager id
      *
-     * @param billingManagerId the billing manager id to filter by
+     * @param billingManagerId the billing manager id
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByBillingManagerId(String billingManagerId) {
+    public ListOrganizationsRequest withBillingManagerId(String billingManagerId) {
         this.billingManagerIds.add(billingManagerId);
         return this;
     }
 
     /**
-     * Returns the manager ids to filter by
+     * Configure the billing manager ids
      *
-     * @return the manager ids to filter by
+     * @param billingManagerIds the billing manager ids
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withBillingManagerIds(List<String> billingManagerIds) {
+        this.billingManagerIds.addAll(billingManagerIds);
+        return this;
+    }
+
+    /**
+     * Returns the manager ids
+     *
+     * @return the manager ids
      */
     @FilterParameter("manager_guid")
     public List<String> getManagerIds() {
@@ -99,20 +120,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a manager id to filter by
+     * Configure the manager id
      *
-     * @param managerId the manager id to filter by
+     * @param managerId the manager id
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByManagerId(String managerId) {
+    public ListOrganizationsRequest withManagerId(String managerId) {
         this.managerIds.add(managerId);
         return this;
     }
 
     /**
-     * Returns the names to filter by
+     * Configure the manager ids
      *
-     * @return the names to filter by
+     * @param managerIds the manager ids
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withManagerIds(List<String> managerIds) {
+        this.managerIds.addAll(managerIds);
+        return this;
+    }
+
+    /**
+     * Returns the names
+     *
+     * @return the names
      */
     @FilterParameter("name")
     public List<String> getNames() {
@@ -120,20 +152,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a name to filter by
+     * Configure the name
      *
-     * @param name the name to filter by
+     * @param name the name
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByName(String name) {
+    public ListOrganizationsRequest withName(String name) {
         this.names.add(name);
         return this;
     }
 
     /**
-     * Returns the space ids to filter by
+     * Configure the names
      *
-     * @return the space ids to filter by
+     * @param names the names
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withNames(List<String> names) {
+        this.names.addAll(names);
+        return this;
+    }
+
+    /**
+     * Returns the space ids
+     *
+     * @return the space ids
      */
     @FilterParameter("space_guid")
     public List<String> getSpaceIds() {
@@ -141,20 +184,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a space id to filter by
+     * Configure the space id
      *
-     * @param spaceId the space id to filter by
+     * @param spaceId the space id
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterBySpaceId(String spaceId) {
+    public ListOrganizationsRequest withSpaceId(String spaceId) {
         this.spaceIds.add(spaceId);
         return this;
     }
 
     /**
-     * Returns the statuses to filter by
+     * Configure the space ids
      *
-     * @return the status to filter by
+     * @param spaceIds the space ids
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withSpaceIds(List<String> spaceIds) {
+        this.spaceIds.addAll(spaceIds);
+        return this;
+    }
+
+    /**
+     * Returns the statuses
+     *
+     * @return the statuses
      */
     @FilterParameter("status")
     public List<String> getStatuses() {
@@ -162,20 +216,31 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a status to filter by
+     * Configure the status
      *
-     * @param status the status to filter by
+     * @param status the status
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByStatus(String status) {
+    public ListOrganizationsRequest withStatus(String status) {
         this.statuses.add(status);
         return this;
     }
 
     /**
-     * Returns the user ids to filter by
+     * Configure the statuses
      *
-     * @return the user ids to filter by
+     * @param statuses the statuses
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withStatuses(List<String> statuses) {
+        this.statuses.addAll(statuses);
+        return this;
+    }
+
+    /**
+     * Returns the user ids
+     *
+     * @return the user ids
      */
     @FilterParameter("user_guid")
     public List<String> getUserIds() {
@@ -183,13 +248,24 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
     }
 
     /**
-     * Add a user id to filter by
+     * Configure the user id
      *
-     * @param userId the user id to filter by
+     * @param userId the user id
      * @return {@code this}
      */
-    public ListOrganizationsRequest filterByUserId(String userId) {
+    public ListOrganizationsRequest withUserId(String userId) {
         this.userIds.add(userId);
+        return this;
+    }
+
+    /**
+     * Configure the user ids
+     *
+     * @param userIds the user ids
+     * @return {@code this}
+     */
+    public ListOrganizationsRequest withUserIds(List<String> userIds) {
+        this.userIds.addAll(userIds);
         return this;
     }
 

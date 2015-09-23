@@ -35,6 +35,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void events() {
+        assertNotNull(this.client.events());
+    }
+
+    @Test
     public void info() {
         assertNotNull(this.client.info());
     }

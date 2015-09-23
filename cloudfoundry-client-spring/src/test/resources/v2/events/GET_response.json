@@ -1,0 +1,74 @@
+{
+  "total_results": 3,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "2cc565c7-18e7-4fff-8fb0-52525f09ee6b",
+        "url": "/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": null
+      },
+      "entity": {
+        "type": "name-1034",
+        "actor": "guid-ddc7f725-c67f-4e68-8118-1ae1687f9fff",
+        "actor_type": "name-1035",
+        "actor_name": "name-1036",
+        "actee": "guid-16ac41e9-c30c-45e1-b51c-226fb37e4197",
+        "actee_type": "name-1037",
+        "actee_name": "name-1038",
+        "timestamp": "2015-07-27T22:43:23Z",
+        "metadata": {
+        },
+        "space_guid": "1a769af6-8ddb-4508-a35a-cc61c51fdcdf",
+        "organization_guid": "49723c2a-a11e-43f8-971a-b34e9134ce00"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "a82493b7-bd16-421b-aef0-d0b5c40869e8",
+        "url": "/v2/events/a82493b7-bd16-421b-aef0-d0b5c40869e8",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": null
+      },
+      "entity": {
+        "type": "name-1042",
+        "actor": "guid-e68c8d10-dc83-4466-8735-9c4201166af9",
+        "actor_type": "name-1043",
+        "actor_name": "name-1044",
+        "actee": "guid-d3ecb6be-c8a0-4e3b-9838-b78c58a88b65",
+        "actee_type": "name-1045",
+        "actee_name": "name-1046",
+        "timestamp": "2015-07-27T22:43:23Z",
+        "metadata": {
+        },
+        "space_guid": "dbe6bbdc-0d9c-495c-abbb-0b5eb93c8494",
+        "organization_guid": "52c7fb45-e31b-4271-9f16-8c94df30d8c7"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "4a0e6a34-2807-44cd-a5cc-b61890662ade",
+        "url": "/v2/events/4a0e6a34-2807-44cd-a5cc-b61890662ade",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": null
+      },
+      "entity": {
+        "type": "name-1050",
+        "actor": "guid-69e5e7e7-7723-4af8-a7cb-255d9a90c8db",
+        "actor_type": "name-1051",
+        "actor_name": "name-1052",
+        "actee": "guid-cc1f17ce-85ab-4cc2-988b-9fca0f3a1d03",
+        "actee_type": "name-1053",
+        "actee_name": "name-1054",
+        "timestamp": "2015-07-27T22:43:23Z",
+        "metadata": {
+        },
+        "space_guid": "38a2f075-fe19-4edc-8787-5571f2af7051",
+        "organization_guid": "9160433e-860d-4251-bd6d-140187a2c5db"
+      }
+    }
+  ]
+}
