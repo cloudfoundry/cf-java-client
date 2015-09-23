@@ -17,6 +17,7 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -47,6 +48,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Info Client API
      */
     Info info();
+
+    /**
+     * Main entry point to the Cloud Foundry Organizations Client API
+     *
+     * @return the Cloud Foundry Organizations Client API
+     */
+    Organizations organizations();
 
     /**
      * Main entry point to the Cloud Foundry Packages Client API
