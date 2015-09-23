@@ -39,6 +39,8 @@ public class CloudCredentials {
 
 	private String proxyUser;
 
+	private String passcode;
+
 	/**
 	 * Create credentials using email and password.
 	 *
@@ -137,6 +139,15 @@ public class CloudCredentials {
 	}
 
 	/**
+	 * Create credentials using OTP passcode.
+	 *
+	 * @param passcode passcode to authenticate with
+	 */
+	public CloudCredentials(String passcode) {
+		this.passcode = passcode;
+	}
+
+	/**
 	 * Get the email.
 	 *
 	 * @return the email
@@ -220,5 +231,21 @@ public class CloudCredentials {
 	 */
 	public boolean isRefreshable() {
 		return refreshable;
+	}
+
+	/**
+	 * Get the OTP passcode
+	 *
+	 * @return the passcode
+	 */
+	public String getPasscode() { return passcode; }
+
+	/**
+	 * Is this a authentication attempt with OTP passcode?
+	 *
+	 * @return whether a passcode is set
+	 */
+	public boolean isPasscodeSet()  {
+		return passcode != null;
 	}
 }

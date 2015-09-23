@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
@@ -67,8 +68,7 @@ public class OauthClient {
 			if (credentials.getToken() != null) {
 				this.token = credentials.getToken();
 			} else {
-				this.token = createToken(credentials.getEmail(), credentials.getPassword(),
-						credentials.getClientId(), credentials.getClientSecret());
+				this.token = createToken(credentials);
 			}
 		}
 	}
@@ -85,8 +85,7 @@ public class OauthClient {
 
 		if(this.credentials.isRefreshable()) {
 			if (token.getExpiresIn() < 50) { // 50 seconds before expiration? Then refresh it.
-				token = refreshToken(token, credentials.getEmail(), credentials.getPassword(),
-						credentials.getClientId(), credentials.getClientSecret());
+				token = refreshToken(token, credentials.getClientId(), credentials.getClientSecret());
 			}
 		}
 
@@ -101,11 +100,24 @@ public class OauthClient {
 		return null;
 	}
 
-	private OAuth2AccessToken createToken(String username, String password, String clientId, String clientSecret) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
+	private OAuth2AccessToken createToken(CloudCredentials credentials) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(credentials);
 		AccessTokenRequest request = createAccessTokenRequest();
 
-		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
+		ResourceOwnerPasswordAccessTokenProvider provider;
+		if(credentials.isPasscodeSet()) {
+			// if we're using OTP passcode for auth, make sure the OAuth client is really only called once
+			// since on the second login attempt, the passcode is invalid and a 403 is thrown.
+			// some parts of cf-java-client seem to login the oauth client multiple times, so we add this protection.
+			if(token != null) {
+				return token;
+			}
+			provider = createResourceOwnerPasscodeAccessTokenProvider();
+		}
+		else {
+			provider = createResourceOwnerPasswordAccessTokenProvider();
+		}
+
 		try {
 			return provider.obtainAccessToken(resource, request);
 		}
@@ -117,8 +129,8 @@ public class OauthClient {
 		}
 	}
 
-	private OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String username, String password, String clientId, String clientSecret) {
-		OAuth2ProtectedResourceDetails resource = getResourceDetails(username, password, clientId, clientSecret);
+	private OAuth2AccessToken refreshToken(OAuth2AccessToken currentToken, String clientId, String clientSecret) {
+		OAuth2ProtectedResourceDetails resource = getResourceDetails(new CloudCredentials(currentToken, clientId, clientSecret));
 		AccessTokenRequest request = createAccessTokenRequest();
 
 		ResourceOwnerPasswordAccessTokenProvider provider = createResourceOwnerPasswordAccessTokenProvider();
@@ -148,19 +160,32 @@ public class OauthClient {
 		return resourceOwnerPasswordAccessTokenProvider;
 	}
 
+	protected ResourceOwnerPasscodeAccessTokenProvider createResourceOwnerPasscodeAccessTokenProvider() {
+		ResourceOwnerPasscodeAccessTokenProvider resourceOwnerPasscodeAccessTokenProvider = new ResourceOwnerPasscodeAccessTokenProvider();
+		resourceOwnerPasscodeAccessTokenProvider.setRequestFactory(restTemplate.getRequestFactory()); //copy the http proxy along
+		return resourceOwnerPasscodeAccessTokenProvider;
+	}
+
 	private AccessTokenRequest createAccessTokenRequest() {
 		AccessTokenRequest request = new DefaultAccessTokenRequest();
 		return request;
 	}
 
-	private OAuth2ProtectedResourceDetails getResourceDetails(String username, String password, String clientId, String clientSecret) {
-		ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
-		resource.setUsername(username);
-		resource.setPassword(password);
+	private OAuth2ProtectedResourceDetails getResourceDetails(CloudCredentials credentials) {
+		BaseOAuth2ProtectedResourceDetails resource;
+		if(credentials.isPasscodeSet()) {
+			resource = new ResourceOwnerPasscodeResourceDetails();
+			((ResourceOwnerPasscodeResourceDetails)resource).setPasscode(credentials.getPasscode());
+		}
+		else {
+			resource = new ResourceOwnerPasswordResourceDetails();
+			((ResourceOwnerPasswordResourceDetails)resource).setUsername(credentials.getEmail());
+			((ResourceOwnerPasswordResourceDetails)resource).setPassword(credentials.getPassword());
+		}
 
-		resource.setClientId(clientId);
-		resource.setClientSecret(clientSecret);
-		resource.setId(clientId);
+		resource.setClientId(credentials.getClientId());
+		resource.setClientSecret(credentials.getClientSecret());
+		resource.setId(credentials.getClientId());
 		resource.setClientAuthenticationScheme(AuthenticationScheme.header);
 		resource.setAccessTokenUri(authorizationUrl + "/oauth/token");
 
