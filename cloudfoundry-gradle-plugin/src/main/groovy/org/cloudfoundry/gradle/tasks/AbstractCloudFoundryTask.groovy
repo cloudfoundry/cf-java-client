@@ -324,9 +324,19 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
     }
 
     File getFile() {
-        ((project.cloudfoundry.file ?:
+        ((getCommandLineFile()?:
+                project.cloudfoundry.file ?:
                 getDefaultArchiveForTask(WarPlugin.WAR_TASK_NAME)) ?:
                 getDefaultArchiveForTask(JavaPlugin.JAR_TASK_NAME))
+    }
+
+    def File getCommandLineFile() {
+        def fileName = propertyOrExtension('file')
+        if(fileName) {
+            File commandLineFile = new File(propertyOrExtension('file'))
+            commandLineFile.exists() ? commandLineFile : null
+        }
+        null
     }
 
     File getDefaultArchiveForTask(String taskName) {
