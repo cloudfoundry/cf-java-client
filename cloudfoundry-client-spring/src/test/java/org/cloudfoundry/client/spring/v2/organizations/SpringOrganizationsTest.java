@@ -47,7 +47,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                         .contentType(APPLICATION_JSON));
 
         ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .filterByName("test-name")
+                .withName("test-name")
                 .withPage(-1);
 
         Streams.wrap(this.organizations.list(request)).consume(response -> {
@@ -94,7 +94,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                         .contentType(APPLICATION_JSON));
 
         ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .filterByName("test-name")
+                .withName("test-name")
                 .withPage(-1);
 
         this.organizations.list(request).subscribe(new ExpectedExceptionSubscriber());

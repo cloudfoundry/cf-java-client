@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -41,6 +42,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application Droplets API
      */
     Droplets droplets();
+
+    /**
+     * Main entry point to the Cloud Foundry Applications Events API
+     *
+     * @return the Cloud Foundry Application Events API
+     */
+    Events events();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API

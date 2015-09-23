@@ -47,7 +47,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
                         .contentType(APPLICATION_JSON));
 
         ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName("test-name")
+                .withName("test-name")
                 .withPage(-1);
 
         Streams.wrap(this.spaces.list(request)).consume(response -> {
@@ -98,7 +98,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
                         .contentType(APPLICATION_JSON));
 
         ListSpacesRequest request = new ListSpacesRequest()
-                .filterByName("test-name")
+                .withName("test-name")
                 .withPage(-1);
 
         this.spaces.list(request).subscribe(new ExpectedExceptionSubscriber());

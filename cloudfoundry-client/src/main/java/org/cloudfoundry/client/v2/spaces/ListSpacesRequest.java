@@ -40,9 +40,9 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
     private final List<String> organizationIds = new ArrayList<>();
 
     /**
-     * Returns the application ids to filter by
+     * Returns the application ids
      *
-     * @return the application ids to filter by
+     * @return the application ids
      */
     @FilterParameter("app_guid")
     public List<String> getApplicationIds() {
@@ -50,20 +50,31 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
     }
 
     /**
-     * Add an application id to filter by
+     * Configure the application id
      *
-     * @param applicationId the application id to filter by
+     * @param applicationId the application id
      * @return {@code this}
      */
-    public ListSpacesRequest filterByApplicationId(String applicationId) {
+    public ListSpacesRequest withApplicationId(String applicationId) {
         this.applicationIds.add(applicationId);
         return this;
     }
 
     /**
-     * Returns the developer ids to filter by
+     * Configure the application ids
      *
-     * @return the developer ids to filter by
+     * @param applicationIds the application ids
+     * @return {@code this}
+     */
+    public ListSpacesRequest withApplicationIds(List<String> applicationIds) {
+        this.applicationIds.addAll(applicationIds);
+        return this;
+    }
+
+    /**
+     * Returns the developer ids
+     *
+     * @return the developer ids
      */
     @FilterParameter("developer_guid")
     public List<String> getDeveloperIds() {
@@ -71,20 +82,31 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
     }
 
     /**
-     * Add a developer id to filter by
+     * Configure the developer id
      *
-     * @param developerId the developer id to filter by
+     * @param developerId the developer id
      * @return {@code this}
      */
-    public ListSpacesRequest filterByDeveloperId(String developerId) {
+    public ListSpacesRequest withDeveloperId(String developerId) {
         this.developerIds.add(developerId);
         return this;
     }
 
     /**
-     * Returns the names to filter by
+     * Configure the developer ids
      *
-     * @return the names to filter by
+     * @param developerIds the developer ids
+     * @return {@code this}
+     */
+    public ListSpacesRequest withDeveloperIds(List<String> developerIds) {
+        this.developerIds.addAll(developerIds);
+        return this;
+    }
+
+    /**
+     * Returns the names
+     *
+     * @return the names
      */
     @FilterParameter("name")
     public List<String> getNames() {
@@ -92,13 +114,24 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
     }
 
     /**
-     * Add a name to filter by
+     * Configure the name
      *
-     * @param name the name to filter by
+     * @param name the name
      * @return {@code this}
      */
-    public ListSpacesRequest filterByName(String name) {
+    public ListSpacesRequest withName(String name) {
         this.names.add(name);
+        return this;
+    }
+
+    /**
+     * Configure the names
+     *
+     * @param names the names
+     * @return {@code this}
+     */
+    public final ListSpacesRequest withNames(List<String> names) {
+        this.names.addAll(names);
         return this;
     }
 
@@ -118,8 +151,19 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
      * @param organizationId the organization id to filter by
      * @return {@code this}
      */
-    public ListSpacesRequest filterByOrganizationId(String organizationId) {
+    public ListSpacesRequest withOrganizationId(String organizationId) {
         this.organizationIds.add(organizationId);
+        return this;
+    }
+
+    /**
+     * Configure the organization ids
+     *
+     * @param organizationIds the organization ids
+     * @return {@code this}
+     */
+    public final ListSpacesRequest withOrganizationIds(List<String> organizationIds) {
+        this.organizationIds.addAll(organizationIds);
         return this;
     }
 
