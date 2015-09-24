@@ -16,32 +16,47 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The response payload for the List Events operation
+ * The request payload for the Get Event operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ListEventsResponse extends PaginatedResponse<ListEventsResponse,
-        ListEventsResponse.ListEventsResponseResource> {
+public final class GetEventRequest implements Validatable {
+
+    private volatile String id;
 
     /**
-     * The resource response payload for the List Events operation
+     * Returns the id
      *
-     * <p><b>This class is NOT threadsafe.</b>
+     * @return the id
      */
-    public static final class ListEventsResponseResource
-            extends Resource<ListEventsResponseResource, ListEventsResponseEntity> {
+    public String getId() {
+        return this.id;
     }
 
     /**
-     * The entity response payload for the List Events operation
+     * Configure the id
      *
-     * <p><b>This class is NOT threadsafe.</b>
+     * @param id the id
+     * @return {@code this}
      */
-    public static final class ListEventsResponseEntity extends Event<ListEventsResponseEntity> {
+    public GetEventRequest withId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult result = new ValidationResult();
+
+        if (this.id == null) {
+            result.invalid("id must be specified");
+        }
+
+        return result;
     }
 
 }

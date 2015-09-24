@@ -27,8 +27,8 @@ public final class PaginatedResponseTest {
 
     @Test
     public void test() {
-        Resource<StubEntity> resource1 = new Resource<StubEntity>().withEntity(new StubEntity());
-        Resource<StubEntity> resource2 = new Resource<StubEntity>().withEntity(new StubEntity());
+        StubResource resource1 = new StubResource().withEntity(new Object());
+        StubResource resource2 = new StubResource().withEntity(new Object());
 
         StubPaginatedResponse response = new StubPaginatedResponse()
                 .withNextUrl("test-next-url")
@@ -46,10 +46,10 @@ public final class PaginatedResponseTest {
     }
 
     private static final class StubPaginatedResponse
-            extends PaginatedResponse<StubPaginatedResponse, StubEntity> {
+            extends PaginatedResponse<StubPaginatedResponse, StubResource> {
     }
 
-    private static final class StubEntity {
+    private static final class StubResource extends Resource<StubResource, Object> {
     }
 
 }

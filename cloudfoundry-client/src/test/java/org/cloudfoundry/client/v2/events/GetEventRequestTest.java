@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v2.events;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetApplicationRequestTest {
+public final class GetEventRequestTest {
 
     @Test
     public void test() {
-        GetApplicationRequest request = new GetApplicationRequest()
+        GetEventRequest request = new GetEventRequest()
                 .withId("test-id");
 
         assertEquals("test-id", request.getId());
@@ -35,7 +35,7 @@ public final class GetApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = new GetApplicationRequest()
+        ValidationResult result = new GetEventRequest()
                 .withId("test-id")
                 .isValid();
 
@@ -44,7 +44,7 @@ public final class GetApplicationRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetApplicationRequest()
+        ValidationResult result = new GetEventRequest()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

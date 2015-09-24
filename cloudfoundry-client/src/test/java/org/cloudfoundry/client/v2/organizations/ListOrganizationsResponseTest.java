@@ -16,17 +16,18 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseEntity;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseResource;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public final class ListOrganizationsResponseTest  {
+public final class ListOrganizationsResponseTest {
 
     @Test
     public void test() {
-        ListOrganizationsResponse.Entity entity = new ListOrganizationsResponse.Entity()
+        ListOrganizationsResponseEntity entity = new ListOrganizationsResponseEntity()
                 .withApplicationEventsUrl("test-application-events-url")
                 .withAuditorsUrl("test-auditors-url")
                 .withBillingEnabled(true)
@@ -57,7 +58,7 @@ public final class ListOrganizationsResponseTest  {
         assertEquals("test-status", entity.getStatus());
         assertEquals("test-users-url", entity.getUsersUrl());
 
-        Resource<ListOrganizationsResponse.Entity> resource = new Resource<ListOrganizationsResponse.Entity>()
+        ListOrganizationsResponseResource resource = new ListOrganizationsResponseResource()
                 .withEntity(entity);
 
         ListOrganizationsResponse response = new ListOrganizationsResponse()

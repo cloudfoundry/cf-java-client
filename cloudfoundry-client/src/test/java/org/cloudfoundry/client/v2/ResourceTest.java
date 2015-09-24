@@ -37,12 +37,15 @@ public final class ResourceTest {
         assertEquals("test-updated-at", metadata.getUpdatedAt());
         assertEquals("test-url", metadata.getUrl());
 
-        Resource resource = new Resource<>()
+        StubResource resource = new StubResource()
                 .withEntity(entity)
                 .withMetadata(metadata);
 
         assertEquals(entity, resource.getEntity());
         assertEquals(metadata, resource.getMetadata());
+    }
+
+    private static final class StubResource extends Resource<StubResource, Object> {
     }
 
 }

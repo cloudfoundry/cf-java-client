@@ -23,11 +23,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * <p><b>This class is NOT threadsafe.</b>
  *
- * @param <T> the type of entity contained within the resource
+ * @param <V> the "self" type.  Used to ensure the appropriate type is returned from builder APIs.
+ * @param <W> the type of entity contained within the resource
  */
-public final class Resource<T> {
+public abstract class Resource<V extends Resource<V, W>, W> {
 
-    private volatile T entity;
+    private volatile W entity;
 
     private volatile Metadata metadata;
 
@@ -36,7 +37,7 @@ public final class Resource<T> {
      *
      * @return the entity
      */
-    public T getEntity() {
+    public final W getEntity() {
         return this.entity;
     }
 
@@ -47,9 +48,10 @@ public final class Resource<T> {
      * @return {@code this}
      */
     @JsonProperty("entity")
-    public Resource<T> withEntity(T entity) {
+    @SuppressWarnings("unchecked")
+    public final V withEntity(W entity) {
         this.entity = entity;
-        return this;
+        return (V) this;
     }
 
     /**
@@ -57,7 +59,7 @@ public final class Resource<T> {
      *
      * @return the metadata
      */
-    public Metadata getMetadata() {
+    public final Metadata getMetadata() {
         return this.metadata;
     }
 
@@ -68,9 +70,10 @@ public final class Resource<T> {
      * @return {@code this}
      */
     @JsonProperty("metadata")
-    public Resource withMetadata(Metadata metadata) {
+    @SuppressWarnings("unchecked")
+    public final V withMetadata(Metadata metadata) {
         this.metadata = metadata;
-        return this;
+        return (V) this;
     }
 
     /**
