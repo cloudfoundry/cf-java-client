@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2.events;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the List Events operation
@@ -32,16 +31,7 @@ public final class ListEventsResponse extends PaginatedResponse<ListEventsRespon
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static final class ListEventsResponseResource
-            extends Resource<ListEventsResponseResource, ListEventsResponseEntity> {
-    }
-
-    /**
-     * The entity response payload for the List Events operation
-     *
-     * <p><b>This class is NOT threadsafe.</b>
-     */
-    public static final class ListEventsResponseEntity extends Event<ListEventsResponseEntity> {
+    public static final class ListEventsResponseResource extends EventResource<ListEventsResponseResource> {
     }
 
 }

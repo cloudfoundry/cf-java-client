@@ -19,9 +19,11 @@ package org.cloudfoundry.client.spring.v2.organizations;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.spring.v2.organizations.auditors.SpringAuditors;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.organizations.auditors.Auditors;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 
@@ -32,6 +34,8 @@ import java.net.URI;
  */
 public final class SpringOrganizations extends AbstractSpringOperations implements Organizations {
 
+    private final Auditors auditors;
+
     /**
      * Creates an instance
      *
@@ -40,6 +44,12 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
      */
     public SpringOrganizations(RestOperations restOperations, URI root) {
         super(restOperations, root);
+        this.auditors = new SpringAuditors(restOperations, root);
+    }
+
+    @Override
+    public Auditors auditors() {
+        return this.auditors;
     }
 
     @Override

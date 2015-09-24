@@ -18,11 +18,13 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
+import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.LoggingDeserializationProblemHandler;
 import org.cloudfoundry.client.spring.util.ResourceOwnerPasswordResourceDetailsBuilder;
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
@@ -36,6 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -170,7 +173,9 @@ public final class SpringCloudFoundryClientBuilder {
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
         RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-        restTemplate.getMessageConverters().stream()
+        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
+
+        messageConverters.stream()
                 .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
                 .map(converter -> (MappingJackson2HttpMessageConverter) converter)
                 .findFirst()
@@ -180,6 +185,8 @@ public final class SpringCloudFoundryClientBuilder {
                             .addHandler(new LoggingDeserializationProblemHandler())
                             .setSerializationInclusion(NON_NULL);
                 });
+
+        messageConverters.add(new FallbackHttpMessageConverter());
 
         return restTemplate;
     }

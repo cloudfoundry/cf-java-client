@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.events;
+package org.cloudfoundry.client.v2.organizations.auditors;
 
 /**
- * The response payload for the Get Event operation
+ * The response payload for the Create Auditor operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class GetEventResponse extends EventResource<GetEventResponse> {
+public final class CreateAuditorResponse extends AuditorResource<CreateAuditorResponse> {
 }
