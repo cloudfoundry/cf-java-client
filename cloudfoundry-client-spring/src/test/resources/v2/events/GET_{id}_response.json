@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "guid": "8f1366e5-1fe2-418c-ae33-38bf29ad857a",
+    "url": "/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a",
+    "created_at": "2015-07-27T22:43:23Z",
+    "updated_at": null
+  },
+  "entity": {
+    "type": "name-1010",
+    "actor": "guid-a01d98f8-ba9a-40b0-86ba-3deacc2978c2",
+    "actor_type": "name-1011",
+    "actor_name": "name-1012",
+    "actee": "guid-ff2c9780-b8db-4276-ba5f-b06adb724873",
+    "actee_type": "name-1013",
+    "actee_name": "name-1014",
+    "timestamp": "2015-07-27T22:43:23Z",
+    "metadata": {
+
+    },
+    "space_guid": "dcb0dcdd-5236-4af3-abc2-1ab0ff424794",
+    "organization_guid": "3317f885-4670-4249-9861-7c75d851d492"
+  }
+}

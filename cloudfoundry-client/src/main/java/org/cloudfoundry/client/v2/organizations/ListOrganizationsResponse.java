@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the List Operations operation
@@ -25,14 +26,23 @@ import org.cloudfoundry.client.v2.PaginatedResponse;
  * <p><b>This class is NOT threadsafe.</b>
  */
 public final class ListOrganizationsResponse extends PaginatedResponse<ListOrganizationsResponse,
-        ListOrganizationsResponse.Entity> {
+        ListOrganizationsResponse.ListOrganizationsResponseResource> {
 
     /**
-     * The Entity response payload for the List Operations operation
+     * The resource response payload for the List Organizations operation
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static final class Entity {
+    public static final class ListOrganizationsResponseResource
+            extends Resource<ListOrganizationsResponseResource, ListOrganizationsResponseEntity> {
+    }
+
+    /**
+     * The entity response payload for the List Organizations operation
+     *
+     * <p><b>This class is NOT threadsafe.</b>
+     */
+    public static final class ListOrganizationsResponseEntity {
 
         private volatile String applicationEventsUrl;
 
@@ -78,7 +88,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("app_events_url")
-        public Entity withApplicationEventsUrl(String applicationEventsUrl) {
+        public ListOrganizationsResponseEntity withApplicationEventsUrl(String applicationEventsUrl) {
             this.applicationEventsUrl = applicationEventsUrl;
             return this;
         }
@@ -99,7 +109,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("auditors_url")
-        public Entity withAuditorsUrl(String auditorsUrl) {
+        public ListOrganizationsResponseEntity withAuditorsUrl(String auditorsUrl) {
             this.auditorsUrl = auditorsUrl;
             return this;
         }
@@ -120,7 +130,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("billing_enabled")
-        public Entity withBillingEnabled(Boolean billingEnabled) {
+        public ListOrganizationsResponseEntity withBillingEnabled(Boolean billingEnabled) {
             this.billingEnabled = billingEnabled;
             return this;
         }
@@ -141,7 +151,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("billing_managers_url")
-        public Entity withBillingManagersUrl(String billingManagersUrl) {
+        public ListOrganizationsResponseEntity withBillingManagersUrl(String billingManagersUrl) {
             this.billingManagersUrl = billingManagersUrl;
             return this;
         }
@@ -162,7 +172,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("domains_url")
-        public Entity withDomainsUrl(String domainsUrl) {
+        public ListOrganizationsResponseEntity withDomainsUrl(String domainsUrl) {
             this.domainsUrl = domainsUrl;
             return this;
         }
@@ -183,7 +193,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("managers_url")
-        public Entity withManagersUrl(String managersUrl) {
+        public ListOrganizationsResponseEntity withManagersUrl(String managersUrl) {
             this.managersUrl = managersUrl;
             return this;
         }
@@ -204,7 +214,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("name")
-        public Entity withName(String name) {
+        public ListOrganizationsResponseEntity withName(String name) {
             this.name = name;
             return this;
         }
@@ -225,7 +235,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("private_domains_url")
-        public Entity withPrivateDomainsUrl(String privateDomainsUrl) {
+        public ListOrganizationsResponseEntity withPrivateDomainsUrl(String privateDomainsUrl) {
             this.privateDomainsUrl = privateDomainsUrl;
             return this;
         }
@@ -246,7 +256,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("quota_definition_guid")
-        public Entity withQuotaDefinitionId(String quotaDefinitionId) {
+        public ListOrganizationsResponseEntity withQuotaDefinitionId(String quotaDefinitionId) {
             this.quotaDefinitionId = quotaDefinitionId;
             return this;
         }
@@ -267,7 +277,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("quota_definition_url")
-        public Entity withQuotaDefinitionUrl(String quotaDefinitionUrl) {
+        public ListOrganizationsResponseEntity withQuotaDefinitionUrl(String quotaDefinitionUrl) {
             this.quotaDefinitionUrl = quotaDefinitionUrl;
             return this;
         }
@@ -288,7 +298,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("space_quota_definitions_url")
-        public Entity withSpaceQuotaDefinitionsUrl(String spaceQuotaDefinitionsUrl) {
+        public ListOrganizationsResponseEntity withSpaceQuotaDefinitionsUrl(String spaceQuotaDefinitionsUrl) {
             this.spaceQuotaDefinitionsUrl = spaceQuotaDefinitionsUrl;
             return this;
         }
@@ -309,7 +319,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("spaces_url")
-        public Entity withSpacesUrl(String spacesUrl) {
+        public ListOrganizationsResponseEntity withSpacesUrl(String spacesUrl) {
             this.spacesUrl = spacesUrl;
             return this;
         }
@@ -330,7 +340,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("status")
-        public Entity withStatus(String status) {
+        public ListOrganizationsResponseEntity withStatus(String status) {
             this.status = status;
             return this;
         }
@@ -351,7 +361,7 @@ public final class ListOrganizationsResponse extends PaginatedResponse<ListOrgan
          * @return {@code this}
          */
         @JsonProperty("users_url")
-        public Entity withUsersUrl(String usersUrl) {
+        public ListOrganizationsResponseEntity withUsersUrl(String usersUrl) {
             this.usersUrl = usersUrl;
             return this;
         }

@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.events.Events;
+import org.cloudfoundry.client.v2.events.GetEventRequest;
+import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.reactivestreams.Publisher;
@@ -43,6 +45,12 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
     }
 
     @Override
+    public Publisher<GetEventResponse> get(GetEventRequest request) {
+        return get(request, GetEventResponse.class,
+                builder -> builder.pathSegment("v2", "events", request.getId()));
+    }
+
+    @Override
     public Publisher<ListEventsResponse> list(ListEventsRequest request) {
         return get(request, ListEventsResponse.class, builder -> {
             builder.pathSegment("v2", "events");
@@ -50,4 +58,5 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
             QueryBuilder.augment(builder, request);
         });
     }
+
 }

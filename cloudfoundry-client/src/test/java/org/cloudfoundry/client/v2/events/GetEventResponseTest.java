@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseEntity;
-import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseResource;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -26,11 +24,11 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListEventsResponseTest {
+public final class GetEventResponseTest {
 
     @Test
     public void test() {
-        ListEventsResponseEntity entity = new ListEventsResponseEntity()
+        GetEventResponse.GetEventResponseEntity entity = new GetEventResponse.GetEventResponseEntity()
                 .withActee("test-actee")
                 .withActeeName("test-actee-name")
                 .withActeeType("test-actee-type")
@@ -60,13 +58,10 @@ public final class ListEventsResponseTest {
         assertEquals("test-timestamp", entity.getTimestamp());
         assertEquals("test-type", entity.getType());
 
-        ListEventsResponseResource resource = new ListEventsResponseResource()
+        GetEventResponse response = new GetEventResponse()
                 .withEntity(entity);
 
-        ListEventsResponse response = new ListEventsResponse()
-                .withResource(resource);
-
-        assertEquals(entity, response.getResources().get(0).getEntity());
+        assertEquals(entity, response.getEntity());
     }
 
 }

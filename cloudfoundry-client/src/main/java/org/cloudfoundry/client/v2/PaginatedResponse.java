@@ -27,15 +27,15 @@ import java.util.List;
  * <p><b>This class is NOT threadsafe.</b>
  *
  * @param <T> the "self" type.  Used to ensure the appropriate type is returned from builder APIs.
- * @param <U> the entity type
+ * @param <U> the resource type
  */
-public abstract class PaginatedResponse<T extends PaginatedResponse<T, U>, U> {
+public abstract class PaginatedResponse<T extends PaginatedResponse<T, U>, U extends Resource<U, ?>> {
 
     private volatile String nextUrl;
 
     private volatile String previousUrl;
 
-    private final List<Resource<U>> resources = new ArrayList<>();
+    private final List<U> resources = new ArrayList<>();
 
     private volatile Integer totalPages;
 
@@ -90,7 +90,7 @@ public abstract class PaginatedResponse<T extends PaginatedResponse<T, U>, U> {
      *
      * @return the resources
      */
-    public final List<Resource<U>> getResources() {
+    public final List<U> getResources() {
         return this.resources;
     }
 
@@ -101,7 +101,7 @@ public abstract class PaginatedResponse<T extends PaginatedResponse<T, U>, U> {
      * @return {@code this}
      */
     @SuppressWarnings("unchecked")
-    public final T withResource(Resource<U> resource) {
+    public final T withResource(U resource) {
         this.resources.add(resource);
         return (T) this;
     }
@@ -114,7 +114,7 @@ public abstract class PaginatedResponse<T extends PaginatedResponse<T, U>, U> {
      */
     @JsonProperty("resources")
     @SuppressWarnings("unchecked")
-    public final T withResources(List<Resource<U>> resources) {
+    public final T withResources(List<U> resources) {
         this.resources.addAll(resources);
         return (T) this;
     }

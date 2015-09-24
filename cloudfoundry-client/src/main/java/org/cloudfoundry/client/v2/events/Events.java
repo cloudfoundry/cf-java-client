@@ -186,18 +186,30 @@ public interface Events {
     /**
      * {@code audit.user_provided_service_instance.create} event type
      */
-    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_CREATE = "audit.user_provided_service_instance.create";
+    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_CREATE =
+            "audit.user_provided_service_instance.create";
 
     /**
      * {@code audit.user_provided_service_instance.delete} event type
      */
-    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_DELETE = "audit.user_provided_service_instance.delete";
+    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_DELETE =
+            "audit.user_provided_service_instance.delete";
 
     /**
      * {@code audit.user_provided_service_instance.update} event type
      */
-    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_UPDATE = "audit.user_provided_service_instance.update";
+    public static final String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_UPDATE =
+            "audit.user_provided_service_instance.update";
 
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/events/retrieve_a_particular_event.html">Get Event</a>
+     * request
+     *
+     * @param request the Get Event request
+     * @return the response from the Get Event request
+     */
+    Publisher<GetEventResponse> get(GetEventRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/events/list_all_events.html">List Events</a> request

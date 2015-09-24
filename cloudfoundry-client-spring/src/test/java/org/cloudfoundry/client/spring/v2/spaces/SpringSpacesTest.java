@@ -20,7 +20,8 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseEntity;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -57,7 +58,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
             assertEquals(Integer.valueOf(1), response.getTotalResults());
 
             assertEquals(1, response.getResources().size());
-            Resource<ListSpacesResponse.Entity> resource = response.getResources().get(0);
+            ListSpacesResponseResource resource = response.getResources().get(0);
 
             Resource.Metadata metadata = resource.getMetadata();
             assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
@@ -65,10 +66,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
             assertNull(metadata.getUpdatedAt());
             assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
 
-            ListSpacesResponse.Entity entity = resource.getEntity();
+            ListSpacesResponseEntity entity = resource.getEntity();
             assertTrue(entity.getAllowSsh());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events", entity.getApplicationEventsUrl
-                    ());
+            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events",
+                    entity.getApplicationEventsUrl());
             assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
             assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
             assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
@@ -103,4 +104,5 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
         this.spaces.list(request).subscribe(new ExpectedExceptionSubscriber());
     }
+
 }

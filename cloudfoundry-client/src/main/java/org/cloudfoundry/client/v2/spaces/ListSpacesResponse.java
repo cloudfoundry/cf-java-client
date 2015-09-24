@@ -18,20 +18,31 @@ package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the List Spaces operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ListSpacesResponse extends PaginatedResponse<ListSpacesResponse, ListSpacesResponse.Entity> {
+public final class ListSpacesResponse extends PaginatedResponse<ListSpacesResponse,
+        ListSpacesResponse.ListSpacesResponseResource> {
 
     /**
-     * The Entity response payload for the List Spaces operation
+     * The resource response payload for the List Spaces operation
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static final class Entity {
+    public static final class ListSpacesResponseResource
+            extends Resource<ListSpacesResponseResource, ListSpacesResponseEntity> {
+    }
+
+    /**
+     * The entity response payload for the List Spaces operation
+     *
+     * <p><b>This class is NOT threadsafe.</b>
+     */
+    public static final class ListSpacesResponseEntity {
 
         private volatile Boolean allowSsh;
 
@@ -79,7 +90,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("allow_ssh")
-        public Entity allowSsh(Boolean allowSsh) {
+        public ListSpacesResponseEntity allowSsh(Boolean allowSsh) {
             this.allowSsh = allowSsh;
             return this;
         }
@@ -100,7 +111,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("app_events_url")
-        public Entity withApplicationEventsUrl(String applicationEventsUrl) {
+        public ListSpacesResponseEntity withApplicationEventsUrl(String applicationEventsUrl) {
             this.applicationEventsUrl = applicationEventsUrl;
             return this;
         }
@@ -121,7 +132,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("apps_url")
-        public Entity withApplicationsUrl(String applicationsUrl) {
+        public ListSpacesResponseEntity withApplicationsUrl(String applicationsUrl) {
             this.applicationsUrl = applicationsUrl;
             return this;
         }
@@ -142,7 +153,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("auditors_url")
-        public Entity withAuditorsUrl(String auditorsUrl) {
+        public ListSpacesResponseEntity withAuditorsUrl(String auditorsUrl) {
             this.auditorsUrl = auditorsUrl;
             return this;
         }
@@ -163,7 +174,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("developers_url")
-        public Entity withDevelopersUrl(String developersUrl) {
+        public ListSpacesResponseEntity withDevelopersUrl(String developersUrl) {
             this.developersUrl = developersUrl;
             return this;
         }
@@ -184,7 +195,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("domains_url")
-        public Entity withDomainsUrl(String domainsUrl) {
+        public ListSpacesResponseEntity withDomainsUrl(String domainsUrl) {
             this.domainsUrl = domainsUrl;
             return this;
         }
@@ -205,7 +216,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("events_url")
-        public Entity withEventsUrl(String eventsUrl) {
+        public ListSpacesResponseEntity withEventsUrl(String eventsUrl) {
             this.eventsUrl = eventsUrl;
             return this;
         }
@@ -226,7 +237,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("managers_url")
-        public Entity withManagersUrl(String managersUrl) {
+        public ListSpacesResponseEntity withManagersUrl(String managersUrl) {
             this.managersUrl = managersUrl;
             return this;
         }
@@ -247,7 +258,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("name")
-        public Entity withName(String name) {
+        public ListSpacesResponseEntity withName(String name) {
             this.name = name;
             return this;
         }
@@ -268,7 +279,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("organization_guid")
-        public Entity withOrganizationId(String organizationId) {
+        public ListSpacesResponseEntity withOrganizationId(String organizationId) {
             this.organizationId = organizationId;
             return this;
         }
@@ -289,7 +300,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("organization_url")
-        public Entity withOrganizationUrl(String organizationUrl) {
+        public ListSpacesResponseEntity withOrganizationUrl(String organizationUrl) {
             this.organizationUrl = organizationUrl;
             return this;
         }
@@ -310,7 +321,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("routes_url")
-        public Entity withRoutesUrl(String routesUrl) {
+        public ListSpacesResponseEntity withRoutesUrl(String routesUrl) {
             this.routesUrl = routesUrl;
             return this;
         }
@@ -331,7 +342,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("security_groups_url")
-        public Entity withSecurityGroupsUrl(String securityGroupsUrl) {
+        public ListSpacesResponseEntity withSecurityGroupsUrl(String securityGroupsUrl) {
             this.securityGroupsUrl = securityGroupsUrl;
             return this;
         }
@@ -352,7 +363,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("service_instances_url")
-        public Entity withServiceInstancesUrl(String serviceInstancesUrl) {
+        public ListSpacesResponseEntity withServiceInstancesUrl(String serviceInstancesUrl) {
             this.serviceInstancesUrl = serviceInstancesUrl;
             return this;
         }
@@ -373,7 +384,7 @@ public final class ListSpacesResponse extends PaginatedResponse<ListSpacesRespon
          * @return {@code this}
          */
         @JsonProperty("space_quota_definition_guid")
-        public Entity withSpaceQuotaDefinitionId(String spaceQuotaDefinitionId) {
+        public ListSpacesResponseEntity withSpaceQuotaDefinitionId(String spaceQuotaDefinitionId) {
             this.spaceQuotaDefinitionId = spaceQuotaDefinitionId;
             return this;
         }
