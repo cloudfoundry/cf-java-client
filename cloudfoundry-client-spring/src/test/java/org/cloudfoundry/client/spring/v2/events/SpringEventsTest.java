@@ -19,10 +19,9 @@ package org.cloudfoundry.client.spring.v2.events;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.events.EventResource.EventEntity;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
-import org.cloudfoundry.client.v2.events.GetEventResponse.GetEventResponseEntity;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseEntity;
 import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseResource;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -60,7 +59,7 @@ public final class SpringEventsTest extends AbstractRestTest {
             assertNull(metadata.getUpdatedAt());
             assertEquals("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a", metadata.getUrl());
 
-            GetEventResponseEntity entity = response.getEntity();
+            EventEntity entity = response.getEntity();
 
             assertEquals("guid-ff2c9780-b8db-4276-ba5f-b06adb724873", entity.getActee());
             assertEquals("name-1014", entity.getActeeName());
@@ -123,7 +122,7 @@ public final class SpringEventsTest extends AbstractRestTest {
             assertNull(metadata.getUpdatedAt());
             assertEquals("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b", metadata.getUrl());
 
-            ListEventsResponseEntity entity = resource.getEntity();
+            EventEntity entity = resource.getEntity();
             assertEquals("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197", entity.getActee());
             assertEquals("name-1038", entity.getActeeName());
             assertEquals("name-1037", entity.getActeeType());

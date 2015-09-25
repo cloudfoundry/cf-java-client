@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
@@ -38,6 +39,8 @@ public abstract class AbstractRestTest {
                     converter.getObjectMapper()
                             .setSerializationInclusion(NON_NULL);
                 });
+
+        this.restTemplate.getMessageConverters().add(new FallbackHttpMessageConverter());
     }
 
     protected final URI root = UriComponentsBuilder.newInstance()

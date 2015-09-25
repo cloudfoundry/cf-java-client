@@ -18,8 +18,8 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.events.EventResource.EventEntity;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.Before;
@@ -100,8 +100,8 @@ public final class ApplicationEvents {
                 .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
 //                .observe(r -> this.logger.info(r.getEntity().getOrganizationId()))
                 .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
-                .consume(r -> {
-                            ListEventsResponseEntity entity = r.getEntity();
+                .multiConsume(25, r -> {
+                            EventEntity entity = r.getEntity();
 
                             String timestamp = entity.getTimestamp();
                             String organization = organizations.get(entity.getOrganizationId());

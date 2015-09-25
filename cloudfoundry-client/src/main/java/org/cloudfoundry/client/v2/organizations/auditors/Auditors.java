@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations;
+package org.cloudfoundry.client.v2.organizations.auditors;
 
-import org.cloudfoundry.client.v2.organizations.auditors.Auditors;
 import org.reactivestreams.Publisher;
 
 /**
- * Main entry point to the Cloud Foundry Organizations Client API
+ * Main entry point to the Cloud Foundry Organization Auditors Client API
  */
-public interface Organizations {
+public interface Auditors {
 
     /**
-     * Main entry point to the Cloud Foundry Organization Auditors Client API
-     *
-     * @return the Cloud Foundry Organization Auditors Client API
-     */
-    Auditors auditors();
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
-     * Organizations</a> request
+     * Makes the <a
+     * href="http://apidocs.cloudfoundry.org/214/organizations/associate_auditor_with_the_organization.html">Create
+     * Auditor</a> request
      *
      * @param request the List Organizations request
      * @return the response from the List Organizations request
      */
-    Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request);
+    Publisher<CreateAuditorResponse> create(CreateAuditorRequest request);
+
 }
