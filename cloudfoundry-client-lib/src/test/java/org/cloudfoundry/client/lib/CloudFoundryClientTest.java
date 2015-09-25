@@ -153,7 +153,7 @@ public class CloudFoundryClientTest {
 	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "p-mysql");
 	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "100mb-dev");
 
-	private static final String DEFAULT_STACK_NAME = "lucid64";
+	private static final String DEFAULT_STACK_NAME = System.getProperty("ccng.stackName", "lucid64");
 
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 
@@ -176,6 +176,8 @@ public class CloudFoundryClientTest {
 	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
 
 	private static final String CCNG_SECURITY_GROUP_NAME_TEST = System.getProperty("ccng.securityGroup", "test_security_group");
+
+	private static final String APP_DOMAIN = System.getProperty("ccng.appDomain", "cf.deepsouthcloud.com");
 
 	private static boolean tearDownComplete = false;
 
@@ -1364,18 +1366,18 @@ public class CloudFoundryClientTest {
 		boolean pass = ensureApplicationRunning("haash-broker");
 		assertTrue("haash-broker failed to start", pass);
 
-		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		String brokerUrl = "http://haash-broker." +  APP_DOMAIN;
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", brokerUrl, "warreng", "snoopdogg");
 		connectedClient.createServiceBroker(newBroker);
 
 		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
 		assertNotNull(broker);
 		assertNotNull(broker.getMeta());
-		assertEquals("haash-broker", broker.getName());
-		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals(brokerUrl, broker.getUrl());
 		assertEquals("warreng", broker.getUsername());
 		assertNull(broker.getPassword());
 
-		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", brokerUrl, "warreng", "snoopdogg");
 		connectedClient.updateServiceBroker(newBroker);
 
 		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", true);
