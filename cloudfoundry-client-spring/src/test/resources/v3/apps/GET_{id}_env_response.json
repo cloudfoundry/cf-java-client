@@ -1,0 +1,25 @@
+{
+  "environment_variables": {
+    "SOME_KEY": "some_val"
+  },
+  "staging_env_json": {
+    "STAGING_ENV": "staging_value"
+  },
+  "running_env_json": {
+    "RUNNING_ENV": "running_value"
+  },
+  "application_env_json": {
+    "VCAP_APPLICATION": {
+      "limits": {
+        "fds": 16384
+      },
+      "application_name": "app_name",
+      "application_uris": [],
+      "name": "app_name",
+      "space_name": "some_space",
+      "space_id": "c595c2ee-df01-4769-a61f-df5bd5e4cbc1",
+      "uris": [],
+      "users": null
+    }
+  }
+}
