@@ -20,6 +20,7 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse.Resource;
@@ -31,6 +32,8 @@ import reactor.rx.Streams;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
@@ -168,6 +171,63 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test
     public void getInvalidRequest() {
         this.applications.get(new GetApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void getEnvironment() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/env"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_env_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.applications.getEnvironment(request)).consume(response -> {
+            Map<String, Object> vcapApplication = new HashMap<>();
+            vcapApplication.put("limits", Collections.singletonMap("fds", 16384));
+            vcapApplication.put("application_name", "app_name");
+            vcapApplication.put("application_uris", Collections.emptyList());
+            vcapApplication.put("name", "app_name");
+            vcapApplication.put("space_name", "some_space");
+            vcapApplication.put("space_id", "c595c2ee-df01-4769-a61f-df5bd5e4cbc1");
+            vcapApplication.put("uris", Collections.emptyList());
+            vcapApplication.put("users", null);
+
+            Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION", vcapApplication);
+            assertEquals(applicationEnvironmentVariables, response.getApplicationEnvironmentVariables());
+
+            Map<String, Object> environmentVariables = Collections.singletonMap("SOME_KEY", "some_val");
+            assertEquals(environmentVariables, response.getEnvironmentVariables());
+
+            Map<String, Object> runningEnvironmentVariables = Collections.singletonMap("RUNNING_ENV", "running_value");
+            assertEquals(runningEnvironmentVariables, response.getRunningEnvironmentVariables());
+
+            Map<String, Object> stagingEnvironmentVariables = Collections.singletonMap("STAGING_ENV", "staging_value");
+            assertEquals(stagingEnvironmentVariables, response.getStagingEnvironmentVariables());
+
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void getEnvironmentError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/env"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
+                .withId("test-id");
+
+        this.applications.getEnvironment(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void getEnvironmentInvalidRequest() {
+        this.applications.getEnvironment(new GetApplicationEnvironmentRequest()).subscribe(new ExpectedExceptionSubscriber());
     }
 
     @Test

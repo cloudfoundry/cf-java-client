@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
@@ -59,6 +61,12 @@ public final class SpringApplications extends AbstractSpringOperations implement
     public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId()));
+    }
+
+    @Override
+    public Publisher<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
+        return get(request, GetApplicationEnvironmentResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "env"));
     }
 
     @Override
