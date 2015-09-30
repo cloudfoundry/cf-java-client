@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 
@@ -88,6 +90,11 @@ public final class SpringApplications extends AbstractSpringOperations implement
     public Publisher<StartApplicationResponse> start(StartApplicationRequest request) {
         return put(request, StartApplicationResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId(), "start"));
+    }
+
+    @Override
+    public Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
+        return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
     }
 
 }

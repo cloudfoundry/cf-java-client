@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -33,6 +34,7 @@ public final class GetApplicationRequest implements Validatable {
      *
      * @return the id
      */
+    @JsonIgnore
     public String getId() {
         return this.id;
     }

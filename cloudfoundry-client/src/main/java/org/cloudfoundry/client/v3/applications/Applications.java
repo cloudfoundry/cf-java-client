@@ -77,4 +77,13 @@ public interface Applications {
      */
     Publisher<StartApplicationResponse> start(StartApplicationRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">Update
+     * Application</a> request
+     *
+     * @param request the Update Application request
+     * @return the response from the Update Application request
+     */
+    Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request);
+
 }

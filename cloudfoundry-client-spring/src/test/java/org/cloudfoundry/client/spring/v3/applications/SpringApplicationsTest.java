@@ -25,9 +25,9 @@ import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse.Resource;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpMethod;
 import reactor.rx.Streams;
 
 import java.io.IOException;
@@ -41,6 +41,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.PATCH;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -57,7 +59,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test
     public void create() throws IOException {
         this.mockServer
-                .expect(method(HttpMethod.POST))
+                .expect(method(POST))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
                 .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_request.json")))
                 .andRespond(withStatus(CREATED)
@@ -96,7 +98,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test
     public void createError() throws IOException {
         this.mockServer
-                .expect(method(HttpMethod.POST))
+                .expect(method(POST))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
                 .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_request.json")))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
@@ -195,7 +197,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
             vcapApplication.put("uris", Collections.emptyList());
             vcapApplication.put("users", null);
 
-            Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION", vcapApplication);
+            Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION",
+                    vcapApplication);
             assertEquals(applicationEnvironmentVariables, response.getApplicationEnvironmentVariables());
 
             Map<String, Object> environmentVariables = Collections.singletonMap("SOME_KEY", "some_val");
@@ -227,7 +230,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void getEnvironmentInvalidRequest() {
-        this.applications.getEnvironment(new GetApplicationEnvironmentRequest()).subscribe(new ExpectedExceptionSubscriber());
+        this.applications.getEnvironment(new GetApplicationEnvironmentRequest()).subscribe(new
+                ExpectedExceptionSubscriber());
     }
 
     @Test
@@ -377,6 +381,77 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test
     public void startInvalidRequest() {
         this.applications.start(new StartApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void update() throws IOException {
+        this.mockServer
+                .expect(method(PATCH))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/PATCH_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        Map<String, String> environment_variables = new HashMap<>();
+        environment_variables.put("MY_ENV_VAR", "foobar");
+        environment_variables.put("FOOBAR", "MY_ENV_VAR");
+
+        UpdateApplicationRequest request = new UpdateApplicationRequest()
+                .withName("new_name")
+                .withEnvironmentVariables(environment_variables)
+                .withBuildpack("http://gitwheel.org/my-app")
+                .withId("test-id");
+
+        Streams.wrap(this.applications.update(request)).consume(response -> {
+            assertEquals("http://gitwheel.org/my-app", response.getBuildpack());
+            assertEquals("2015-07-27T22:43:14Z", response.getCreatedAt());
+            assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
+            assertEquals("STOPPED", response.getDesiredState());
+            assertEquals(environment_variables, response.getEnvironmentVariables());
+            assertEquals("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a", response.getId());
+
+            assertEquals(7, response.getLinks().size());
+            assertNotNull(response.getLink("self"));
+            assertNotNull(response.getLink("processes"));
+            assertNotNull(response.getLink("packages"));
+            assertNotNull(response.getLink("space"));
+            assertNotNull(response.getLink("start"));
+            assertNotNull(response.getLink("stop"));
+            assertNotNull(response.getLink("assign_current_droplet"));
+
+            assertEquals("new_name", response.getName());
+            assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void updateError() throws IOException {
+        this.mockServer
+                .expect(method(PATCH))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        Map<String, String> environment_variables = new HashMap<>();
+        environment_variables.put("MY_ENV_VAR", "foobar");
+        environment_variables.put("FOOBAR", "MY_ENV_VAR");
+
+        UpdateApplicationRequest request = new UpdateApplicationRequest()
+                .withName("new_name")
+                .withEnvironmentVariables(environment_variables)
+                .withBuildpack("http://gitwheel.org/my-app")
+                .withId("test-id");
+
+        this.applications.update(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void updateInvalidRequest() throws Throwable {
+        this.applications.update(new UpdateApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
     }
 
 }
