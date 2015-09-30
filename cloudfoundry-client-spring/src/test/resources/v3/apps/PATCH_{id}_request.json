@@ -1,0 +1,8 @@
+{
+  "name": "new_name",
+  "environment_variables": {
+    "MY_ENV_VAR": "foobar",
+    "FOOBAR": "MY_ENV_VAR"
+  },
+  "buildpack": "http://gitwheel.org/my-app"
+}

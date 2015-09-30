@@ -33,6 +33,7 @@ import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.PUT;
 
 public abstract class AbstractSpringOperations {
@@ -49,7 +50,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Publisher<T> get(Validatable request, Class<T> responseType,
-                                          Consumer<UriComponentsBuilder> builderCallback) {
+                                         Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -61,7 +62,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Publisher<T> delete(Validatable request, T response,
-                                             Consumer<UriComponentsBuilder> builderCallback) {
+                                            Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -92,8 +93,20 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Publisher<T> post(Validatable request, Class<T> responseType,
+    protected final <T> Publisher<T> patch(Validatable request, Class<T> responseType,
                                            Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, () -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
+
+            this.logger.debug("PATCH {}", uri);
+            return this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
+        });
+    }
+
+    protected final <T> Publisher<T> post(Validatable request, Class<T> responseType,
+                                          Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -105,7 +118,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Publisher<T> put(Validatable request, Class<T> responseType,
-                                          Consumer<UriComponentsBuilder> builderCallback) {
+                                         Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
