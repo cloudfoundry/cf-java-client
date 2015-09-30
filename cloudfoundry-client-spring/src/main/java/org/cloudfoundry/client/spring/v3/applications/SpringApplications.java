@@ -94,7 +94,8 @@ public final class SpringApplications extends AbstractSpringOperations implement
 
     @Override
     public Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
+        return patch(request, UpdateApplicationResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId()));
     }
 
 }

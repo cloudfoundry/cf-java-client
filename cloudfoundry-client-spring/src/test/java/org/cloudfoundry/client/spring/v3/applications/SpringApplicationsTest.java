@@ -387,7 +387,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     public void update() throws IOException {
         this.mockServer
                 .expect(method(PATCH))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
                 .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v3/apps/PATCH_{id}_response.json"))
