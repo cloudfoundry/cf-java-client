@@ -38,6 +38,7 @@ public final class GetInfoResponseTest {
                 .withName("test-name")
                 .withSupport("test-support")
                 .withTokenEndpoint("test-token-endpoint")
+                .withUser("test-user")
                 .withVersion(-1);
 
         assertEquals("test-api-version", response.getApiVersion());
@@ -53,6 +54,7 @@ public final class GetInfoResponseTest {
         assertEquals("test-min-recommended-cli-version", response.getMinRecommendedCliVersion());
         assertEquals("test-support", response.getSupport());
         assertEquals("test-token-endpoint", response.getTokenEndpoint());
+        assertEquals("test-user", response.getUser());
         assertEquals(Integer.valueOf(-1), response.getVersion());
     }
 }

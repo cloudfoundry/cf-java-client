@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * Base class for resources that contain events
  *
  * <p><b>This class is NOT threadsafe.</b>

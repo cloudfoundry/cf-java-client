@@ -18,12 +18,9 @@ package org.cloudfoundry.client.spring.util;
 
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
-
-import java.io.IOException;
 
 /**
  * An implementation of {@link HttpMessageConverter} that can be used as a fallback for all types that do not have a
@@ -38,14 +35,17 @@ public final class FallbackHttpMessageConverter extends AbstractHttpMessageConve
     }
 
     @Override
-    protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) throws IOException,
-            HttpMessageNotReadableException {
+    protected boolean canRead(MediaType mediaType) {
+        return false;
+    }
+
+    @Override
+    protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void writeInternal(Object o, HttpOutputMessage outputMessage) throws IOException,
-            HttpMessageNotWritableException {
+    protected void writeInternal(Object o, HttpOutputMessage outputMessage) {
     }
 
 }

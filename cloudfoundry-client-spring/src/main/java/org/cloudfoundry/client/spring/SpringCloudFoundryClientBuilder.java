@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.LoggingDeserializationProblemHandler;
@@ -28,6 +29,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
@@ -137,7 +139,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @return a new instance of a Spring-backed implementation of the {@link CloudFoundryClient}
      * @throws IllegalArgumentException if {@code host}, {@code username}, or {@code password} has not been set
      */
-    public CloudFoundryClient build() {
+    public SpringCloudFoundryClient build() {
         Assert.notNull(this.host, "host must be set");
         Assert.hasText(this.username, "username must be set");
         Assert.hasText(this.password, "password must be set");
@@ -168,11 +170,11 @@ public final class SpringCloudFoundryClientBuilder {
                 .build();
     }
 
-    private RestTemplate getRestOperations() {
+    private OAuth2RestOperations getRestOperations() {
         OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails();
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
-        RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
 
         messageConverters.stream()
@@ -186,6 +188,7 @@ public final class SpringCloudFoundryClientBuilder {
                             .setSerializationInclusion(NON_NULL);
                 });
 
+        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
 
         return restTemplate;

@@ -51,6 +51,8 @@ public final class GetInfoResponse {
 
     private volatile String tokenEndpoint;
 
+    private volatile String user;
+
     private volatile Integer version;
 
     /**
@@ -323,6 +325,26 @@ public final class GetInfoResponse {
     @JsonProperty("token_endpoint")
     public GetInfoResponse withTokenEndpoint(String tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
+        return this;
+    }
+
+    /**
+     * Returns the user
+     *
+     * @return the user
+     */
+    public String getUser() {
+        return this.user;
+    }
+
+    /**
+     * Configure the user
+     *
+     * @param user the user
+     * @return {@code this}
+     */
+    public GetInfoResponse withUser(String user) {
+        this.user = user;
         return this;
     }
 

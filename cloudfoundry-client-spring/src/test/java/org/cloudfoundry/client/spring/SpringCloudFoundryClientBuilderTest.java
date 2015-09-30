@@ -47,7 +47,7 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
                 .expect(requestTo("https://api.run.pivotal.io/info"))
                 .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
 
-        SpringCloudFoundryClient client = (SpringCloudFoundryClient) this.builder
+        SpringCloudFoundryClient client = this.builder
                 .withApi("api.run.pivotal.io")
                 .withClient("test-client-id", "test-client-secret")
                 .withCredentials("test-username", "test-password")

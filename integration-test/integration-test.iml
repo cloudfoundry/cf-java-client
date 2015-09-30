@@ -10,13 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter:1.2.5.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot:1.2.5.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-autoconfigure:1.2.5.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.2.5.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jul-to-slf4j:1.7.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:log4j-over-slf4j:1.7.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.yaml:snakeyaml:1.14" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-stream:2.1.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-core:2.1.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
@@ -26,7 +19,11 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.4.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.59" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:7.0.59" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:7.0.59" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" scope="TEST" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.protobuf:protobuf-java:2.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jcl-over-slf4j:1.7.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-api:1.7.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-web:4.1.7.RELEASE" level="project" />

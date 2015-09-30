@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
-import org.springframework.web.client.RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 
 import java.net.URI;
 
@@ -49,11 +49,11 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Packages packages;
 
-    private final RestOperations restOperations;
+    private final OAuth2RestOperations restOperations;
 
     private final Spaces spaces;
 
-    SpringCloudFoundryClient(RestOperations restOperations, URI root) {
+    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root) {
         this.applications = new SpringApplications(restOperations, root);
         this.droplets = new SpringDroplets(restOperations, root);
         this.events = new SpringEvents(restOperations, root);
@@ -65,7 +65,7 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.restOperations = restOperations;
     }
 
-    RestOperations getRestOperations() {
+    OAuth2RestOperations getRestOperations() {
         return this.restOperations;
     }
 
@@ -82,6 +82,10 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Events events() {
         return this.events;
+    }
+
+    String getAccessToken() {
+        return this.restOperations.getAccessToken().getValue();
     }
 
     @Override
