@@ -16,7 +16,9 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -26,6 +28,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -35,7 +38,9 @@ public abstract class AbstractRestTest {
             new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
     {
-        this.restTemplate.getMessageConverters().stream()
+        List<HttpMessageConverter<?>> messageConverters = this.restTemplate.getMessageConverters();
+
+        messageConverters.stream()
                 .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
                 .map(converter -> (MappingJackson2HttpMessageConverter) converter)
                 .findFirst()
@@ -44,7 +49,8 @@ public abstract class AbstractRestTest {
                             .setSerializationInclusion(NON_NULL);
                 });
 
-        this.restTemplate.getMessageConverters().add(new FallbackHttpMessageConverter());
+        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
+        messageConverters.add(new FallbackHttpMessageConverter());
     }
 
     protected final URI root = UriComponentsBuilder.newInstance()

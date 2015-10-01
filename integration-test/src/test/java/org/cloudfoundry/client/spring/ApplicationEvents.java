@@ -96,7 +96,7 @@ public final class ApplicationEvents {
         try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
             getAllPages(page -> new ListEventsRequest()
                             .withTypes(EVENT_TYPES)
-                            .withTimestamp("2015-09-29T00:00:00Z")
+                            .withTimestamp("2015-10-01T05:18:38Z")
                             .withResultsPerPage(100)
                             .withPage(page),
                     request -> this.client.events().list(request))

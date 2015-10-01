@@ -16,9 +16,12 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
 import javax.websocket.ClientEndpointConfig;
@@ -34,6 +37,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public final class SpringLoggregatorClientTest extends AbstractRestTest {
 
+    private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; " +
+            "boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
+
     private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class);
 
     private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class);
@@ -47,20 +53,18 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
                 .expect(requestTo("https://api.run.pivotal.io/recent?app=test-id"))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("loggregator_response.bin"))
-                        .contentType(APPLICATION_JSON));
+                        .contentType(MEDIA_TYPE));
 
         RecentLogsRequest request = new RecentLogsRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.client.recent(request))
-                .count()
-                .consume(i -> {
-                    assertEquals(Long.valueOf(14), i);
-                    this.mockServer.verify();
-                });
+        Long count = Streams.wrap(this.client.recent(request)).count().next().get();
+
+        assertEquals(Long.valueOf(14), count);
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void recentError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/recent?app=test-id"))
@@ -71,11 +75,11 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
         RecentLogsRequest request = new RecentLogsRequest()
                 .withId("test-id");
 
-        this.client.recent(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.client.recent(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void recentInvalidRequest() {
-        this.client.recent(new RecentLogsRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.client.recent(new RecentLogsRequest())).next().get();
     }
 }

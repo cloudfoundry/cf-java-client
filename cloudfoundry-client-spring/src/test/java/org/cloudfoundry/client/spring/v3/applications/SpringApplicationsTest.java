@@ -18,19 +18,26 @@ package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
+import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse.Resource;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
+import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -74,31 +81,31 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
                 .withId("test-id");
 
-        Streams.wrap(this.applications.assignDroplet(request)).consume(response -> {
-            assertNull(response.getBuildpack());
-            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-            assertEquals("STOPPED", response.getDesiredState());
-            assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-            assertEquals("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a", response.getId());
+        AssignApplicationDropletResponse response = Streams.wrap(this.applications.assignDroplet(request)).next().get();
 
-            assertEquals(8, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("droplet"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertNull(response.getBuildpack());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+        assertEquals("STOPPED", response.getDesiredState());
+        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
+        assertEquals("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a", response.getId());
 
-            assertEquals("name1", response.getName());
-            assertEquals(Integer.valueOf(1), response.getTotalDesiredInstances());
-            assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(8, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("droplet"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("name1", response.getName());
+        assertEquals(Integer.valueOf(1), response.getTotalDesiredInstances());
+        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void assignDropletError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/current_droplet"))
@@ -110,13 +117,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
                 .withId("test-id");
 
-        this.applications.assignDroplet(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.assignDroplet(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void assignDropletInvalidRequest() {
-        this.applications.assignDroplet(new AssignApplicationDropletRequest()).subscribe(new
-                ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.assignDroplet(new AssignApplicationDropletRequest())).next().get();
     }
 
     @Test
@@ -135,30 +141,30 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withEnvironmentVariable("open", "source")
                 .withBuildpack("name-410");
 
-        Streams.wrap(this.applications.create(request)).consume(response -> {
-            assertEquals("name-410", response.getBuildpack());
-            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-            assertEquals("STOPPED", response.getDesiredState());
-            assertEquals(Collections.singletonMap("open", "source"), response.getEnvironmentVariables());
-            assertEquals("8b51db6f-7bae-47ca-bc75-74bc957ed460", response.getId());
+        CreateApplicationResponse response = Streams.wrap(this.applications.create(request)).next().get();
 
-            assertEquals(7, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertEquals("name-410", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+        assertEquals("STOPPED", response.getDesiredState());
+        assertEquals(Collections.singletonMap("open", "source"), response.getEnvironmentVariables());
+        assertEquals("8b51db6f-7bae-47ca-bc75-74bc957ed460", response.getId());
 
-            assertEquals("my_app", response.getName());
-            assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-            assertNull(response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(7, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("my_app", response.getName());
+        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
+        assertNull(response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void createError() throws IOException {
         this.mockServer
                 .expect(method(POST))
@@ -174,12 +180,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withEnvironmentVariable("open", "source")
                 .withBuildpack("name-410");
 
-        this.applications.create(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.create(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() throws Throwable {
-        this.applications.create(new CreateApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.create(new CreateApplicationRequest())).next().get();
     }
 
     @Test
@@ -193,33 +199,33 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.applications.get(request)).consume(response -> {
-            assertEquals("name-2068", response.getBuildpack());
-            assertEquals("2015-08-06T00:36:52Z", response.getCreatedAt());
-            assertEquals("STOPPED", response.getDesiredState());
-            assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
-            assertEquals("guid-a2ea0b27-971f-4f59-a9e4-d299e96c3f20", response.getId());
+        GetApplicationResponse response = Streams.wrap(this.applications.get(request)).next().get();
 
-            assertEquals(10, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("routes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("droplet"));
-            assertNotNull(response.getLink("droplets"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertEquals("name-2068", response.getBuildpack());
+        assertEquals("2015-08-06T00:36:52Z", response.getCreatedAt());
+        assertEquals("STOPPED", response.getDesiredState());
+        assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
+        assertEquals("guid-a2ea0b27-971f-4f59-a9e4-d299e96c3f20", response.getId());
 
-            assertEquals("my_app", response.getName());
-            assertEquals(Integer.valueOf(3), response.getTotalDesiredInstances());
-            assertNull(response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(10, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("routes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("droplet"));
+        assertNotNull(response.getLink("droplets"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("my_app", response.getName());
+        assertEquals(Integer.valueOf(3), response.getTotalDesiredInstances());
+        assertNull(response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void getError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
@@ -230,12 +236,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
 
-        this.applications.get(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.get(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        this.applications.get(new GetApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.get(new GetApplicationRequest())).next().get();
     }
 
     @Test
@@ -249,35 +255,36 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.applications.getEnvironment(request)).consume(response -> {
-            Map<String, Object> vcapApplication = new HashMap<>();
-            vcapApplication.put("limits", Collections.singletonMap("fds", 16384));
-            vcapApplication.put("application_name", "app_name");
-            vcapApplication.put("application_uris", Collections.emptyList());
-            vcapApplication.put("name", "app_name");
-            vcapApplication.put("space_name", "some_space");
-            vcapApplication.put("space_id", "c595c2ee-df01-4769-a61f-df5bd5e4cbc1");
-            vcapApplication.put("uris", Collections.emptyList());
-            vcapApplication.put("users", null);
+        GetApplicationEnvironmentResponse response = Streams.wrap(this.applications.getEnvironment(request))
+                .next().get();
 
-            Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION",
-                    vcapApplication);
-            assertEquals(applicationEnvironmentVariables, response.getApplicationEnvironmentVariables());
+        Map<String, Object> vcapApplication = new HashMap<>();
+        vcapApplication.put("limits", Collections.singletonMap("fds", 16384));
+        vcapApplication.put("application_name", "app_name");
+        vcapApplication.put("application_uris", Collections.emptyList());
+        vcapApplication.put("name", "app_name");
+        vcapApplication.put("space_name", "some_space");
+        vcapApplication.put("space_id", "c595c2ee-df01-4769-a61f-df5bd5e4cbc1");
+        vcapApplication.put("uris", Collections.emptyList());
+        vcapApplication.put("users", null);
 
-            Map<String, Object> environmentVariables = Collections.singletonMap("SOME_KEY", "some_val");
-            assertEquals(environmentVariables, response.getEnvironmentVariables());
+        Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION",
+                vcapApplication);
+        assertEquals(applicationEnvironmentVariables, response.getApplicationEnvironmentVariables());
 
-            Map<String, Object> runningEnvironmentVariables = Collections.singletonMap("RUNNING_ENV", "running_value");
-            assertEquals(runningEnvironmentVariables, response.getRunningEnvironmentVariables());
+        Map<String, Object> environmentVariables = Collections.singletonMap("SOME_KEY", "some_val");
+        assertEquals(environmentVariables, response.getEnvironmentVariables());
 
-            Map<String, Object> stagingEnvironmentVariables = Collections.singletonMap("STAGING_ENV", "staging_value");
-            assertEquals(stagingEnvironmentVariables, response.getStagingEnvironmentVariables());
+        Map<String, Object> runningEnvironmentVariables = Collections.singletonMap("RUNNING_ENV", "running_value");
+        assertEquals(runningEnvironmentVariables, response.getRunningEnvironmentVariables());
 
-            this.mockServer.verify();
-        });
+        Map<String, Object> stagingEnvironmentVariables = Collections.singletonMap("STAGING_ENV", "staging_value");
+        assertEquals(stagingEnvironmentVariables, response.getStagingEnvironmentVariables());
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void getEnvironmentError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/env"))
@@ -288,13 +295,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
 
-        this.applications.getEnvironment(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.getEnvironment(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void getEnvironmentInvalidRequest() {
-        this.applications.getEnvironment(new GetApplicationEnvironmentRequest()).subscribe(new
-                ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.getEnvironment(new GetApplicationEnvironmentRequest())).next().get();
     }
 
     @Test
@@ -307,12 +313,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.applications.delete(request)).consume(response -> {
-            this.mockServer.verify();
-        });
+        DeleteApplicationResponse response = Streams.wrap(this.applications.delete(request)).next().get();
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void deleteError() {
         this.mockServer
                 .expect(method(DELETE))
@@ -324,12 +330,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
 
-        this.applications.delete(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.delete(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void deleteInvalidRequest() {
-        this.applications.delete(new DeleteApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.delete(new DeleteApplicationRequest())).next().get();
     }
 
     @Test
@@ -345,31 +351,31 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withOrderBy(CREATED_AT)
                 .withName("test-name");
 
-        Streams.wrap(this.applications.list(request)).consume(response -> {
-            ListApplicationsResponse.Resource resource = response.getResources().get(0);
+        ListApplicationsResponse response = Streams.wrap(this.applications.list(request)).next().get();
 
-            assertEquals("name-383", resource.getBuildpack());
-            assertEquals("1970-01-01T00:00:03Z", resource.getCreatedAt());
-            assertEquals("STOPPED", resource.getDesiredState());
-            assertEquals(Collections.singletonMap("magic", "beautiful"), resource.getEnvironmentVariables());
-            assertEquals("guid-acfbae75-7d3a-45b1-b730-ca3cc4263045", resource.getId());
-            assertEquals("my_app3", resource.getName());
-            assertEquals(Integer.valueOf(0), resource.getTotalDesiredInstances());
-            assertNull(resource.getUpdatedAt());
+        Resource resource = response.getResources().get(0);
 
-            assertNotNull(resource.getLink("self"));
-            assertNotNull(resource.getLink("processes"));
-            assertNotNull(resource.getLink("packages"));
-            assertNotNull(resource.getLink("space"));
-            assertNotNull(resource.getLink("start"));
-            assertNotNull(resource.getLink("stop"));
-            assertNotNull(resource.getLink("assign_current_droplet"));
+        assertEquals("name-383", resource.getBuildpack());
+        assertEquals("1970-01-01T00:00:03Z", resource.getCreatedAt());
+        assertEquals("STOPPED", resource.getDesiredState());
+        assertEquals(Collections.singletonMap("magic", "beautiful"), resource.getEnvironmentVariables());
+        assertEquals("guid-acfbae75-7d3a-45b1-b730-ca3cc4263045", resource.getId());
+        assertEquals("my_app3", resource.getName());
+        assertEquals(Integer.valueOf(0), resource.getTotalDesiredInstances());
+        assertNull(resource.getUpdatedAt());
 
-            this.mockServer.verify();
-        });
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("processes"));
+        assertNotNull(resource.getLink("packages"));
+        assertNotNull(resource.getLink("space"));
+        assertNotNull(resource.getLink("start"));
+        assertNotNull(resource.getLink("stop"));
+        assertNotNull(resource.getLink("assign_current_droplet"));
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void listError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1"))
@@ -382,12 +388,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withOrderBy(CREATED_AT)
                 .withName("test-name");
 
-        this.applications.list(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.list(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void listInvalidRequest() {
-        this.applications.list(new ListApplicationsRequest().withPage(-1)).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.list(new ListApplicationsRequest().withPage(-1))).next().get();
     }
 
     @Test
@@ -457,31 +463,31 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.applications.start(request)).consume(response -> {
-            assertNull(response.getBuildpack());
-            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-            assertEquals("STARTED", response.getDesiredState());
-            assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-            assertEquals("guid-40460094-d035-4663-b58c-cdf4c802a2c6", response.getId());
+        StartApplicationResponse response = Streams.wrap(this.applications.start(request)).next().get();
 
-            assertEquals(8, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("droplet"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertNull(response.getBuildpack());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+        assertEquals("STARTED", response.getDesiredState());
+        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
+        assertEquals("guid-40460094-d035-4663-b58c-cdf4c802a2c6", response.getId());
 
-            assertEquals("original_name", response.getName());
-            assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-            assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(8, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("droplet"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("original_name", response.getName());
+        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
+        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void startError() {
         this.mockServer
                 .expect(method(PUT))
@@ -493,12 +499,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
 
-        this.applications.start(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.start(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void startInvalidRequest() {
-        this.applications.start(new StartApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.start(new StartApplicationRequest())).next().get();
     }
 
     @Test
@@ -521,34 +527,34 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withBuildpack("http://gitwheel.org/my-app")
                 .withId("test-id");
 
-        Streams.wrap(this.applications.update(request)).consume(response -> {
-            assertEquals("http://gitwheel.org/my-app", response.getBuildpack());
-            assertEquals("2015-07-27T22:43:14Z", response.getCreatedAt());
-            assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
-            assertEquals("STOPPED", response.getDesiredState());
-            assertEquals(environment_variables, response.getEnvironmentVariables());
-            assertEquals("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a", response.getId());
+        UpdateApplicationResponse response = Streams.wrap(this.applications.update(request)).next().get();
 
-            assertEquals(7, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("processes"));
-            assertNotNull(response.getLink("packages"));
-            assertNotNull(response.getLink("space"));
-            assertNotNull(response.getLink("start"));
-            assertNotNull(response.getLink("stop"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertEquals("http://gitwheel.org/my-app", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:14Z", response.getCreatedAt());
+        assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
+        assertEquals("STOPPED", response.getDesiredState());
+        assertEquals(environment_variables, response.getEnvironmentVariables());
+        assertEquals("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a", response.getId());
 
-            assertEquals("new_name", response.getName());
-            assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-            this.mockServer.verify();
-        });
+        assertEquals(7, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("new_name", response.getName());
+        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void updateError() throws IOException {
         this.mockServer
                 .expect(method(PATCH))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
                 .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
@@ -564,12 +570,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withBuildpack("http://gitwheel.org/my-app")
                 .withId("test-id");
 
-        this.applications.update(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.update(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void updateInvalidRequest() throws Throwable {
-        this.applications.update(new UpdateApplicationRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.applications.update(new UpdateApplicationRequest())).next().get();
     }
 
 }

@@ -16,11 +16,13 @@
 
 package org.cloudfoundry.client.spring.v2.organizations.auditors;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.auditors.AuditorResource.AuditorEntity;
 import org.cloudfoundry.client.v2.organizations.auditors.CreateAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.auditors.CreateAuditorResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -56,34 +58,38 @@ public final class SpringAuditorsTest extends AbstractRestTest {
                 .withAuditorId("uaa-id-71")
                 .withOrganizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef");
 
-        Streams.wrap(this.auditors.create(request)).consume(response -> {
-            Resource.Metadata metadata = response.getMetadata();
-            assertEquals("2015-07-27T22:43:10Z", metadata.getCreatedAt());
-            assertEquals("83c4fac5-cd9e-41ee-96df-b4f50fff4aef", metadata.getId());
-            assertNull(metadata.getUpdatedAt());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef", metadata.getUrl());
+        CreateAuditorResponse response = Streams.wrap(this.auditors.create(request)).next().get();
 
-            AuditorEntity entity = response.getEntity();
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/app_events", entity.getApplicationEventsUrl());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors", entity.getAuditorsUrl());
-            assertFalse(entity.getBillingEnabled());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/billing_managers", entity.getBillingManagersUrl());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/domains", entity.getDomainsUrl());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/managers", entity.getManagersUrl());
-            assertEquals("name-187", entity.getName());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/private_domains", entity.getPrivateDomainsUrl());
-            assertEquals("1d18a00b-4e36-412b-9308-2f5f2402e880", entity.getQuotaDefinitionId());
-            assertEquals("/v2/quota_definitions/1d18a00b-4e36-412b-9308-2f5f2402e880", entity.getQuotaDefinitionUrl());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/space_quota_definitions", entity.getSpaceQuotaDefinitionsUrl());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/spaces", entity.getSpacesUrl());
-            assertEquals("active", entity.getStatus());
-            assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/users", entity.getUsersUrl());
+        Resource.Metadata metadata = response.getMetadata();
+        assertEquals("2015-07-27T22:43:10Z", metadata.getCreatedAt());
+        assertEquals("83c4fac5-cd9e-41ee-96df-b4f50fff4aef", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef", metadata.getUrl());
 
-            this.mockServer.verify();
-        });
+        AuditorEntity entity = response.getEntity();
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/app_events",
+                entity.getApplicationEventsUrl());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors", entity.getAuditorsUrl());
+        assertFalse(entity.getBillingEnabled());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/billing_managers",
+                entity.getBillingManagersUrl());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/domains", entity.getDomainsUrl());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/managers", entity.getManagersUrl());
+        assertEquals("name-187", entity.getName());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/private_domains",
+                entity.getPrivateDomainsUrl());
+        assertEquals("1d18a00b-4e36-412b-9308-2f5f2402e880", entity.getQuotaDefinitionId());
+        assertEquals("/v2/quota_definitions/1d18a00b-4e36-412b-9308-2f5f2402e880", entity.getQuotaDefinitionUrl());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/space_quota_definitions",
+                entity.getSpaceQuotaDefinitionsUrl());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/spaces", entity.getSpacesUrl());
+        assertEquals("active", entity.getStatus());
+        assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/users", entity.getUsersUrl());
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void createError() throws IOException {
         this.mockServer
                 .expect(method(PUT))
@@ -97,11 +103,12 @@ public final class SpringAuditorsTest extends AbstractRestTest {
                 .withAuditorId("uaa-id-71")
                 .withOrganizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef");
 
-        this.auditors.create(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.auditors.create(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() throws Throwable {
-        this.auditors.create(new CreateAuditorRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.auditors.create(new CreateAuditorRequest())).next().get();
     }
+
 }
