@@ -24,7 +24,14 @@ import org.cloudfoundry.client.v3.LinkBased;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class Package<T extends Package<T>> implements LinkBased {
+/**
+ * Base class for responses that are packages
+ *
+ * <p><b>This class is NOT threadsafe.</b>
+ *
+ * @param <T> the "self" type.  Used to ensure the appropriate type is returned from builder APIs.
+ */
+public abstract class Package<T extends Package<T>> implements LinkBased {
 
     private volatile String createdAt;
 
