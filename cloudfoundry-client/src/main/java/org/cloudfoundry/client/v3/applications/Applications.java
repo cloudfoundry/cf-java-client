@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Applications {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/assigning_a_droplet_as_a_an_apps_current_droplet.html">
+     *     Assign Application Droplet</a> request
+     *
+     * @param request the Assign Application Droplet request
+     * @return the response from the Assign Application Droplet request
+     */
+    Publisher<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/create_an_app.html">Create
      * Application</a> request
      *

@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v3.FilterBuilder;
 import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
+import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
@@ -52,6 +54,12 @@ public final class SpringApplications extends AbstractSpringOperations implement
      */
     public SpringApplications(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
+        return put(request, AssignApplicationDropletResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "current_droplet"));
     }
 
     @Override
