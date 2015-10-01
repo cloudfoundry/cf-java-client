@@ -18,6 +18,7 @@ package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
@@ -55,6 +56,63 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public final class SpringApplicationsTest extends AbstractRestTest {
 
     private final SpringApplications applications = new SpringApplications(this.restTemplate, this.root);
+
+    @Test
+    public void assignDroplet() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/current_droplet"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/PUT_{id}_current_droplet_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
+                .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
+                .withId("test-id");
+
+        Streams.wrap(this.applications.assignDroplet(request)).consume(response -> {
+            assertNull(response.getBuildpack());
+            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+            assertEquals("STOPPED", response.getDesiredState());
+            assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
+            assertEquals("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a", response.getId());
+
+            assertEquals(8, response.getLinks().size());
+            assertNotNull(response.getLink("self"));
+            assertNotNull(response.getLink("processes"));
+            assertNotNull(response.getLink("packages"));
+            assertNotNull(response.getLink("space"));
+            assertNotNull(response.getLink("droplet"));
+            assertNotNull(response.getLink("start"));
+            assertNotNull(response.getLink("stop"));
+            assertNotNull(response.getLink("assign_current_droplet"));
+
+            assertEquals("name1", response.getName());
+            assertEquals(Integer.valueOf(1), response.getTotalDesiredInstances());
+            assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
+            this.mockServer.verify();
+        });
+    }
+
+    @Test
+    public void assignDropletError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/current_droplet"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
+                .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
+                .withId("test-id");
+
+        this.applications.assignDroplet(request).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void assignDropletInvalidRequest() {
+        this.applications.assignDroplet(new AssignApplicationDropletRequest()).subscribe(new ExpectedExceptionSubscriber());
+    }
 
     @Test
     public void create() throws IOException {
