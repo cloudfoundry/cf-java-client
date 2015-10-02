@@ -16,10 +16,12 @@
 
 package org.cloudfoundry.client.spring.v3.droplets;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
+import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -50,32 +52,32 @@ public final class SpringDropletsTest extends AbstractRestTest {
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.droplets.get(request)).consume(response -> {
-            assertEquals("http://buildpack.git.url.com", response.getBuildpack());
-            assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
-            assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
-            assertEquals("example error", response.getError());
+        GetDropletResponse response = Streams.wrap(this.droplets.get(request)).next().get();
 
-            Hash hash = response.getHash();
-            assertEquals("sha1", hash.getType());
-            assertNull(hash.getValue());
+        assertEquals("http://buildpack.git.url.com", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
+        assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
+        assertEquals("example error", response.getError());
 
-            assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
+        Hash hash = response.getHash();
+        assertEquals("sha1", hash.getType());
+        assertNull(hash.getValue());
 
-            assertEquals(4, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("package"));
-            assertNotNull(response.getLink("app"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
 
-            assertNull(response.getProcfile());
-            assertEquals("STAGED", response.getState());
-            assertNull(response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(4, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("package"));
+        assertNotNull(response.getLink("app"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertNull(response.getProcfile());
+        assertEquals("STAGED", response.getState());
+        assertNull(response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void getError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
@@ -86,11 +88,11 @@ public final class SpringDropletsTest extends AbstractRestTest {
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
 
-        this.droplets.get(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.droplets.get(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        this.droplets.get(new GetDropletRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.droplets.get(new GetDropletRequest())).next().get();
     }
 }

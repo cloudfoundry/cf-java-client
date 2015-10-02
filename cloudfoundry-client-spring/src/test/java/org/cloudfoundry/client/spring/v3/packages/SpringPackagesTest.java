@@ -16,13 +16,18 @@
 
 package org.cloudfoundry.client.spring.v3.packages;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.StagePackageRequest;
+import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -66,28 +71,28 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withType(DOCKER)
                 .withUrl("docker://cloudfoundry/runtime-ci");
 
-        Streams.wrap(this.packages.create(request)).consume(response -> {
-            assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
-            assertNull(response.getError());
+        CreatePackageResponse response = Streams.wrap(this.packages.create(request)).next().get();
 
-            assertEquals("sha1", response.getHash().getType());
-            assertNull(response.getHash().getValue());
+        assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
+        assertNull(response.getError());
 
-            assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
 
-            assertEquals(2, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("app"));
+        assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
 
-            assertEquals("READY", response.getState());
-            assertEquals("docker", response.getType());
-            assertNull(response.getUpdatedAt());
-            assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
-            this.mockServer.verify();
-        });
+        assertEquals(2, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("app"));
+
+        assertEquals("READY", response.getState());
+        assertEquals("docker", response.getType());
+        assertNull(response.getUpdatedAt());
+        assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void createError() {
         this.mockServer
                 .expect(method(POST))
@@ -102,12 +107,12 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withType(DOCKER)
                 .withUrl("docker://cloudfoundry/runtime-ci");
 
-        this.packages.create(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.create(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() {
-        this.packages.create(new CreatePackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.create(new CreatePackageRequest())).next().get();
     }
 
     @Test
@@ -121,31 +126,31 @@ public final class SpringPackagesTest extends AbstractRestTest {
         GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
 
-        Streams.wrap(this.packages.get(request)).consume(response -> {
-            assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-            assertNull(response.getError());
+        GetPackageResponse response = Streams.wrap(this.packages.get(request)).next().get();
 
-            assertEquals("sha1", response.getHash().getType());
-            assertNull(response.getHash().getValue());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+        assertNull(response.getError());
 
-            assertEquals("guid-9067cc41-b832-4de9-89a2-0987dab65e8e", response.getId());
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
 
-            assertEquals(5, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("upload"));
-            assertNotNull(response.getLink("download"));
-            assertNotNull(response.getLink("stage"));
-            assertNotNull(response.getLink("app"));
+        assertEquals("guid-9067cc41-b832-4de9-89a2-0987dab65e8e", response.getId());
 
-            assertEquals("AWAITING_UPLOAD", response.getState());
-            assertEquals("bits", response.getType());
-            assertNull(response.getUpdatedAt());
-            assertNull(response.getUrl());
-            this.mockServer.verify();
-        });
+        assertEquals(5, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("upload"));
+        assertNotNull(response.getLink("download"));
+        assertNotNull(response.getLink("stage"));
+        assertNotNull(response.getLink("app"));
+
+        assertEquals("AWAITING_UPLOAD", response.getState());
+        assertEquals("bits", response.getType());
+        assertNull(response.getUpdatedAt());
+        assertNull(response.getUrl());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void getError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
@@ -156,12 +161,12 @@ public final class SpringPackagesTest extends AbstractRestTest {
         GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
 
-        this.packages.get(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.get(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        this.packages.get(new GetPackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.get(new GetPackageRequest())).next().get();
     }
 
     @Test
@@ -180,32 +185,32 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withId("test-id")
                 .withStack("cflinuxfs2");
 
-        Streams.wrap(this.packages.stage(request)).consume(response -> {
-            assertEquals("http://buildpack.git.url.com", response.getBuildpack());
-            assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
-            assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
-            assertEquals("example error", response.getError());
+        StagePackageResponse response = Streams.wrap(this.packages.stage(request)).next().get();
 
-            Hash hash = response.getHash();
-            assertEquals("sha1", hash.getType());
-            assertNull(hash.getValue());
+        assertEquals("http://buildpack.git.url.com", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
+        assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
+        assertEquals("example error", response.getError());
 
-            assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
+        Hash hash = response.getHash();
+        assertEquals("sha1", hash.getType());
+        assertNull(hash.getValue());
 
-            assertEquals(4, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("package"));
-            assertNotNull(response.getLink("app"));
-            assertNotNull(response.getLink("assign_current_droplet"));
+        assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
 
-            assertNull(response.getProcfile());
-            assertEquals("STAGED", response.getState());
-            assertNull(response.getUpdatedAt());
-            this.mockServer.verify();
-        });
+        assertEquals(4, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("package"));
+        assertNotNull(response.getLink("app"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertNull(response.getProcfile());
+        assertEquals("STAGED", response.getState());
+        assertNull(response.getUpdatedAt());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void stageError() {
         this.mockServer
                 .expect(method(POST))
@@ -221,12 +226,12 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withId("test-id")
                 .withStack("cflinuxfs2");
 
-        this.packages.stage(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.stage(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void stageInvalidRequest() {
-        this.packages.stage(new StagePackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.stage(new StagePackageRequest())).next().get();
     }
 
     @Test
@@ -243,31 +248,31 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withFile(new ClassPathResource("v3/packages/test-file").getFile())
                 .withId("test-id");
 
-        Streams.wrap(this.packages.upload(request)).consume(response -> {
-            assertEquals("2015-08-06T00:36:54Z", response.getCreatedAt());
-            assertNull(response.getError());
+        UploadPackageResponse response = Streams.wrap(this.packages.upload(request)).next().get();
 
-            assertEquals("sha1", response.getHash().getType());
-            assertNull(response.getHash().getValue());
+        assertEquals("2015-08-06T00:36:54Z", response.getCreatedAt());
+        assertNull(response.getError());
 
-            assertEquals("guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50", response.getId());
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
 
-            assertEquals(5, response.getLinks().size());
-            assertNotNull(response.getLink("self"));
-            assertNotNull(response.getLink("upload"));
-            assertNotNull(response.getLink("download"));
-            assertNotNull(response.getLink("stage"));
-            assertNotNull(response.getLink("app"));
+        assertEquals("guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50", response.getId());
 
-            assertEquals("PROCESSING_UPLOAD", response.getState());
-            assertEquals("bits", response.getType());
-            assertEquals("2015-08-06T00:36:55Z", response.getUpdatedAt());
-            assertNull(response.getUrl());
-            this.mockServer.verify();
-        });
+        assertEquals(5, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("upload"));
+        assertNotNull(response.getLink("download"));
+        assertNotNull(response.getLink("stage"));
+        assertNotNull(response.getLink("app"));
+
+        assertEquals("PROCESSING_UPLOAD", response.getState());
+        assertEquals("bits", response.getType());
+        assertEquals("2015-08-06T00:36:55Z", response.getUpdatedAt());
+        assertNull(response.getUrl());
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void uploadError() throws IOException {
         this.mockServer
                 .expect(method(POST))
@@ -281,12 +286,12 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .withFile(new ClassPathResource("v3/packages/test-file").getFile())
                 .withId("test-id");
 
-        this.packages.upload(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.upload(request)).next().get();
     }
 
-    @Test
+    @Test(expected = RequestValidationException.class)
     public void uploadInvalidRequest() {
-        this.packages.upload(new UploadPackageRequest()).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.packages.upload(new UploadPackageRequest())).next().get();
     }
 
 }

@@ -31,7 +31,7 @@ public final class MultipartTest {
 
     @Test
     public void test() throws IOException {
-        Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
+        Long count = Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
                 .map(part -> {
                     try {
                         return LogMessage.parseFrom(part);
@@ -40,6 +40,8 @@ public final class MultipartTest {
                     }
                 })
                 .count()
-                .consume(i -> assertEquals(Long.valueOf(14), i));
+                .next().get();
+
+        assertEquals(Long.valueOf(14), count);
     }
 }

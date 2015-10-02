@@ -17,9 +17,10 @@
 package org.cloudfoundry.client.spring.v2.spaces;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseEntity;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
 import org.junit.Test;
@@ -51,46 +52,46 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .withName("test-name")
                 .withPage(-1);
 
-        Streams.wrap(this.spaces.list(request)).consume(response -> {
-            assertNull(response.getNextUrl());
-            assertNull(response.getPreviousUrl());
-            assertEquals(Integer.valueOf(1), response.getTotalPages());
-            assertEquals(Integer.valueOf(1), response.getTotalResults());
+        ListSpacesResponse response = Streams.wrap(this.spaces.list(request)).next().get();
 
-            assertEquals(1, response.getResources().size());
-            ListSpacesResponseResource resource = response.getResources().get(0);
+        assertNull(response.getNextUrl());
+        assertNull(response.getPreviousUrl());
+        assertEquals(Integer.valueOf(1), response.getTotalPages());
+        assertEquals(Integer.valueOf(1), response.getTotalResults());
 
-            Resource.Metadata metadata = resource.getMetadata();
-            assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-            assertEquals("b4293b09-8316-472c-a29a-6468a3adff59", metadata.getId());
-            assertNull(metadata.getUpdatedAt());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
+        assertEquals(1, response.getResources().size());
+        ListSpacesResponseResource resource = response.getResources().get(0);
 
-            ListSpacesResponseEntity entity = resource.getEntity();
-            assertTrue(entity.getAllowSsh());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events",
-                    entity.getApplicationEventsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains", entity.getDomainsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events", entity.getEventsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers", entity.getManagersUrl());
-            assertEquals("name-111", entity.getName());
-            assertEquals("3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationId());
-            assertEquals("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes", entity.getRoutesUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups", entity
-                    .getSecurityGroupsUrl());
-            assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances",
-                    entity.getServiceInstancesUrl());
-            assertNull(entity.getSpaceQuotaDefinitionId());
+        Resource.Metadata metadata = resource.getMetadata();
+        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
+        assertEquals("b4293b09-8316-472c-a29a-6468a3adff59", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
 
-            this.mockServer.verify();
-        });
+        ListSpacesResponseEntity entity = resource.getEntity();
+        assertTrue(entity.getAllowSsh());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events",
+                entity.getApplicationEventsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains", entity.getDomainsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events", entity.getEventsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers", entity.getManagersUrl());
+        assertEquals("name-111", entity.getName());
+        assertEquals("3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationId());
+        assertEquals("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes", entity.getRoutesUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups", entity
+                .getSecurityGroupsUrl());
+        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances",
+                entity.getServiceInstancesUrl());
+        assertNull(entity.getSpaceQuotaDefinitionId());
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void listError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name&page=-1"))
@@ -102,7 +103,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .withName("test-name")
                 .withPage(-1);
 
-        this.spaces.list(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.spaces.list(request)).next().get();
     }
 
 }

@@ -17,9 +17,10 @@
 package org.cloudfoundry.client.spring.v2.organizations;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseResource;
 import org.junit.Test;
@@ -51,46 +52,47 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .withName("test-name")
                 .withPage(-1);
 
-        Streams.wrap(this.organizations.list(request)).consume(response -> {
-            assertNull(response.getNextUrl());
-            assertNull(response.getPreviousUrl());
-            assertEquals(Integer.valueOf(1), response.getTotalPages());
-            assertEquals(Integer.valueOf(1), response.getTotalResults());
+        ListOrganizationsResponse response = Streams.wrap(this.organizations.list(request)).next()
+                .get();
 
-            assertEquals(1, response.getResources().size());
-            ListOrganizationsResponseResource resource = response.getResources().get(0);
+        assertNull(response.getNextUrl());
+        assertNull(response.getPreviousUrl());
+        assertEquals(Integer.valueOf(1), response.getTotalPages());
+        assertEquals(Integer.valueOf(1), response.getTotalResults());
 
-            Resource.Metadata metadata = resource.getMetadata();
-            assertEquals("2015-07-27T22:43:05Z", metadata.getCreatedAt());
-            assertEquals("deb3c359-2261-45ba-b34f-ee7487acd71a", metadata.getId());
-            assertNull(metadata.getUpdatedAt());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a", metadata.getUrl());
+        assertEquals(1, response.getResources().size());
+        ListOrganizationsResponseResource resource = response.getResources().get(0);
 
-            ListOrganizationsResponseEntity entity = resource.getEntity();
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/app_events",
-                    entity.getApplicationEventsUrl());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/auditors", entity.getAuditorsUrl());
-            assertFalse(entity.getBillingEnabled());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/billing_managers",
-                    entity.getBillingManagersUrl());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/domains", entity.getDomainsUrl());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/managers", entity.getManagersUrl());
-            assertEquals("the-system_domain-org-name", entity.getName());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/private_domains",
-                    entity.getPrivateDomainsUrl());
-            assertEquals("9b56a1ec-4981-4a1e-9348-0d78eeca842c", entity.getQuotaDefinitionId());
-            assertEquals("/v2/quota_definitions/9b56a1ec-4981-4a1e-9348-0d78eeca842c", entity.getQuotaDefinitionUrl());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/space_quota_definitions",
-                    entity.getSpaceQuotaDefinitionsUrl());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/spaces", entity.getSpacesUrl());
-            assertEquals("active", entity.getStatus());
-            assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/users", entity.getUsersUrl());
+        Resource.Metadata metadata = resource.getMetadata();
+        assertEquals("2015-07-27T22:43:05Z", metadata.getCreatedAt());
+        assertEquals("deb3c359-2261-45ba-b34f-ee7487acd71a", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a", metadata.getUrl());
 
-            this.mockServer.verify();
-        });
+        ListOrganizationsResponseEntity entity = resource.getEntity();
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/app_events",
+                entity.getApplicationEventsUrl());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/auditors", entity.getAuditorsUrl());
+        assertFalse(entity.getBillingEnabled());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/billing_managers",
+                entity.getBillingManagersUrl());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/domains", entity.getDomainsUrl());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/managers", entity.getManagersUrl());
+        assertEquals("the-system_domain-org-name", entity.getName());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/private_domains",
+                entity.getPrivateDomainsUrl());
+        assertEquals("9b56a1ec-4981-4a1e-9348-0d78eeca842c", entity.getQuotaDefinitionId());
+        assertEquals("/v2/quota_definitions/9b56a1ec-4981-4a1e-9348-0d78eeca842c", entity.getQuotaDefinitionUrl());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/space_quota_definitions",
+                entity.getSpaceQuotaDefinitionsUrl());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/spaces", entity.getSpacesUrl());
+        assertEquals("active", entity.getStatus());
+        assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/users", entity.getUsersUrl());
+
+        this.mockServer.verify();
     }
 
-    @Test
+    @Test(expected = CloudFoundryException.class)
     public void listError() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v2/organizations?q=name%20IN%20test-name&page=-1"))
@@ -102,7 +104,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .withName("test-name")
                 .withPage(-1);
 
-        this.organizations.list(request).subscribe(new ExpectedExceptionSubscriber());
+        Streams.wrap(this.organizations.list(request)).next().get();
     }
 
 }
