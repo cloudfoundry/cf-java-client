@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations;
+package org.cloudfoundry.client.v2.serviceinstances;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.PaginatedRequest;
@@ -26,37 +26,37 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListOrganizationsRequestTest {
+public final class ListServiceInstancesRequestTest {
 
     @Test
     public void test() {
-        ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .withAuditorId("test-auditor-id-1")
-                .withAuditorIds(Collections.singletonList("test-auditor-id-2"))
-                .withBillingManagerId("test-billing-manager-id-1")
-                .withBillingManagerIds(Collections.singletonList("test-billing-manager-id-2"))
-                .withManagerId("test-manager-id-1")
-                .withManagerIds(Collections.singletonList("test-manager-id-2"))
+        ListServiceInstancesRequest request = new ListServiceInstancesRequest()
+                .withGatewayName("test-gateway-name-id-1")
+                .withGatewayNames(Collections.singletonList("test-gateway-name-id-2"))
                 .withName("test-name-1")
                 .withNames(Collections.singletonList("test-name-2"))
+                .withOrganizationId("test-organization-id-1")
+                .withOrganizationIds(Collections.singletonList("test-organization-id-2"))
+                .withServiceKeyId("test-service-key-id-1")
+                .withServiceKeyIds(Collections.singletonList("test-service-key-id-2"))
+                .withServiceBindingId("test-service-binding-id-1")
+                .withServiceBindingIds(Collections.singletonList("test-service-binding-id-2"))
+                .withServicePlanId("test-service-plan-id-1")
+                .withServicePlanIds(Collections.singletonList("test-service-plan-id-2"))
                 .withSpaceId("test-space-id-1")
                 .withSpaceIds(Collections.singletonList("test-space-id-2"))
-                .withStatus("test-status-1")
-                .withStatuses(Collections.singletonList("test-status-2"))
-                .withUserId("test-user-id-1")
-                .withUserIds(Collections.singletonList("test-user-id-2"))
                 .withOrderDirection(PaginatedRequest.OrderDirection.ASC)
                 .withPage(-1)
                 .withResultsPerPage(-2);
 
-        assertEquals(Arrays.asList("test-auditor-id-1", "test-auditor-id-2"), request.getAuditorIds());
-        assertEquals(Arrays.asList("test-billing-manager-id-1", "test-billing-manager-id-2"), request
-                .getBillingManagerIds());
-        assertEquals(Arrays.asList("test-manager-id-1", "test-manager-id-2"), request.getManagerIds());
+        assertEquals(Arrays.asList("test-gateway-name-id-1", "test-gateway-name-id-2"), request.getGatewayNames());
         assertEquals(Arrays.asList("test-name-1", "test-name-2"), request.getNames());
+        assertEquals(Arrays.asList("test-organization-id-1", "test-organization-id-2"), request.getOrganizationIds());
+        assertEquals(Arrays.asList("test-service-key-id-1", "test-service-key-id-2"), request.getServiceKeyIds());
+        assertEquals(Arrays.asList("test-service-binding-id-1", "test-service-binding-id-2"),
+                request.getServiceBindingIds());
+        assertEquals(Arrays.asList("test-service-plan-id-1", "test-service-plan-id-2"), request.getServicePlanIds());
         assertEquals(Arrays.asList("test-space-id-1", "test-space-id-2"), request.getSpaceIds());
-        assertEquals(Arrays.asList("test-status-1", "test-status-2"), request.getStatuses());
-        assertEquals(Arrays.asList("test-user-id-1", "test-user-id-2"), request.getUserIds());
         Assert.assertEquals(PaginatedRequest.OrderDirection.ASC, request.getOrderDirection());
         assertEquals(Integer.valueOf(-1), request.getPage());
         assertEquals(Integer.valueOf(-2), request.getResultsPerPage());
@@ -64,7 +64,6 @@ public final class ListOrganizationsRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, new ListOrganizationsRequest().isValid().getStatus());
+        assertEquals(ValidationResult.Status.VALID, new ListServiceInstancesRequest().isValid().getStatus());
     }
-
 }

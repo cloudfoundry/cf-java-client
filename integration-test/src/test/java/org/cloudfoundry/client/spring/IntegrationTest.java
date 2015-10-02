@@ -38,6 +38,7 @@ import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.junit.Before;
 import org.junit.Test;
+import org.reactivestreams.Processor;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.StandardEnvironment;
 import reactor.Processors;
 import reactor.Publishers;
-import reactor.core.processor.BaseProcessor;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 import reactor.rx.action.Control;
@@ -108,7 +108,8 @@ public final class IntegrationTest {
                 .flatMap(this::stagePackage);
 
         CountDownLatch latch = new CountDownLatch(2);
-        BaseProcessor<StagePackageResponse, StagePackageResponse> async = Processors.async();
+        Processor<StagePackageResponse, StagePackageResponse> async = Processors.<StagePackageResponse>asyncGroup()
+                .get();
 
         Control loggregatorControl = Streams.wrap(async)
                 .flatMap(this::streamLogs)
