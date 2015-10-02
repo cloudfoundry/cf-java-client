@@ -12,6 +12,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
@@ -91,14 +94,15 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResponseExtractor;
@@ -149,7 +153,7 @@ public class CloudFoundryClientTest {
 	private static final String MYSQL_SERVICE_LABEL = System.getProperty("vcap.mysql.label", "p-mysql");
 	private static final String MYSQL_SERVICE_PLAN = System.getProperty("vcap.mysql.plan", "100mb-dev");
 
-	private static final String DEFAULT_STACK_NAME = "lucid64";
+	private static final String DEFAULT_STACK_NAME = System.getProperty("ccng.stackName", "lucid64");
 
 	private static final boolean SILENT_TEST_TIMINGS = Boolean.getBoolean("silent.testTimings");
 
@@ -172,6 +176,8 @@ public class CloudFoundryClientTest {
 	private static final String CCNG_QUOTA_NAME_TEST = System.getProperty("ccng.quota", "test_quota");
 
 	private static final String CCNG_SECURITY_GROUP_NAME_TEST = System.getProperty("ccng.securityGroup", "test_security_group");
+
+	private static final String APP_DOMAIN = System.getProperty("ccng.appDomain", "cf.deepsouthcloud.com");
 
 	private static boolean tearDownComplete = false;
 
@@ -1360,18 +1366,18 @@ public class CloudFoundryClientTest {
 		boolean pass = ensureApplicationRunning("haash-broker");
 		assertTrue("haash-broker failed to start", pass);
 
-		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		String brokerUrl = "http://haash-broker." +  APP_DOMAIN;
+		CloudServiceBroker newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", brokerUrl, "warreng", "snoopdogg");
 		connectedClient.createServiceBroker(newBroker);
 
 		CloudServiceBroker broker = connectedClient.getServiceBroker("haash-broker");
 		assertNotNull(broker);
 		assertNotNull(broker.getMeta());
-		assertEquals("haash-broker", broker.getName());
-		assertEquals("http://haash-broker.cf.deepsouthcloud.com", broker.getUrl());
+		assertEquals(brokerUrl, broker.getUrl());
 		assertEquals("warreng", broker.getUsername());
 		assertNull(broker.getPassword());
 
-		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", "http://haash-broker.cf.deepsouthcloud.com", "warreng", "snoopdogg");
+		newBroker = new CloudServiceBroker(CloudEntity.Meta.defaultMeta(), "haash-broker", brokerUrl, "warreng", "snoopdogg");
 		connectedClient.updateServiceBroker(newBroker);
 
 		connectedClient.updateServicePlanVisibilityForBroker("haash-broker", true);
@@ -2246,6 +2252,137 @@ public class CloudFoundryClientTest {
 		} catch(Exception e){
 			// Nothing we can do at this point except protect other teardown logic from not running
 		}
+	}
+
+	@Test
+	public void loginWithPasscode() throws Exception {
+		String passcode = getOtpPasscodeForTest();
+		assumeNotNull(passcode);
+		CloudCredentials credentials = new CloudCredentials(passcode);
+
+		URL cloudControllerUrl = new URL(CCNG_API_URL);
+		CloudFoundryClient clientForPasscodeLogin =
+				new CloudFoundryClient(credentials, cloudControllerUrl, httpProxyConfiguration);
+		// setting up client triggers login - so no need to login() again
+		assertTrue("orgs should be retrieved (login successful)", !clientForPasscodeLogin.getOrganizations().isEmpty());
+	}
+
+	@Test
+	public void loginWithPasscodeHandlesMultipleCallsToLogin() throws Exception {
+		String passcode = getOtpPasscodeForTest();
+		assumeNotNull(passcode);
+		CloudCredentials credentials = new CloudCredentials(passcode);
+
+		URL cloudControllerUrl = new URL(CCNG_API_URL);
+		CloudFoundryClient clientForPasscodeLogin =
+				new CloudFoundryClient(credentials, cloudControllerUrl, httpProxyConfiguration);
+		clientForPasscodeLogin.login();
+		clientForPasscodeLogin.login();
+		clientForPasscodeLogin.login();
+		assertTrue("orgs should be retrieved (login successful)", !clientForPasscodeLogin.getOrganizations().isEmpty());
+	}
+
+	@Test
+	public void refreshTokenOnExpirationWithPasscodeLogin() throws Exception {
+		String passcode = getOtpPasscodeForTest();
+		assumeNotNull(passcode);
+		CloudCredentials credentials = new CloudCredentials(passcode);
+
+		URL cloudControllerUrl = new URL(CCNG_API_URL);
+
+		CloudControllerClientFactory factory =
+				new CloudControllerClientFactory(httpProxyConfiguration, CCNG_API_SSL);
+		CloudControllerClient client = factory.newCloudController(cloudControllerUrl, credentials, CCNG_USER_ORG, CCNG_USER_SPACE);
+
+		client.login();
+
+		validateClientAccess(client);
+
+		OauthClient oauthClient = factory.getOauthClient();
+		OAuth2AccessToken token = oauthClient.getToken();
+		if (token instanceof DefaultOAuth2AccessToken) {
+			// set the token expiration to "now", forcing the access token to be refreshed
+			((DefaultOAuth2AccessToken) token).setExpiration(new Date());
+			validateClientAccess(client);
+		} else {
+			fail("Error forcing expiration of access token");
+		}
+	}
+
+	@Test
+	public void obtainPasscodeForLoggedInUser() throws Exception {
+		String passcodePattern = "[A-Za-z0-9]{6}";
+
+		String passcode1 = getOtpPasscodeForTest();
+		assumeNotNull(passcode1);
+		assertTrue("Passcode is retrieved and looks valid", passcode1.matches(passcodePattern));
+
+		String passcode2 = getOtpPasscodeForTest();
+		assertTrue("Can obtain multiple passcodes", !passcode2.equals(passcode1));
+		assertTrue("Can obtain multiple passcodes", passcode2.matches(passcodePattern));
+	}
+
+	private String getOtpPasscodeForTest() throws Exception {
+		try {
+			CloudInfo info = connectedClient.getCloudInfo();
+			List<String> cookies = doFormAuthOnLoginServer(info.getAuthorizationEndpoint());
+			return retrieveOtpPasscodeFromLoginServerSession(info.getAuthorizationEndpoint(), cookies);
+		}
+		catch(Exception e) {
+			System.err.println("WARNING: Skipping some tests since obtaining passcodes failed: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private List<String> doFormAuthOnLoginServer(String loginServerUrl) {
+		String loginEndpointUrl = loginServerUrl + "/login.do";
+
+		RestUtil restUtil = new RestUtil();
+		RestTemplate restTemplate = restUtil.createRestTemplate(httpProxyConfiguration, CCNG_API_SSL);
+		MultiValueMap<String, String> loginRequestBody = new LinkedMultiValueMap<>();
+		loginRequestBody.add("username", CCNG_USER_EMAIL);
+		loginRequestBody.add("password", CCNG_USER_PASS);
+		HttpHeaders loginRequestHeaders = new HttpHeaders();
+		loginRequestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		HttpEntity<MultiValueMap<String, String>> loginRequest = new HttpEntity<>(loginRequestBody, loginRequestHeaders);
+		HttpEntity<String> response = restTemplate.exchange(loginEndpointUrl, HttpMethod.POST, loginRequest, String.class);
+
+		HttpHeaders headers = response.getHeaders();
+		List<String> cookies = headers.get("Set-Cookie");
+		if(cookies == null || cookies.isEmpty()) {
+			throw new RuntimeException("No cookies set when logging in on login server for passcodes: " + response);
+		}
+		return cookies;
+	}
+
+	private String retrieveOtpPasscodeFromLoginServerSession(String loginServerUrl, List<String> sessionCookies) {
+		String passcodeUrl = loginServerUrl + "/passcode";
+
+		RestUtil restUtil = new RestUtil();
+		RestTemplate restTemplate = restUtil.createRestTemplate(httpProxyConfiguration, CCNG_API_SSL);
+
+		HttpHeaders requestHeaders = new HttpHeaders();
+		for(String cookie : sessionCookies) {
+			requestHeaders.add("Cookie", cookie);
+		}
+		requestHeaders.add("Accept", "*/*");
+		HttpEntity requestEntity = new HttpEntity(null, requestHeaders);
+		ResponseEntity passcodeResponse = restTemplate.exchange(
+				passcodeUrl,
+				HttpMethod.GET,
+				requestEntity,
+				String.class);
+		return parseOtpPasscodeFromHtml((String) passcodeResponse.getBody());
+	}
+
+	private String parseOtpPasscodeFromHtml(String html) {
+		String passcodeRegex = "<h1>Temporary Authentication Code</h1>.*<h2>([A-Za-z0-9]{6})</h2>";
+		Pattern passcodePattern = Pattern.compile(passcodeRegex, Pattern.DOTALL);
+		Matcher passcodeMatcher = passcodePattern.matcher(html);
+		assertTrue(passcodeMatcher.find());
+
+		return passcodeMatcher.group(1);
 	}
 
 	//
