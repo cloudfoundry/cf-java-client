@@ -16,15 +16,19 @@
 
 package org.cloudfoundry.client.spring.v3.applications;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.spring.ExpectedExceptionSubscriber;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationsResponse.Resource;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.junit.Test;
@@ -111,7 +115,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void assignDropletInvalidRequest() {
-        this.applications.assignDroplet(new AssignApplicationDropletRequest()).subscribe(new ExpectedExceptionSubscriber());
+        this.applications.assignDroplet(new AssignApplicationDropletRequest()).subscribe(new
+                ExpectedExceptionSubscriber());
     }
 
     @Test
@@ -341,7 +346,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withName("test-name");
 
         Streams.wrap(this.applications.list(request)).consume(response -> {
-            Resource resource = response.getResources().get(0);
+            ListApplicationsResponse.Resource resource = response.getResources().get(0);
 
             assertEquals("name-383", resource.getBuildpack());
             assertEquals("1970-01-01T00:00:03Z", resource.getCreatedAt());
@@ -383,6 +388,61 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test
     public void listInvalidRequest() {
         this.applications.list(new ListApplicationsRequest().withPage(-1)).subscribe(new ExpectedExceptionSubscriber());
+    }
+
+    @Test
+    public void listPackages() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_packages_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
+                .withPage(1)
+                .withId("test-id");
+
+        ListApplicationPackagesResponse response = Streams.wrap(this.applications.listPackages(request)).next().get();
+
+        ListApplicationPackagesResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("2015-07-27T22:43:34Z", resource.getCreatedAt());
+        assertNull(resource.getError());
+        assertEquals("sha1", resource.getHash().getType());
+        assertNull(resource.getHash().getValue());
+        assertEquals("guid-3d792a08-e415-4f9e-912b-2a8485db781a", resource.getId());
+
+        assertEquals(5, resource.getLinks().size());
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("upload"));
+        assertNotNull(resource.getLink("download"));
+        assertNotNull(resource.getLink("stage"));
+        assertNotNull(resource.getLink("app"));
+
+        assertEquals("AWAITING_UPLOAD", resource.getState());
+        assertEquals("bits", resource.getType());
+        assertNull(resource.getUpdatedAt());
+        assertNull(resource.getUrl());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listPackagesError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
+                .withPage(1)
+                .withId("test-id");
+        Streams.wrap(this.applications.listPackages(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listPackagesInvalidRequest() {
+        Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
     }
 
     @Test

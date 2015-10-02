@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
@@ -92,6 +94,12 @@ public final class SpringApplications extends AbstractSpringOperations implement
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Publisher<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
+        return get(request, ListApplicationPackagesResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "packages"));
     }
 
     @Override

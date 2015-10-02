@@ -78,6 +78,15 @@ public interface Applications {
     Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/list_associated_packages.html">
+     * List Application Packages</a> request
+     *
+     * @param request the List Application Packages request
+     * @return the response from the List Application Packages request
+     */
+    Publisher<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start
      * Application</a> request
      *
