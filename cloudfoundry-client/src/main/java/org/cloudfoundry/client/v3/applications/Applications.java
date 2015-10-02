@@ -87,6 +87,15 @@ public interface Applications {
     Publisher<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/scaling_a_process_from_its_app.html">
+     * Scale Application</a> request
+     *
+     * @param request the Scale Application request
+     * @return the response from the Scale Application request
+     */
+    Publisher<ScaleApplicationResponse> scale(ScaleApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start
      * Application</a> request
      *
