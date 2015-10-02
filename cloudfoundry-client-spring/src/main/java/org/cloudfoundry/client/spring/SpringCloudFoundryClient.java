@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
+import org.cloudfoundry.client.spring.v2.service_instances.SpringServiceInstances;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
 import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
@@ -27,6 +28,7 @@ import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.Applications;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -51,6 +53,8 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final OAuth2RestOperations restOperations;
 
+    private final ServiceInstances serviceInstances;
+
     private final Spaces spaces;
 
     SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root) {
@@ -60,6 +64,7 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.info = new SpringInfo(restOperations, root);
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
+        this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
 
         this.restOperations = restOperations;
@@ -101,6 +106,11 @@ final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Packages packages() {
         return this.packages;
+    }
+
+    @Override
+    public ServiceInstances serviceInstances() {
+        return this.serviceInstances;
     }
 
     @Override
