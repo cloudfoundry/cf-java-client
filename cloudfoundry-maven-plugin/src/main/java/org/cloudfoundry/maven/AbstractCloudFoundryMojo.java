@@ -197,7 +197,12 @@ public abstract class AbstractCloudFoundryMojo extends AbstractMojo {
 		Proxy proxy = getMavenProxy();
 		if (proxy != null) {
 			if (!targetIsExcludedFromProxy(target.getHost(), proxy)) {
-				return new HttpProxyConfiguration(proxy.getHost(), proxy.getPort());
+				if( proxy.getPassword() != null && proxy.getUsername() != null ) {
+					return new HttpProxyConfiguration(proxy.getHost(), proxy.getPort(), true, proxy.getUsername(), proxy.getPassword());
+				}
+				else {
+					return new HttpProxyConfiguration(proxy.getHost(), proxy.getPort());
+				}
 			}
 		}
 		return null;
