@@ -120,7 +120,15 @@ public class CloudApplication extends CloudEntity {
 	}
 
 	public enum AppState {
-		UPDATING, STARTED, STOPPED
+		UPDATING, STARTED, STOPPED, UNKNOWN;
+		
+		public static AppState valueOfWithDefault(String s) {
+			try {
+				return AppState.valueOf(s);
+			} catch (IllegalArgumentException e) {
+				return AppState.UNKNOWN;
+			}
+		}
 	}
 
 	public enum DebugMode {

@@ -40,8 +40,11 @@ import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
+import org.cloudfoundry.client.lib.domain.CloudServiceUsageEvent;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUsageEvent;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
@@ -364,6 +367,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	public List<CloudEvent> getApplicationEvents(String appName) {
 		return cc.getApplicationEvents(appName);
 	}
+	
+	public List<CloudUsageEvent> getApplicationUsageEvents() {
+		return cc.getApplicationUsageEvents();
+	}
+	
+	public List<CloudUsageEvent> getApplicationUsageEventsAfter(UUID after) {
+		return cc.getApplicationUsageEventsAfter(after);
+	}
 
 	/**
 	 * @deprecated use {@link #streamLogs(String, ApplicationLogListener)} or {@link #getRecentLogs(String)}
@@ -458,6 +469,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
     public CloudServiceInstance getServiceInstance(String service) {
 		return cc.getServiceInstance(service);
 	}
+    
+    public CloudServiceInstance getServiceInstance(UUID service) {
+		return cc.getServiceInstance(service);
+	}
+    
+    public CloudServicePlan getServicePlan(UUID servicePlan) {
+    	return cc.getServicePlan(servicePlan);
+    }
 
 	public void deleteService(String service) {
 		cc.deleteService(service);
@@ -473,6 +492,14 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public void unbindService(String appName, String serviceName) {
 		cc.unbindService(appName, serviceName);
+	}
+	
+	public List<CloudServiceUsageEvent> getServiceUsageEvents() {
+		return cc.getServiceUsageEvents();
+	}
+	
+	public List<CloudServiceUsageEvent> getServiceUsageEventsAfter(UUID after) {
+		return cc.getServiceUsageEventsAfter(after);
 	}
 
 	public InstancesInfo getApplicationInstances(String appName) {
@@ -553,6 +580,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 
 	public CloudOrganization getOrgByName(String orgName, boolean required){
     	return cc.getOrgByName(orgName, required);
+    }
+	
+	public CloudOrganization getOrgByGuid(UUID orgGuid, boolean required){
+    	return cc.getOrgByGuid(orgGuid, required);
     }
 
 	public List<CloudQuota> getQuotas() {

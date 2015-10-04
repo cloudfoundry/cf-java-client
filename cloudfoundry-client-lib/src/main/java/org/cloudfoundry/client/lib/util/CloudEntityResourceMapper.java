@@ -16,33 +16,36 @@
 
 package org.cloudfoundry.client.lib.util;
 
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudJob;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudEntity;
-import org.cloudfoundry.client.lib.domain.CloudEvent;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceBinding;
-import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-import org.cloudfoundry.client.lib.domain.CloudServicePlan;
-import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.domain.CloudStack;
-import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.CloudUser;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudDomain;
+import org.cloudfoundry.client.lib.domain.CloudEntity;
+import org.cloudfoundry.client.lib.domain.CloudEvent;
+import org.cloudfoundry.client.lib.domain.CloudJob;
+import org.cloudfoundry.client.lib.domain.CloudOrganization;
+import org.cloudfoundry.client.lib.domain.CloudQuota;
+import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.client.lib.domain.CloudServiceBinding;
+import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
+import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.cloudfoundry.client.lib.domain.CloudServicePlan;
+import org.cloudfoundry.client.lib.domain.CloudServiceUsageEvent;
+import org.cloudfoundry.client.lib.domain.CloudSpace;
+import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUsageEvent;
+import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.InstanceState;
+import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
+import org.cloudfoundry.client.lib.domain.Staging;
 
 /**
  * Class handling the mapping of the cloud domain objects
@@ -83,6 +86,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudEvent.class) {
 			return (T) mapEventResource(resource);
 		}
+		if (targetClass == CloudUsageEvent.class) {
+			return (T) mapUsageEventResource(resource);
+		}
 		if (targetClass == CloudService.class) {
 			return (T) mapServiceResource(resource);
 		}
@@ -94,6 +100,9 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == CloudServiceBroker.class) {
 			return (T) mapServiceBrokerResource(resource);
+		}
+		if (targetClass == CloudServiceUsageEvent.class) {
+			return (T) mapServiceUsageEventResource(resource);
 		}
 		if (targetClass == CloudStack.class) {
 			return (T) mapStackResource(resource);
@@ -110,6 +119,9 @@ public class CloudEntityResourceMapper {
 		if (targetClass == CloudUser.class){
             return (T) mapUserResource(resource);
         }
+		if (targetClass ==  CloudServicePlan.class){
+			return (T) mapServicePlanResource(resource);
+		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for entity mapping " + targetClass.getName());
 	}
@@ -236,6 +248,22 @@ public class CloudEntityResourceMapper {
 
 		return event;
 	}
+	
+	protected CloudUsageEvent mapUsageEventResource(Map<String, Object> resource) {
+		CloudUsageEvent event = new CloudUsageEvent(
+			getMeta(resource),
+			getNameOfResource(resource));
+		event.setState(getEntityAttribute(resource, "state", CloudUsageEvent.AppState.class));
+		event.setMemoryInMBPerInstance(getEntityAttribute(resource, "memory_in_mb_per_instance", Integer.class));
+		event.setInstanceCount(getEntityAttribute(resource, "instance_count", Integer.class));
+		event.setAppGUID(getEntityAttribute(resource, "app_guid", UUID.class));
+		event.setAppName(getEntityAttribute(resource, "app_name", String.class));
+		event.setOrgGUID(getEntityAttribute(resource, "org_guid", UUID.class));
+		event.setSpaceGUID(getEntityAttribute(resource, "space_guid", UUID.class));
+		event.setSpaceName(getEntityAttribute(resource, "space_name", String.class));
+
+		return event;
+	}
 
 	private CloudService mapServiceResource(Map<String, Object> resource) {
 		CloudService cloudService = new CloudService(getMeta(resource), getNameOfResource(resource));
@@ -333,6 +361,25 @@ public class CloudEntityResourceMapper {
 			getEntityAttribute(resource, "name", String.class),
 			getEntityAttribute(resource, "broker_url", String.class),
 			getEntityAttribute(resource, "auth_username", String.class));
+	}
+	
+	protected CloudServiceUsageEvent mapServiceUsageEventResource(Map<String, Object> resource) {
+		CloudServiceUsageEvent event = new CloudServiceUsageEvent(
+			getMeta(resource),
+			getNameOfResource(resource));
+		event.setState(getEntityAttribute(resource, "state", CloudServiceUsageEvent.ServiceState.class));
+		event.setOrgGUID(getEntityAttribute(resource, "org_guid", UUID.class));
+		event.setSpaceGUID(getEntityAttribute(resource, "space_guid", UUID.class));
+		event.setSpaceName(getEntityAttribute(resource, "space_name", String.class));
+		event.setServiceInstanceGUID(getEntityAttribute(resource, "service_instance_guid", UUID.class));
+		event.setServiceInstanceName(getEntityAttribute(resource, "service_instance_name", String.class));
+		event.setServiceInstanceType(getEntityAttribute(resource, "service_instance_type", CloudServiceUsageEvent.ServiceInstanceType.class));
+		event.setServicePlanGUID(getEntityAttribute(resource, "service_plan_guid", UUID.class));
+		event.setServicePlanName(getEntityAttribute(resource, "service_plan_name", String.class));
+		event.setServiceGUID(getEntityAttribute(resource, "service_guid", UUID.class));
+		event.setServiceLabel(getEntityAttribute(resource, "service_label", String.class));
+
+		return event;
 	}
 
 	private CloudStack mapStackResource(Map<String, Object> resource) {
@@ -432,6 +479,15 @@ public class CloudEntityResourceMapper {
 		}
 		if (targetClass == UUID.class && attributeValue instanceof String) {
 			return (T) UUID.fromString((String)attributeValue);
+		}
+		if (targetClass == CloudUsageEvent.AppState.class && attributeValue instanceof String) {
+			return (T) CloudUsageEvent.AppState.valueOfWithDefault((String)attributeValue);
+		}
+		if (targetClass == CloudServiceUsageEvent.ServiceState.class && attributeValue instanceof String) {
+			return (T) CloudServiceUsageEvent.ServiceState.valueOfWithDefault((String)attributeValue);
+		}
+		if (targetClass == CloudServiceUsageEvent.ServiceInstanceType.class && attributeValue instanceof String) {
+			return (T) CloudServiceUsageEvent.ServiceInstanceType.valueOfWithDefault((String)attributeValue);
 		}
 		throw new IllegalArgumentException(
 				"Error during mapping - unsupported class for attribute mapping " + targetClass.getName());
