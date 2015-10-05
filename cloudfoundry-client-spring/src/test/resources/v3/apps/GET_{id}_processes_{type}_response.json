@@ -1,0 +1,25 @@
+{
+  "guid": "32f64d22-ab45-4a9b-ba93-2b3b160f3750",
+  "type": "web",
+  "command": null,
+  "instances": 1,
+  "memory_in_mb": 1024,
+  "disk_in_mb": 1024,
+  "created_at": "2015-07-27T22:43:29Z",
+  "updated_at": "2015-07-27T22:43:29Z",
+  "_links": {
+    "self": {
+      "href": "/v3/processes/32f64d22-ab45-4a9b-ba93-2b3b160f3750"
+    },
+    "scale": {
+      "href": "/v3/processes/32f64d22-ab45-4a9b-ba93-2b3b160f3750/scale",
+      "method": "PUT"
+    },
+    "app": {
+      "href": "/v3/apps/guid-03125b96-e771-4346-8003-026ecfab6a75"
+    },
+    "space": {
+      "href": "/v2/spaces/55f4b2be-0ff7-470f-add0-3b2b6e19930c"
+    }
+  }
+}
