@@ -37,6 +37,8 @@ import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
+import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
+import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.junit.Test;
@@ -563,6 +565,62 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void startInvalidRequest() {
         Streams.wrap(this.applications.start(new StartApplicationRequest())).next().get();
+    }
+
+    @Test
+    public void stop() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/stop"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/PUT_{id}_stop_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        StopApplicationRequest request = new StopApplicationRequest()
+                .withId("test-id");
+
+        StopApplicationResponse response = Streams.wrap(this.applications.stop(request)).next().get();
+
+        assertNull(response.getBuildpack());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
+        assertEquals("STOPPED", response.getDesiredState());
+        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
+        assertEquals("guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0", response.getId());
+
+        assertEquals(8, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("processes"));
+        assertNotNull(response.getLink("packages"));
+        assertNotNull(response.getLink("space"));
+        assertNotNull(response.getLink("droplet"));
+        assertNotNull(response.getLink("start"));
+        assertNotNull(response.getLink("stop"));
+        assertNotNull(response.getLink("assign_current_droplet"));
+
+        assertEquals("original_name", response.getName());
+        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
+        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void stopError() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/stop"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        StopApplicationRequest request = new StopApplicationRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.applications.stop(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void stopInvalidRequest() {
+        Streams.wrap(this.applications.stop(new StopApplicationRequest())).next().get();
     }
 
     @Test

@@ -105,6 +105,15 @@ public interface Applications {
     Publisher<StartApplicationResponse> start(StartApplicationRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/stopping_an_app.html">Stop
+     * Application</a> request
+     *
+     * @param request the Stop Application request
+     * @return the response from the Stop Application request
+     */
+    Publisher<StopApplicationResponse> stop(StopApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">Update
      * Application</a> request
      *
