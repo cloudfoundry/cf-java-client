@@ -153,6 +153,8 @@ public interface CloudControllerClient {
 	StartingInfo restartApplication(String appName);
 
 	void deleteApplication(String appName);
+	
+	void deleteApplicationInstance(String appName, int index);
 
 	void deleteAllApplications();
 

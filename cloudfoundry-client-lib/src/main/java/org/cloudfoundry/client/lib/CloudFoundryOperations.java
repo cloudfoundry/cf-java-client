@@ -504,6 +504,14 @@ public interface CloudFoundryOperations {
 	void deleteApplication(String appName);
 
 	/**
+         * Delete application instance at index.
+         *
+         * @param appName name of application
+         * @param index index of instance to delete
+         */
+        void deleteApplicationInstance(String appName, int index);
+        
+	/**
 	 * Delete all applications.
 	 */
 	void deleteAllApplications();

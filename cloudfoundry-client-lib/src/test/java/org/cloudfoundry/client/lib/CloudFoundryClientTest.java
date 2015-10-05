@@ -667,6 +667,75 @@ public class CloudFoundryClientTest {
 		app = connectedClient.getApplication(appName);
 		assertEquals(CloudApplication.AppState.STOPPED, app.getState());
 	}
+    
+        @Test
+        public void canDeleteTheSpecifiedApplicationInstance() throws Exception {
+            String appName = namespacedAppName("delete-instance-0");
+            CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+            assertEquals(1, app.getInstances());
+    
+            waitForInstanceCountWithTimeout(appName, 1);
+    
+            connectedClient.deleteApplicationInstance(appName, 0);
+    
+            app = connectedClient.getApplication(appName);
+    
+            assertEquals("There were more than expected running instances", 0, app.getRunningInstances());
+    
+            // Cleanup
+            connectedClient.deleteApplication(appName);
+        }
+    
+        @Test
+        public void canAttemptToDeleteANonExistentApplicationInstance() throws Exception {
+            String appName = namespacedAppName("delete-instance-100");
+            CloudApplication app = createAndUploadAndStartSimpleSpringApp(appName);
+            assertEquals(1, app.getInstances());
+    
+            waitForInstanceCountWithTimeout(appName, 1);
+    
+            connectedClient.deleteApplicationInstance(appName, 100);
+    
+            app = connectedClient.getApplication(appName);
+    
+            assertEquals("An instance was killed that was not supposed to be killed", app.getInstances(), app.getRunningInstances());
+    
+            // Cleanup
+            connectedClient.deleteApplication(appName);
+        }
+    
+        @Test
+        public void attemptingToDeleteAnInstanceOnANonExistentApplicationThrowsCloudFoundryException() {
+            try {
+                String appName = UUID.randomUUID().toString();
+                connectedClient.deleteApplicationInstance(appName, 0);
+                fail("should have thrown exception");
+            } catch (CloudFoundryException e) {
+                assertTrue(e.getStatusCode().equals(HttpStatus.NOT_FOUND));
+            }
+        }
+    
+        private void waitForInstanceCountWithTimeout(String appName, int count) {
+            long start = System.currentTimeMillis();
+            while (true) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e1) {
+                    // ignore
+                }
+    
+                CloudApplication app = connectedClient.getApplication(appName);
+                if (app.getRunningInstances() == count) {
+                    return;
+                }
+    
+                if (System.currentTimeMillis() - start > STARTUP_TIMEOUT) {
+                    fail("Timed out waiting for startup");
+                    break; // for the compiler
+                }
+            }
+    
+        }
 
 	@Test
 	public void paginationWorksForUris() throws IOException {
