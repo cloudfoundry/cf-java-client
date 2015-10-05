@@ -61,9 +61,9 @@ public final class SpringPackagesTest extends AbstractRestTest {
         this.mockServer
                 .expect(method(POST))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_request.json")))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_{id}_packages_request.json")))
                 .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v3/packages/POST_response.json"))
+                        .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
                         .contentType(APPLICATION_JSON));
 
         CreatePackageRequest request = new CreatePackageRequest()
@@ -97,7 +97,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
         this.mockServer
                 .expect(method(POST))
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_request.json")))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_{id}_packages_request.json")))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
