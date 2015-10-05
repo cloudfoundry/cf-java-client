@@ -25,9 +25,7 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessRequest;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
@@ -80,16 +78,14 @@ public final class SpringApplications extends AbstractSpringOperations implement
     }
 
     @Override
-    public Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
-        return delete(request, new DeleteApplicationResponse(),
-                builder -> builder.pathSegment("v3", "apps", request.getId()));
+    public Publisher<Void> delete(DeleteApplicationRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "apps", request.getId()));
     }
 
     @Override
-    public Publisher<DeleteApplicationProcessResponse> deleteProcess(DeleteApplicationProcessRequest request) {
-        return delete(request, new DeleteApplicationProcessResponse(),
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(),
-                        "instances", request.getIndex()));
+    public Publisher<Void> deleteProcess(DeleteApplicationProcessRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "apps", request.getId(), "processes",
+                request.getType(), "instances", request.getIndex()));
     }
 
     @Override

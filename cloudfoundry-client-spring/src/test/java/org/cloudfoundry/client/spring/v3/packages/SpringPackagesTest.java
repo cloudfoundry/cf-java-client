@@ -23,7 +23,6 @@ import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
-import org.cloudfoundry.client.v3.packages.DeletePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
@@ -130,7 +129,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
         DeletePackageRequest request = new DeletePackageRequest()
                 .withId("test-id");
 
-        DeletePackageResponse response = Streams.wrap(this.packages.delete(request)).next().get();
+        Streams.wrap(this.packages.delete(request)).next().get();
 
         this.mockServer.verify();
     }

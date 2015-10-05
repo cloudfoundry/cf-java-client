@@ -62,8 +62,7 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Stream<T> delete(Validatable request, T response,
-                                         Consumer<UriComponentsBuilder> builderCallback) {
+    protected final Stream<Void> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -71,7 +70,7 @@ public abstract class AbstractSpringOperations {
 
             this.logger.debug("DELETE {}", uri);
             this.restOperations.delete(uri);
-            return response;
+            return null;
         });
     }
 
