@@ -1,31 +1,49 @@
 {
-  "guid": "guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9",
-  "state": "STAGED",
+  "guid": "whatuuid",
+  "state": "PENDING",
   "hash": {
     "type": "sha1",
     "value": null
   },
-  "buildpack": "http://buildpack.git.url.com",
-  "error": "example error",
+  "buildpack": "http://github.com/myorg/awesome-buildpack",
+  "error": null,
   "procfile": null,
   "environment_variables": {
-    "cloud": "foundry"
+    "CUSTOM_ENV_VAR": "hello",
+    "VCAP_APPLICATION": {
+      "limits": {
+        "mem": 1024,
+        "disk": 4096,
+        "fds": 16384
+      },
+      "application_id": "guid-a174c559-deb6-4db7-b3ef-2a5d778d8866",
+      "application_version": "whatuuid",
+      "application_name": "name-454",
+      "application_uris": [
+
+      ],
+      "version": "whatuuid",
+      "name": "name-454",
+      "space_name": "name-451",
+      "space_id": "a9573106-2d65-45bb-9a93-55bfe029be33",
+      "uris": [
+
+      ],
+      "users": null
+    },
+    "CF_STACK": "cflinuxfs2"
   },
-  "created_at": "2015-07-27T22:43:30Z",
+  "created_at": "2015-07-27T22:43:16Z",
   "updated_at": null,
   "_links": {
     "self": {
-      "href": "/v3/droplets/guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9"
+      "href": "/v3/droplets/whatuuid"
     },
     "package": {
-      "href": "/v3/packages/guid-1df1d953-ef12-4604-a746-d6e047314c12"
+      "href": "/v3/packages/guid-c89ed121-a2f1-4f78-9d98-e3b607a07d09"
     },
     "app": {
-      "href": "/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8"
-    },
-    "assign_current_droplet": {
-      "href": "/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8/current_droplet",
-      "method": "PUT"
+      "href": "/v3/apps/guid-a174c559-deb6-4db7-b3ef-2a5d778d8866"
     }
   }
 }
