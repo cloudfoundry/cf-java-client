@@ -201,19 +201,17 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         GetApplicationResponse response = Streams.wrap(this.applications.get(request)).next().get();
 
-        assertEquals("name-2068", response.getBuildpack());
-        assertEquals("2015-08-06T00:36:52Z", response.getCreatedAt());
+        assertEquals("name-371", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
-        assertEquals("guid-a2ea0b27-971f-4f59-a9e4-d299e96c3f20", response.getId());
+        assertEquals("guid-e23c9834-9c4a-4397-be7d-e0fb686cb646", response.getId());
 
-        assertEquals(10, response.getLinks().size());
+        assertEquals(8, response.getLinks().size());
         assertNotNull(response.getLink("self"));
         assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("routes"));
         assertNotNull(response.getLink("packages"));
         assertNotNull(response.getLink("droplet"));
-        assertNotNull(response.getLink("droplets"));
         assertNotNull(response.getLink("space"));
         assertNotNull(response.getLink("start"));
         assertNotNull(response.getLink("stop"));
