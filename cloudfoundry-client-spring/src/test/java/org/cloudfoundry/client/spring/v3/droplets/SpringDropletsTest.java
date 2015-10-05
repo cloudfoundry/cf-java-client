@@ -27,6 +27,8 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,25 +56,25 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
         GetDropletResponse response = Streams.wrap(this.droplets.get(request)).next().get();
 
-        assertEquals("http://buildpack.git.url.com", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
-        assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
-        assertEquals("example error", response.getError());
+        assertEquals("http://github.com/myorg/awesome-buildpack", response.getBuildpack());
+        assertEquals("2015-07-27T22:43:16Z", response.getCreatedAt());
+
+        assertEquals(getExpectedEnvironmentVariables(), response.getEnvironmentVariables());
+        assertNull(response.getError());
 
         Hash hash = response.getHash();
         assertEquals("sha1", hash.getType());
         assertNull(hash.getValue());
 
-        assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
+        assertEquals("whatuuid", response.getId());
 
-        assertEquals(4, response.getLinks().size());
+        assertEquals(3, response.getLinks().size());
         assertNotNull(response.getLink("self"));
         assertNotNull(response.getLink("package"));
         assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("assign_current_droplet"));
 
         assertNull(response.getProcfile());
-        assertEquals("STAGED", response.getState());
+        assertEquals("PENDING", response.getState());
         assertNull(response.getUpdatedAt());
         this.mockServer.verify();
     }
@@ -94,5 +96,34 @@ public final class SpringDropletsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
         Streams.wrap(this.droplets.get(new GetDropletRequest())).next().get();
+    }
+
+    public Map<String, Object> getExpectedEnvironmentVariables() {
+        Map<String, Object> environmentVariables = new HashMap<>();
+
+        environmentVariables.put("CUSTOM_ENV_VAR", "hello");
+
+        Map<String, Object> limits = new HashMap<>();
+        limits.put("mem", 1024);
+        limits.put("disk", 4096);
+        limits.put("fds", 16384);
+
+        Map<String, Object> vcapApplication = new HashMap<>();
+        vcapApplication.put("limits", limits);
+        vcapApplication.put("application_id", "guid-a174c559-deb6-4db7-b3ef-2a5d778d8866");
+        vcapApplication.put("application_version", "whatuuid");
+        vcapApplication.put("application_name", "name-454");
+        vcapApplication.put("application_uris", Collections.emptyList());
+        vcapApplication.put("version", "whatuuid");
+        vcapApplication.put("name", "name-454");
+        vcapApplication.put("space_name", "name-451");
+        vcapApplication.put("space_id", "a9573106-2d65-45bb-9a93-55bfe029be33");
+        vcapApplication.put("uris", Collections.emptyList());
+        vcapApplication.put("users", null);
+
+        environmentVariables.put("VCAP_APPLICATION", vcapApplication);
+        environmentVariables.put("CF_STACK", "cflinuxfs2");
+
+        return environmentVariables;
     }
 }
