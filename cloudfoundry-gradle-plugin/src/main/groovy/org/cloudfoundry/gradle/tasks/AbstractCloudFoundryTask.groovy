@@ -334,7 +334,11 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
         String fileName = propertyOrExtension('file')
         if(fileName) {
             File commandLineFile = new File(fileName)
-            commandLineFile.exists() ? commandLineFile : null
+            if (commandLineFile.exists()){
+                return commandLineFile
+            } else {
+                throw new RuntimeException("could not use file [${file.getAbsolutePath()}] as it does not exist")
+            }
         }
         null
     }
