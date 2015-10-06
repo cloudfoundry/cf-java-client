@@ -28,12 +28,14 @@ import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
+import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
@@ -100,6 +102,12 @@ public final class SpringApplications extends AbstractSpringOperations implement
     public Publisher<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
         return get(request, ListApplicationPackagesResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId(), "packages"));
+    }
+
+    @Override
+    public Publisher<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
+        return put(request, ScaleApplicationResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "scale"));
     }
 
     @Override

@@ -33,7 +33,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationsResponse.Resource;
+import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
+import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
@@ -351,7 +352,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         ListApplicationsResponse response = Streams.wrap(this.applications.list(request)).next().get();
 
-        Resource resource = response.getResources().get(0);
+        ListApplicationsResponse.Resource resource = response.getResources().get(0);
 
         assertEquals("name-383", resource.getBuildpack());
         assertEquals("1970-01-01T00:00:03Z", resource.getCreatedAt());
@@ -447,6 +448,65 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void listPackagesInvalidRequest() {
         Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
+    }
+
+    @Test
+    public void scale() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_processes_{type}_scale_request.json")))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/PUT_{id}_processes_{type}_scale_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ScaleApplicationRequest request = new ScaleApplicationRequest()
+                .withDiskInMb(100)
+                .withId("test-id")
+                .withInstances(3)
+                .withMemoryInMb(100)
+                .withType("web");
+
+        ScaleApplicationResponse response = Streams.wrap(this.applications.scale(request)).next().get();
+
+        assertEquals("2015-07-27T22:43:29Z", response.getCreatedAt());
+        assertEquals(Integer.valueOf(100), response.getDiskInMb());
+        assertEquals("edc2dffe-9f0d-416f-a712-890d56de8bae", response.getId());
+        assertEquals(Integer.valueOf(3), response.getInstances());
+
+        assertEquals(4, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("scale"));
+        assertNotNull(response.getLink("app"));
+        assertNotNull(response.getLink("space"));
+
+        assertEquals(Integer.valueOf(100), response.getMemoryInMb());
+        assertEquals("web", response.getType());
+        assertEquals("2015-07-27T22:43:29Z", response.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void scaleError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ScaleApplicationRequest request = new ScaleApplicationRequest()
+                .withDiskInMb(100)
+                .withId("test-id")
+                .withInstances(3)
+                .withMemoryInMb(100)
+                .withType("web");
+
+        Streams.wrap(this.applications.scale(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void scaleInvalidRequest() {
+        Streams.wrap(this.applications.scale(new ScaleApplicationRequest())).next().get();
     }
 
     @Test
