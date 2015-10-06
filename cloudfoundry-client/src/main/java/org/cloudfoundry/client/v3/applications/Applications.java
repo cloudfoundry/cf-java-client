@@ -69,6 +69,15 @@ public interface Applications {
     Publisher<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/get_a_process_from_an_app.html">
+     * Get Application Process</a> request
+     *
+     * @param request the Get Application Process request
+     * @return the response from the Get Application Process request
+     */
+    Publisher<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List
      * Applications</a> request
      *

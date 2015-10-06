@@ -19,10 +19,11 @@ package org.cloudfoundry.client.v3.applications;
 import org.cloudfoundry.client.v3.processes.Process;
 
 /**
- * The response payload for the Scale Application operation
+ * The response payload for the Get Application Process operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ScaleApplicationResponse extends Process<ScaleApplicationResponse> {
+public final class GetApplicationProcessResponse extends Process<GetApplicationProcessResponse> {
+
 
 }
