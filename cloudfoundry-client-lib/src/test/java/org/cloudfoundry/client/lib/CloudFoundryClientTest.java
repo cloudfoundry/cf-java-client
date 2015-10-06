@@ -548,6 +548,8 @@ public class CloudFoundryClientTest {
 		assertNull(app.getStaging().getCommand());
 		assertNull(app.getStaging().getBuildpackUrl());
 		assertNull(app.getStaging().getHealthCheckTimeout());
+		
+		assertNotNull(app.getStaging().getDetectedStartCommand());
 	}
 
 	@Test

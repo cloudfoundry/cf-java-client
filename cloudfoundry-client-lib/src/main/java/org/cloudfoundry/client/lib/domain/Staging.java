@@ -27,6 +27,7 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class Staging {
 	private String command;
+	private String detectedStartCommand;
 	private String buildpackUrl;
 	private String detectedBuildpack;
 	private String stack;
@@ -85,6 +86,21 @@ public class Staging {
 		this(command, buildpackUrl, stack, healthCheckTimeout);
 		this.detectedBuildpack = detectedBuildpack;
 	}
+	   
+    /**
+     *
+     * @param command the application command; may be null
+     * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
+     * @param stack the stack to use when staging the application; may be null
+     * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
+     * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property, and should not be set except when parsing a response. May be null.
+     * @param detectedStartCommand The command detected by the buildpack during staging.
+     */
+    public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout, String detectedBuildpack, String detectedStartCommand) {
+        this(command, buildpackUrl, stack, healthCheckTimeout);
+        this.detectedBuildpack = detectedBuildpack;
+        this.detectedStartCommand = detectedStartCommand;
+    }
 
 	/**
 	 *
@@ -93,8 +109,16 @@ public class Staging {
 	public String getCommand() {
 		return command;
 	}
-
+	
 	/**
+	 * 
+	 * @return The command detected by the buildpack during staging.
+	 */
+	public String getDetectedStartCommand() {
+        return detectedStartCommand;
+    }
+
+    /**
 	 *
 	 * @return The buildpack url, or null to use the default
 	 *         buildpack detected based on application content
@@ -132,7 +156,9 @@ public class Staging {
 	@Override
 	public String toString() {
 		return "Staging [command=" + getCommand() +
+                " detectedCommand=" + getDetectedStartCommand() +
 				" buildpack=" + getBuildpackUrl() +
+                " detectedBuildpack=" + getDetectedBuildpack() +
 				" stack=" + getStack() +
 				" healthCheckTimeout=" + getHealthCheckTimeout() +
 				"]";
