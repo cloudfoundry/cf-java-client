@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
@@ -196,6 +198,82 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     }
 
     @Test
+    public void delete() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(OK));
+
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId("test-id");
+
+        DeleteApplicationResponse response = Streams.wrap(this.applications.delete(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeleteApplicationRequest request = new DeleteApplicationRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.applications.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        Streams.wrap(this.applications.delete(new DeleteApplicationRequest())).next().get();
+    }
+
+    @Test
+    public void deleteProcess() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-id/processes/test-type/instances/test-index"))
+                .andRespond(withStatus(OK));
+
+        DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
+                .withId("test-id")
+                .withIndex("test-index")
+                .withType("test-type");
+
+        DeleteApplicationProcessResponse response = Streams.wrap(this.applications.deleteProcess(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteProcessError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-id/processes/test-type/instances/test-index"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
+                .withId("test-id")
+                .withIndex("test-index")
+                .withType("test-type");
+
+        Streams.wrap(this.applications.deleteProcess(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteProcessInvalidRequest() {
+        Streams.wrap(this.applications.deleteProcess(new DeleteApplicationProcessRequest())).next().get();
+    }
+
+    @Test
     public void get() {
         this.mockServer
                 .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
@@ -359,41 +437,6 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void getProcessInvalidRequest() {
         Streams.wrap(this.applications.getProcess(new GetApplicationProcessRequest())).next().get();
-    }
-
-    @Test
-    public void delete() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(OK));
-
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId("test-id");
-
-        DeleteApplicationResponse response = Streams.wrap(this.applications.delete(request)).next().get();
-
-        this.mockServer.verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void deleteError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
-
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId("test-id");
-
-        Streams.wrap(this.applications.delete(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void deleteInvalidRequest() {
-        Streams.wrap(this.applications.delete(new DeleteApplicationRequest())).next().get();
     }
 
     @Test
