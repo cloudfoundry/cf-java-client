@@ -214,6 +214,8 @@ public interface CloudControllerClient {
 
 	void deleteSpace(String spaceName);
 
+	void deleteSpaceRecursively(String spaceName);
+
 	// Domains and routes management
 
 

@@ -588,6 +588,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteSpace(spaceName);
 	}
 
+	@Override
+	public void deleteSpaceRecursively(String spaceName) {
+		cc.deleteSpaceRecursively(spaceName);
+	}
+
 
 	@Override
 	public CloudSpace getSpace(String spaceName) {
