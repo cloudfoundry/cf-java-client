@@ -754,6 +754,16 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 	}
 
 	@Override
+	public void associateUserWithOrg(String orgName, String username) {
+		CloudOrganization organization = getOrgByName(orgName, true);
+		String orgUrl=organization.getMeta().getUrl()+"/users";
+
+		HashMap<String, Object> orgRequest = new HashMap<String, Object>();
+		orgRequest.put("username", username);
+		getRestTemplate().put(getUrl(orgUrl), orgRequest);
+	}
+
+	@Override
 	public List<CloudOrganization> getOrganizations() {
 		String urlPath = "/v2/organizations?inline-relations-depth=0";
 		List<Map<String, Object>> resourceList = getAllResources(urlPath, null);

@@ -309,4 +309,6 @@ public interface CloudControllerClient {
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
 	Map<String, CloudUser> getOrganizationUsers(String orgName);
+
+	void associateUserWithOrg(String orgName, String username);
 }
