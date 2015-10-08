@@ -36,6 +36,8 @@ import org.cloudfoundry.client.lib.domain.CloudStack;
 import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
 import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.domain.CloudUser;
+import org.cloudfoundry.client.lib.domain.ServiceInstanceLastOperation;
+import org.cloudfoundry.client.lib.domain.OperationState;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -261,6 +263,9 @@ public class CloudEntityResourceMapper {
 		serviceInstance.setDashboardUrl(getEntityAttribute(resource, "dashboard_url", String.class));
 		serviceInstance.setCredentials(getEntityAttribute(resource, "credentials", Map.class));
 
+		Map<String, Object> serviceLastOperation = getEmbeddedResource(resource, "last_operation");
+		serviceInstance.setLastOperation(mapServiceLastOperation(serviceLastOperation));
+
 		Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
 		serviceInstance.setServicePlan(mapServicePlanResource(servicePlanResource));
 
@@ -275,6 +280,28 @@ public class CloudEntityResourceMapper {
 		serviceInstance.setBindings(bindings);
 
 		return serviceInstance;
+	}
+
+	private ServiceInstanceLastOperation mapServiceLastOperation(Map<String, Object> serviceLastOperation) {
+		if (serviceLastOperation!=null) {
+			String type = String.valueOf(serviceLastOperation.get("type"));
+			OperationState state = mapOperationState(String.valueOf(serviceLastOperation.get("state")));
+			String description = String.valueOf(serviceLastOperation.get("description"));
+			return new ServiceInstanceLastOperation(type, state, description);
+		}
+		return null;
+	}
+
+	private OperationState mapOperationState(String state) {
+		switch (state) {
+			case "in progress":
+				return OperationState.IN_PROGRESS;
+			case "succeeded":
+				return OperationState.SUCCEEDED;
+			case "failed":
+				return  OperationState.FAILED;
+		}
+		throw new IllegalArgumentException("unknown service instance operation state : " + state);
 	}
 
 	@SuppressWarnings("unchecked")
