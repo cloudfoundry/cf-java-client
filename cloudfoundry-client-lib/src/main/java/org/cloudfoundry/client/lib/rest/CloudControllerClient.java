@@ -210,6 +210,8 @@ public interface CloudControllerClient {
 
 	void createSpace(String spaceName);
 
+	void createSpace(String orgName, String spaceName);
+
 	CloudSpace getSpace(String spaceName);
 
 	void deleteSpace(String spaceName);
@@ -309,4 +311,5 @@ public interface CloudControllerClient {
 	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
 	Map<String, CloudUser> getOrganizationUsers(String orgName);
+
 }
