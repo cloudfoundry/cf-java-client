@@ -640,6 +640,11 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 	}
 
 	@Override
+	public void associateUserWithOrg(String orgName, String username) {
+		cc.associateUserWithOrg(orgName,username);
+	}
+
+	@Override
 	public void associateManagerWithSpace(String orgName, String spaceName) {
 		cc.associateManagerWithSpace(orgName, spaceName, null);
 	}

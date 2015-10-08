@@ -147,6 +147,14 @@ public interface CloudFoundryOperations {
 	void associateAuditorWithSpace(String spaceName);
 
 	/**
+	 * Associate a user to an organization
+	 *
+	 * @param orgName  organization name
+	 * @param username name of the user
+	 */
+	void associateUserWithOrg(String orgName,String username);
+
+	/**
 	 * Associate current user to the space developer role
 	 *
 	 * @param spaceName name of the space
