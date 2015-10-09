@@ -1,0 +1,40 @@
+{
+  "pagination": {
+    "total_results": 1,
+    "first": {
+      "href": "/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50"
+    },
+    "last": {
+      "href": "/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "38fcaafa-5356-4f74-af10-dc70da151993",
+      "type": "web",
+      "command": null,
+      "instances": 1,
+      "memory_in_mb": 1024,
+      "disk_in_mb": 1024,
+      "created_at": "2015-07-27T22:43:29Z",
+      "updated_at": "2015-07-27T22:43:29Z",
+      "_links": {
+        "self": {
+          "href": "/v3/processes/38fcaafa-5356-4f74-af10-dc70da151993"
+        },
+        "scale": {
+          "href": "/v3/processes/38fcaafa-5356-4f74-af10-dc70da151993/scale",
+          "method": "PUT"
+        },
+        "app": {
+          "href": "/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389"
+        },
+        "space": {
+          "href": "/v2/spaces/b35fe3b3-7ec3-4fc0-acd0-249eb61a27f3"
+        }
+      }
+    }
+  ]
+}

@@ -33,6 +33,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
@@ -505,6 +507,59 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void listPackagesInvalidRequest() {
         Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
+    }
+
+    @Test
+    public void listProcesses() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_processes_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
+                .withPage(1)
+                .withId("test-id");
+
+        ListApplicationProcessesResponse response = Streams.wrap(this.applications.listProcesses(request)).next().get();
+
+        ListApplicationProcessesResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("2015-07-27T22:43:29Z", resource.getCreatedAt());
+        assertNull(resource.getCommand());
+        assertEquals(Integer.valueOf(1024), resource.getDiskInMb());
+        assertEquals("38fcaafa-5356-4f74-af10-dc70da151993", resource.getId());
+        assertEquals(Integer.valueOf(1), resource.getInstances());
+
+        assertEquals(4, resource.getLinks().size());
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("scale"));
+        assertNotNull(resource.getLink("app"));
+        assertNotNull(resource.getLink("space"));
+
+        assertEquals(Integer.valueOf(1024), resource.getMemoryInMb());
+        assertEquals("web", resource.getType());
+        assertEquals("2015-07-27T22:43:29Z", resource.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listProcessesError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
+                .withPage(1)
+                .withId("test-id");
+        Streams.wrap(this.applications.listProcesses(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listProcessesInvalidRequest() {
+        Streams.wrap(this.applications.listProcesses(new ListApplicationProcessesRequest())).next().get();
     }
 
     @Test
