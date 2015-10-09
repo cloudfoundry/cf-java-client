@@ -39,7 +39,7 @@ public interface Packages {
      * @param request the Delete Package request
      * @return the response from the Delete Package request
      */
-    Publisher<DeletePackageResponse> delete(DeletePackageRequest request);
+    Publisher<Void> delete(DeletePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/get_a_package.html">Get

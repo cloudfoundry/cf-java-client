@@ -24,9 +24,7 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessRequest;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
@@ -207,7 +205,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
 
-        DeleteApplicationResponse response = Streams.wrap(this.applications.delete(request)).next().get();
+        Streams.wrap(this.applications.delete(request)).next().get();
 
         this.mockServer.verify();
     }
@@ -245,7 +243,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withIndex("test-index")
                 .withType("test-type");
 
-        DeleteApplicationProcessResponse response = Streams.wrap(this.applications.deleteProcess(request)).next().get();
+        Streams.wrap(this.applications.deleteProcess(request)).next().get();
 
         this.mockServer.verify();
     }

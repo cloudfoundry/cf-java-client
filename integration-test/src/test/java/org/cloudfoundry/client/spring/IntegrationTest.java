@@ -25,7 +25,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
@@ -174,7 +173,7 @@ public final class IntegrationTest {
                 .observe(r -> this.logger.info("Created package"));
     }
 
-    private Publisher<DeleteApplicationResponse> deleteApplication(ListApplicationsResponse.Resource resource) {
+    private Publisher<Void> deleteApplication(ListApplicationsResponse.Resource resource) {
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId(resource.getId());
 

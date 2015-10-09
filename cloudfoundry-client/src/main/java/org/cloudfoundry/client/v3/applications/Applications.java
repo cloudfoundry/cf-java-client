@@ -48,7 +48,7 @@ public interface Applications {
      * @param request the Delete Application request
      * @return the response from the Delete Application request
      */
-    Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request);
+    Publisher<Void> delete(DeleteApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/terminating_a_process_instance_from_its_app.html">
@@ -57,7 +57,7 @@ public interface Applications {
      * @param request the Delete Application Process request
      * @return the response from the Delete Application Process request
      */
-    Publisher<DeleteApplicationProcessResponse> deleteProcess(DeleteApplicationProcessRequest request);
+    Publisher<Void> deleteProcess(DeleteApplicationProcessRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/apps_(experimental)/get_an_app.html">Get Application</a>
