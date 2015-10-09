@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
+import org.cloudfoundry.client.v3.packages.DeletePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.StagePackageRequest;
@@ -41,6 +43,7 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -113,6 +116,41 @@ public final class SpringPackagesTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() {
         Streams.wrap(this.packages.create(new CreatePackageRequest())).next().get();
+    }
+
+    @Test
+    public void delete() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
+                .andRespond(withStatus(OK));
+
+        DeletePackageRequest request = new DeletePackageRequest()
+                .withId("test-id");
+
+        DeletePackageResponse response = Streams.wrap(this.packages.delete(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeletePackageRequest request = new DeletePackageRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.packages.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        Streams.wrap(this.packages.delete(new DeletePackageRequest())).next().get();
     }
 
     @Test
