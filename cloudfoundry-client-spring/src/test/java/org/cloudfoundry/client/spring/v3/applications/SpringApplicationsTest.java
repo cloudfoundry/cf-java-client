@@ -322,6 +322,7 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .next().get();
 
         assertEquals("2015-07-27T22:43:29Z", response.getCreatedAt());
+        assertNull(response.getCommand());
         assertEquals(Integer.valueOf(1024), response.getDiskInMb());
         assertEquals("32f64d22-ab45-4a9b-ba93-2b3b160f3750", response.getId());
         assertEquals(Integer.valueOf(1), response.getInstances());

@@ -1,0 +1,25 @@
+{
+  "guid": "07063514-b0ca-4e58-adbb-8e8bd7eebd64",
+  "type": "web",
+  "command": null,
+  "instances": 1,
+  "memory_in_mb": 1024,
+  "disk_in_mb": 1024,
+  "created_at": "2015-07-27T22:43:31Z",
+  "updated_at": "2015-07-27T22:43:31Z",
+  "_links": {
+    "self": {
+      "href": "/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64"
+    },
+    "scale": {
+      "href": "/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64/scale",
+      "method": "PUT"
+    },
+    "app": {
+      "href": "/v3/apps/"
+    },
+    "space": {
+      "href": "/v2/spaces/a99fa535-dfa7-4edf-9b18-5cadc80acb0f"
+    }
+  }
+}
