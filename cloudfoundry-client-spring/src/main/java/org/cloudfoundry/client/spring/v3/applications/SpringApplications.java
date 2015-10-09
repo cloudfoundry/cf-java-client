@@ -80,6 +80,19 @@ public final class SpringApplications extends AbstractSpringOperations implement
     }
 
     @Override
+    public Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
+        return delete(request, new DeleteApplicationResponse(),
+                builder -> builder.pathSegment("v3", "apps", request.getId()));
+    }
+
+    @Override
+    public Publisher<DeleteApplicationProcessResponse> deleteProcess(DeleteApplicationProcessRequest request) {
+        return delete(request, new DeleteApplicationProcessResponse(),
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(),
+                        "instances", request.getIndex()));
+    }
+
+    @Override
     public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId()));
@@ -95,19 +108,6 @@ public final class SpringApplications extends AbstractSpringOperations implement
     public Publisher<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
         return get(request, GetApplicationProcessResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType()));
-    }
-
-    @Override
-    public Publisher<DeleteApplicationResponse> delete(DeleteApplicationRequest request) {
-        return delete(request, new DeleteApplicationResponse(),
-                builder -> builder.pathSegment("v3", "apps", request.getId()));
-    }
-
-    @Override
-    public Publisher<DeleteApplicationProcessResponse> deleteProcess(DeleteApplicationProcessRequest request) {
-        return delete(request, new DeleteApplicationProcessResponse(),
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(),
-                        "instances", request.getIndex()));
     }
 
     @Override

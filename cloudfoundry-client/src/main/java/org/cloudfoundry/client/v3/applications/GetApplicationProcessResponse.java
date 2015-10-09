@@ -24,6 +24,5 @@ import org.cloudfoundry.client.v3.processes.Process;
  * <p><b>This class is NOT threadsafe.</b>
  */
 public final class GetApplicationProcessResponse extends Process<GetApplicationProcessResponse> {
-
-
+    
 }
