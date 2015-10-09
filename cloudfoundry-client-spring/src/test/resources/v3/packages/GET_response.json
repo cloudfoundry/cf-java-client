@@ -1,0 +1,71 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "first": {
+      "href": "/v3/packages?page=1&per_page=2"
+    },
+    "last": {
+      "href": "/v3/packages?page=2&per_page=2"
+    },
+    "next": {
+      "href": "/v3/packages?page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a",
+      "type": "bits",
+      "hash": {
+        "type": "sha1",
+        "value": null
+      },
+      "url": null,
+      "state": "AWAITING_UPLOAD",
+      "error": null,
+      "created_at": "2015-07-27T22:43:15Z",
+      "updated_at": null,
+      "_links": {
+        "self": {
+          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a"
+        },
+        "upload": {
+          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/upload",
+          "method": "POST"
+        },
+        "download": {
+          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/download",
+          "method": "GET"
+        },
+        "stage": {
+          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/droplets",
+          "method": "POST"
+        },
+        "app": {
+          "href": "/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4"
+        }
+      }
+    },
+    {
+      "guid": "guid-caa0f920-0f24-4a80-b7e4-3119758901c3",
+      "type": "docker",
+      "hash": {
+        "type": "sha1",
+        "value": null
+      },
+      "url": "http://docker-repo/my-image",
+      "state": "READY",
+      "error": null,
+      "created_at": "2015-07-27T22:43:15Z",
+      "updated_at": null,
+      "_links": {
+        "self": {
+          "href": "/v3/packages/guid-caa0f920-0f24-4a80-b7e4-3119758901c3"
+        },
+        "app": {
+          "href": "/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4"
+        }
+      }
+    }
+  ]
+}
