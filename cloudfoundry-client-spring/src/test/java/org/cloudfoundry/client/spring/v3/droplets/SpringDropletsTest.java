@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
+import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
+import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -96,6 +98,66 @@ public final class SpringDropletsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
         Streams.wrap(this.droplets.get(new GetDropletRequest())).next().get();
+    }
+
+
+    @Test
+    public void list() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/droplets"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/droplets/GET_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListDropletsRequest request = new ListDropletsRequest();
+        ListDropletsResponse response = Streams.wrap(this.droplets.list(request)).next().get();
+
+
+        Map<String, Object> environmentVariables = new HashMap<>();
+        environmentVariables.put("yuu", "huuu");
+
+        ListDropletsResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("name-2141", resource.getBuildpack());
+        assertEquals("2015-07-27T22:43:30Z", resource.getCreatedAt());
+
+        assertEquals(environmentVariables, resource.getEnvironmentVariables());
+        assertNull(resource.getError());
+
+        Hash hash = resource.getHash();
+        assertEquals("sha1", hash.getType());
+        assertNull(hash.getValue());
+
+        assertEquals("guid-5be1225e-5f49-499a-87db-bcdff646eed6", resource.getId());
+
+        assertEquals(4, resource.getLinks().size());
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("package"));
+        assertNotNull(resource.getLink("app"));
+        assertNotNull(resource.getLink("buildpack"));
+
+        assertNull(resource.getProcfile());
+        assertEquals("STAGING", resource.getState());
+        assertNull(resource.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/droplets"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListDropletsRequest request = new ListDropletsRequest();
+
+        Streams.wrap(this.droplets.list(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listInvalidRequest() {
+        Streams.wrap(this.droplets.list(new ListDropletsRequest().withPage(0))).next().get();
     }
 
     public Map<String, Object> getExpectedEnvironmentVariables() {

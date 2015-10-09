@@ -1,0 +1,76 @@
+{
+  "pagination": {
+    "total_results": 2,
+    "first": {
+      "href": "/v3/droplets?page=1&per_page=2"
+    },
+    "last": {
+      "href": "/v3/droplets?page=1&per_page=2"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "guid-5be1225e-5f49-499a-87db-bcdff646eed6",
+      "state": "STAGING",
+      "hash": {
+        "type": "sha1",
+        "value": null
+      },
+      "buildpack": "name-2141",
+      "error": null,
+      "procfile": null,
+      "environment_variables": {
+        "yuu": "huuu"
+      },
+      "created_at": "2015-07-27T22:43:30Z",
+      "updated_at": null,
+      "_links": {
+        "self": {
+          "href": "/v3/droplets/guid-5be1225e-5f49-499a-87db-bcdff646eed6"
+        },
+        "package": {
+          "href": "/v3/packages/guid-09037508-293d-4923-9552-12fe9cda5f98"
+        },
+        "app": {
+          "href": "/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0"
+        },
+        "buildpack": {
+          "href": "/v2/buildpacks/b0179650-8a4f-4b3a-b485-255118b0c619"
+        }
+      }
+    },
+    {
+      "guid": "guid-74a54cf4-99a5-40b1-8f81-74377c36240d",
+      "state": "STAGED",
+      "hash": {
+        "type": "sha1",
+        "value": "my-hash"
+      },
+      "buildpack": "https://github.com/cloudfoundry/my-buildpack.git",
+      "error": null,
+      "procfile": null,
+      "environment_variables": {
+
+      },
+      "created_at": "2015-07-27T22:43:30Z",
+      "updated_at": null,
+      "_links": {
+        "self": {
+          "href": "/v3/droplets/guid-74a54cf4-99a5-40b1-8f81-74377c36240d"
+        },
+        "package": {
+          "href": "/v3/packages/guid-09037508-293d-4923-9552-12fe9cda5f98"
+        },
+        "app": {
+          "href": "/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0"
+        },
+        "assign_current_droplet": {
+          "href": "/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0/current_droplet",
+          "method": "PUT"
+        }
+      }
+    }
+  ]
+}

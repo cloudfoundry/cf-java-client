@@ -32,4 +32,13 @@ public interface Droplets {
      */
     Publisher<GetDropletResponse> get(GetDropletRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_%28experimental%29/list_all_droplets.html">List
+     * Droplets</a> request
+     *
+     * @param request the List Droplets request
+     * @return the response from the List Droplets request
+     */
+    Publisher<ListDropletsResponse> list(ListDropletsRequest request);
+
 }
