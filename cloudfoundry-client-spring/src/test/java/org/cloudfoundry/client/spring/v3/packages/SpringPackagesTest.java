@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.DeletePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
+import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.StagePackageRequest;
 import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
@@ -205,6 +207,57 @@ public final class SpringPackagesTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
         Streams.wrap(this.packages.get(new GetPackageRequest())).next().get();
+    }
+
+    @Test
+    public void list() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/packages"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/packages/GET_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListPackagesRequest request = new ListPackagesRequest();
+        ListPackagesResponse response = Streams.wrap(this.packages.list(request)).next().get();
+
+        ListPackagesResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("2015-07-27T22:43:15Z", resource.getCreatedAt());
+        assertNull(resource.getError());
+        assertEquals("sha1", resource.getHash().getType());
+        assertNull(resource.getHash().getValue());
+        assertEquals("guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a", resource.getId());
+
+        assertEquals(5, resource.getLinks().size());
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("upload"));
+        assertNotNull(resource.getLink("download"));
+        assertNotNull(resource.getLink("stage"));
+        assertNotNull(resource.getLink("app"));
+
+        assertEquals("AWAITING_UPLOAD", resource.getState());
+        assertEquals("bits", resource.getType());
+        assertNull(resource.getUpdatedAt());
+        assertNull(resource.getUrl());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/packages"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListPackagesRequest request = new ListPackagesRequest();
+
+        Streams.wrap(this.packages.list(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listInvalidRequest() {
+        Streams.wrap(this.packages.list(new ListPackagesRequest().withPage(0))).next().get();
     }
 
     @Test

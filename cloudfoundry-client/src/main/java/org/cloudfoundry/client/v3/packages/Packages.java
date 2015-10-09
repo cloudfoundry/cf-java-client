@@ -51,6 +51,15 @@ public interface Packages {
     Publisher<GetPackageResponse> get(GetPackageRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/list_all_packages.html">List
+     * Packages</a> request
+     *
+     * @param request the List Packages request
+     * @return the response from the List Packages request
+     */
+    Publisher<ListPackagesResponse> list(ListPackagesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage
      * Package</a> request
      *

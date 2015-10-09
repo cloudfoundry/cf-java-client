@@ -100,7 +100,6 @@ public final class SpringDropletsTest extends AbstractRestTest {
         Streams.wrap(this.droplets.get(new GetDropletRequest())).next().get();
     }
 
-
     @Test
     public void list() {
         this.mockServer
