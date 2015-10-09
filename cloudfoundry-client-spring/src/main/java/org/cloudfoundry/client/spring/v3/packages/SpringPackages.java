@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.CollectionUtils;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
+import org.cloudfoundry.client.v3.packages.DeletePackageResponse;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.Packages;
@@ -59,6 +61,12 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     public Publisher<CreatePackageResponse> create(CreatePackageRequest request) {
         return post(request, CreatePackageResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+    }
+
+    @Override
+    public Publisher<DeletePackageResponse> delete(DeletePackageRequest request) {
+        return delete(request, new DeletePackageResponse(),
+                builder -> builder.pathSegment("v3", "packages", request.getId()));
     }
 
     @Override
