@@ -29,10 +29,6 @@ public final class ScaleApplicationResponseTest {
 
     @Test
     public void test() {
-        Map<String, String> environmentVariables = new HashMap<>();
-        environmentVariables.put("test-key-1", "test-value-1");
-        environmentVariables.put("test-key-2", "test-value-2");
-
         Map<String, Link> links = new HashMap<>();
         links.put("test-link-1", new Link());
         links.put("test-link-2", new Link());
