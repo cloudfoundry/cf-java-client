@@ -18,6 +18,8 @@ package org.cloudfoundry.client.spring.v3.packages;
 
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.CollectionUtils;
+import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
+import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
@@ -56,6 +58,12 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
      */
     public SpringPackages(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<CopyPackageResponse> copy(CopyPackageRequest request) {
+        return post(request, CopyPackageResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
     }
 
     @Override
