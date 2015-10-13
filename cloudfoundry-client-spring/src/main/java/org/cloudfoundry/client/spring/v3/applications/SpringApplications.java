@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
@@ -113,6 +115,12 @@ public final class SpringApplications extends AbstractSpringOperations implement
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Publisher<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
+        return get(request, ListApplicationDropletsResponse.class,
+                builder -> builder.pathSegment("v3", "apps", request.getId(), "droplets"));
     }
 
     @Override

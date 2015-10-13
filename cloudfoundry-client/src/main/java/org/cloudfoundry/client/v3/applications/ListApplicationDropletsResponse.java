@@ -17,21 +17,21 @@
 package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.client.v3.PaginatedResponse;
-import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.droplets.Droplet;
 
 /**
- * The response payload for the List Application Packages operation
+ * The response payload for the List Application Droplets operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ListApplicationPackagesResponse extends PaginatedResponse<ListApplicationPackagesResponse,
-        ListApplicationPackagesResponse.Resource> {
+public final class ListApplicationDropletsResponse extends PaginatedResponse<ListApplicationDropletsResponse,
+        ListApplicationDropletsResponse.Resource> {
 
     /**
-     * The Resource response payload for the List Application Packages operation
+     * The Resource response payload for the List Application Droplets operation
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static final class Resource extends Package<Resource> {
+    public static final class Resource extends Droplet<Resource> {
     }
 }
