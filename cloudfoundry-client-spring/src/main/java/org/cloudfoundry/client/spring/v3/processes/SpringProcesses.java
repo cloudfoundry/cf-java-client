@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v3.processes;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
+import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
+import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
@@ -44,5 +46,10 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     public Publisher<GetProcessResponse> get(GetProcessRequest request) {
         return get(request, GetProcessResponse.class,
                 builder -> builder.pathSegment("v3", "processes", request.getId()));
+    }
+
+    @Override
+    public Publisher<ListProcessesResponse> list(ListProcessesRequest request) {
+        return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("v3", "processes"));
     }
 }

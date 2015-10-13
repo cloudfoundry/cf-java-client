@@ -149,7 +149,6 @@ public final class SpringDropletsTest extends AbstractRestTest {
         ListDropletsRequest request = new ListDropletsRequest();
         ListDropletsResponse response = Streams.wrap(this.droplets.list(request)).next().get();
 
-
         Map<String, Object> environmentVariables = new HashMap<>();
         environmentVariables.put("yuu", "huuu");
 
