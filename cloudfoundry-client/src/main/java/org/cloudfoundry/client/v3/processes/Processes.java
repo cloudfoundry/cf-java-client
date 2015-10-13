@@ -32,4 +32,13 @@ public interface Processes {
      */
     Publisher<GetProcessResponse> get(GetProcessRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/list_all_processes.html">
+     * List Process</a> request
+     *
+     * @param request the List Processes request
+     * @return the response from the List Processes request
+     */
+    Publisher<ListProcessesResponse> list(ListProcessesRequest request);
+
 }
