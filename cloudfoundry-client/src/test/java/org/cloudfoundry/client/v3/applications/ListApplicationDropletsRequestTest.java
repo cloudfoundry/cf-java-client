@@ -30,17 +30,19 @@ public final class ListApplicationDropletsRequestTest {
     public void test() {
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withId("test-id")
-                .withState("test-state");
+                .withState("test-state-1")
+                .withStates(new String[]{"test-state-2", "test-state-3"});
 
         assertEquals("test-id", request.getId());
-        assertArrayEquals(new String[]{"test-state"}, request.getState());
+        assertArrayEquals(new String[]{"test-state-1", "test-state-2", "test-state-3"}, request.getState());
     }
 
     @Test
     public void isValid() {
         ValidationResult result = new ListApplicationDropletsRequest()
                 .withId("test-id")
-                .withState("test-state")
+                .withState("test-state-1")
+                .withStates(new String[]{"test-state-2", "test-state-3"})
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
