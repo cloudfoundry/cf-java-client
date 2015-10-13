@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v3.applications;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -31,6 +32,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
@@ -548,6 +551,70 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void listPackagesInvalidRequest() {
         Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
+    }
+
+
+    @Test
+    public void listDroplets() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/droplets"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_droplets_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
+                .withPage(1)
+                .withId("test-id");
+
+        ListApplicationDropletsResponse response = Streams.wrap(this.applications.listDroplets(request)).next().get();
+
+        Map<String, Object> environmentVariables = new HashMap<>();
+        environmentVariables.put("yuu", "huuu");
+
+        ListApplicationDropletsResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("name-2089", resource.getBuildpack());
+        assertEquals("1970-01-01T00:00:01Z", resource.getCreatedAt());
+
+        assertEquals(environmentVariables, resource.getEnvironmentVariables());
+        assertNull(resource.getError());
+
+        Hash hash = resource.getHash();
+        assertEquals("sha1", hash.getType());
+        assertNull(hash.getValue());
+
+        assertEquals("guid-5df0a4bb-4fcb-4393-acdd-868524ad761e", resource.getId());
+
+        assertEquals(5, resource.getLinks().size());
+        assertNotNull(resource.getLink("self"));
+        assertNotNull(resource.getLink("package"));
+        assertNotNull(resource.getLink("app"));
+        assertNotNull(resource.getLink("assign_current_droplet"));
+        assertNotNull(resource.getLink("buildpack"));
+
+        assertNull(resource.getProcfile());
+        assertEquals("STAGING", resource.getState());
+        assertNull(resource.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listDropletsError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/droplets"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
+                .withPage(1)
+                .withId("test-id");
+        Streams.wrap(this.applications.listDroplets(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listDropletsInvalidRequest() {
+        Streams.wrap(this.applications.listDroplets(new ListApplicationDropletsRequest())).next().get();
     }
 
     @Test

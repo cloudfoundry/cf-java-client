@@ -19,16 +19,22 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * The request payload for the List Application Packages operation
+ * The request payload for the List Application Droplets operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ListApplicationPackagesRequest extends PaginatedRequest<ListApplicationPackagesRequest> implements Validatable {
+public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequest<ListApplicationDropletsRequest> implements Validatable {
 
     private volatile String id;
+
+    private volatile List<String> state = new ArrayList<>();
 
     /**
      * Returns the id
@@ -46,14 +52,46 @@ public final class ListApplicationPackagesRequest extends PaginatedRequest<ListA
      * @param id the id
      * @return {@code this}
      */
-    public ListApplicationPackagesRequest withId(String id) {
+    public ListApplicationDropletsRequest withId(String id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * Returns the state
+     *
+     * @return the state
+     */
+    @JsonIgnore
+    public String[] getState() {
+        return this.state.toArray(new String[this.state.size()]);
+    }
+
+    /**
+     * Configure the id
+     *
+     * @param state the id
+     * @return {@code this}
+     */
+    public ListApplicationDropletsRequest withState(String state) {
+        this.state.add(state);
+        return this;
+    }
+
+    /**
+     * Configure the id
+     *
+     * @param state the id
+     * @return {@code this}
+     */
+    public ListApplicationDropletsRequest withState(String[] state) {
+        this.state.addAll(Arrays.asList(state));
         return this;
     }
 
     @Override
     public ValidationResult isValid() {
-        ValidationResult result = isPaginatedRequestValid();
+        ValidationResult result = isPaginatedAndSortedRequestValid();
 
         if (this.id == null) {
             result.invalid("id must be specified");
