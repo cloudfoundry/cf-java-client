@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.v3.droplets;
 
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
@@ -40,6 +41,11 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
      */
     public SpringDroplets(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<Void> delete(DeleteDropletRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "droplets", request.getId()));
     }
 
     @Override

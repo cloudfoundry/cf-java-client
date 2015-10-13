@@ -20,6 +20,7 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
@@ -35,15 +36,52 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringDropletsTest extends AbstractRestTest {
 
     private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root);
+
+    @Test
+    public void delete() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
+                .andRespond(withStatus(OK));
+
+        DeleteDropletRequest request = new DeleteDropletRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.droplets.delete(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeleteDropletRequest request = new DeleteDropletRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.droplets.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        Streams.wrap(this.droplets.delete(new DeleteDropletRequest())).next().get();
+    }
 
     @Test
     public void get() {
