@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Packages {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/copy_a_package.html">Copy
+     * Package</a> request
+     *
+     * @param request the Copy Package request
+     * @return the response from the Copy Package request
+     */
+    Publisher<CopyPackageResponse> copy(CopyPackageRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/create_a_package.html">Create
      * Package</a> request
      *

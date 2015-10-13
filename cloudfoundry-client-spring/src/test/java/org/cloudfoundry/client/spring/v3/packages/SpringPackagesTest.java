@@ -20,6 +20,8 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
+import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
@@ -59,6 +61,61 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public final class SpringPackagesTest extends AbstractRestTest {
 
     private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+
+    @Test
+    public void copy() {
+        this.mockServer
+                .expect(method(POST))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        CopyPackageRequest request = new CopyPackageRequest()
+                .withId("test-id")
+                .withSourcePackageId("source-test-id");
+
+        CopyPackageResponse response = Streams.wrap(this.packages.copy(request)).next().get();
+
+        assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
+        assertNull(response.getError());
+
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
+
+        assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
+
+        assertEquals(2, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("app"));
+
+        assertEquals("READY", response.getState());
+        assertEquals("docker", response.getType());
+        assertNull(response.getUpdatedAt());
+        assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void copyError() {
+        this.mockServer
+                .expect(method(POST))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        CopyPackageRequest request = new CopyPackageRequest()
+                .withId("test-id")
+                .withSourcePackageId("source-test-id");
+
+        Streams.wrap(this.packages.copy(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void copyInvalidRequest() {
+        Streams.wrap(this.packages.copy(new CopyPackageRequest())).next().get();
+    }
 
     @Test
     public void create() {
