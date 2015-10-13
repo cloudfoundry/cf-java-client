@@ -84,7 +84,7 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
      * @param state the id
      * @return {@code this}
      */
-    public ListApplicationDropletsRequest withState(String[] state) {
+    public ListApplicationDropletsRequest withStates(String[] state) {
         this.state.addAll(Arrays.asList(state));
         return this;
     }
