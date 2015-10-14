@@ -23,7 +23,7 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public class DeleteInstanceRequestTest {
+public final class DeleteInstanceRequestTest {
 
     @Test
     public void test() throws Exception {
