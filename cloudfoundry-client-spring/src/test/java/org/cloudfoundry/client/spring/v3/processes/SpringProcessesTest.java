@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
+import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
+import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -35,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -239,6 +242,62 @@ public final class SpringProcessesTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void scaleInvalidRequest() {
         Streams.wrap(this.processes.scale(new ScaleProcessRequest())).next().get();
+    }
+
+    @Test
+    public void update() {
+        this.mockServer
+                .expect(method(PATCH))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/processes/test-id"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/processes/PATCH_{id}_request.json")))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/processes/PATCH_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        UpdateProcessRequest request = new UpdateProcessRequest()
+                .withId("test-id")
+                .withCommand("test-command");
+
+        UpdateProcessResponse response = Streams.wrap(this.processes.update(request))
+                .next().get();
+
+        assertEquals("2015-07-27T22:43:32Z", response.getCreatedAt());
+        assertEquals("X", response.getCommand());
+        assertEquals(Integer.valueOf(1024), response.getDiskInMb());
+        assertEquals("92d5b770-32ed-4f5c-8def-b1f2348447fb", response.getId());
+        assertEquals(Integer.valueOf(1), response.getInstances());
+
+        assertEquals(4, response.getLinks().size());
+        assertNotNull(response.getLink("self"));
+        assertNotNull(response.getLink("scale"));
+        assertNotNull(response.getLink("app"));
+        assertNotNull(response.getLink("space"));
+
+        assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
+        assertEquals("web", response.getType());
+        assertEquals("2015-07-27T22:43:32Z", response.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void updateError() {
+        this.mockServer
+                .expect(method(PATCH))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/processes/test-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        UpdateProcessRequest request = new UpdateProcessRequest()
+                .withId("test-id")
+                .withCommand("test-command");
+
+        Streams.wrap(this.processes.update(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void updateInvalidRequest() {
+        Streams.wrap(this.processes.update(new UpdateProcessRequest())).next().get();
     }
 
 }

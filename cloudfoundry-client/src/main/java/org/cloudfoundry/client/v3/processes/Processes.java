@@ -60,4 +60,13 @@ public interface Processes {
      */
     Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/updating_a_process.html">
+     * Update Process</a> request
+     *
+     * @param request the Update Process request
+     * @return the response from the Update Process request
+     */
+    Publisher<UpdateProcessResponse> update(UpdateProcessRequest request);
+
 }
