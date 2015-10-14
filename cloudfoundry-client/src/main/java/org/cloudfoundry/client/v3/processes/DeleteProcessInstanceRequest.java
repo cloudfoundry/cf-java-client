@@ -25,7 +25,7 @@ import org.cloudfoundry.client.ValidationResult;
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class DeleteInstanceRequest implements Validatable {
+public final class DeleteProcessInstanceRequest implements Validatable {
 
     private volatile String id;
 
@@ -47,7 +47,7 @@ public final class DeleteInstanceRequest implements Validatable {
      * @param id the id
      * @return {@code this}
      */
-    public DeleteInstanceRequest withId(String id) {
+    public DeleteProcessInstanceRequest withId(String id) {
         this.id = id;
         return this;
     }
@@ -68,7 +68,7 @@ public final class DeleteInstanceRequest implements Validatable {
      * @param index the instance index
      * @return {@code this}
      */
-    public DeleteInstanceRequest withIndex(String index) {
+    public DeleteProcessInstanceRequest withIndex(String index) {
         this.index = index;
         return this;
     }

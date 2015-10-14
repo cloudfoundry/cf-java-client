@@ -31,7 +31,7 @@ public interface Processes {
      * @param request the Terminate Process Instance request
      * @return the response from the Terminate Process Instance request
      */
-    Publisher<Void> deleteInstance(DeleteInstanceRequest request);
+    Publisher<Void> deleteInstance(DeleteProcessInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/get_a_process.html">Get
@@ -52,7 +52,7 @@ public interface Processes {
     Publisher<ListProcessesResponse> list(ListProcessesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_(experimental)/scaling_a_process.html"> Scale
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/scaling_a_process.html"> Scale
      * Application</a> request
      *
      * @param request the Scale Process request

@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.v3.processes;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v3.processes.DeleteInstanceRequest;
+import org.cloudfoundry.client.v3.processes.DeleteProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -54,7 +54,7 @@ public final class SpringProcessesTest extends AbstractRestTest {
                 .andExpect(requestTo("https://api.run.pivotal.io/v3/processes/test-id/instances/test-index"))
                 .andRespond(withStatus(OK));
 
-        DeleteInstanceRequest request = new DeleteInstanceRequest()
+        DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index");
 
@@ -72,7 +72,7 @@ public final class SpringProcessesTest extends AbstractRestTest {
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
-        DeleteInstanceRequest request = new DeleteInstanceRequest()
+        DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index");
 
@@ -81,7 +81,7 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test(expected = RequestValidationException.class)
     public void deleteInstanceInvalidRequest() {
-        Streams.wrap(this.processes.deleteInstance(new DeleteInstanceRequest())).next().get();
+        Streams.wrap(this.processes.deleteInstance(new DeleteProcessInstanceRequest())).next().get();
     }
 
     @Test
