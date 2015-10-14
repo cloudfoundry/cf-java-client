@@ -40,6 +40,7 @@ import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.MapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
@@ -668,6 +669,45 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void listProcessesInvalidRequest() {
         Streams.wrap(this.applications.listProcesses(new ListApplicationProcessesRequest())).next().get();
+    }
+
+    @Test
+    public void mapRoute() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_routes_request.json")))
+                .andRespond(withStatus(OK));
+
+        MapApplicationRouteRequest request = new MapApplicationRouteRequest()
+                .withId("test-id")
+                .withRouteId("9cf0271a-420f-4ae4-b227-16683db93573");
+
+        Streams.wrap(this.applications.mapRoute(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void mapRouteError() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_routes_request.json")))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        MapApplicationRouteRequest request = new MapApplicationRouteRequest()
+                .withId("test-id")
+                .withRouteId("9cf0271a-420f-4ae4-b227-16683db93573");
+
+        Streams.wrap(this.applications.mapRoute(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void mapRouteInvalidRequest() {
+        Streams.wrap(this.applications.mapRoute(new MapApplicationRouteRequest())).next().get();
     }
 
     @Test
