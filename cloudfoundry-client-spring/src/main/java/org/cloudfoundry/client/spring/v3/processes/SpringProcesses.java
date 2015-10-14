@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
+import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 
@@ -59,4 +61,10 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     public Publisher<ListProcessesResponse> list(ListProcessesRequest request) {
         return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("v3", "processes"));
     }
+
+    public Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request) {
+        return put(request, ScaleProcessResponse.class,
+                builder -> builder.pathSegment("v3", "processes", request.getId(), "scale"));
+    }
+
 }
