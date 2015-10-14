@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v3.processes;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v3.processes.DeleteInstanceRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -30,15 +31,54 @@ import reactor.rx.Streams;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringProcessesTest extends AbstractRestTest {
 
     private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+
+    @Test
+    public void deleteInstance() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/processes/test-id/instances/test-index"))
+                .andRespond(withStatus(OK));
+
+        DeleteInstanceRequest request = new DeleteInstanceRequest()
+                .withId("test-id")
+                .withIndex("test-index");
+
+        Streams.wrap(this.processes.deleteInstance(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteInstanceError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/processes/test-id/instances/test-index"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        DeleteInstanceRequest request = new DeleteInstanceRequest()
+                .withId("test-id")
+                .withIndex("test-index");
+
+        Streams.wrap(this.processes.deleteInstance(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInstanceInvalidRequest() {
+        Streams.wrap(this.processes.deleteInstance(new DeleteInstanceRequest())).next().get();
+    }
 
     @Test
     public void get() {

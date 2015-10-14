@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.v3.processes;
 
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.v3.processes.DeleteInstanceRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -40,6 +41,12 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
      */
     public SpringProcesses(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<Void> deleteInstance(DeleteInstanceRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "processes", request.getId(),
+                "instances", request.getIndex()));
     }
 
     @Override

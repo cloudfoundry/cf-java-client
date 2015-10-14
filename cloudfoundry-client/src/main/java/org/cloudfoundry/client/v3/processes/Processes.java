@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Processes {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/terminating_a_process_instance.html">Terminate
+     * Process Instance</a> request
+     *
+     * @param request the Terminate Process Instance request
+     * @return the response from the Terminate Process Instance request
+     */
+    Publisher<Void> deleteInstance(DeleteInstanceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/get_a_process.html">Get
      * Process</a> request
      *
