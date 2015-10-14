@@ -40,6 +40,7 @@ import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.MapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
@@ -133,6 +134,11 @@ public final class SpringApplications extends AbstractSpringOperations implement
     public Publisher<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
         return get(request, ListApplicationProcessesResponse.class,
                 builder -> builder.pathSegment("v3", "apps", request.getId(), "processes"));
+    }
+
+    @Override
+    public Publisher<Void> mapRoute(MapApplicationRouteRequest request) {
+        return put(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getId(), "routes"));
     }
 
     @Override

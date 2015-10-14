@@ -127,7 +127,12 @@ public abstract class AbstractSpringOperations {
             URI uri = builder.build().toUri();
 
             this.logger.debug("PUT {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
+            if(Void.class == responseType) {
+                this.restOperations.put(uri, request);
+                return null;
+            } else {
+                return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
+            }
         });
 
     }
