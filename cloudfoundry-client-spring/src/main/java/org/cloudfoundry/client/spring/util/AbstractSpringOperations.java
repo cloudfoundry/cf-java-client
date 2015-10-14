@@ -34,6 +34,7 @@ import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.PUT;
 
@@ -69,7 +70,7 @@ public abstract class AbstractSpringOperations {
             URI uri = builder.build().toUri();
 
             this.logger.debug("DELETE {}", uri);
-            this.restOperations.delete(uri);
+            this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class).getBody();
             return null;
         });
     }

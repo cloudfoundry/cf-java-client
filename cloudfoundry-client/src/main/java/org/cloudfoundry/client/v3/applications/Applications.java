@@ -171,6 +171,15 @@ public interface Applications {
     Publisher<StopApplicationResponse> stop(StopApplicationRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/unmap_a_route.html"> Unmap
+     * Application Route</a> request
+     *
+     * @param request the Unmap Application Route request
+     * @return the response from the Unmap Application Route request
+     */
+    Publisher<Void> unmapRoute(UnmapApplicationRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">
      * Update Application</a> request
      *

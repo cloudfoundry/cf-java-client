@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
+import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.junit.Test;
@@ -927,6 +928,45 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void stopInvalidRequest() {
         Streams.wrap(this.applications.stop(new StopApplicationRequest())).next().get();
+    }
+
+    @Test
+    public void unmapRoute() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/DELETE_{id}_routes_request.json")))
+                .andRespond(withStatus(OK));
+
+        UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
+                .withId("test-id")
+                .withRouteId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091");
+
+        Streams.wrap(this.applications.unmapRoute(request)).next().get();
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void unmapRouteError() {
+        this.mockServer
+                .expect(method(DELETE))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andExpect(jsonPayload(new ClassPathResource("v3/apps/DELETE_{id}_routes_request.json")))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
+                .withId("test-id")
+                .withRouteId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091");
+
+        Streams.wrap(this.applications.unmapRoute(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void unmapRouteInvalidRequest() {
+        Streams.wrap(this.applications.unmapRoute(new UnmapApplicationRouteRequest())).next().get();
     }
 
     @Test
