@@ -19,27 +19,26 @@ package org.cloudfoundry.client.v3.processes;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteProcessInstanceRequestTest {
+public final class UpdateProcessRequestTest {
 
     @Test
     public void test() {
-        DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
+        UpdateProcessRequest request = new UpdateProcessRequest()
                 .withId("test-id")
-                .withIndex("test-index");
+                .withCommand("test-command");
 
         assertEquals("test-id", request.getId());
-        assertEquals("test-index", request.getIndex());
+        assertEquals("test-command", request.getCommand());
     }
 
     @Test
     public void isValid() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
+        ValidationResult result = new UpdateProcessRequest()
                 .withId("test-id")
-                .withIndex("test-index")
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,22 +46,12 @@ public final class DeleteProcessInstanceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
-                .withIndex("test-index")
+        ValidationResult result = new UpdateProcessRequest()
+                .withCommand("test-command")
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoIndex() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
-                .withId("test-id")
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("index must be specified", result.getMessages().get(0));
     }
 
 }
