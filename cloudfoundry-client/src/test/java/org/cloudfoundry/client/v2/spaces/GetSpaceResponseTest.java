@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public final class ListSpacesResponseTest {
+public final class GetSpaceResponseTest {
 
     @Test
     public void test() {
-        ListSpacesResponseResource.SpaceEntity entity = new ListSpacesResponseResource.SpaceEntity()
+        GetSpaceResponse.SpaceEntity entity = new GetSpaceResponse.SpaceEntity()
                 .allowSsh(true)
                 .withApplicationEventsUrl("test-application-events-url")
                 .withApplicationsUrl("test-applications-url")
@@ -59,13 +58,10 @@ public final class ListSpacesResponseTest {
         assertEquals("test-service-instances-url", entity.getServiceInstancesUrl());
         assertEquals("test-space-quota-definition-id", entity.getSpaceQuotaDefinitionId());
 
-        ListSpacesResponseResource resource = new ListSpacesResponseResource()
+        GetSpaceResponse response = new GetSpaceResponse()
                 .withEntity(entity);
 
-        ListSpacesResponse response = new ListSpacesResponse()
-                .withResource(resource);
-
-        assertEquals(entity, response.getResources().get(0).getEntity());
+        assertEquals(entity, response.getEntity());
     }
 
 }

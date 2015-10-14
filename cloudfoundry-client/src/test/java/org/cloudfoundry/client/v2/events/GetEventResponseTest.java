@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.cloudfoundry.client.v2.events.EventResource.EventEntity;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -29,7 +28,7 @@ public final class GetEventResponseTest {
 
     @Test
     public void test() {
-        EventEntity entity = new EventEntity()
+        GetEventResponse.EventEntity entity = new GetEventResponse.EventEntity()
                 .withActee("test-actee")
                 .withActeeName("test-actee-name")
                 .withActeeType("test-actee-type")

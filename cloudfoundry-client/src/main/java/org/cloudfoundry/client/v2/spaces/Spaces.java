@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Spaces {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieve_a_particular_space.html">Get Space</a>
+     * request
+     *
+     * @param request the Get Space request
+     * @return the response from the Get Space request
+     */
+    Publisher<GetSpaceResponse> get(GetSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_spaces.html">List Spaces</a> request
      *
      * @param request the List Spaces request

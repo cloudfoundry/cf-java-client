@@ -36,7 +36,7 @@ public abstract class EventResource<T extends EventResource<T>> extends Resource
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static final class EventEntity {
+    public static class EventEntity {
 
         private volatile String actee;
 

@@ -19,13 +19,11 @@ package org.cloudfoundry.client.spring.v2.events;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.events.EventResource.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseResource;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
@@ -57,13 +55,13 @@ public final class SpringEventsTest extends AbstractRestTest {
 
         GetEventResponse response = Streams.wrap(this.events.get(request)).next().get();
 
-        Resource.Metadata metadata = response.getMetadata();
+        EventResource.Metadata metadata = response.getMetadata();
         assertEquals("2015-07-27T22:43:23Z", metadata.getCreatedAt());
         assertEquals("8f1366e5-1fe2-418c-ae33-38bf29ad857a", metadata.getId());
         assertNull(metadata.getUpdatedAt());
         assertEquals("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a", metadata.getUrl());
 
-        EventEntity entity = response.getEntity();
+        EventResource.EventEntity entity = response.getEntity();
 
         assertEquals("guid-ff2c9780-b8db-4276-ba5f-b06adb724873", entity.getActee());
         assertEquals("name-1014", entity.getActeeName());
@@ -118,15 +116,15 @@ public final class SpringEventsTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(3), response.getTotalResults());
 
         assertEquals(3, response.getResources().size());
-        ListEventsResponseResource resource = response.getResources().get(0);
+        ListEventsResponse.ListEventsResponseResource resource = response.getResources().get(0);
 
-        Resource.Metadata metadata = resource.getMetadata();
+        EventResource.Metadata metadata = resource.getMetadata();
         assertEquals("2015-07-27T22:43:23Z", metadata.getCreatedAt());
         assertEquals("2cc565c7-18e7-4fff-8fb0-52525f09ee6b", metadata.getId());
         assertNull(metadata.getUpdatedAt());
         assertEquals("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b", metadata.getUrl());
 
-        EventEntity entity = resource.getEntity();
+        EventResource.EventEntity entity = resource.getEntity();
         assertEquals("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197", entity.getActee());
         assertEquals("name-1038", entity.getActeeName());
         assertEquals("name-1037", entity.getActeeType());

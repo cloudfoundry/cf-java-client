@@ -16,22 +16,11 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.cloudfoundry.client.v2.PaginatedResponse;
-
 /**
- * The response payload for the List Spaces operation
+ * The response payload for the Get Space operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class ListSpacesResponse extends PaginatedResponse<ListSpacesResponse,
-        ListSpacesResponse.ListSpacesResponseResource> {
-
-    /**
-     * The resource response payload for the List Spaces operation
-     *
-     * <p><b>This class is NOT threadsafe.</b>
-     */
-    public static final class ListSpacesResponseResource extends SpaceResource<ListSpacesResponseResource> {
-    }
+public final class GetSpaceResponse extends SpaceResource<GetSpaceResponse> {
 
 }
