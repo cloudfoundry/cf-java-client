@@ -24,8 +24,9 @@ import org.reactivestreams.Publisher;
 public interface Processes {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/terminating_a_process_instance.html">Terminate
-     * Process Instance</a> request
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/terminating_a_process_instance.html">
+     * Terminate Process Instance</a> request
      *
      * @param request the Terminate Process Instance request
      * @return the response from the Terminate Process Instance request
@@ -49,5 +50,14 @@ public interface Processes {
      * @return the response from the List Processes request
      */
     Publisher<ListProcessesResponse> list(ListProcessesRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_(experimental)/scaling_a_process.html"> Scale
+     * Application</a> request
+     *
+     * @param request the Scale Process request
+     * @return the response from the Scale Process request
+     */
+    Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request);
 
 }
