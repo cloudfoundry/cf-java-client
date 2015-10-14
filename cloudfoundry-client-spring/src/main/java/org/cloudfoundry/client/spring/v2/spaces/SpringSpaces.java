@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v2.spaces;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -40,6 +42,12 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
      */
     public SpringSpaces(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<GetSpaceResponse> get(GetSpaceRequest request) {
+        return get(request, GetSpaceResponse.class,
+                builder -> builder.pathSegment("v2", "spaces", request.getId()));
     }
 
     @Override
