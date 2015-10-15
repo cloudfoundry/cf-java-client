@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Spaces {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/associate_auditor_with_the_space.html">Associate
+     * Auditor with the Space</a> request
+     *
+     * @param request the Associate Auditor request
+     * @return the response from the Associate Auditor request
+     */
+    Publisher<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieve_a_particular_space.html">Get Space</a>
      * request
      *

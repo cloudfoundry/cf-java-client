@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v2.spaces;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -31,15 +33,79 @@ import reactor.rx.Streams;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringSpacesTest extends AbstractRestTest {
 
     private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+
+    @Test
+    public void associateAuditor() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/auditors/test-auditor-id"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v2/spaces/PUT_{id}_auditors_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
+                .withId("test-id")
+                .withAuditorId("test-auditor-id");
+
+        AssociateSpaceAuditorResponse response = Streams.wrap(this.spaces.associateAuditor(request)).next().get();
+
+        SpaceResource.Metadata metadata = response.getMetadata();
+        assertEquals("2015-07-27T22:43:07Z", metadata.getCreatedAt());
+        assertEquals("9639c996-9005-4b70-b852-d40f346d58dc", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc", metadata.getUrl());
+
+        SpaceResource.SpaceEntity entity = response.getEntity();
+
+        assertTrue(entity.getAllowSsh());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/app_events", entity.getApplicationEventsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/apps", entity.getApplicationsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/auditors", entity.getAuditorsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/developers", entity.getDevelopersUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/domains", entity.getDomainsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/events", entity.getEventsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/managers", entity.getManagersUrl());
+        assertEquals("name-59", entity.getName());
+        assertEquals("bc168e1d-b399-4624-b7f6-fbe64eeb870f", entity.getOrganizationId());
+        assertEquals("/v2/organizations/bc168e1d-b399-4624-b7f6-fbe64eeb870f", entity.getOrganizationUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/routes", entity.getRoutesUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/security_groups", entity.getSecurityGroupsUrl());
+        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/service_instances",
+                entity.getServiceInstancesUrl());
+        assertNull(entity.getSpaceQuotaDefinitionId());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateAuditorError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/auditors/test-auditor-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
+                .withId("test-id")
+                .withAuditorId("test-auditor-id");
+
+        Streams.wrap(this.spaces.associateAuditor(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateAuditorInvalidRequest() {
+        Streams.wrap(this.spaces.associateAuditor(new AssociateSpaceAuditorRequest())).next().get();
+    }
 
     @Test
     public void get() {
