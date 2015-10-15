@@ -21,6 +21,8 @@ import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
@@ -51,12 +53,25 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     @Override
     public Publisher<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request) {
         return put(request, AssociateSpaceAuditorResponse.class,
-                builder -> builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId()));
+                builder -> builder.pathSegment("v2",
+                        "spaces", request.getId(),
+                        "auditors", request.getAuditorId()));
     }
+
+    @Override
+    public Publisher<AssociateSpaceDeveloperResponse> associateDeveloper(AssociateSpaceDeveloperRequest request) {
+        return put(request, AssociateSpaceDeveloperResponse.class,
+                builder -> builder.pathSegment("v2",
+                        "spaces", request.getId(),
+                        "developers", request.getDeveloperId()));
+    }
+
     @Override
     public Publisher<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request) {
         return put(request, AssociateSpaceManagerResponse.class,
-                builder -> builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId()));
+                builder -> builder.pathSegment("v2",
+                        "spaces", request.getId(),
+                        "managers", request.getManagerId()));
     }
 
     @Override
