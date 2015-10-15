@@ -24,8 +24,9 @@ import org.reactivestreams.Publisher;
 public interface Applications {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/assigning_a_droplet_as_a_an_apps_current_droplet.html">
-     *     Assign Application Droplet</a> request
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/assigning_a_droplet_as_a_an_apps_current_droplet.html">
+     * Assign Application Droplet</a> request
      *
      * @param request the Assign Application Droplet request
      * @return the response from the Assign Application Droplet request
@@ -33,8 +34,8 @@ public interface Applications {
     Publisher<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/create_an_app.html">Create
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/create_an_app.html">
+     * Create Application</a> request
      *
      * @param request the Create Application request
      * @return the response from the Create Application request
@@ -42,8 +43,8 @@ public interface Applications {
     Publisher<CreateApplicationResponse> create(CreateApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/delete_an_app.html">Delete
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/delete_an_app.html">
+     * Delete Application</a> request
      *
      * @param request the Delete Application request
      * @return the response from the Delete Application request
@@ -51,7 +52,8 @@ public interface Applications {
     Publisher<Void> delete(DeleteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/terminating_a_process_instance_from_its_app.html">
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/terminating_a_process_instance_from_its_app.html">
      * Delete Application Process</a> request
      *
      * @param request the Delete Application Process request
@@ -87,8 +89,8 @@ public interface Applications {
     Publisher<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List
-     * Applications</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">
+     * List Applications</a> request
      *
      * @param request the List Applications request
      * @return the response from the List Applications request
@@ -123,8 +125,17 @@ public interface Applications {
     Publisher<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/map_a_route.html">Map
-     * Application Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_(experimental)/list_routes.html">
+     * List Application Routes</a> request
+     *
+     * @param request the List Application Routes request
+     * @return the response from the List Application Routes request
+     */
+    Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/map_a_route.html">
+     * Map Application Route</a> request
      *
      * @param request the Map Application Route request
      * @return the response from the Map Application Route request
@@ -132,7 +143,8 @@ public interface Applications {
     Publisher<Void> mapRoute(MapApplicationRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/scaling_a_process_from_its_app.html">
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/scaling_a_process_from_its_app.html">
      * Scale Application</a> request
      *
      * @param request the Scale Application request
@@ -141,8 +153,8 @@ public interface Applications {
     Publisher<ScaleApplicationResponse> scale(ScaleApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">
+     * Start Application</a> request
      *
      * @param request the Start Application request
      * @return the response from the Start Application request
@@ -150,8 +162,8 @@ public interface Applications {
     Publisher<StartApplicationResponse> start(StartApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/stopping_an_app.html">Stop
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/stopping_an_app.html">
+     * Stop Application</a> request
      *
      * @param request the Stop Application request
      * @return the response from the Stop Application request
@@ -159,8 +171,8 @@ public interface Applications {
     Publisher<StopApplicationResponse> stop(StopApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">Update
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">
+     * Update Application</a> request
      *
      * @param request the Update Application request
      * @return the response from the Update Application request

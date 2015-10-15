@@ -38,6 +38,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.MapApplicationRouteRequest;
@@ -669,6 +671,52 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void listProcessesInvalidRequest() {
         Streams.wrap(this.applications.listProcesses(new ListApplicationProcessesRequest())).next().get();
+    }
+
+    @Test
+    public void listRoutes() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v3/apps/GET_{id}_routes_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
+                .withId("test-id");
+
+        ListApplicationRoutesResponse response = Streams.wrap(this.applications.listRoutes(request)).next().get();
+
+        ListApplicationRoutesResponse.Resource resource = response.getResources().get(0);
+
+        assertEquals("2015-07-27T22:43:32Z", resource.getCreatedAt());
+        assertEquals("host-20", resource.getHost());
+        assertEquals("cad6fe1d-d6de-4698-9b8e-caf9506ecf8d", resource.getId());
+        assertEquals("", resource.getPath());
+
+        assertEquals(2, resource.getLinks().size());
+        assertNotNull(resource.getLink("space"));
+        assertNotNull(resource.getLink("domain"));
+
+        assertNull(resource.getUpdatedAt());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listRoutesError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
+                .withId("test-id");
+        Streams.wrap(this.applications.listRoutes(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listRoutesInvalidRequest() {
+        Streams.wrap(this.applications.listRoutes(new ListApplicationRoutesRequest())).next().get();
     }
 
     @Test
