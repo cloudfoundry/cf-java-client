@@ -21,6 +21,8 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
@@ -107,6 +109,68 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void associateAuditorInvalidRequest() {
         Streams.wrap(this.spaces.associateAuditor(new AssociateSpaceAuditorRequest())).next().get();
+    }
+
+    @Test
+    public void associateDeveloper() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/developers/test-developer-id"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v2/spaces/PUT_{id}_developers_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
+                .withId("test-id")
+                .withDeveloperId("test-developer-id");
+
+        AssociateSpaceDeveloperResponse response = Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
+
+        SpaceResource.Metadata metadata = response.getMetadata();
+        assertEquals("2015-07-27T22:43:07Z", metadata.getCreatedAt());
+        assertEquals("6f8f8e0d-54f2-4736-a08e-1044fcf061d3", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3", metadata.getUrl());
+
+        SpaceResource.SpaceEntity entity = response.getEntity();
+
+        assertTrue(entity.getAllowSsh());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/app_events", entity.getApplicationEventsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/apps", entity.getApplicationsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/auditors", entity.getAuditorsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/developers", entity.getDevelopersUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/domains", entity.getDomainsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/events", entity.getEventsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/managers", entity.getManagersUrl());
+        assertEquals("name-68", entity.getName());
+        assertEquals("5b556f7c-63f5-43e5-9522-c4fec533b09d", entity.getOrganizationId());
+        assertEquals("/v2/organizations/5b556f7c-63f5-43e5-9522-c4fec533b09d", entity.getOrganizationUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/routes", entity.getRoutesUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/security_groups", entity.getSecurityGroupsUrl());
+        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/service_instances",
+                entity.getServiceInstancesUrl());
+        assertNull(entity.getSpaceQuotaDefinitionId());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateDeveloperError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/developers/test-developer-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
+                .withId("test-id")
+                .withDeveloperId("test-developer-id");
+
+        Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateDeveloperInvalidRequest() {
+        Streams.wrap(this.spaces.associateDeveloper(new AssociateSpaceDeveloperRequest())).next().get();
     }
 
     @Test
