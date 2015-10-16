@@ -33,7 +33,7 @@ public abstract class SpaceResource<T extends SpaceResource<T>> extends Resource
      *
      * <p><b>This class is NOT threadsafe.</b>
      */
-    public static class SpaceEntity {
+    public static final class SpaceEntity {
 
         private volatile Boolean allowSsh;
 
