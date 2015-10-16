@@ -82,6 +82,10 @@ public final class UpdateProcessRequest implements Validatable {
             result.invalid("id must be specified");
         }
 
+        if (this.command == null) {
+            result.invalid("command must be specified");
+        }
+
         return result;
     }
 }

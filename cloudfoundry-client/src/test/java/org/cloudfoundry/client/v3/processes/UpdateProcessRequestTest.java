@@ -39,6 +39,7 @@ public final class UpdateProcessRequestTest {
     public void isValid() {
         ValidationResult result = new UpdateProcessRequest()
                 .withId("test-id")
+                .withCommand("test-command")
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -52,6 +53,16 @@ public final class UpdateProcessRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoCommand() {
+        ValidationResult result = new UpdateProcessRequest()
+                .withId("test-id")
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("command must be specified", result.getMessages().get(0));
     }
 
 }
