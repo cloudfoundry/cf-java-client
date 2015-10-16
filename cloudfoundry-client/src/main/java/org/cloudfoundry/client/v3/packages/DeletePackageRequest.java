@@ -34,7 +34,6 @@ public final class DeletePackageRequest implements Validatable {
      *
      * @return the id
      */
-    @JsonIgnore
     public String getId() {
         return this.id;
     }

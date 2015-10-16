@@ -52,8 +52,8 @@ public interface Processes {
     Publisher<ListProcessesResponse> list(ListProcessesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/scaling_a_process.html"> Scale
-     * Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/scaling_a_process.html">
+     * Scale Application</a> request
      *
      * @param request the Scale Process request
      * @return the response from the Scale Process request
