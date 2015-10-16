@@ -28,17 +28,17 @@ public final class CopyPackageRequestTest {
     @Test
     public void test() {
         CopyPackageRequest request = new CopyPackageRequest()
-                .withId("test-id")
+                .withApplicationId("test-application-id")
                 .withSourcePackageId("source-test-id");
 
-        assertEquals("test-id", request.getApplicationId());
+        assertEquals("test-application-id", request.getApplicationId());
         assertEquals("source-test-id", request.getSourcePackageId());
     }
 
     @Test
     public void isValid() {
         ValidationResult result = new CopyPackageRequest()
-                .withId("test-id")
+                .withApplicationId("test-application-id")
                 .withSourcePackageId("source-test-id")
                 .isValid();
 
@@ -52,14 +52,14 @@ public final class CopyPackageRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
     @Test
 
     public void isValidNoSourceId() {
         ValidationResult result = new CopyPackageRequest()
-                .withId("test-id")
+                .withApplicationId("test-application-id")
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
