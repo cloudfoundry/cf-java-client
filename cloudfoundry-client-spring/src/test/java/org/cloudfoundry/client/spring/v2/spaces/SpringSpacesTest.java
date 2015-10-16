@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -41,6 +43,7 @@ import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -234,6 +237,73 @@ public final class SpringSpacesTest extends AbstractRestTest {
     public void associateManagerInvalidRequest() {
         Streams.wrap(this.spaces.associateManager(new AssociateSpaceManagerRequest())).next().get();
     }
+
+    @Test
+    public void associateSecurityGroup() {
+        this.mockServer
+                .expect(method(PUT))
+                .andExpect(requestTo(
+                        "https://api.run.pivotal.io/v2/spaces/test-id/security_groups/test-security-group-id"))
+                .andExpect(content().string(""))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v2/spaces/PUT_{id}_security_group_{id}_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
+                .withId("test-id")
+                .withSecurityGroupId("test-security-group-id");
+
+        AssociateSpaceSecurityGroupResponse response = Streams.wrap(this.spaces.associateSecurityGroup(request)).next
+                ().get();
+
+        SpaceResource.Metadata metadata = response.getMetadata();
+        assertEquals("2015-07-27T22:43:06Z", metadata.getCreatedAt());
+        assertEquals("c9424692-395b-403b-90e6-10049bbd9e23", metadata.getId());
+        assertNull(metadata.getUpdatedAt());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23", metadata.getUrl());
+
+        SpaceResource.SpaceEntity entity = response.getEntity();
+
+        assertTrue(entity.getAllowSsh());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/app_events", entity.getApplicationEventsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/apps", entity.getApplicationsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/auditors", entity.getAuditorsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/developers", entity.getDevelopersUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/domains", entity.getDomainsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/events", entity.getEventsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/managers", entity.getManagersUrl());
+        assertEquals("name-39", entity.getName());
+        assertEquals("67096164-bdcf-4b53-92e1-a2991882a066", entity.getOrganizationId());
+        assertEquals("/v2/organizations/67096164-bdcf-4b53-92e1-a2991882a066", entity.getOrganizationUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/routes", entity.getRoutesUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/security_groups", entity.getSecurityGroupsUrl());
+        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/service_instances",
+                entity.getServiceInstancesUrl());
+        assertNull(entity.getSpaceQuotaDefinitionId());
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateSecurityGroupError() {
+        this.mockServer
+                .expect(requestTo(
+                        "https://api.run.pivotal.io/v2/spaces/test-id/security_groups/test-security-group-id"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
+                .withId("test-id")
+                .withSecurityGroupId("test-security-group-id");
+
+        Streams.wrap(this.spaces.associateSecurityGroup(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateSecurityGroupInvalidRequest() {
+        Streams.wrap(this.spaces.associateSecurityGroup(new AssociateSpaceSecurityGroupRequest())).next().get();
+    }
+
 
     @Test
     public void get() {
