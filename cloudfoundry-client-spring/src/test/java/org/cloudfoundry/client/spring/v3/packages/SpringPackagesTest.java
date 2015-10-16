@@ -66,13 +66,13 @@ public final class SpringPackagesTest extends AbstractRestTest {
     public void copy() {
         this.mockServer
                 .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
                         .contentType(APPLICATION_JSON));
 
         CopyPackageRequest request = new CopyPackageRequest()
-                .withId("test-id")
+                .withApplicationId("test-application-id")
                 .withSourcePackageId("source-test-id");
 
         CopyPackageResponse response = Streams.wrap(this.packages.copy(request)).next().get();
@@ -100,13 +100,13 @@ public final class SpringPackagesTest extends AbstractRestTest {
     public void copyError() {
         this.mockServer
                 .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
+                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
         CopyPackageRequest request = new CopyPackageRequest()
-                .withId("test-id")
+                .withApplicationId("test-application-id")
                 .withSourcePackageId("source-test-id");
 
         Streams.wrap(this.packages.copy(request)).next().get();

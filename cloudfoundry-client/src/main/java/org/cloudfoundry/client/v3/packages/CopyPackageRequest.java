@@ -27,28 +27,28 @@ import org.cloudfoundry.client.ValidationResult;
  */
 public final class CopyPackageRequest implements Validatable {
 
-    private volatile String id;
+    private volatile String applicationId;
 
-    private volatile String sourceId;
+    private volatile String sourcePackageId;
 
     /**
-     * Returns the id
+     * Returns the application id
      *
-     * @return the id
+     * @return the application id
      */
     @JsonIgnore
     public String getApplicationId() {
-        return this.id;
+        return this.applicationId;
     }
 
     /**
-     * Configure the id
+     * Configure the application id
      *
-     * @param id the id
+     * @param applicationId the application id
      * @return {@code this}
      */
-    public CopyPackageRequest withId(String id) {
-        this.id = id;
+    public CopyPackageRequest withApplicationId(String applicationId) {
+        this.applicationId = applicationId;
         return this;
     }
 
@@ -59,17 +59,17 @@ public final class CopyPackageRequest implements Validatable {
      */
     @JsonIgnore
     public String getSourcePackageId() {
-        return this.sourceId;
+        return this.sourcePackageId;
     }
 
     /**
      * Configure the source package id
      *
-     * @param sourceId the source package id
+     * @param sourcePackageId the source package id
      * @return {@code this}
      */
-    public CopyPackageRequest withSourcePackageId(String sourceId) {
-        this.sourceId = sourceId;
+    public CopyPackageRequest withSourcePackageId(String sourcePackageId) {
+        this.sourcePackageId = sourcePackageId;
         return this;
     }
 
@@ -77,11 +77,11 @@ public final class CopyPackageRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult result = new ValidationResult();
 
-        if (this.id == null) {
-            result.invalid("id must be specified");
+        if (this.applicationId == null) {
+            result.invalid("application id must be specified");
         }
 
-        if (this.sourceId == null) {
+        if (this.sourcePackageId == null) {
             result.invalid("source package id must be specified");
         }
 
