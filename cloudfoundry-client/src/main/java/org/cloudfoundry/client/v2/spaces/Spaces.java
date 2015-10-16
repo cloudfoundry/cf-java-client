@@ -84,4 +84,13 @@ public interface Spaces {
      */
     Publisher<ListSpacesResponse> list(ListSpacesRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_apps_for_the_space.html">List all Apps for
+     * the Space</a> request
+     *
+     * @param request the List all Apps for the Space request
+     * @return the response from the List all Apps for the Space request
+     */
+    Publisher<ListSpaceApplicationsResponse> listApplications(ListSpaceApplicationsRequest request);
+
 }

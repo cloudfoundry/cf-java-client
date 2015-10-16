@@ -31,9 +31,9 @@ public final class ValidationResult {
     private final List<String> messages = new ArrayList<>();
 
     /**
-     * Returns the messages indication why validation failed
+     * Returns the messages indicating why validation failed
      *
-     * @return the messages indication why validation failed
+     * @return the messages indicating why validation failed
      */
     public List<String> getMessages() {
         return this.messages;

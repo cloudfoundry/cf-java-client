@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 public final class ListSpacesRequestTest {
 
     @Test
-    public void name() {
+    public void test() {
         ListSpacesRequest request = new ListSpacesRequest()
                 .withApplicationId("test-application-id-1")
                 .withApplicationIds(Collections.singletonList("test-application-id-2"))
