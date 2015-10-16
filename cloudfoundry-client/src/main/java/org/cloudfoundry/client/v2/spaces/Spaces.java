@@ -59,6 +59,13 @@ public interface Spaces {
      */
     Publisher<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(AssociateSpaceSecurityGroupRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/creating_a_space.html">Create Space</a> request
+     *
+     * @param request the Create Space request
+     * @return the response from the Create Space request
+     */
+    Publisher<CreateSpaceResponse> create(CreateSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieve_a_particular_space.html">Get Space</a>
