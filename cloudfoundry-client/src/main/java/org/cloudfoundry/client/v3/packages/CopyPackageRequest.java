@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -57,6 +58,7 @@ public final class CopyPackageRequest implements Validatable {
      *
      * @return the source package id
      */
+    @QueryParameter("source_package_guid")
     @JsonIgnore
     public String getSourcePackageId() {
         return this.sourcePackageId;
