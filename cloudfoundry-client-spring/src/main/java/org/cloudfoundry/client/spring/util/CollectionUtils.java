@@ -38,6 +38,7 @@ public final class CollectionUtils {
      * @param <V>    the value type
      * @return the map
      */
+    @SuppressWarnings("unchecked")
     public static <K, V> MultiValueMap<K, V> singletonMultiValueMap(K key, V... values) {
         MultiValueMap<K, V> map = new LinkedMultiValueMap<>(1);
         map.put(key, Arrays.asList(values));

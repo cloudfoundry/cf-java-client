@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring;
+package org.cloudfoundry.demo;
 
 final class ProcessingIncomplete extends Exception {
 }

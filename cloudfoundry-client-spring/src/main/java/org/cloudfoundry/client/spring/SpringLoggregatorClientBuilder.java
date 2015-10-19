@@ -57,7 +57,7 @@ public final class SpringLoggregatorClientBuilder {
      * @return a new instance of a Spring-backed implementation of the {@link LoggregatorClient}
      * @throws IllegalArgumentException if {@code cloudFoundryClient} has not been set
      */
-    public LoggregatorClient build() {
+    public SpringLoggregatorClient build() {
         Assert.notNull(this.cloudFoundryClient, "cloudFoundryClient must be set");
 
         URI root = Streams.wrap(this.cloudFoundryClient.info().get())

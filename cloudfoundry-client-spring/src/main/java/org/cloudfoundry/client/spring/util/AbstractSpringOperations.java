@@ -109,7 +109,7 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Stream<T> post(Validatable request, Class<T> responseType,
-                                          Consumer<UriComponentsBuilder> builderCallback) {
+                                       Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
