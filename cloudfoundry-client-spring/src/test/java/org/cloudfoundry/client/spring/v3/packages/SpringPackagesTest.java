@@ -53,6 +53,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -66,14 +67,16 @@ public final class SpringPackagesTest extends AbstractRestTest {
     public void copy() {
         this.mockServer
                 .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
+                .andExpect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id"))
+                .andExpect(content().string(""))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
                         .contentType(APPLICATION_JSON));
 
         CopyPackageRequest request = new CopyPackageRequest()
                 .withApplicationId("test-application-id")
-                .withSourcePackageId("source-test-id");
+                .withSourcePackageId("test-source-package-id");
 
         CopyPackageResponse response = Streams.wrap(this.packages.copy(request)).next().get();
 
@@ -100,14 +103,15 @@ public final class SpringPackagesTest extends AbstractRestTest {
     public void copyError() {
         this.mockServer
                 .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
+                .andExpect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id"))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
         CopyPackageRequest request = new CopyPackageRequest()
                 .withApplicationId("test-application-id")
-                .withSourcePackageId("source-test-id");
+                .withSourcePackageId("test-source-package-id");
 
         Streams.wrap(this.packages.copy(request)).next().get();
     }
