@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v2.spaces;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -31,6 +32,8 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -38,8 +41,11 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
+import java.util.Collections;
+
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpMethod.POST;
@@ -492,6 +498,96 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .withPage(-1);
 
         Streams.wrap(this.spaces.list(request)).next().get();
+    }
+
+    @Test
+    public void listApplications() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v2/spaces/GET_{id}_apps_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
+                .withId("test-id")
+                .withNames(Collections.singletonList("test-name"))
+                .withPage(-1);
+
+        ListSpaceApplicationsResponse response = Streams.wrap(this.spaces.listApplications(request)).next().get();
+
+        assertNull(response.getNextUrl());
+        assertNull(response.getPreviousUrl());
+        assertEquals(Integer.valueOf(1), response.getTotalPages());
+        assertEquals(Integer.valueOf(1), response.getTotalResults());
+        assertEquals(1, response.getResources().size());
+
+        ListSpaceApplicationsResponse.Resource resource = response.getResources().get(0);
+
+        ApplicationResource.Metadata metadata = resource.getMetadata();
+
+        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
+        assertEquals("4ee31730-3c0e-4ec6-8329-26e727ab8ccd", metadata.getId());
+        assertEquals("2015-07-27T22:43:08Z", metadata.getUpdatedAt());
+        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd", metadata.getUrl());
+
+        ApplicationResource.ApplicationEntity entity = resource.getEntity();
+
+        assertNull(entity.getBuildpack());
+        assertNull(entity.getCommand());
+        assertFalse(entity.getConsole());
+        assertNull(entity.getDebug());
+        assertNull(entity.getDetectedBuildpack());
+        assertEquals("", entity.getDetectedStartCommand());
+        assertFalse(entity.getDiego());
+        assertEquals(Integer.valueOf(1024), entity.getDiskQuota());
+        assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
+                entity.getDockerCredentialsJson());
+        assertNull(entity.getDockerImage());
+        assertTrue(entity.getEnableSsh());
+        assertNull(entity.getEnvironmentJson());
+        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events", entity.getEventsUrl());
+        assertNull(entity.getHealthCheckTimeout());
+        assertEquals("port", entity.getHealthCheckType());
+        assertEquals(Integer.valueOf(1), entity.getInstances());
+        assertEquals(Integer.valueOf(1024), entity.getMemory());
+        assertEquals("name-103", entity.getName());
+        assertEquals("PENDING", entity.getPackageState());
+        assertEquals("2015-07-27T22:43:08Z", entity.getPackageUpdatedAt());
+        assertFalse(entity.getProduction());
+        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes", entity.getRoutesUrl());
+        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings", entity.getServiceBindingsUrl());
+        assertEquals("ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f", entity.getSpaceId());
+        assertEquals("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f", entity.getSpaceUrl());
+        assertEquals("e458a99f-53a4-4da4-b78a-5f2eb212cc47", entity.getStackId());
+        assertEquals("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47", entity.getStackUrl());
+        assertNull(entity.getStagingFailedDescription());
+        assertNull(entity.getStagingFailedReason());
+        assertNull(entity.getStagingTaskId());
+        assertEquals("STOPPED", entity.getState());
+        assertEquals("cc21d137-45d6-4687-ab71-8288ac0e5724", entity.getVersion());
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listApplicationsError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
+                .withId("test-id")
+                .withNames(Collections.singletonList("test-name"))
+                .withPage(-1);
+
+        Streams.wrap(this.spaces.listApplications(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listApplicationsInvalidRequest() {
+        Streams.wrap(this.spaces.listApplications(new ListSpaceApplicationsRequest())).next().get();
     }
 
 }

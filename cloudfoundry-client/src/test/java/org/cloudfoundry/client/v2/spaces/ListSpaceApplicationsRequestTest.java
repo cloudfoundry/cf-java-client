@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations;
+package org.cloudfoundry.client.v2.spaces;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.PaginatedRequest;
@@ -25,37 +25,30 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListOrganizationsRequestTest {
+public final class ListSpaceApplicationsRequestTest {
 
     @Test
     public void test() {
-        ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .withAuditorId("test-auditor-id-1")
-                .withAuditorIds(Collections.singletonList("test-auditor-id-2"))
-                .withBillingManagerId("test-billing-manager-id-1")
-                .withBillingManagerIds(Collections.singletonList("test-billing-manager-id-2"))
-                .withManagerId("test-manager-id-1")
-                .withManagerIds(Collections.singletonList("test-manager-id-2"))
+        ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
+                .withDiego(true)
+                .withDiegos(Collections.singletonList(false))
                 .withName("test-name-1")
                 .withNames(Collections.singletonList("test-name-2"))
+                .withOrganizationId("test-organization-id-1")
+                .withOrganizationIds(Collections.singletonList("test-organization-id-2"))
                 .withSpaceId("test-space-id-1")
                 .withSpaceIds(Collections.singletonList("test-space-id-2"))
-                .withStatus("test-status-1")
-                .withStatuses(Collections.singletonList("test-status-2"))
-                .withUserId("test-user-id-1")
-                .withUserIds(Collections.singletonList("test-user-id-2"))
+                .withStackId("test-stack-id-1")
+                .withStackIds(Collections.singletonList("test-stack-id-2"))
                 .withOrderDirection(PaginatedRequest.OrderDirection.ASC)
                 .withPage(-1)
                 .withResultsPerPage(-2);
 
-        assertEquals(Arrays.asList("test-auditor-id-1", "test-auditor-id-2"), request.getAuditorIds());
-        assertEquals(Arrays.asList("test-billing-manager-id-1", "test-billing-manager-id-2"), request
-                .getBillingManagerIds());
-        assertEquals(Arrays.asList("test-manager-id-1", "test-manager-id-2"), request.getManagerIds());
+        assertEquals(Arrays.asList(true, false), request.getDiegos());
         assertEquals(Arrays.asList("test-name-1", "test-name-2"), request.getNames());
+        assertEquals(Arrays.asList("test-organization-id-1", "test-organization-id-2"), request.getOrganizationIds());
         assertEquals(Arrays.asList("test-space-id-1", "test-space-id-2"), request.getSpaceIds());
-        assertEquals(Arrays.asList("test-status-1", "test-status-2"), request.getStatuses());
-        assertEquals(Arrays.asList("test-user-id-1", "test-user-id-2"), request.getUserIds());
+        assertEquals(Arrays.asList("test-stack-id-1", "test-stack-id-2"), request.getStackIds());
         assertEquals(PaginatedRequest.OrderDirection.ASC, request.getOrderDirection());
         assertEquals(Integer.valueOf(-1), request.getPage());
         assertEquals(Integer.valueOf(-2), request.getResultsPerPage());
@@ -63,7 +56,13 @@ public final class ListOrganizationsRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, new ListOrganizationsRequest().isValid().getStatus());
+        assertEquals(ValidationResult.Status.VALID, new ListSpaceApplicationsRequest().withId("test-id")
+                .isValid().getStatus());
+    }
+
+    @Test
+    public void isValidNoId() {
+        assertEquals(ValidationResult.Status.INVALID, new ListSpaceApplicationsRequest().isValid().getStatus());
     }
 
 }
