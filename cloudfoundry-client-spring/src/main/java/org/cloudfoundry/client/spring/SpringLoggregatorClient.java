@@ -49,7 +49,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
+/**
+ * The Spring-based implementation of {@link LoggregatorClient}
+ */
+public final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

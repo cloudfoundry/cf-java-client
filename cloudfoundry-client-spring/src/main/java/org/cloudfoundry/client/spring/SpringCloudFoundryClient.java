@@ -37,7 +37,10 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 
 import java.net.URI;
 
-final class SpringCloudFoundryClient implements CloudFoundryClient {
+/**
+ * The Spring-based implementation of {@link CloudFoundryClient}
+ */
+public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Applications applications;
 
