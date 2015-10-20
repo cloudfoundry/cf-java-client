@@ -114,17 +114,22 @@ public final class SpringApplications extends AbstractSpringOperations implement
 
     @Override
     public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> {
-            builder.pathSegment("v3", "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
-        });
+        return get(request, ListApplicationsResponse.class,
+                builder -> {
+                    builder.pathSegment("v3", "apps");
+                    FilterBuilder.augment(builder, request);
+                    QueryBuilder.augment(builder, request);
+                });
     }
 
     @Override
     public Publisher<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
         return get(request, ListApplicationDropletsResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "droplets"));
+                builder -> {
+                    builder.pathSegment("v3", "apps", request.getId(), "droplets");
+                    FilterBuilder.augment(builder, request);
+                    QueryBuilder.augment(builder, request);
+                });
     }
 
     @Override

@@ -19,10 +19,10 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,9 +62,10 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
      *
      * @return the state
      */
+    @FilterParameter("state")
     @JsonIgnore
-    public String[] getState() {
-        return this.state.toArray(new String[this.state.size()]);
+    public List<String> getState() {
+        return this.state;
     }
 
     /**
@@ -84,8 +85,8 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
      * @param state the id
      * @return {@code this}
      */
-    public ListApplicationDropletsRequest withStates(String[] state) {
-        this.state.addAll(Arrays.asList(state));
+    public ListApplicationDropletsRequest withStates(List<String> state) {
+        this.state.addAll(state);
         return this;
     }
 
