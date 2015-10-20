@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.v3.processes;
 
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.processes.DeleteProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
@@ -61,7 +62,10 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
     @Override
     public Publisher<ListProcessesResponse> list(ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("v3", "processes"));
+        return get(request, ListProcessesResponse.class, builder -> {
+            builder.pathSegment("v3", "processes");
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     public Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request) {

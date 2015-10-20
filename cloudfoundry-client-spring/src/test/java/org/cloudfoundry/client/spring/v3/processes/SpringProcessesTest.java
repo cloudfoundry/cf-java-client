@@ -141,12 +141,15 @@ public final class SpringProcessesTest extends AbstractRestTest {
     @Test
     public void list() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/processes"))
+                .expect(requestTo("https://api.run.pivotal.io/v3/processes?page=1&per_page=2"))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v3/processes/GET_response.json"))
                         .contentType(APPLICATION_JSON));
 
-        ListProcessesRequest request = new ListProcessesRequest();
+        ListProcessesRequest request = new ListProcessesRequest()
+                .withPage(1)
+                .withPerPage(2);
+
         ListProcessesResponse response = Streams.wrap(this.processes.list(request)).next().get();
 
         ListProcessesResponse.Resource resource = response.getResources().get(0);
@@ -172,12 +175,14 @@ public final class SpringProcessesTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listError() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/processes"))
+                .expect(requestTo("https://api.run.pivotal.io/v3/processes?page=1&per_page=2"))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
-        ListProcessesRequest request = new ListProcessesRequest();
+        ListProcessesRequest request = new ListProcessesRequest()
+                .withPage(1)
+                .withPerPage(2);
 
         Streams.wrap(this.processes.list(request)).next().get();
     }
