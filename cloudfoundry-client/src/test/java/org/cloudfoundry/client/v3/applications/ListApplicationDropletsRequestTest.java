@@ -19,9 +19,12 @@ package org.cloudfoundry.client.v3.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public final class ListApplicationDropletsRequestTest {
@@ -31,10 +34,15 @@ public final class ListApplicationDropletsRequestTest {
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withId("test-id")
                 .withState("test-state-1")
-                .withStates(new String[]{"test-state-2", "test-state-3"});
+                .withStates(Collections.singletonList("test-state-2"));
 
         assertEquals("test-id", request.getId());
-        assertArrayEquals(new String[]{"test-state-1", "test-state-2", "test-state-3"}, request.getState());
+
+        List<String> state = new ArrayList<>();
+        state.add("test-state-1");
+        state.add("test-state-2");
+
+        assertEquals(state, request.getState());
     }
 
     @Test
@@ -42,7 +50,7 @@ public final class ListApplicationDropletsRequestTest {
         ValidationResult result = new ListApplicationDropletsRequest()
                 .withId("test-id")
                 .withState("test-state-1")
-                .withStates(new String[]{"test-state-2", "test-state-3"})
+                .withStates(Collections.singletonList("test-state-2"))
                 .isValid();
 
         assertEquals(VALID, result.getStatus());

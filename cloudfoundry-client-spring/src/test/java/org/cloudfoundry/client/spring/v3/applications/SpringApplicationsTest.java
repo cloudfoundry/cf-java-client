@@ -63,6 +63,7 @@ import java.util.Map;
 
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
+import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.ASC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -557,17 +558,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
     }
 
-
     @Test
     public void listDroplets() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/droplets"))
+                .expect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"))
                 .andRespond(withStatus(OK)
                         .body(new ClassPathResource("v3/apps/GET_{id}_droplets_response.json"))
                         .contentType(APPLICATION_JSON));
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
+                .withPerPage(2)
+                .withOrderBy(CREATED_AT)
+                .withOrderDirection(ASC)
                 .withId("test-id");
 
         ListApplicationDropletsResponse response = Streams.wrap(this.applications.listDroplets(request)).next().get();
@@ -605,14 +609,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listDropletsError() {
         this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/droplets"))
+                .expect(requestTo("https://api.run.pivotal" +
+                        ".io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"))
                 .andRespond(withStatus(UNPROCESSABLE_ENTITY)
                         .body(new ClassPathResource("v2/error_response.json"))
                         .contentType(APPLICATION_JSON));
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
+                .withPerPage(2)
+                .withOrderBy(CREATED_AT)
+                .withOrderDirection(ASC)
                 .withId("test-id");
+
         Streams.wrap(this.applications.listDroplets(request)).next().get();
     }
 
