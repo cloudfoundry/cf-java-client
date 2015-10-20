@@ -19,13 +19,11 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-5level [%thread]: %msg%n</pattern>
+            <pattern>%-5level: %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="org.cloudfoundry.client.spring" level="DEBUG"/>
-
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 
