@@ -100,6 +100,29 @@ public abstract class PaginatedRequest<T extends PaginatedRequest<T>> {
         return (T) this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PaginatedRequest<?> that = (PaginatedRequest<?>) o;
+
+        if (orderDirection != that.orderDirection) return false;
+        if (page != null ? !page.equals(that.page) : that.page != null) return false;
+        return !(resultsPerPage != null ? !resultsPerPage.equals(that.resultsPerPage) : that.resultsPerPage != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = orderDirection != null ? orderDirection.hashCode() : 0;
+        result = 31 * result + (page != null ? page.hashCode() : 0);
+        result = 31 * result + (resultsPerPage != null ? resultsPerPage.hashCode() : 0);
+        return result;
+    }
+
+
+
     /**
      * The order direction of the {@link PaginatedRequest}
      */

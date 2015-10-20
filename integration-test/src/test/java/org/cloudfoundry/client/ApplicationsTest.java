@@ -27,8 +27,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.rx.Streams;
 
-import java.util.Collection;
-
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,9 +43,10 @@ public final class ApplicationsTest {
     public void zeroExistingApplications() {
         ListApplicationsRequest request = new ListApplicationsRequest().withSpaceId(this.spaceId);
 
-        int size = Streams.wrap(this.cloudFoundryClient.applications().list(request))
+        long size = Streams.wrap(this.cloudFoundryClient.applications().list(request))
                 .map(PaginatedResponse::getResources)
-                .map(Collection::size)
+                .flatMap(Streams::from)
+                .count()
                 .next().poll();
 
         assertEquals("Unexpected applications exist", 0, size);
@@ -62,9 +61,10 @@ public final class ApplicationsTest {
                 .next().poll();
 
         ListApplicationsRequest listRequest = new ListApplicationsRequest().withSpaceId(this.spaceId);
-        int size = Streams.wrap(this.cloudFoundryClient.applications().list(listRequest))
+        long size = Streams.wrap(this.cloudFoundryClient.applications().list(listRequest))
                 .map(PaginatedResponse::getResources)
-                .map(Collection::size)
+                .flatMap(Streams::from)
+                .count()
                 .next().poll();
 
         assertEquals(1, size);

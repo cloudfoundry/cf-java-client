@@ -274,4 +274,36 @@ public final class ListOrganizationsRequest extends PaginatedRequest<ListOrganiz
         return new ValidationResult();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ListOrganizationsRequest request = (ListOrganizationsRequest) o;
+
+        if (auditorIds != null ? !auditorIds.equals(request.auditorIds) : request.auditorIds != null) return false;
+        if (billingManagerIds != null ? !billingManagerIds.equals(request.billingManagerIds) : request
+                .billingManagerIds != null)
+            return false;
+        if (managerIds != null ? !managerIds.equals(request.managerIds) : request.managerIds != null) return false;
+        if (names != null ? !names.equals(request.names) : request.names != null) return false;
+        if (spaceIds != null ? !spaceIds.equals(request.spaceIds) : request.spaceIds != null) return false;
+        if (statuses != null ? !statuses.equals(request.statuses) : request.statuses != null) return false;
+        return !(userIds != null ? !userIds.equals(request.userIds) : request.userIds != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (auditorIds != null ? auditorIds.hashCode() : 0);
+        result = 31 * result + (billingManagerIds != null ? billingManagerIds.hashCode() : 0);
+        result = 31 * result + (managerIds != null ? managerIds.hashCode() : 0);
+        result = 31 * result + (names != null ? names.hashCode() : 0);
+        result = 31 * result + (spaceIds != null ? spaceIds.hashCode() : 0);
+        result = 31 * result + (statuses != null ? statuses.hashCode() : 0);
+        result = 31 * result + (userIds != null ? userIds.hashCode() : 0);
+        return result;
+    }
 }
