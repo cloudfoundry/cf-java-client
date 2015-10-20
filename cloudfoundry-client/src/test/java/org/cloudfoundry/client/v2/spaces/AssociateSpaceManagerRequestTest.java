@@ -62,7 +62,7 @@ public final class AssociateSpaceManagerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("managerId must be specified", result.getMessages().get(0));
+        assertEquals("manager id must be specified", result.getMessages().get(0));
     }
 
 }

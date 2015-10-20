@@ -27,9 +27,9 @@ import org.cloudfoundry.client.ValidationResult;
  */
 public final class AssociateSpaceManagerRequest implements Validatable {
 
-    private volatile String managerId;
-
     private volatile String id;
+
+    private volatile String managerId;
 
     /**
      * Returns the id
@@ -82,7 +82,7 @@ public final class AssociateSpaceManagerRequest implements Validatable {
         }
 
         if (this.managerId == null) {
-            result.invalid("managerId must be specified");
+            result.invalid("manager id must be specified");
         }
 
         return result;
