@@ -19,7 +19,6 @@ package org.cloudfoundry.client.spring.v3.applications;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -53,7 +52,6 @@ import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.io.IOException;
@@ -61,23 +59,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.ASC;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringApplicationsTest extends AbstractRestTest {
 
@@ -85,12 +79,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void assignDroplet() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/current_droplet"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PUT_{id}_current_droplet_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
+                "v3/apps/PUT_{id}_current_droplet_request.json",
+                OK,
+                "v3/apps/PUT_{id}_current_droplet_response.json");
 
         AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
@@ -103,30 +96,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
         assertEquals("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a", response.getId());
-
-        assertEquals(8, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("droplet"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("name1", response.getName());
         assertEquals(Integer.valueOf(1), response.getTotalDesiredInstances());
         assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "processes", "packages", "droplet", "space", "start", "stop",
+                "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void assignDropletError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/current_droplet"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
+                "v3/apps/PUT_{id}_current_droplet_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
@@ -142,13 +126,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void create() throws IOException {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_request.json")))
-                .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v3/apps/POST_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(POST,
+                "https://api.run.pivotal.io/v3/apps",
+                "v3/apps/POST_request.json",
+                CREATED,
+                "v3/apps/POST_response.json");
 
         CreateApplicationRequest request = new CreateApplicationRequest()
                 .withName("my_app")
@@ -163,31 +145,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(Collections.singletonMap("open", "source"), response.getEnvironmentVariables());
         assertEquals("8b51db6f-7bae-47ca-bc75-74bc957ed460", response.getId());
-
-        assertEquals(7, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("my_app", response.getName());
         assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
         assertNull(response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void createError() throws IOException {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(POST,
+                "https://api.run.pivotal.io/v3/apps",
+                "v3/apps/POST_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         CreateApplicationRequest request = new CreateApplicationRequest()
                 .withName("my_app")
@@ -205,27 +176,27 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void delete() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(OK));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                null,
+                NO_CONTENT,
+                null);
 
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
 
         Streams.wrap(this.applications.delete(request)).next().get();
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
@@ -240,11 +211,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void deleteProcess() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-id/processes/test-type/instances/test-index"))
-                .andRespond(withStatus(OK));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
+                null,
+                NO_CONTENT,
+                null);
 
         DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
                 .withId("test-id")
@@ -253,18 +224,16 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         Streams.wrap(this.applications.deleteProcess(request)).next().get();
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteProcessError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-id/processes/test-type/instances/test-index"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
                 .withId("test-id")
@@ -281,11 +250,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                null,
+                OK,
+                "v3/apps/GET_{id}_response.json");
 
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
@@ -297,30 +266,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
         assertEquals("guid-e23c9834-9c4a-4397-be7d-e0fb686cb646", response.getId());
-
-        assertEquals(8, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("droplet"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("my_app", response.getName());
         assertEquals(Integer.valueOf(3), response.getTotalDesiredInstances());
         assertNull(response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "processes", "packages", "droplet", "space", "start", "stop",
+                "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
@@ -335,11 +295,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void getEnvironment() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/env"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_env_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/env",
+                null,
+                OK,
+                "v3/apps/GET_{id}_env_response.json");
 
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
@@ -370,16 +330,16 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         Map<String, Object> stagingEnvironmentVariables = Collections.singletonMap("STAGING_ENV", "staging_value");
         assertEquals(stagingEnvironmentVariables, response.getStagingEnvironmentVariables());
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getEnvironmentError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/env"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/env",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
@@ -394,11 +354,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void getProcess() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_processes_{type}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
+                null,
+                OK,
+                "v3/apps/GET_{id}_processes_{type}_response.json");
 
         GetApplicationProcessRequest request = new GetApplicationProcessRequest()
                 .withId("test-id")
@@ -412,26 +372,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), response.getDiskInMb());
         assertEquals("32f64d22-ab45-4a9b-ba93-2b3b160f3750", response.getId());
         assertEquals(Integer.valueOf(1), response.getInstances());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("scale"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("space"));
-
         assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:29Z", response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "scale", "app", "space");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getProcessError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         GetApplicationProcessRequest request = new GetApplicationProcessRequest()
                 .withId("test-id")
@@ -447,11 +401,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
+                null,
+                OK,
+                "v3/apps/GET_response.json");
 
         ListApplicationsRequest request = new ListApplicationsRequest()
                 .withPage(1)
@@ -459,7 +413,6 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withName("test-name");
 
         ListApplicationsResponse response = Streams.wrap(this.applications.list(request)).next().get();
-
         ListApplicationsResponse.Resource resource = response.getResources().get(0);
 
         assertEquals("name-383", resource.getBuildpack());
@@ -470,25 +423,17 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("my_app3", resource.getName());
         assertEquals(Integer.valueOf(0), resource.getTotalDesiredInstances());
         assertNull(resource.getUpdatedAt());
-
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("processes"));
-        assertNotNull(resource.getLink("packages"));
-        assertNotNull(resource.getLink("space"));
-        assertNotNull(resource.getLink("start"));
-        assertNotNull(resource.getLink("stop"));
-        assertNotNull(resource.getLink("assign_current_droplet"));
-
-        this.mockServer.verify();
+        validateLinks(resource, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ListApplicationsRequest request = new ListApplicationsRequest()
                 .withPage(1)
@@ -505,18 +450,17 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listPackages() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_packages_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/packages",
+                null,
+                OK,
+                "v3/apps/GET_{id}_packages_response.json");
 
         ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
                 .withPage(1)
                 .withId("test-id");
 
         ListApplicationPackagesResponse response = Streams.wrap(this.applications.listPackages(request)).next().get();
-
         ListApplicationPackagesResponse.Resource resource = response.getResources().get(0);
 
         assertEquals("2015-07-27T22:43:34Z", resource.getCreatedAt());
@@ -524,28 +468,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("sha1", resource.getHash().getType());
         assertNull(resource.getHash().getValue());
         assertEquals("guid-3d792a08-e415-4f9e-912b-2a8485db781a", resource.getId());
-
-        assertEquals(5, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("upload"));
-        assertNotNull(resource.getLink("download"));
-        assertNotNull(resource.getLink("stage"));
-        assertNotNull(resource.getLink("app"));
-
         assertEquals("AWAITING_UPLOAD", resource.getState());
         assertEquals("bits", resource.getType());
         assertNull(resource.getUpdatedAt());
         assertNull(resource.getUrl());
-        this.mockServer.verify();
+        validateLinks(resource, "self", "upload", "download", "stage", "app");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listPackagesError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/packages"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/packages",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
                 .withPage(1)
@@ -560,12 +497,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listDroplets() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_droplets_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
+                null,
+                OK,
+                "v3/apps/GET_{id}_droplets_response.json");
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
@@ -575,45 +511,32 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .withId("test-id");
 
         ListApplicationDropletsResponse response = Streams.wrap(this.applications.listDroplets(request)).next().get();
+        ListApplicationDropletsResponse.Resource resource = response.getResources().get(0);
 
         Map<String, Object> environmentVariables = new HashMap<>();
         environmentVariables.put("yuu", "huuu");
 
-        ListApplicationDropletsResponse.Resource resource = response.getResources().get(0);
-
         assertEquals("name-2089", resource.getBuildpack());
         assertEquals("1970-01-01T00:00:01Z", resource.getCreatedAt());
-
         assertEquals(environmentVariables, resource.getEnvironmentVariables());
         assertNull(resource.getError());
-
-        Hash hash = resource.getHash();
-        assertEquals("sha1", hash.getType());
-        assertNull(hash.getValue());
-
+        assertEquals("sha1", resource.getHash().getType());
+        assertNull(resource.getHash().getValue());
         assertEquals("guid-5df0a4bb-4fcb-4393-acdd-868524ad761e", resource.getId());
-
-        assertEquals(5, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("package"));
-        assertNotNull(resource.getLink("app"));
-        assertNotNull(resource.getLink("assign_current_droplet"));
-        assertNotNull(resource.getLink("buildpack"));
-
         assertNull(resource.getProcfile());
         assertEquals("STAGING", resource.getState());
         assertNull(resource.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(resource, "self", "package", "app", "assign_current_droplet", "buildpack");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listDropletsError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
@@ -632,18 +555,17 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listProcesses() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_processes_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes",
+                null,
+                OK,
+                "v3/apps/GET_{id}_processes_response.json");
 
         ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
                 .withPage(1)
                 .withId("test-id");
 
         ListApplicationProcessesResponse response = Streams.wrap(this.applications.listProcesses(request)).next().get();
-
         ListApplicationProcessesResponse.Resource resource = response.getResources().get(0);
 
         assertEquals("2015-07-27T22:43:29Z", resource.getCreatedAt());
@@ -651,26 +573,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), resource.getDiskInMb());
         assertEquals("38fcaafa-5356-4f74-af10-dc70da151993", resource.getId());
         assertEquals(Integer.valueOf(1), resource.getInstances());
-
-        assertEquals(4, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("scale"));
-        assertNotNull(resource.getLink("app"));
-        assertNotNull(resource.getLink("space"));
-
         assertEquals(Integer.valueOf(1024), resource.getMemoryInMb());
         assertEquals("web", resource.getType());
         assertEquals("2015-07-27T22:43:29Z", resource.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(resource, "self", "scale", "app", "space");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listProcessesError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
                 .withPage(1)
@@ -685,39 +601,34 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listRoutes() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/GET_{id}_routes_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                null,
+                OK,
+                "v3/apps/GET_{id}_routes_response.json");
 
         ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
                 .withId("test-id");
 
         ListApplicationRoutesResponse response = Streams.wrap(this.applications.listRoutes(request)).next().get();
-
         ListApplicationRoutesResponse.Resource resource = response.getResources().get(0);
 
         assertEquals("2015-07-27T22:43:32Z", resource.getCreatedAt());
         assertEquals("host-20", resource.getHost());
         assertEquals("cad6fe1d-d6de-4698-9b8e-caf9506ecf8d", resource.getId());
         assertEquals("", resource.getPath());
-
-        assertEquals(2, resource.getLinks().size());
-        assertNotNull(resource.getLink("space"));
-        assertNotNull(resource.getLink("domain"));
-
         assertNull(resource.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(resource, "space", "domain");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listRoutesError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(GET,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
                 .withId("test-id");
@@ -731,11 +642,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void mapRoute() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_routes_request.json")))
-                .andRespond(withStatus(OK));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                "v3/apps/PUT_{id}_routes_request.json",
+                NO_CONTENT,
+                null);
 
         MapApplicationRouteRequest request = new MapApplicationRouteRequest()
                 .withId("test-id")
@@ -743,18 +654,16 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         Streams.wrap(this.applications.mapRoute(request)).next().get();
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void mapRouteError() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_routes_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                "v3/apps/PUT_{id}_routes_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         MapApplicationRouteRequest request = new MapApplicationRouteRequest()
                 .withId("test-id")
@@ -770,13 +679,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void scale() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PUT_{id}_processes_{type}_scale_request.json")))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PUT_{id}_processes_{type}_scale_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
+                "v3/apps/PUT_{id}_processes_{type}_scale_request.json",
+                OK,
+                "v3/apps/PUT_{id}_processes_{type}_scale_response.json");
 
         ScaleApplicationRequest request = new ScaleApplicationRequest()
                 .withDiskInMb(100)
@@ -791,26 +698,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(100), response.getDiskInMb());
         assertEquals("edc2dffe-9f0d-416f-a712-890d56de8bae", response.getId());
         assertEquals(Integer.valueOf(3), response.getInstances());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("scale"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("space"));
-
         assertEquals(Integer.valueOf(100), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:29Z", response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "scale", "app", "space");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void scaleError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
+                "v3/apps/PUT_{id}_processes_{type}_scale_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         ScaleApplicationRequest request = new ScaleApplicationRequest()
                 .withDiskInMb(100)
@@ -829,12 +730,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void start() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/start"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PUT_{id}_start_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/start",
+                null,
+                OK,
+                "v3/apps/PUT_{id}_start_response.json");
 
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
@@ -846,31 +746,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("STARTED", response.getDesiredState());
         assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
         assertEquals("guid-40460094-d035-4663-b58c-cdf4c802a2c6", response.getId());
-
-        assertEquals(8, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("droplet"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("original_name", response.getName());
         assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
         assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "processes", "packages", "space", "droplet", "start", "stop",
+                "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void startError() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/start"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/start",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
@@ -885,12 +775,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void stop() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/stop"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PUT_{id}_stop_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/stop",
+                null,
+                OK,
+                "v3/apps/PUT_{id}_stop_response.json");
 
         StopApplicationRequest request = new StopApplicationRequest()
                 .withId("test-id");
@@ -902,31 +791,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
         assertEquals("guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0", response.getId());
-
-        assertEquals(8, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("droplet"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("original_name", response.getName());
         assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
         assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        this.mockServer.verify();
+        validateLinks(response, "self", "processes", "packages", "space", "droplet", "start", "stop",
+                "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void stopError() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/stop"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PUT,
+                "https://api.run.pivotal.io/v3/apps/test-id/stop",
+                null,
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         StopApplicationRequest request = new StopApplicationRequest()
                 .withId("test-id");
@@ -941,11 +820,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void unmapRoute() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/DELETE_{id}_routes_request.json")))
-                .andRespond(withStatus(OK));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                "v3/apps/DELETE_{id}_routes_request.json",
+                NO_CONTENT,
+                null);
 
         UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
                 .withId("test-id")
@@ -953,18 +832,16 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         Streams.wrap(this.applications.unmapRoute(request)).next().get();
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void unmapRouteError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id/routes"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/DELETE_{id}_routes_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(DELETE,
+                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                "v3/apps/DELETE_{id}_routes_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
                 .withId("test-id")
@@ -980,13 +857,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void update() throws IOException {
-        this.mockServer
-                .expect(method(PATCH))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/PATCH_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PATCH,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                "v3/apps/PATCH_{id}_request.json",
+                OK,
+                "v3/apps/PATCH_{id}_response.json");
 
         Map<String, String> environment_variables = new HashMap<>();
         environment_variables.put("MY_ENV_VAR", "foobar");
@@ -1002,34 +877,23 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
         assertEquals("http://gitwheel.org/my-app", response.getBuildpack());
         assertEquals("2015-07-27T22:43:14Z", response.getCreatedAt());
-        assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
         assertEquals("STOPPED", response.getDesiredState());
         assertEquals(environment_variables, response.getEnvironmentVariables());
         assertEquals("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a", response.getId());
-
-        assertEquals(7, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("processes"));
-        assertNotNull(response.getLink("packages"));
-        assertNotNull(response.getLink("space"));
-        assertNotNull(response.getLink("start"));
-        assertNotNull(response.getLink("stop"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertEquals("new_name", response.getName());
         assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-        this.mockServer.verify();
+        assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
+        validateLinks(response, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void updateError() throws IOException {
-        this.mockServer
-                .expect(method(PATCH))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-id"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/PATCH_{id}_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        setupMockServer(PATCH,
+                "https://api.run.pivotal.io/v3/apps/test-id",
+                "v3/apps/PATCH_{id}_request.json",
+                UNPROCESSABLE_ENTITY,
+                "v2/error_response.json");
 
         Map<String, String> environment_variables = new HashMap<>();
         environment_variables.put("MY_ENV_VAR", "foobar");

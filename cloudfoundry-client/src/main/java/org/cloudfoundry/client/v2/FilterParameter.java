@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v2;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,6 +31,8 @@ import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@JsonIgnore
+@JacksonAnnotationsInside
 public @interface FilterParameter {
 
     /**
