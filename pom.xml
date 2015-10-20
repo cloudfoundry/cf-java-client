@@ -35,7 +35,7 @@
         <module>cloudfoundry-client-spring</module>
         <module>cloudfoundry-gradle-plugin</module>
         <module>cloudfoundry-maven-plugin</module>
-        <module>cloudfoundry-resources</module>
+        <module>cloudfoundry-operations</module>
     </modules>
 
     <properties>

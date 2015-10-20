@@ -29,11 +29,15 @@
         <version>2.0.0.BUILD-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cloudfoundry-resources</artifactId>
-    <name>Cloud Foundry Java Resources</name>
+    <artifactId>cloudfoundry-operations</artifactId>
+    <name>Cloud Foundry Java Operations</name>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-stream</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.cloudfoundry</groupId>
             <artifactId>cloudfoundry-client</artifactId>

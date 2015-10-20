@@ -41,6 +41,6 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
-    <orderEntry type="module" module-name="cloudfoundry-resources" />
+    <orderEntry type="module" module-name="cloudfoundry-operations" />
   </component>
 </module>
