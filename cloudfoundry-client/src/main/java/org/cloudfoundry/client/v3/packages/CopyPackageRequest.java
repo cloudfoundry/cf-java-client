@@ -59,7 +59,6 @@ public final class CopyPackageRequest implements Validatable {
      * @return the source package id
      */
     @QueryParameter("source_package_guid")
-    @JsonIgnore
     public String getSourcePackageId() {
         return this.sourcePackageId;
     }

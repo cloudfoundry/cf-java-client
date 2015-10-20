@@ -63,7 +63,6 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
      * @return the state
      */
     @FilterParameter("state")
-    @JsonIgnore
     public List<String> getState() {
         return this.state;
     }
