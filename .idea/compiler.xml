@@ -25,13 +25,6 @@
         <processorPath useClasspath="true" />
         <module name="cloudfoundry-maven-plugin" />
       </profile>
-      <profile default="false" name="Annotation profile for cloudfoundry-resources" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="true" />
-        <module name="cloudfoundry-resources" />
-      </profile>
       <profile default="false" name="Annotation profile for cloudfoundry-client-spring" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -59,6 +52,13 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
       </profile>
+      <profile default="false" name="Annotation profile for cloudfoundry-operations" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="cloudfoundry-operations" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cloudfoundry-client" target="1.8" />
@@ -66,7 +66,7 @@
       <module name="cloudfoundry-gradle-plugin" target="1.8" />
       <module name="cloudfoundry-java-client" target="1.5" />
       <module name="cloudfoundry-maven-plugin" target="1.8" />
-      <module name="cloudfoundry-resources" target="1.8" />
+      <module name="cloudfoundry-operations" target="1.8" />
       <module name="integration-test" target="1.8" />
     </bytecodeTargetLevel>
   </component>

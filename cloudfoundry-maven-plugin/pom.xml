@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.cloudfoundry</groupId>
-            <artifactId>cloudfoundry-resources</artifactId>
+            <artifactId>cloudfoundry-operations</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
