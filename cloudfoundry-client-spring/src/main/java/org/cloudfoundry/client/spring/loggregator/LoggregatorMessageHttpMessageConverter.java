@@ -25,12 +25,12 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.util.TypeUtils;
+import reactor.rx.Stream;
 
 import java.io.IOException;
-import java.util.List;
 
 public final class LoggregatorMessageHttpMessageConverter
-        extends AbstractHttpMessageConverter<List<LoggregatorMessage>> {
+        extends AbstractHttpMessageConverter<Stream<LoggregatorMessage>> {
 
     public LoggregatorMessageHttpMessageConverter() {
         super(MediaType.parseMediaType("multipart/x-protobuf"));
@@ -43,12 +43,12 @@ public final class LoggregatorMessageHttpMessageConverter
 
     @Override
     protected boolean supports(Class<?> clazz) {
-        return TypeUtils.isAssignable(List.class, clazz);
+        return TypeUtils.isAssignable(Stream.class, clazz);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected List<LoggregatorMessage> readInternal(Class<? extends List<LoggregatorMessage>> clazz,
+    protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz,
                                                     HttpInputMessage inputMessage) throws IOException {
 
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
@@ -61,12 +61,12 @@ public final class LoggregatorMessageHttpMessageConverter
                     } catch (InvalidProtocolBufferException e) {
                         throw new RuntimeException(e);
                     }
-                })
-                .toList().poll();
+                });
+//                .toList().poll();
     }
 
     @Override
-    protected void writeInternal(List<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
+    protected void writeInternal(Stream<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
         throw new UnsupportedOperationException();
     }
 }

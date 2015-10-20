@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.client.spring.loggregator;
 
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.http.MockHttpInputMessage;
+import reactor.rx.Stream;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +51,7 @@ public final class LoggregatorMessageHttpMessageConverterTest {
     @Test
     public void supports() {
         assertFalse(this.messageConverter.supports(Map.class));
-        assertTrue(this.messageConverter.supports(List.class));
+        assertTrue(this.messageConverter.supports(Stream.class));
     }
 
     @Test
@@ -61,9 +60,11 @@ public final class LoggregatorMessageHttpMessageConverterTest {
                 new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
-        List<LoggregatorMessage> result = this.messageConverter.readInternal(null, inputMessage);
+        Long result = this.messageConverter.readInternal(null, inputMessage)
+                .count()
+                .next().poll();
 
-        assertEquals(14, result.size());
+        assertEquals(Long.valueOf(14), result);
     }
 
     @Test(expected = UnsupportedOperationException.class)
