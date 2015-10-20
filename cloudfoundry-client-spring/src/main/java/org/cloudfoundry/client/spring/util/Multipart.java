@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.util;
 
+import reactor.Publishers;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
@@ -24,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Multipart {
 
@@ -35,28 +35,29 @@ public final class Multipart {
     private static final String DASHES = "--";
 
     public static Stream<byte[]> from(InputStream inputStream, String boundary) {
-        AtomicBoolean streamPrimed = new AtomicBoolean(false);
+        return Streams.wrap(Publishers.create(subscriber -> {
+            byte[] part = new byte[0];
 
-        return Streams.createWith((n, s) -> {
             try {
-                if (!streamPrimed.getAndSet(true)) {
-                    primeStream(inputStream, boundary);
-                }
+                part = getPart(inputStream, boundary);
 
-                for (int i = 0; i < n; i++) {
-                    byte[] part = getPart(inputStream, boundary);
-
-                    if (part == null) {
-                        s.onComplete();
-                        break;
-                    }
-
-                    s.onNext(part);
+                if (part == null) {
+                    subscriber.onComplete();
+                } else {
+                    subscriber.onNext(part);
                 }
             } catch (IOException e) {
-                s.onError(e);
+                subscriber.onError(e);
             }
-        });
+        }, subscriber -> {
+            try {
+                primeStream(inputStream, boundary);
+            } catch (IOException e) {
+                subscriber.onError(e);
+            }
+
+            return null;
+        }));
     }
 
     private static void discardHeader(InputStream in) throws IOException {
@@ -113,7 +114,7 @@ public final class Multipart {
             // discard content
         }
 
-        if(isEomBoundary(boundary, line)) {
+        if (isEomBoundary(boundary, line)) {
             drain(in);
         }
     }

@@ -43,7 +43,6 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -74,10 +73,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     @Override
     @SuppressWarnings("unchecked")
     public Publisher<LoggregatorMessage> recent(RecentLogsRequest request) {
-        return get(request, List.class,
-                builder -> builder.pathSegment("recent").queryParam("app", request.getId()))
-                .flatMap(Streams::from)
-                .cast(LoggregatorMessage.class);
+        return get(request, Stream.class, builder -> builder.pathSegment("recent").queryParam("app", request.getId()))
+                .flatMap(stream -> stream);
     }
 
     @Override
