@@ -79,11 +79,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void assignDroplet() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
                 "v3/apps/PUT_{id}_current_droplet_request.json",
-                OK,
-                "v3/apps/PUT_{id}_current_droplet_response.json");
+                OK, "v3/apps/PUT_{id}_current_droplet_response.json");
 
         AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
@@ -106,11 +104,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void assignDropletError() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/current_droplet",
                 "v3/apps/PUT_{id}_current_droplet_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
                 .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
@@ -126,11 +122,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void create() throws IOException {
-        setupMockServer(POST,
-                "https://api.run.pivotal.io/v3/apps",
-                "v3/apps/POST_request.json",
-                CREATED,
-                "v3/apps/POST_response.json");
+        mockRequest(POST, "https://api.run.pivotal.io/v3/apps", "v3/apps/POST_request.json",
+                CREATED, "v3/apps/POST_response.json");
 
         CreateApplicationRequest request = new CreateApplicationRequest()
                 .withName("my_app")
@@ -154,11 +147,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void createError() throws IOException {
-        setupMockServer(POST,
-                "https://api.run.pivotal.io/v3/apps",
-                "v3/apps/POST_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(POST, "https://api.run.pivotal.io/v3/apps", "v3/apps/POST_request.json",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         CreateApplicationRequest request = new CreateApplicationRequest()
                 .withName("my_app")
@@ -176,11 +166,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void delete() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                null,
-                NO_CONTENT,
-                null);
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id",
+                NO_CONTENT);
 
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
@@ -192,11 +179,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         DeleteApplicationRequest request = new DeleteApplicationRequest()
                 .withId("test-id");
@@ -211,11 +195,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void deleteProcess() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
-                null,
-                NO_CONTENT,
-                null);
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
+                NO_CONTENT);
 
         DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
                 .withId("test-id")
@@ -229,11 +210,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void deleteProcessError() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
                 .withId("test-id")
@@ -250,11 +228,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                null,
-                OK,
-                "v3/apps/GET_{id}_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id",
+                OK, "v3/apps/GET_{id}_response.json");
 
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
@@ -276,11 +251,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         GetApplicationRequest request = new GetApplicationRequest()
                 .withId("test-id");
@@ -295,11 +267,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void getEnvironment() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/env",
-                null,
-                OK,
-                "v3/apps/GET_{id}_env_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/env",
+                OK, "v3/apps/GET_{id}_env_response.json");
 
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
@@ -335,11 +304,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void getEnvironmentError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/env",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/env",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
                 .withId("test-id");
@@ -354,11 +320,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void getProcess() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
-                null,
-                OK,
-                "v3/apps/GET_{id}_processes_{type}_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
+                OK, "v3/apps/GET_{id}_processes_{type}_response.json");
 
         GetApplicationProcessRequest request = new GetApplicationProcessRequest()
                 .withId("test-id")
@@ -381,11 +344,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void getProcessError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/processes/web",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         GetApplicationProcessRequest request = new GetApplicationProcessRequest()
                 .withId("test-id")
@@ -401,11 +361,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
-                null,
-                OK,
-                "v3/apps/GET_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
+                OK, "v3/apps/GET_response.json");
 
         ListApplicationsRequest request = new ListApplicationsRequest()
                 .withPage(1)
@@ -429,11 +386,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps?names[]=test-name&order_by=created_at&page=1",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListApplicationsRequest request = new ListApplicationsRequest()
                 .withPage(1)
@@ -450,11 +404,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listPackages() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/packages",
-                null,
-                OK,
-                "v3/apps/GET_{id}_packages_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/packages",
+                OK, "v3/apps/GET_{id}_packages_response.json");
 
         ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
                 .withPage(1)
@@ -478,11 +429,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void listPackagesError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/packages",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/packages",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
                 .withPage(1)
@@ -497,11 +445,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listDroplets() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
-                null,
-                OK,
-                "v3/apps/GET_{id}_droplets_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io" +
+                        "/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
+                OK, "v3/apps/GET_{id}_droplets_response.json");
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
@@ -532,11 +478,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void listDropletsError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io" +
+                        "/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
                 .withPage(1)
@@ -555,11 +499,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listProcesses() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes",
-                null,
-                OK,
-                "v3/apps/GET_{id}_processes_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/processes",
+                OK, "v3/apps/GET_{id}_processes_response.json");
 
         ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
                 .withPage(1)
@@ -582,11 +523,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void listProcessesError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/processes",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
                 .withPage(1)
@@ -601,11 +539,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void listRoutes() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
-                null,
-                OK,
-                "v3/apps/GET_{id}_routes_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                OK, "v3/apps/GET_{id}_routes_response.json");
 
         ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
                 .withId("test-id");
@@ -624,11 +559,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void listRoutesError() {
-        setupMockServer(GET,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(GET, "https://api.run.pivotal.io/v3/apps/test-id/routes",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
                 .withId("test-id");
@@ -642,11 +574,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void mapRoute() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
-                "v3/apps/PUT_{id}_routes_request.json",
-                NO_CONTENT,
-                null);
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/routes", "v3/apps/PUT_{id}_routes_request.json",
+                NO_CONTENT);
 
         MapApplicationRouteRequest request = new MapApplicationRouteRequest()
                 .withId("test-id")
@@ -659,11 +588,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void mapRouteError() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
-                "v3/apps/PUT_{id}_routes_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/routes", "v3/apps/PUT_{id}_routes_request.json",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         MapApplicationRouteRequest request = new MapApplicationRouteRequest()
                 .withId("test-id")
@@ -679,11 +605,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void scale() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
                 "v3/apps/PUT_{id}_processes_{type}_scale_request.json",
-                OK,
-                "v3/apps/PUT_{id}_processes_{type}_scale_response.json");
+                OK, "v3/apps/PUT_{id}_processes_{type}_scale_response.json");
 
         ScaleApplicationRequest request = new ScaleApplicationRequest()
                 .withDiskInMb(100)
@@ -707,11 +631,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void scaleError() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/processes/web/scale",
                 "v3/apps/PUT_{id}_processes_{type}_scale_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ScaleApplicationRequest request = new ScaleApplicationRequest()
                 .withDiskInMb(100)
@@ -730,11 +652,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void start() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/start",
-                null,
-                OK,
-                "v3/apps/PUT_{id}_start_response.json");
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/start",
+                OK, "v3/apps/PUT_{id}_start_response.json");
 
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
@@ -756,11 +675,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void startError() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/start",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/start",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         StartApplicationRequest request = new StartApplicationRequest()
                 .withId("test-id");
@@ -775,11 +691,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void stop() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/stop",
-                null,
-                OK,
-                "v3/apps/PUT_{id}_stop_response.json");
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/stop",
+                OK, "v3/apps/PUT_{id}_stop_response.json");
 
         StopApplicationRequest request = new StopApplicationRequest()
                 .withId("test-id");
@@ -801,11 +714,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void stopError() {
-        setupMockServer(PUT,
-                "https://api.run.pivotal.io/v3/apps/test-id/stop",
-                null,
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(PUT, "https://api.run.pivotal.io/v3/apps/test-id/stop",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         StopApplicationRequest request = new StopApplicationRequest()
                 .withId("test-id");
@@ -820,11 +730,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void unmapRoute() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/routes",
                 "v3/apps/DELETE_{id}_routes_request.json",
-                NO_CONTENT,
-                null);
+                NO_CONTENT);
 
         UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
                 .withId("test-id")
@@ -837,11 +745,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void unmapRouteError() {
-        setupMockServer(DELETE,
-                "https://api.run.pivotal.io/v3/apps/test-id/routes",
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/routes",
                 "v3/apps/DELETE_{id}_routes_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
                 .withId("test-id")
@@ -857,11 +763,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test
     public void update() throws IOException {
-        setupMockServer(PATCH,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                "v3/apps/PATCH_{id}_request.json",
-                OK,
-                "v3/apps/PATCH_{id}_response.json");
+        mockRequest(PATCH, "https://api.run.pivotal.io/v3/apps/test-id", "v3/apps/PATCH_{id}_request.json",
+                OK, "v3/apps/PATCH_{id}_response.json");
 
         Map<String, String> environment_variables = new HashMap<>();
         environment_variables.put("MY_ENV_VAR", "foobar");
@@ -889,11 +792,8 @@ public final class SpringApplicationsTest extends AbstractRestTest {
 
     @Test(expected = CloudFoundryException.class)
     public void updateError() throws IOException {
-        setupMockServer(PATCH,
-                "https://api.run.pivotal.io/v3/apps/test-id",
-                "v3/apps/PATCH_{id}_request.json",
-                UNPROCESSABLE_ENTITY,
-                "v2/error_response.json");
+        mockRequest(PATCH, "https://api.run.pivotal.io/v3/apps/test-id", "v3/apps/PATCH_{id}_request.json",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         Map<String, String> environment_variables = new HashMap<>();
         environment_variables.put("MY_ENV_VAR", "foobar");

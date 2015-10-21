@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.processes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -35,6 +36,7 @@ public final class DeleteProcessInstanceRequest implements Validatable {
      *
      * @return the id
      */
+    @JsonIgnore
     public String getId() {
         return id;
     }
@@ -55,6 +57,7 @@ public final class DeleteProcessInstanceRequest implements Validatable {
      *
      * @return the instance index
      */
+    @JsonIgnore
     public String getIndex() {
         return index;
     }
