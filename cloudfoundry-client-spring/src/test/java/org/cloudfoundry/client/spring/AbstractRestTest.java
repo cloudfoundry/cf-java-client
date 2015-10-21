@@ -75,8 +75,27 @@ public abstract class AbstractRestTest {
 
     protected final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
 
-    protected final void setupMockServer(HttpMethod httpMethod, String endpoint, String requestFile,
-                                         HttpStatus httpResponse, String responseFile) {
+    protected final void mockRequest(HttpMethod httpMethod, String endpoint, String requestFile,
+                                     HttpStatus httpResponse, String responseFile) {
+        mockRequest(httpMethod, endpoint, null, requestFile, httpResponse, responseFile);
+    }
+
+    protected final void mockRequest(HttpMethod httpMethod, String endpoint, HttpStatus httpResponse,
+                                     String responseFile) {
+        mockRequest(httpMethod, endpoint, null, null, httpResponse, responseFile);
+    }
+
+    protected final void mockRequest(HttpMethod httpMethod, String endpoint, String requestFile,
+                                     HttpStatus httpResponse) {
+        mockRequest(httpMethod, endpoint, null, requestFile, httpResponse, null);
+    }
+
+    protected final void mockRequest(HttpMethod httpMethod, String endpoint, HttpStatus httpResponse) {
+        mockRequest(httpMethod, endpoint, null, null, httpResponse, null);
+    }
+
+    protected final void mockRequest(HttpMethod httpMethod, String endpoint, RequestMatcher header, String requestFile,
+                                     HttpStatus httpResponse, String responseFile) {
         this.mockRestServiceServer = MockRestServiceServer.createServer(this.restTemplate);
 
         RequestMatcher requestMatcher;
