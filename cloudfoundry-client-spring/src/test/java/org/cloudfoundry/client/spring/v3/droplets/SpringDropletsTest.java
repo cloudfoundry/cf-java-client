@@ -26,7 +26,6 @@ import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Collections;
@@ -37,12 +36,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringDropletsTest extends AbstractRestTest {
 
@@ -50,27 +47,21 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void delete() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
-                .andRespond(withStatus(OK));
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/droplets/test-id",
+                NO_CONTENT);
 
         DeleteDropletRequest request = new DeleteDropletRequest()
                 .withId("test-id");
 
         Streams.wrap(this.droplets.delete(request)).next().get();
 
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(DELETE, "https://api.run.pivotal.io/v3/droplets/test-id",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         DeleteDropletRequest request = new DeleteDropletRequest()
                 .withId("test-id");
@@ -85,11 +76,8 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/droplets/GET_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets/test-id",
+                OK, "v3/droplets/GET_{id}_response.json");
 
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
@@ -116,16 +104,13 @@ public final class SpringDropletsTest extends AbstractRestTest {
         assertNull(response.getProcfile());
         assertEquals("PENDING", response.getState());
         assertNull(response.getUpdatedAt());
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/droplets/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets/test-id",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
@@ -140,11 +125,8 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/droplets"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/droplets/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets",
+                OK, "v3/droplets/GET_response.json");
 
         ListDropletsRequest request = new ListDropletsRequest();
         ListDropletsResponse response = Streams.wrap(this.droplets.list(request)).next().get();
@@ -175,16 +157,13 @@ public final class SpringDropletsTest extends AbstractRestTest {
         assertNull(resource.getProcfile());
         assertEquals("STAGING", resource.getState());
         assertNull(resource.getUpdatedAt());
-        this.mockServer.verify();
+        verifyMockServer();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/droplets"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets",
+                UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
         ListDropletsRequest request = new ListDropletsRequest();
 
@@ -224,4 +203,5 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
         return environmentVariables;
     }
+
 }
