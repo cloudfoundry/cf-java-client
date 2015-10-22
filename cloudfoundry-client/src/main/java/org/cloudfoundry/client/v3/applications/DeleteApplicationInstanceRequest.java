@@ -21,11 +21,11 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the Delete Application Process operation
+ * The request payload for the Delete Application Process Instance operation
  *
  * <p><b>This class is NOT threadsafe.</b>
  */
-public final class DeleteApplicationProcessRequest implements Validatable {
+public final class DeleteApplicationInstanceRequest implements Validatable {
 
     private volatile String id;
 
@@ -49,7 +49,7 @@ public final class DeleteApplicationProcessRequest implements Validatable {
      * @param id the id
      * @return {@code this}
      */
-    public DeleteApplicationProcessRequest withId(String id) {
+    public DeleteApplicationInstanceRequest withId(String id) {
         this.id = id;
         return this;
     }
@@ -70,7 +70,7 @@ public final class DeleteApplicationProcessRequest implements Validatable {
      * @param index the index
      * @return {@code this}
      */
-    public DeleteApplicationProcessRequest withIndex(String index) {
+    public DeleteApplicationInstanceRequest withIndex(String index) {
         this.index = index;
         return this;
     }
@@ -91,7 +91,7 @@ public final class DeleteApplicationProcessRequest implements Validatable {
      * @param type the type
      * @return {@code this}
      */
-    public DeleteApplicationProcessRequest withType(String type) {
+    public DeleteApplicationInstanceRequest withType(String type) {
         this.type = type;
         return this;
     }
