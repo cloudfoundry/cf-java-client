@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteApplicationProcessRequestTest {
+public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void test() {
-        DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
+        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index")
                 .withType("test-type");
@@ -39,7 +39,7 @@ public final class DeleteApplicationProcessRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = new DeleteApplicationProcessRequest()
+        ValidationResult result = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index")
                 .withType("test-type")
@@ -50,7 +50,7 @@ public final class DeleteApplicationProcessRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteApplicationProcessRequest()
+        ValidationResult result = new DeleteApplicationInstanceRequest()
                 .withIndex("test-index")
                 .withType("test-type")
                 .isValid();
@@ -61,7 +61,7 @@ public final class DeleteApplicationProcessRequestTest {
 
     @Test
     public void isValidNoIndex() {
-        ValidationResult result = new DeleteApplicationProcessRequest()
+        ValidationResult result = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withType("test-type")
                 .isValid();
@@ -72,7 +72,7 @@ public final class DeleteApplicationProcessRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = new DeleteApplicationProcessRequest()
+        ValidationResult result = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index")
                 .isValid();

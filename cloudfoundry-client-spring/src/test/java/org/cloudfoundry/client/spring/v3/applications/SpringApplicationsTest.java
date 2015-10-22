@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -198,12 +198,12 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
                 NO_CONTENT);
 
-        DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
+        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index")
                 .withType("test-type");
 
-        Streams.wrap(this.applications.deleteProcess(request)).next().get();
+        Streams.wrap(this.applications.deleteInstance(request)).next().get();
 
         verifyMockServer();
     }
@@ -213,17 +213,17 @@ public final class SpringApplicationsTest extends AbstractRestTest {
         mockRequest(DELETE, "https://api.run.pivotal.io/v3/apps/test-id/processes/test-type/instances/test-index",
                 UNPROCESSABLE_ENTITY, "v2/error_response.json");
 
-        DeleteApplicationProcessRequest request = new DeleteApplicationProcessRequest()
+        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
                 .withId("test-id")
                 .withIndex("test-index")
                 .withType("test-type");
 
-        Streams.wrap(this.applications.deleteProcess(request)).next().get();
+        Streams.wrap(this.applications.deleteInstance(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteProcessInvalidRequest() {
-        Streams.wrap(this.applications.deleteProcess(new DeleteApplicationProcessRequest())).next().get();
+        Streams.wrap(this.applications.deleteInstance(new DeleteApplicationInstanceRequest())).next().get();
     }
 
     @Test
