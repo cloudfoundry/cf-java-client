@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -27,8 +28,8 @@ public class ListSpaceApplicationsResponseTest {
 
     @Test
     public void test() {
-        ListSpaceApplicationsResponse.Resource.ApplicationEntity entityIn =
-                new ListSpaceApplicationsResponse.Resource.ApplicationEntity()
+        ApplicationEntity entityIn =
+                new ApplicationEntity()
                         .diego(true)
                         .enableSsh(true)
                         .withBuildpack("test-buildpack")
@@ -68,7 +69,7 @@ public class ListSpaceApplicationsResponseTest {
 
         assertEquals(Collections.singletonList(resource), response.getResources());
 
-        ListSpaceApplicationsResponse.Resource.ApplicationEntity entityOut = response.getResources().get(0).getEntity();
+        ApplicationEntity entityOut = response.getResources().get(0).getEntity();
 
         assertTrue(entityOut.getDiego());
         assertTrue(entityOut.getEnableSsh());

@@ -77,6 +77,15 @@ public interface Spaces {
     Publisher<GetSpaceResponse> get(GetSpaceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/get_space_summary.html">Get Space Summary</a>
+     * request
+     *
+     * @param request the Get Space Summary request
+     * @return the response from the Get Space Summary request
+     */
+    Publisher<GetSpaceSummaryResponse> getSummary(GetSpaceSummaryRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_spaces.html">List Spaces</a> request
      *
      * @param request the List Spaces request

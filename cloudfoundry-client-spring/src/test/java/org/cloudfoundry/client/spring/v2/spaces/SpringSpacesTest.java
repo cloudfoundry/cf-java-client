@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v2.spaces;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
@@ -32,16 +33,21 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
+import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
+import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.spaces.SpaceServiceSummary;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.junit.Assert.assertEquals;
@@ -436,6 +442,111 @@ public final class SpringSpacesTest extends AbstractRestTest {
         Streams.wrap(this.spaces.get(new GetSpaceRequest())).next().get();
     }
 
+    public void getSummary() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/summary"))
+                .andRespond(withStatus(OK)
+                        .body(new ClassPathResource("v2/spaces/GET_{id}_summary_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
+                .withId("test-id");
+
+        GetSpaceSummaryResponse response = Streams.wrap(this.spaces.getSummary(request)).next().get();
+
+        {
+            List<SpaceApplicationSummary> applications = response.getApplications();
+            assertTrue(null != applications && applications.size() == 1);
+            SpaceApplicationSummary app = applications.get(0);
+
+            assertEquals("e1efe0a2-a931-4604-a419-f76dbe23ad76", app.getId());
+            assertEquals(Integer.valueOf(1), app.getRunningInstances());
+            {
+                List<SpaceApplicationSummary.Route> routes = app.getRoutes();
+                assertTrue(null != routes && routes.size() == 1);
+                SpaceApplicationSummary.Route route = routes.get(0);
+
+                assertEquals("af154090-baca-4805-a8a2-9db93a16a84b", route.getDomain().getId());
+                assertEquals("domain-48.example.com", route.getDomain().getName());
+                assertEquals("host-11", route.getHost());
+                assertEquals("3445e88d-adda-4255-9b9d-6f701fb0de17", route.getId());
+            }
+            assertEquals(Integer.valueOf(1), app.getServiceCount());
+            assertEquals(Collections.singletonList("name-654"), app.getServiceNames());
+            assertEquals(Collections.singletonList("host-11.domain-48.example.com"), app.getUrls());
+
+            assertNull(app.getBuildpack());
+            assertNull(app.getCommand());
+            assertFalse(app.getConsole());
+            assertNull(app.getDebug());
+            assertNull(app.getDetectedBuildpack());
+            assertEquals("", app.getDetectedStartCommand());
+            assertFalse(app.getDiego());
+            assertEquals(Integer.valueOf(1024), app.getDiskQuota());
+            assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
+                    app.getDockerCredentialsJson());
+            assertNull(app.getDockerImage());
+            assertTrue(app.getEnableSsh());
+            assertNull(app.getEnvironmentJson());
+            assertNull(app.getHealthCheckTimeout());
+            assertEquals("port", app.getHealthCheckType());
+            assertEquals(Integer.valueOf(1), app.getInstances());
+            assertEquals(Integer.valueOf(1024), app.getMemory());
+            assertEquals("name-652", app.getName());
+            assertEquals("PENDING", app.getPackageState());
+            assertEquals("2015-07-27T22:43:19Z", app.getPackageUpdatedAt());
+            assertFalse(app.getProduction());
+            assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", app.getSpaceId());
+            assertEquals("01a9ea88-1028-4d1a-a8ee-d1acc686815c", app.getStackId());
+            assertNull(app.getStagingFailedDescription());
+            assertNull(app.getStagingFailedReason());
+            assertNull(app.getStagingTaskId());
+            assertEquals("STOPPED", app.getState());
+            assertEquals("6505d60e-2a6f-475c-8c1d-85c66139447e", app.getVersion());
+        }
+        assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", response.getId());
+        assertEquals("name-649", response.getName());
+        {
+            List<SpaceServiceSummary> services = response.getServices();
+            assertTrue(null != services && services.size() == 1);
+            SpaceServiceSummary serviceSummary = services.get(0);
+
+            assertEquals(Integer.valueOf(1), serviceSummary.getBoundAppCount());
+            assertNull(serviceSummary.getDashboardUrl());
+            assertEquals("83e3713f-5f9b-4168-a43c-02cc66493cc0", serviceSummary.getId());
+            assertNull(serviceSummary.getLastOperation());
+            assertEquals("", serviceSummary.getName());
+
+            assertEquals("67bd9226-6d63-48ac-9114-a756a01bff7c", serviceSummary.getServicePlan().getId());
+            assertEquals("name-655", serviceSummary.getServicePlan().getName());
+            assertEquals("64ce598e-0c24-4dba-bfa1-594187db7404", serviceSummary.getServicePlan().getService().getId());
+            assertEquals("label-23", serviceSummary.getServicePlan().getService().getLabel());
+            assertNull(serviceSummary.getServicePlan().getService().getProvider());
+            assertNull(serviceSummary.getServicePlan().getService().getVersion());
+        }
+
+        this.mockServer.verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getSummaryError() {
+        this.mockServer
+                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/summary"))
+                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
+                        .body(new ClassPathResource("v2/error_response.json"))
+                        .contentType(APPLICATION_JSON));
+
+        GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
+                .withId("test-id");
+
+        Streams.wrap(this.spaces.getSummary(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getSummaryInvalidRequest() {
+        Streams.wrap(this.spaces.getSummary(new GetSpaceSummaryRequest())).next().get();
+    }
+
     @Test
     public void list() {
         this.mockServer
@@ -530,7 +641,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("2015-07-27T22:43:08Z", metadata.getUpdatedAt());
         assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd", metadata.getUrl());
 
-        ApplicationResource.ApplicationEntity entity = resource.getEntity();
+        ApplicationEntity entity = resource.getEntity();
 
         assertNull(entity.getBuildpack());
         assertNull(entity.getCommand());
