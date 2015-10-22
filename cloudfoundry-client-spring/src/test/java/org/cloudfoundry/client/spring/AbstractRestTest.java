@@ -20,8 +20,10 @@ import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageC
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.v3.LinkBased;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
@@ -31,15 +33,18 @@ import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.RequestMatcher;
 import org.springframework.test.web.client.ResponseActions;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -50,8 +55,6 @@ public abstract class AbstractRestTest {
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(),
             new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
-
-    private MockRestServiceServer mockRestServiceServer;
 
     {
         List<HttpMessageConverter<?>> messageConverters = this.restTemplate.getMessageConverters();
@@ -73,50 +76,43 @@ public abstract class AbstractRestTest {
             .scheme("https").host("api.run.pivotal.io")
             .build().toUri();
 
-    protected final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
+    private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
 
-    protected final void mockRequest(HttpMethod httpMethod, String endpoint, String requestFile,
-                                     HttpStatus httpResponse, String responseFile) {
-        mockRequest(httpMethod, endpoint, null, requestFile, httpResponse, responseFile);
-    }
+    protected final void mockRequest(RequestContext requestContext) {
+        HttpMethod method = requestContext.getMethod()
+                .orElseThrow(() -> new IllegalStateException("method must be set"));
 
-    protected final void mockRequest(HttpMethod httpMethod, String endpoint, HttpStatus httpResponse,
-                                     String responseFile) {
-        mockRequest(httpMethod, endpoint, null, null, httpResponse, responseFile);
-    }
+        String uri = requestContext.getPath()
+                .map(path -> UriComponentsBuilder.fromUri(this.root).path(path).build(false).toString())
+                .orElseThrow(() -> new IllegalStateException("path must be set"));
 
-    protected final void mockRequest(HttpMethod httpMethod, String endpoint, String requestFile,
-                                     HttpStatus httpResponse) {
-        mockRequest(httpMethod, endpoint, null, requestFile, httpResponse, null);
-    }
+        ResponseActions responseActions = this.mockServer
+                .expect(method(method))
+                .andExpect(requestTo(uri));
 
-    protected final void mockRequest(HttpMethod httpMethod, String endpoint, HttpStatus httpResponse) {
-        mockRequest(httpMethod, endpoint, null, null, httpResponse, null);
-    }
+        if (!requestContext.getAnyRequestPayload()) {
+            RequestMatcher payloadMatcher = requestContext.getRequestPayload()
+                    .map(ContentMatchers::jsonPayload)
+                    .orElse(content().string(""));
 
-    protected final void mockRequest(HttpMethod httpMethod, String endpoint, RequestMatcher header, String requestFile,
-                                     HttpStatus httpResponse, String responseFile) {
-        this.mockRestServiceServer = MockRestServiceServer.createServer(this.restTemplate);
-
-        RequestMatcher requestMatcher;
-        if (requestFile == null) {
-            requestMatcher = content().string("");
-        } else {
-            requestMatcher = jsonPayload(new ClassPathResource(requestFile));
+            responseActions = responseActions.andExpect(payloadMatcher);
         }
 
-        ResponseActions baseResponse = this.mockRestServiceServer
-                .expect(method(httpMethod))
-                .andExpect(requestTo(endpoint))
-                .andExpect(requestMatcher);
-
-        if (responseFile == null) {
-            baseResponse.andRespond(withStatus(httpResponse));
-        } else {
-            baseResponse.andRespond(withStatus(httpResponse)
-                    .body(new ClassPathResource(responseFile))
-                    .contentType(APPLICATION_JSON));
+        for (RequestMatcher requestMatcher : requestContext.getRequestMatchers()) {
+            responseActions = responseActions.andExpect(requestMatcher);
         }
+
+        HttpStatus status = requestContext.getStatus()
+                .orElseThrow(() -> new IllegalStateException("status must be set"));
+
+        MediaType contentType = requestContext.getContentType()
+                .orElse(APPLICATION_JSON);
+
+        ResponseCreator responseCreator = requestContext.getResponsePayload()
+                .map(resource -> withStatus(status).contentType(contentType).body(resource))
+                .orElse(withStatus(status));
+
+        responseActions.andRespond(responseCreator);
     }
 
     protected final void validateLinks(LinkBased response, String... links) {
@@ -126,7 +122,106 @@ public abstract class AbstractRestTest {
         }
     }
 
-    protected final void verifyMockServer() {
-        this.mockRestServiceServer.verify();
+    protected final void verify() {
+        this.mockServer.verify();
     }
+
+    public static final class RequestContext {
+
+        private volatile boolean anyRequestPayload = false;
+
+        private volatile Optional<MediaType> contentType = Optional.empty();
+
+        private volatile Optional<HttpMethod> method = Optional.empty();
+
+        private final List<RequestMatcher> requestMatchers = new ArrayList<>();
+
+        private volatile Optional<Resource> requestPayload = Optional.empty();
+
+        private volatile Optional<Resource> responsePayload = Optional.empty();
+
+        private volatile Optional<HttpStatus> status = Optional.empty();
+
+        private volatile Optional<String> path = Optional.empty();
+
+        Boolean getAnyRequestPayload() {
+            return this.anyRequestPayload;
+        }
+
+        Optional<MediaType> getContentType() {
+            return this.contentType;
+        }
+
+        Optional<HttpMethod> getMethod() {
+            return this.method;
+        }
+
+        List<RequestMatcher> getRequestMatchers() {
+            return this.requestMatchers;
+        }
+
+        Optional<Resource> getRequestPayload() {
+            return this.requestPayload;
+        }
+
+        Optional<Resource> getResponsePayload() {
+            return this.responsePayload;
+        }
+
+        Optional<HttpStatus> getStatus() {
+            return this.status;
+        }
+
+        Optional<String> getPath() {
+            return this.path;
+        }
+
+        public RequestContext anyRequestPayload() {
+            this.anyRequestPayload = true;
+            return this;
+        }
+
+        public RequestContext contentType(MediaType contentType) {
+            this.contentType = Optional.of(contentType);
+            return this;
+        }
+
+        public RequestContext errorResponse() {
+            status(UNPROCESSABLE_ENTITY);
+            responsePayload("v2/error_response.json");
+            return this;
+        }
+
+        public RequestContext method(HttpMethod method) {
+            this.method = Optional.of(method);
+            return this;
+        }
+
+        public RequestContext path(String path) {
+            this.path = Optional.of(path);
+            return this;
+        }
+
+        public RequestContext requestMatcher(RequestMatcher requestMatcher) {
+            this.requestMatchers.add(requestMatcher);
+            return this;
+        }
+
+        public RequestContext requestPayload(String path) {
+            this.requestPayload = Optional.of(path).map(ClassPathResource::new);
+            return this;
+        }
+
+        public RequestContext responsePayload(String path) {
+            this.responsePayload = Optional.of(path).map(ClassPathResource::new);
+            return this;
+        }
+
+        public RequestContext status(HttpStatus status) {
+            this.status = Optional.of(status);
+            return this;
+        }
+
+    }
+
 }

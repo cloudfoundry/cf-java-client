@@ -43,26 +43,19 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.SpaceServiceSummary;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringSpacesTest extends AbstractRestTest {
 
@@ -70,12 +63,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void associateAuditor() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/auditors/test-auditor-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/PUT_{id}_auditors_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/auditors/test-auditor-id")
+                .status(OK)
+                .responsePayload("v2/spaces/PUT_{id}_auditors_{id}_response.json"));
 
         AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
                 .withId("test-id")
@@ -107,16 +98,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void associateAuditorError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/auditors/test-auditor-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/auditors/test-auditor-id")
+                .errorResponse());
 
         AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
                 .withId("test-id")
@@ -132,12 +121,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void associateDeveloper() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/developers/test-developer-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/PUT_{id}_developers_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/developers/test-developer-id")
+                .status(OK)
+                .responsePayload("v2/spaces/PUT_{id}_developers_{id}_response.json"));
 
         AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
                 .withId("test-id")
@@ -169,16 +156,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void associateDeveloperError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/developers/test-developer-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/developers/test-developer-id")
+                .errorResponse());
 
         AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
                 .withId("test-id")
@@ -194,12 +179,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void associateManager() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/managers/test-manager-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/PUT_{id}_managers_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/managers/test-manager-id")
+                .status(OK)
+                .responsePayload("v2/spaces/PUT_{id}_managers_{id}_response.json"));
 
         AssociateSpaceManagerRequest request = new AssociateSpaceManagerRequest()
                 .withId("test-id")
@@ -231,16 +214,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void associateManagerError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/managers/test-manager-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/managers/test-manager-id")
+                .errorResponse());
 
         AssociateSpaceManagerRequest request = new AssociateSpaceManagerRequest()
                 .withId("test-id")
@@ -256,14 +237,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void associateSecurityGroup() {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo(
-                        "https://api.run.pivotal.io/v2/spaces/test-id/security_groups/test-security-group-id"))
-                .andExpect(content().string(""))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/PUT_{id}_security_group_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/security_groups/test-security-group-id")
+                .status(OK)
+                .responsePayload("v2/spaces/PUT_{id}_security_group_{id}_response.json"));
 
         AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
                 .withId("test-id")
@@ -296,17 +273,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void associateSecurityGroupError() {
-        this.mockServer
-                .expect(requestTo(
-                        "https://api.run.pivotal.io/v2/spaces/test-id/security_groups/test-security-group-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/spaces/test-id/security_groups/test-security-group-id")
+                .errorResponse());
 
         AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
                 .withId("test-id")
@@ -322,13 +296,11 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void create() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces"))
-                .andExpect(jsonPayload(new ClassPathResource("v2/spaces/POST_request.json")))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/POST_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v2/spaces")
+                .requestPayload("v2/spaces/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/spaces/POST_response.json"));
 
         CreateSpaceRequest request = new CreateSpaceRequest()
                 .withName("development")
@@ -360,21 +332,19 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void createError() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/spaces"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v2/spaces")
+                .requestPayload("v2/spaces/POST_request.json")
+                .errorResponse());
 
         CreateSpaceRequest request = new CreateSpaceRequest()
-                .withName("test-name")
-                .withOrganizationId("test-organization-id");
+                .withName("development")
+                .withOrganizationId("c523070c-3006-4715-86dd-414afaecd949");
 
         Streams.wrap(this.spaces.create(request)).next().get();
     }
@@ -385,11 +355,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
     }
 
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/GET_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_response.json"));
 
         GetSpaceRequest request = new GetSpaceRequest()
                 .withId("test-id");
@@ -420,16 +389,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/service_instances",
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id")
+                .errorResponse());
 
         GetSpaceRequest request = new GetSpaceRequest()
                 .withId("test-id");
@@ -443,11 +410,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
     }
 
     public void getSummary() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/summary"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/GET_{id}_summary_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id/summary")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_summary_response.json"));
 
         GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
                 .withId("test-id");
@@ -525,16 +491,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
             assertNull(serviceSummary.getServicePlan().getService().getVersion());
         }
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getSummaryError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/summary"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id/summary")
+                .errorResponse());
 
         GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
                 .withId("test-id");
@@ -549,11 +513,11 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                        .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
+                        .status(OK)
+                        .responsePayload("v2/spaces/GET_response.json")
+        );
 
         ListSpacesRequest request = new ListSpacesRequest()
                 .withName("test-name")
@@ -593,16 +557,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 entity.getServiceInstancesUrl());
         assertNull(entity.getSpaceQuotaDefinitionId());
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
 
         ListSpacesRequest request = new ListSpacesRequest()
                 .withName("test-name")
@@ -613,11 +575,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
     @Test
     public void listApplications() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/spaces/GET_{id}_apps_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_apps_response.json"));
 
         ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
                 .withId("test-id")
@@ -677,16 +638,14 @@ public final class SpringSpacesTest extends AbstractRestTest {
         assertEquals("STOPPED", entity.getState());
         assertEquals("cc21d137-45d6-4687-ab71-8288ac0e5724", entity.getVersion());
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listApplicationsError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
 
         ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
                 .withId("test-id")

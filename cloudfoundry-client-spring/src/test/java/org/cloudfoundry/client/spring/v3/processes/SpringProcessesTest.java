@@ -40,7 +40,6 @@ import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public final class SpringProcessesTest extends AbstractRestTest {
 
@@ -48,8 +47,9 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test
     public void deleteInstance() {
-        mockRequest(DELETE, "https://api.run.pivotal.io/v3/processes/test-id/instances/test-index",
-                NO_CONTENT);
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/processes/test-id/instances/test-index")
+                .status(NO_CONTENT));
 
         DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
                 .withId("test-id")
@@ -57,13 +57,14 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
         Streams.wrap(this.processes.deleteInstance(request)).next().get();
 
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteInstanceError() {
-        mockRequest(DELETE, "https://api.run.pivotal.io/v3/processes/test-id/instances/test-index",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/processes/test-id/instances/test-index")
+                .errorResponse());
 
         DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
                 .withId("test-id")
@@ -79,8 +80,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/processes/test-id",
-                OK, "v3/processes/GET_{id}_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/processes/test-id")
+                .status(OK)
+                .responsePayload("v3/processes/GET_{id}_response.json"));
 
         GetProcessRequest request = new GetProcessRequest()
                 .withId("test-id");
@@ -103,13 +106,14 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:31Z", response.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/processes/test-id",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/processes/test-id")
+                .errorResponse());
 
         GetProcessRequest request = new GetProcessRequest()
                 .withId("test-id");
@@ -124,8 +128,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/processes?page=1&per_page=2",
-                OK, "v3/processes/GET_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/processes?page=1&per_page=2")
+                .status(OK)
+                .responsePayload("v3/processes/GET_response.json"));
 
         ListProcessesRequest request = new ListProcessesRequest()
                 .withPage(1)
@@ -150,13 +156,14 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), resource.getMemoryInMb());
         assertEquals("web", resource.getType());
         assertEquals("2015-07-27T22:43:31Z", resource.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/processes?page=1&per_page=2",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/processes?page=1&per_page=2")
+                .errorResponse());
 
         ListProcessesRequest request = new ListProcessesRequest()
                 .withPage(1)
@@ -172,9 +179,11 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test
     public void scale() {
-        mockRequest(PUT, "https://api.run.pivotal.io/v3/processes/test-id/scale",
-                "v3/processes/PUT_{id}_scale_request.json",
-                OK, "v3/processes/PUT_{id}_scale_response.json");
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v3/processes/test-id/scale")
+                .requestPayload("v3/processes/PUT_{id}_scale_request.json")
+                .status(OK)
+                .responsePayload("v3/processes/PUT_{id}_scale_response.json"));
 
         ScaleProcessRequest request = new ScaleProcessRequest()
                 .withDiskInMb(100)
@@ -198,14 +207,15 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(100), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:32Z", response.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void scaleError() {
-        mockRequest(PUT, "https://api.run.pivotal.io/v3/processes/test-id/scale",
-                "v3/processes/PUT_{id}_scale_request.json",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v3/processes/test-id/scale")
+                .requestPayload("v3/processes/PUT_{id}_scale_request.json")
+                .errorResponse());
 
         ScaleProcessRequest request = new ScaleProcessRequest()
                 .withDiskInMb(100)
@@ -223,8 +233,11 @@ public final class SpringProcessesTest extends AbstractRestTest {
 
     @Test
     public void update() {
-        mockRequest(PATCH, "https://api.run.pivotal.io/v3/processes/test-id", "v3/processes/PATCH_{id}_request.json",
-                OK, "v3/processes/PATCH_{id}_response.json");
+        mockRequest(new RequestContext()
+                .method(PATCH).path("/v3/processes/test-id")
+                .requestPayload("v3/processes/PATCH_{id}_request.json")
+                .status(OK)
+                .responsePayload("v3/processes/PATCH_{id}_response.json"));
 
         UpdateProcessRequest request = new UpdateProcessRequest()
                 .withId("test-id")
@@ -248,13 +261,15 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:32Z", response.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void updateError() {
-        mockRequest(PATCH, "https://api.run.pivotal.io/v3/processes/test-id", "v3/processes/PATCH_{id}_request.json",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(PATCH).path("/v3/processes/test-id")
+                .requestPayload("v3/processes/PATCH_{id}_request.json")
+                .errorResponse());
 
         UpdateProcessRequest request = new UpdateProcessRequest()
                 .withId("test-id")

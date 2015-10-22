@@ -20,7 +20,6 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
@@ -29,11 +28,8 @@ import javax.websocket.WebSocketContainer;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringLoggregatorClientTest extends AbstractRestTest {
 
@@ -49,11 +45,10 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
 
     @Test
     public void recent() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/recent?app=test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("loggregator_response.bin"))
-                        .contentType(MEDIA_TYPE));
+        mockRequest(new RequestContext()
+                .method(GET).path("/recent?app=test-id")
+                .status(OK)
+                .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin"));
 
         RecentLogsRequest request = new RecentLogsRequest()
                 .withId("test-id");
@@ -61,16 +56,14 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
         Long count = Streams.wrap(this.client.recent(request)).count().next().get();
 
         assertEquals(Long.valueOf(14), count);
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void recentError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/recent?app=test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/recent?app=test-id")
+                .errorResponse());
 
         RecentLogsRequest request = new RecentLogsRequest()
                 .withId("test-id");

@@ -19,14 +19,12 @@ package org.cloudfoundry.client.spring.v2.info;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringInfoTest extends AbstractRestTest {
 
@@ -34,10 +32,10 @@ public final class SpringInfoTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/info"))
-                .andRespond(withSuccess(new ClassPathResource("v2/info/GET_response.json"),
-                        MediaType.APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/info")
+                .status(OK)
+                .responsePayload("v2/info/GET_response.json"));
 
         GetInfoResponse response = Streams.wrap(this.info.get()).next().get();
 
@@ -57,7 +55,7 @@ public final class SpringInfoTest extends AbstractRestTest {
         assertNull(response.getUser());
         assertEquals(Integer.valueOf(2), response.getVersion());
 
-        this.mockServer.verify();
+        verify();
     }
 
 }

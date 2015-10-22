@@ -39,7 +39,6 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public final class SpringDropletsTest extends AbstractRestTest {
 
@@ -47,21 +46,23 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void delete() {
-        mockRequest(DELETE, "https://api.run.pivotal.io/v3/droplets/test-id",
-                NO_CONTENT);
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/droplets/test-id")
+                .status(NO_CONTENT));
 
         DeleteDropletRequest request = new DeleteDropletRequest()
                 .withId("test-id");
 
         Streams.wrap(this.droplets.delete(request)).next().get();
 
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
-        mockRequest(DELETE, "https://api.run.pivotal.io/v3/droplets/test-id",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/droplets/test-id")
+                .errorResponse());
 
         DeleteDropletRequest request = new DeleteDropletRequest()
                 .withId("test-id");
@@ -76,8 +77,10 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets/test-id",
-                OK, "v3/droplets/GET_{id}_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/droplets/test-id")
+                .status(OK)
+                .responsePayload("v3/droplets/GET_{id}_response.json"));
 
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
@@ -104,13 +107,14 @@ public final class SpringDropletsTest extends AbstractRestTest {
         assertNull(response.getProcfile());
         assertEquals("PENDING", response.getState());
         assertNull(response.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets/test-id",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/droplets/test-id")
+                .errorResponse());
 
         GetDropletRequest request = new GetDropletRequest()
                 .withId("test-id");
@@ -125,8 +129,10 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets",
-                OK, "v3/droplets/GET_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/droplets")
+                .status(OK)
+                .responsePayload("v3/droplets/GET_response.json"));
 
         ListDropletsRequest request = new ListDropletsRequest();
         ListDropletsResponse response = Streams.wrap(this.droplets.list(request)).next().get();
@@ -157,13 +163,14 @@ public final class SpringDropletsTest extends AbstractRestTest {
         assertNull(resource.getProcfile());
         assertEquals("STAGING", resource.getState());
         assertNull(resource.getUpdatedAt());
-        verifyMockServer();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        mockRequest(GET, "https://api.run.pivotal.io/v3/droplets",
-                UNPROCESSABLE_ENTITY, "v2/error_response.json");
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/droplets")
+                .errorResponse());
 
         ListDropletsRequest request = new ListDropletsRequest();
 

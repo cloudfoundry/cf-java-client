@@ -24,7 +24,6 @@ import org.cloudfoundry.client.v2.organizations.auditors.AuditorResource.Auditor
 import org.cloudfoundry.client.v2.organizations.auditors.CreateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.auditors.CreateAuditorResponse;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.io.IOException;
@@ -34,11 +33,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringAuditorsTest extends AbstractRestTest {
 
@@ -46,13 +40,10 @@ public final class SpringAuditorsTest extends AbstractRestTest {
 
     @Test
     public void create() throws IOException {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/organizations/83c4fac5-cd9e-41ee-96df" +
-                        "-b4f50fff4aef/auditors/uaa-id-71"))
-                .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v2/organizations/auditors/PUT_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
+                .status(CREATED)
+                .responsePayload("v2/organizations/auditors/PUT_{id}_response.json"));
 
         CreateAuditorRequest request = new CreateAuditorRequest()
                 .withAuditorId("uaa-id-71")
@@ -86,18 +77,15 @@ public final class SpringAuditorsTest extends AbstractRestTest {
         assertEquals("active", entity.getStatus());
         assertEquals("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/users", entity.getUsersUrl());
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void createError() throws IOException {
-        this.mockServer
-                .expect(method(PUT))
-                .andExpect(requestTo("https://api.run.pivotal.io/v2/organizations/83c4fac5-cd9e-41ee-96df" +
-                        "-b4f50fff4aef/auditors/uaa-id-71"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
+                .errorResponse());
 
         CreateAuditorRequest request = new CreateAuditorRequest()
                 .withAuditorId("uaa-id-71")

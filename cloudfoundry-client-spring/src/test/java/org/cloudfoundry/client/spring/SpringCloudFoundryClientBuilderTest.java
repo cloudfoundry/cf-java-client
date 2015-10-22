@@ -18,8 +18,7 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
+import org.mockito.Mockito;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
@@ -29,10 +28,9 @@ import java.security.GeneralSecurityException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest {
 
@@ -43,9 +41,10 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
 
     @Test
     public void test() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/info"))
-                .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/info")
+                .status(OK)
+                .responsePayload("info_GET_response.json"));
 
         SpringCloudFoundryClient client = this.builder
                 .withApi("api.run.pivotal.io")
@@ -59,14 +58,15 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
         assertEquals("test-client-id", details.getClientId());
         assertEquals("test-client-secret", details.getClientSecret());
         assertEquals("https://uaa.run.pivotal.io/oauth/token", details.getAccessTokenUri());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test
     public void skipSslValidationTrue() throws GeneralSecurityException, IOException {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/info"))
-                .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/info")
+                .status(OK)
+                .responsePayload("info_GET_response.json"));
 
         this.builder
                 .withApi("api.run.pivotal.io")
@@ -74,14 +74,15 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
                 .withSkipSslValidation(true)
                 .build();
 
-        verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
+        Mockito.verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
     }
 
     @Test
     public void skipSslValidationFalse() throws GeneralSecurityException, IOException {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/info"))
-                .andRespond(withSuccess(new ClassPathResource("info_GET_response.json"), MediaType.APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/info")
+                .status(OK)
+                .responsePayload("info_GET_response.json"));
 
         this.builder
                 .withApi("api.run.pivotal.io")
