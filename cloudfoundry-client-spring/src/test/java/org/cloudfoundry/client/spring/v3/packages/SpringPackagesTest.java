@@ -40,24 +40,18 @@ import reactor.rx.Streams;
 import java.io.IOException;
 import java.util.Collections;
 
-import static org.cloudfoundry.client.spring.ContentMatchers.jsonPayload;
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringPackagesTest extends AbstractRestTest {
 
@@ -65,14 +59,10 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void copy() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id"))
-                .andExpect(content().string(""))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
+                .status(OK)
+                .responsePayload("v3/apps/POST_{id}_packages_response.json"));
 
         CopyPackageRequest request = new CopyPackageRequest()
                 .withApplicationId("test-application-id")
@@ -96,18 +86,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("docker", response.getType());
         assertNull(response.getUpdatedAt());
         assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void copyError() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal" +
-                        ".io/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
+                .errorResponse());
 
         CopyPackageRequest request = new CopyPackageRequest()
                 .withApplicationId("test-application-id")
@@ -123,13 +109,11 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void create() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_{id}_packages_request.json")))
-                .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v3/apps/POST_{id}_packages_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/apps/test-application-id/packages")
+                .requestPayload("v3/apps/POST_{id}_packages_request.json")
+                .status(CREATED)
+                .responsePayload("v3/apps/POST_{id}_packages_response.json"));
 
         CreatePackageRequest request = new CreatePackageRequest()
                 .withApplicationId("test-application-id")
@@ -154,18 +138,15 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("docker", response.getType());
         assertNull(response.getUpdatedAt());
         assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void createError() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/apps/test-application-id/packages"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/apps/POST_{id}_packages_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/apps/test-application-id/packages")
+                .requestPayload("v3/apps/POST_{id}_packages_request.json")
+                .errorResponse());
 
         CreatePackageRequest request = new CreatePackageRequest()
                 .withApplicationId("test-application-id")
@@ -182,27 +163,23 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void delete() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
-                .andRespond(withStatus(OK));
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/packages/test-id")
+                .status(OK));
 
         DeletePackageRequest request = new DeletePackageRequest()
                 .withId("test-id");
 
         Streams.wrap(this.packages.delete(request)).next().get();
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
-        this.mockServer
-                .expect(method(DELETE))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v3/packages/test-id")
+                .errorResponse());
 
         DeletePackageRequest request = new DeletePackageRequest()
                 .withId("test-id");
@@ -217,11 +194,10 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/packages/GET_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/packages/test-id")
+                .status(OK)
+                .responsePayload("v3/packages/GET_{id}_response.json"));
 
         GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
@@ -247,16 +223,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("bits", response.getType());
         assertNull(response.getUpdatedAt());
         assertNull(response.getUrl());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/packages/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/packages/test-id")
+                .errorResponse());
 
         GetPackageRequest request = new GetPackageRequest()
                 .withId("test-id");
@@ -271,11 +245,10 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/packages"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v3/packages/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/packages")
+                .status(OK)
+                .responsePayload("v3/packages/GET_response.json"));
 
         ListPackagesRequest request = new ListPackagesRequest();
         ListPackagesResponse response = Streams.wrap(this.packages.list(request)).next().get();
@@ -299,16 +272,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("bits", resource.getType());
         assertNull(resource.getUpdatedAt());
         assertNull(resource.getUrl());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v3/packages"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/packages")
+                .errorResponse());
 
         ListPackagesRequest request = new ListPackagesRequest();
 
@@ -322,13 +293,11 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void stage() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/droplets"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_{id}_droplets_request.json")))
-                .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v3/packages/POST_{id}_droplets_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/packages/test-id/droplets")
+                .requestPayload("v3/packages/POST_{id}_droplets_request.json")
+                .status(CREATED)
+                .responsePayload("v3/packages/POST_{id}_droplets_response.json"));
 
         StagePackageRequest request = new StagePackageRequest()
                 .withBuildpack("http://github.com/myorg/awesome-buildpack")
@@ -358,18 +327,15 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertNull(response.getProcfile());
         assertEquals("STAGED", response.getState());
         assertNull(response.getUpdatedAt());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void stageError() {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/droplets"))
-                .andExpect(jsonPayload(new ClassPathResource("v3/packages/POST_{id}_droplets_request.json")))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/packages/test-id/droplets")
+                .requestPayload("v3/packages/POST_{id}_droplets_request.json")
+                .errorResponse());
 
         StagePackageRequest request = new StagePackageRequest()
                 .withBuildpack("http://github.com/myorg/awesome-buildpack")
@@ -387,13 +353,12 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
     @Test
     public void upload() throws IOException {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/upload"))
-                .andExpect(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
-                .andRespond(withStatus(CREATED)
-                        .body(new ClassPathResource("v3/packages/POST_{id}_upload_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/packages/test-id/upload")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .status(CREATED)
+                .responsePayload("v3/packages/POST_{id}_upload_response.json"));
 
         UploadPackageRequest request = new UploadPackageRequest()
                 .withFile(new ClassPathResource("v3/packages/test-file").getFile())
@@ -420,18 +385,16 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("bits", response.getType());
         assertEquals("2015-08-06T00:36:55Z", response.getUpdatedAt());
         assertNull(response.getUrl());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void uploadError() throws IOException {
-        this.mockServer
-                .expect(method(POST))
-                .andExpect(requestTo("https://api.run.pivotal.io/v3/packages/test-id/upload"))
-                .andExpect(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(POST).path("/v3/packages/test-id/upload")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .errorResponse());
 
         UploadPackageRequest request = new UploadPackageRequest()
                 .withFile(new ClassPathResource("v3/packages/test-file").getFile())

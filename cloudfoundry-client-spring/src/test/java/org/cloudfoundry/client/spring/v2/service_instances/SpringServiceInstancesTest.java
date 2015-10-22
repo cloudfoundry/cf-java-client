@@ -23,7 +23,6 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse.ListServiceInstancesResponseEntity;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Arrays;
@@ -31,11 +30,8 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringServiceInstancesTest extends AbstractRestTest {
 
@@ -43,11 +39,10 @@ public final class SpringServiceInstancesTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/service_instances?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/service_instances/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
+                .status(OK)
+                .responsePayload("v2/service_instances/GET_response.json"));
 
         ListServiceInstancesRequest request = new ListServiceInstancesRequest()
                 .withName("test-name")
@@ -93,16 +88,14 @@ public final class SpringServiceInstancesTest extends AbstractRestTest {
         assertEquals("/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19", entity.getSpaceUrl());
         assertEquals(Arrays.asList("accounting", "mongodb"), entity.getTags());
         assertEquals("managed_service_instance", entity.getType());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/service_instances?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
 
         ListServiceInstancesRequest request = new ListServiceInstancesRequest()
                 .withName("test-name")

@@ -25,18 +25,14 @@ import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringEventsTest extends AbstractRestTest {
 
@@ -44,11 +40,10 @@ public final class SpringEventsTest extends AbstractRestTest {
 
     @Test
     public void get() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/events/test-id"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/events/GET_{id}_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/events/test-id")
+                .status(OK)
+                .responsePayload("v2/events/GET_{id}_response.json"));
 
         GetEventRequest request = new GetEventRequest()
                 .withId("test-id");
@@ -74,16 +69,14 @@ public final class SpringEventsTest extends AbstractRestTest {
         assertEquals("dcb0dcdd-5236-4af3-abc2-1ab0ff424794", entity.getSpaceId());
         assertEquals("2015-07-27T22:43:23Z", entity.getTimestamp());
         assertEquals("name-1010", entity.getType());
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void getError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/events/test-id"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/events/test-id")
+                .errorResponse());
 
         GetEventRequest request = new GetEventRequest()
                 .withId("test-id");
@@ -98,11 +91,10 @@ public final class SpringEventsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/events?q=actee%20IN%20test-actee&page=-1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/events/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
+                .status(OK)
+                .responsePayload("v2/events/GET_response.json"));
 
         ListEventsRequest request = new ListEventsRequest()
                 .withActee("test-actee")
@@ -137,16 +129,14 @@ public final class SpringEventsTest extends AbstractRestTest {
         assertEquals("2015-07-27T22:43:23Z", entity.getTimestamp());
         assertEquals("name-1034", entity.getType());
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/events?q=actee%20IN%20test-actee&page=-1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
+                .errorResponse());
 
         ListEventsRequest request = new ListEventsRequest()
                 .withActee("test-actee")

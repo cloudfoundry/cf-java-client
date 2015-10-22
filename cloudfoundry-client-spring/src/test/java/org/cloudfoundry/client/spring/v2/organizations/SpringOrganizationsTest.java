@@ -24,17 +24,13 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseResource;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public final class SpringOrganizationsTest extends AbstractRestTest {
 
@@ -42,11 +38,10 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
 
     @Test
     public void list() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/organizations?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(OK)
-                        .body(new ClassPathResource("v2/organizations/GET_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_response.json"));
 
         ListOrganizationsRequest request = new ListOrganizationsRequest()
                 .withName("test-name")
@@ -89,16 +84,14 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         assertEquals("active", entity.getStatus());
         assertEquals("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/users", entity.getUsersUrl());
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
     public void listError() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/organizations?q=name%20IN%20test-name&page=-1"))
-                .andRespond(withStatus(UNPROCESSABLE_ENTITY)
-                        .body(new ClassPathResource("v2/error_response.json"))
-                        .contentType(APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
 
         ListOrganizationsRequest request = new ListOrganizationsRequest()
                 .withName("test-name")

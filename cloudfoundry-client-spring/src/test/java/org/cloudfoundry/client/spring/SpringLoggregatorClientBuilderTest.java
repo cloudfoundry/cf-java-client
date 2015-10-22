@@ -17,14 +17,12 @@
 package org.cloudfoundry.client.spring;
 
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
 
 import javax.websocket.WebSocketContainer;
 
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringLoggregatorClientBuilderTest extends AbstractRestTest {
 
@@ -37,16 +35,16 @@ public final class SpringLoggregatorClientBuilderTest extends AbstractRestTest {
 
     @Test
     public void test() {
-        this.mockServer
-                .expect(requestTo("https://api.run.pivotal.io/v2/info"))
-                .andRespond(withSuccess(new ClassPathResource("v2/info/GET_response.json"),
-                        MediaType.APPLICATION_JSON));
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/info")
+                .status(OK)
+                .responsePayload("v2/info/GET_response.json"));
 
         this.builder
                 .withCloudFoundryClient(this.cloudFoundryClient)
                 .build();
 
-        this.mockServer.verify();
+        verify();
     }
 
     @Test
