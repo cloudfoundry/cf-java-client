@@ -64,6 +64,7 @@ public final class ListOrganizationsResponseTest {
         ListOrganizationsResponse response = new ListOrganizationsResponse()
                 .withResource(resource);
 
+        assertTrue(response.getResources() != null && response.getResources().size() == 1);
         assertEquals(entity, response.getResources().get(0).getEntity());
     }
 

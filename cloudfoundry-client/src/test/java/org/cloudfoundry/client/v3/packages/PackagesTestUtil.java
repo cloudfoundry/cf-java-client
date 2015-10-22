@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.packages;
 
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse.Resource;
-import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListApplicationPackagesResponseTest {
+final class PackagesTestUtil {
 
-    @Test
-    public void test() {
-        Hash hash = ApplicationsTestUtil.getHash();
-        Map<String, Link> links = ApplicationsTestUtil.getLinks();
+    static <T extends Package<T>> void test(Package<T> response) {
+        Hash hash = new Hash()
+                .withType("test-type")
+                .withValue("test-value");
 
-        Resource resource = new Resource()
-                .withCreatedAt("test-created-at")
+        assertEquals("test-type", hash.getType());
+        assertEquals("test-value", hash.getValue());
+
+        Map<String, Link> links = new HashMap<>();
+        links.put("test-link-1", new Link());
+        links.put("test-link-2", new Link());
+
+        response.withCreatedAt("test-created-at")
                 .withError("test-error")
                 .withHash(hash)
                 .withId("test-id")
@@ -45,16 +50,14 @@ public final class ListApplicationPackagesResponseTest {
                 .withUpdatedAt("test-updated-at")
                 .withUrl("test-url");
 
-        assertEquals("test-created-at", resource.getCreatedAt());
-        assertEquals("test-error", resource.getError());
-        assertEquals(hash, resource.getHash());
-        assertEquals("test-id", resource.getId());
-        assertEquals(links, resource.getLinks());
-        assertEquals("test-state", resource.getState());
-        assertEquals("test-type", resource.getType());
-        assertEquals("test-updated-at", resource.getUpdatedAt());
-        assertEquals("test-url", resource.getUrl());
-
+        assertEquals("test-created-at", response.getCreatedAt());
+        assertEquals("test-error", response.getError());
+        assertEquals(hash, response.getHash());
+        assertEquals("test-id", response.getId());
+        assertEquals(links, response.getLinks());
+        assertEquals("test-state", response.getState());
+        assertEquals("test-type", response.getType());
+        assertEquals("test-updated-at", response.getUpdatedAt());
+        assertEquals("test-url", response.getUrl());
     }
-
 }

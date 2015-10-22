@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -67,9 +68,11 @@ public class ListSpaceApplicationsResponseTest {
         ListSpaceApplicationsResponse response = new ListSpaceApplicationsResponse()
                 .withResource(resource);
 
-        assertEquals(Collections.singletonList(resource), response.getResources());
+        List<ListSpaceApplicationsResponse.Resource> resources = response.getResources();
+        assertTrue(null != resources && resources.size() == 1);
 
-        ApplicationEntity entityOut = response.getResources().get(0).getEntity();
+        assertTrue(response.getResources() != null && response.getResources().size() == 1);
+        ApplicationEntity entityOut = resources.get(0).getEntity();
 
         assertTrue(entityOut.getDiego());
         assertTrue(entityOut.getEnableSsh());

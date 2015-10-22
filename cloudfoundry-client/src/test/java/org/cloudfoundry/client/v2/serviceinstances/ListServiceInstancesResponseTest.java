@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class ListServiceInstancesResponseTest {
 
@@ -88,6 +89,7 @@ public final class ListServiceInstancesResponseTest {
         ListServiceInstancesResponse response = new ListServiceInstancesResponse()
                 .withResource(resource);
 
+        assertTrue(response.getResources() != null && response.getResources().size() == 1);
         assertEquals(entity, response.getResources().get(0).getEntity());
     }
 

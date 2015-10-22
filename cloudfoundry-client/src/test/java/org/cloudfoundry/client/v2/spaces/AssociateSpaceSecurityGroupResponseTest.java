@@ -19,49 +19,15 @@ package org.cloudfoundry.client.v2.spaces;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public final class AssociateSpaceSecurityGroupResponseTest {
 
     @Test
     public void test() {
-        AssociateSpaceSecurityGroupResponse.SpaceEntity entity = new AssociateSpaceSecurityGroupResponse.SpaceEntity()
-                .allowSsh(true)
-                .withApplicationEventsUrl("test-application-events-url")
-                .withApplicationsUrl("test-applications-url")
-                .withAuditorsUrl("test-auditors-url")
-                .withDevelopersUrl("test-developers-url")
-                .withDomainsUrl("test-domains-url")
-                .withEventsUrl("test-events-url")
-                .withManagersUrl("test-managers-url")
-                .withName("test-name")
-                .withOrganizationId("test-organization-id")
-                .withOrganizationUrl("test-organization-url")
-                .withRoutesUrl("test-routes-url")
-                .withSecurityGroupsUrl("test-security-groups-url")
-                .withServiceInstancesUrl("test-service-instances-url")
-                .withSpaceQuotaDefinitionId("test-space-quota-definition-id");
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("test-application-events-url", entity.getApplicationEventsUrl());
-        assertEquals("test-applications-url", entity.getApplicationsUrl());
-        assertEquals("test-auditors-url", entity.getAuditorsUrl());
-        assertEquals("test-developers-url", entity.getDevelopersUrl());
-        assertEquals("test-domains-url", entity.getDomainsUrl());
-        assertEquals("test-events-url", entity.getEventsUrl());
-        assertEquals("test-managers-url", entity.getManagersUrl());
-        assertEquals("test-name", entity.getName());
-        assertEquals("test-organization-id", entity.getOrganizationId());
-        assertEquals("test-organization-url", entity.getOrganizationUrl());
-        assertEquals("test-routes-url", entity.getRoutesUrl());
-        assertEquals("test-security-groups-url", entity.getSecurityGroupsUrl());
-        assertEquals("test-service-instances-url", entity.getServiceInstancesUrl());
-        assertEquals("test-space-quota-definition-id", entity.getSpaceQuotaDefinitionId());
-
         AssociateSpaceSecurityGroupResponse response = new AssociateSpaceSecurityGroupResponse()
-                .withEntity(entity);
+                .withEntity(SpacesTestUtil.entity());
 
-        assertEquals(entity, response.getEntity());
+        SpacesTestUtil.verify(response.getEntity());
     }
 
 }

@@ -16,44 +16,13 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.cloudfoundry.client.v3.Link;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public final class UpdateProcessResponseTest {
 
     @Test
     public void test() {
-        Map<String, Link> links = new HashMap<>();
-        links.put("test-link-1", new Link());
-        links.put("test-link-2", new Link());
-
-        UpdateProcessResponse response = new UpdateProcessResponse()
-                .withCreatedAt("test-created-at")
-                .withCommand("test-command")
-                .withDiskInMb(400)
-                .withId("test-id")
-                .withLink("test-link-1", links.get("test-link-1"))
-                .withLinks(Collections.singletonMap("test-link-2", links.get("test-link-2")))
-                .withInstances(3)
-                .withMemoryInMb(1024)
-                .withType("web")
-                .withUpdatedAt("test-updated-at");
-
-        assertEquals("test-created-at", response.getCreatedAt());
-        assertEquals("test-command", response.getCommand());
-        assertEquals(Integer.valueOf(400), response.getDiskInMb());
-        assertEquals("test-id", response.getId());
-        assertEquals(links, response.getLinks());
-        assertEquals(Integer.valueOf(3), response.getInstances());
-        assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
-        assertEquals("web", response.getType());
-        assertEquals("test-updated-at", response.getUpdatedAt());
+        ProcessesTestUtil.test(new UpdateProcessResponse());
     }
 
 }

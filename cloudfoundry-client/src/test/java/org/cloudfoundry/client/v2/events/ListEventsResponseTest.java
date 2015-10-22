@@ -19,53 +19,20 @@ package org.cloudfoundry.client.v2.events;
 import org.cloudfoundry.client.v2.events.ListEventsResponse.ListEventsResponseResource;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class ListEventsResponseTest {
 
     @Test
     public void test() {
-        ListEventsResponseResource.EventEntity entity = new ListEventsResponseResource.EventEntity()
-                .withActee("test-actee")
-                .withActeeName("test-actee-name")
-                .withActeeType("test-actee-type")
-                .withActor("test-actor")
-                .withActorName("test-actor-name")
-                .withActorType("test-actor-type")
-                .withMetadata("test-key-1", "test-value-1")
-                .withMetadatas(Collections.singletonMap("test-key-2", "test-value-2"))
-                .withOrganizationId("test-organization-id")
-                .withSpaceId("test-space-id")
-                .withTimestamp("test-timestamp")
-                .withType("test-type");
-
-        Map<String, String> metadatas = new HashMap<>();
-        metadatas.put("test-key-1", "test-value-1");
-        metadatas.put("test-key-2", "test-value-2");
-
-        assertEquals("test-actee", entity.getActee());
-        assertEquals("test-actee-name", entity.getActeeName());
-        assertEquals("test-actee-type", entity.getActeeType());
-        assertEquals("test-actor", entity.getActor());
-        assertEquals("test-actor-name", entity.getActorName());
-        assertEquals("test-actor-type", entity.getActorType());
-        assertEquals(metadatas, entity.getMetadatas());
-        assertEquals("test-organization-id", entity.getOrganizationId());
-        assertEquals("test-space-id", entity.getSpaceId());
-        assertEquals("test-timestamp", entity.getTimestamp());
-        assertEquals("test-type", entity.getType());
-
         ListEventsResponseResource resource = new ListEventsResponseResource()
-                .withEntity(entity);
+                .withEntity(EventsTestUtil.entity());
 
         ListEventsResponse response = new ListEventsResponse()
                 .withResource(resource);
 
-        assertEquals(entity, response.getResources().get(0).getEntity());
+        assertTrue(response.getResources() != null && response.getResources().size() == 1);
+        EventsTestUtil.verify(response.getResources().get(0).getEntity());
     }
 
 }

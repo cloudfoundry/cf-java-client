@@ -14,28 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.droplets;
 
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse.Resource;
-import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public final class ListApplicationDropletsResponseTest {
+final class DropletsTestUtil {
 
-    @Test
-    public void test() {
-        Hash hash = ApplicationsTestUtil.getHash();
-        Map<String, String> environmentVariables = ApplicationsTestUtil.getEnvironment();
-        Map<String, Link> links = ApplicationsTestUtil.getLinks();
+    static <T extends Droplet<T>> void test(Droplet<T> response) {
+        Map<String, String> environmentVariables = new HashMap<>();
+        environmentVariables.put("test-key-1", "test-value-1");
+        environmentVariables.put("test-key-2", "test-value-2");
 
-        Resource resource = new Resource()
-                .withBuildpack("test-buildpack")
+        Hash hash = new Hash();
+
+        Map<String, Link> links = new HashMap<>();
+        links.put("test-link-1", new Link());
+        links.put("test-link-2", new Link());
+
+        response.withBuildpack("test-buildpack")
                 .withCreatedAt("test-created-at")
                 .withEnvironmentVariable("test-key-1", environmentVariables.get("test-key-1"))
                 .withEnvironmentVariables(Collections.singletonMap("test-key-2",
@@ -49,17 +52,15 @@ public final class ListApplicationDropletsResponseTest {
                 .withState("test-state")
                 .withUpdatedAt("test-updated-at");
 
-        assertEquals("test-buildpack", resource.getBuildpack());
-        assertEquals("test-created-at", resource.getCreatedAt());
-        assertEquals(environmentVariables, resource.getEnvironmentVariables());
-        assertEquals("test-error", resource.getError());
-        assertEquals(hash, resource.getHash());
-        assertEquals("test-id", resource.getId());
-        assertEquals(links, resource.getLinks());
-        assertEquals("test-procfile", resource.getProcfile());
-        assertEquals("test-state", resource.getState());
-        assertEquals("test-updated-at", resource.getUpdatedAt());
-
+        assertEquals("test-buildpack", response.getBuildpack());
+        assertEquals("test-created-at", response.getCreatedAt());
+        assertEquals(environmentVariables, response.getEnvironmentVariables());
+        assertEquals("test-error", response.getError());
+        assertEquals(hash, response.getHash());
+        assertEquals("test-id", response.getId());
+        assertEquals(links, response.getLinks());
+        assertEquals("test-procfile", response.getProcfile());
+        assertEquals("test-state", response.getState());
+        assertEquals("test-updated-at", response.getUpdatedAt());
     }
-
 }
