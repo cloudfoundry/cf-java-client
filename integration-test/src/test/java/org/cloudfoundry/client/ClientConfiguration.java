@@ -25,11 +25,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import reactor.rx.Streams;
 
 @Configuration
 @EnableAutoConfiguration
-class ClientConfiguration {
+@Lazy
+public class ClientConfiguration {
 
     @Bean
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,

@@ -21,13 +21,15 @@ import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import reactor.rx.Streams;
 
-@SpringBootApplication
+@Configuration
+@EnableAutoConfiguration
 public class DeleteServices {
 
     public static void main(String[] args) {
