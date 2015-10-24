@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class ListApplicationPackagesRequestTest {
 
     @Test
-    public void test() {
-        ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ListApplicationPackagesRequest()
-                .withId("test-id")
+        ValidationResult result = ListApplicationPackagesRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class ListApplicationPackagesRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new ListApplicationPackagesRequest()
+        ValidationResult result = ListApplicationPackagesRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -53,8 +47,9 @@ public final class ListApplicationPackagesRequestTest {
 
     @Test
     public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = new ListApplicationPackagesRequest()
-                .withPage(0)
+        ValidationResult result = ListApplicationPackagesRequest.builder()
+                .page(0)
+                .build()
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());

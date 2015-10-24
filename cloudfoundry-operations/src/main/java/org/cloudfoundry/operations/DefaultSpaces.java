@@ -39,9 +39,10 @@ final class DefaultSpaces extends AbstractOperations implements Spaces {
         String organizationId = this.organizationId
                 .orElseThrow(() -> new IllegalStateException("No organization targeted"));
 
-        return paginate(() -> new ListSpacesRequest().withOrganizationId(organizationId),
+        return paginate(page -> ListSpacesRequest.builder().organizationId(organizationId).page(page).build(),
                 request -> this.cloudFoundryClient.spaces().list(request))
                 .flatMap(r -> Streams.from(r.getResources()))
-                .map(resource -> new Space(resource.getMetadata().getId(), resource.getEntity().getName()));
+                .map(resource -> Space.builder().id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName()).build());
     }
 }

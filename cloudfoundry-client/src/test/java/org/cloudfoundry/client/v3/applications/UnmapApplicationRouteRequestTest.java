@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class UnmapApplicationRouteRequestTest {
 
     @Test
-    public void test() {
-        UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("test-route-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-route-id", request.getRouteId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new UnmapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("test-route-id")
+        ValidationResult result = UnmapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class UnmapApplicationRouteRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new UnmapApplicationRouteRequest()
-                .withRouteId("test-route-id")
+        ValidationResult result = UnmapApplicationRouteRequest.builder()
+                .routeId("test-route-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class UnmapApplicationRouteRequestTest {
 
     @Test
     public void isValidNoRouteId() {
-        ValidationResult result = new UnmapApplicationRouteRequest()
-                .withId("test-id")
+        ValidationResult result = UnmapApplicationRouteRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

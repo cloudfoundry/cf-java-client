@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class RecentLogsRequestTest {
 
     @Test
-    public void test() {
-        RecentLogsRequest request = new RecentLogsRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new RecentLogsRequest()
-                .withId("test-id")
+        ValidationResult result = RecentLogsRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class RecentLogsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new RecentLogsRequest()
+        ValidationResult result = RecentLogsRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

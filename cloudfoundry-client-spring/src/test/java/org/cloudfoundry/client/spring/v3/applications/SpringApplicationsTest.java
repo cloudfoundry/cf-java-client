@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v3.applications;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -61,8 +63,10 @@ import java.util.Map;
 
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
 import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.ASC;
+import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
+import static org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse.Resource;
+import static org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse.builder;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -84,22 +88,50 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/PUT_{id}_current_droplet_response.json"));
 
-        AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
-                .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
-                .withId("test-id");
+        AssignApplicationDropletRequest request = AssignApplicationDropletRequest.builder()
+                .dropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
+                .id("test-id")
+                .build();
 
-        AssignApplicationDropletResponse response = Streams.wrap(this.applications.assignDroplet(request)).next().get();
+        AssignApplicationDropletResponse expected = AssignApplicationDropletResponse.builder()
+                .id("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a")
+                .name("name1")
+                .desiredState("STOPPED")
+                .totalDesiredInstances(1)
+                .createdAt("2015-07-27T22:43:15Z")
+                .updatedAt("2015-07-27T22:43:15Z")
+                .link("self", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/7f5329b4-ab5b-404f-a0dd-6dbdedb6f742")
+                        .build())
+                .link("droplet", Link.builder()
+                        .href("/v3/droplets/guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertNull(response.getBuildpack());
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertEquals("STOPPED", response.getDesiredState());
-        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-        assertEquals("guid-9f33c9e4-4b31-4dda-b188-adf197dbea0a", response.getId());
-        assertEquals("name1", response.getName());
-        assertEquals(Integer.valueOf(1), response.getTotalDesiredInstances());
-        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "droplet", "space", "start", "stop",
-                "assign_current_droplet");
+        AssignApplicationDropletResponse actual = Streams.wrap(this.applications.assignDroplet(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -111,16 +143,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                         .errorResponse()
         );
 
-        AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
-                .withDropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
-                .withId("test-id");
+        AssignApplicationDropletRequest request = AssignApplicationDropletRequest.builder()
+                .dropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.assignDroplet(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void assignDropletInvalidRequest() {
-        Streams.wrap(this.applications.assignDroplet(new AssignApplicationDropletRequest())).next().get();
+        AssignApplicationDropletRequest request = AssignApplicationDropletRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.assignDroplet(request)).next().get();
     }
 
     @Test
@@ -131,23 +167,50 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(CREATED)
                 .responsePayload("v3/apps/POST_response.json"));
 
-        CreateApplicationRequest request = new CreateApplicationRequest()
-                .withName("my_app")
-                .withSpaceId("31627bdc-5bc4-4c4d-a883-c7b2f53db249")
-                .withEnvironmentVariable("open", "source")
-                .withBuildpack("name-410");
+        CreateApplicationRequest request = CreateApplicationRequest.builder()
+                .name("my_app")
+                .spaceId("31627bdc-5bc4-4c4d-a883-c7b2f53db249")
+                .environmentVariable("open", "source")
+                .buildpack("name-410")
+                .build();
 
-        CreateApplicationResponse response = Streams.wrap(this.applications.create(request)).next().get();
+        CreateApplicationResponse expected = CreateApplicationResponse.builder()
+                .id("8b51db6f-7bae-47ca-bc75-74bc957ed460")
+                .name("my_app")
+                .desiredState("STOPPED")
+                .totalDesiredInstances(0)
+                .buildpack("name-410")
+                .createdAt("2015-07-27T22:43:15Z")
+                .environmentVariable("open", "source")
+                .link("self", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/31627bdc-5bc4-4c4d-a883-c7b2f53db249")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/8b51db6f-7bae-47ca-bc75-74bc957ed460/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertEquals("name-410", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertEquals("STOPPED", response.getDesiredState());
-        assertEquals(Collections.singletonMap("open", "source"), response.getEnvironmentVariables());
-        assertEquals("8b51db6f-7bae-47ca-bc75-74bc957ed460", response.getId());
-        assertEquals("my_app", response.getName());
-        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-        assertNull(response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        CreateApplicationResponse actual = Streams.wrap(this.applications.create(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -158,18 +221,22 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/POST_request.json")
                 .errorResponse());
 
-        CreateApplicationRequest request = new CreateApplicationRequest()
-                .withName("my_app")
-                .withSpaceId("31627bdc-5bc4-4c4d-a883-c7b2f53db249")
-                .withEnvironmentVariable("open", "source")
-                .withBuildpack("name-410");
+        CreateApplicationRequest request = CreateApplicationRequest.builder()
+                .name("my_app")
+                .spaceId("31627bdc-5bc4-4c4d-a883-c7b2f53db249")
+                .environmentVariable("open", "source")
+                .buildpack("name-410")
+                .build();
 
         Streams.wrap(this.applications.create(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() throws Throwable {
-        Streams.wrap(this.applications.create(new CreateApplicationRequest())).next().get();
+        CreateApplicationRequest request = CreateApplicationRequest
+                .builder().build();
+
+        Streams.wrap(this.applications.create(request)).next().get();
     }
 
     @Test
@@ -178,8 +245,9 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/apps/test-id")
                 .status(NO_CONTENT));
 
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId("test-id");
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.delete(request)).next().get();
 
@@ -192,15 +260,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/apps/test-id")
                 .errorResponse());
 
-        DeleteApplicationRequest request = new DeleteApplicationRequest()
-                .withId("test-id");
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.delete(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteInvalidRequest() {
-        Streams.wrap(this.applications.delete(new DeleteApplicationRequest())).next().get();
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.delete(request)).next().get();
     }
 
     @Test
@@ -209,10 +281,11 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/apps/test-id/processes/test-type/instances/test-index")
                 .status(NO_CONTENT));
 
-        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
-                .withType("test-type");
+        DeleteApplicationInstanceRequest request = DeleteApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index("test-index")
+                .type("test-type")
+                .build();
 
         Streams.wrap(this.applications.deleteInstance(request)).next().get();
 
@@ -225,17 +298,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/apps/test-id/processes/test-type/instances/test-index")
                 .errorResponse());
 
-        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
-                .withType("test-type");
+        DeleteApplicationInstanceRequest request = DeleteApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index("test-index")
+                .type("test-type")
+                .build();
 
         Streams.wrap(this.applications.deleteInstance(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteProcessInvalidRequest() {
-        Streams.wrap(this.applications.deleteInstance(new DeleteApplicationInstanceRequest())).next().get();
+        DeleteApplicationInstanceRequest request = DeleteApplicationInstanceRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.deleteInstance(request)).next().get();
     }
 
     @Test
@@ -245,21 +322,50 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_response.json"));
 
-        GetApplicationRequest request = new GetApplicationRequest()
-                .withId("test-id");
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetApplicationResponse response = Streams.wrap(this.applications.get(request)).next().get();
+        GetApplicationResponse expected = GetApplicationResponse.builder()
+                .id("guid-e23c9834-9c4a-4397-be7d-e0fb686cb646")
+                .name("my_app")
+                .desiredState("STOPPED")
+                .totalDesiredInstances(3)
+                .buildpack("name-371")
+                .createdAt("2015-07-27T22:43:15Z")
+                .environmentVariable("unicorn", "horn")
+                .link("self", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/6776a2d8-ef86-4760-a51e-f2b24b27d019")
+                        .build())
+                .link("droplet", Link.builder()
+                        .href("/v3/droplets/a-droplet-guid")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-e23c9834-9c4a-4397-be7d-e0fb686cb646/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertEquals("name-371", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertEquals("STOPPED", response.getDesiredState());
-        assertEquals(Collections.singletonMap("unicorn", "horn"), response.getEnvironmentVariables());
-        assertEquals("guid-e23c9834-9c4a-4397-be7d-e0fb686cb646", response.getId());
-        assertEquals("my_app", response.getName());
-        assertEquals(Integer.valueOf(3), response.getTotalDesiredInstances());
-        assertNull(response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "droplet", "space", "start", "stop",
-                "assign_current_droplet");
+        GetApplicationResponse actual = Streams.wrap(this.applications.get(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -269,15 +375,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id")
                 .errorResponse());
 
-        GetApplicationRequest request = new GetApplicationRequest()
-                .withId("test-id");
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.get(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        Streams.wrap(this.applications.get(new GetApplicationRequest())).next().get();
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.get(request)).next().get();
     }
 
     @Test
@@ -287,35 +397,21 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_env_response.json"));
 
-        GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
-                .withId("test-id");
+        GetApplicationEnvironmentRequest request = GetApplicationEnvironmentRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetApplicationEnvironmentResponse response = Streams.wrap(this.applications.getEnvironment(request))
+        GetApplicationEnvironmentResponse expected = GetApplicationEnvironmentResponse.builder()
+                .environmentVariable("SOME_KEY", "some_val")
+                .stagingEnvironmentVariable("STAGING_ENV", "staging_value")
+                .runningEnvironmentVariable("RUNNING_ENV", "running_value")
+                .applicationEnvironmentVariable("VCAP_APPLICATION", vcapApplication())
+                .build();
+
+        GetApplicationEnvironmentResponse actual = Streams.wrap(this.applications.getEnvironment(request))
                 .next().get();
 
-        Map<String, Object> vcapApplication = new HashMap<>();
-        vcapApplication.put("limits", Collections.singletonMap("fds", 16384));
-        vcapApplication.put("application_name", "app_name");
-        vcapApplication.put("application_uris", Collections.emptyList());
-        vcapApplication.put("name", "app_name");
-        vcapApplication.put("space_name", "some_space");
-        vcapApplication.put("space_id", "c595c2ee-df01-4769-a61f-df5bd5e4cbc1");
-        vcapApplication.put("uris", Collections.emptyList());
-        vcapApplication.put("users", null);
-
-        Map<String, Object> applicationEnvironmentVariables = Collections.singletonMap("VCAP_APPLICATION",
-                vcapApplication);
-        assertEquals(applicationEnvironmentVariables, response.getApplicationEnvironmentVariables());
-
-        Map<String, Object> environmentVariables = Collections.singletonMap("SOME_KEY", "some_val");
-        assertEquals(environmentVariables, response.getEnvironmentVariables());
-
-        Map<String, Object> runningEnvironmentVariables = Collections.singletonMap("RUNNING_ENV", "running_value");
-        assertEquals(runningEnvironmentVariables, response.getRunningEnvironmentVariables());
-
-        Map<String, Object> stagingEnvironmentVariables = Collections.singletonMap("STAGING_ENV", "staging_value");
-        assertEquals(stagingEnvironmentVariables, response.getStagingEnvironmentVariables());
-
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -325,15 +421,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/env")
                 .errorResponse());
 
-        GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
-                .withId("test-id");
+        GetApplicationEnvironmentRequest request = GetApplicationEnvironmentRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.getEnvironment(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getEnvironmentInvalidRequest() {
-        Streams.wrap(this.applications.getEnvironment(new GetApplicationEnvironmentRequest())).next().get();
+        GetApplicationEnvironmentRequest request = GetApplicationEnvironmentRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.getEnvironment(request)).next().get();
     }
 
     @Test
@@ -343,22 +443,38 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_processes_{type}_response.json"));
 
-        GetApplicationProcessRequest request = new GetApplicationProcessRequest()
-                .withId("test-id")
-                .withType("web");
+        GetApplicationProcessRequest request = GetApplicationProcessRequest.builder()
+                .id("test-id")
+                .type("web")
+                .build();
 
-        GetApplicationProcessResponse response = Streams.wrap(this.applications.getProcess(request))
+        GetApplicationProcessResponse expected = GetApplicationProcessResponse.builder()
+                .id("32f64d22-ab45-4a9b-ba93-2b3b160f3750")
+                .type("web")
+                .instances(1)
+                .memoryInMb(1024)
+                .diskInMb(1024)
+                .createdAt("2015-07-27T22:43:29Z")
+                .updatedAt("2015-07-27T22:43:29Z")
+                .link("self", Link.builder()
+                        .href("/v3/processes/32f64d22-ab45-4a9b-ba93-2b3b160f3750")
+                        .build())
+                .link("scale", Link.builder()
+                        .href("/v3/processes/32f64d22-ab45-4a9b-ba93-2b3b160f3750/scale")
+                        .method("PUT")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-03125b96-e771-4346-8003-026ecfab6a75")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/55f4b2be-0ff7-470f-add0-3b2b6e19930c")
+                        .build())
+                .build();
+
+        GetApplicationProcessResponse actual = Streams.wrap(this.applications.getProcess(request))
                 .next().get();
 
-        assertEquals("2015-07-27T22:43:29Z", response.getCreatedAt());
-        assertNull(response.getCommand());
-        assertEquals(Integer.valueOf(1024), response.getDiskInMb());
-        assertEquals("32f64d22-ab45-4a9b-ba93-2b3b160f3750", response.getId());
-        assertEquals(Integer.valueOf(1), response.getInstances());
-        assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
-        assertEquals("web", response.getType());
-        assertEquals("2015-07-27T22:43:29Z", response.getUpdatedAt());
-        validateLinks(response, "self", "scale", "app", "space");
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -368,16 +484,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/processes/web")
                 .errorResponse());
 
-        GetApplicationProcessRequest request = new GetApplicationProcessRequest()
-                .withId("test-id")
-                .withType("web");
+        GetApplicationProcessRequest request = GetApplicationProcessRequest.builder()
+                .id("test-id")
+                .type("web")
+                .build();
 
         Streams.wrap(this.applications.getProcess(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getProcessInvalidRequest() {
-        Streams.wrap(this.applications.getProcess(new GetApplicationProcessRequest())).next().get();
+        GetApplicationProcessRequest request = GetApplicationProcessRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.getProcess(request)).next().get();
     }
 
     @Test
@@ -387,23 +507,94 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_response.json"));
 
-        ListApplicationsRequest request = new ListApplicationsRequest()
-                .withPage(1)
-                .withOrderBy(CREATED_AT)
-                .withName("test-name");
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .page(1)
+                .orderBy(CREATED_AT)
+                .name("test-name")
+                .build();
 
-        ListApplicationsResponse response = Streams.wrap(this.applications.list(request)).next().get();
-        ListApplicationsResponse.Resource resource = response.getResources().get(0);
+        ListApplicationsResponse expected = ListApplicationsResponse.builder()
+                .pagination(Pagination.builder()
+                        .totalResults(3)
+                        .first(Link.builder()
+                                .href("/v3/apps?order_by=created_at&order_direction=desc&page=1&per_page=2")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2")
+                                .build())
+                        .next(Link.builder()
+                                .href("/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2")
+                                .build())
+                        .build())
+                .resource(ListApplicationsResponse.Resource.builder()
+                        .id("guid-acfbae75-7d3a-45b1-b730-ca3cc4263045")
+                        .name("my_app3")
+                        .desiredState("STOPPED")
+                        .totalDesiredInstances(0)
+                        .buildpack("name-383")
+                        .createdAt("1970-01-01T00:00:03Z")
+                        .environmentVariable("magic", "beautiful")
+                        .link("self", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045")
+                                .build())
+                        .link("processes", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/processes")
+                                .build())
+                        .link("packages", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/packages")
+                                .build())
+                        .link("space", Link.builder()
+                                .href("/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62")
+                                .build())
+                        .link("start", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/start")
+                                .method("PUT")
+                                .build())
+                        .link("stop", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/stop")
+                                .method("PUT")
+                                .build())
+                        .link("assign_current_droplet", Link.builder()
+                                .href("/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/current_droplet")
+                                .method("PUT")
+                                .build())
+                        .build())
+                .resource(ListApplicationsResponse.Resource.builder()
+                        .id("guid-f2e97073-86d2-473e-8d03-76742f16bf6e")
+                        .name("my_app2")
+                        .desiredState("STOPPED")
+                        .totalDesiredInstances(0)
+                        .createdAt("1970-01-01T00:00:02Z")
+                        .link("self", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e")
+                                .build())
+                        .link("processes", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/processes")
+                                .build())
+                        .link("packages", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/packages")
+                                .build())
+                        .link("space", Link.builder()
+                                .href("/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62")
+                                .build())
+                        .link("start", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/start")
+                                .method("PUT")
+                                .build())
+                        .link("stop", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/stop")
+                                .method("PUT")
+                                .build())
+                        .link("assign_current_droplet", Link.builder()
+                                .href("/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/current_droplet")
+                                .method("PUT")
+                                .build())
+                        .build())
+                .build();
 
-        assertEquals("name-383", resource.getBuildpack());
-        assertEquals("1970-01-01T00:00:03Z", resource.getCreatedAt());
-        assertEquals("STOPPED", resource.getDesiredState());
-        assertEquals(Collections.singletonMap("magic", "beautiful"), resource.getEnvironmentVariables());
-        assertEquals("guid-acfbae75-7d3a-45b1-b730-ca3cc4263045", resource.getId());
-        assertEquals("my_app3", resource.getName());
-        assertEquals(Integer.valueOf(0), resource.getTotalDesiredInstances());
-        assertNull(resource.getUpdatedAt());
-        validateLinks(resource, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        ListApplicationsResponse actual = Streams.wrap(this.applications.list(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -413,17 +604,22 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps?names[]=test-name&order_by=created_at&page=1")
                 .errorResponse());
 
-        ListApplicationsRequest request = new ListApplicationsRequest()
-                .withPage(1)
-                .withOrderBy(CREATED_AT)
-                .withName("test-name");
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .page(1)
+                .orderBy(CREATED_AT)
+                .name("test-name")
+                .build();
 
         Streams.wrap(this.applications.list(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listInvalidRequest() {
-        Streams.wrap(this.applications.list(new ListApplicationsRequest().withPage(-1))).next().get();
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.applications.list(request)).next().get();
     }
 
     @Test
@@ -434,23 +630,53 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                         .responsePayload("v3/apps/GET_{id}_packages_response.json")
         );
 
-        ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
-                .withPage(1)
-                .withId("test-id");
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
 
-        ListApplicationPackagesResponse response = Streams.wrap(this.applications.listPackages(request)).next().get();
-        ListApplicationPackagesResponse.Resource resource = response.getResources().get(0);
+        ListApplicationPackagesResponse expected = builder()
+                .pagination(Pagination.builder()
+                        .totalResults(1)
+                        .first(Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-3d792a08-e415-4f9e-912b-2a8485db781a")
+                        .type("bits")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .state("AWAITING_UPLOAD")
+                        .createdAt("2015-07-27T22:43:34Z")
+                        .link("self", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a")
+                                .build())
+                        .link("upload", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/upload")
+                                .method("POST")
+                                .build())
+                        .link("download", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/download")
+                                .method("GET")
+                                .build())
+                        .link("stage", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/droplets")
+                                .method("POST")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8")
+                                .build())
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:34Z", resource.getCreatedAt());
-        assertNull(resource.getError());
-        assertEquals("sha1", resource.getHash().getType());
-        assertNull(resource.getHash().getValue());
-        assertEquals("guid-3d792a08-e415-4f9e-912b-2a8485db781a", resource.getId());
-        assertEquals("AWAITING_UPLOAD", resource.getState());
-        assertEquals("bits", resource.getType());
-        assertNull(resource.getUpdatedAt());
-        assertNull(resource.getUrl());
-        validateLinks(resource, "self", "upload", "download", "stage", "app");
+        ListApplicationPackagesResponse actual = Streams.wrap(this.applications.listPackages(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -460,15 +686,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/packages")
                 .errorResponse());
 
-        ListApplicationPackagesRequest request = new ListApplicationPackagesRequest()
-                .withPage(1)
-                .withId("test-id");
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
+
         Streams.wrap(this.applications.listPackages(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listPackagesInvalidRequest() {
-        Streams.wrap(this.applications.listPackages(new ListApplicationPackagesRequest())).next().get();
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listPackages(request)).next().get();
     }
 
     @Test
@@ -478,31 +709,78 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_droplets_response.json"));
 
+        ListApplicationDropletsRequest request = ListApplicationDropletsRequest.builder()
+                .page(1)
+                .perPage(2)
+                .orderBy(CREATED_AT)
+                .orderDirection(ASC)
+                .id("test-id")
+                .build();
 
-        ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
-                .withPage(1)
-                .withPerPage(2)
-                .withOrderBy(CREATED_AT)
-                .withOrderDirection(ASC)
-                .withId("test-id");
+        ListApplicationDropletsResponse expected = ListApplicationDropletsResponse.builder()
+                .pagination(Pagination.builder()
+                        .totalResults(2)
+                        .first(Link.builder()
+                                .href("/v3/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
+                                .build())
+                        .build())
+                .resource(ListApplicationDropletsResponse.Resource.builder()
+                        .id("guid-5df0a4bb-4fcb-4393-acdd-868524ad761e")
+                        .state("STAGING")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .buildpack("name-2089")
+                        .environmentVariable("yuu", "huuu")
+                        .createdAt("1970-01-01T00:00:01Z")
+                        .link("self", Link.builder()
+                                .href("/v3/droplets/guid-5df0a4bb-4fcb-4393-acdd-868524ad761e")
+                                .build())
+                        .link("package", Link.builder()
+                                .href("/v3/packages/guid-f80c4f3c-b625-474d-b43b-2c8b223b84e3")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1")
+                                .build())
+                        .link("assign_current_droplet", Link.builder()
+                                .href("/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1/current_droplet")
+                                .method("PUT")
+                                .build())
+                        .link("buildpack", Link.builder()
+                                .href("/v2/buildpacks/9058357a-a54f-4a6c-a18d-b63b079305b3")
+                                .build())
+                        .build())
+                .resource(ListApplicationDropletsResponse.Resource.builder()
+                        .id("guid-dd5fc1f8-fa34-4d97-9edd-a8fc82624fa8")
+                        .state("STAGED")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .value("my-hash")
+                                .build())
+                        .buildpack("https://github.com/cloudfoundry/my-buildpack.git")
+                        .createdAt("1970-01-01T00:00:02Z")
+                        .link("self", Link.builder()
+                                .href("/v3/droplets/guid-dd5fc1f8-fa34-4d97-9edd-a8fc82624fa8")
+                                .build())
+                        .link("package", Link.builder()
+                                .href("/v3/packages/guid-f80c4f3c-b625-474d-b43b-2c8b223b84e3")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1")
+                                .build())
+                        .link("assign_current_droplet", Link.builder()
+                                .href("/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1/current_droplet")
+                                .method("PUT")
+                                .build())
+                        .build())
+                .build();
 
-        ListApplicationDropletsResponse response = Streams.wrap(this.applications.listDroplets(request)).next().get();
-        ListApplicationDropletsResponse.Resource resource = response.getResources().get(0);
+        ListApplicationDropletsResponse actual = Streams.wrap(this.applications.listDroplets(request)).next().get();
 
-        Map<String, Object> environmentVariables = new HashMap<>();
-        environmentVariables.put("yuu", "huuu");
-
-        assertEquals("name-2089", resource.getBuildpack());
-        assertEquals("1970-01-01T00:00:01Z", resource.getCreatedAt());
-        assertEquals(environmentVariables, resource.getEnvironmentVariables());
-        assertNull(resource.getError());
-        assertEquals("sha1", resource.getHash().getType());
-        assertNull(resource.getHash().getValue());
-        assertEquals("guid-5df0a4bb-4fcb-4393-acdd-868524ad761e", resource.getId());
-        assertNull(resource.getProcfile());
-        assertEquals("STAGING", resource.getState());
-        assertNull(resource.getUpdatedAt());
-        validateLinks(resource, "self", "package", "app", "assign_current_droplet", "buildpack");
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -512,19 +790,23 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
                 .errorResponse());
 
-        ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
-                .withPage(1)
-                .withPerPage(2)
-                .withOrderBy(CREATED_AT)
-                .withOrderDirection(ASC)
-                .withId("test-id");
+        ListApplicationDropletsRequest request = ListApplicationDropletsRequest.builder()
+                .page(1)
+                .perPage(2)
+                .orderBy(CREATED_AT)
+                .orderDirection(ASC)
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.listDroplets(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listDropletsInvalidRequest() {
-        Streams.wrap(this.applications.listDroplets(new ListApplicationDropletsRequest())).next().get();
+        ListApplicationDropletsRequest request = ListApplicationDropletsRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listDroplets(request)).next().get();
     }
 
     @Test
@@ -534,22 +816,48 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_processes_response.json"));
 
-        ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
-                .withPage(1)
-                .withId("test-id");
+        ListApplicationProcessesRequest request = ListApplicationProcessesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
 
-        ListApplicationProcessesResponse response = Streams.wrap(this.applications.listProcesses(request)).next().get();
-        ListApplicationProcessesResponse.Resource resource = response.getResources().get(0);
+        ListApplicationProcessesResponse expected = ListApplicationProcessesResponse.builder()
+                .pagination(Pagination.builder()
+                        .totalResults(1)
+                        .first(Link.builder()
+                                .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50")
+                                .build())
+                        .build())
+                .resource(ListApplicationProcessesResponse.Resource.builder()
+                        .id("38fcaafa-5356-4f74-af10-dc70da151993")
+                        .type("web")
+                        .instances(1)
+                        .memoryInMb(1024)
+                        .diskInMb(1024)
+                        .createdAt("2015-07-27T22:43:29Z")
+                        .updatedAt("2015-07-27T22:43:29Z")
+                        .link("self", Link.builder()
+                                .href("/v3/processes/38fcaafa-5356-4f74-af10-dc70da151993")
+                                .build())
+                        .link("scale", Link.builder()
+                                .href("/v3/processes/38fcaafa-5356-4f74-af10-dc70da151993/scale")
+                                .method("PUT")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389")
+                                .build())
+                        .link("space", Link.builder()
+                                .href("/v2/spaces/b35fe3b3-7ec3-4fc0-acd0-249eb61a27f3")
+                                .build())
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:29Z", resource.getCreatedAt());
-        assertNull(resource.getCommand());
-        assertEquals(Integer.valueOf(1024), resource.getDiskInMb());
-        assertEquals("38fcaafa-5356-4f74-af10-dc70da151993", resource.getId());
-        assertEquals(Integer.valueOf(1), resource.getInstances());
-        assertEquals(Integer.valueOf(1024), resource.getMemoryInMb());
-        assertEquals("web", resource.getType());
-        assertEquals("2015-07-27T22:43:29Z", resource.getUpdatedAt());
-        validateLinks(resource, "self", "scale", "app", "space");
+        ListApplicationProcessesResponse actual = Streams.wrap(this.applications.listProcesses(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -559,15 +867,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/processes")
                 .errorResponse());
 
-        ListApplicationProcessesRequest request = new ListApplicationProcessesRequest()
-                .withPage(1)
-                .withId("test-id");
+        ListApplicationProcessesRequest request = ListApplicationProcessesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
+
         Streams.wrap(this.applications.listProcesses(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listProcessesInvalidRequest() {
-        Streams.wrap(this.applications.listProcesses(new ListApplicationProcessesRequest())).next().get();
+        ListApplicationProcessesRequest request = ListApplicationProcessesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listProcesses(request)).next().get();
     }
 
     @Test
@@ -577,18 +890,49 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_routes_response.json"));
 
-        ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
-                .withId("test-id");
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .id("test-id")
+                .build();
 
-        ListApplicationRoutesResponse response = Streams.wrap(this.applications.listRoutes(request)).next().get();
-        ListApplicationRoutesResponse.Resource resource = response.getResources().get(0);
+        ListApplicationRoutesResponse expected = ListApplicationRoutesResponse.builder()
+                .pagination(Pagination.builder()
+                        .totalResults(2)
+                        .first(Link.builder()
+                                .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
+                                .build())
+                        .build())
+                .resource(ListApplicationRoutesResponse.Resource.builder()
+                        .id("cad6fe1d-d6de-4698-9b8e-caf9506ecf8d")
+                        .host("host-20")
+                        .path("")
+                        .createdAt("2015-07-27T22:43:32Z")
+                        .link("space", Link.builder()
+                                .href("/v2/spaces/5835dcab-415d-4758-b8cc-dc4246f930ce")
+                                .build())
+                        .link("domain", Link.builder()
+                                .href("/v2/domains/74797591-b1cc-40a6-8cd3-d8bfa277a306")
+                                .build())
+                        .build())
+                .resource(ListApplicationRoutesResponse.Resource.builder()
+                        .id("74f9b772-ace2-4932-aa7b-328434e712a1")
+                        .host("host-21")
+                        .path("/foo/bar")
+                        .createdAt("2015-07-27T22:43:32Z")
+                        .link("space", Link.builder()
+                                .href("/v2/spaces/5835dcab-415d-4758-b8cc-dc4246f930ce")
+                                .build())
+                        .link("domain", Link.builder()
+                                .href("/v2/domains/9274a306-f253-4bd8-9cd1-d4af023bcf90")
+                                .build())
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:32Z", resource.getCreatedAt());
-        assertEquals("host-20", resource.getHost());
-        assertEquals("cad6fe1d-d6de-4698-9b8e-caf9506ecf8d", resource.getId());
-        assertEquals("", resource.getPath());
-        assertNull(resource.getUpdatedAt());
-        validateLinks(resource, "space", "domain");
+        ListApplicationRoutesResponse actual = Streams.wrap(this.applications.listRoutes(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -598,14 +942,18 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(GET).path("/v3/apps/test-id/routes")
                 .errorResponse());
 
-        ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
-                .withId("test-id");
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .id("test-id")
+                .build();
         Streams.wrap(this.applications.listRoutes(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listRoutesInvalidRequest() {
-        Streams.wrap(this.applications.listRoutes(new ListApplicationRoutesRequest())).next().get();
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listRoutes(request)).next().get();
     }
 
     @Test
@@ -615,9 +963,10 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/PUT_{id}_routes_request.json")
                 .status(NO_CONTENT));
 
-        MapApplicationRouteRequest request = new MapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("9cf0271a-420f-4ae4-b227-16683db93573");
+        MapApplicationRouteRequest request = MapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("9cf0271a-420f-4ae4-b227-16683db93573")
+                .build();
 
         Streams.wrap(this.applications.mapRoute(request)).next().get();
 
@@ -631,16 +980,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/PUT_{id}_routes_request.json")
                 .errorResponse());
 
-        MapApplicationRouteRequest request = new MapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("9cf0271a-420f-4ae4-b227-16683db93573");
+        MapApplicationRouteRequest request = MapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("9cf0271a-420f-4ae4-b227-16683db93573")
+                .build();
 
         Streams.wrap(this.applications.mapRoute(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void mapRouteInvalidRequest() {
-        Streams.wrap(this.applications.mapRoute(new MapApplicationRouteRequest())).next().get();
+        MapApplicationRouteRequest request = MapApplicationRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.mapRoute(request)).next().get();
     }
 
     @Test
@@ -651,23 +1004,40 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/PUT_{id}_processes_{type}_scale_response.json"));
 
-        ScaleApplicationRequest request = new ScaleApplicationRequest()
-                .withDiskInMb(100)
-                .withId("test-id")
-                .withInstances(3)
-                .withMemoryInMb(100)
-                .withType("web");
+        ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .diskInMb(100)
+                .id("test-id")
+                .instances(3)
+                .memoryInMb(100)
+                .type("web")
+                .build();
 
-        ScaleApplicationResponse response = Streams.wrap(this.applications.scale(request)).next().get();
+        ScaleApplicationResponse expected = ScaleApplicationResponse.builder()
+                .id("edc2dffe-9f0d-416f-a712-890d56de8bae")
+                .type("web")
+                .instances(3)
+                .memoryInMb(100)
+                .diskInMb(100)
+                .createdAt("2015-07-27T22:43:29Z")
+                .updatedAt("2015-07-27T22:43:29Z")
+                .link("self", Link.builder()
+                        .href("/v3/processes/edc2dffe-9f0d-416f-a712-890d56de8bae")
+                        .build())
+                .link("scale", Link.builder()
+                        .href("/v3/processes/edc2dffe-9f0d-416f-a712-890d56de8bae/scale")
+                        .method("PUT")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-4b2de865-95a6-47a4-86af-0169ae6b9003")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/baac2863-4fa7-4662-8c07-5645271640b9")
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:29Z", response.getCreatedAt());
-        assertEquals(Integer.valueOf(100), response.getDiskInMb());
-        assertEquals("edc2dffe-9f0d-416f-a712-890d56de8bae", response.getId());
-        assertEquals(Integer.valueOf(3), response.getInstances());
-        assertEquals(Integer.valueOf(100), response.getMemoryInMb());
-        assertEquals("web", response.getType());
-        assertEquals("2015-07-27T22:43:29Z", response.getUpdatedAt());
-        validateLinks(response, "self", "scale", "app", "space");
+        ScaleApplicationResponse actual = Streams.wrap(this.applications.scale(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -678,19 +1048,23 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/PUT_{id}_processes_{type}_scale_request.json")
                 .errorResponse());
 
-        ScaleApplicationRequest request = new ScaleApplicationRequest()
-                .withDiskInMb(100)
-                .withId("test-id")
-                .withInstances(3)
-                .withMemoryInMb(100)
-                .withType("web");
+        ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .diskInMb(100)
+                .id("test-id")
+                .instances(3)
+                .memoryInMb(100)
+                .type("web")
+                .build();
 
         Streams.wrap(this.applications.scale(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void scaleInvalidRequest() {
-        Streams.wrap(this.applications.scale(new ScaleApplicationRequest())).next().get();
+        ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.scale(request)).next().get();
     }
 
     @Test
@@ -700,21 +1074,49 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/PUT_{id}_start_response.json"));
 
-        StartApplicationRequest request = new StartApplicationRequest()
-                .withId("test-id");
+        StartApplicationRequest request = StartApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
-        StartApplicationResponse response = Streams.wrap(this.applications.start(request)).next().get();
+        StartApplicationResponse expected = StartApplicationResponse.builder()
+                .id("guid-40460094-d035-4663-b58c-cdf4c802a2c6")
+                .name("original_name")
+                .desiredState("STARTED")
+                .totalDesiredInstances(0)
+                .createdAt("2015-07-27T22:43:15Z")
+                .updatedAt("2015-07-27T22:43:15Z")
+                .link("self", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/24f4776a-0cfd-49d3-922b-64951eb73e49")
+                        .build())
+                .link("droplet", Link.builder()
+                        .href("/v3/droplets/guid-9b8fb4ff-e212-4024-bf2b-bed0d0803727")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertNull(response.getBuildpack());
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertEquals("STARTED", response.getDesiredState());
-        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-        assertEquals("guid-40460094-d035-4663-b58c-cdf4c802a2c6", response.getId());
-        assertEquals("original_name", response.getName());
-        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "space", "droplet", "start", "stop",
-                "assign_current_droplet");
+        StartApplicationResponse actual = Streams.wrap(this.applications.start(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -724,15 +1126,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(PUT).path("/v3/apps/test-id/start")
                 .errorResponse());
 
-        StartApplicationRequest request = new StartApplicationRequest()
-                .withId("test-id");
+        StartApplicationRequest request = StartApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.start(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void startInvalidRequest() {
-        Streams.wrap(this.applications.start(new StartApplicationRequest())).next().get();
+        StartApplicationRequest request = StartApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.start(request)).next().get();
     }
 
     @Test
@@ -742,21 +1148,49 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/PUT_{id}_stop_response.json"));
 
-        StopApplicationRequest request = new StopApplicationRequest()
-                .withId("test-id");
+        StopApplicationRequest request = StopApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
-        StopApplicationResponse response = Streams.wrap(this.applications.stop(request)).next().get();
+        StopApplicationResponse expected = StopApplicationResponse.builder()
+                .id("guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0")
+                .name("original_name")
+                .desiredState("STOPPED")
+                .totalDesiredInstances(0)
+                .createdAt("2015-07-27T22:43:15Z")
+                .updatedAt("2015-07-27T22:43:15Z")
+                .link("self", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/7550ea49-3bce-4655-b44c-30b5ca622402")
+                        .build())
+                .link("droplet", Link.builder()
+                        .href("/v3/droplets/guid-978d2287-36ff-4074-bbdf-b613b8211397")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertNull(response.getBuildpack());
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertEquals("STOPPED", response.getDesiredState());
-        assertEquals(Collections.emptyMap(), response.getEnvironmentVariables());
-        assertEquals("guid-be4e4357-5a9d-48fc-ae37-821f48c1ace0", response.getId());
-        assertEquals("original_name", response.getName());
-        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-        assertEquals("2015-07-27T22:43:15Z", response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "space", "droplet", "start", "stop",
-                "assign_current_droplet");
+        StopApplicationResponse actual = Streams.wrap(this.applications.stop(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -766,15 +1200,19 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .method(PUT).path("/v3/apps/test-id/stop")
                 .errorResponse());
 
-        StopApplicationRequest request = new StopApplicationRequest()
-                .withId("test-id");
+        StopApplicationRequest request = StopApplicationRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.stop(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void stopInvalidRequest() {
-        Streams.wrap(this.applications.stop(new StopApplicationRequest())).next().get();
+        StopApplicationRequest request = StopApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.stop(request)).next().get();
     }
 
     @Test
@@ -784,9 +1222,10 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/DELETE_{id}_routes_request.json")
                 .status(NO_CONTENT));
 
-        UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091");
+        UnmapApplicationRouteRequest request = UnmapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091")
+                .build();
 
         Streams.wrap(this.applications.unmapRoute(request)).next().get();
 
@@ -800,16 +1239,20 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/DELETE_{id}_routes_request.json")
                 .errorResponse());
 
-        UnmapApplicationRouteRequest request = new UnmapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091");
+        UnmapApplicationRouteRequest request = UnmapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091")
+                .build();
 
         Streams.wrap(this.applications.unmapRoute(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void unmapRouteInvalidRequest() {
-        Streams.wrap(this.applications.unmapRoute(new UnmapApplicationRouteRequest())).next().get();
+        UnmapApplicationRouteRequest request = UnmapApplicationRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.unmapRoute(request)).next().get();
     }
 
     @Test
@@ -820,27 +1263,53 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/PATCH_{id}_response.json"));
 
-        Map<String, String> environment_variables = new HashMap<>();
-        environment_variables.put("MY_ENV_VAR", "foobar");
-        environment_variables.put("FOOBAR", "MY_ENV_VAR");
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .name("new_name")
+                .environmentVariable("MY_ENV_VAR", "foobar")
+                .environmentVariable("FOOBAR", "MY_ENV_VAR")
+                .buildpack("http://gitwheel.org/my-app")
+                .id("test-id")
+                .build();
 
-        UpdateApplicationRequest request = new UpdateApplicationRequest()
-                .withName("new_name")
-                .withEnvironmentVariables(environment_variables)
-                .withBuildpack("http://gitwheel.org/my-app")
-                .withId("test-id");
+        UpdateApplicationResponse expected = UpdateApplicationResponse.builder()
+                .id("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a")
+                .name("new_name")
+                .desiredState("STOPPED")
+                .totalDesiredInstances(0)
+                .buildpack("http://gitwheel.org/my-app")
+                .createdAt("2015-07-27T22:43:14Z")
+                .updatedAt("2015-07-27T22:43:14Z")
+                .environmentVariable("MY_ENV_VAR", "foobar")
+                .environmentVariable("FOOBAR", "MY_ENV_VAR")
+                .link("self", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a")
+                        .build())
+                .link("processes", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a/processes")
+                        .build())
+                .link("packages", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a/packages")
+                        .build())
+                .link("space", Link.builder()
+                        .href("/v2/spaces/68040a7b-e84d-4461-960d-36bf8c9873d8")
+                        .build())
+                .link("start", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a/start")
+                        .method("PUT")
+                        .build())
+                .link("stop", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a/stop")
+                        .method("PUT")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        UpdateApplicationResponse response = Streams.wrap(this.applications.update(request)).next().get();
+        UpdateApplicationResponse actual = Streams.wrap(this.applications.update(request)).next().get();
 
-        assertEquals("http://gitwheel.org/my-app", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:14Z", response.getCreatedAt());
-        assertEquals("STOPPED", response.getDesiredState());
-        assertEquals(environment_variables, response.getEnvironmentVariables());
-        assertEquals("guid-a7b667e9-2358-4f51-9b1d-92a74beaa30a", response.getId());
-        assertEquals("new_name", response.getName());
-        assertEquals(Integer.valueOf(0), response.getTotalDesiredInstances());
-        assertEquals("2015-07-27T22:43:14Z", response.getUpdatedAt());
-        validateLinks(response, "self", "processes", "packages", "space", "start", "stop", "assign_current_droplet");
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -851,22 +1320,36 @@ public final class SpringApplicationsTest extends AbstractRestTest {
                 .requestPayload("v3/apps/PATCH_{id}_request.json")
                 .errorResponse());
 
-        Map<String, String> environment_variables = new HashMap<>();
-        environment_variables.put("MY_ENV_VAR", "foobar");
-        environment_variables.put("FOOBAR", "MY_ENV_VAR");
-
-        UpdateApplicationRequest request = new UpdateApplicationRequest()
-                .withName("new_name")
-                .withEnvironmentVariables(environment_variables)
-                .withBuildpack("http://gitwheel.org/my-app")
-                .withId("test-id");
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .name("new_name")
+                .environmentVariable("MY_ENV_VAR", "foobar")
+                .environmentVariable("FOOBAR", "MY_ENV_VAR")
+                .buildpack("http://gitwheel.org/my-app")
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.applications.update(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void updateInvalidRequest() throws Throwable {
-        Streams.wrap(this.applications.update(new UpdateApplicationRequest())).next().get();
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.update(request)).next().get();
     }
 
+    private Map<String, Object> vcapApplication() {
+        Map<String, Object> vcapApplication = new HashMap<>();
+        vcapApplication.put("limits", Collections.singletonMap("fds", 16384));
+        vcapApplication.put("application_name", "app_name");
+        vcapApplication.put("application_uris", Collections.emptyList());
+        vcapApplication.put("name", "app_name");
+        vcapApplication.put("space_name", "some_space");
+        vcapApplication.put("space_id", "c595c2ee-df01-4769-a61f-df5bd5e4cbc1");
+        vcapApplication.put("uris", Collections.emptyList());
+        vcapApplication.put("users", null);
+
+        return vcapApplication;
+    }
 }

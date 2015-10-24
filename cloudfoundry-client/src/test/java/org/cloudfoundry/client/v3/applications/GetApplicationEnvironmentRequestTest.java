@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class GetApplicationEnvironmentRequestTest {
 
     @Test
-    public void test() {
-        GetApplicationEnvironmentRequest request = new GetApplicationEnvironmentRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetApplicationEnvironmentRequest()
-                .withId("test-id")
+        ValidationResult result = GetApplicationEnvironmentRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class GetApplicationEnvironmentRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetApplicationEnvironmentRequest()
+        ValidationResult result = GetApplicationEnvironmentRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

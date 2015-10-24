@@ -35,8 +35,8 @@ public class OperationsConfiguration {
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
                                                   @Value("${test.organization}") String organization) {
         return new CloudFoundryOperationsBuilder()
-                .withCloudFoundryClient(cloudFoundryClient)
-                .withTarget(organization)
+                .cloudFoundryClient(cloudFoundryClient)
+                .target(organization)
                 .build();
     }
 

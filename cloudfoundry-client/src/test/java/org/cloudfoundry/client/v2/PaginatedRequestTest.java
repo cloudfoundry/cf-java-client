@@ -25,24 +25,9 @@ import static org.junit.Assert.assertEquals;
 public final class PaginatedRequestTest {
 
     @Test
-    public void test() {
-        StubPaginatedRequest request = new StubPaginatedRequest()
-                .withOrderDirection(ASC)
-                .withPage(-1)
-                .withResultsPerPage(-2);
-
-        assertEquals(ASC, request.getOrderDirection());
-        assertEquals(Integer.valueOf(-1), request.getPage());
-        assertEquals(Integer.valueOf(-2), request.getResultsPerPage());
-    }
-
-    @Test
     public void orderedBy() {
         assertEquals("asc", ASC.toString());
         assertEquals("desc", DESC.toString());
-    }
-
-    private static final class StubPaginatedRequest extends PaginatedRequest<StubPaginatedRequest> {
     }
 
 }

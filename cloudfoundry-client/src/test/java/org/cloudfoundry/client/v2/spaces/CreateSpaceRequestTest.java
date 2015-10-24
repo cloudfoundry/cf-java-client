@@ -19,8 +19,6 @@ package org.cloudfoundry.client.v2.spaces;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.util.Collections;
-
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
@@ -28,34 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class CreateSpaceRequestTest {
 
     @Test
-    public void test() {
-        CreateSpaceRequest request = new CreateSpaceRequest()
-                .withAllowSsh(true)
-                .withAuditorId("test-auditor-id")
-                .withDeveloperId("test-developer-id")
-                .withDomainId("test-domain-id")
-                .withManagerId("test-manager-id")
-                .withName("test-name")
-                .withOrganizationId("test-organization-id")
-                .withSecurityGroupId("test-security-group-id")
-                .withSpaceQuotaDefinitionId("test-space-quote-definition-id");
-
-        assertEquals(true, request.getAllowSsh());
-        assertEquals(Collections.singletonList("test-auditor-id"), request.getAuditorIds());
-        assertEquals(Collections.singletonList("test-developer-id"), request.getDeveloperIds());
-        assertEquals(Collections.singletonList("test-domain-id"), request.getDomainIds());
-        assertEquals(Collections.singletonList("test-manager-id"), request.getManagerIds());
-        assertEquals("test-name", request.getName());
-        assertEquals("test-organization-id", request.getOrganizationId());
-        assertEquals(Collections.singletonList("test-security-group-id"), request.getSecurityGroups());
-        assertEquals("test-space-quote-definition-id", request.getSpaceQuotaDefinitionId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new CreateSpaceRequest()
-                .withName("test-name")
-                .withOrganizationId("test-organization-id")
+        ValidationResult result = CreateSpaceRequest.builder()
+                .name("test-name")
+                .organizationId("test-organization-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -63,8 +38,9 @@ public final class CreateSpaceRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = new CreateSpaceRequest()
-                .withOrganizationId("test-organization-id")
+        ValidationResult result = CreateSpaceRequest.builder()
+                .organizationId("test-organization-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -73,8 +49,9 @@ public final class CreateSpaceRequestTest {
 
     @Test
     public void isValidNoOrganizationId() {
-        ValidationResult result = new CreateSpaceRequest()
-                .withName("test-name")
+        ValidationResult result = CreateSpaceRequest.builder()
+                .name("test-name")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

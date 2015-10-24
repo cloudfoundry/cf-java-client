@@ -26,23 +26,12 @@ import static org.junit.Assert.assertEquals;
 public final class DeleteApplicationInstanceRequestTest {
 
     @Test
-    public void test() {
-        DeleteApplicationInstanceRequest request = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
-                .withType("test-type");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-index", request.getIndex());
-        assertEquals("test-type", request.getType());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
-                .withType("test-type")
+        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index("test-index")
+                .type("test-type")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -50,9 +39,10 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteApplicationInstanceRequest()
-                .withIndex("test-index")
-                .withType("test-type")
+        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+                .index("test-index")
+                .type("test-type")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -61,9 +51,10 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoIndex() {
-        ValidationResult result = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withType("test-type")
+        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+                .id("test-id")
+                .type("test-type")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -72,9 +63,10 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = new DeleteApplicationInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
+        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index("test-index")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

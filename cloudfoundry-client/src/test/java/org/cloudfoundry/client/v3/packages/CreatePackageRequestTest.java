@@ -28,22 +28,11 @@ import static org.junit.Assert.assertEquals;
 public final class CreatePackageRequestTest {
 
     @Test
-    public void test() {
-        CreatePackageRequest request = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(DOCKER)
-                .withUrl("test-url");
-
-        assertEquals("test-application-id", request.getApplicationId());
-        assertEquals(DOCKER, request.getType());
-        assertEquals("test-url", request.getUrl());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(BITS)
+        ValidationResult result = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .type(BITS)
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -51,8 +40,9 @@ public final class CreatePackageRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
+        ValidationResult result = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -61,10 +51,11 @@ public final class CreatePackageRequestTest {
 
     @Test
     public void isValidBitsAndUrl() {
-        ValidationResult result = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(BITS)
-                .withUrl("test-url")
+        ValidationResult result = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .type(BITS)
+                .url("test-url")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -73,9 +64,10 @@ public final class CreatePackageRequestTest {
 
     @Test
     public void isValidDockerNoUrl() {
-        ValidationResult result = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(DOCKER)
+        ValidationResult result = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .type(DOCKER)
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -85,8 +77,9 @@ public final class CreatePackageRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new CreatePackageRequest()
-                .withType(BITS)
+        ValidationResult result = CreatePackageRequest.builder()
+                .type(BITS)
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

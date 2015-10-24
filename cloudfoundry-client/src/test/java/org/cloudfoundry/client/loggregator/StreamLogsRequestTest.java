@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class StreamLogsRequestTest {
 
     @Test
-    public void test() {
-        StreamLogsRequest request = new StreamLogsRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new StreamLogsRequest()
-                .withId("test-id")
+        ValidationResult result = StreamLogsRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class StreamLogsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new StreamLogsRequest()
+        ValidationResult result = StreamLogsRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

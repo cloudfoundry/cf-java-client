@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class GetDropletRequestTest {
 
     @Test
-    public void test() {
-        GetDropletRequest request = new GetDropletRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetDropletRequest()
-                .withId("test-id")
+        ValidationResult result = GetDropletRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,10 +37,12 @@ public final class GetDropletRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetDropletRequest()
+        ValidationResult result = GetDropletRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
     }
+
 }

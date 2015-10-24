@@ -90,7 +90,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @param host The host to connect to.  This is typically something like {@code api.run.pivotal.io}.
      * @return {@code this}
      */
-    public SpringCloudFoundryClientBuilder withApi(String host) {
+    public SpringCloudFoundryClientBuilder api(String host) {
         this.host = Optional.of(host);
         return this;
     }
@@ -102,7 +102,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @param clientSecret the client secret to use.  Defaults to {@code ''}.
      * @return {@code this}
      */
-    public SpringCloudFoundryClientBuilder withClient(String clientId, String clientSecret) {
+    public SpringCloudFoundryClientBuilder client(String clientId, String clientSecret) {
         this.clientId = Optional.of(clientId);
         this.clientSecret = Optional.of(clientSecret);
         return this;
@@ -115,7 +115,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @param password the password to use
      * @return {@code this}
      */
-    public SpringCloudFoundryClientBuilder withCredentials(String username, String password) {
+    public SpringCloudFoundryClientBuilder credentials(String username, String password) {
         this.username = Optional.of(username);
         this.password = Optional.of(password);
         return this;
@@ -127,7 +127,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @param skipSslValidation whether to skip SSL validation
      * @return {@code this}
      */
-    public SpringCloudFoundryClientBuilder withSkipSslValidation(Boolean skipSslValidation) {
+    public SpringCloudFoundryClientBuilder skipSslValidation(Boolean skipSslValidation) {
         this.skipSslValidation = Optional.of(skipSslValidation);
         return this;
     }

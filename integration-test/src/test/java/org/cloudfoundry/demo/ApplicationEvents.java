@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_CREATE;
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_DELETE_REQUEST;
@@ -73,8 +72,8 @@ public class ApplicationEvents {
                                           @Value("${test.username}") String username,
                                           @Value("${test.password}") String password) {
         return new SpringCloudFoundryClientBuilder()
-                .withApi(host)
-                .withCredentials(username, password)
+                .api(host)
+                .credentials(username, password)
                 .build();
     }
 
@@ -111,10 +110,12 @@ public class ApplicationEvents {
             this.logger.info("{} Organizations Found", organizations.size());
 
             try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
-                paginate(() -> new ListEventsRequest()
-                                .withTypes(EVENT_TYPES)
-                                .withTimestamp("2015-10-01T05:18:38Z")
-                                .withResultsPerPage(100),
+                paginate(page -> ListEventsRequest.builder()
+                                .types(EVENT_TYPES)
+                                .timestamp("2015-10-01T05:18:38Z")
+                                .page(page)
+                                .resultsPerPage(100)
+                                .build(),
                         request -> cloudFoundryClient.events().list(request))
                         .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
                         .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
@@ -142,20 +143,21 @@ public class ApplicationEvents {
             }
         }
 
-        private <T extends PaginatedRequest<T>, U extends PaginatedResponse> Stream<U> paginate(
-                Supplier<T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
+        private <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
+                Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
 
-            return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.get().withPage(1))))
+            return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
                     .concatMap(responseStream -> responseStream
                             .take(1)
                             .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
-                                            .flatMap(page -> operationExecutor.apply(requestProvider.get().withPage(page)))
+                                            .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
                                             .startWith(response)
                             ));
         }
 
         private Stream<ListOrganizationsResponse> listOrganizations() {
-            return paginate(ListOrganizationsRequest::new,
+            return paginate(
+                    page -> ListOrganizationsRequest.builder().page(page).build(),
                     request -> this.cloudFoundryClient.organizations().list(request));
         }
     }

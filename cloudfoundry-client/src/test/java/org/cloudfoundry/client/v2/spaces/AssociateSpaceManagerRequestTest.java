@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class AssociateSpaceManagerRequestTest {
 
     @Test
-    public void test() {
-        AssociateSpaceManagerRequest request = new AssociateSpaceManagerRequest()
-                .withId("test-id")
-                .withManagerId("test-manager-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-manager-id", request.getManagerId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new AssociateSpaceManagerRequest()
-                .withId("test-id")
-                .withManagerId("test-manager-id")
+        ValidationResult result = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class AssociateSpaceManagerRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new AssociateSpaceManagerRequest()
-                .withManagerId("test-manager-id")
+        ValidationResult result = AssociateSpaceManagerRequest.builder()
+                .managerId("test-manager-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class AssociateSpaceManagerRequestTest {
 
     @Test
     public void isValidNoManagerId() {
-        ValidationResult result = new AssociateSpaceManagerRequest()
-                .withId("test-id")
+        ValidationResult result = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

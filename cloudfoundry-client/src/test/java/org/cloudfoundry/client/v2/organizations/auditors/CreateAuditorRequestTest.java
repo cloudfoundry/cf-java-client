@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class CreateAuditorRequestTest {
 
     @Test
-    public void test() {
-        CreateAuditorRequest request = new CreateAuditorRequest()
-                .withAuditorId("test-auditor-id")
-                .withOrganizationId("test-organization-id");
-
-        assertEquals("test-auditor-id", request.getAuditorId());
-        assertEquals("test-organization-id", request.getOrganizationId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new CreateAuditorRequest()
-                .withAuditorId("test-auditor-id")
-                .withOrganizationId("test-organization-id")
+        ValidationResult result = CreateAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .organizationId("test-organization-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class CreateAuditorRequestTest {
 
     @Test
     public void isValidNoAuditorId() {
-        ValidationResult result = new CreateAuditorRequest()
-                .withOrganizationId("test-organization-id")
+        ValidationResult result = CreateAuditorRequest.builder()
+                .organizationId("test-organization-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class CreateAuditorRequestTest {
 
     @Test
     public void isValidNoOrganizationId() {
-        ValidationResult result = new CreateAuditorRequest()
-                .withAuditorId("test-auditor-id")
+        ValidationResult result = CreateAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

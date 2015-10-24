@@ -19,6 +19,9 @@ package org.cloudfoundry.client.spring.v3.packages;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -37,12 +40,12 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
+import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
+import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -62,22 +65,31 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/apps/POST_{id}_packages_response.json"));
 
-        CopyPackageRequest request = new CopyPackageRequest()
-                .withApplicationId("test-application-id")
-                .withSourcePackageId("test-source-package-id");
+        CopyPackageRequest request = CopyPackageRequest.builder()
+                .applicationId("test-application-id")
+                .sourcePackageId("test-source-package-id")
+                .build();
 
-        CopyPackageResponse response = Streams.wrap(this.packages.copy(request)).next().get();
+        CopyPackageResponse expected = CopyPackageResponse.builder()
+                .id("126e54c4-811d-4f7a-9a34-804130a75ab2")
+                .type("docker")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .url("docker://cloudfoundry/runtime-ci")
+                .state("READY")
+                .createdAt("2015-08-06T00:36:55Z")
+                .link("self", Link.builder()
+                        .href("/v3/packages/126e54c4-811d-4f7a-9a34-804130a75ab2")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-f8e68f3f-663d-478d-98ff-5d554910fde0")
+                        .build())
+                .build();
 
-        assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
-        assertNull(response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
-        assertEquals("READY", response.getState());
-        assertEquals("docker", response.getType());
-        assertNull(response.getUpdatedAt());
-        assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
-        validateLinks(response, "self", "app");
+        CopyPackageResponse actual = Streams.wrap(this.packages.copy(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -87,16 +99,20 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
                 .errorResponse());
 
-        CopyPackageRequest request = new CopyPackageRequest()
-                .withApplicationId("test-application-id")
-                .withSourcePackageId("test-source-package-id");
+        CopyPackageRequest request = CopyPackageRequest.builder()
+                .applicationId("test-application-id")
+                .sourcePackageId("test-source-package-id")
+                .build();
 
         Streams.wrap(this.packages.copy(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void copyInvalidRequest() {
-        Streams.wrap(this.packages.copy(new CopyPackageRequest())).next().get();
+        CopyPackageRequest request = CopyPackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.copy(request)).next().get();
     }
 
     @Test
@@ -107,23 +123,32 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(CREATED)
                 .responsePayload("v3/apps/POST_{id}_packages_response.json"));
 
-        CreatePackageRequest request = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(DOCKER)
-                .withUrl("docker://cloudfoundry/runtime-ci");
+        CreatePackageRequest request = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .type(DOCKER)
+                .url("docker://cloudfoundry/runtime-ci")
+                .build();
 
-        CreatePackageResponse response = Streams.wrap(this.packages.create(request)).next().get();
+        CreatePackageResponse expected = CreatePackageResponse.builder()
+                .id("126e54c4-811d-4f7a-9a34-804130a75ab2")
+                .type("docker")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .url("docker://cloudfoundry/runtime-ci")
+                .state("READY")
+                .createdAt("2015-08-06T00:36:55Z")
+                .link("self", Link.builder()
+                        .href("/v3/packages/126e54c4-811d-4f7a-9a34-804130a75ab2")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-f8e68f3f-663d-478d-98ff-5d554910fde0")
+                        .build())
+                .build();
 
-        assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
-        assertNull(response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
-        assertEquals("READY", response.getState());
-        assertEquals("docker", response.getType());
-        assertNull(response.getUpdatedAt());
-        assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
-        validateLinks(response, "self", "app");
+        CreatePackageResponse actual = Streams.wrap(this.packages.create(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -134,17 +159,21 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .requestPayload("v3/apps/POST_{id}_packages_request.json")
                 .errorResponse());
 
-        CreatePackageRequest request = new CreatePackageRequest()
-                .withApplicationId("test-application-id")
-                .withType(DOCKER)
-                .withUrl("docker://cloudfoundry/runtime-ci");
+        CreatePackageRequest request = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .type(DOCKER)
+                .url("docker://cloudfoundry/runtime-ci")
+                .build();
 
         Streams.wrap(this.packages.create(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() {
-        Streams.wrap(this.packages.create(new CreatePackageRequest())).next().get();
+        CreatePackageRequest request = CreatePackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.create(request)).next().get();
     }
 
     @Test
@@ -153,8 +182,9 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/packages/test-id")
                 .status(OK));
 
-        DeletePackageRequest request = new DeletePackageRequest()
-                .withId("test-id");
+        DeletePackageRequest request = DeletePackageRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.packages.delete(request)).next().get();
 
@@ -167,15 +197,19 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/packages/test-id")
                 .errorResponse());
 
-        DeletePackageRequest request = new DeletePackageRequest()
-                .withId("test-id");
+        DeletePackageRequest request = DeletePackageRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.packages.delete(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteInvalidRequest() {
-        Streams.wrap(this.packages.delete(new DeletePackageRequest())).next().get();
+        DeletePackageRequest request = DeletePackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.delete(request)).next().get();
     }
 
     @Test
@@ -185,21 +219,41 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/packages/GET_{id}_response.json"));
 
-        GetPackageRequest request = new GetPackageRequest()
-                .withId("test-id");
+        GetPackageRequest request = GetPackageRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetPackageResponse response = Streams.wrap(this.packages.get(request)).next().get();
+        GetPackageResponse expected = GetPackageResponse.builder()
+                .id("guid-9067cc41-b832-4de9-89a2-0987dab65e8e")
+                .type("bits")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .state("AWAITING_UPLOAD")
+                .createdAt("2015-07-27T22:43:15Z")
+                .link("self", Link.builder()
+                        .href("/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e")
+                        .build())
+                .link("upload", Link.builder()
+                        .href("/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/upload")
+                        .method("POST")
+                        .build())
+                .link("download", Link.builder()
+                        .href("/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/download")
+                        .method("GET")
+                        .build())
+                .link("stage", Link.builder()
+                        .href("/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/droplets")
+                        .method("POST")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-1eb7b328-4769-45c9-8c61-3d2e7b69541a")
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
-        assertNull(response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("guid-9067cc41-b832-4de9-89a2-0987dab65e8e", response.getId());
-        assertEquals("AWAITING_UPLOAD", response.getState());
-        assertEquals("bits", response.getType());
-        assertNull(response.getUpdatedAt());
-        assertNull(response.getUrl());
-        validateLinks(response, "self", "upload", "download", "stage", "app");
+        GetPackageResponse actual = Streams.wrap(this.packages.get(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -209,15 +263,19 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .method(GET).path("/v3/packages/test-id")
                 .errorResponse());
 
-        GetPackageRequest request = new GetPackageRequest()
-                .withId("test-id");
+        GetPackageRequest request = GetPackageRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.packages.get(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        Streams.wrap(this.packages.get(new GetPackageRequest())).next().get();
+        GetPackageRequest request = GetPackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.get(request)).next().get();
     }
 
     @Test
@@ -227,21 +285,70 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/packages/GET_response.json"));
 
-        ListPackagesRequest request = new ListPackagesRequest();
-        ListPackagesResponse response = Streams.wrap(this.packages.list(request)).next().get();
+        ListPackagesRequest request = ListPackagesRequest.builder()
+                .build();
 
-        ListPackagesResponse.Resource resource = response.getResources().get(0);
+        ListPackagesResponse expected = builder()
+                .pagination(Pagination.builder()
+                        .totalResults(3)
+                        .first(Link.builder()
+                                .href("/v3/packages?page=1&per_page=2")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/packages?page=2&per_page=2")
+                                .build())
+                        .next(Link.builder()
+                                .href("/v3/packages?page=2&per_page=2")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a")
+                        .type("bits")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .state("AWAITING_UPLOAD")
+                        .createdAt("2015-07-27T22:43:15Z")
+                        .link("self", Link.builder()
+                                .href("/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a")
+                                .build())
+                        .link("upload", Link.builder()
+                                .href("/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/upload")
+                                .method("POST")
+                                .build())
+                        .link("download", Link.builder()
+                                .href("/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/download")
+                                .method("GET")
+                                .build())
+                        .link("stage", Link.builder()
+                                .href("/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/droplets")
+                                .method("POST")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-caa0f920-0f24-4a80-b7e4-3119758901c3")
+                        .type("docker")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .url("http://docker-repo/my-image")
+                        .state("READY")
+                        .createdAt("2015-07-27T22:43:15Z")
+                        .link("self", Link.builder()
+                                .href("/v3/packages/guid-caa0f920-0f24-4a80-b7e4-3119758901c3")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4")
+                                .build())
+                        .build())
+                .build();
 
-        assertEquals("2015-07-27T22:43:15Z", resource.getCreatedAt());
-        assertNull(resource.getError());
-        assertEquals("sha1", resource.getHash().getType());
-        assertNull(resource.getHash().getValue());
-        assertEquals("guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a", resource.getId());
-        assertEquals("AWAITING_UPLOAD", resource.getState());
-        assertEquals("bits", resource.getType());
-        assertNull(resource.getUpdatedAt());
-        assertNull(resource.getUrl());
-        validateLinks(resource, "self", "upload", "download", "stage", "app");
+        ListPackagesResponse actual = Streams.wrap(this.packages.list(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -251,14 +358,19 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .method(GET).path("/v3/packages")
                 .errorResponse());
 
-        ListPackagesRequest request = new ListPackagesRequest();
+        ListPackagesRequest request = ListPackagesRequest.builder()
+                .build();
 
         Streams.wrap(this.packages.list(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listInvalidRequest() {
-        Streams.wrap(this.packages.list(new ListPackagesRequest().withPage(0))).next().get();
+        ListPackagesRequest request = ListPackagesRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.packages.list(request)).next().get();
     }
 
     @Test
@@ -269,25 +381,41 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(CREATED)
                 .responsePayload("v3/packages/POST_{id}_droplets_response.json"));
 
-        StagePackageRequest request = new StagePackageRequest()
-                .withBuildpack("http://github.com/myorg/awesome-buildpack")
-                .withEnvironmentVariable("CUSTOM_ENV_VAR", "hello")
-                .withId("test-id")
-                .withStack("cflinuxfs2");
+        StagePackageRequest request = StagePackageRequest.builder()
+                .buildpack("http://github.com/myorg/awesome-buildpack")
+                .environmentVariable("CUSTOM_ENV_VAR", "hello")
+                .id("test-id")
+                .stack("cflinuxfs2")
+                .build();
 
-        StagePackageResponse response = Streams.wrap(this.packages.stage(request)).next().get();
+        StagePackageResponse expected = StagePackageResponse.builder()
+                .id("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9")
+                .state("STAGED")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .buildpack("http://buildpack.git.url.com")
+                .error("example error")
+                .environmentVariable("cloud", "foundry")
+                .createdAt("2015-07-27T22:43:30Z")
+                .link("self", Link.builder()
+                        .href("/v3/droplets/guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9")
+                        .build())
+                .link("package", Link.builder()
+                        .href("/v3/packages/guid-1df1d953-ef12-4604-a746-d6e047314c12")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8")
+                        .build())
+                .link("assign_current_droplet", Link.builder()
+                        .href("/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8/current_droplet")
+                        .method("PUT")
+                        .build())
+                .build();
 
-        assertEquals("http://buildpack.git.url.com", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
-        assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
-        assertEquals("example error", response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
-        assertNull(response.getProcfile());
-        assertEquals("STAGED", response.getState());
-        assertNull(response.getUpdatedAt());
-        validateLinks(response, "self", "package", "app", "assign_current_droplet");
+        StagePackageResponse actual = Streams.wrap(this.packages.stage(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -298,18 +426,22 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .requestPayload("v3/packages/POST_{id}_droplets_request.json")
                 .errorResponse());
 
-        StagePackageRequest request = new StagePackageRequest()
-                .withBuildpack("http://github.com/myorg/awesome-buildpack")
-                .withEnvironmentVariable("CUSTOM_ENV_VAR", "hello")
-                .withId("test-id")
-                .withStack("cflinuxfs2");
+        StagePackageRequest request = StagePackageRequest.builder()
+                .buildpack("http://github.com/myorg/awesome-buildpack")
+                .environmentVariable("CUSTOM_ENV_VAR", "hello")
+                .id("test-id")
+                .stack("cflinuxfs2")
+                .build();
 
         Streams.wrap(this.packages.stage(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void stageInvalidRequest() {
-        Streams.wrap(this.packages.stage(new StagePackageRequest())).next().get();
+        StagePackageRequest request = StagePackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.stage(request)).next().get();
     }
 
     @Test
@@ -321,22 +453,43 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .status(CREATED)
                 .responsePayload("v3/packages/POST_{id}_upload_response.json"));
 
-        UploadPackageRequest request = new UploadPackageRequest()
-                .withFile(new ClassPathResource("v3/packages/test-file").getFile())
-                .withId("test-id");
+        UploadPackageRequest request = UploadPackageRequest.builder()
+                .file(new ClassPathResource("v3/packages/test-file").getFile())
+                .id("test-id")
+                .build();
 
-        UploadPackageResponse response = Streams.wrap(this.packages.upload(request)).next().get();
+        UploadPackageResponse expected = UploadPackageResponse.builder()
+                .id("guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50")
+                .type("bits")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .state("PROCESSING_UPLOAD")
+                .createdAt("2015-08-06T00:36:54Z")
+                .updatedAt("2015-08-06T00:36:55Z")
+                .link("self", Link.builder()
+                        .href("/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50")
+                        .build())
+                .link("upload", Link.builder()
+                        .href("/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/upload")
+                        .method("POST")
+                        .build())
+                .link("download", Link.builder()
+                        .href("/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/download")
+                        .method("GET")
+                        .build())
+                .link("stage", Link.builder()
+                        .href("/v3/packages/guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50/droplets")
+                        .method("POST")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-06761177-23bb-4dbc-a9da-90cd993d495f")
+                        .build())
+                .build();
 
-        assertEquals("2015-08-06T00:36:54Z", response.getCreatedAt());
-        assertNull(response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50", response.getId());
-        assertEquals("PROCESSING_UPLOAD", response.getState());
-        assertEquals("bits", response.getType());
-        assertEquals("2015-08-06T00:36:55Z", response.getUpdatedAt());
-        assertNull(response.getUrl());
-        validateLinks(response, "self", "upload", "download", "stage", "app");
+        UploadPackageResponse actual = Streams.wrap(this.packages.upload(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -348,16 +501,20 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .anyRequestPayload()
                 .errorResponse());
 
-        UploadPackageRequest request = new UploadPackageRequest()
-                .withFile(new ClassPathResource("v3/packages/test-file").getFile())
-                .withId("test-id");
+        UploadPackageRequest request = UploadPackageRequest.builder()
+                .file(new ClassPathResource("v3/packages/test-file").getFile())
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.packages.upload(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void uploadInvalidRequest() {
-        Streams.wrap(this.packages.upload(new UploadPackageRequest())).next().get();
+        UploadPackageRequest request = UploadPackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.upload(request)).next().get();
     }
 
 }

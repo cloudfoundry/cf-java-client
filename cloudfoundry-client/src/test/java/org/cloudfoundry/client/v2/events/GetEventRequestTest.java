@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class GetEventRequestTest {
 
     @Test
-    public void test() {
-        GetEventRequest request = new GetEventRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetEventRequest()
-                .withId("test-id")
+        ValidationResult result = GetEventRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class GetEventRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetEventRequest()
+        ValidationResult result = GetEventRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

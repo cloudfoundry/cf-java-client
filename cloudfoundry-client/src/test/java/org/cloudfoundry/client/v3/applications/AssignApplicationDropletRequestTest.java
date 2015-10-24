@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class AssignApplicationDropletRequestTest {
 
     @Test
-    public void test() {
-        AssignApplicationDropletRequest request = new AssignApplicationDropletRequest()
-                .withDropletId("test-droplet-id")
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-droplet-id", request.getDropletId());
-    }
-
-    @Test
     public void isValidId() {
-        ValidationResult result = new AssignApplicationDropletRequest()
-                .withDropletId("test-droplet-id")
-                .withId("test-id")
+        ValidationResult result = AssignApplicationDropletRequest.builder()
+                .dropletId("test-droplet-id")
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class AssignApplicationDropletRequestTest {
 
     @Test
     public void isValidNoDropletId() {
-        ValidationResult result = new AssignApplicationDropletRequest()
-                .withId("test-id")
+        ValidationResult result = AssignApplicationDropletRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class AssignApplicationDropletRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new AssignApplicationDropletRequest()
-                .withDropletId("test-droplet-id")
+        ValidationResult result = AssignApplicationDropletRequest.builder()
+                .dropletId("test-droplet-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

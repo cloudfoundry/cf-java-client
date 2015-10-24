@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
 import org.junit.Test;
 import reactor.Publishers;
@@ -40,27 +41,39 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
 
     @Test
     public void list() {
-        ListSpacesResponse page1 = new ListSpacesResponse()
-                .withResource(new ListSpacesResponse.ListSpacesResponseResource()
-                        .withMetadata(new Metadata().withId("test-id-1"))
-                        .withEntity(new SpaceEntity().withName("test-name-1")))
-                .withTotalPages(2);
+        ListSpacesResponse page1 = ListSpacesResponse.builder()
+                .resource(ListSpacesResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-id-1")
+                                .build())
+                        .entity(SpaceEntity.builder()
+                                .name("test-name-1")
+                                .build())
+                        .build())
+                .totalPages(2)
+                .build();
         when(this.cloudFoundryClient.spaces().list(
-                new ListSpacesRequest().withOrganizationId("test-organization-id").withPage(1)))
+                ListSpacesRequest.builder().organizationId("test-organization-id").page(1).build()))
                 .thenReturn(Publishers.just(page1));
 
-        ListSpacesResponse page2 = new ListSpacesResponse()
-                .withResource(new ListSpacesResponse.ListSpacesResponseResource()
-                        .withMetadata(new Metadata().withId("test-id-2"))
-                        .withEntity(new SpaceEntity().withName("test-name-2")))
-                .withTotalPages(2);
+        ListSpacesResponse page2 = ListSpacesResponse.builder()
+                .resource(ListSpacesResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-id-2")
+                                .build())
+                        .entity(SpaceEntity.builder()
+                                .name("test-name-2")
+                                .build())
+                        .build())
+                .totalPages(2)
+                .build();
         when(this.cloudFoundryClient.spaces().list(
-                new ListSpacesRequest().withOrganizationId("test-organization-id").withPage(2)))
+                ListSpacesRequest.builder().organizationId("test-organization-id").page(2).build()))
                 .thenReturn(Publishers.just(page2));
 
         List<Space> expected = Arrays.asList(
-                new Space("test-id-1", "test-name-1"),
-                new Space("test-id-2", "test-name-2")
+                Space.builder().id("test-id-1").name("test-name-1").build(),
+                Space.builder().id("test-id-2").name("test-name-2").build()
         );
 
         List<Space> actual = Streams.wrap(this.spaces.list()).toList().poll();
@@ -72,4 +85,5 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     public void listNoOrganization() {
         this.spacesNoOrganization.list();
     }
+
 }

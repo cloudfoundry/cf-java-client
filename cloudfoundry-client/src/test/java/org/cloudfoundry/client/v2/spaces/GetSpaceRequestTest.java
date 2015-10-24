@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2.spaces;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
@@ -27,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class GetSpaceRequestTest {
 
     @Test
-    public void test() {
-        GetSpaceRequest request = new GetSpaceRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetSpaceRequest()
-                .withId("test-id")
+        ValidationResult result = GetSpaceRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -45,7 +37,8 @@ public final class GetSpaceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetSpaceRequest()
+        ValidationResult result = GetSpaceRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

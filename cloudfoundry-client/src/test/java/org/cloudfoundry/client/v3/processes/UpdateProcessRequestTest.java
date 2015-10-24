@@ -19,27 +19,18 @@ package org.cloudfoundry.client.v3.processes;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class UpdateProcessRequestTest {
 
     @Test
-    public void test() {
-        UpdateProcessRequest request = new UpdateProcessRequest()
-                .withId("test-id")
-                .withCommand("test-command");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-command", request.getCommand());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new UpdateProcessRequest()
-                .withId("test-id")
-                .withCommand("test-command")
+        ValidationResult result = UpdateProcessRequest.builder()
+                .id("test-id")
+                .command("test-command")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class UpdateProcessRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new UpdateProcessRequest()
-                .withCommand("test-command")
+        ValidationResult result = UpdateProcessRequest.builder()
+                .command("test-command")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class UpdateProcessRequestTest {
 
     @Test
     public void isValidNoCommand() {
-        ValidationResult result = new UpdateProcessRequest()
-                .withId("test-id")
+        ValidationResult result = UpdateProcessRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

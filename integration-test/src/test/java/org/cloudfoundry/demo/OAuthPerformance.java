@@ -74,8 +74,8 @@ public class OAuthPerformance {
 
                 startup.add(time(() -> {
                     client.set(new SpringCloudFoundryClientBuilder()
-                            .withApi(this.host)
-                            .withCredentials(this.username, this.password)
+                            .api(this.host)
+                            .credentials(this.username, this.password)
                             .build());
                 }));
 

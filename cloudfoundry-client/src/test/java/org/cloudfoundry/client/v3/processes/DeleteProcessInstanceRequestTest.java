@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class DeleteProcessInstanceRequestTest {
 
     @Test
-    public void test() {
-        DeleteProcessInstanceRequest request = new DeleteProcessInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-index", request.getIndex());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
-                .withId("test-id")
-                .withIndex("test-index")
+        ValidationResult result = DeleteProcessInstanceRequest.builder()
+                .id("test-id")
+                .index("test-index")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class DeleteProcessInstanceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
-                .withIndex("test-index")
+        ValidationResult result = DeleteProcessInstanceRequest.builder()
+                .index("test-index")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class DeleteProcessInstanceRequestTest {
 
     @Test
     public void isValidNoIndex() {
-        ValidationResult result = new DeleteProcessInstanceRequest()
-                .withId("test-id")
+        ValidationResult result = DeleteProcessInstanceRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
