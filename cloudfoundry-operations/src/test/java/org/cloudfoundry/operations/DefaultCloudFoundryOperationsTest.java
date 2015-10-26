@@ -18,11 +18,14 @@ package org.cloudfoundry.operations;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertNotNull;
 
 public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient);
+    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(
+            this.cloudFoundryClient, Optional.empty(), Optional.<String>empty());
 
     @Test
     public void organizations() {

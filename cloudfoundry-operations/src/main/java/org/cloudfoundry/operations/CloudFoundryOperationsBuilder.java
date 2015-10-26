@@ -17,13 +17,22 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import reactor.rx.Streams;
+
+import java.util.Optional;
 
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
  */
 public final class CloudFoundryOperationsBuilder {
 
-    private volatile CloudFoundryClient cloudFoundryClient;
+    private volatile Optional<CloudFoundryClient> cloudFoundryClient = Optional.empty();
+
+    private volatile Optional<String> organization = Optional.empty();
+
+    private volatile Optional<String> space = Optional.empty();
 
     /**
      * Configure the {@link CloudFoundryClient} to use
@@ -32,7 +41,31 @@ public final class CloudFoundryOperationsBuilder {
      * @return {@code this}
      */
     public CloudFoundryOperationsBuilder withCloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = cloudFoundryClient;
+        this.cloudFoundryClient = Optional.of(cloudFoundryClient);
+        return this;
+    }
+
+    /**
+     * Configure the organization to target
+     *
+     * @param organization the organization to target
+     * @return {@code this}
+     */
+    public CloudFoundryOperationsBuilder withTarget(String organization) {
+        this.organization = Optional.of(organization);
+        return this;
+    }
+
+    /**
+     * Configure the organization and space to target
+     *
+     * @param organization the organization to target
+     * @param space        the space to target
+     * @return {@code this}
+     */
+    public CloudFoundryOperationsBuilder withTarget(String organization, String space) {
+        this.organization = Optional.of(organization);
+        this.space = Optional.of(space);
         return this;
     }
 
@@ -44,15 +77,44 @@ public final class CloudFoundryOperationsBuilder {
      * @throws IllegalArgumentException if {@code cloudFoundryClient} has not been set
      */
     public CloudFoundryOperations build() {
-        notNull(this.cloudFoundryClient, "cloudFoundryClient must be set");
+        CloudFoundryClient cloudFoundryClient = this.cloudFoundryClient
+                .orElseThrow(() -> new IllegalArgumentException("CloudFoundryClient must be set"));
 
-        return new DefaultCloudFoundryOperations(this.cloudFoundryClient);
+        Optional<String> organizationId = getOrganizationId(cloudFoundryClient);
+        Optional<String> spaceId = getSpaceId(cloudFoundryClient, organizationId);
+
+        return new DefaultCloudFoundryOperations(cloudFoundryClient, organizationId, spaceId);
     }
 
-    private void notNull(Object object, String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
+    private Optional<String> getOrganizationId(CloudFoundryClient cloudFoundryClient) {
+        return this.organization.map(name -> {
+            ListOrganizationsRequest request = new ListOrganizationsRequest()
+                    .withName(name);
+
+            return Streams.wrap(cloudFoundryClient.organizations().list(request))
+                    .map(response -> response.getResources().stream())
+                    .map(stream -> stream.findFirst().map(resource -> resource.getMetadata().getId()))
+                    .observe(id -> id.orElseThrow(() -> new IllegalArgumentException(
+                                    String.format("Organization '%s' does not exist", name)))
+                    )
+                    .next().poll();
+        }).orElse(Optional.empty());
+    }
+
+    private Optional<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Optional<String> organizationId) {
+        return organizationId.map(orgId -> this.space.map(name -> {
+            ListSpacesRequest request = new ListSpacesRequest()
+                    .withOrganizationId(orgId)
+                    .withName(name);
+
+            return Streams.wrap(cloudFoundryClient.spaces().list(request))
+                    .map(response -> response.getResources().stream())
+                    .map(stream -> stream.findFirst().map(resource -> resource.getMetadata().getId()))
+                    .observe(id -> id.orElseThrow(() -> new IllegalArgumentException(
+                                    String.format("Space '%s' does not exist", name)))
+                    )
+                    .next().poll();
+        }).orElse(Optional.empty())).orElse(Optional.empty());
     }
 
 }
