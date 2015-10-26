@@ -19,7 +19,6 @@ package org.cloudfoundry.client.spring.v3.droplets;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
@@ -33,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -89,24 +87,15 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
         assertEquals("http://github.com/myorg/awesome-buildpack", response.getBuildpack());
         assertEquals("2015-07-27T22:43:16Z", response.getCreatedAt());
-
         assertEquals(getExpectedEnvironmentVariables(), response.getEnvironmentVariables());
         assertNull(response.getError());
-
-        Hash hash = response.getHash();
-        assertEquals("sha1", hash.getType());
-        assertNull(hash.getValue());
-
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
         assertEquals("whatuuid", response.getId());
-
-        assertEquals(3, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("package"));
-        assertNotNull(response.getLink("app"));
-
         assertNull(response.getProcfile());
         assertEquals("PENDING", response.getState());
         assertNull(response.getUpdatedAt());
+        validateLinks(response, "self", "package", "app");
         verify();
     }
 
@@ -144,25 +133,15 @@ public final class SpringDropletsTest extends AbstractRestTest {
 
         assertEquals("name-2141", resource.getBuildpack());
         assertEquals("2015-07-27T22:43:30Z", resource.getCreatedAt());
-
         assertEquals(environmentVariables, resource.getEnvironmentVariables());
         assertNull(resource.getError());
-
-        Hash hash = resource.getHash();
-        assertEquals("sha1", hash.getType());
-        assertNull(hash.getValue());
-
+        assertEquals("sha1", resource.getHash().getType());
+        assertNull(resource.getHash().getValue());
         assertEquals("guid-5be1225e-5f49-499a-87db-bcdff646eed6", resource.getId());
-
-        assertEquals(4, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("package"));
-        assertNotNull(resource.getLink("app"));
-        assertNotNull(resource.getLink("buildpack"));
-
         assertNull(resource.getProcfile());
         assertEquals("STAGING", resource.getState());
         assertNull(resource.getUpdatedAt());
+        validateLinks(resource, "self", "package", "app", "buildpack");
         verify();
     }
 

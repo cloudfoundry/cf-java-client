@@ -32,7 +32,6 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -96,16 +95,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), response.getDiskInMb());
         assertEquals("07063514-b0ca-4e58-adbb-8e8bd7eebd64", response.getId());
         assertEquals(Integer.valueOf(1), response.getInstances());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("scale"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("space"));
-
         assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:31Z", response.getUpdatedAt());
+        validateLinks(response, "self", "scale", "app", "space");
         verify();
     }
 
@@ -146,16 +139,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), resource.getDiskInMb());
         assertEquals("fdfa71c4-5e0e-4f68-adb6-82fc250cd233", resource.getId());
         assertEquals(Integer.valueOf(1), resource.getInstances());
-
-        assertEquals(4, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("scale"));
-        assertNotNull(resource.getLink("app"));
-        assertNotNull(resource.getLink("space"));
-
         assertEquals(Integer.valueOf(1024), resource.getMemoryInMb());
         assertEquals("web", resource.getType());
         assertEquals("2015-07-27T22:43:31Z", resource.getUpdatedAt());
+        validateLinks(resource, "self", "scale", "app", "space");
         verify();
     }
 
@@ -197,16 +184,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(100), response.getDiskInMb());
         assertEquals("1dbdf1dc-ec61-4ade-96bf-4e148092b2e8", response.getId());
         assertEquals(Integer.valueOf(3), response.getInstances());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("scale"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("space"));
-
         assertEquals(Integer.valueOf(100), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:32Z", response.getUpdatedAt());
+        validateLinks(response, "self", "scale", "app", "space");
         verify();
     }
 
@@ -251,16 +232,10 @@ public final class SpringProcessesTest extends AbstractRestTest {
         assertEquals(Integer.valueOf(1024), response.getDiskInMb());
         assertEquals("92d5b770-32ed-4f5c-8def-b1f2348447fb", response.getId());
         assertEquals(Integer.valueOf(1), response.getInstances());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("scale"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("space"));
-
         assertEquals(Integer.valueOf(1024), response.getMemoryInMb());
         assertEquals("web", response.getType());
         assertEquals("2015-07-27T22:43:32Z", response.getUpdatedAt());
+        validateLinks(response, "self", "scale", "app", "space");
         verify();
     }
 

@@ -38,7 +38,6 @@ public final class ListApplicationDropletsResponseTest {
         assertEquals("test-type", hash.getType());
         assertEquals("test-value", hash.getValue());
 
-
         Map<String, String> environmentVariables = new HashMap<>();
         environmentVariables.put("test-key-1", "test-value-1");
         environmentVariables.put("test-key-2", "test-value-2");
