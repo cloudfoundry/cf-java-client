@@ -37,11 +37,16 @@ public final class ApplicationsTest {
     private volatile CloudFoundryClient cloudFoundryClient;
 
     @Autowired
+    private volatile String organizationId;
+
+    @Autowired
     private volatile String spaceId;
 
     @Before
     public void zeroExistingApplications() {
-        ListApplicationsRequest request = new ListApplicationsRequest().withSpaceId(this.spaceId);
+        ListApplicationsRequest request = new ListApplicationsRequest()
+                .withOrganizationId(this.organizationId)
+                .withSpaceId(this.spaceId);
 
         long size = Streams.wrap(this.cloudFoundryClient.applications().list(request))
                 .map(PaginatedResponse::getResources)
