@@ -33,7 +33,6 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -42,6 +41,7 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -60,17 +60,17 @@ public final class SpringCloudFoundryClientBuilder {
 
     private final SslCertificateTruster sslCertificateTruster;
 
-    private volatile String clientId = "cf";
+    private volatile Optional<String> clientId = Optional.empty();
 
-    private volatile String clientSecret = "";
+    private volatile Optional<String> clientSecret = Optional.empty();
 
-    private volatile String host;
+    private volatile Optional<String> host = Optional.empty();
 
-    private volatile String username;
+    private volatile Optional<String> username = Optional.empty();
 
-    private volatile String password;
+    private volatile Optional<String> password = Optional.empty();
 
-    private volatile Boolean skipSslValidation;
+    private volatile Optional<Boolean> skipSslValidation = Optional.empty();
 
     /**
      * Creates a new instance of the builder
@@ -91,7 +91,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @return {@code this}
      */
     public SpringCloudFoundryClientBuilder withApi(String host) {
-        this.host = host;
+        this.host = Optional.of(host);
         return this;
     }
 
@@ -103,8 +103,8 @@ public final class SpringCloudFoundryClientBuilder {
      * @return {@code this}
      */
     public SpringCloudFoundryClientBuilder withClient(String clientId, String clientSecret) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.clientId = Optional.of(clientId);
+        this.clientSecret = Optional.of(clientSecret);
         return this;
     }
 
@@ -116,8 +116,8 @@ public final class SpringCloudFoundryClientBuilder {
      * @return {@code this}
      */
     public SpringCloudFoundryClientBuilder withCredentials(String username, String password) {
-        this.username = username;
-        this.password = password;
+        this.username = Optional.of(username);
+        this.password = Optional.of(password);
         return this;
     }
 
@@ -128,7 +128,7 @@ public final class SpringCloudFoundryClientBuilder {
      * @return {@code this}
      */
     public SpringCloudFoundryClientBuilder withSkipSslValidation(Boolean skipSslValidation) {
-        this.skipSslValidation = skipSslValidation;
+        this.skipSslValidation = Optional.of(skipSslValidation);
         return this;
     }
 
@@ -140,38 +140,48 @@ public final class SpringCloudFoundryClientBuilder {
      * @throws IllegalArgumentException if {@code host}, {@code username}, or {@code password} has not been set
      */
     public SpringCloudFoundryClient build() {
-        Assert.notNull(this.host, "host must be set");
-        Assert.hasText(this.username, "username must be set");
-        Assert.hasText(this.password, "password must be set");
+        String clientId = this.clientId.orElse("cf");
+        String clientSecret = this.clientSecret.orElse("");
+        String host = this.host
+                .orElseThrow(() -> new IllegalArgumentException("host must be set"));
+        String username = this.username
+                .orElseThrow(() -> new IllegalArgumentException("username must be set"));
+        String password = this.password
+                .orElseThrow(() -> new IllegalArgumentException("password must be set"));
+        Boolean skipSslValidation = this.skipSslValidation.orElse(false);
 
-        if (this.skipSslValidation != null && this.skipSslValidation) {
+        if (skipSslValidation) {
             try {
-                this.sslCertificateTruster.trust(this.host, 443, 5, SECONDS);
+                this.sslCertificateTruster.trust(host, 443, 5, SECONDS);
             } catch (GeneralSecurityException | IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        URI root = UriComponentsBuilder.newInstance().scheme("https").host(this.host).build().toUri();
-        return new SpringCloudFoundryClient(getRestOperations(), root);
+        URI root = UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
+        return new SpringCloudFoundryClient(getRestOperations(clientId, clientSecret, host, username, password), root);
     }
 
     private OAuth2ClientContext getOAuth2ClientContext() {
         return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
     }
 
-    private OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails() {
+    private OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(String clientId, String clientSecret,
+                                                                             String host, String username,
+                                                                             String password) {
         return new ResourceOwnerPasswordResourceDetailsBuilder()
-                .withClientId(this.clientId)
-                .withClientSecret(this.clientSecret)
-                .withAccessTokenUri(getAccessTokenUri())
-                .withUsername(this.username)
-                .withPassword(this.password)
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
+                .withAccessTokenUri(getAccessTokenUri(host))
+                .withUsername(username)
+                .withPassword(password)
                 .build();
     }
 
-    private OAuth2RestOperations getRestOperations() {
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails();
+    private OAuth2RestOperations getRestOperations(String clientId, String clientSecret, String host, String username,
+                                                   String password) {
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId,
+                clientSecret, host, username, password);
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
@@ -195,9 +205,9 @@ public final class SpringCloudFoundryClientBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private String getAccessTokenUri() {
+    private String getAccessTokenUri(String host) {
         String infoUri = UriComponentsBuilder.newInstance()
-                .scheme("https").host(this.host).pathSegment("info")
+                .scheme("https").host(host).pathSegment("info")
                 .build().toUriString();
 
         Map<String, String> results = this.restTemplate.getForObject(infoUri, Map.class);

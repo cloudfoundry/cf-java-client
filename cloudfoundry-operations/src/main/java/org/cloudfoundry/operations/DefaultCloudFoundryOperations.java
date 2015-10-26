@@ -18,11 +18,14 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 
+import java.util.Optional;
+
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Organizations organizations;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient) {
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Optional<String> organizationId,
+                                  Optional<String> spaceId) {
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
     }
 
