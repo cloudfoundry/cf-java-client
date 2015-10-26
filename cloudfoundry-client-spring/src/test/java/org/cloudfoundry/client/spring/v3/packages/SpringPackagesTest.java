@@ -19,7 +19,6 @@ package org.cloudfoundry.client.spring.v3.packages;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -43,7 +42,6 @@ import java.util.Collections;
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -72,20 +70,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
         assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
         assertNull(response.getError());
-
         assertEquals("sha1", response.getHash().getType());
         assertNull(response.getHash().getValue());
-
         assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
-
-        assertEquals(2, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("app"));
-
         assertEquals("READY", response.getState());
         assertEquals("docker", response.getType());
         assertNull(response.getUpdatedAt());
         assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
+        validateLinks(response, "self", "app");
         verify();
     }
 
@@ -124,20 +116,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
         assertEquals("2015-08-06T00:36:55Z", response.getCreatedAt());
         assertNull(response.getError());
-
         assertEquals("sha1", response.getHash().getType());
         assertNull(response.getHash().getValue());
-
         assertEquals("126e54c4-811d-4f7a-9a34-804130a75ab2", response.getId());
-
-        assertEquals(2, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("app"));
-
         assertEquals("READY", response.getState());
         assertEquals("docker", response.getType());
         assertNull(response.getUpdatedAt());
         assertEquals("docker://cloudfoundry/runtime-ci", response.getUrl());
+        validateLinks(response, "self", "app");
         verify();
     }
 
@@ -206,23 +192,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
         assertEquals("2015-07-27T22:43:15Z", response.getCreatedAt());
         assertNull(response.getError());
-
         assertEquals("sha1", response.getHash().getType());
         assertNull(response.getHash().getValue());
-
         assertEquals("guid-9067cc41-b832-4de9-89a2-0987dab65e8e", response.getId());
-
-        assertEquals(5, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("upload"));
-        assertNotNull(response.getLink("download"));
-        assertNotNull(response.getLink("stage"));
-        assertNotNull(response.getLink("app"));
-
         assertEquals("AWAITING_UPLOAD", response.getState());
         assertEquals("bits", response.getType());
         assertNull(response.getUpdatedAt());
         assertNull(response.getUrl());
+        validateLinks(response, "self", "upload", "download", "stage", "app");
         verify();
     }
 
@@ -260,18 +237,11 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("sha1", resource.getHash().getType());
         assertNull(resource.getHash().getValue());
         assertEquals("guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a", resource.getId());
-
-        assertEquals(5, resource.getLinks().size());
-        assertNotNull(resource.getLink("self"));
-        assertNotNull(resource.getLink("upload"));
-        assertNotNull(resource.getLink("download"));
-        assertNotNull(resource.getLink("stage"));
-        assertNotNull(resource.getLink("app"));
-
         assertEquals("AWAITING_UPLOAD", resource.getState());
         assertEquals("bits", resource.getType());
         assertNull(resource.getUpdatedAt());
         assertNull(resource.getUrl());
+        validateLinks(resource, "self", "upload", "download", "stage", "app");
         verify();
     }
 
@@ -311,22 +281,13 @@ public final class SpringPackagesTest extends AbstractRestTest {
         assertEquals("2015-07-27T22:43:30Z", response.getCreatedAt());
         assertEquals(Collections.singletonMap("cloud", "foundry"), response.getEnvironmentVariables());
         assertEquals("example error", response.getError());
-
-        Hash hash = response.getHash();
-        assertEquals("sha1", hash.getType());
-        assertNull(hash.getValue());
-
+        assertEquals("sha1", response.getHash().getType());
+        assertNull(response.getHash().getValue());
         assertEquals("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9", response.getId());
-
-        assertEquals(4, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("package"));
-        assertNotNull(response.getLink("app"));
-        assertNotNull(response.getLink("assign_current_droplet"));
-
         assertNull(response.getProcfile());
         assertEquals("STAGED", response.getState());
         assertNull(response.getUpdatedAt());
+        validateLinks(response, "self", "package", "app", "assign_current_droplet");
         verify();
     }
 
@@ -368,23 +329,14 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
         assertEquals("2015-08-06T00:36:54Z", response.getCreatedAt());
         assertNull(response.getError());
-
         assertEquals("sha1", response.getHash().getType());
         assertNull(response.getHash().getValue());
-
         assertEquals("guid-9d6845e9-0dab-41e9-a1fb-48b5b8f35d50", response.getId());
-
-        assertEquals(5, response.getLinks().size());
-        assertNotNull(response.getLink("self"));
-        assertNotNull(response.getLink("upload"));
-        assertNotNull(response.getLink("download"));
-        assertNotNull(response.getLink("stage"));
-        assertNotNull(response.getLink("app"));
-
         assertEquals("PROCESSING_UPLOAD", response.getState());
         assertEquals("bits", response.getType());
         assertEquals("2015-08-06T00:36:55Z", response.getUpdatedAt());
         assertNull(response.getUrl());
+        validateLinks(response, "self", "upload", "download", "stage", "app");
         verify();
     }
 
