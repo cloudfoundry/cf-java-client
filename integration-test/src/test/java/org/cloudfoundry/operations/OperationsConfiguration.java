@@ -18,6 +18,7 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.ClientConfiguration;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +32,11 @@ import org.springframework.context.annotation.Lazy;
 public class OperationsConfiguration {
 
     @Bean
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient) {
+    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+                                                  @Value("${test.organization}") String organization) {
         return new CloudFoundryOperationsBuilder()
                 .withCloudFoundryClient(cloudFoundryClient)
+                .withTarget(organization)
                 .build();
     }
 

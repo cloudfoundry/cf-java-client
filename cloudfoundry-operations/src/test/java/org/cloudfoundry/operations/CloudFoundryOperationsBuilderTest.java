@@ -90,21 +90,19 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
         ListOrganizationsResponse orgResponse = new ListOrganizationsResponse()
                 .withResource(new ListOrganizationsResponseResource()
                         .withMetadata(new Metadata().withId("test-organization-id"))
-                        .withEntity(new ListOrganizationsResponseEntity()
-                                .withName("test-name")))
+                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name")))
                 .withTotalPages(1);
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Publishers.just(orgResponse));
 
         ListSpacesRequest spaceRequest = new ListSpacesRequest()
                 .withOrganizationId("test-organization-id")
-                .withName("test-name");
+                .withName("test-space");
 
         ListSpacesResponse spaceResponse = new ListSpacesResponse()
                 .withResource(new ListSpacesResponseResource()
                         .withMetadata(new Metadata().withId("test-space-id"))
-                        .withEntity(new SpaceEntity()
-                                .withName("test-name")))
+                        .withEntity(new SpaceEntity().withName("test-name")))
                 .withTotalPages(1);
 
         when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Publishers.just(spaceResponse));
@@ -123,15 +121,14 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
         ListOrganizationsResponse orgResponse = new ListOrganizationsResponse()
                 .withResource(new ListOrganizationsResponseResource()
                         .withMetadata(new Metadata().withId("test-organization-id"))
-                        .withEntity(new ListOrganizationsResponseEntity()
-                                .withName("test-name")))
+                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name")))
                 .withTotalPages(1);
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Publishers.just(orgResponse));
 
         ListSpacesRequest spaceRequest = new ListSpacesRequest()
                 .withOrganizationId("test-organization-id")
-                .withName("test-name");
+                .withName("test-space");
 
         ListSpacesResponse spaceResponse = new ListSpacesResponse()
                 .withTotalPages(1);

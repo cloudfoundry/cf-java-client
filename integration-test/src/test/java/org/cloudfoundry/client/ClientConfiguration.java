@@ -20,6 +20,7 @@ import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClientBuilder;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,8 +54,19 @@ public class ClientConfiguration {
     }
 
     @Bean
-    String spaceId(@Value("${test.space}") String space, CloudFoundryClient cloudFoundryClient) {
-        return Streams.wrap(cloudFoundryClient.spaces().list(new ListSpacesRequest().withName(space)))
+    String organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
+        return Streams.wrap(cloudFoundryClient.organizations().list(new ListOrganizationsRequest()
+                .withName(organization)))
+                .flatMap(response -> Streams.from(response.getResources()))
+                .map(resource -> resource.getMetadata().getId())
+                .next().poll();
+    }
+
+
+    @Bean
+    String spaceId(CloudFoundryClient cloudFoundryClient, String organizationId, @Value("${test.space}") String space) {
+        return Streams.wrap(cloudFoundryClient.spaces().list(
+                new ListSpacesRequest().withOrganizationId(organizationId).withName(space)))
                 .flatMap(response -> Streams.from(response.getResources()))
                 .map(resource -> resource.getMetadata().getId())
                 .next().poll();

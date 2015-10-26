@@ -24,14 +24,22 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Organizations organizations;
 
+    private final Spaces spaces;
+
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Optional<String> organizationId,
                                   Optional<String> spaceId) {
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
+        this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
     }
 
     @Override
     public Organizations organizations() {
         return this.organizations;
+    }
+
+    @Override
+    public Spaces spaces() {
+        return this.spaces;
     }
 
 }

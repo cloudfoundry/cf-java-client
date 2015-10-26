@@ -172,4 +172,31 @@ public final class ListSpacesRequest extends PaginatedRequest<ListSpacesRequest>
         return new ValidationResult();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ListSpacesRequest that = (ListSpacesRequest) o;
+
+        if (applicationIds != null ? !applicationIds.equals(that.applicationIds) : that.applicationIds != null)
+            return false;
+        if (developerIds != null ? !developerIds.equals(that.developerIds) : that.developerIds != null) return false;
+        if (names != null ? !names.equals(that.names) : that.names != null) return false;
+        return !(organizationIds != null ? !organizationIds.equals(that.organizationIds) : that.organizationIds !=
+                null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (applicationIds != null ? applicationIds.hashCode() : 0);
+        result = 31 * result + (developerIds != null ? developerIds.hashCode() : 0);
+        result = 31 * result + (names != null ? names.hashCode() : 0);
+        result = 31 * result + (organizationIds != null ? organizationIds.hashCode() : 0);
+        return result;
+    }
+
 }

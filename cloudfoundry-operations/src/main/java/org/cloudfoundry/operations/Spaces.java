@@ -16,23 +16,18 @@
 
 package org.cloudfoundry.operations;
 
+import org.reactivestreams.Publisher;
+
 /**
- * Main entry point to the Cloud Foundry Operations API
+ * Main entry point to the Cloud Foundry Spaces Operations API
  */
-public interface CloudFoundryOperations {
+public interface Spaces {
 
     /**
-     * Main entry point to the Cloud Foundry Organizations Operations API
+     * Lists the spaces
      *
-     * @return the Cloud Foundry Organizations Operations API
+     * @return the spaces
      */
-    Organizations organizations();
-
-    /**
-     * Main entry point to the Cloud Foundry Spaces Operations API
-     *
-     * @return the Cloud Foundry Spaces Operations API
-     */
-    Spaces spaces();
+    Publisher<Space> list();
 
 }

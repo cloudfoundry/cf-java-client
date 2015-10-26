@@ -16,23 +16,18 @@
 
 package org.cloudfoundry.operations;
 
-/**
- * Main entry point to the Cloud Foundry Operations API
- */
-public interface CloudFoundryOperations {
+import org.junit.Test;
 
-    /**
-     * Main entry point to the Cloud Foundry Organizations Operations API
-     *
-     * @return the Cloud Foundry Organizations Operations API
-     */
-    Organizations organizations();
+import static org.junit.Assert.assertEquals;
 
-    /**
-     * Main entry point to the Cloud Foundry Spaces Operations API
-     *
-     * @return the Cloud Foundry Spaces Operations API
-     */
-    Spaces spaces();
+public final class SpaceTest {
 
+    @Test
+    public void test() {
+        Space space = new Space("test-id", "test-name");
+
+        assertEquals("test-id", space.getId());
+        assertEquals("test-name", space.getName());
+    }
+    
 }

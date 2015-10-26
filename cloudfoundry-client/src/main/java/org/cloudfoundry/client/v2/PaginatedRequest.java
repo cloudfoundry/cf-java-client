@@ -121,8 +121,6 @@ public abstract class PaginatedRequest<T extends PaginatedRequest<T>> {
         return result;
     }
 
-
-
     /**
      * The order direction of the {@link PaginatedRequest}
      */
