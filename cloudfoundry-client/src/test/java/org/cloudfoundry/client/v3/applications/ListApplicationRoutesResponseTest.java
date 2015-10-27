@@ -20,7 +20,6 @@ import org.cloudfoundry.client.v3.Link;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -29,9 +28,7 @@ public final class ListApplicationRoutesResponseTest {
 
     @Test
     public void test() {
-        Map<String, Link> links = new HashMap<>();
-        links.put("test-link-1", new Link());
-        links.put("test-link-2", new Link());
+        Map<String, Link> links = ApplicationsTestUtil.getLinks();
 
         ListApplicationRoutesResponse.Resource resource = new ListApplicationRoutesResponse.Resource()
                 .withCreatedAt("test-created-at")

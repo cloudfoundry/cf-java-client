@@ -16,54 +16,13 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.client.v3.Hash;
-import org.cloudfoundry.client.v3.Link;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public final class ListPackagesResponseTest {
 
     @Test
     public void test() {
-        new ListPackagesResponse();
-
-        Hash hash = new Hash()
-                .withType("test-type")
-                .withValue("test-value");
-
-        assertEquals("test-type", hash.getType());
-        assertEquals("test-value", hash.getValue());
-
-        Map<String, Link> links = new HashMap<>();
-        links.put("test-link-1", new Link());
-        links.put("test-link-2", new Link());
-
-        ListPackagesResponse.Resource resource = new ListPackagesResponse.Resource()
-                .withCreatedAt("test-created-at")
-                .withError("test-error")
-                .withHash(hash)
-                .withId("test-id")
-                .withLink("test-link-1", links.get("test-link-1"))
-                .withLinks(Collections.singletonMap("test-link-2", links.get("test-link-2")))
-                .withState("test-state")
-                .withType("test-type")
-                .withUpdatedAt("test-updated-at")
-                .withUrl("test-url");
-
-        assertEquals("test-created-at", resource.getCreatedAt());
-        assertEquals("test-error", resource.getError());
-        assertEquals(hash, resource.getHash());
-        assertEquals("test-id", resource.getId());
-        assertEquals(links, resource.getLinks());
-        assertEquals("test-state", resource.getState());
-        assertEquals("test-type", resource.getType());
-        assertEquals("test-updated-at", resource.getUpdatedAt());
-        assertEquals("test-url", resource.getUrl());
+        PackagesTestUtil.test(new ListPackagesResponse.Resource());
     }
 
 }
