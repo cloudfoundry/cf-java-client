@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -54,6 +55,8 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSpacesTest extends AbstractRestTest {
@@ -351,6 +354,39 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() {
         Streams.wrap(this.spaces.create(new CreateSpaceRequest())).next().get();
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id?async=true")
+                .status(NO_CONTENT));
+
+        DeleteSpaceRequest request = new DeleteSpaceRequest()
+                .withAsync(true)
+                .withId("test-id");
+
+        Streams.wrap(this.spaces.delete(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id?async=true")
+                .errorResponse());
+
+        DeleteSpaceRequest request = new DeleteSpaceRequest()
+                .withAsync(true)
+                .withId("test-id");
+
+        Streams.wrap(this.spaces.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        Streams.wrap(this.spaces.delete(new DeleteSpaceRequest())).next().get();
     }
 
     public void get() {
