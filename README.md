@@ -113,19 +113,20 @@ _Cloud Foundry Open Source Platform as a Service_
 
 ## Learn
 
-Our documentation, currently a work in progress, is available here: [http://cloudfoundry.github.com/](http://cloudfoundry.github.com/)
+Our documentation, currently a work in progress, is available here: [http://docs.cloudfoundry.org/buildpacks/java/java-client.html](http://docs.cloudfoundry.org/buildpacks/java/java-client.html)
 
 ## Ask Questions
 
-Questions about the Cloud Foundry Open Source Project can be directed to our Google Groups.
+Questions about the Cloud Foundry Open Source Project can be directed to our Mailing Lists.
 
-* Cloud Foundry Developers: [https://groups.google.com/a/cloudfoundry.org/group/vcap-dev/topics](https://groups.google.com/a/cloudfoundry.org/group/vcap-dev/topics)
-* BOSH Developers: [https://groups.google.com/a/cloudfoundry.org/group/bosh-dev/topics](https://groups.google.com/a/cloudfoundry.org/group/bosh-dev/topics)
-* BOSH Users:[https://groups.google.com/a/cloudfoundry.org/group/bosh-users/topics](https://groups.google.com/a/cloudfoundry.org/group/bosh-users/topics)
+* Cloud Foundry Developers:
+[cf-dev](https://lists.cloudfoundry.org/pipermail/cf-dev)
+* BOSH:
+[cf-bosh](https://lists.cloudfoundry.org/pipermail/cf-bosh)
 
 ## File a bug
 
-Bugs can be filed using Github Issues within the various repositories of the [Cloud Foundry](http://github.com/cloudfoundry) components.
+Bugs can be filed using Github Issues within the various repositories of the [Cloud Foundry](http://github.com/cloudfoundry) components, including for [this project](https://github.com/cloudfoundry/cf-java-client/issues)
 
 ## OSS Contributions
 
@@ -133,7 +134,7 @@ The Cloud Foundry team uses GitHub and accepts contributions via [pull request](
 
 Follow these steps to make a contribution to any of our open source repositories:
 
-1. Complete our CLA Agreement for [individuals](http://www.cloudfoundry.org/individualcontribution.pdf) or [corporations](http://www.cloudfoundry.org/corpcontribution.pdf)
+1. Complete our CLA Agreement for [individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf) or [corporations](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf)
 2. Set your name and email
 
 ```
