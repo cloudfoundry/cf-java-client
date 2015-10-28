@@ -62,7 +62,7 @@ public final class GetSpaceSummaryResponse {
      * @param applications list of application summaries for this space
      * @return {@code this}
      */
-    @JsonProperty("applications")
+    @JsonProperty("apps")
     public final GetSpaceSummaryResponse withApplications(List<SpaceApplicationSummary> applications) {
         this.applications.addAll(applications);
         return this;

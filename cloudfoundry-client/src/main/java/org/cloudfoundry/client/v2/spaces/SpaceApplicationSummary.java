@@ -29,7 +29,7 @@ import java.util.List;
  */
 public final class SpaceApplicationSummary extends AbstractApplicationEntity<SpaceApplicationSummary> {
 
-    private volatile String id; //guid
+    private volatile String id;
 
     private final List<Route> routes = new ArrayList<>();
 
@@ -206,7 +206,7 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity<Spa
 
         private volatile String host;
 
-        private volatile String id; //guid
+        private volatile String id;
 
         /**
          * Returns domain summary
@@ -273,7 +273,7 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity<Spa
 
         public final static class Domain {
 
-            private volatile String id; //guid
+            private volatile String id;
 
             private volatile String name;
 
