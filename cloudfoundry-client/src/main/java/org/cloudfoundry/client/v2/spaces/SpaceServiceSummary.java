@@ -29,7 +29,7 @@ public final class SpaceServiceSummary {
 
     private volatile String dashboardUrl;
 
-    private volatile String id; //guid
+    private volatile String id;
 
     private volatile String lastOperation;
 
@@ -165,7 +165,7 @@ public final class SpaceServiceSummary {
 
     public final static class Plan {
 
-        private volatile String id; //guid
+        private volatile String id;
 
         private volatile String name;
 
@@ -236,7 +236,7 @@ public final class SpaceServiceSummary {
 
         public final static class Service {
 
-            private volatile String id; //guid
+            private volatile String id;
 
             private volatile String label;
 

@@ -24,6 +24,7 @@ import java.util.Map;
  * The core entity response payload for Application resources
  *
  * <p><b>This class is NOT threadsafe.</b>
+ *
  * @param <E> the "self" type.  Used to ensure the appropriate type is returned from chainable APIs.
  */
 public abstract class AbstractApplicationEntity<E extends AbstractApplicationEntity<E>> {
@@ -44,7 +45,7 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
 
     private volatile Integer diskQuota;
 
-    private volatile Map<String, Object> dockerCredentialsJson; // can be redacted
+    private volatile Map<String, Object> dockerCredentialsJson;
 
     private volatile String dockerImage;
 
@@ -68,9 +69,9 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
 
     private volatile Boolean production;
 
-    private volatile String spaceId; //guid
+    private volatile String spaceId;
 
-    private volatile String stackId; //guid
+    private volatile String stackId;
 
     private volatile String stagingFailedDescription;
 
@@ -97,11 +98,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param buildpack the buildpack
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("buildpack")
     public final E withBuildpack(String buildpack) {
         this.buildpack = buildpack;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -119,11 +120,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param command the command
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("command")
     public final E withCommand(String command) {
         this.command = command;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -143,11 +144,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @return {@code this}
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     @JsonProperty("console")
     public final E console(Boolean console) {
         this.console = console;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -167,11 +168,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @return {@code this}
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     @JsonProperty("debug")
     public final E debug(Boolean debug) {
         this.debug = debug;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -189,11 +190,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param detectedBuildpack the autodetected buildpack that staged the application
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("detected_buildpack")
     public final E withDetectedBuildpack(String detectedBuildpack) {
         this.detectedBuildpack = detectedBuildpack;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -211,11 +212,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param detectedStartCommand the command detected by the buildpack during staging
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("detected_start_command")
     public final E withDetectedStartCommand(String detectedStartCommand) {
         this.detectedStartCommand = detectedStartCommand;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -233,11 +234,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param diego whether to use diego to stage and to run when available
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("diego")
     public final E diego(Boolean diego) {
         this.diego = diego;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -255,11 +256,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param diskQuota the maximum amount of disk available to an instance of an application in megabytes
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("disk_quota")
     public final E withDiskQuota(Integer diskQuota) {
         this.diskQuota = diskQuota;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -277,11 +278,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param dockerCredentialsJson the Docker credentials for pulling docker image
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("docker_credentials_json")
     public final E withDockerCredentialsJson(Map<String, Object> dockerCredentialsJson) {
         this.dockerCredentialsJson = dockerCredentialsJson;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -299,11 +300,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param dockerImage the name of the Docker image containing the application
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("docker_image")
     public final E withDockerImage(String dockerImage) {
         this.dockerImage = dockerImage;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -321,11 +322,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param enableSsh whether to enable ssh
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("enable_ssh")
     public final E enableSsh(Boolean enableSsh) {
         this.enableSsh = enableSsh;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -343,11 +344,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param environmentJson the application environment variables
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("environment_json")
     public final E withEnvironmentJson(Map<String, String> environmentJson) {
         this.environmentJson = environmentJson;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -365,11 +366,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param healthCheckTimeout the health check timeout
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("health_check_timeout")
     public final E withHealthCheckTimeout(Integer healthCheckTimeout) {
         this.healthCheckTimeout = healthCheckTimeout;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -387,11 +388,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param healthCheckType health check type
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("health_check_type")
     public final E withHealthCheckType(String healthCheckType) {
         this.healthCheckType = healthCheckType;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -409,11 +410,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param instances the number of instances
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("instances")
     public final E withInstances(Integer instances) {
         this.instances = instances;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -431,11 +432,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param memory the memory allocated to each instance in megabytes
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("memory")
     public final E withMemory(Integer memory) {
         this.memory = memory;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -453,11 +454,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param name the name
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("name")
     public final E withName(String name) {
         this.name = name;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -475,11 +476,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param packageState the current state of the package
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("package_state")
     public final E withPackageState(String packageState) {
         this.packageState = packageState;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -497,11 +498,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param packageUpdatedAt the time package was last updated
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("package_updated_at")
     public final E withPackageUpdatedAt(String packageUpdatedAt) {
         this.packageUpdatedAt = packageUpdatedAt;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -521,11 +522,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @return {@code this}
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     @JsonProperty("production")
     public final E production(Boolean production) {
         this.production = production;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -543,11 +544,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param spaceId space id
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("space_guid")
     public final E withSpaceId(String spaceId) {
         this.spaceId = spaceId;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -565,11 +566,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param stackId stack id
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("stack_guid")
     public final E withStackId(String stackId) {
         this.stackId = stackId;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -587,11 +588,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param stagingFailedDescription staging failed description
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("staging_failed_description")
     public final E withStagingFailedDescription(String stagingFailedDescription) {
         this.stagingFailedDescription = stagingFailedDescription;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -609,11 +610,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param stagingFailedReason staging failed reason
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("staging_failed_reason")
     public final E withStagingFailedReason(String stagingFailedReason) {
         this.stagingFailedReason = stagingFailedReason;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -631,11 +632,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param stagingTaskId staging task id
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("staging_task_id")
     public final E withStagingTaskId(String stagingTaskId) {
         this.stagingTaskId = stagingTaskId;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -653,11 +654,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param state state
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("state")
     public final E withState(String state) {
         this.state = state;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 
     /**
@@ -675,11 +676,11 @@ public abstract class AbstractApplicationEntity<E extends AbstractApplicationEnt
      * @param version version
      * @return {@code this}
      */
+    @SuppressWarnings("unchecked")
     @JsonProperty("version")
     public final E withVersion(String version) {
         this.version = version;
-        @SuppressWarnings("unchecked") E thisE = (E) this;
-        return thisE;
+        return (E) this;
     }
 }
 

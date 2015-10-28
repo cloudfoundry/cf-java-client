@@ -46,7 +46,6 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -409,6 +408,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         Streams.wrap(this.spaces.get(new GetSpaceRequest())).next().get();
     }
 
+    @Test
     public void getSummary() {
         mockRequest(new RequestContext()
                 .method(GET).path("/v2/spaces/test-id/summary")
@@ -420,76 +420,71 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
         GetSpaceSummaryResponse response = Streams.wrap(this.spaces.getSummary(request)).next().get();
 
-        {
-            List<SpaceApplicationSummary> applications = response.getApplications();
-            assertTrue(null != applications && applications.size() == 1);
-            SpaceApplicationSummary app = applications.get(0);
+        assertTrue(null != response.getApplications() && response.getApplications().size() == 1);
+        SpaceApplicationSummary app = response.getApplications().get(0);
 
-            assertEquals("e1efe0a2-a931-4604-a419-f76dbe23ad76", app.getId());
-            assertEquals(Integer.valueOf(1), app.getRunningInstances());
-            {
-                List<SpaceApplicationSummary.Route> routes = app.getRoutes();
-                assertTrue(null != routes && routes.size() == 1);
-                SpaceApplicationSummary.Route route = routes.get(0);
+        assertEquals("e1efe0a2-a931-4604-a419-f76dbe23ad76", app.getId());
+        assertEquals(Integer.valueOf(0), app.getRunningInstances());
 
-                assertEquals("af154090-baca-4805-a8a2-9db93a16a84b", route.getDomain().getId());
-                assertEquals("domain-48.example.com", route.getDomain().getName());
-                assertEquals("host-11", route.getHost());
-                assertEquals("3445e88d-adda-4255-9b9d-6f701fb0de17", route.getId());
-            }
-            assertEquals(Integer.valueOf(1), app.getServiceCount());
-            assertEquals(Collections.singletonList("name-654"), app.getServiceNames());
-            assertEquals(Collections.singletonList("host-11.domain-48.example.com"), app.getUrls());
+        assertTrue(null != app.getRoutes() && app.getRoutes().size() == 1);
+        SpaceApplicationSummary.Route route = app.getRoutes().get(0);
 
-            assertNull(app.getBuildpack());
-            assertNull(app.getCommand());
-            assertFalse(app.getConsole());
-            assertNull(app.getDebug());
-            assertNull(app.getDetectedBuildpack());
-            assertEquals("", app.getDetectedStartCommand());
-            assertFalse(app.getDiego());
-            assertEquals(Integer.valueOf(1024), app.getDiskQuota());
-            assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
-                    app.getDockerCredentialsJson());
-            assertNull(app.getDockerImage());
-            assertTrue(app.getEnableSsh());
-            assertNull(app.getEnvironmentJson());
-            assertNull(app.getHealthCheckTimeout());
-            assertEquals("port", app.getHealthCheckType());
-            assertEquals(Integer.valueOf(1), app.getInstances());
-            assertEquals(Integer.valueOf(1024), app.getMemory());
-            assertEquals("name-652", app.getName());
-            assertEquals("PENDING", app.getPackageState());
-            assertEquals("2015-07-27T22:43:19Z", app.getPackageUpdatedAt());
-            assertFalse(app.getProduction());
-            assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", app.getSpaceId());
-            assertEquals("01a9ea88-1028-4d1a-a8ee-d1acc686815c", app.getStackId());
-            assertNull(app.getStagingFailedDescription());
-            assertNull(app.getStagingFailedReason());
-            assertNull(app.getStagingTaskId());
-            assertEquals("STOPPED", app.getState());
-            assertEquals("6505d60e-2a6f-475c-8c1d-85c66139447e", app.getVersion());
-        }
+        assertEquals("af154090-baca-4805-a8a2-9db93a16a84b", route.getDomain().getId());
+        assertEquals("domain-48.example.com", route.getDomain().getName());
+        assertEquals("host-11", route.getHost());
+        assertEquals("3445e88d-adda-4255-9b9d-6f701fb0de17", route.getId());
+
+        assertEquals(Integer.valueOf(1), app.getServiceCount());
+        assertEquals(Collections.singletonList("name-654"), app.getServiceNames());
+        assertEquals(Collections.singletonList("host-11.domain-48.example.com"), app.getUrls());
+
+        assertNull(app.getBuildpack());
+        assertNull(app.getCommand());
+        assertFalse(app.getConsole());
+        assertNull(app.getDebug());
+        assertNull(app.getDetectedBuildpack());
+        assertEquals("", app.getDetectedStartCommand());
+        assertFalse(app.getDiego());
+        assertEquals(Integer.valueOf(1024), app.getDiskQuota());
+        assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
+                app.getDockerCredentialsJson());
+        assertNull(app.getDockerImage());
+        assertTrue(app.getEnableSsh());
+        assertNull(app.getEnvironmentJson());
+        assertNull(app.getHealthCheckTimeout());
+        assertEquals("port", app.getHealthCheckType());
+        assertEquals(Integer.valueOf(1), app.getInstances());
+        assertEquals(Integer.valueOf(1024), app.getMemory());
+        assertEquals("name-652", app.getName());
+        assertEquals("PENDING", app.getPackageState());
+        assertEquals("2015-07-27T22:43:19Z", app.getPackageUpdatedAt());
+        assertFalse(app.getProduction());
+        assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", app.getSpaceId());
+        assertEquals("01a9ea88-1028-4d1a-a8ee-d1acc686815c", app.getStackId());
+        assertNull(app.getStagingFailedDescription());
+        assertNull(app.getStagingFailedReason());
+        assertNull(app.getStagingTaskId());
+        assertEquals("STOPPED", app.getState());
+        assertEquals("6505d60e-2a6f-475c-8c1d-85c66139447e", app.getVersion());
+
         assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", response.getId());
         assertEquals("name-649", response.getName());
-        {
-            List<SpaceServiceSummary> services = response.getServices();
-            assertTrue(null != services && services.size() == 1);
-            SpaceServiceSummary serviceSummary = services.get(0);
 
-            assertEquals(Integer.valueOf(1), serviceSummary.getBoundAppCount());
-            assertNull(serviceSummary.getDashboardUrl());
-            assertEquals("83e3713f-5f9b-4168-a43c-02cc66493cc0", serviceSummary.getId());
-            assertNull(serviceSummary.getLastOperation());
-            assertEquals("", serviceSummary.getName());
+        assertTrue(null != response.getServices() && response.getServices().size() == 1);
+        SpaceServiceSummary serviceSummary = response.getServices().get(0);
 
-            assertEquals("67bd9226-6d63-48ac-9114-a756a01bff7c", serviceSummary.getServicePlan().getId());
-            assertEquals("name-655", serviceSummary.getServicePlan().getName());
-            assertEquals("64ce598e-0c24-4dba-bfa1-594187db7404", serviceSummary.getServicePlan().getService().getId());
-            assertEquals("label-23", serviceSummary.getServicePlan().getService().getLabel());
-            assertNull(serviceSummary.getServicePlan().getService().getProvider());
-            assertNull(serviceSummary.getServicePlan().getService().getVersion());
-        }
+        assertEquals(Integer.valueOf(1), serviceSummary.getBoundAppCount());
+        assertNull(serviceSummary.getDashboardUrl());
+        assertEquals("83e3713f-5f9b-4168-a43c-02cc66493cc0", serviceSummary.getId());
+        assertNull(serviceSummary.getLastOperation());
+        assertEquals("name-654", serviceSummary.getName());
+
+        assertEquals("67bd9226-6d63-48ac-9114-a756a01bff7c", serviceSummary.getServicePlan().getId());
+        assertEquals("name-655", serviceSummary.getServicePlan().getName());
+        assertEquals("64ce598e-0c24-4dba-bfa1-594187db7404", serviceSummary.getServicePlan().getService().getId());
+        assertEquals("label-23", serviceSummary.getServicePlan().getService().getLabel());
+        assertNull(serviceSummary.getServicePlan().getService().getProvider());
+        assertNull(serviceSummary.getServicePlan().getService().getVersion());
 
         verify();
     }
