@@ -3,7 +3,6 @@
 
 cf-java-client
 ================
-[![Build Status](https://travis-ci.org/cloudfoundry/cf-java-client.png)](https://travis-ci.org/cloudfoundry/cf-java-client)
 
 The cf-java-client repo contains a Java client library and tools for Cloud Foundry. Three major components are included
 in this repo.
@@ -145,4 +144,4 @@ $ git config --global user.email "your_email@youremail.com"
 3. Fork the repo
 4. Make your changes on a topic branch, commit, and push to github and open a pull request.
 
-Once your commits are approved by Travis CI and reviewed by the core team, they will be merged.
+Once your commits are approved by Concourse CI and reviewed by the core team, they will be merged.
