@@ -1,0 +1,11 @@
+
+application: first
+state: STARTED
+instances: 0/2
+usage: 1024M x 2 instance
+urls: cf-rocks.api.run.pivotal.io
+services: mysql
+
+  instance  state    cpu    memory        disk      
+  --------  -------  -----  ------------  ----------
+  id1       running  0.10%  513B of 613B  512B of 1K
