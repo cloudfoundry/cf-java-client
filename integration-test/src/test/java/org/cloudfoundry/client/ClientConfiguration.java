@@ -40,23 +40,26 @@ public class ClientConfiguration {
                                                 @Value("${test.password}") String password,
                                                 @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
         return new SpringCloudFoundryClientBuilder()
-                .withApi(host)
-                .withCredentials(username, password)
-                .withSkipSslValidation(skipSslValidation)
+                .api(host)
+                .credentials(username, password)
+                .skipSslValidation(skipSslValidation)
                 .build();
     }
 
     @Bean
     SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
         return new SpringLoggregatorClientBuilder()
-                .withCloudFoundryClient(cloudFoundryClient)
+                .cloudFoundryClient(cloudFoundryClient)
                 .build();
     }
 
     @Bean
     String organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
-        return Streams.wrap(cloudFoundryClient.organizations().list(new ListOrganizationsRequest()
-                .withName(organization)))
+        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                .name(organization)
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.organizations().list(request))
                 .flatMap(response -> Streams.from(response.getResources()))
                 .map(resource -> resource.getMetadata().getId())
                 .next().poll();
@@ -65,8 +68,12 @@ public class ClientConfiguration {
 
     @Bean
     String spaceId(CloudFoundryClient cloudFoundryClient, String organizationId, @Value("${test.space}") String space) {
-        return Streams.wrap(cloudFoundryClient.spaces().list(
-                new ListSpacesRequest().withOrganizationId(organizationId).withName(space)))
+        ListSpacesRequest request = ListSpacesRequest.builder()
+                .organizationId(organizationId)
+                .name(space)
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.spaces().list(request))
                 .flatMap(response -> Streams.from(response.getResources()))
                 .map(resource -> resource.getMetadata().getId())
                 .next().poll();

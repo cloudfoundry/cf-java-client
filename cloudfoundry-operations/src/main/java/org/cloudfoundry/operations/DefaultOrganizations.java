@@ -31,9 +31,12 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
 
     @Override
     public Publisher<Organization> list() {
-        return paginate(ListOrganizationsRequest::new, request -> this.cloudFoundryClient.organizations().list(request))
+        return paginate(
+                page -> ListOrganizationsRequest.builder().page(page).build(),
+                request -> this.cloudFoundryClient.organizations().list(request))
                 .flatMap(r -> Streams.from(r.getResources()))
-                .map(resource -> new Organization(resource.getMetadata().getId(), resource.getEntity().getName()));
+                .map(resource -> Organization.builder().id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName()).build());
     }
 
 }

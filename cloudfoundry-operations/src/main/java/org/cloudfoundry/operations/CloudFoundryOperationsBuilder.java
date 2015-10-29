@@ -40,7 +40,7 @@ public final class CloudFoundryOperationsBuilder {
      * @param cloudFoundryClient the {@link CloudFoundryClient} to use
      * @return {@code this}
      */
-    public CloudFoundryOperationsBuilder withCloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
+    public CloudFoundryOperationsBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = Optional.of(cloudFoundryClient);
         return this;
     }
@@ -51,7 +51,7 @@ public final class CloudFoundryOperationsBuilder {
      * @param organization the organization to target
      * @return {@code this}
      */
-    public CloudFoundryOperationsBuilder withTarget(String organization) {
+    public CloudFoundryOperationsBuilder target(String organization) {
         this.organization = Optional.of(organization);
         return this;
     }
@@ -63,7 +63,7 @@ public final class CloudFoundryOperationsBuilder {
      * @param space        the space to target
      * @return {@code this}
      */
-    public CloudFoundryOperationsBuilder withTarget(String organization, String space) {
+    public CloudFoundryOperationsBuilder target(String organization, String space) {
         this.organization = Optional.of(organization);
         this.space = Optional.of(space);
         return this;
@@ -88,8 +88,9 @@ public final class CloudFoundryOperationsBuilder {
 
     private Optional<String> getOrganizationId(CloudFoundryClient cloudFoundryClient) {
         return this.organization.map(name -> {
-            ListOrganizationsRequest request = new ListOrganizationsRequest()
-                    .withName(name);
+            ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                    .name(name)
+                    .build();
 
             return Streams.wrap(cloudFoundryClient.organizations().list(request))
                     .map(response -> response.getResources().stream())
@@ -103,9 +104,10 @@ public final class CloudFoundryOperationsBuilder {
 
     private Optional<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Optional<String> organizationId) {
         return organizationId.map(orgId -> this.space.map(name -> {
-            ListSpacesRequest request = new ListSpacesRequest()
-                    .withOrganizationId(orgId)
-                    .withName(name);
+            ListSpacesRequest request = ListSpacesRequest.builder()
+                    .organizationId(orgId)
+                    .name(name)
+                    .build();
 
             return Streams.wrap(cloudFoundryClient.spaces().list(request))
                     .map(response -> response.getResources().stream())

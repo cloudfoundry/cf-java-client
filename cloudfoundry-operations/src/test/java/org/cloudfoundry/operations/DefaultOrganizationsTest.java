@@ -37,29 +37,42 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     @Test
     public void list() {
-        ListOrganizationsResponse page1 = new ListOrganizationsResponse()
-                .withResource(new ListOrganizationsResponseResource()
-                        .withMetadata(new Metadata().withId("test-id-1"))
-                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name-1")))
-                .withTotalPages(2);
-        when(this.cloudFoundryClient.organizations().list(new ListOrganizationsRequest().withPage(1)))
+        ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
+                .resource(ListOrganizationsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-id-1")
+                                .build())
+                        .entity(ListOrganizationsResponseEntity.builder()
+                                .name("test-name-1")
+                                .build())
+                        .build())
+                .totalPages(2)
+                .build();
+        when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(1).build()))
                 .thenReturn(Publishers.just(page1));
 
-        ListOrganizationsResponse page2 = new ListOrganizationsResponse()
-                .withResource(new ListOrganizationsResponseResource()
-                        .withMetadata(new Metadata().withId("test-id-2"))
-                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name-2")))
-                .withTotalPages(2);
-        when(this.cloudFoundryClient.organizations().list(new ListOrganizationsRequest().withPage(2)))
+        ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
+                .resource(ListOrganizationsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-id-2")
+                                .build())
+                        .entity(ListOrganizationsResponseEntity.builder()
+                                .name("test-name-2")
+                                .build())
+                        .build())
+                .totalPages(2)
+                .build();
+        when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(2).build()))
                 .thenReturn(Publishers.just(page2));
 
         List<Organization> expected = Arrays.asList(
-                new Organization("test-id-1", "test-name-1"),
-                new Organization("test-id-2", "test-name-2")
+                Organization.builder().id("test-id-1").name("test-name-1").build(),
+                Organization.builder().id("test-id-2").name("test-name-2").build()
         );
 
         List<Organization> actual = Streams.wrap(this.organizations.list()).toList().poll();
 
         assertEquals(expected, actual);
     }
+
 }

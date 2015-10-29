@@ -18,7 +18,7 @@
         "stack_guid": "e458a99f-53a4-4da4-b78a-5f2eb212cc47",
         "buildpack": null,
         "detected_buildpack": null,
-        "environment_json": null,
+        "environment_json": {},
         "memory": 1024,
         "instances": 1,
         "disk_quota": 1024,

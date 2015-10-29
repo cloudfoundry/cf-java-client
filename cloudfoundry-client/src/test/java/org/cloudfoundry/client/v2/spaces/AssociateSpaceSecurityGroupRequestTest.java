@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class AssociateSpaceSecurityGroupRequestTest {
 
     @Test
-    public void test() {
-        AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
-                .withId("test-id")
-                .withSecurityGroupId("test-security-group-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-security-group-id", request.getSecurityGroupId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new AssociateSpaceSecurityGroupRequest()
-                .withId("test-id")
-                .withSecurityGroupId("test-security-group-id")
+        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .securityGroupId("test-security-group-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class AssociateSpaceSecurityGroupRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new AssociateSpaceSecurityGroupRequest()
-                .withSecurityGroupId("test-security-group-id")
+        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
+                .securityGroupId("test-security-group-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class AssociateSpaceSecurityGroupRequestTest {
 
     @Test
     public void isValidNoSecurityGroupId() {
-        ValidationResult result = new AssociateSpaceSecurityGroupRequest()
-                .withId("test-id")
+        ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

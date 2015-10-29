@@ -76,15 +76,15 @@ public class PushApplication {
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password) {
         return new SpringCloudFoundryClientBuilder()
-                .withApi(host)
-                .withCredentials(username, password)
+                .api(host)
+                .credentials(username, password)
                 .build();
     }
 
     @Bean
     SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
         return new SpringLoggregatorClientBuilder()
-                .withCloudFoundryClient(cloudFoundryClient)
+                .cloudFoundryClient(cloudFoundryClient)
                 .build();
     }
 
@@ -167,9 +167,10 @@ public class PushApplication {
                     .orElseThrow(() -> new IllegalStateException("Could not find space " + this.space))
                     .getMetadata();
 
-            CreateApplicationRequest request = new CreateApplicationRequest()
-                    .withSpaceId(metadata.getId())
-                    .withName(this.application);
+            CreateApplicationRequest request = CreateApplicationRequest.builder()
+                    .spaceId(metadata.getId())
+                    .name(this.application)
+                    .build();
 
             return Streams.wrap(this.cloudFoundryClient.applications().create(request))
                     .observeSubscribe(s -> this.logger.info("Creating application"))
@@ -177,9 +178,10 @@ public class PushApplication {
         }
 
         private Publisher<CreatePackageResponse> createPackage(CreateApplicationResponse response) {
-            CreatePackageRequest request = new CreatePackageRequest()
-                    .withApplicationId(response.getId())
-                    .withType(BITS);
+            CreatePackageRequest request = CreatePackageRequest.builder()
+                    .applicationId(response.getId())
+                    .type(BITS)
+                    .build();
 
             return Streams.wrap(this.cloudFoundryClient.packages().create(request))
                     .observeSubscribe(s -> this.logger.info("Creating package"))
@@ -187,8 +189,9 @@ public class PushApplication {
         }
 
         private Publisher<Void> deleteApplication(ListApplicationsResponse.Resource resource) {
-            DeleteApplicationRequest request = new DeleteApplicationRequest()
-                    .withId(resource.getId());
+            DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                    .id(resource.getId())
+                    .build();
 
             return Streams.wrap(this.cloudFoundryClient.applications().delete(request))
                     .observeSubscribe(s -> this.logger.info("Deleting application"))
@@ -196,33 +199,43 @@ public class PushApplication {
         }
 
         private Stream<ListApplicationsResponse> listApplications() {
-            return Streams.wrap(this.cloudFoundryClient.applications().list(new ListApplicationsRequest()));
+            ListApplicationsRequest request = ListApplicationsRequest.builder()
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.applications().list(request));
         }
 
         private Stream<ListSpacesResponse> listSpaces() {
-            return Streams.wrap(this.cloudFoundryClient.spaces().list(new ListSpacesRequest().withName(this.space)));
+            ListSpacesRequest request = ListSpacesRequest.builder()
+                    .name(this.space)
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.spaces().list(request));
         }
 
         private Publisher<StagePackageResponse> stagePackage(UploadPackageResponse response) {
-            StagePackageRequest request = new StagePackageRequest()
-                    .withId(response.getId())
-                    .withBuildpack("https://github.com/cloudfoundry/java-buildpack.git");
+            StagePackageRequest request = StagePackageRequest.builder()
+                    .id(response.getId())
+                    .buildpack("https://github.com/cloudfoundry/java-buildpack.git")
+                    .build();
 
             return Streams.wrap(this.cloudFoundryClient.packages().stage(request))
                     .observe(r -> this.logger.info("Staging package"));
         }
 
         private Publisher<LoggregatorMessage> streamLogs(StagePackageResponse response) {
-            StreamLogsRequest request = new StreamLogsRequest()
-                    .withId(response.getId());
+            StreamLogsRequest request = StreamLogsRequest.builder()
+                    .id(response.getId())
+                    .build();
 
             return this.loggregatorClient.stream(request);
         }
 
         private Publisher<UploadPackageResponse> uploadPackage(CreatePackageResponse response) {
-            UploadPackageRequest request = new UploadPackageRequest()
-                    .withId(response.getId())
-                    .withFile(this.bits);
+            UploadPackageRequest request = UploadPackageRequest.builder()
+                    .id(response.getId())
+                    .file(this.bits)
+                    .build();
 
             return Streams.wrap(this.cloudFoundryClient.packages().upload(request))
                     .observeSubscribe(s -> this.logger.info("Uploading package"));
@@ -230,8 +243,9 @@ public class PushApplication {
 
         private Publisher<StagePackageResponse> waitForPackageStagingProcessing(StagePackageResponse response) {
             return Streams.wrap(Publishers.<StagePackageResponse>create(subscriber -> {
-                GetDropletRequest request = new GetDropletRequest()
-                        .withId(response.getId());
+                GetDropletRequest request = GetDropletRequest.builder()
+                        .id(response.getId())
+                        .build();
 
                 Streams.wrap(this.cloudFoundryClient.droplets().get(request))
                         .observe(r -> this.logger.debug("Staging package processing: {}", r.getState()))
@@ -258,8 +272,9 @@ public class PushApplication {
 
         private Publisher<UploadPackageResponse> waitForPackageUploadProcessing(UploadPackageResponse response) {
             return Streams.wrap(Publishers.<UploadPackageResponse>create(subscriber -> {
-                GetPackageRequest request = new GetPackageRequest()
-                        .withId(response.getId());
+                GetPackageRequest request = GetPackageRequest.builder()
+                        .id(response.getId())
+                        .build();
 
                 Streams.wrap(this.cloudFoundryClient.packages().get(request))
                         .observe(r -> this.logger.warn("Upload package processing: {}", r.getState()))

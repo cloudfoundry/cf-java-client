@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
+import lombok.Builder;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
@@ -28,16 +29,6 @@ import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirectio
 import static org.junit.Assert.assertEquals;
 
 public final class PaginatedAndSortedRequestTest {
-
-    @Test
-    public void test() {
-        StubPaginatedAndSortedRequest request = new StubPaginatedAndSortedRequest()
-                .withOrderBy(CREATED_AT)
-                .withOrderDirection(ASC);
-
-        assertEquals(CREATED_AT, request.getOrderBy());
-        assertEquals(ASC, request.getOrderDirection());
-    }
 
     @Test
     public void orderedBy() {
@@ -53,24 +44,33 @@ public final class PaginatedAndSortedRequestTest {
 
     @Test
     public void isPaginatedAndSortedRequestValid() {
-        ValidationResult result = new StubPaginatedAndSortedRequest()
-                .isPaginatedAndSortedRequestValid();
+        ValidationResult result = StubPaginatedAndSortedRequest.builder()
+                .build()
+                .isPaginatedAndSortedRequestValid()
+                .build();
 
         assertEquals(VALID, result.getStatus());
     }
 
     @Test
     public void isPaginatedAndSortedRequestValidInvalidPaginatedRequest() {
-        ValidationResult result = new StubPaginatedAndSortedRequest()
-                .withPage(-1)
-                .isPaginatedAndSortedRequestValid();
+        ValidationResult result = StubPaginatedAndSortedRequest.builder()
+                .page(-1)
+                .build()
+                .isPaginatedAndSortedRequestValid()
+                .build();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
     }
 
-    private static final class StubPaginatedAndSortedRequest
-            extends PaginatedAndSortedRequest<StubPaginatedAndSortedRequest> {
+    private static final class StubPaginatedAndSortedRequest extends PaginatedAndSortedRequest {
+
+        @Builder
+        private StubPaginatedAndSortedRequest(Integer page, Integer perPage, OrderBy orderBy,
+                                              OrderDirection orderDirection) {
+            super(page, perPage, orderBy, orderDirection);
+        }
     }
 
 }

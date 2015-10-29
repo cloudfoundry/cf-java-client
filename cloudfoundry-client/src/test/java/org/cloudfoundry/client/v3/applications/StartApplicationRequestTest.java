@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class StartApplicationRequestTest {
 
     @Test
-    public void test() {
-        StartApplicationRequest request = new StartApplicationRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValidId() {
-        ValidationResult result = new StartApplicationRequest()
-                .withId("test-id")
+        ValidationResult result = StartApplicationRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class StartApplicationRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new StartApplicationRequest()
+        ValidationResult result = StartApplicationRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

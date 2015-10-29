@@ -50,8 +50,9 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
                 .status(OK)
                 .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin"));
 
-        RecentLogsRequest request = new RecentLogsRequest()
-                .withId("test-id");
+        RecentLogsRequest request = RecentLogsRequest.builder()
+                .id("test-id")
+                .build();
 
         Long count = Streams.wrap(this.client.recent(request)).count().next().get();
 
@@ -65,14 +66,15 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
                 .method(GET).path("/recent?app=test-id")
                 .errorResponse());
 
-        RecentLogsRequest request = new RecentLogsRequest()
-                .withId("test-id");
+        RecentLogsRequest request = RecentLogsRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.client.recent(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void recentInvalidRequest() {
-        Streams.wrap(this.client.recent(new RecentLogsRequest())).next().get();
+        Streams.wrap(this.client.recent(RecentLogsRequest.builder().build())).next().get();
     }
 }

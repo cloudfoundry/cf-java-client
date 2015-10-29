@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.v2.events;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.v2.events.EventResource.EventEntity;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -29,8 +29,8 @@ import reactor.rx.Streams;
 
 import java.util.Collections;
 
+import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -45,30 +45,34 @@ public final class SpringEventsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/events/GET_{id}_response.json"));
 
-        GetEventRequest request = new GetEventRequest()
-                .withId("test-id");
+        GetEventRequest request = GetEventRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetEventResponse response = Streams.wrap(this.events.get(request)).next().get();
+        GetEventResponse expected = GetEventResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("8f1366e5-1fe2-418c-ae33-38bf29ad857a")
+                        .url("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a")
+                        .createdAt("2015-07-27T22:43:23Z")
+                        .build())
+                .entity(EventEntity.builder()
+                        .type("name-1010")
+                        .actor("guid-a01d98f8-ba9a-40b0-86ba-3deacc2978c2")
+                        .actorType("name-1011")
+                        .actorName("name-1012")
+                        .actee("guid-ff2c9780-b8db-4276-ba5f-b06adb724873")
+                        .acteeType("name-1013")
+                        .acteeName("name-1014")
+                        .timestamp("2015-07-27T22:43:23Z")
+                        .metadatas(Collections.emptyMap())
+                        .spaceId("dcb0dcdd-5236-4af3-abc2-1ab0ff424794")
+                        .organizationId("3317f885-4670-4249-9861-7c75d851d492")
+                        .build())
+                .build();
 
-        EventResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:23Z", metadata.getCreatedAt());
-        assertEquals("8f1366e5-1fe2-418c-ae33-38bf29ad857a", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a", metadata.getUrl());
+        GetEventResponse actual = Streams.wrap(this.events.get(request)).next().get();
 
-        EventResource.EventEntity entity = response.getEntity();
-
-        assertEquals("guid-ff2c9780-b8db-4276-ba5f-b06adb724873", entity.getActee());
-        assertEquals("name-1014", entity.getActeeName());
-        assertEquals("name-1013", entity.getActeeType());
-        assertEquals("guid-a01d98f8-ba9a-40b0-86ba-3deacc2978c2", entity.getActor());
-        assertEquals("name-1012", entity.getActorName());
-        assertEquals("name-1011", entity.getActorType());
-        assertEquals(Collections.emptyMap(), entity.getMetadatas());
-        assertEquals("3317f885-4670-4249-9861-7c75d851d492", entity.getOrganizationId());
-        assertEquals("dcb0dcdd-5236-4af3-abc2-1ab0ff424794", entity.getSpaceId());
-        assertEquals("2015-07-27T22:43:23Z", entity.getTimestamp());
-        assertEquals("name-1010", entity.getType());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -78,15 +82,19 @@ public final class SpringEventsTest extends AbstractRestTest {
                 .method(GET).path("/v2/events/test-id")
                 .errorResponse());
 
-        GetEventRequest request = new GetEventRequest()
-                .withId("test-id");
+        GetEventRequest request = GetEventRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.events.get(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        Streams.wrap(this.events.get(new GetEventRequest())).next().get();
+        GetEventRequest request = GetEventRequest.builder()
+                .build();
+
+        Streams.wrap(this.events.get(request)).next().get();
     }
 
     @Test
@@ -96,39 +104,79 @@ public final class SpringEventsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/events/GET_response.json"));
 
-        ListEventsRequest request = new ListEventsRequest()
-                .withActee("test-actee")
-                .withPage(-1);
+        ListEventsRequest request = ListEventsRequest.builder()
+                .actee("test-actee")
+                .page(-1)
+                .build();
 
-        ListEventsResponse response = Streams.wrap(this.events.list(request)).next().get();
+        ListEventsResponse expected = ListEventsResponse.builder()
+                .totalResults(3)
+                .totalPages(1)
+                .resource(ListEventsResponse.ListEventsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
+                                .url("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
+                                .createdAt("2015-07-27T22:43:23Z")
+                                .build())
+                        .entity(EventEntity.builder()
+                                .type("name-1034")
+                                .actor("guid-ddc7f725-c67f-4e68-8118-1ae1687f9fff")
+                                .actorType("name-1035")
+                                .actorName("name-1036")
+                                .actee("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197")
+                                .acteeType("name-1037")
+                                .acteeName("name-1038")
+                                .timestamp("2015-07-27T22:43:23Z")
+                                .metadatas(Collections.emptyMap())
+                                .spaceId("1a769af6-8ddb-4508-a35a-cc61c51fdcdf")
+                                .organizationId("49723c2a-a11e-43f8-971a-b34e9134ce00")
+                                .build())
+                        .build())
+                .resource(ListEventsResponse.ListEventsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("a82493b7-bd16-421b-aef0-d0b5c40869e8")
+                                .url("/v2/events/a82493b7-bd16-421b-aef0-d0b5c40869e8")
+                                .createdAt("2015-07-27T22:43:23Z")
+                                .build())
+                        .entity(EventEntity.builder()
+                                .type("name-1042")
+                                .actor("guid-e68c8d10-dc83-4466-8735-9c4201166af9")
+                                .actorType("name-1043")
+                                .actorName("name-1044")
+                                .actee("guid-d3ecb6be-c8a0-4e3b-9838-b78c58a88b65")
+                                .acteeType("name-1045")
+                                .acteeName("name-1046")
+                                .timestamp("2015-07-27T22:43:23Z")
+                                .metadatas(Collections.emptyMap())
+                                .spaceId("dbe6bbdc-0d9c-495c-abbb-0b5eb93c8494")
+                                .organizationId("52c7fb45-e31b-4271-9f16-8c94df30d8c7")
+                                .build())
+                        .build())
+                .resource(ListEventsResponse.ListEventsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("4a0e6a34-2807-44cd-a5cc-b61890662ade")
+                                .url("/v2/events/4a0e6a34-2807-44cd-a5cc-b61890662ade")
+                                .createdAt("2015-07-27T22:43:23Z")
+                                .build())
+                        .entity(EventEntity.builder()
+                                .type("name-1050")
+                                .actor("guid-69e5e7e7-7723-4af8-a7cb-255d9a90c8db")
+                                .actorType("name-1051")
+                                .actorName("name-1052")
+                                .actee("guid-cc1f17ce-85ab-4cc2-988b-9fca0f3a1d03")
+                                .acteeType("name-1053")
+                                .acteeName("name-1054")
+                                .timestamp("2015-07-27T22:43:23Z")
+                                .metadatas(Collections.emptyMap())
+                                .spaceId("38a2f075-fe19-4edc-8787-5571f2af7051")
+                                .organizationId("9160433e-860d-4251-bd6d-140187a2c5db")
+                                .build())
+                        .build())
+                .build();
 
-        assertNull(response.getNextUrl());
-        assertNull(response.getPreviousUrl());
-        assertEquals(Integer.valueOf(1), response.getTotalPages());
-        assertEquals(Integer.valueOf(3), response.getTotalResults());
+        ListEventsResponse actual = Streams.wrap(this.events.list(request)).next().get();
 
-        assertEquals(3, response.getResources().size());
-        ListEventsResponse.ListEventsResponseResource resource = response.getResources().get(0);
-
-        EventResource.Metadata metadata = resource.getMetadata();
-        assertEquals("2015-07-27T22:43:23Z", metadata.getCreatedAt());
-        assertEquals("2cc565c7-18e7-4fff-8fb0-52525f09ee6b", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b", metadata.getUrl());
-
-        EventResource.EventEntity entity = resource.getEntity();
-        assertEquals("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197", entity.getActee());
-        assertEquals("name-1038", entity.getActeeName());
-        assertEquals("name-1037", entity.getActeeType());
-        assertEquals("guid-ddc7f725-c67f-4e68-8118-1ae1687f9fff", entity.getActor());
-        assertEquals("name-1036", entity.getActorName());
-        assertEquals("name-1035", entity.getActorType());
-        assertEquals(Collections.emptyMap(), entity.getMetadatas());
-        assertEquals("49723c2a-a11e-43f8-971a-b34e9134ce00", entity.getOrganizationId());
-        assertEquals("1a769af6-8ddb-4508-a35a-cc61c51fdcdf", entity.getSpaceId());
-        assertEquals("2015-07-27T22:43:23Z", entity.getTimestamp());
-        assertEquals("name-1034", entity.getType());
-
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -138,9 +186,10 @@ public final class SpringEventsTest extends AbstractRestTest {
                 .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
                 .errorResponse());
 
-        ListEventsRequest request = new ListEventsRequest()
-                .withActee("test-actee")
-                .withPage(-1);
+        ListEventsRequest request = ListEventsRequest.builder()
+                .actee("test-actee")
+                .page(-1)
+                .build();
 
         Streams.wrap(this.events.list(request)).next().get();
     }

@@ -19,39 +19,17 @@ package org.cloudfoundry.client.v3.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateApplicationRequestTest {
 
     @Test
-    public void test() {
-        CreateApplicationRequest request = new CreateApplicationRequest()
-                .withBuildpack("test-buildpack")
-                .withEnvironmentVariable("test-key-1", "test-value-1")
-                .withEnvironmentVariables(Collections.singletonMap("test-key-2", "test-value-2"))
-                .withName("test-name")
-                .withSpaceId("test-space-id");
-
-        Map<String, String> environmentVariables = new HashMap<>();
-        environmentVariables.put("test-key-1", "test-value-1");
-        environmentVariables.put("test-key-2", "test-value-2");
-
-        assertEquals("test-buildpack", request.getBuildpack());
-        assertEquals(environmentVariables, request.getEnvironmentVariables());
-        assertEquals("test-name", request.getName());
-        assertEquals("test-space-id", request.getSpaceId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new CreateApplicationRequest()
-                .withName("test-name")
-                .withSpaceId("test-space-id")
+        ValidationResult result = CreateApplicationRequest.builder()
+                .name("test-name")
+                .spaceId("test-space-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -59,8 +37,9 @@ public final class CreateApplicationRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = new CreateApplicationRequest()
-                .withSpaceId("test-space-id")
+        ValidationResult result = CreateApplicationRequest.builder()
+                .spaceId("test-space-id")
+                .build()
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
@@ -69,8 +48,9 @@ public final class CreateApplicationRequestTest {
 
     @Test
     public void isValidNoSpaceId() {
-        ValidationResult result = new CreateApplicationRequest()
-                .withName("test-name")
+        ValidationResult result = CreateApplicationRequest.builder()
+                .name("test-name")
+                .build()
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());

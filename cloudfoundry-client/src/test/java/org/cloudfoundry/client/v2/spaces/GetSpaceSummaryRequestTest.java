@@ -21,22 +21,15 @@ import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class GetSpaceSummaryRequestTest {
-
-    @Test
-    public void test() {
-        GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
+public final class GetSpaceSummaryRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = new GetSpaceSummaryRequest()
-                .withId("test-id")
+        ValidationResult result = GetSpaceSummaryRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public class GetSpaceSummaryRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetSpaceSummaryRequest()
+        ValidationResult result = GetSpaceSummaryRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

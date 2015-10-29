@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class ListApplicationRoutesRequestTest {
 
     @Test
-    public void test() {
-        ListApplicationRoutesRequest request = new ListApplicationRoutesRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ListApplicationRoutesRequest()
-                .withId("test-id")
+        ValidationResult result = ListApplicationRoutesRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class ListApplicationRoutesRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new ListApplicationRoutesRequest()
+        ValidationResult result = ListApplicationRoutesRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

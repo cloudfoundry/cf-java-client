@@ -7,6 +7,7 @@
       <w>adff</w>
       <w>cflinuxfs</w>
       <w>ctxt</w>
+      <w>diegos</w>
       <w>gradle</w>
       <w>guids</w>
       <w>metadatas</w>
@@ -14,6 +15,7 @@
       <w>springapps</w>
       <w>truster</w>
       <w>truststore</w>
+      <w>whatuuid</w>
     </words>
   </dictionary>
 </component>

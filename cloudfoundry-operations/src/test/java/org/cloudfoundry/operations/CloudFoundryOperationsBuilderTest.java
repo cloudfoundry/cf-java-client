@@ -37,7 +37,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
     @Test
     public void buildWithClient() {
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
+                .cloudFoundryClient(this.cloudFoundryClient)
                 .build();
     }
 
@@ -48,96 +48,127 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
     @Test
     public void buildWithOrganization() {
-        ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .withName("test-organization");
+        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                .name("test-organization")
+                .build();
 
-        ListOrganizationsResponse response = new ListOrganizationsResponse()
-                .withResource(new ListOrganizationsResponseResource()
-                        .withMetadata(new Metadata().withId("test-organization-id"))
-                        .withEntity(new ListOrganizationsResponseEntity()
-                                .withName("test-name")))
-                .withTotalPages(1);
+        ListOrganizationsResponse response = ListOrganizationsResponse.builder()
+                .resource(ListOrganizationsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-organization-id")
+                                .build())
+                        .entity(ListOrganizationsResponseEntity.builder()
+                                .name("test-name")
+                                .build())
+                        .build())
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Publishers.just(response));
 
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
-                .withTarget("test-organization")
+                .cloudFoundryClient(this.cloudFoundryClient)
+                .target("test-organization")
                 .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void buildWithInvalidOrganization() {
-        ListOrganizationsRequest request = new ListOrganizationsRequest()
-                .withName("test-organization");
+        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                .name("test-organization")
+                .build();
 
-        ListOrganizationsResponse response = new ListOrganizationsResponse()
-                .withTotalPages(1);
+        ListOrganizationsResponse response = ListOrganizationsResponse.builder()
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Publishers.just(response));
 
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
-                .withTarget("test-organization")
+                .cloudFoundryClient(this.cloudFoundryClient)
+                .target("test-organization")
                 .build();
     }
 
     @Test
     public void buildWithOrganizationSpace() {
-        ListOrganizationsRequest orgRequest = new ListOrganizationsRequest()
-                .withName("test-organization");
+        ListOrganizationsRequest orgRequest = ListOrganizationsRequest.builder()
+                .name("test-organization")
+                .build();
 
-        ListOrganizationsResponse orgResponse = new ListOrganizationsResponse()
-                .withResource(new ListOrganizationsResponseResource()
-                        .withMetadata(new Metadata().withId("test-organization-id"))
-                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name")))
-                .withTotalPages(1);
+        ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
+                .resource(ListOrganizationsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-organization-id")
+                                .build())
+                        .entity(ListOrganizationsResponseEntity.builder()
+                                .name("test-name")
+                                .build())
+                        .build())
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Publishers.just(orgResponse));
 
-        ListSpacesRequest spaceRequest = new ListSpacesRequest()
-                .withOrganizationId("test-organization-id")
-                .withName("test-space");
+        ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
+                .organizationId("test-organization-id")
+                .name("test-space")
+                .build();
 
-        ListSpacesResponse spaceResponse = new ListSpacesResponse()
-                .withResource(new ListSpacesResponseResource()
-                        .withMetadata(new Metadata().withId("test-space-id"))
-                        .withEntity(new SpaceEntity().withName("test-name")))
-                .withTotalPages(1);
+        ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
+                .resource(ListSpacesResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-space-id")
+                                .build())
+                        .entity(SpaceEntity.builder()
+                                .name("test-name")
+                                .build())
+                        .build())
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Publishers.just(spaceResponse));
 
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
-                .withTarget("test-organization", "test-space")
+                .cloudFoundryClient(this.cloudFoundryClient)
+                .target("test-organization", "test-space")
                 .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void buildWithOrganizationInvalidSpace() {
-        ListOrganizationsRequest orgRequest = new ListOrganizationsRequest()
-                .withName("test-organization");
+        ListOrganizationsRequest orgRequest = ListOrganizationsRequest.builder()
+                .name("test-organization")
+                .build();
 
-        ListOrganizationsResponse orgResponse = new ListOrganizationsResponse()
-                .withResource(new ListOrganizationsResponseResource()
-                        .withMetadata(new Metadata().withId("test-organization-id"))
-                        .withEntity(new ListOrganizationsResponseEntity().withName("test-name")))
-                .withTotalPages(1);
+        ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
+                .resource(ListOrganizationsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("test-organization-id")
+                                .build())
+                        .entity(ListOrganizationsResponseEntity.builder()
+                                .name("test-name")
+                                .build())
+                        .build())
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Publishers.just(orgResponse));
 
-        ListSpacesRequest spaceRequest = new ListSpacesRequest()
-                .withOrganizationId("test-organization-id")
-                .withName("test-space");
+        ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
+                .organizationId("test-organization-id")
+                .name("test-space")
+                .build();
 
-        ListSpacesResponse spaceResponse = new ListSpacesResponse()
-                .withTotalPages(1);
+        ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
+                .totalPages(1)
+                .build();
 
         when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Publishers.just(spaceResponse));
 
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
-                .withTarget("test-organization", "test-space")
+                .cloudFoundryClient(this.cloudFoundryClient)
+                .target("test-organization", "test-space")
                 .build();
     }
 

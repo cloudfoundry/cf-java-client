@@ -47,9 +47,9 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
                 .responsePayload("info_GET_response.json"));
 
         SpringCloudFoundryClient client = this.builder
-                .withApi("api.run.pivotal.io")
-                .withClient("test-client-id", "test-client-secret")
-                .withCredentials("test-username", "test-password")
+                .api("api.run.pivotal.io")
+                .client("test-client-id", "test-client-secret")
+                .credentials("test-username", "test-password")
                 .build();
 
         OAuth2RestTemplate restTemplate = (OAuth2RestTemplate) client.getRestOperations();
@@ -69,9 +69,9 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
                 .responsePayload("info_GET_response.json"));
 
         this.builder
-                .withApi("api.run.pivotal.io")
-                .withCredentials("test-username", "test-password")
-                .withSkipSslValidation(true)
+                .api("api.run.pivotal.io")
+                .credentials("test-username", "test-password")
+                .skipSslValidation(true)
                 .build();
 
         Mockito.verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
@@ -85,8 +85,8 @@ public final class SpringCloudFoundryClientBuilderTest extends AbstractRestTest 
                 .responsePayload("info_GET_response.json"));
 
         this.builder
-                .withApi("api.run.pivotal.io")
-                .withCredentials("test-username", "test-password")
+                .api("api.run.pivotal.io")
+                .credentials("test-username", "test-password")
                 .build();
 
         verifyZeroInteractions(this.sslCertificateTruster);

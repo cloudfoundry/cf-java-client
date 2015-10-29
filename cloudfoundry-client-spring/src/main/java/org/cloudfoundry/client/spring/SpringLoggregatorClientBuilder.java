@@ -45,7 +45,7 @@ public final class SpringLoggregatorClientBuilder {
         this.webSocketContainer = webSocketContainer;
     }
 
-    public SpringLoggregatorClientBuilder withCloudFoundryClient(SpringCloudFoundryClient cloudFoundryClient) {
+    public SpringLoggregatorClientBuilder cloudFoundryClient(SpringCloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
         return this;
     }

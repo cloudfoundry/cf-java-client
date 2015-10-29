@@ -19,10 +19,6 @@ package org.cloudfoundry.client.v3.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
@@ -30,27 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class ListApplicationDropletsRequestTest {
 
     @Test
-    public void test() {
-        ListApplicationDropletsRequest request = new ListApplicationDropletsRequest()
-                .withId("test-id")
-                .withState("test-state-1")
-                .withStates(Collections.singletonList("test-state-2"));
-
-        assertEquals("test-id", request.getId());
-
-        List<String> state = new ArrayList<>();
-        state.add("test-state-1");
-        state.add("test-state-2");
-
-        assertEquals(state, request.getState());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ListApplicationDropletsRequest()
-                .withId("test-id")
-                .withState("test-state-1")
-                .withStates(Collections.singletonList("test-state-2"))
+        ValidationResult result = ListApplicationDropletsRequest.builder()
+                .id("test-id")
+                .state("test-state-1")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -58,8 +38,9 @@ public final class ListApplicationDropletsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new ListApplicationDropletsRequest()
-                .withState("test-state")
+        ValidationResult result = ListApplicationDropletsRequest.builder()
+                .state("test-state")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -68,8 +49,9 @@ public final class ListApplicationDropletsRequestTest {
 
     @Test
     public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = new ListApplicationDropletsRequest()
-                .withPage(0)
+        ValidationResult result = ListApplicationDropletsRequest.builder()
+                .page(0)
+                .build()
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());

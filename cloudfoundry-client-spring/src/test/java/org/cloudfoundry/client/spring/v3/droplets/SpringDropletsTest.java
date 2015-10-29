@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v3.droplets;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
@@ -31,8 +33,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
+import static org.cloudfoundry.client.v3.droplets.ListDropletsResponse.Resource;
+import static org.cloudfoundry.client.v3.droplets.ListDropletsResponse.builder;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -48,8 +52,9 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/droplets/test-id")
                 .status(NO_CONTENT));
 
-        DeleteDropletRequest request = new DeleteDropletRequest()
-                .withId("test-id");
+        DeleteDropletRequest request = DeleteDropletRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.droplets.delete(request)).next().get();
 
@@ -62,15 +67,19 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .method(DELETE).path("/v3/droplets/test-id")
                 .errorResponse());
 
-        DeleteDropletRequest request = new DeleteDropletRequest()
-                .withId("test-id");
+        DeleteDropletRequest request = DeleteDropletRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.droplets.delete(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteInvalidRequest() {
-        Streams.wrap(this.droplets.delete(new DeleteDropletRequest())).next().get();
+        DeleteDropletRequest request = DeleteDropletRequest.builder()
+                .build();
+
+        Streams.wrap(this.droplets.delete(request)).next().get();
     }
 
     @Test
@@ -80,22 +89,35 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/droplets/GET_{id}_response.json"));
 
-        GetDropletRequest request = new GetDropletRequest()
-                .withId("test-id");
+        GetDropletRequest request = GetDropletRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetDropletResponse response = Streams.wrap(this.droplets.get(request)).next().get();
+        GetDropletResponse expected = GetDropletResponse.builder()
+                .id("whatuuid")
+                .state("PENDING")
+                .hash(Hash.builder()
+                        .type("sha1")
+                        .build())
+                .buildpack("http://github.com/myorg/awesome-buildpack")
+                .environmentVariable("CUSTOM_ENV_VAR", "hello")
+                .environmentVariable("VCAP_APPLICATION", vcapApplication())
+                .environmentVariable("CF_STACK", "cflinuxfs2")
+                .createdAt("2015-07-27T22:43:16Z")
+                .link("self", Link.builder()
+                        .href("/v3/droplets/whatuuid")
+                        .build())
+                .link("package", Link.builder()
+                        .href("/v3/packages/guid-c89ed121-a2f1-4f78-9d98-e3b607a07d09")
+                        .build())
+                .link("app", Link.builder()
+                        .href("/v3/apps/guid-a174c559-deb6-4db7-b3ef-2a5d778d8866")
+                        .build())
+                .build();
 
-        assertEquals("http://github.com/myorg/awesome-buildpack", response.getBuildpack());
-        assertEquals("2015-07-27T22:43:16Z", response.getCreatedAt());
-        assertEquals(getExpectedEnvironmentVariables(), response.getEnvironmentVariables());
-        assertNull(response.getError());
-        assertEquals("sha1", response.getHash().getType());
-        assertNull(response.getHash().getValue());
-        assertEquals("whatuuid", response.getId());
-        assertNull(response.getProcfile());
-        assertEquals("PENDING", response.getState());
-        assertNull(response.getUpdatedAt());
-        validateLinks(response, "self", "package", "app");
+        GetDropletResponse actual = Streams.wrap(this.droplets.get(request)).next().get();
+
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -105,15 +127,19 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .method(GET).path("/v3/droplets/test-id")
                 .errorResponse());
 
-        GetDropletRequest request = new GetDropletRequest()
-                .withId("test-id");
+        GetDropletRequest request = GetDropletRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.droplets.get(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        Streams.wrap(this.droplets.get(new GetDropletRequest())).next().get();
+        GetDropletRequest request = GetDropletRequest.builder()
+                .build();
+
+        Streams.wrap(this.droplets.get(request)).next().get();
     }
 
     @Test
@@ -123,25 +149,69 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v3/droplets/GET_response.json"));
 
-        ListDropletsRequest request = new ListDropletsRequest();
-        ListDropletsResponse response = Streams.wrap(this.droplets.list(request)).next().get();
+        ListDropletsRequest request = ListDropletsRequest.builder()
+                .build();
 
-        Map<String, Object> environmentVariables = new HashMap<>();
-        environmentVariables.put("yuu", "huuu");
+        ListDropletsResponse expected = builder()
+                .pagination(Pagination.builder()
+                        .totalResults(2)
+                        .first(Link.builder()
+                                .href("/v3/droplets?page=1&per_page=2")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/droplets?page=1&per_page=2")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-5be1225e-5f49-499a-87db-bcdff646eed6")
+                        .state("STAGING")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .buildpack("name-2141")
+                        .environmentVariable("yuu", "huuu")
+                        .createdAt("2015-07-27T22:43:30Z")
+                        .link("self", Link.builder()
+                                .href("/v3/droplets/guid-5be1225e-5f49-499a-87db-bcdff646eed6")
+                                .build())
+                        .link("package", Link.builder()
+                                .href("/v3/packages/guid-09037508-293d-4923-9552-12fe9cda5f98")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0")
+                                .build())
+                        .link("buildpack", Link.builder()
+                                .href("/v2/buildpacks/b0179650-8a4f-4b3a-b485-255118b0c619")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-74a54cf4-99a5-40b1-8f81-74377c36240d")
+                        .state("STAGED")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .value("my-hash")
+                                .build())
+                        .buildpack("https://github.com/cloudfoundry/my-buildpack.git")
+                        .createdAt("2015-07-27T22:43:30Z")
+                        .link("self", Link.builder()
+                                .href("/v3/droplets/guid-74a54cf4-99a5-40b1-8f81-74377c36240d")
+                                .build())
+                        .link("package", Link.builder()
+                                .href("/v3/packages/guid-09037508-293d-4923-9552-12fe9cda5f98")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0")
+                                .build())
+                        .link("assign_current_droplet", Link.builder()
+                                .href("/v3/apps/guid-d686e53a-9a5b-4bad-b1f5-0fe264b2b0c0/current_droplet")
+                                .method("PUT")
+                                .build())
+                        .build())
+                .build();
 
-        ListDropletsResponse.Resource resource = response.getResources().get(0);
+        ListDropletsResponse actual = Streams.wrap(this.droplets.list(request)).next().get();
 
-        assertEquals("name-2141", resource.getBuildpack());
-        assertEquals("2015-07-27T22:43:30Z", resource.getCreatedAt());
-        assertEquals(environmentVariables, resource.getEnvironmentVariables());
-        assertNull(resource.getError());
-        assertEquals("sha1", resource.getHash().getType());
-        assertNull(resource.getHash().getValue());
-        assertEquals("guid-5be1225e-5f49-499a-87db-bcdff646eed6", resource.getId());
-        assertNull(resource.getProcfile());
-        assertEquals("STAGING", resource.getState());
-        assertNull(resource.getUpdatedAt());
-        validateLinks(resource, "self", "package", "app", "buildpack");
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -151,21 +221,21 @@ public final class SpringDropletsTest extends AbstractRestTest {
                 .method(GET).path("/v3/droplets")
                 .errorResponse());
 
-        ListDropletsRequest request = new ListDropletsRequest();
+        ListDropletsRequest request = ListDropletsRequest.builder()
+                .build();
 
         Streams.wrap(this.droplets.list(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listInvalidRequest() {
-        Streams.wrap(this.droplets.list(new ListDropletsRequest().withPage(0))).next().get();
+        ListDropletsRequest request = ListDropletsRequest.builder().page(0)
+                .build();
+
+        Streams.wrap(this.droplets.list(request)).next().get();
     }
 
-    public Map<String, Object> getExpectedEnvironmentVariables() {
-        Map<String, Object> environmentVariables = new HashMap<>();
-
-        environmentVariables.put("CUSTOM_ENV_VAR", "hello");
-
+    private Map<String, Object> vcapApplication() {
         Map<String, Object> limits = new HashMap<>();
         limits.put("mem", 1024);
         limits.put("disk", 4096);
@@ -184,10 +254,7 @@ public final class SpringDropletsTest extends AbstractRestTest {
         vcapApplication.put("uris", Collections.emptyList());
         vcapApplication.put("users", null);
 
-        environmentVariables.put("VCAP_APPLICATION", vcapApplication);
-        environmentVariables.put("CF_STACK", "cflinuxfs2");
-
-        return environmentVariables;
+        return vcapApplication;
     }
 
 }

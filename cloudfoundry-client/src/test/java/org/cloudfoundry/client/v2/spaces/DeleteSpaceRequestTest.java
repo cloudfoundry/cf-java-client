@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class DeleteSpaceRequestTest {
 
     @Test
-    public void test() {
-        DeleteSpaceRequest request = new DeleteSpaceRequest()
-                .withAsync(true)
-                .withId("test-id");
-
-        assertEquals(true, request.getAsync());
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new DeleteSpaceRequest()
-                .withAsync(true)
-                .withId("test-id")
+        ValidationResult result = DeleteSpaceRequest.builder()
+                .async(true)
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,12 +38,13 @@ public final class DeleteSpaceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteSpaceRequest()
-                .withAsync(true)
+        ValidationResult result = DeleteSpaceRequest.builder()
+                .async(true)
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }

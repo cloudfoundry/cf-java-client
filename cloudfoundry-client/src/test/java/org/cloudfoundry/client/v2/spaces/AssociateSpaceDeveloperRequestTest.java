@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class AssociateSpaceDeveloperRequestTest {
 
     @Test
-    public void test() {
-        AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
-                .withId("test-id")
-                .withDeveloperId("test-developer-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-developer-id", request.getDeveloperId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new AssociateSpaceDeveloperRequest()
-                .withId("test-id")
-                .withDeveloperId("test-developer-id")
+        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
+                .id("test-id")
+                .developerId("test-developer-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class AssociateSpaceDeveloperRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new AssociateSpaceDeveloperRequest()
-                .withDeveloperId("test-developer-id")
+        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
+                .developerId("test-developer-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class AssociateSpaceDeveloperRequestTest {
 
     @Test
     public void isValidNoAuditorId() {
-        ValidationResult result = new AssociateSpaceDeveloperRequest()
-                .withId("test-id")
+        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

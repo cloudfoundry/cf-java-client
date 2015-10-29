@@ -26,23 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class ScaleProcessRequestTest {
 
     @Test
-    public void test() {
-        ScaleProcessRequest request = new ScaleProcessRequest()
-                .withDiskInMb(400)
-                .withId("test-id")
-                .withInstances(5)
-                .withMemoryInMb(1024);
-
-        assertEquals(new Integer(400), request.getDiskInMb());
-        assertEquals("test-id", request.getId());
-        assertEquals(new Integer(5), request.getInstances());
-        assertEquals(new Integer(1024), request.getMemoryInMb());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ScaleProcessRequest()
-                .withId("test-id")
+        ValidationResult result = ScaleProcessRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -50,7 +37,8 @@ public final class ScaleProcessRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new ScaleProcessRequest()
+        ValidationResult result = ScaleProcessRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

@@ -24,12 +24,14 @@ public final class RequestValidationExceptionTest {
 
     @Test
     public void test() {
-        ValidationResult validationResult = new ValidationResult()
-                .invalid("test-message-1")
-                .invalid("test-message-2");
+        ValidationResult validationResult = ValidationResult.builder()
+                .message("test-message-1")
+                .message("test-message-2")
+                .build();
 
         RequestValidationException exception = new RequestValidationException(validationResult);
 
         assertEquals("Request is invalid: test-message-1, test-message-2", exception.getMessage());
     }
+
 }

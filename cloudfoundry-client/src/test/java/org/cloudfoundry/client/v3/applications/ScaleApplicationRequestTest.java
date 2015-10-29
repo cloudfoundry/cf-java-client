@@ -26,26 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class ScaleApplicationRequestTest {
 
     @Test
-    public void test() {
-        ScaleApplicationRequest request = new ScaleApplicationRequest()
-                .withDiskInMb(400)
-                .withId("test-id")
-                .withInstances(5)
-                .withMemoryInMb(1024)
-                .withType("web");
-
-        assertEquals(new Integer(400), request.getDiskInMb());
-        assertEquals("test-id", request.getId());
-        assertEquals(new Integer(5), request.getInstances());
-        assertEquals(new Integer(1024), request.getMemoryInMb());
-        assertEquals("web", request.getType());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ScaleApplicationRequest()
-                .withId("test-id")
-                .withType("web")
+        ValidationResult result = ScaleApplicationRequest.builder()
+                .id("test-id")
+                .type("web")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -53,8 +38,9 @@ public final class ScaleApplicationRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new ScaleApplicationRequest()
-                .withType("web")
+        ValidationResult result = ScaleApplicationRequest.builder()
+                .type("web")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -63,8 +49,9 @@ public final class ScaleApplicationRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = new ScaleApplicationRequest()
-                .withId("test-id")
+        ValidationResult result = ScaleApplicationRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

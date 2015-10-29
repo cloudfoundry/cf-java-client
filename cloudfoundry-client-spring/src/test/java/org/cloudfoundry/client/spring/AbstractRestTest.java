@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
-import org.cloudfoundry.client.v3.LinkBased;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -42,8 +41,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -113,13 +110,6 @@ public abstract class AbstractRestTest {
                 .orElse(withStatus(status));
 
         responseActions.andRespond(responseCreator);
-    }
-
-    protected final void validateLinks(LinkBased response, String... links) {
-        assertEquals(links.length, response.getLinks().size());
-        for (String link : links) {
-            assertNotNull(response.getLink(link));
-        }
     }
 
     protected final void verify() {

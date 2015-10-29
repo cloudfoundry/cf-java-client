@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class MapApplicationRouteRequestTest {
 
     @Test
-    public void test() {
-        MapApplicationRouteRequest request = new MapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("test-route-id");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("test-route-id", request.getRouteId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new MapApplicationRouteRequest()
-                .withId("test-id")
-                .withRouteId("test-route-id")
+        ValidationResult result = MapApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class MapApplicationRouteRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new MapApplicationRouteRequest()
-                .withRouteId("test-route-id")
+        ValidationResult result = MapApplicationRouteRequest.builder()
+                .routeId("test-route-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class MapApplicationRouteRequestTest {
 
     @Test
     public void isValidNoRouteId() {
-        ValidationResult result = new MapApplicationRouteRequest()
-                .withId("test-id")
+        ValidationResult result = MapApplicationRouteRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

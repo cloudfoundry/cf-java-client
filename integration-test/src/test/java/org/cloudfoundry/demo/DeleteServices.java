@@ -42,8 +42,8 @@ public class DeleteServices {
                                           @Value("${test.username}") String username,
                                           @Value("${test.password}") String password) {
         return new SpringCloudFoundryClientBuilder()
-                .withApi(host)
-                .withCredentials(username, password)
+                .api(host)
+                .credentials(username, password)
                 .build();
     }
 
@@ -58,8 +58,9 @@ public class DeleteServices {
         }
 
         private void run() {
-            ListServiceInstancesRequest request = new ListServiceInstancesRequest()
-                    .withSpaceId("371e051f-8521-42bc-acef-ac11cc896323");
+            ListServiceInstancesRequest request = ListServiceInstancesRequest.builder()
+                    .spaceId("371e051f-8521-42bc-acef-ac11cc896323")
+                    .build();
 
             Streams.wrap(this.cloudFoundryClient.serviceInstances().list(request))
                     .flatMap(r -> Streams.from(r.getResources()))

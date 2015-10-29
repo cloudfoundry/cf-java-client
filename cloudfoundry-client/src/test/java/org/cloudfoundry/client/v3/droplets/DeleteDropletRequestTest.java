@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class DeleteDropletRequestTest {
 
     @Test
-    public void test() {
-        DeleteDropletRequest request = new DeleteDropletRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new DeleteDropletRequest()
-                .withId("test-id")
+        ValidationResult result = DeleteDropletRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class DeleteDropletRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new DeleteDropletRequest()
+        ValidationResult result = DeleteDropletRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

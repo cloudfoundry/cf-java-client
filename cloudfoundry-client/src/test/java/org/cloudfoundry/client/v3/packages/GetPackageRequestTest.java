@@ -26,17 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class GetPackageRequestTest {
 
     @Test
-    public void test() {
-        GetPackageRequest request = new GetPackageRequest()
-                .withId("test-id");
-
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetPackageRequest()
-                .withId("test-id")
+        ValidationResult result = GetPackageRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -44,7 +37,8 @@ public final class GetPackageRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetPackageRequest()
+        ValidationResult result = GetPackageRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

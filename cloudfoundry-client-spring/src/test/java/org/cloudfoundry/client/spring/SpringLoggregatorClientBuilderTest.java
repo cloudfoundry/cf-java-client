@@ -41,7 +41,7 @@ public final class SpringLoggregatorClientBuilderTest extends AbstractRestTest {
                 .responsePayload("v2/info/GET_response.json"));
 
         this.builder
-                .withCloudFoundryClient(this.cloudFoundryClient)
+                .cloudFoundryClient(this.cloudFoundryClient)
                 .build();
 
         verify();

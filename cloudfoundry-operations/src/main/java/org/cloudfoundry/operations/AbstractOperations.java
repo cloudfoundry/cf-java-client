@@ -23,18 +23,17 @@ import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 abstract class AbstractOperations {
 
-    protected final <T extends PaginatedRequest<T>, U extends PaginatedResponse> Stream<U> paginate(
-            Supplier<T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
+    protected final <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
+            Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
 
-        return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.get().withPage(1))))
+        return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
                 .concatMap(responseStream -> responseStream
                         .take(1)
                         .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
-                                        .flatMap(page -> operationExecutor.apply(requestProvider.get().withPage(page)))
+                                        .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
                                         .startWith(response)
                         ));
     }

@@ -17,12 +17,12 @@
 package org.cloudfoundry.client.spring.v2.info;
 
 import org.cloudfoundry.client.spring.AbstractRestTest;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -37,25 +37,34 @@ public final class SpringInfoTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/info/GET_response.json"));
 
-        GetInfoResponse response = Streams.wrap(this.info.get()).next().get();
+        GetInfoResponse expected = GetInfoResponse.builder()
+                .apiVersion("2.33.0")
+                .appSshEndpoint("ssh.run.pivotal.io:2222")
+                .authorizationEndpoint("https://login.run.pivotal.io")
+                .buildNumber("2222")
+                .description("Cloud Foundry sponsored by Pivotal")
+                .dopplerLoggingEndpoint("wss://doppler.run.pivotal.io:443")
+                .loggingEndpoint("wss://loggregator.run.pivotal.io:4443")
+                .name("vcap")
+                .support("http://support.cloudfoundry.com")
+                .tokenEndpoint("https://uaa.run.pivotal.io")
+                .version(2)
+                .build();
 
-        assertEquals("2.33.0", response.getApiVersion());
-        assertEquals("ssh.run.pivotal.io:2222", response.getAppSshEndpoint());
-        assertNull(response.getAppSshHostKeyFingerprint());
-        assertEquals("https://login.run.pivotal.io", response.getAuthorizationEndpoint());
-        assertEquals("2222", response.getBuild());
-        assertEquals("Cloud Foundry sponsored by Pivotal", response.getDescription());
-        assertEquals("wss://doppler.run.pivotal.io:443", response.getDopplerLoggingEndpoint());
-        assertEquals("wss://loggregator.run.pivotal.io:4443", response.getLoggingEndpoint());
-        assertEquals("vcap", response.getName());
-        assertNull(response.getMinCliVersion());
-        assertNull(response.getMinRecommendedCliVersion());
-        assertEquals("http://support.cloudfoundry.com", response.getSupport());
-        assertEquals("https://uaa.run.pivotal.io", response.getTokenEndpoint());
-        assertNull(response.getUser());
-        assertEquals(Integer.valueOf(2), response.getVersion());
+        GetInfoResponse actual = Streams.wrap(this.info.get()).next().get();
 
+        assertEquals(expected, actual);
         verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/info")
+                .status(OK)
+                .errorResponse());
+
+        Streams.wrap(this.info.get()).next().get();
     }
 
 }

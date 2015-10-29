@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class GetApplicationProcessRequestTest {
 
     @Test
-    public void test() {
-        GetApplicationProcessRequest request = new GetApplicationProcessRequest()
-                .withId("test-id")
-                .withType("web");
-
-        assertEquals("test-id", request.getId());
-        assertEquals("web", request.getType());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new GetApplicationProcessRequest()
-                .withId("test-id")
-                .withType("web")
+        ValidationResult result = GetApplicationProcessRequest.builder()
+                .id("test-id")
+                .type("web")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class GetApplicationProcessRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new GetApplicationProcessRequest()
-                .withType("web")
+        ValidationResult result = GetApplicationProcessRequest.builder()
+                .type("web")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -57,8 +49,9 @@ public final class GetApplicationProcessRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = new GetApplicationProcessRequest()
-                .withId("test-id")
+        ValidationResult result = GetApplicationProcessRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

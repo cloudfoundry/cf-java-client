@@ -26,20 +26,11 @@ import static org.junit.Assert.assertEquals;
 public final class CopyPackageRequestTest {
 
     @Test
-    public void test() {
-        CopyPackageRequest request = new CopyPackageRequest()
-                .withApplicationId("test-application-id")
-                .withSourcePackageId("test-source-package-id");
-
-        assertEquals("test-application-id", request.getApplicationId());
-        assertEquals("test-source-package-id", request.getSourcePackageId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new CopyPackageRequest()
-                .withApplicationId("test-application-id")
-                .withSourcePackageId("test-source-package-id")
+        ValidationResult result = CopyPackageRequest.builder()
+                .applicationId("test-application-id")
+                .sourcePackageId("test-source-package-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -47,8 +38,9 @@ public final class CopyPackageRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new CopyPackageRequest()
-                .withSourcePackageId("test-source-package-id")
+        ValidationResult result = CopyPackageRequest.builder()
+                .sourcePackageId("test-source-package-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -56,10 +48,10 @@ public final class CopyPackageRequestTest {
     }
 
     @Test
-
     public void isValidNoSourceId() {
-        ValidationResult result = new CopyPackageRequest()
-                .withApplicationId("test-application-id")
+        ValidationResult result = CopyPackageRequest.builder()
+                .applicationId("test-application-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

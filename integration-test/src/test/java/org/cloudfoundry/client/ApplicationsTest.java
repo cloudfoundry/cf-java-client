@@ -44,9 +44,10 @@ public final class ApplicationsTest {
 
     @Before
     public void zeroExistingApplications() {
-        ListApplicationsRequest request = new ListApplicationsRequest()
-                .withOrganizationId(this.organizationId)
-                .withSpaceId(this.spaceId);
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .organizationId(this.organizationId)
+                .spaceId(this.spaceId)
+                .build();
 
         long size = Streams.wrap(this.cloudFoundryClient.applications().list(request))
                 .map(PaginatedResponse::getResources)
@@ -59,13 +60,18 @@ public final class ApplicationsTest {
 
     @Test
     public void create() {
-        CreateApplicationRequest createRequest = new CreateApplicationRequest()
-                .withSpaceId(this.spaceId)
-                .withName("test-name");
+        CreateApplicationRequest createRequest = CreateApplicationRequest.builder()
+                .spaceId(this.spaceId)
+                .name("test-name")
+                .build();
+
         Streams.wrap(this.cloudFoundryClient.applications().create(createRequest))
                 .next().poll();
 
-        ListApplicationsRequest listRequest = new ListApplicationsRequest().withSpaceId(this.spaceId);
+        ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
+                .spaceId(this.spaceId)
+                .build();
+
         long size = Streams.wrap(this.cloudFoundryClient.applications().list(listRequest))
                 .map(PaginatedResponse::getResources)
                 .flatMap(Streams::from)

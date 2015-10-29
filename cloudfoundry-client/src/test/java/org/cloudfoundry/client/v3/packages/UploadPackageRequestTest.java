@@ -28,22 +28,11 @@ import static org.junit.Assert.assertEquals;
 public final class UploadPackageRequestTest {
 
     @Test
-    public void test() {
-        File file = new File("");
-
-        UploadPackageRequest request = new UploadPackageRequest()
-                .withFile(file)
-                .withId("test-id");
-
-        assertEquals(file, request.getFile());
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new UploadPackageRequest()
-                .withFile(new File(""))
-                .withId("test-id")
+        ValidationResult result = UploadPackageRequest.builder()
+                .file(new File(""))
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -51,8 +40,9 @@ public final class UploadPackageRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new UploadPackageRequest()
-                .withFile(new File(""))
+        ValidationResult result = UploadPackageRequest.builder()
+                .file(new File(""))
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
@@ -61,8 +51,9 @@ public final class UploadPackageRequestTest {
 
     @Test
     public void isValidNoFile() {
-        ValidationResult result = new UploadPackageRequest()
-                .withId("-id")
+        ValidationResult result = UploadPackageRequest.builder()
+                .id("-id")
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());

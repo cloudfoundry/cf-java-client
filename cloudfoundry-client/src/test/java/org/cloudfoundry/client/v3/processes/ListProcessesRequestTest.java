@@ -25,13 +25,9 @@ import static org.junit.Assert.assertEquals;
 public final class ListProcessesRequestTest {
 
     @Test
-    public void test() {
-        new ListProcessesRequest();
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new ListProcessesRequest()
+        ValidationResult result = ListProcessesRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -39,8 +35,9 @@ public final class ListProcessesRequestTest {
 
     @Test
     public void isValidInvalidPaginatedRequest() {
-        ValidationResult result = new ListProcessesRequest()
-                .withPage(0)
+        ValidationResult result = ListProcessesRequest.builder()
+                .page(0)
+                .build()
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());

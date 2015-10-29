@@ -20,7 +20,6 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -41,21 +40,25 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
-import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.client.v2.spaces.SpaceServiceSummary;
 import org.junit.Test;
 import reactor.rx.Streams;
 
 import java.util.Collections;
 
+import static org.cloudfoundry.client.v2.Resource.Metadata;
+import static org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse.Resource;
+import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
+import static org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary.Route;
+import static org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary.Route.Domain;
+import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
+import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.Plan;
+import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.Plan.Service;
+import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.builder;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -70,36 +73,38 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/PUT_{id}_auditors_{id}_response.json"));
 
-        AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
-                .withId("test-id")
-                .withAuditorId("test-auditor-id");
+        AssociateSpaceAuditorRequest request = AssociateSpaceAuditorRequest.builder()
+                .id("test-id")
+                .auditorId("test-auditor-id")
+                .build();
 
-        AssociateSpaceAuditorResponse response = Streams.wrap(this.spaces.associateAuditor(request)).next().get();
+        AssociateSpaceAuditorResponse expected = AssociateSpaceAuditorResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("9639c996-9005-4b70-b852-d40f346d58dc")
+                        .url("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc")
+                        .createdAt("2015-07-27T22:43:07Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-59")
+                        .organizationId("bc168e1d-b399-4624-b7f6-fbe64eeb870f")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/bc168e1d-b399-4624-b7f6-fbe64eeb870f")
+                        .developersUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/developers")
+                        .managersUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/managers")
+                        .auditorsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/auditors")
+                        .applicationsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/apps")
+                        .routesUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/routes")
+                        .domainsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/domains")
+                        .serviceInstancesUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/service_instances")
+                        .applicationEventsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/app_events")
+                        .eventsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/events")
+                        .securityGroupsUrl("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:07Z", metadata.getCreatedAt());
-        assertEquals("9639c996-9005-4b70-b852-d40f346d58dc", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc", metadata.getUrl());
+        AssociateSpaceAuditorResponse actual = Streams.wrap(this.spaces.associateAuditor(request)).next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/managers", entity.getManagersUrl());
-        assertEquals("name-59", entity.getName());
-        assertEquals("bc168e1d-b399-4624-b7f6-fbe64eeb870f", entity.getOrganizationId());
-        assertEquals("/v2/organizations/bc168e1d-b399-4624-b7f6-fbe64eeb870f", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/9639c996-9005-4b70-b852-d40f346d58dc/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -109,16 +114,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(PUT).path("/v2/spaces/test-id/auditors/test-auditor-id")
                 .errorResponse());
 
-        AssociateSpaceAuditorRequest request = new AssociateSpaceAuditorRequest()
-                .withId("test-id")
-                .withAuditorId("test-auditor-id");
+        AssociateSpaceAuditorRequest request = AssociateSpaceAuditorRequest.builder()
+                .id("test-id")
+                .auditorId("test-auditor-id")
+                .build();
 
         Streams.wrap(this.spaces.associateAuditor(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void associateAuditorInvalidRequest() {
-        Streams.wrap(this.spaces.associateAuditor(new AssociateSpaceAuditorRequest())).next().get();
+        AssociateSpaceAuditorRequest request = AssociateSpaceAuditorRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.associateAuditor(request)).next().get();
     }
 
     @Test
@@ -128,36 +137,38 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/PUT_{id}_developers_{id}_response.json"));
 
-        AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
-                .withId("test-id")
-                .withDeveloperId("test-developer-id");
+        AssociateSpaceDeveloperRequest request = AssociateSpaceDeveloperRequest.builder()
+                .id("test-id")
+                .developerId("test-developer-id")
+                .build();
 
-        AssociateSpaceDeveloperResponse response = Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
+        AssociateSpaceDeveloperResponse expected = AssociateSpaceDeveloperResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("6f8f8e0d-54f2-4736-a08e-1044fcf061d3")
+                        .url("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3")
+                        .createdAt("2015-07-27T22:43:07Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-68")
+                        .organizationId("5b556f7c-63f5-43e5-9522-c4fec533b09d")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/5b556f7c-63f5-43e5-9522-c4fec533b09d")
+                        .developersUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/developers")
+                        .managersUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/managers")
+                        .auditorsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/auditors")
+                        .applicationsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/apps")
+                        .routesUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/routes")
+                        .domainsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/domains")
+                        .serviceInstancesUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/service_instances")
+                        .applicationEventsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/app_events")
+                        .eventsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/events")
+                        .securityGroupsUrl("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:07Z", metadata.getCreatedAt());
-        assertEquals("6f8f8e0d-54f2-4736-a08e-1044fcf061d3", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3", metadata.getUrl());
+        AssociateSpaceDeveloperResponse actual = Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/managers", entity.getManagersUrl());
-        assertEquals("name-68", entity.getName());
-        assertEquals("5b556f7c-63f5-43e5-9522-c4fec533b09d", entity.getOrganizationId());
-        assertEquals("/v2/organizations/5b556f7c-63f5-43e5-9522-c4fec533b09d", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/6f8f8e0d-54f2-4736-a08e-1044fcf061d3/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -167,16 +178,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(PUT).path("/v2/spaces/test-id/developers/test-developer-id")
                 .errorResponse());
 
-        AssociateSpaceDeveloperRequest request = new AssociateSpaceDeveloperRequest()
-                .withId("test-id")
-                .withDeveloperId("test-developer-id");
+        AssociateSpaceDeveloperRequest request = AssociateSpaceDeveloperRequest.builder()
+                .id("test-id")
+                .developerId("test-developer-id")
+                .build();
 
         Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void associateDeveloperInvalidRequest() {
-        Streams.wrap(this.spaces.associateDeveloper(new AssociateSpaceDeveloperRequest())).next().get();
+        AssociateSpaceDeveloperRequest request = AssociateSpaceDeveloperRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.associateDeveloper(request)).next().get();
     }
 
     @Test
@@ -186,36 +201,38 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/PUT_{id}_managers_{id}_response.json"));
 
-        AssociateSpaceManagerRequest request = new AssociateSpaceManagerRequest()
-                .withId("test-id")
-                .withManagerId("test-manager-id");
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
 
-        AssociateSpaceManagerResponse response = Streams.wrap(this.spaces.associateManager(request)).next().get();
+        AssociateSpaceManagerResponse expected = AssociateSpaceManagerResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("542943ff-a40b-4004-9559-434b0169508c")
+                        .url("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c")
+                        .createdAt("2015-07-27T22:43:07Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-85")
+                        .organizationId("0a68fcd5-dc1c-48d0-98dc-33008ce0d7ce")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/0a68fcd5-dc1c-48d0-98dc-33008ce0d7ce")
+                        .developersUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/developers")
+                        .managersUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/managers")
+                        .auditorsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/auditors")
+                        .applicationsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/apps")
+                        .routesUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/routes")
+                        .domainsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/domains")
+                        .serviceInstancesUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/service_instances")
+                        .applicationEventsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/app_events")
+                        .eventsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/events")
+                        .securityGroupsUrl("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:07Z", metadata.getCreatedAt());
-        assertEquals("542943ff-a40b-4004-9559-434b0169508c", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c", metadata.getUrl());
+        AssociateSpaceManagerResponse actual = Streams.wrap(this.spaces.associateManager(request)).next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/managers", entity.getManagersUrl());
-        assertEquals("name-85", entity.getName());
-        assertEquals("0a68fcd5-dc1c-48d0-98dc-33008ce0d7ce", entity.getOrganizationId());
-        assertEquals("/v2/organizations/0a68fcd5-dc1c-48d0-98dc-33008ce0d7ce", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/542943ff-a40b-4004-9559-434b0169508c/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -225,16 +242,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(PUT).path("/v2/spaces/test-id/managers/test-manager-id")
                 .errorResponse());
 
-        AssociateSpaceManagerRequest request = new AssociateSpaceManagerRequest()
-                .withId("test-id")
-                .withManagerId("test-manager-id");
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
 
         Streams.wrap(this.spaces.associateManager(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void associateManagerInvalidRequest() {
-        Streams.wrap(this.spaces.associateManager(new AssociateSpaceManagerRequest())).next().get();
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.associateManager(request)).next().get();
     }
 
     @Test
@@ -244,37 +265,39 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/PUT_{id}_security_group_{id}_response.json"));
 
-        AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
-                .withId("test-id")
-                .withSecurityGroupId("test-security-group-id");
+        AssociateSpaceSecurityGroupRequest request = AssociateSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .securityGroupId("test-security-group-id")
+                .build();
 
-        AssociateSpaceSecurityGroupResponse response = Streams.wrap(this.spaces.associateSecurityGroup(request)).next
-                ().get();
+        AssociateSpaceSecurityGroupResponse expected = AssociateSpaceSecurityGroupResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("c9424692-395b-403b-90e6-10049bbd9e23")
+                        .url("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23")
+                        .createdAt("2015-07-27T22:43:06Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-39")
+                        .organizationId("67096164-bdcf-4b53-92e1-a2991882a066")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/67096164-bdcf-4b53-92e1-a2991882a066")
+                        .developersUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/developers")
+                        .managersUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/managers")
+                        .auditorsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/auditors")
+                        .applicationsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/apps")
+                        .routesUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/routes")
+                        .domainsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/domains")
+                        .serviceInstancesUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/service_instances")
+                        .applicationEventsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/app_events")
+                        .eventsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/events")
+                        .securityGroupsUrl("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:06Z", metadata.getCreatedAt());
-        assertEquals("c9424692-395b-403b-90e6-10049bbd9e23", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23", metadata.getUrl());
+        AssociateSpaceSecurityGroupResponse actual = Streams.wrap(this.spaces.associateSecurityGroup(request))
+                .next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/managers", entity.getManagersUrl());
-        assertEquals("name-39", entity.getName());
-        assertEquals("67096164-bdcf-4b53-92e1-a2991882a066", entity.getOrganizationId());
-        assertEquals("/v2/organizations/67096164-bdcf-4b53-92e1-a2991882a066", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/c9424692-395b-403b-90e6-10049bbd9e23/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -284,16 +307,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(PUT).path("/v2/spaces/test-id/security_groups/test-security-group-id")
                 .errorResponse());
 
-        AssociateSpaceSecurityGroupRequest request = new AssociateSpaceSecurityGroupRequest()
-                .withId("test-id")
-                .withSecurityGroupId("test-security-group-id");
+        AssociateSpaceSecurityGroupRequest request = AssociateSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .securityGroupId("test-security-group-id")
+                .build();
 
         Streams.wrap(this.spaces.associateSecurityGroup(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void associateSecurityGroupInvalidRequest() {
-        Streams.wrap(this.spaces.associateSecurityGroup(new AssociateSpaceSecurityGroupRequest())).next().get();
+        AssociateSpaceSecurityGroupRequest request = AssociateSpaceSecurityGroupRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.associateSecurityGroup(request)).next().get();
     }
 
     @Test
@@ -304,36 +331,38 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/POST_response.json"));
 
-        CreateSpaceRequest request = new CreateSpaceRequest()
-                .withName("development")
-                .withOrganizationId("c523070c-3006-4715-86dd-414afaecd949");
+        CreateSpaceRequest request = CreateSpaceRequest.builder()
+                .name("development")
+                .organizationId("c523070c-3006-4715-86dd-414afaecd949")
+                .build();
 
-        CreateSpaceResponse response = Streams.wrap(this.spaces.create(request)).next().get();
+        CreateSpaceResponse expected = CreateSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("d29dc30c-793c-49a6-97fe-9aff75dcbd12")
+                        .url("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12")
+                        .createdAt("2015-07-27T22:43:08Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("development")
+                        .organizationId("c523070c-3006-4715-86dd-414afaecd949")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/c523070c-3006-4715-86dd-414afaecd949")
+                        .developersUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/developers")
+                        .managersUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/managers")
+                        .auditorsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/auditors")
+                        .applicationsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/apps")
+                        .routesUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/routes")
+                        .domainsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/domains")
+                        .serviceInstancesUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/service_instances")
+                        .applicationEventsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/app_events")
+                        .eventsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/events")
+                        .securityGroupsUrl("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-        assertEquals("d29dc30c-793c-49a6-97fe-9aff75dcbd12", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12", metadata.getUrl());
+        CreateSpaceResponse actual = Streams.wrap(this.spaces.create(request)).next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/managers", entity.getManagersUrl());
-        assertEquals("development", entity.getName());
-        assertEquals("c523070c-3006-4715-86dd-414afaecd949", entity.getOrganizationId());
-        assertEquals("/v2/organizations/c523070c-3006-4715-86dd-414afaecd949", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/d29dc30c-793c-49a6-97fe-9aff75dcbd12/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -344,16 +373,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .requestPayload("v2/spaces/POST_request.json")
                 .errorResponse());
 
-        CreateSpaceRequest request = new CreateSpaceRequest()
-                .withName("development")
-                .withOrganizationId("c523070c-3006-4715-86dd-414afaecd949");
+        CreateSpaceRequest request = CreateSpaceRequest.builder()
+                .name("development")
+                .organizationId("c523070c-3006-4715-86dd-414afaecd949")
+                .build();
 
         Streams.wrap(this.spaces.create(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void createInvalidRequest() {
-        Streams.wrap(this.spaces.create(new CreateSpaceRequest())).next().get();
+        CreateSpaceRequest request = CreateSpaceRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.create(request)).next().get();
     }
 
     @Test
@@ -362,9 +395,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(DELETE).path("v2/spaces/test-id?async=true")
                 .status(NO_CONTENT));
 
-        DeleteSpaceRequest request = new DeleteSpaceRequest()
-                .withAsync(true)
-                .withId("test-id");
+        DeleteSpaceRequest request = DeleteSpaceRequest.builder()
+                .async(true)
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.spaces.delete(request)).next().get();
 
@@ -377,16 +411,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(DELETE).path("v2/spaces/test-id?async=true")
                 .errorResponse());
 
-        DeleteSpaceRequest request = new DeleteSpaceRequest()
-                .withAsync(true)
-                .withId("test-id");
+        DeleteSpaceRequest request = DeleteSpaceRequest.builder()
+                .async(true)
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.spaces.delete(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void deleteInvalidRequest() {
-        Streams.wrap(this.spaces.delete(new DeleteSpaceRequest())).next().get();
+        DeleteSpaceRequest request = DeleteSpaceRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.delete(request)).next().get();
     }
 
     public void get() {
@@ -395,35 +433,37 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/GET_{id}_response.json"));
 
-        GetSpaceRequest request = new GetSpaceRequest()
-                .withId("test-id");
+        GetSpaceRequest request = GetSpaceRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetSpaceResponse response = Streams.wrap(this.spaces.get(request)).next().get();
+        GetSpaceResponse expected = GetSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("0f102457-c1fc-42e5-9c81-c7be2bc65dcd")
+                        .url("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd")
+                        .createdAt("2015-07-27T22:43:08Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-108")
+                        .organizationId("525a31fb-bc2b-4f7f-865e-1c93b42a6762")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/525a31fb-bc2b-4f7f-865e-1c93b42a6762")
+                        .developersUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/developers")
+                        .managersUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/managers")
+                        .auditorsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/auditors")
+                        .applicationsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/apps")
+                        .routesUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/routes")
+                        .domainsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/domains")
+                        .serviceInstancesUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/service_instances")
+                        .applicationEventsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/app_events")
+                        .eventsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/events")
+                        .securityGroupsUrl("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/security_groups")
+                        .build())
+                .build();
 
-        SpaceResource.Metadata metadata = response.getMetadata();
-        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-        assertEquals("0f102457-c1fc-42e5-9c81-c7be2bc65dcd", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd", metadata.getUrl());
+        GetSpaceResponse actual = Streams.wrap(this.spaces.get(request)).next().get();
 
-        SpaceResource.SpaceEntity entity = response.getEntity();
-
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/managers", entity.getManagersUrl());
-        assertEquals("name-108", entity.getName());
-        assertEquals("525a31fb-bc2b-4f7f-865e-1c93b42a6762", entity.getOrganizationId());
-        assertEquals("/v2/organizations/525a31fb-bc2b-4f7f-865e-1c93b42a6762", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/0f102457-c1fc-42e5-9c81-c7be2bc65dcd/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -433,15 +473,19 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(GET).path("/v2/spaces/test-id")
                 .errorResponse());
 
-        GetSpaceRequest request = new GetSpaceRequest()
-                .withId("test-id");
+        GetSpaceRequest request = GetSpaceRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.spaces.get(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getInvalidRequest() {
-        Streams.wrap(this.spaces.get(new GetSpaceRequest())).next().get();
+        GetSpaceRequest request = GetSpaceRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.get(request)).next().get();
     }
 
     @Test
@@ -451,77 +495,63 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/GET_{id}_summary_response.json"));
 
-        GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
-                .withId("test-id");
+        GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                .id("test-id")
+                .build();
 
-        GetSpaceSummaryResponse response = Streams.wrap(this.spaces.getSummary(request)).next().get();
+        GetSpaceSummaryResponse expected = GetSpaceSummaryResponse.builder()
+                .id("f9c44c5c-9613-40b2-9296-e156c661a0ba")
+                .name("name-649")
+                .application(SpaceApplicationSummary.builder()
+                        .id("e1efe0a2-a931-4604-a419-f76dbe23ad76")
+                        .url("host-11.domain-48.example.com")
+                        .route(Route.builder()
+                                .id("3445e88d-adda-4255-9b9d-6f701fb0de17")
+                                .host("host-11")
+                                .domain(Domain.builder()
+                                        .id("af154090-baca-4805-a8a2-9db93a16a84b")
+                                        .name("domain-48.example.com")
+                                        .build())
+                                .build())
+                        .serviceCount(1)
+                        .serviceName("name-654")
+                        .runningInstances(0)
+                        .name("name-652")
+                        .production(false)
+                        .spaceId("f9c44c5c-9613-40b2-9296-e156c661a0ba")
+                        .stackId("01a9ea88-1028-4d1a-a8ee-d1acc686815c")
+                        .memory(1024)
+                        .instances(1)
+                        .diskQuota(1024)
+                        .state("STOPPED")
+                        .version("6505d60e-2a6f-475c-8c1d-85c66139447e")
+                        .console(false)
+                        .packageState("PENDING")
+                        .healthCheckType("port")
+                        .diego(false)
+                        .packageUpdatedAt("2015-07-27T22:43:19Z")
+                        .detectedStartCommand("")
+                        .enableSsh(true)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .build())
+                .service(builder()
+                        .id("83e3713f-5f9b-4168-a43c-02cc66493cc0")
+                        .name("name-654")
+                        .boundApplicationCount(1)
+                        .servicePlan(Plan.builder()
+                                .id("67bd9226-6d63-48ac-9114-a756a01bff7c")
+                                .name("name-655")
+                                .service(Service.builder()
+                                        .id("64ce598e-0c24-4dba-bfa1-594187db7404")
+                                        .label("label-23")
+                                        .build())
+                                .build())
+                        .build())
+                .build();
 
-        assertTrue(null != response.getApplications() && response.getApplications().size() == 1);
-        SpaceApplicationSummary app = response.getApplications().get(0);
+        GetSpaceSummaryResponse actual = Streams.wrap(this.spaces.getSummary(request)).next().get();
 
-        assertEquals("e1efe0a2-a931-4604-a419-f76dbe23ad76", app.getId());
-        assertEquals(Integer.valueOf(0), app.getRunningInstances());
-
-        assertTrue(null != app.getRoutes() && app.getRoutes().size() == 1);
-        SpaceApplicationSummary.Route route = app.getRoutes().get(0);
-
-        assertEquals("af154090-baca-4805-a8a2-9db93a16a84b", route.getDomain().getId());
-        assertEquals("domain-48.example.com", route.getDomain().getName());
-        assertEquals("host-11", route.getHost());
-        assertEquals("3445e88d-adda-4255-9b9d-6f701fb0de17", route.getId());
-
-        assertEquals(Integer.valueOf(1), app.getServiceCount());
-        assertEquals(Collections.singletonList("name-654"), app.getServiceNames());
-        assertEquals(Collections.singletonList("host-11.domain-48.example.com"), app.getUrls());
-
-        assertNull(app.getBuildpack());
-        assertNull(app.getCommand());
-        assertFalse(app.getConsole());
-        assertNull(app.getDebug());
-        assertNull(app.getDetectedBuildpack());
-        assertEquals("", app.getDetectedStartCommand());
-        assertFalse(app.getDiego());
-        assertEquals(Integer.valueOf(1024), app.getDiskQuota());
-        assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
-                app.getDockerCredentialsJson());
-        assertNull(app.getDockerImage());
-        assertTrue(app.getEnableSsh());
-        assertNull(app.getEnvironmentJson());
-        assertNull(app.getHealthCheckTimeout());
-        assertEquals("port", app.getHealthCheckType());
-        assertEquals(Integer.valueOf(1), app.getInstances());
-        assertEquals(Integer.valueOf(1024), app.getMemory());
-        assertEquals("name-652", app.getName());
-        assertEquals("PENDING", app.getPackageState());
-        assertEquals("2015-07-27T22:43:19Z", app.getPackageUpdatedAt());
-        assertFalse(app.getProduction());
-        assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", app.getSpaceId());
-        assertEquals("01a9ea88-1028-4d1a-a8ee-d1acc686815c", app.getStackId());
-        assertNull(app.getStagingFailedDescription());
-        assertNull(app.getStagingFailedReason());
-        assertNull(app.getStagingTaskId());
-        assertEquals("STOPPED", app.getState());
-        assertEquals("6505d60e-2a6f-475c-8c1d-85c66139447e", app.getVersion());
-
-        assertEquals("f9c44c5c-9613-40b2-9296-e156c661a0ba", response.getId());
-        assertEquals("name-649", response.getName());
-
-        assertTrue(null != response.getServices() && response.getServices().size() == 1);
-        SpaceServiceSummary serviceSummary = response.getServices().get(0);
-
-        assertEquals(Integer.valueOf(1), serviceSummary.getBoundAppCount());
-        assertNull(serviceSummary.getDashboardUrl());
-        assertEquals("83e3713f-5f9b-4168-a43c-02cc66493cc0", serviceSummary.getId());
-        assertNull(serviceSummary.getLastOperation());
-        assertEquals("name-654", serviceSummary.getName());
-
-        assertEquals("67bd9226-6d63-48ac-9114-a756a01bff7c", serviceSummary.getServicePlan().getId());
-        assertEquals("name-655", serviceSummary.getServicePlan().getName());
-        assertEquals("64ce598e-0c24-4dba-bfa1-594187db7404", serviceSummary.getServicePlan().getService().getId());
-        assertEquals("label-23", serviceSummary.getServicePlan().getService().getLabel());
-        assertNull(serviceSummary.getServicePlan().getService().getProvider());
-        assertNull(serviceSummary.getServicePlan().getService().getVersion());
-
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -531,15 +561,19 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(GET).path("/v2/spaces/test-id/summary")
                 .errorResponse());
 
-        GetSpaceSummaryRequest request = new GetSpaceSummaryRequest()
-                .withId("test-id");
+        GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                .id("test-id")
+                .build();
 
         Streams.wrap(this.spaces.getSummary(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void getSummaryInvalidRequest() {
-        Streams.wrap(this.spaces.getSummary(new GetSpaceSummaryRequest())).next().get();
+        GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.getSummary(request)).next().get();
     }
 
     @Test
@@ -550,44 +584,43 @@ public final class SpringSpacesTest extends AbstractRestTest {
                         .responsePayload("v2/spaces/GET_response.json")
         );
 
-        ListSpacesRequest request = new ListSpacesRequest()
-                .withName("test-name")
-                .withPage(-1);
+        ListSpacesRequest request = ListSpacesRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
 
-        ListSpacesResponse response = Streams.wrap(this.spaces.list(request)).next().get();
+        ListSpacesResponse expected = ListSpacesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ListSpacesResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("b4293b09-8316-472c-a29a-6468a3adff59")
+                                .url("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59")
+                                .createdAt("2015-07-27T22:43:08Z")
+                                .build())
+                        .entity(SpaceEntity.builder()
+                                .name("name-111")
+                                .organizationId("3ce736dd-3b8c-4f64-acab-ed76488b79a3")
+                                .allowSsh(true)
+                                .organizationUrl("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3")
+                                .developersUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers")
+                                .managersUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers")
+                                .auditorsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors")
+                                .applicationsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps")
+                                .routesUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes")
+                                .domainsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains")
+                                .serviceInstancesUrl
+                                        ("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances")
+                                .applicationEventsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events")
+                                .eventsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events")
+                                .securityGroupsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups")
+                                .build())
+                        .build())
+                .build();
 
-        assertNull(response.getNextUrl());
-        assertNull(response.getPreviousUrl());
-        assertEquals(Integer.valueOf(1), response.getTotalPages());
-        assertEquals(Integer.valueOf(1), response.getTotalResults());
+        ListSpacesResponse actual = Streams.wrap(this.spaces.list(request)).next().get();
 
-        assertEquals(1, response.getResources().size());
-        ListSpacesResponse.ListSpacesResponseResource resource = response.getResources().get(0);
-
-        SpaceResource.Metadata metadata = resource.getMetadata();
-        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-        assertEquals("b4293b09-8316-472c-a29a-6468a3adff59", metadata.getId());
-        assertNull(metadata.getUpdatedAt());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59", metadata.getUrl());
-
-        SpaceResource.SpaceEntity entity = resource.getEntity();
-        assertTrue(entity.getAllowSsh());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events", entity.getApplicationEventsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps", entity.getApplicationsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/auditors", entity.getAuditorsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/developers", entity.getDevelopersUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains", entity.getDomainsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events", entity.getEventsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/managers", entity.getManagersUrl());
-        assertEquals("name-111", entity.getName());
-        assertEquals("3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationId());
-        assertEquals("/v2/organizations/3ce736dd-3b8c-4f64-acab-ed76488b79a3", entity.getOrganizationUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes", entity.getRoutesUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups", entity.getSecurityGroupsUrl());
-        assertEquals("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances",
-                entity.getServiceInstancesUrl());
-        assertNull(entity.getSpaceQuotaDefinitionId());
-
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -597,9 +630,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
                 .errorResponse());
 
-        ListSpacesRequest request = new ListSpacesRequest()
-                .withName("test-name")
-                .withPage(-1);
+        ListSpacesRequest request = ListSpacesRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
 
         Streams.wrap(this.spaces.list(request)).next().get();
     }
@@ -611,64 +645,52 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/spaces/GET_{id}_apps_response.json"));
 
-        ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
-                .withId("test-id")
-                .withNames(Collections.singletonList("test-name"))
-                .withPage(-1);
+        ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                .id("test-id")
+                .names(Collections.singletonList("test-name"))
+                .page(-1)
+                .build();
 
-        ListSpaceApplicationsResponse response = Streams.wrap(this.spaces.listApplications(request)).next().get();
+        ListSpaceApplicationsResponse expected = ListSpaceApplicationsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(Resource.builder()
+                        .metadata(Metadata.builder()
+                                .id("4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
+                                .url("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
+                                .createdAt("2015-07-27T22:43:08Z")
+                                .updatedAt("2015-07-27T22:43:08Z")
+                                .build())
+                        .entity(ApplicationEntity.builder()
+                                .name("name-103")
+                                .production(false)
+                                .spaceId("ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f")
+                                .stackId("e458a99f-53a4-4da4-b78a-5f2eb212cc47")
+                                .memory(1024)
+                                .instances(1)
+                                .diskQuota(1024)
+                                .state("STOPPED")
+                                .version("cc21d137-45d6-4687-ab71-8288ac0e5724")
+                                .console(false)
+                                .packageState("PENDING")
+                                .healthCheckType("port")
+                                .diego(false)
+                                .packageUpdatedAt("2015-07-27T22:43:08Z")
+                                .detectedStartCommand("")
+                                .enableSsh(true)
+                                .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                                .spaceUrl("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f")
+                                .stackUrl("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47")
+                                .eventsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events")
+                                .serviceBindingsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings")
+                                .routesUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes")
+                                .build())
+                        .build())
+                .build();
 
-        assertNull(response.getNextUrl());
-        assertNull(response.getPreviousUrl());
-        assertEquals(Integer.valueOf(1), response.getTotalPages());
-        assertEquals(Integer.valueOf(1), response.getTotalResults());
-        assertEquals(1, response.getResources().size());
+        ListSpaceApplicationsResponse actual = Streams.wrap(this.spaces.listApplications(request)).next().get();
 
-        ListSpaceApplicationsResponse.Resource resource = response.getResources().get(0);
-
-        ApplicationResource.Metadata metadata = resource.getMetadata();
-
-        assertEquals("2015-07-27T22:43:08Z", metadata.getCreatedAt());
-        assertEquals("4ee31730-3c0e-4ec6-8329-26e727ab8ccd", metadata.getId());
-        assertEquals("2015-07-27T22:43:08Z", metadata.getUpdatedAt());
-        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd", metadata.getUrl());
-
-        ApplicationEntity entity = resource.getEntity();
-
-        assertNull(entity.getBuildpack());
-        assertNull(entity.getCommand());
-        assertFalse(entity.getConsole());
-        assertNull(entity.getDebug());
-        assertNull(entity.getDetectedBuildpack());
-        assertEquals("", entity.getDetectedStartCommand());
-        assertFalse(entity.getDiego());
-        assertEquals(Integer.valueOf(1024), entity.getDiskQuota());
-        assertEquals(Collections.singletonMap("redacted_message", "[PRIVATE DATA HIDDEN]"),
-                entity.getDockerCredentialsJson());
-        assertNull(entity.getDockerImage());
-        assertTrue(entity.getEnableSsh());
-        assertNull(entity.getEnvironmentJson());
-        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events", entity.getEventsUrl());
-        assertNull(entity.getHealthCheckTimeout());
-        assertEquals("port", entity.getHealthCheckType());
-        assertEquals(Integer.valueOf(1), entity.getInstances());
-        assertEquals(Integer.valueOf(1024), entity.getMemory());
-        assertEquals("name-103", entity.getName());
-        assertEquals("PENDING", entity.getPackageState());
-        assertEquals("2015-07-27T22:43:08Z", entity.getPackageUpdatedAt());
-        assertFalse(entity.getProduction());
-        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes", entity.getRoutesUrl());
-        assertEquals("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings", entity.getServiceBindingsUrl());
-        assertEquals("ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f", entity.getSpaceId());
-        assertEquals("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f", entity.getSpaceUrl());
-        assertEquals("e458a99f-53a4-4da4-b78a-5f2eb212cc47", entity.getStackId());
-        assertEquals("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47", entity.getStackUrl());
-        assertNull(entity.getStagingFailedDescription());
-        assertNull(entity.getStagingFailedReason());
-        assertNull(entity.getStagingTaskId());
-        assertEquals("STOPPED", entity.getState());
-        assertEquals("cc21d137-45d6-4687-ab71-8288ac0e5724", entity.getVersion());
-
+        assertEquals(expected, actual);
         verify();
     }
 
@@ -678,17 +700,21 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .method(GET).path("/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1")
                 .errorResponse());
 
-        ListSpaceApplicationsRequest request = new ListSpaceApplicationsRequest()
-                .withId("test-id")
-                .withNames(Collections.singletonList("test-name"))
-                .withPage(-1);
+        ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                .id("test-id")
+                .names(Collections.singletonList("test-name"))
+                .page(-1)
+                .build();
 
         Streams.wrap(this.spaces.listApplications(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
     public void listApplicationsInvalidRequest() {
-        Streams.wrap(this.spaces.listApplications(new ListSpaceApplicationsRequest())).next().get();
+        ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listApplications(request)).next().get();
     }
 
 }

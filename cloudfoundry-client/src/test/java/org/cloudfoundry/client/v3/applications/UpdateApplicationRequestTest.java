@@ -19,10 +19,6 @@ package org.cloudfoundry.client.v3.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
@@ -30,28 +26,10 @@ import static org.junit.Assert.assertEquals;
 public final class UpdateApplicationRequestTest {
 
     @Test
-    public void test() {
-        UpdateApplicationRequest request = new UpdateApplicationRequest()
-                .withBuildpack("test-buildpack")
-                .withEnvironmentVariable("test-key-1", "test-value-1")
-                .withEnvironmentVariables(Collections.singletonMap("test-key-2", "test-value-2"))
-                .withName("test-name")
-                .withId("test-id");
-
-        Map<String, String> environmentVariables = new HashMap<>();
-        environmentVariables.put("test-key-1", "test-value-1");
-        environmentVariables.put("test-key-2", "test-value-2");
-
-        assertEquals("test-buildpack", request.getBuildpack());
-        assertEquals(environmentVariables, request.getEnvironmentVariables());
-        assertEquals("test-name", request.getName());
-        assertEquals("test-id", request.getId());
-    }
-
-    @Test
     public void isValid() {
-        ValidationResult result = new UpdateApplicationRequest()
-                .withId("test-id")
+        ValidationResult result = UpdateApplicationRequest.builder()
+                .id("test-id")
+                .build()
                 .isValid();
 
         assertEquals(VALID, result.getStatus());
@@ -59,7 +37,8 @@ public final class UpdateApplicationRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = new UpdateApplicationRequest()
+        ValidationResult result = UpdateApplicationRequest.builder()
+                .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
