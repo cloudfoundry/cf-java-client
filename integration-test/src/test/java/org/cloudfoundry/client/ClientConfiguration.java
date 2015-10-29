@@ -17,9 +17,7 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
-import org.cloudfoundry.client.spring.SpringLoggregatorClientBuilder;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,16 +37,18 @@ public class ClientConfiguration {
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password,
                                                 @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
-        return new SpringCloudFoundryClientBuilder()
-                .api(host)
-                .credentials(username, password)
+
+        return SpringCloudFoundryClient.builder()
+                .host(host)
+                .username(username)
+                .password(password)
                 .skipSslValidation(skipSslValidation)
                 .build();
     }
 
     @Bean
     SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return new SpringLoggregatorClientBuilder()
+        return SpringLoggregatorClient.builder()
                 .cloudFoundryClient(cloudFoundryClient)
                 .build();
     }
@@ -64,7 +64,6 @@ public class ClientConfiguration {
                 .map(resource -> resource.getMetadata().getId())
                 .next().poll();
     }
-
 
     @Bean
     String spaceId(CloudFoundryClient cloudFoundryClient, String organizationId, @Value("${test.space}") String space) {

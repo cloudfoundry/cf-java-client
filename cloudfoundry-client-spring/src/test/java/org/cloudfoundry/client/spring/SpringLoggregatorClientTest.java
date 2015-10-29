@@ -77,4 +77,5 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
     public void recentInvalidRequest() {
         Streams.wrap(this.client.recent(RecentLogsRequest.builder().build())).next().get();
     }
+
 }

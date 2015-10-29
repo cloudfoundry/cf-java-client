@@ -17,7 +17,7 @@
 package org.cloudfoundry.demo;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
+import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -73,9 +73,10 @@ public class OAuthPerformance {
                 System.out.printf("Iteration %d%n", i);
 
                 startup.add(time(() -> {
-                    client.set(new SpringCloudFoundryClientBuilder()
-                            .api(this.host)
-                            .credentials(this.username, this.password)
+                    client.set(SpringCloudFoundryClient.builder()
+                            .host(this.host)
+                            .username(this.username)
+                            .password(this.password)
                             .build());
                 }));
 

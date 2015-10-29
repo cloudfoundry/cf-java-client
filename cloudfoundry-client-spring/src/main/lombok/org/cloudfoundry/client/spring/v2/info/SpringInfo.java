@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.v2.info;
 
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
@@ -28,6 +29,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Info}
  */
+@ToString(callSuper = true)
 public final class SpringInfo extends AbstractSpringOperations implements Info {
 
     /**

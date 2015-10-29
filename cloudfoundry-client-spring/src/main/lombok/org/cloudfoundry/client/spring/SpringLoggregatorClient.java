@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.spring;
 
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.ToString;
 import org.cloudfoundry.client.LoggregatorClient;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
@@ -26,6 +29,7 @@ import org.cloudfoundry.client.loggregator.StreamLogsRequest;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHandler;
 import org.cloudfoundry.client.spring.loggregator.ReactiveEndpoint;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
@@ -37,6 +41,7 @@ import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import javax.websocket.ClientEndpointConfig;
+import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
@@ -51,23 +56,36 @@ import java.util.function.Function;
 /**
  * The Spring-based implementation of {@link LoggregatorClient}
  */
+@ToString(callSuper = true)
 public final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ClientEndpointConfig clientEndpointConfig;
 
+    private final URI root;
+
     private final WebSocketContainer webSocketContainer;
 
-    private final URI root;
+    @Builder
+    SpringLoggregatorClient(@NonNull SpringCloudFoundryClient cloudFoundryClient) {
+        this(cloudFoundryClient, ContainerProvider.getWebSocketContainer());
+    }
+
+    SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
+        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient));
+
+        this.clientEndpointConfig = getClientEndpointConfig(cloudFoundryClient);
+        this.root = UriComponentsBuilder.fromUri(super.root).scheme("wss").build().toUri();
+        this.webSocketContainer = webSocketContainer;
+    }
 
     SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer,
                             RestOperations restOperations, URI root) {
-        super(restOperations, UriComponentsBuilder.fromUri(root).scheme("https").build().toUri());
-
+        super(restOperations, root);
         this.clientEndpointConfig = clientEndpointConfig;
-        this.webSocketContainer = webSocketContainer;
         this.root = root;
+        this.webSocketContainer = webSocketContainer;
     }
 
     @Override
@@ -129,6 +147,23 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
             exchange.accept(subscriber);
         }));
+    }
+
+    private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
+        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
+        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
+    }
+
+    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getRestOperations();
+    }
+
+    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
+        return Streams.wrap(cloudFoundryClient.info().get())
+                .map(GetInfoResponse::getLoggingEndpoint)
+                .map(loggingEndpoint ->
+                        UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri())
+                .next().poll();
     }
 
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2.spaces;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
@@ -47,6 +48,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Spaces}
  */
+@ToString(callSuper = true)
 public final class SpringSpaces extends AbstractSpringOperations implements Spaces {
 
     /**

@@ -21,9 +21,7 @@ import org.cloudfoundry.client.LoggregatorClient;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.StreamLogsRequest;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
-import org.cloudfoundry.client.spring.SpringLoggregatorClientBuilder;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
@@ -74,16 +72,20 @@ public class PushApplication {
     @Bean
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
                                                 @Value("${test.username}") String username,
-                                                @Value("${test.password}") String password) {
-        return new SpringCloudFoundryClientBuilder()
-                .api(host)
-                .credentials(username, password)
+                                                @Value("${test.password}") String password,
+                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
+
+        return SpringCloudFoundryClient.builder()
+                .host(host)
+                .username(username)
+                .password(password)
+                .skipSslValidation(skipSslValidation)
                 .build();
     }
 
     @Bean
     SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return new SpringLoggregatorClientBuilder()
+        return SpringLoggregatorClient.builder()
                 .cloudFoundryClient(cloudFoundryClient)
                 .build();
     }

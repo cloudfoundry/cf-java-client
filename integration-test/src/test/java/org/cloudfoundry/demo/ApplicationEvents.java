@@ -17,7 +17,7 @@
 package org.cloudfoundry.demo;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringCloudFoundryClientBuilder;
+import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.events.EventResource;
@@ -68,12 +68,16 @@ public class ApplicationEvents {
     }
 
     @Bean
-    CloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
-                                          @Value("${test.username}") String username,
-                                          @Value("${test.password}") String password) {
-        return new SpringCloudFoundryClientBuilder()
-                .api(host)
-                .credentials(username, password)
+    SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
+                                                @Value("${test.username}") String username,
+                                                @Value("${test.password}") String password,
+                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
+
+        return SpringCloudFoundryClient.builder()
+                .host(host)
+                .username(username)
+                .password(password)
+                .skipSslValidation(skipSslValidation)
                 .build();
     }
 

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2.organizations.auditors;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.organizations.auditors.Auditors;
 import org.cloudfoundry.client.v2.organizations.auditors.CreateAuditorRequest;
@@ -28,6 +29,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Auditors}
  */
+@ToString(callSuper = true)
 public final class SpringAuditors extends AbstractSpringOperations implements Auditors {
 
     /**

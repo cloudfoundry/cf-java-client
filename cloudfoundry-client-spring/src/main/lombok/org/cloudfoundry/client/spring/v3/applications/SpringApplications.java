@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v3.applications;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v3.FilterBuilder;
@@ -60,6 +61,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Applications}
  */
+@ToString(callSuper = true)
 public final class SpringApplications extends AbstractSpringOperations implements Applications {
 
     /**

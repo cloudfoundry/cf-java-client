@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v3.packages;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.CollectionUtils;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
@@ -47,6 +48,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Packages}
  */
+@ToString(callSuper = true)
 public final class SpringPackages extends AbstractSpringOperations implements Packages {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

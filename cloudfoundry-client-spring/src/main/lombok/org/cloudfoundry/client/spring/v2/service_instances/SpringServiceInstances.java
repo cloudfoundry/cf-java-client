@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2.service_instances;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
@@ -30,6 +31,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link ServiceInstances}
  */
+@ToString(callSuper = true)
 public final class SpringServiceInstances extends AbstractSpringOperations implements ServiceInstances {
 
     /**

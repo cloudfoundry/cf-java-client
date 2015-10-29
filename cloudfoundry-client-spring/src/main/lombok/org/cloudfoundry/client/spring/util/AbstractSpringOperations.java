@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.util;
 
+import lombok.ToString;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
@@ -38,6 +39,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.PUT;
 
+@ToString
 public abstract class AbstractSpringOperations {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

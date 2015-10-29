@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v3.droplets;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -31,6 +32,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Droplets}
  */
+@ToString(callSuper = true)
 public final class SpringDroplets extends AbstractSpringOperations implements Droplets {
 
     /**

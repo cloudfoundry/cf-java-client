@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.v2.organizations;
+package org.cloudfoundry.client.spring.v2.events;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
-import org.cloudfoundry.client.spring.v2.organizations.auditors.SpringAuditors;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.Organizations;
-import org.cloudfoundry.client.v2.organizations.auditors.Auditors;
+import org.cloudfoundry.client.v2.events.Events;
+import org.cloudfoundry.client.v2.events.GetEventRequest;
+import org.cloudfoundry.client.v2.events.GetEventResponse;
+import org.cloudfoundry.client.v2.events.ListEventsRequest;
+import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;
 
 /**
- * The Spring-based implementation of {@link Organizations}
+ * The Spring-based implementation of {@link Events}
  */
-public final class SpringOrganizations extends AbstractSpringOperations implements Organizations {
-
-    private final Auditors auditors;
+@ToString(callSuper = true)
+public final class SpringEvents extends AbstractSpringOperations implements Events {
 
     /**
      * Creates an instance
@@ -42,20 +42,20 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      */
-    public SpringOrganizations(RestOperations restOperations, URI root) {
+    public SpringEvents(RestOperations restOperations, URI root) {
         super(restOperations, root);
-        this.auditors = new SpringAuditors(restOperations, root);
     }
 
     @Override
-    public Auditors auditors() {
-        return this.auditors;
+    public Publisher<GetEventResponse> get(GetEventRequest request) {
+        return get(request, GetEventResponse.class,
+                builder -> builder.pathSegment("v2", "events", request.getId()));
     }
 
     @Override
-    public Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
-        return get(request, ListOrganizationsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations");
+    public Publisher<ListEventsResponse> list(ListEventsRequest request) {
+        return get(request, ListEventsResponse.class, builder -> {
+            builder.pathSegment("v2", "events");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });

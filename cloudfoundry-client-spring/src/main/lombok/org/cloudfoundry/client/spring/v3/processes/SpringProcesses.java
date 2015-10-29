@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v3.processes;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.processes.DeleteProcessInstanceRequest;
@@ -36,6 +37,7 @@ import java.net.URI;
 /**
  * The Spring-based implementation of {@link Processes}
  */
+@ToString(callSuper = true)
 public final class SpringProcesses extends AbstractSpringOperations implements Processes {
 
     /**
