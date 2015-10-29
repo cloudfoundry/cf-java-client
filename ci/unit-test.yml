@@ -1,6 +1,6 @@
 ---
 platform: linux
-image: docker:///java#jdk-8
+image: docker:///java#8-jdk
 
 inputs:
 - name: cf-java-client
