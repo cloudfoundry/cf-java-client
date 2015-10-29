@@ -103,21 +103,24 @@ public final class UiUtils {
 			table.getHeaders().get(COLUMN_2).updateWidth(String.valueOf(state).length());
 			tableRow.addValue(COLUMN_2, String.valueOf(state));
 
-			String cpu = String.format("%.2f%%", instance.getUsage().getCpu() * 100);
-			table.getHeaders().get(COLUMN_3).updateWidth(String.valueOf(cpu).length());
-			tableRow.addValue(COLUMN_3, String.valueOf(cpu));
+			InstanceStats.Usage usage = instance.getUsage();
+			if (usage != null) {
+				String cpu = String.format("%.2f%%", usage.getCpu() * 100);
+				table.getHeaders().get(COLUMN_3).updateWidth(String.valueOf(cpu).length());
+				tableRow.addValue(COLUMN_3, String.valueOf(cpu));
 
-			String memory = String.format("%s of %s",
-					formatBytes(instance.getUsage().getMem()),
-					formatBytes(instance.getMemQuota()));
-			table.getHeaders().get(COLUMN_4).updateWidth(String.valueOf(memory).length());
-			tableRow.addValue(COLUMN_4, String.valueOf(memory));
+				String memory = String.format("%s of %s",
+						formatBytes(usage.getMem()),
+						formatBytes(instance.getMemQuota()));
+				table.getHeaders().get(COLUMN_4).updateWidth(String.valueOf(memory).length());
+				tableRow.addValue(COLUMN_4, String.valueOf(memory));
 
-			String disk = String.format("%s of %s",
-					formatBytes(instance.getUsage().getDisk()),
-					formatBytes(instance.getDiskQuota()));
-			table.getHeaders().get(COLUMN_5).updateWidth(String.valueOf(disk).length());
-			tableRow.addValue(COLUMN_5, String.valueOf(disk));
+				String disk = String.format("%s of %s",
+						formatBytes(usage.getDisk()),
+						formatBytes(instance.getDiskQuota()));
+				table.getHeaders().get(COLUMN_5).updateWidth(String.valueOf(disk).length());
+				tableRow.addValue(COLUMN_5, String.valueOf(disk));
+			}
 
 			table.getRows().add(tableRow);
 		}
