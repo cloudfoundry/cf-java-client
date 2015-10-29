@@ -19,4 +19,3 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-java-client.git
-    branch: concourse

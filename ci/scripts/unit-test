@@ -3,5 +3,5 @@
 set -e -x
 
 pushd cf-java-client
-  mvn clean package
+  ./mvnw clean package
 popd
