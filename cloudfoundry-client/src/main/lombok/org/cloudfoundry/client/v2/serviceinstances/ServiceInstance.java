@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
 /**
- * A service summary for the Get Space summary response payload
+ * A service instance
  */
 @Data
-public final class SpaceServiceSummary {
+public final class ServiceInstance {
 
     /**
      * The bound application count
@@ -75,12 +75,12 @@ public final class SpaceServiceSummary {
     private final Plan servicePlan;
 
     @Builder
-    SpaceServiceSummary(@JsonProperty("bound_app_count") Integer boundApplicationCount,
-                        @JsonProperty("dashboard_url") String dashboardUrl,
-                        @JsonProperty("guid") String id,
-                        @JsonProperty("last_operation") String lastOperation,
-                        @JsonProperty("name") String name,
-                        @JsonProperty("service_plan") Plan servicePlan) {
+    ServiceInstance(@JsonProperty("bound_app_count") Integer boundApplicationCount,
+                    @JsonProperty("dashboard_url") String dashboardUrl,
+                    @JsonProperty("guid") String id,
+                    @JsonProperty("last_operation") String lastOperation,
+                    @JsonProperty("name") String name,
+                    @JsonProperty("service_plan") Plan servicePlan) {
         this.boundApplicationCount = boundApplicationCount;
         this.dashboardUrl = dashboardUrl;
         this.id = id;
@@ -89,6 +89,9 @@ public final class SpaceServiceSummary {
         this.servicePlan = servicePlan;
     }
 
+    /**
+     * A service plan
+     */
     @Data
     public final static class Plan {
 
@@ -114,7 +117,7 @@ public final class SpaceServiceSummary {
          * @param service the service
          * @return the service
          */
-        private final Plan.Service service;
+        private final Service service;
 
         @Builder
         Plan(@JsonProperty("guid") String id,

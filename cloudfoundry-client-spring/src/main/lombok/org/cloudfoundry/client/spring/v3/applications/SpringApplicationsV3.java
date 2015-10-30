@@ -20,7 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v3.FilterBuilder;
-import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -59,10 +59,10 @@ import org.springframework.web.client.RestOperations;
 import java.net.URI;
 
 /**
- * The Spring-based implementation of {@link Applications}
+ * The Spring-based implementation of {@link ApplicationsV3}
  */
 @ToString(callSuper = true)
-public final class SpringApplications extends AbstractSpringOperations implements Applications {
+public final class SpringApplicationsV3 extends AbstractSpringOperations implements ApplicationsV3 {
 
     /**
      * Creates an instance
@@ -70,7 +70,7 @@ public final class SpringApplications extends AbstractSpringOperations implement
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      */
-    public SpringApplications(RestOperations restOperations, URI root) {
+    public SpringApplicationsV3(RestOperations restOperations, URI root) {
         super(restOperations, root);
     }
 

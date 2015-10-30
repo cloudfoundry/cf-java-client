@@ -25,20 +25,22 @@ import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTr
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.LoggingDeserializationProblemHandler;
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
+import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
-import org.cloudfoundry.client.spring.v2.service_instances.SpringServiceInstances;
+import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
-import org.cloudfoundry.client.spring.v3.applications.SpringApplications;
+import org.cloudfoundry.client.spring.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
 import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
+import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.spaces.Spaces;
-import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.slf4j.Logger;
@@ -74,7 +76,9 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudFoundryClient.class);
 
-    private final Applications applications;
+    private final ApplicationsV2 applicationsV2;
+
+    private final ApplicationsV3 applicationsV3;
 
     private final Droplets droplets;
 
@@ -117,7 +121,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
         this.restOperations = restOperations;
 
-        this.applications = new SpringApplications(restOperations, root);
+        this.applicationsV2 = new SpringApplicationsV2(restOperations, root);
+        this.applicationsV3 = new SpringApplicationsV3(restOperations, root);
         this.droplets = new SpringDroplets(restOperations, root);
         this.events = new SpringEvents(restOperations, root);
         this.info = new SpringInfo(restOperations, root);
@@ -130,7 +135,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root) {
         this.restOperations = restOperations;
 
-        this.applications = new SpringApplications(restOperations, root);
+        this.applicationsV2 = new SpringApplicationsV2(restOperations, root);
+        this.applicationsV3 = new SpringApplicationsV3(restOperations, root);
         this.droplets = new SpringDroplets(restOperations, root);
         this.events = new SpringEvents(restOperations, root);
         this.info = new SpringInfo(restOperations, root);
@@ -145,8 +151,13 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public Applications applications() {
-        return this.applications;
+    public ApplicationsV2 applicationsV2() {
+        return this.applicationsV2;
+    }
+
+    @Override
+    public ApplicationsV3 applicationsV3() {
+        return this.applicationsV3;
     }
 
     @Override

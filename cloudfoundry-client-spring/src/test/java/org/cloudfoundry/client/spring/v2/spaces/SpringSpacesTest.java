@@ -48,12 +48,13 @@ import java.util.Collections;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse.Resource;
 import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
-import static org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary.Route;
-import static org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary.Route.Domain;
+
+import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.domains.Domain;
 import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
-import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.Plan;
-import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.Plan.Service;
-import static org.cloudfoundry.client.v2.spaces.SpaceServiceSummary.builder;
+import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
+import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
+import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
