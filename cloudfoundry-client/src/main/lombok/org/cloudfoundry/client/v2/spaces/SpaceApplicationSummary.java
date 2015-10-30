@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationEntity;
+import org.cloudfoundry.client.v2.routes.Route;
 
 import java.util.List;
 import java.util.Map;
@@ -128,72 +129,6 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
         this.serviceCount = serviceCount;
         this.serviceNames = serviceNames;
         this.urls = urls;
-    }
-
-    @Data
-    public static final class Route {
-
-        /**
-         * The domain
-         *
-         * @param domain the domain
-         * @return the domain
-         */
-        private final Domain domain;
-
-        /**
-         * The host
-         *
-         * @param host the host
-         * @return the host
-         */
-        private final String host;
-
-        /**
-         * The id
-         *
-         * @param id the id
-         * @return the id
-         */
-        private final String id;
-
-        @Builder
-        Route(@JsonProperty("domain") Domain domain,
-              @JsonProperty("host") String host,
-              @JsonProperty("guid") String id) {
-            this.domain = domain;
-            this.host = host;
-            this.id = id;
-        }
-
-        @Data
-        public static final class Domain {
-
-            /**
-             * The id
-             *
-             * @param id the id
-             * @return the id
-             */
-            private final String id;
-
-            /**
-             * The name
-             *
-             * @param name the name
-             * @return the name
-             */
-            private final String name;
-
-            @Builder
-            Domain(@JsonProperty("guid") String id,
-                   @JsonProperty("name") String name) {
-                this.id = id;
-                this.name = name;
-            }
-
-        }
-
     }
 
 }

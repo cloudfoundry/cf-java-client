@@ -19,9 +19,9 @@ package org.cloudfoundry.client.v3.applications;
 import org.reactivestreams.Publisher;
 
 /**
- * Main entry point to the Cloud Foundry Applications Client API
+ * Main entry point to the Cloud Foundry Applications V3 Client API
  */
-public interface Applications {
+public interface ApplicationsV3 {
 
     /**
      * Makes the

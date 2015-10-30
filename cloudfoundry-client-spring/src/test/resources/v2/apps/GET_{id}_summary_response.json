@@ -1,0 +1,77 @@
+{
+  "guid": "f501634a-c6a8-44a7-aafc-88862ec727ba",
+  "name": "name-2124",
+  "routes": [
+    {
+      "guid": "7b0b080a-c567-48a3-acee-28a2c252e959",
+      "host": "host-18",
+      "domain": {
+        "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
+        "name": "domain-55.example.com"
+      }
+    }
+  ],
+  "running_instances": 0,
+  "services": [
+    {
+      "guid": "b74ee576-9eb9-4e7e-8185-0c48db893d97",
+      "name": "name-2126",
+      "bound_app_count": 1,
+      "last_operation": null,
+      "dashboard_url": null,
+      "service_plan": {
+        "guid": "192be526-c7c0-4899-aa2a-3aca7996ccb0",
+        "name": "name-2127",
+        "service": {
+          "guid": "0e586250-a340-4924-8e2e-f13250f595ce",
+          "label": "label-75",
+          "provider": null,
+          "version": null
+        }
+      }
+    }
+  ],
+  "available_domains": [
+    {
+      "guid": "011461ec-476b-444d-a048-b0e2a3ff0f30",
+      "name": "domain-55.example.com",
+      "owning_organization_guid": "aadb707d-bf3b-4a0e-8b22-c06aabad53c4"
+    },
+    {
+      "guid": "7c4e943b-5e9b-44ac-85ce-fcff57134d3b",
+      "name": "customer-app-domain1.com"
+    },
+    {
+      "guid": "1477a304-2af6-48d0-9e8f-6e2cdf06a9a2",
+      "name": "customer-app-domain2.com"
+    }
+  ],
+  "production": false,
+  "space_guid": "3736ea8c-7ff0-44ba-8ed0-bd60971e8155",
+  "stack_guid": "21a9a6e8-127a-41ce-886a-0294d807c5e9",
+  "buildpack": null,
+  "detected_buildpack": null,
+  "environment_json": {},
+  "memory": 1024,
+  "instances": 1,
+  "disk_quota": 1024,
+  "state": "STOPPED",
+  "version": "53188475-8b6c-4e13-b321-2955431b27de",
+  "command": null,
+  "console": false,
+  "debug": null,
+  "staging_task_id": null,
+  "package_state": "PENDING",
+  "health_check_type": "port",
+  "health_check_timeout": null,
+  "staging_failed_reason": null,
+  "staging_failed_description": null,
+  "diego": false,
+  "docker_image": null,
+  "package_updated_at": "2015-07-27T22:43:29Z",
+  "detected_start_command": "",
+  "enable_ssh": true,
+  "docker_credentials_json": {
+    "redacted_message": "[PRIVATE DATA HIDDEN]"
+  }
+}

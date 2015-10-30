@@ -76,9 +76,9 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringApplicationsTest extends AbstractRestTest {
+public final class SpringApplicationsV3Test extends AbstractRestTest {
 
-    private final SpringApplications applications = new SpringApplications(this.restTemplate, this.root);
+    private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
     @Test
     public void assignDroplet() {

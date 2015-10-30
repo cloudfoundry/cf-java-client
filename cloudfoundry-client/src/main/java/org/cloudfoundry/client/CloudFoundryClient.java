@@ -16,12 +16,13 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.spaces.Spaces;
-import org.cloudfoundry.client.v3.applications.Applications;
+import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 
@@ -31,11 +32,18 @@ import org.cloudfoundry.client.v3.packages.Packages;
 public interface CloudFoundryClient {
 
     /**
-     * Main entry point to the Cloud Foundry Applications Client API
+     * Main entry point to the Cloud Foundry Applications V2 Client API
      *
-     * @return the Cloud Foundry Application Client API
+     * @return the Cloud Foundry Application V2 Client API
      */
-    Applications applications();
+    ApplicationsV2 applicationsV2();
+
+    /**
+     * Main entry point to the Cloud Foundry Applications V3 Client API
+     *
+     * @return the Cloud Foundry Application V3 Client API
+     */
+    ApplicationsV3 applicationsV3();
 
     /**
      * Main entry point to the Cloud Foundry Applications Droplets API

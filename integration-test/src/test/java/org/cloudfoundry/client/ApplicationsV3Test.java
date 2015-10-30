@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
-public final class ApplicationsTest {
+public final class ApplicationsV3Test {
 
     @Autowired
     private volatile CloudFoundryClient cloudFoundryClient;
@@ -49,7 +49,7 @@ public final class ApplicationsTest {
                 .spaceId(this.spaceId)
                 .build();
 
-        long size = Streams.wrap(this.cloudFoundryClient.applications().list(request))
+        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
                 .map(PaginatedResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
@@ -65,14 +65,14 @@ public final class ApplicationsTest {
                 .name("test-name")
                 .build();
 
-        Streams.wrap(this.cloudFoundryClient.applications().create(createRequest))
+        Streams.wrap(this.cloudFoundryClient.applicationsV3().create(createRequest))
                 .next().poll();
 
         ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
                 .spaceId(this.spaceId)
                 .build();
 
-        long size = Streams.wrap(this.cloudFoundryClient.applications().list(listRequest))
+        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(listRequest))
                 .map(PaginatedResponse::getResources)
                 .flatMap(Streams::from)
                 .count()

@@ -174,7 +174,7 @@ public class PushApplication {
                     .name(this.application)
                     .build();
 
-            return Streams.wrap(this.cloudFoundryClient.applications().create(request))
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().create(request))
                     .observeSubscribe(s -> this.logger.info("Creating application"))
                     .observe(r -> this.logger.info("Created application"));
         }
@@ -195,7 +195,7 @@ public class PushApplication {
                     .id(resource.getId())
                     .build();
 
-            return Streams.wrap(this.cloudFoundryClient.applications().delete(request))
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().delete(request))
                     .observeSubscribe(s -> this.logger.info("Deleting application"))
                     .observe(r -> this.logger.info("Deleted application"));
         }
@@ -204,7 +204,7 @@ public class PushApplication {
             ListApplicationsRequest request = ListApplicationsRequest.builder()
                     .build();
 
-            return Streams.wrap(this.cloudFoundryClient.applications().list(request));
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request));
         }
 
         private Stream<ListSpacesResponse> listSpaces() {

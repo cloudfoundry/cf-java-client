@@ -14,39 +14,49 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.domains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
-
-import java.util.List;
 
 /**
- * The response payload for the Get Space summary operation
+ * The domain
  */
 @Data
-public final class GetSpaceSummaryResponse {
+public final class Domain {
 
-    private final List<SpaceApplicationSummary> applications;
-
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
     private final String id;
 
+    /**
+     * The name
+     *
+     * @param name the name
+     * @return the name
+     */
     private final String name;
 
-    private final List<ServiceInstance> services;
+    /**
+     * The owning organization id
+     *
+     * @param owningOrganizationId the owning organization id
+     * @return the owning organization id
+     */
+    private final String owningOrganizationId;
 
     @Builder
-    GetSpaceSummaryResponse(@JsonProperty("apps") @Singular List<SpaceApplicationSummary> applications,
-                            @JsonProperty("guid") String id,
-                            @JsonProperty("name") String name,
-                            @JsonProperty("services") @Singular List<ServiceInstance> services) {
-        this.applications = applications;
+    Domain(@JsonProperty("guid") String id,
+           @JsonProperty("name") String name,
+           @JsonProperty("owning_organization_guid") String owningOrganizationId) {
         this.id = id;
         this.name = name;
-        this.services = services;
+        this.owningOrganizationId = owningOrganizationId;
     }
 
 }
