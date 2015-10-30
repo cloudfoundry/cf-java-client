@@ -49,22 +49,6 @@ public final class ListServiceInstancesResponse
     }
 
     /**
-     * The resource response payload for the List Service Instances operation
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static final class ListServiceInstancesResponseResource
-            extends Resource<ListServiceInstancesResponseEntity> {
-
-        @Builder
-        ListServiceInstancesResponseResource(@JsonProperty("entity") ListServiceInstancesResponseEntity entity,
-                                             @JsonProperty("metadata") Metadata metadata) {
-            super(entity, metadata);
-        }
-    }
-
-    /**
      * The entity response payload for the List Service Instances operation
      */
     @Data
@@ -246,4 +230,21 @@ public final class ListServiceInstancesResponse
         }
 
     }
+
+    /**
+     * The resource response payload for the List Service Instances operation
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static final class ListServiceInstancesResponseResource
+            extends Resource<ListServiceInstancesResponseEntity> {
+
+        @Builder
+        ListServiceInstancesResponseResource(@JsonProperty("entity") ListServiceInstancesResponseEntity entity,
+                                             @JsonProperty("metadata") Metadata metadata) {
+            super(entity, metadata);
+        }
+    }
+
 }

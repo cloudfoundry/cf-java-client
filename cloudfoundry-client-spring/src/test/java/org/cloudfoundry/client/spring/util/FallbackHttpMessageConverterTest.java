@@ -28,11 +28,6 @@ public final class FallbackHttpMessageConverterTest {
     private final FallbackHttpMessageConverter messageConverter = new FallbackHttpMessageConverter();
 
     @Test
-    public void supports() {
-        assertTrue(this.messageConverter.supports(Object.class));
-    }
-
-    @Test
     public void canRead() {
         assertFalse(this.messageConverter.canRead(null));
     }
@@ -40,6 +35,11 @@ public final class FallbackHttpMessageConverterTest {
     @Test(expected = UnsupportedOperationException.class)
     public void readInternal() {
         this.messageConverter.readInternal(null, null);
+    }
+
+    @Test
+    public void supports() {
+        assertTrue(this.messageConverter.supports(Object.class));
     }
 
     @Test

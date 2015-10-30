@@ -39,11 +39,10 @@ public final class CertificateCollectingTrustManagerTest {
 
     private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
 
-    @Test
-    public void checkClientTrustedTrusted() throws CertificateException {
+    @Test(expected = IllegalStateException.class)
+    public void checkClientTrustedAlreadyCollected() throws CertificateException {
         this.trustManager.checkClientTrusted(this.chain, null);
-
-        assertTrue(this.trustManager.isTrusted());
+        this.trustManager.checkClientTrusted(this.chain, null);
     }
 
     @Test
@@ -55,17 +54,17 @@ public final class CertificateCollectingTrustManagerTest {
         assertFalse(this.trustManager.isTrusted());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void checkClientTrustedAlreadyCollected() throws CertificateException {
-        this.trustManager.checkClientTrusted(this.chain, null);
-        this.trustManager.checkClientTrusted(this.chain, null);
-    }
-
     @Test
-    public void checkServerTrustedTrusted() throws CertificateException {
-        this.trustManager.checkServerTrusted(this.chain, null);
+    public void checkClientTrustedTrusted() throws CertificateException {
+        this.trustManager.checkClientTrusted(this.chain, null);
 
         assertTrue(this.trustManager.isTrusted());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void checkServerTrustedAlreadyCollected() throws CertificateException {
+        this.trustManager.checkServerTrusted(this.chain, null);
+        this.trustManager.checkServerTrusted(this.chain, null);
     }
 
     @Test
@@ -77,10 +76,11 @@ public final class CertificateCollectingTrustManagerTest {
         assertFalse(this.trustManager.isTrusted());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void checkServerTrustedAlreadyCollected() throws CertificateException {
+    @Test
+    public void checkServerTrustedTrusted() throws CertificateException {
         this.trustManager.checkServerTrusted(this.chain, null);
-        this.trustManager.checkServerTrusted(this.chain, null);
+
+        assertTrue(this.trustManager.isTrusted());
     }
 
     @Test

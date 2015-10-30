@@ -35,9 +35,19 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
+    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
+
     private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
+    @Test
+    public void applicationsV2() {
+        assertNotNull(this.client.applicationsV2());
+    }
+
+    @Test
+    public void applicationsV3() {
+        assertNotNull(this.client.applicationsV3());
+    }
 
     @Test
     public void builder() throws GeneralSecurityException, IOException {
@@ -75,16 +85,6 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void applicationsV2() {
-        assertNotNull(this.client.applicationsV2());
-    }
-
-    @Test
-    public void applicationsV3() {
-        assertNotNull(this.client.applicationsV3());
-    }
-
-    @Test
     public void droplets() {
         assertNotNull(this.client.droplets());
     }
@@ -110,12 +110,12 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void space() {
-        assertNotNull(this.client.spaces());
+    public void serviceInstances() {
+        assertNotNull(this.client.serviceInstances());
     }
 
     @Test
-    public void serviceInstances() {
-        assertNotNull(this.client.serviceInstances());
+    public void space() {
+        assertNotNull(this.client.spaces());
     }
 }

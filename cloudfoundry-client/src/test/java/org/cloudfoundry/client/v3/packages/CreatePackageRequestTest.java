@@ -39,17 +39,6 @@ public final class CreatePackageRequestTest {
     }
 
     @Test
-    public void isValidNoType() {
-        ValidationResult result = CreatePackageRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("type must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidBitsAndUrl() {
         ValidationResult result = CreatePackageRequest.builder()
                 .applicationId("test-application-id")
@@ -74,7 +63,6 @@ public final class CreatePackageRequestTest {
         assertEquals("url must be specified if type is DOCKER", result.getMessages().get(0));
     }
 
-
     @Test
     public void isValidNoId() {
         ValidationResult result = CreatePackageRequest.builder()
@@ -84,6 +72,17 @@ public final class CreatePackageRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("applicationId must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoType() {
+        ValidationResult result = CreatePackageRequest.builder()
+                .applicationId("test-application-id")
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("type must be specified", result.getMessages().get(0));
     }
 
 }

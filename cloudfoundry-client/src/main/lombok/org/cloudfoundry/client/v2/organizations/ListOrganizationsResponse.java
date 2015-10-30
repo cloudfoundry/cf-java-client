@@ -46,21 +46,6 @@ public final class ListOrganizationsResponse
     }
 
     /**
-     * The resource response payload for the List Organizations operation
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static final class ListOrganizationsResponseResource extends Resource<ListOrganizationsResponseEntity> {
-
-        @Builder
-        ListOrganizationsResponseResource(@JsonProperty("entity") ListOrganizationsResponseEntity entity,
-                                          @JsonProperty("metadata") Metadata metadata) {
-            super(entity, metadata);
-        }
-    }
-
-    /**
      * The entity response payload for the List Organizations operation
      */
     @Data
@@ -77,7 +62,7 @@ public final class ListOrganizationsResponse
         /**
          * The auditors url
          *
-         * @param auditorisUrl the auditors url
+         * @param auditorsUrl the auditors url
          * @return the auditors url
          */
         private final String auditorsUrl;
@@ -209,6 +194,21 @@ public final class ListOrganizationsResponse
             this.usersUrl = usersUrl;
         }
 
+    }
+
+    /**
+     * The resource response payload for the List Organizations operation
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static final class ListOrganizationsResponseResource extends Resource<ListOrganizationsResponseEntity> {
+
+        @Builder
+        ListOrganizationsResponseResource(@JsonProperty("entity") ListOrganizationsResponseEntity entity,
+                                          @JsonProperty("metadata") Metadata metadata) {
+            super(entity, metadata);
+        }
     }
 
 }

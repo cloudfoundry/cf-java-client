@@ -31,20 +31,20 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 public final class ValidationResult {
 
     /**
-     * The status of the validation attempt
-     *
-     * @param status the status of the validation attempt
-     * @return the status of the validation attempt
-     */
-    private final Status status;
-
-    /**
      * The messages indicating why validation failed
      *
      * @param messages the messages indicating why validation failed
      * @return the messages indicating why validation failed
      */
     private final List<String> messages;
+
+    /**
+     * The status of the validation attempt
+     *
+     * @param status the status of the validation attempt
+     * @return the status of the validation attempt
+     */
+    private final Status status;
 
     @Builder
     ValidationResult(@Singular List<String> messages) {
@@ -58,14 +58,14 @@ public final class ValidationResult {
     public enum Status {
 
         /**
-         * Indicates that the validation is valid
-         */
-        VALID,
-
-        /**
          * Indicates that the validation is invalid
          */
-        INVALID
+        INVALID,
+
+        /**
+         * Indicates that the validation is valid
+         */
+        VALID
 
     }
 

@@ -36,16 +36,16 @@ import java.util.Map;
 public final class ScaleApplicationResponse extends Process {
 
     @Builder
-    ScaleApplicationResponse(@JsonProperty("created_at") String createdAt,
-                             @JsonProperty("command") String command,
+    ScaleApplicationResponse(@JsonProperty("command") String command,
+                             @JsonProperty("created_at") String createdAt,
                              @JsonProperty("disk_in_mb") Integer diskInMb,
                              @JsonProperty("guid") String id,
-                             @JsonProperty("_links") @Singular Map<String, Link> links,
                              @JsonProperty("instances") Integer instances,
+                             @JsonProperty("_links") @Singular Map<String, Link> links,
                              @JsonProperty("memory_in_mb") Integer memoryInMb,
                              @JsonProperty("type") String type,
                              @JsonProperty("updated_at") String updatedAt) {
-        super(createdAt, command, diskInMb, id, links, instances, memoryInMb, type, updatedAt);
+        super(command, createdAt, diskInMb, id, instances, links, memoryInMb, type, updatedAt);
     }
 
 }

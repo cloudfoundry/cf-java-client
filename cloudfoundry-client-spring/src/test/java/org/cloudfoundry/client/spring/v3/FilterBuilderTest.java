@@ -44,14 +44,14 @@ public final class FilterBuilderTest {
 
     private static abstract class StubFilterParams {
 
-        @FilterParameter("test-single")
-        String getSingle() {
-            return "test-value-1";
-        }
-
         @FilterParameter("test-collection")
         List<String> getCollection() {
             return Arrays.asList("test-value-2", "test-value-3");
+        }
+
+        @FilterParameter("test-empty")
+        List<String> getEmpty() {
+            return Collections.emptyList();
         }
 
         @FilterParameter("test-null")
@@ -59,9 +59,9 @@ public final class FilterBuilderTest {
             return null;
         }
 
-        @FilterParameter("test-empty")
-        List<String> getEmpty() {
-            return Collections.emptyList();
+        @FilterParameter("test-single")
+        String getSingle() {
+            return "test-value-1";
         }
 
     }

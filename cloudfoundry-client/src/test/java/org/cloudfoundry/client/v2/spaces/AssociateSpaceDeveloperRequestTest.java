@@ -37,17 +37,6 @@ public final class AssociateSpaceDeveloperRequestTest {
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
-                .developerId("test-developer-id")
-                .build()
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoAuditorId() {
         ValidationResult result = AssociateSpaceDeveloperRequest.builder()
                 .id("test-id")
@@ -56,6 +45,17 @@ public final class AssociateSpaceDeveloperRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("developerId must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoId() {
+        ValidationResult result = AssociateSpaceDeveloperRequest.builder()
+                .developerId("test-developer-id")
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }

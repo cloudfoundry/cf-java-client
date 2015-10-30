@@ -39,14 +39,14 @@ public final class QueryBuilderTest {
 
     private static abstract class StubQueryParams {
 
-        @QueryParameter("test-parameter-1")
-        final String getParameter1() {
-            return "test-value-1";
-        }
-
         @QueryParameter("test-parameter-2")
         final String getNull() {
             return null;
+        }
+
+        @QueryParameter("test-parameter-1")
+        final String getParameter1() {
+            return "test-value-1";
         }
 
     }

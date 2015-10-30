@@ -65,15 +65,6 @@ public final class ListServiceInstancesRequest extends PaginatedRequest implemen
     private final List<String> organizationIds;
 
     /**
-     * The service key ids
-     *
-     * @param serviceKeyIds the service key ids
-     * @return the service key ids
-     */
-    @Getter(onMethod = @__(@FilterParameter("service_key_guid")))
-    private final List<String> serviceKeyIds;
-
-    /**
      * The service binding ids
      *
      * @param serviceBindingIds the service binding ids
@@ -81,6 +72,15 @@ public final class ListServiceInstancesRequest extends PaginatedRequest implemen
      */
     @Getter(onMethod = @__(@FilterParameter("service_binding_guid")))
     private final List<String> serviceBindingIds;
+
+    /**
+     * The service key ids
+     *
+     * @param serviceKeyIds the service key ids
+     * @return the service key ids
+     */
+    @Getter(onMethod = @__(@FilterParameter("service_key_guid")))
+    private final List<String> serviceKeyIds;
 
     /**
      * The service plan ids
@@ -103,8 +103,8 @@ public final class ListServiceInstancesRequest extends PaginatedRequest implemen
     @Builder
     ListServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                 @Singular List<String> gatewayNames, @Singular List<String> names,
-                                @Singular List<String> organizationIds, @Singular List<String> serviceKeyIds,
-                                @Singular List<String> serviceBindingIds, @Singular List<String> servicePlanIds,
+                                @Singular List<String> organizationIds, @Singular List<String> serviceBindingIds,
+                                @Singular List<String> serviceKeyIds, @Singular List<String> servicePlanIds,
                                 @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.gatewayNames = gatewayNames;

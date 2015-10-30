@@ -146,59 +146,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaces = new SpringSpaces(restOperations, root);
     }
 
-    OAuth2RestOperations getRestOperations() {
-        return this.restOperations;
-    }
-
-    @Override
-    public ApplicationsV2 applicationsV2() {
-        return this.applicationsV2;
-    }
-
-    @Override
-    public ApplicationsV3 applicationsV3() {
-        return this.applicationsV3;
-    }
-
-    @Override
-    public Droplets droplets() {
-        return this.droplets;
-    }
-
-    @Override
-    public Events events() {
-        return this.events;
-    }
-
-    String getAccessToken() {
-        return this.restOperations.getAccessToken().getValue();
-    }
-
-    @Override
-    public Info info() {
-        return this.info;
-    }
-
-    @Override
-    public Organizations organizations() {
-        return this.organizations;
-    }
-
-    @Override
-    public Packages packages() {
-        return this.packages;
-    }
-
-    @Override
-    public ServiceInstances serviceInstances() {
-        return this.serviceInstances;
-    }
-
-    @Override
-    public Spaces spaces() {
-        return this.spaces;
-    }
-
     @SuppressWarnings("unchecked")
     private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations) {
         String infoUri = UriComponentsBuilder.newInstance()
@@ -260,6 +207,59 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static URI getRoot(String host) {
         return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
+    }
+
+    @Override
+    public ApplicationsV2 applicationsV2() {
+        return this.applicationsV2;
+    }
+
+    @Override
+    public ApplicationsV3 applicationsV3() {
+        return this.applicationsV3;
+    }
+
+    @Override
+    public Droplets droplets() {
+        return this.droplets;
+    }
+
+    @Override
+    public Events events() {
+        return this.events;
+    }
+
+    @Override
+    public Info info() {
+        return this.info;
+    }
+
+    @Override
+    public Organizations organizations() {
+        return this.organizations;
+    }
+
+    @Override
+    public Packages packages() {
+        return this.packages;
+    }
+
+    @Override
+    public ServiceInstances serviceInstances() {
+        return this.serviceInstances;
+    }
+
+    @Override
+    public Spaces spaces() {
+        return this.spaces;
+    }
+
+    String getAccessToken() {
+        return this.restOperations.getAccessToken().getValue();
+    }
+
+    OAuth2RestOperations getRestOperations() {
+        return this.restOperations;
     }
 
 }

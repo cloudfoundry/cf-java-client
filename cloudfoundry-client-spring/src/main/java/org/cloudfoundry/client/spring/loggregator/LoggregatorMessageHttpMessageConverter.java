@@ -42,14 +42,9 @@ public final class LoggregatorMessageHttpMessageConverter
     }
 
     @Override
-    protected boolean supports(Class<?> clazz) {
-        return TypeUtils.isAssignable(Stream.class, clazz);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz,
-                                                    HttpInputMessage inputMessage) throws IOException {
+                                                      HttpInputMessage inputMessage) throws IOException {
 
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
 
@@ -63,6 +58,11 @@ public final class LoggregatorMessageHttpMessageConverter
                     }
                 });
 //                .toList().poll();
+    }
+
+    @Override
+    protected boolean supports(Class<?> clazz) {
+        return TypeUtils.isAssignable(Stream.class, clazz);
     }
 
     @Override

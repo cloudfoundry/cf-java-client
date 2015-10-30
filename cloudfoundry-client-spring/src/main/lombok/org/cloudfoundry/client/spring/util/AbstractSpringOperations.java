@@ -53,18 +53,6 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final <T> Stream<T> get(Validatable request, Class<T> responseType,
-                                      Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
-
-            this.logger.debug("GET {}", uri);
-            return this.restOperations.getForObject(uri, responseType);
-        });
-    }
-
     protected final Stream<Void> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
@@ -96,6 +84,18 @@ public abstract class AbstractSpringOperations {
                 subscriber.onError(e);
             }
         }));
+    }
+
+    protected final <T> Stream<T> get(Validatable request, Class<T> responseType,
+                                      Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, () -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
+
+            this.logger.debug("GET {}", uri);
+            return this.restOperations.getForObject(uri, responseType);
+        });
     }
 
     protected final <T> Stream<T> patch(Validatable request, Class<T> responseType,

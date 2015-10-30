@@ -35,6 +35,23 @@ public final class CloudFoundryOperationsBuilder {
     private volatile Optional<String> space = Optional.empty();
 
     /**
+     * Builds a new instance of the default implementation of the {@link CloudFoundryOperations} using the information
+     * provided.
+     *
+     * @return a new instance of the default implementation of the {@link CloudFoundryOperations}
+     * @throws IllegalArgumentException if {@code cloudFoundryClient} has not been set
+     */
+    public CloudFoundryOperations build() {
+        CloudFoundryClient cloudFoundryClient = this.cloudFoundryClient
+                .orElseThrow(() -> new IllegalArgumentException("CloudFoundryClient must be set"));
+
+        Optional<String> organizationId = getOrganizationId(cloudFoundryClient);
+        Optional<String> spaceId = getSpaceId(cloudFoundryClient, organizationId);
+
+        return new DefaultCloudFoundryOperations(cloudFoundryClient, organizationId, spaceId);
+    }
+
+    /**
      * Configure the {@link CloudFoundryClient} to use
      *
      * @param cloudFoundryClient the {@link CloudFoundryClient} to use
@@ -42,17 +59,6 @@ public final class CloudFoundryOperationsBuilder {
      */
     public CloudFoundryOperationsBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = Optional.of(cloudFoundryClient);
-        return this;
-    }
-
-    /**
-     * Configure the organization to target
-     *
-     * @param organization the organization to target
-     * @return {@code this}
-     */
-    public CloudFoundryOperationsBuilder target(String organization) {
-        this.organization = Optional.of(organization);
         return this;
     }
 
@@ -70,20 +76,14 @@ public final class CloudFoundryOperationsBuilder {
     }
 
     /**
-     * Builds a new instance of the default implementation of the {@link CloudFoundryOperations} using the information
-     * provided.
+     * Configure the organization to target
      *
-     * @return a new instance of the default implementation of the {@link CloudFoundryOperations}
-     * @throws IllegalArgumentException if {@code cloudFoundryClient} has not been set
+     * @param organization the organization to target
+     * @return {@code this}
      */
-    public CloudFoundryOperations build() {
-        CloudFoundryClient cloudFoundryClient = this.cloudFoundryClient
-                .orElseThrow(() -> new IllegalArgumentException("CloudFoundryClient must be set"));
-
-        Optional<String> organizationId = getOrganizationId(cloudFoundryClient);
-        Optional<String> spaceId = getSpaceId(cloudFoundryClient, organizationId);
-
-        return new DefaultCloudFoundryOperations(cloudFoundryClient, organizationId, spaceId);
+    public CloudFoundryOperationsBuilder target(String organization) {
+        this.organization = Optional.of(organization);
+        return this;
     }
 
     private Optional<String> getOrganizationId(CloudFoundryClient cloudFoundryClient) {

@@ -38,20 +38,14 @@ public final class LoggregatorMessageHttpMessageConverterTest {
             new LoggregatorMessageHttpMessageConverter();
 
     @Test
-    public void mediaType() {
-        this.messageConverter.getSupportedMediaTypes().stream()
-                .forEach(mediaType -> assertTrue(mediaType.isCompatibleWith(MEDIA_TYPE)));
-    }
-
-    @Test
     public void canWrite() {
         assertFalse(this.messageConverter.canWrite(null));
     }
 
     @Test
-    public void supports() {
-        assertFalse(this.messageConverter.supports(Map.class));
-        assertTrue(this.messageConverter.supports(Stream.class));
+    public void mediaType() {
+        this.messageConverter.getSupportedMediaTypes().stream()
+                .forEach(mediaType -> assertTrue(mediaType.isCompatibleWith(MEDIA_TYPE)));
     }
 
     @Test
@@ -65,6 +59,12 @@ public final class LoggregatorMessageHttpMessageConverterTest {
                 .next().poll();
 
         assertEquals(Long.valueOf(14), result);
+    }
+
+    @Test
+    public void supports() {
+        assertFalse(this.messageConverter.supports(Map.class));
+        assertTrue(this.messageConverter.supports(Stream.class));
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -30,11 +30,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 public final class FallbackHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 
     @Override
-    protected boolean supports(Class<?> clazz) {
-        return true;
-    }
-
-    @Override
     protected boolean canRead(MediaType mediaType) {
         return false;
     }
@@ -42,6 +37,11 @@ public final class FallbackHttpMessageConverter extends AbstractHttpMessageConve
     @Override
     protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected boolean supports(Class<?> clazz) {
+        return true;
     }
 
     @Override

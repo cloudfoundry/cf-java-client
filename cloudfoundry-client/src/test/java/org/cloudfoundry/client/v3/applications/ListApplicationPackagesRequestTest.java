@@ -36,16 +36,6 @@ public final class ListApplicationPackagesRequestTest {
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = ListApplicationPackagesRequest.builder()
-                .build()
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidInvalidPaginatedRequest() {
         ValidationResult result = ListApplicationPackagesRequest.builder()
                 .page(0)
@@ -54,6 +44,16 @@ public final class ListApplicationPackagesRequestTest {
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoId() {
+        ValidationResult result = ListApplicationPackagesRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }

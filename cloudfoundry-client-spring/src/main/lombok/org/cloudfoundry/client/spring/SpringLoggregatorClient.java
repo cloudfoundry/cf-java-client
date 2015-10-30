@@ -88,6 +88,18 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         this.webSocketContainer = webSocketContainer;
     }
 
+    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getRestOperations();
+    }
+
+    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
+        return Streams.wrap(cloudFoundryClient.info().get())
+                .map(GetInfoResponse::getLoggingEndpoint)
+                .map(loggingEndpoint ->
+                        UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri())
+                .next().poll();
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public Publisher<LoggregatorMessage> recent(RecentLogsRequest request) {
@@ -100,6 +112,30 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         return ws(request,
                 builder -> builder.path("tail/").queryParam("app", request.getId()),
                 LoggregatorMessageHandler::new);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Stream<T> exchange(Validatable request, Consumer<Subscriber<T>> exchange) {
+        return Streams.wrap(Publishers.createWithDemand((n, subscriber) -> {
+            if (n != Long.MAX_VALUE) {
+                subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
+            }
+
+            if (request != null) {
+                ValidationResult validationResult = request.isValid();
+                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                    subscriber.onError(new RequestValidationException(validationResult));
+                    return;
+                }
+            }
+
+            exchange.accept(subscriber);
+        }));
+    }
+
+    private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
+        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
+        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
     }
 
     private <T> Stream<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback,
@@ -130,42 +166,6 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                 this.logger.warn("Failure closing session", e);
             }
         }));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Stream<T> exchange(Validatable request, Consumer<Subscriber<T>> exchange) {
-        return Streams.wrap(Publishers.createWithDemand((n, subscriber) -> {
-            if (n != Long.MAX_VALUE) {
-                subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-            }
-
-            if (request != null) {
-                ValidationResult validationResult = request.isValid();
-                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                    subscriber.onError(new RequestValidationException(validationResult));
-                    return;
-                }
-            }
-
-            exchange.accept(subscriber);
-        }));
-    }
-
-    private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
-        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
-        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
-    }
-
-    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getRestOperations();
-    }
-
-    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
-        return Streams.wrap(cloudFoundryClient.info().get())
-                .map(GetInfoResponse::getLoggingEndpoint)
-                .map(loggingEndpoint ->
-                        UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri())
-                .next().poll();
     }
 
 }

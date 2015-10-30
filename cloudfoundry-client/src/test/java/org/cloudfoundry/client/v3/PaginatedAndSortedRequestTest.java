@@ -31,18 +31,6 @@ import static org.junit.Assert.assertEquals;
 public final class PaginatedAndSortedRequestTest {
 
     @Test
-    public void orderedBy() {
-        assertEquals("created_at", CREATED_AT.toString());
-        assertEquals("updated_at", UPDATED_AT.toString());
-    }
-
-    @Test
-    public void orderDirection() {
-        assertEquals("asc", ASC.toString());
-        assertEquals("desc", DESC.toString());
-    }
-
-    @Test
     public void isPaginatedAndSortedRequestValid() {
         ValidationResult result = StubPaginatedAndSortedRequest.builder()
                 .build()
@@ -62,6 +50,18 @@ public final class PaginatedAndSortedRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
+    }
+
+    @Test
+    public void orderDirection() {
+        assertEquals("asc", ASC.toString());
+        assertEquals("desc", DESC.toString());
+    }
+
+    @Test
+    public void orderedBy() {
+        assertEquals("created_at", CREATED_AT.toString());
+        assertEquals("updated_at", UPDATED_AT.toString());
     }
 
     private static final class StubPaginatedAndSortedRequest extends PaginatedAndSortedRequest {

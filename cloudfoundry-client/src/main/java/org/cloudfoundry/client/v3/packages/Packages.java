@@ -78,8 +78,8 @@ public interface Packages {
     Publisher<StagePackageResponse> stage(StagePackageRequest request);
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
+     * Makes the <a
+     * href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
      * Upload Package</a> request
      *
      * @param request the Upload Package request

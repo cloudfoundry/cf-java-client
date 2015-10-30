@@ -39,16 +39,16 @@ public final class ReactiveEndpointTest {
             this.subscriber);
 
     @Test
-    public void onCloseNormalClosure() {
-        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
+    public void onCloseGoingAway() {
+        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.GOING_AWAY,
                 "test-reason-phrase"));
 
         assertFalse(this.subscriber.getOnCompleteEvents().isEmpty());
     }
 
     @Test
-    public void onCloseGoingAway() {
-        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.GOING_AWAY,
+    public void onCloseNormalClosure() {
+        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
                 "test-reason-phrase"));
 
         assertFalse(this.subscriber.getOnCompleteEvents().isEmpty());

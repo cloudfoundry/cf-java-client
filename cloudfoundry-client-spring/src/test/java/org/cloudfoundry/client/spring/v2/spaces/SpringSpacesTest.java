@@ -20,6 +20,8 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.domains.Domain;
+import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -46,15 +48,12 @@ import reactor.rx.Streams;
 import java.util.Collections;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse.Resource;
-import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
-
-import org.cloudfoundry.client.v2.routes.Route;
-import org.cloudfoundry.client.v2.domains.Domain;
-import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
+import static org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse.Resource;
+import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
+import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -625,20 +624,6 @@ public final class SpringSpacesTest extends AbstractRestTest {
         verify();
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
-                .errorResponse());
-
-        ListSpacesRequest request = ListSpacesRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.spaces.list(request)).next().get();
-    }
-
     @Test
     public void listApplications() {
         mockRequest(new RequestContext()
@@ -716,6 +701,20 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listApplications(request)).next().get();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
+
+        ListSpacesRequest request = ListSpacesRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.list(request)).next().get();
     }
 
 }

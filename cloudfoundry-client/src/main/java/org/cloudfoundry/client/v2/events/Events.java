@@ -64,21 +64,6 @@ public interface Events {
     String AUDIT_APP_UPDATE = "audit.app.update";
 
     /**
-     * {@code audit.service.create} event type
-     */
-    String AUDIT_SERVICE_CREATE = "audit.service.create";
-
-    /**
-     * {@code audit.service.delete} event type
-     */
-    String AUDIT_SERVICE_DELETE = "audit.service.delete";
-
-    /**
-     * {@code audit.service.update} event type
-     */
-    String AUDIT_SERVICE_UPDATE = "audit.service.update";
-
-    /**
      * {@code audit.service_binding.create} event type
      */
     String AUDIT_SERVICE_BINDING_CREATE = "audit.service_binding.create";
@@ -104,6 +89,11 @@ public interface Events {
     String AUDIT_SERVICE_BROKER_UPDATE = "audit.service_broker.update";
 
     /**
+     * {@code audit.service.create} event type
+     */
+    String AUDIT_SERVICE_CREATE = "audit.service.create";
+
+    /**
      * {@code audit.service_dashboard_client.create} event type
      */
     String AUDIT_SERVICE_DASHBOARD_CLIENT_CREATE = "audit.service_dashboard_client.create";
@@ -112,6 +102,11 @@ public interface Events {
      * {@code audit.service_dashboard_client.delete} event type
      */
     String AUDIT_SERVICE_DASHBOARD_CLIENT_DELETE = "audit.service_dashboard_client.delete";
+
+    /**
+     * {@code audit.service.delete} event type
+     */
+    String AUDIT_SERVICE_DELETE = "audit.service.delete";
 
     /**
      * {@code audit.service_instance.create} event type
@@ -169,6 +164,11 @@ public interface Events {
     String AUDIT_SERVICE_PLAN_VISIBILITY_UPDATE = "audit.service_plan_visibility.update";
 
     /**
+     * {@code audit.service.update} event type
+     */
+    String AUDIT_SERVICE_UPDATE = "audit.service.update";
+
+    /**
      * {@code audit.space.create} event type
      */
     String AUDIT_SPACE_CREATE = "audit.space.create";
@@ -214,4 +214,5 @@ public interface Events {
      * @return the response from the List Events request
      */
     Publisher<ListEventsResponse> list(ListEventsRequest request);
+
 }

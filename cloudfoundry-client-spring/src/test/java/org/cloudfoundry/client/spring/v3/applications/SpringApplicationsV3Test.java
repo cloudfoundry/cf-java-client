@@ -369,27 +369,6 @@ public final class SpringApplicationsV3Test extends AbstractRestTest {
         verify();
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void getError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v3/apps/test-id")
-                .errorResponse());
-
-        GetApplicationRequest request = GetApplicationRequest.builder()
-                .id("test-id")
-                .build();
-
-        Streams.wrap(this.applications.get(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void getInvalidRequest() {
-        GetApplicationRequest request = GetApplicationRequest.builder()
-                .build();
-
-        Streams.wrap(this.applications.get(request)).next().get();
-    }
-
     @Test
     public void getEnvironment() {
         mockRequest(new RequestContext()
@@ -434,6 +413,27 @@ public final class SpringApplicationsV3Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.getEnvironment(request)).next().get();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/apps/test-id")
+                .errorResponse());
+
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.get(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getInvalidRequest() {
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.get(request)).next().get();
     }
 
     @Test
@@ -598,110 +598,6 @@ public final class SpringApplicationsV3Test extends AbstractRestTest {
         verify();
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v3/apps?names[]=test-name&order_by=created_at&page=1")
-                .errorResponse());
-
-        ListApplicationsRequest request = ListApplicationsRequest.builder()
-                .page(1)
-                .orderBy(CREATED_AT)
-                .name("test-name")
-                .build();
-
-        Streams.wrap(this.applications.list(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void listInvalidRequest() {
-        ListApplicationsRequest request = ListApplicationsRequest.builder()
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.applications.list(request)).next().get();
-    }
-
-    @Test
-    public void listPackages() {
-        mockRequest(new RequestContext()
-                        .method(GET).path("/v3/apps/test-id/packages")
-                        .status(OK)
-                        .responsePayload("v3/apps/GET_{id}_packages_response.json")
-        );
-
-        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
-                .page(1)
-                .id("test-id")
-                .build();
-
-        ListApplicationPackagesResponse expected = builder()
-                .pagination(Pagination.builder()
-                        .totalResults(1)
-                        .first(Link.builder()
-                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
-                                .build())
-                        .last(Link.builder()
-                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
-                                .build())
-                        .build())
-                .resource(Resource.builder()
-                        .id("guid-3d792a08-e415-4f9e-912b-2a8485db781a")
-                        .type("bits")
-                        .hash(Hash.builder()
-                                .type("sha1")
-                                .build())
-                        .state("AWAITING_UPLOAD")
-                        .createdAt("2015-07-27T22:43:34Z")
-                        .link("self", Link.builder()
-                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a")
-                                .build())
-                        .link("upload", Link.builder()
-                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/upload")
-                                .method("POST")
-                                .build())
-                        .link("download", Link.builder()
-                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/download")
-                                .method("GET")
-                                .build())
-                        .link("stage", Link.builder()
-                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/droplets")
-                                .method("POST")
-                                .build())
-                        .link("app", Link.builder()
-                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8")
-                                .build())
-                        .build())
-                .build();
-
-        ListApplicationPackagesResponse actual = Streams.wrap(this.applications.listPackages(request)).next().get();
-
-        assertEquals(expected, actual);
-        verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void listPackagesError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v3/apps/test-id/packages")
-                .errorResponse());
-
-        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
-                .page(1)
-                .id("test-id")
-                .build();
-
-        Streams.wrap(this.applications.listPackages(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void listPackagesInvalidRequest() {
-        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
-                .build();
-
-        Streams.wrap(this.applications.listPackages(request)).next().get();
-    }
-
     @Test
     public void listDroplets() {
         mockRequest(new RequestContext()
@@ -807,6 +703,110 @@ public final class SpringApplicationsV3Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.listDroplets(request)).next().get();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/apps?names[]=test-name&order_by=created_at&page=1")
+                .errorResponse());
+
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .page(1)
+                .orderBy(CREATED_AT)
+                .name("test-name")
+                .build();
+
+        Streams.wrap(this.applications.list(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listInvalidRequest() {
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.applications.list(request)).next().get();
+    }
+
+    @Test
+    public void listPackages() {
+        mockRequest(new RequestContext()
+                        .method(GET).path("/v3/apps/test-id/packages")
+                        .status(OK)
+                        .responsePayload("v3/apps/GET_{id}_packages_response.json")
+        );
+
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
+
+        ListApplicationPackagesResponse expected = builder()
+                .pagination(Pagination.builder()
+                        .totalResults(1)
+                        .first(Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
+                                .build())
+                        .last(Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
+                                .build())
+                        .build())
+                .resource(Resource.builder()
+                        .id("guid-3d792a08-e415-4f9e-912b-2a8485db781a")
+                        .type("bits")
+                        .hash(Hash.builder()
+                                .type("sha1")
+                                .build())
+                        .state("AWAITING_UPLOAD")
+                        .createdAt("2015-07-27T22:43:34Z")
+                        .link("self", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a")
+                                .build())
+                        .link("upload", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/upload")
+                                .method("POST")
+                                .build())
+                        .link("download", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/download")
+                                .method("GET")
+                                .build())
+                        .link("stage", Link.builder()
+                                .href("/v3/packages/guid-3d792a08-e415-4f9e-912b-2a8485db781a/droplets")
+                                .method("POST")
+                                .build())
+                        .link("app", Link.builder()
+                                .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8")
+                                .build())
+                        .build())
+                .build();
+
+        ListApplicationPackagesResponse actual = Streams.wrap(this.applications.listPackages(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listPackagesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v3/apps/test-id/packages")
+                .errorResponse());
+
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .page(1)
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.listPackages(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listPackagesInvalidRequest() {
+        ListApplicationPackagesRequest request = ListApplicationPackagesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listPackages(request)).next().get();
     }
 
     @Test

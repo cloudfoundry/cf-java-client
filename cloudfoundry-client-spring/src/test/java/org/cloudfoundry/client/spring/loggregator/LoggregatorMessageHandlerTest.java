@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.cloudfoundry.client.loggregator.LoggregatorMessage.MessageType.*;
+import static org.cloudfoundry.client.loggregator.LoggregatorMessage.MessageType.ERR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

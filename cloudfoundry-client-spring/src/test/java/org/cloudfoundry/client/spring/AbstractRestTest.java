@@ -53,6 +53,12 @@ public abstract class AbstractRestTest {
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(),
             new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
+    protected final URI root = UriComponentsBuilder.newInstance()
+            .scheme("https").host("api.run.pivotal.io")
+            .build().toUri();
+
+    private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
+
     {
         List<HttpMessageConverter<?>> messageConverters = this.restTemplate.getMessageConverters();
 
@@ -68,12 +74,6 @@ public abstract class AbstractRestTest {
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
     }
-
-    protected final URI root = UriComponentsBuilder.newInstance()
-            .scheme("https").host("api.run.pivotal.io")
-            .build().toUri();
-
-    private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
 
     protected final void mockRequest(RequestContext requestContext) {
         HttpMethod method = requestContext.getMethod()
@@ -118,53 +118,21 @@ public abstract class AbstractRestTest {
 
     public static final class RequestContext {
 
+        private final List<RequestMatcher> requestMatchers = new ArrayList<>();
+
         private volatile boolean anyRequestPayload = false;
 
         private volatile Optional<MediaType> contentType = Optional.empty();
 
         private volatile Optional<HttpMethod> method = Optional.empty();
 
-        private final List<RequestMatcher> requestMatchers = new ArrayList<>();
+        private volatile Optional<String> path = Optional.empty();
 
         private volatile Optional<Resource> requestPayload = Optional.empty();
 
         private volatile Optional<Resource> responsePayload = Optional.empty();
 
         private volatile Optional<HttpStatus> status = Optional.empty();
-
-        private volatile Optional<String> path = Optional.empty();
-
-        Boolean getAnyRequestPayload() {
-            return this.anyRequestPayload;
-        }
-
-        Optional<MediaType> getContentType() {
-            return this.contentType;
-        }
-
-        Optional<HttpMethod> getMethod() {
-            return this.method;
-        }
-
-        List<RequestMatcher> getRequestMatchers() {
-            return this.requestMatchers;
-        }
-
-        Optional<Resource> getRequestPayload() {
-            return this.requestPayload;
-        }
-
-        Optional<Resource> getResponsePayload() {
-            return this.responsePayload;
-        }
-
-        Optional<HttpStatus> getStatus() {
-            return this.status;
-        }
-
-        Optional<String> getPath() {
-            return this.path;
-        }
 
         public RequestContext anyRequestPayload() {
             this.anyRequestPayload = true;
@@ -210,6 +178,38 @@ public abstract class AbstractRestTest {
         public RequestContext status(HttpStatus status) {
             this.status = Optional.of(status);
             return this;
+        }
+
+        Boolean getAnyRequestPayload() {
+            return this.anyRequestPayload;
+        }
+
+        Optional<MediaType> getContentType() {
+            return this.contentType;
+        }
+
+        Optional<HttpMethod> getMethod() {
+            return this.method;
+        }
+
+        Optional<String> getPath() {
+            return this.path;
+        }
+
+        List<RequestMatcher> getRequestMatchers() {
+            return this.requestMatchers;
+        }
+
+        Optional<Resource> getRequestPayload() {
+            return this.requestPayload;
+        }
+
+        Optional<Resource> getResponsePayload() {
+            return this.responsePayload;
+        }
+
+        Optional<HttpStatus> getStatus() {
+            return this.status;
         }
 
     }

@@ -25,20 +25,20 @@ import static org.junit.Assert.assertEquals;
 public final class ValidationResultTest {
 
     @Test
-    public void valid() {
-        ValidationResult result = ValidationResult.builder()
-                .build();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
     public void invalid() {
         ValidationResult result = ValidationResult.builder()
                 .message("Test Message")
                 .build();
 
         assertEquals(INVALID, result.getStatus());
+    }
+
+    @Test
+    public void valid() {
+        ValidationResult result = ValidationResult.builder()
+                .build();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }

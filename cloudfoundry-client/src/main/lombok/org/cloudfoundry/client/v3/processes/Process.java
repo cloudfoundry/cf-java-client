@@ -30,20 +30,20 @@ import java.util.Map;
 public abstract class Process {
 
     /**
-     * The created at
-     *
-     * @param createdAt the created at
-     * @return the created at
-     */
-    private final String createdAt;
-
-    /**
      * The command
      *
      * @param command the command
      * @return the command
      */
     private final String command;
+
+    /**
+     * The created at
+     *
+     * @param createdAt the created at
+     * @return the created at
+     */
+    private final String createdAt;
 
     /**
      * The disk in megabytes
@@ -62,20 +62,20 @@ public abstract class Process {
     private final String id;
 
     /**
-     * The links
-     *
-     * @param links the links
-     * @return the links
-     */
-    private final Map<String, Link> links;
-
-    /**
      * The instances
      *
      * @param instances the instances
      * @return the instances
      */
     private final Integer instances;
+
+    /**
+     * The links
+     *
+     * @param links the links
+     * @return the links
+     */
+    private final Map<String, Link> links;
 
     /**
      * The memory in megabytes
@@ -101,21 +101,21 @@ public abstract class Process {
      */
     private final String updatedAt;
 
-    protected Process(@JsonProperty("created_at") String createdAt,
-                      @JsonProperty("command") String command,
+    protected Process(@JsonProperty("command") String command,
+                      @JsonProperty("created_at") String createdAt,
                       @JsonProperty("disk_in_mb") Integer diskInMb,
                       @JsonProperty("guid") String id,
-                      @JsonProperty("_links") @Singular Map<String, Link> links,
                       @JsonProperty("instances") Integer instances,
+                      @JsonProperty("_links") @Singular Map<String, Link> links,
                       @JsonProperty("memory_in_mb") Integer memoryInMb,
                       @JsonProperty("type") String type,
                       @JsonProperty("updated_at") String updatedAt) {
-        this.createdAt = createdAt;
         this.command = command;
+        this.createdAt = createdAt;
         this.diskInMb = diskInMb;
         this.id = id;
-        this.links = links;
         this.instances = instances;
+        this.links = links;
         this.memoryInMb = memoryInMb;
         this.type = type;
         this.updatedAt = updatedAt;

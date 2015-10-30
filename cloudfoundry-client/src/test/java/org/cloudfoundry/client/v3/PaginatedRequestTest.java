@@ -37,6 +37,18 @@ public final class PaginatedRequestTest {
     }
 
     @Test
+    public void isPaginationRequestValidExcessivePerPage() {
+        ValidationResult result = StubPaginatedRequest.builder()
+                .perPage(10_000)
+                .build()
+                .isPaginatedRequestValid()
+                .build();
+
+        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
+        assertEquals("perPage must be between 1 and 5000 inclusive", result.getMessages().get(0));
+    }
+
+    @Test
     public void isPaginationRequestValidNull() {
         ValidationResult result = StubPaginatedRequest.builder()
                 .build()
@@ -62,18 +74,6 @@ public final class PaginatedRequestTest {
     public void isPaginationRequestValidZeroPerPage() {
         ValidationResult result = StubPaginatedRequest.builder()
                 .perPage(0)
-                .build()
-                .isPaginatedRequestValid()
-                .build();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("perPage must be between 1 and 5000 inclusive", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isPaginationRequestValidExcessivePerPage() {
-        ValidationResult result = StubPaginatedRequest.builder()
-                .perPage(10_000)
                 .build()
                 .isPaginatedRequestValid()
                 .build();

@@ -56,6 +56,11 @@ public final class FilterBuilderTest {
 
     private static abstract class StubFilterParams {
 
+        @FilterParameter(name = "test-empty")
+        final List<String> getEmpty() {
+            return Collections.emptyList();
+        }
+
         @FilterParameter(name = "test-greater-than", operation = GREATER_THAN)
         final String getGreaterThan() {
             return "test-value-1";
@@ -89,11 +94,6 @@ public final class FilterBuilderTest {
         @FilterParameter(name = "test-null")
         final String getNull() {
             return null;
-        }
-
-        @FilterParameter(name = "test-empty")
-        final List<String> getEmpty() {
-            return Collections.emptyList();
         }
 
     }

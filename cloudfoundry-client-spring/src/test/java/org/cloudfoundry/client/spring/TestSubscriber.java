@@ -24,38 +24,33 @@ import java.util.List;
 
 public final class TestSubscriber<T> implements Subscriber<T> {
 
-    private final List<Subscription> onSubscribeEvents = new ArrayList<>();
-
-    private final List<T> onNextEvents = new ArrayList<>();
+    private final List<Void> onCompleteEvents = new ArrayList<>();
 
     private final List<Throwable> onErrorEvents = new ArrayList<>();
 
-    private final List<Void> onCompleteEvents = new ArrayList<>();
+    private final List<T> onNextEvents = new ArrayList<>();
 
-    public List<Subscription> getOnSubscribeEvents() {
-        return this.onSubscribeEvents;
-    }
+    private final List<Subscription> onSubscribeEvents = new ArrayList<>();
 
-    public List<T> getOnNextEvents() {
-        return this.onNextEvents;
+    public List<Void> getOnCompleteEvents() {
+        return this.onCompleteEvents;
     }
 
     public List<Throwable> getOnErrorEvents() {
         return this.onErrorEvents;
     }
 
-    public List<Void> getOnCompleteEvents() {
-        return this.onCompleteEvents;
+    public List<T> getOnNextEvents() {
+        return this.onNextEvents;
+    }
+
+    public List<Subscription> getOnSubscribeEvents() {
+        return this.onSubscribeEvents;
     }
 
     @Override
-    public void onSubscribe(Subscription subscription) {
-        this.onSubscribeEvents.add(subscription);
-    }
-
-    @Override
-    public void onNext(T t) {
-        this.onNextEvents.add(t);
+    public void onComplete() {
+        this.onCompleteEvents.add(null);
     }
 
     @Override
@@ -64,7 +59,12 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     }
 
     @Override
-    public void onComplete() {
-        this.onCompleteEvents.add(null);
+    public void onNext(T t) {
+        this.onNextEvents.add(t);
+    }
+
+    @Override
+    public void onSubscribe(Subscription subscription) {
+        this.onSubscribeEvents.add(subscription);
     }
 }

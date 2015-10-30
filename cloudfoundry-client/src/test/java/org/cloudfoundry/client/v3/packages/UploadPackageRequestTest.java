@@ -39,17 +39,6 @@ public final class UploadPackageRequestTest {
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = UploadPackageRequest.builder()
-                .file(new File(""))
-                .build()
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
-    }
-
-    @Test
     public void isValidNoFile() {
         ValidationResult result = UploadPackageRequest.builder()
                 .id("-id")
@@ -58,6 +47,17 @@ public final class UploadPackageRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("file must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoId() {
+        ValidationResult result = UploadPackageRequest.builder()
+                .file(new File(""))
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }

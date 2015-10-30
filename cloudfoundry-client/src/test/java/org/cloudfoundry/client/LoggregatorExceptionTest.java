@@ -23,14 +23,14 @@ import static org.junit.Assert.assertEquals;
 public final class LoggregatorExceptionTest {
 
     @Test
-    public void message() {
-        String message = "test-message";
-        assertEquals(message, new LoggregatorException(message).getMessage());
-    }
-
-    @Test
     public void cause() {
         Exception cause = new Exception();
         assertEquals(cause, new LoggregatorException(cause).getCause());
+    }
+
+    @Test
+    public void message() {
+        String message = "test-message";
+        assertEquals(message, new LoggregatorException(message).getMessage());
     }
 }
