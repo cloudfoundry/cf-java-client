@@ -58,7 +58,6 @@ import java.util.function.Function;
  */
 @ToString(callSuper = true)
 public final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
-    // TODO: Move to src/main/lombok
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -108,7 +107,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
         AtomicReference<Session> session = new AtomicReference<>();
 
-        return exchange(request, (Subscriber<T> subscriber) -> {
+        Stream<T> exchange = exchange(request, subscriber -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().toUri();
@@ -122,7 +121,9 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
             } catch (DeploymentException | IOException e) {
                 subscriber.onError(e);
             }
-        }).observeCancel(r -> Optional.ofNullable(session.get()).ifPresent(s -> {
+        });
+
+        return exchange.observeCancel(r -> Optional.ofNullable(session.get()).ifPresent(s -> {
             try {
                 s.close();
             } catch (IOException e) {

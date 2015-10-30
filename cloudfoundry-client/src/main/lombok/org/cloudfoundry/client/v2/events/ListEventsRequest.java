@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
 
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.GREATER_THAN_OR_EQUAL_TO;
+
 /**
  * The request payload for the List Events operation
  */
@@ -52,8 +54,6 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
      * @param timestamps the timestamps
      * @return the timestamps
      */
-    // TODO: @Getter(onMethod = @__(@FilterParameter(name = "timestamp", operation = GREATER_THAN_OR_EQUAL_TO)))
-    @Getter(onMethod = @__(@FilterParameter("timestamp")))
     private final List<String> timestamps;
 
     /**
@@ -72,6 +72,18 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
         this.actees = actees;
         this.timestamps = timestamps;
         this.types = types;
+    }
+
+    /**
+     * The timestamps
+     *
+     * @return the timestamps
+     */
+    @FilterParameter(name = "timestamp", operation = GREATER_THAN_OR_EQUAL_TO)
+    public List<String> getTimestamps() {
+        // This method exists because annotations with arguments break Lombok.
+        // https://github.com/rzwitserloot/lombok/issues/735
+        return this.timestamps;
     }
 
     @Override
