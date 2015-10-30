@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -25,31 +23,33 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
+
 public class InstanceStats {
 
 	public static class Usage {
 
 		private double cpu;
-		private int disk;
-		private int mem;
+		private long disk;
+		private long mem;
 		private Date time;
 
 		public Usage(Map<String, Object> attributes) {
 			this.time = parseDate(parse(String.class, attributes.get("time")));
 			this.cpu = parse(Double.class, attributes.get("cpu"));
-			this.disk = parse(Integer.class, attributes.get("disk"));
-			this.mem = parse(Integer.class, attributes.get("mem"));
+			this.disk = parse(Long.class, attributes.get("disk"));
+			this.mem = parse(Long.class, attributes.get("mem"));
 		}
 
 		public double getCpu() {
 			return cpu;
 		}
 
-		public int getDisk() {
+		public long getDisk() {
 			return disk;
 		}
 
-		public int getMem() {
+		public long getMem() {
 			return mem;
 		}
 
