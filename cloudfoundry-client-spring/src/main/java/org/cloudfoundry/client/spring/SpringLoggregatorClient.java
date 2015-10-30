@@ -58,6 +58,7 @@ import java.util.function.Function;
  */
 @ToString(callSuper = true)
 public final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
+    // TODO: Move to src/main/lombok
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
