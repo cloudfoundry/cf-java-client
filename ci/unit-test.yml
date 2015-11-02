@@ -6,4 +6,4 @@ inputs:
 - name: cf-java-client
 
 run:
-  path: cf-java-client/ci/scripts/unit-test
+  path: cf-java-client/ci/unit-test.sh
