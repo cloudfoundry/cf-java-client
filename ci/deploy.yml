@@ -1,0 +1,9 @@
+---
+platform: linux
+image: docker:///java#8-jdk
+
+inputs:
+- name: cf-java-client
+
+run:
+  path: cf-java-client/ci/deploy.sh
