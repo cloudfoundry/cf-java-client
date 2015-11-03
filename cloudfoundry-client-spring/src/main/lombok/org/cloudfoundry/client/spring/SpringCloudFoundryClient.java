@@ -107,7 +107,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                              String username, String password, RestOperations bootstrapRestOperations,
                              SslCertificateTruster sslCertificateTruster) {
 
-        if (!Optional.of(skipSslValidation).orElse(false)) {
+        if (!Optional.ofNullable(skipSslValidation).orElse(false)) {
             try {
                 sslCertificateTruster.trust(host, 443, 5, SECONDS);
             } catch (GeneralSecurityException | IOException e) {
