@@ -17,6 +17,8 @@
 
 package org.cloudfoundry.maven;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
@@ -37,23 +39,27 @@ public class BindServices extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		for (CloudService service : getServices()) {
-			if (getClient().getService(service.getName()) == null) {
-				throw new MojoExecutionException(String.format("Service '%s' does not exist", service.getName()));
-			}
-
-			try {
-				final CloudApplication application = getClient().getApplication(getAppname());
-				if (application.getServices().contains(service.getName())) {
-					getLog().info(String.format("Service '%s' is already bound to application '%s'",
-							service.getName(), application.getName()));
-				} else {
-					getClient().bindService(getAppname(), service.getName());
-					getLog().info(String.format("Binding Service '%s'", service.getName()));
+		final List<? extends CloudService> services = getServices();
+		if (services != null) {
+			for (CloudService service : services) {
+				if (getClient().getService(service.getName()) == null) {
+					throw new MojoExecutionException(String.format("Service '%s' does not exist", service.getName()));
 				}
-			}
-			catch (CloudFoundryException e) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist", getAppname()));
+
+				try {
+					final CloudApplication application = getClient().getApplication(getAppname());
+					if (application.getServices().contains(service.getName())) {
+						getLog().info(String.format("Service '%s' is already bound to application '%s'",
+								service.getName(), application.getName()));
+					}
+					else {
+						getClient().bindService(getAppname(), service.getName());
+						getLog().info(String.format("Binding Service '%s'", service.getName()));
+					}
+				}
+				catch (CloudFoundryException e) {
+					throw new MojoExecutionException(String.format("Application '%s' does not exist", getAppname()));
+				}
 			}
 		}
 	}

@@ -18,7 +18,6 @@ package org.cloudfoundry.maven.common;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.cloudfoundry.client.lib.domain.CloudService;
 
 /**
@@ -80,7 +79,7 @@ public final class Assert {
 			message.append(String.format("\nRequired argument '%s' is missing.\n", objectName));
 			message.append("========================================================================\n\n");
 			message.append(String.format("Did you configure the parameter? You "
-					+"can provide the parameter either as:\n\n"
+					+ "can provide the parameter either as:\n\n"
 					+ "- System Property using: -D%1$s=<provide value> or \n"
 					+ "- Add the parameter to the pom.xml under the plugin's configuration element:\n\n"
 					+ "    <configuration>\n"
@@ -105,7 +104,7 @@ public final class Assert {
 	 * @param additionalDescription
 	 */
 	public static void configurationServiceNotNull(CloudService cloudService,
-												   String additionalDescription) throws MojoExecutionException {
+			String additionalDescription) throws MojoExecutionException {
 
 		if (cloudService.getName() == null || cloudService.getLabel() == null) {
 
@@ -139,12 +138,12 @@ public final class Assert {
 	 * Cannot use elements url and urls together
 	 */
 	public static void configurationUrls(String url, List<String> urls) throws MojoExecutionException {
-		if (url != null && !urls.isEmpty()) {
+		if (url != null && urls != null && !urls.isEmpty()) {
 			final String message = "\n\n" +
-			"Both url and urls elements are specified at the same level\n" +
-			"========================================================================\n\n" +
-			"The element <url> should be nested inside a <urls> element or specified alone without a <urls> element present.\n" +
-			UiUtils.HORIZONTAL_LINE;
+					"Both url and urls elements are specified at the same level\n" +
+					"========================================================================\n\n" +
+					"The element <url> should be nested inside a <urls> element or specified alone without a <urls> element present.\n" +
+					UiUtils.HORIZONTAL_LINE;
 
 			throw new MojoExecutionException(message);
 		}

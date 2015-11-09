@@ -67,10 +67,24 @@ public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
 		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
 		assertEquals("cf-maven-tests", mojo.getAppname());
+		assertNull(mojo.getAppStartupTimeout());
+		assertNull(mojo.getCommand());
+		assertNull(mojo.getBuildpack());
+		assertNull(mojo.getDiskQuota());
+		assertNull(mojo.getEnv());
+		assertNull(mojo.getHealthCheckTimeout());
+		assertNull(mojo.getInstances());
 		assertNull(mojo.getMemory());
+		assertFalse(mojo.isMergeEnv());
+		assertFalse(mojo.isNoStart());
+		assertNull(mojo.getPassword());
+//		assertNull(mojo.getPath()); // cannot be null
+		assertNull(mojo.getServices());
+		assertNull(mojo.getUrls());
+		assertNull(mojo.getUsername());
+		
 		assertNull("Password by default is null.", mojo.getPassword());
 		assertEquals("cloud-foundry-credentials", mojo.getServer());
-		assertTrue(mojo.getServices().isEmpty());
 		assertNull("Target Url is not backed by a default value.", mojo.getTarget());
 		assertNull("Username by default is null.", mojo.getUsername());
 	}

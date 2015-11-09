@@ -143,9 +143,15 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 				if (diskQuota != null) {
 					client.updateApplicationDiskQuota(appname, diskQuota);
 				}
-				client.updateApplicationUris(appname, uris);
-				client.updateApplicationServices(appname, serviceNames);
-				client.updateApplicationEnv(appname, getMergedEnv(application, env));
+				if (urlsAreExplicitlySet()) {
+					client.updateApplicationUris(appname, uris);
+				}
+				if (null != getServices()) {
+					client.updateApplicationServices(appname, serviceNames);
+				}
+				if (null != env) {
+					client.updateApplicationEnv(appname, getMergedEnv(application, env));
+				}
 			}
 		} catch (CloudFoundryException e) {
 			throw new MojoExecutionException(String.format("Error while creating application '%s'. Error message: '%s'. Description: '%s'",
@@ -168,8 +174,10 @@ public class AbstractPush extends AbstractApplicationAwareCloudFoundryMojo {
 		final List<? extends CloudService> services = getServices();
 		List<String> serviceNames = new ArrayList<String>();
 
-		for (CloudService service : services) {
-			serviceNames.add(service.getName());
+		if (services != null) {
+			for (CloudService service : services) {
+				serviceNames.add(service.getName());
+			}
 		}
 		return serviceNames;
 	}

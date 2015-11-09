@@ -66,12 +66,12 @@ public class Help extends AbstractApplicationAwareCloudFoundryMojo {
 		parameterMap.put("diskQuota (in MB)", getDiskQuota() != null ? String.valueOf(getDiskQuota()) : NOT_AVAILABLE);
 		parameterMap.put("healthCheckTimeout", getHealthCheckTimeout() != null ? String.valueOf(getHealthCheckTimeout()) : NOT_AVAILABLE);
 		parameterMap.put("url", getUrl() != null ? getUrl() : NOT_AVAILABLE);
-		parameterMap.put("urls", getUrls().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(getUrls()));
+		parameterMap.put("urls", getUrls() == null ? NOT_AVAILABLE : CommonUtils.collectionToCommaDelimitedString(getUrls()));
 		parameterMap.put("path", getArtifactPath());
 
 		parameterMap.put("env", getEnv() != null ? String.valueOf(getEnv()) : NOT_AVAILABLE);
 		parameterMap.put("mergeEnv", String.valueOf(isMergeEnv()));
-		parameterMap.put("services", getServices().isEmpty() ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
+		parameterMap.put("services", getServices() == null ? NOT_AVAILABLE : CommonUtils.collectionServicesToCommaDelimitedString(getServices()));
 		parameterMap.put("noStart", String.valueOf(isNoStart()));
 
 		parameterMap.put("server", getServer());

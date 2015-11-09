@@ -76,7 +76,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private String url;
 
 	/**
-	 * @parameter expression="${cf.urls}"
+	 * @parameter
 	 */
 	private List<String> urls;
 
@@ -157,9 +157,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	private Integer instances;
 
 	/**
-	 * list of services to use by the application.
+	 * list of services to use by the application; defined in the pom; cannot be specified on the command line
 	 *
-	 * @parameter expression="${services}"
+	 * @parameter
 	 */
 	private List<CloudServiceWithUserProvided> services;
 
@@ -173,9 +173,9 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	/**
 	 * Environment variables
 	 *
-	 * @parameter expression="${cf.env}"
+	 * @parameter
 	 */
-	private Map<String, String> env = new HashMap<String, String>();
+	private Map<String, String> env;
 
 	/**
 	 * Merge existing env vars when updating the application
@@ -240,16 +240,13 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 	/**
 	 * Environment properties can only be specified from the maven pom.
-	 *
-	 * Example:
-	 *
-	 * {code}
-	 * <env>
-	 *     <JAVA_OPTS>-XX:MaxPermSize=256m</JAVA_OPTS>
-	 * </env>
-	 * {code}
-	 *
-	 * @return Returns the env, will never return Null.
+	 * <p/>Example:
+	 * <pre>
+	 * &LT;env>
+	 *   &LT;JAVA_OPTS>-XX:MaxPermSize=256m&LT;/JAVA_OPTS>
+	 * &LT;/env>
+	 * </pre>
+	 * @return Returns the environment, may be <code>null</code>.
 	 */
 	public Map<String,String> getEnv() {
 		return this.env;
@@ -261,7 +258,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 *
 	 * @return Never null
 	 */
-	public Boolean isMergeEnv() {
+	public boolean isMergeEnv() {
 		return getBooleanValue(SystemProperties.MERGE_ENV, this.mergeEnv, DefaultConstants.MERGE_ENV);
 	}
 
@@ -416,8 +413,8 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 
 	/**
 	 * Returns the buildpack to use, if set. Otherwise Null is returned.
-	 * If the parameter is set via the command line (aka system property, then
-	 * that value is used). If not the pom.xml configuration parameter is used,
+	 * If the parameter is set via the command line (aka system property) then
+	 * that value is used; if not the pom.xml configuration parameter is used,
 	 * if available.
 	 *
 	 * For a list of available properties see {@link SystemProperties}.
@@ -481,16 +478,16 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 * @return Returns the number of configured instance or null
 	 */
 	public Integer getInstances() {
-		return getIntegerValue(SystemProperties.INSTANCES, this.instances, DefaultConstants.DEFAULT_INSTANCE);
+		return getIntegerValue(SystemProperties.INSTANCES, this.instances);
 	}
 
 	/**
 	 * Returns the services names that shall be bound to the application.
 	 *
-	 * @return Never null
+	 * @return list of services defined in the pom; otherwise null
 	 */
 	public List<CloudServiceWithUserProvided> getServices() {
-		return this.services == null ? new ArrayList<CloudServiceWithUserProvided>(0) : this.services;
+		return this.services;
 	}
 
 	/**
@@ -505,10 +502,10 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	/**
 	 * Returns the list of urls that shall be associated with the application.
 	 *
-	 * @return Never null
+	 * @return the list of urls, or null if not specified
 	 */
 	public List<String> getUrls() {
-		return this.urls == null ? new ArrayList<String>(0) : this.urls;
+		return this.urls;
 	}
 
 	/**
@@ -517,7 +514,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	 *
 	 * @return Never null
 	 */
-	public Boolean isNoStart() {
+	public boolean isNoStart() {
 		return getBooleanValue(SystemProperties.NO_START, this.noStart, DefaultConstants.NO_START);
 	}
 
@@ -529,23 +526,27 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			currentServicesNames.add(currentService.getName());
 		}
 
-		for (CloudServiceWithUserProvided service: getServices()) {
-			if (currentServicesNames.contains(service.getName())) {
-				getLog().debug(String.format("Service '%s' already exists", service.getName()));
-			}
-			else {
-				getLog().info(String.format("Creating Service '%s'", service.getName()));
-				Assert.configurationServiceNotNull(service, null);
+		if (getServices() != null) {
+			for (CloudServiceWithUserProvided service : getServices()) {
+				if (currentServicesNames.contains(service.getName())) {
+					getLog().debug(String.format("Service '%s' already exists", service.getName()));
+				}
+				else {
+					getLog().info(String.format("Creating Service '%s'", service.getName()));
+					Assert.configurationServiceNotNull(service, null);
 
-				try {
-					if (service.getLabel().equals("user-provided")) {
-						service.setLabel(null);
-						client.createUserProvidedService(service, service.getUserProvidedCredentials(), service.getSyslogDrainUrl());
-					} else {
-						client.createService(service);
+					try {
+						if (service.getLabel().equals("user-provided")) {
+							service.setLabel(null);
+							client.createUserProvidedService(service, service.getUserProvidedCredentials(), service.getSyslogDrainUrl());
+						}
+						else {
+							client.createService(service);
+						}
 					}
-				} catch (CloudFoundryException e) {
-					throw new MojoExecutionException(String.format("Not able to create service '%s'.", service.getName()));
+					catch (CloudFoundryException e) {
+						throw new MojoExecutionException(String.format("Not able to create service '%s'.", service.getName()));
+					}
 				}
 			}
 		}
@@ -574,9 +575,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 			throw new IllegalStateException("Error while uploading application.", e);
 		}
 	}
-
-
-
+	
 	protected void showStagingStatus(StartingInfo startingInfo) {
 		if (startingInfo != null) {
 			responseErrorHandler.addExpectedStatus(HttpStatus.NOT_FOUND);
@@ -738,7 +737,7 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 		List<String> uris;
 		if (getUrl() != null) {
 			uris = Arrays.asList(getUrl());
-		} else if (!getUrls().isEmpty()) {
+		} else if (getUrls() != null) {
 			uris = getUrls();
 		} else {
 			String defaultUri = getAppname() + "." + getClient().getDefaultDomain().getName();
@@ -748,6 +747,10 @@ abstract class AbstractApplicationAwareCloudFoundryMojo extends AbstractCloudFou
 	  return replaceRandomWords(uris);
 	}
 
+	protected boolean urlsAreExplicitlySet() {
+		return (getUrl() != null || getUrls() != null);
+	}
+	
 	private long getAppStartupExpiry() {
 		long timeout = System.currentTimeMillis();
 		if (getAppStartupTimeout() != null) {
