@@ -35,13 +35,18 @@ public class DeleteServices extends AbstractApplicationAwareCloudFoundryMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		for (CloudService service : getServices()) {
-			try {
-				getLog().info(String.format("Deleting service '%s'", service.getName()));
-				getClient().deleteService(service.getName());
-			} catch (NullPointerException e) {
-				getLog().info(String.format("Service '%s' does not exist", service.getName()));
+		if (null != getServices()) {
+			for (CloudService service : getServices()) {
+				try {
+					getLog().info(String.format("Deleting service '%s'", service.getName()));
+					getClient().deleteService(service.getName());
+				}
+				catch (NullPointerException e) {
+					getLog().info(String.format("Service '%s' does not exist", service.getName()));
+				}
 			}
+		} else {
+			getLog().info("No services to delete.");
 		}
 	}
 }

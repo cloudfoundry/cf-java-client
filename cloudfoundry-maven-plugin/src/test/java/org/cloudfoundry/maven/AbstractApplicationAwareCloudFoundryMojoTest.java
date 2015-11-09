@@ -121,7 +121,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		setVariableValueToObject( mojo, "noStart", Boolean.TRUE );
 		doReturn(null).when(mojo).getCommandlineProperty(SystemProperties.NO_START);
 
-		assertEquals(Boolean.TRUE, mojo.isNoStart());
+		assertTrue(mojo.isNoStart());
 
 	}
 
@@ -139,7 +139,7 @@ public class AbstractApplicationAwareCloudFoundryMojoTest extends AbstractMojoTe
 		setVariableValueToObject( mojo, "noStart", Boolean.FALSE );
 		doReturn("false").when(mojo).getCommandlineProperty(SystemProperties.NO_START);
 
-		assertEquals(Boolean.FALSE, mojo.isNoStart());
+		assertFalse(mojo.isNoStart());
 
 	}
 
