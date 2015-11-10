@@ -19,7 +19,6 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseResource;
 import org.junit.Test;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -27,7 +26,6 @@ import reactor.rx.Streams;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseEntity;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +36,11 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     @Test
     public void list() {
         ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponseResource.builder()
+                .resource(ListOrganizationsResponse.Resource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-id-1")
                                 .build())
-                        .entity(ListOrganizationsResponseEntity.builder()
+                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
                                 .name("test-name-1")
                                 .build())
                         .build())
@@ -52,11 +50,11 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                 .thenReturn(Publishers.just(page1));
 
         ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponseResource.builder()
+                .resource(ListOrganizationsResponse.Resource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-id-2")
                                 .build())
-                        .entity(ListOrganizationsResponseEntity.builder()
+                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
                                 .name("test-name-2")
                                 .build())
                         .build())

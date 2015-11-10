@@ -20,8 +20,6 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseEntity;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse.ListOrganizationsResponseResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -49,13 +47,13 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         ListOrganizationsResponse expected = ListOrganizationsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListOrganizationsResponseResource.builder()
+                .resource(ListOrganizationsResponse.Resource.builder()
                         .metadata(Metadata.builder()
                                 .id("deb3c359-2261-45ba-b34f-ee7487acd71a")
                                 .url("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a")
                                 .createdAt("2015-07-27T22:43:05Z")
                                 .build())
-                        .entity(ListOrganizationsResponseEntity.builder()
+                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
                                 .name("the-system_domain-org-name")
                                 .billingEnabled(false)
                                 .quotaDefinitionId("9b56a1ec-4981-4a1e-9348-0d78eeca842c")
