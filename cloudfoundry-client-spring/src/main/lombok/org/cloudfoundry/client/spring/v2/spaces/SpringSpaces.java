@@ -37,6 +37,8 @@ import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -133,6 +135,15 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     public Publisher<ListSpaceApplicationsResponse> listApplications(ListSpaceApplicationsRequest request) {
         return get(request, ListSpaceApplicationsResponse.class, builder -> {
             builder.pathSegment("v2", "spaces", request.getId(), "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceAuditorsResponse> listAuditors(ListSpaceAuditorsRequest request) {
+        return get(request, ListSpaceAuditorsResponse.class, builder -> {
+            builder.pathSegment("v2", "spaces", request.getId(), "auditors");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });

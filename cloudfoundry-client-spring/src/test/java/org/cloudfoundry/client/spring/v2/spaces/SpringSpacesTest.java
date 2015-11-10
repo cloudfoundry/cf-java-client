@@ -39,6 +39,8 @@ import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -51,7 +53,6 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
-import static org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse.Resource;
 import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
 import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
 import static org.junit.Assert.assertEquals;
@@ -640,7 +641,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceApplicationsResponse expected = ListSpaceApplicationsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(Resource.builder()
+                .resource(ListSpaceApplicationsResponse.Resource.builder()
                         .metadata(Metadata.builder()
                                 .id("4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
                                 .url("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
@@ -701,6 +702,73 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listApplications(request)).next().get();
+    }
+
+    @Test
+    public void listAuditors() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/auditors?auditor_guid=test-auditor-id&page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_auditors_response.json"));
+
+        ListSpaceAuditorsRequest request = ListSpaceAuditorsRequest.builder()
+                .auditorId("test-auditor-id")
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceAuditorsResponse expected = ListSpaceAuditorsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ListSpaceAuditorsResponse.ListSpaceAuditorsResponseResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-15")
+                                .url("/v2/users/uaa-id-15")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(ListSpaceAuditorsResponse.ListSpaceAuditorsResponseEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("auditor@example.com")
+                                .spacesUrl("/v2/users/uaa-id-15/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-15/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-15/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-15/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-15/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-15/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-15/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceAuditorsResponse actual = Streams.wrap(this.spaces.listAuditors(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listAuditorsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/auditors?auditor_guid=test-auditor-id&page=-1")
+                .errorResponse());
+
+        ListSpaceAuditorsRequest request = ListSpaceAuditorsRequest.builder()
+                .auditorId("test-auditor-id")
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listAuditors(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listAuditorsInvalidRequest() {
+        ListSpaceAuditorsRequest request = ListSpaceAuditorsRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listAuditors(request)).next().get();
     }
 
     @Test(expected = CloudFoundryException.class)

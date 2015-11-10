@@ -111,4 +111,13 @@ public interface Spaces {
      */
     Publisher<ListSpaceApplicationsResponse> listApplications(ListSpaceApplicationsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_auditors_for_the_space.html">List all
+     * Auditors for the Space</a> request
+     *
+     * @param request the List all Auditors for the Space request
+     * @return the response from the List all Auditors for the Space request
+     */
+    Publisher<ListSpaceAuditorsResponse> listAuditors(ListSpaceAuditorsRequest request);
+
 }
