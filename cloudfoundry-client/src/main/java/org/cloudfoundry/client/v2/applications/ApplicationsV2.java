@@ -24,11 +24,20 @@ import org.reactivestreams.Publisher;
 public interface ApplicationsV2 {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/retrieve_a_particular_app.html">Retrieve a Particular
+     * App</a> request
+     *
+     * @param request the Get Application request
+     * @return the response from the Get Application request
+     */
+    Publisher<GetApplicationResponse> get(GetApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_app_summary.html">Get Application Summary</a>
      * request
      *
-     * @param request the Get Event request
-     * @return the response from the Get Event request
+     * @param request the Get Application Summary request
+     * @return the response from the Get Application Summary request
      */
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 

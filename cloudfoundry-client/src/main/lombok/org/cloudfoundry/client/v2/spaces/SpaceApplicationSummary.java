@@ -37,12 +37,44 @@ import java.util.Map;
 public final class SpaceApplicationSummary extends AbstractApplicationEntity {
 
     /**
+     * The detected buildpack
+     *
+     * @param detectedBuildpack the detected buildpack
+     * @return the detected buildpack
+     */
+    private final String detectedBuildpack;
+
+    /**
+     * Enable SSH
+     *
+     * @param enableSsh enable SSH
+     * @return enable SSH
+     */
+    private final Boolean enableSsh;
+
+    /**
      * The id
      *
      * @param id the id
      * @return the id
      */
     private final String id;
+
+    /**
+     * The package state
+     *
+     * @param packageState the package state
+     * @return the package state
+     */
+    private final String packageState;
+
+    /**
+     * The package updated at
+     *
+     * @param packageUpdatedAt the package updated at
+     * @return the package updated at
+     */
+    private final String packageUpdatedAt;
 
     /**
      * The routes
@@ -77,12 +109,28 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
     private final List<String> serviceNames;
 
     /**
+     * The staging task id
+     *
+     * @param stagingTaskId the staging task id
+     * @return the staging task id
+     */
+    private final String stagingTaskId;
+
+    /**
      * The urls
      *
      * @param urls the urls
      * @return the urls
      */
     private final List<String> urls;
+
+    /**
+     * The version
+     *
+     * @param version the version
+     * @return the version
+     */
+    private final String version;
 
     @Builder
     SpaceApplicationSummary(@JsonProperty("buildpack") String buildpack,
@@ -119,16 +167,21 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("service_count") Integer serviceCount,
                             @JsonProperty("service_names") @Singular List<String> serviceNames,
                             @JsonProperty("urls") @Singular List<String> urls) {
-        super(buildpack, command, console, debug, detectedBuildpack, detectedStartCommand, diego, diskQuota,
-                dockerCredentialsJsons, dockerImage, enableSsh, environmentJsons, healthCheckTimeout, healthCheckType,
-                instances, memory, name, packageState, packageUpdatedAt, production, spaceId, stackId,
-                stagingFailedDescription, stagingFailedReason, stagingTaskId, state, version);
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
+                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
+                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+        this.detectedBuildpack = detectedBuildpack;
+        this.enableSsh = enableSsh;
         this.id = id;
+        this.packageState = packageState;
+        this.packageUpdatedAt = packageUpdatedAt;
         this.routes = routes;
         this.runningInstances = runningInstances;
         this.serviceCount = serviceCount;
         this.serviceNames = serviceNames;
+        this.stagingTaskId = stagingTaskId;
         this.urls = urls;
+        this.version = version;
     }
 
 }

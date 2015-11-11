@@ -43,6 +43,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceApplicationResource;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.junit.Test;
 import reactor.rx.Streams;
@@ -641,7 +642,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceApplicationsResponse expected = ListSpaceApplicationsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpaceApplicationsResponse.Resource.builder()
+                .resource(SpaceApplicationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
                                 .url("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd")

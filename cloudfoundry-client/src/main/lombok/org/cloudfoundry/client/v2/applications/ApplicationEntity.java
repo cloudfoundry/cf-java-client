@@ -34,12 +34,44 @@ import java.util.Map;
 public final class ApplicationEntity extends AbstractApplicationEntity {
 
     /**
+     * The detected buildpack
+     *
+     * @param detectedBuildpack the detected buildpack
+     * @return the detected buildpack
+     */
+    private final String detectedBuildpack;
+
+    /**
+     * Enable SSH
+     *
+     * @param enableSsh enable SSH
+     * @return enable SSH
+     */
+    private final Boolean enableSsh;
+
+    /**
      * The events url
      *
      * @param eventsUrl the events url
      * @return the events url
      */
     private final String eventsUrl;
+
+    /**
+     * The package state
+     *
+     * @param packageState the package state
+     * @return the package state
+     */
+    private final String packageState;
+
+    /**
+     * The package updated at
+     *
+     * @param packageUpdatedAt the package updated at
+     * @return the package updated at
+     */
+    private final String packageUpdatedAt;
 
     /**
      * The routes url
@@ -73,6 +105,22 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
      */
     private final String stackUrl;
 
+    /**
+     * The staging task id
+     *
+     * @param stagingTaskId the staging task id
+     * @return the staging task id
+     */
+    private final String stagingTaskId;
+
+    /**
+     * The version
+     *
+     * @param version the version
+     * @return the version
+     */
+    private final String version;
+
     @Builder
     ApplicationEntity(@JsonProperty("buildpack") String buildpack,
                       @JsonProperty("command") String command,
@@ -82,7 +130,8 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("detected_start_command") String detectedStartCommand,
                       @JsonProperty("diego") Boolean diego,
                       @JsonProperty("disk_quota") Integer diskQuota,
-                      @JsonProperty("docker_credentials_json") @Singular Map<String, Object> dockerCredentialsJsons,
+                      @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
+                              dockerCredentialsJsons,
                       @JsonProperty("docker_image") String dockerImage,
                       @JsonProperty("enable_ssh") Boolean enableSsh,
                       @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
@@ -106,15 +155,21 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("service_bindings_url") String serviceBindingsUrl,
                       @JsonProperty("space_url") String spaceUrl,
                       @JsonProperty("stack_url") String stackUrl) {
-        super(buildpack, command, console, debug, detectedBuildpack, detectedStartCommand, diego, diskQuota,
-                dockerCredentialsJsons, dockerImage, enableSsh, environmentJsons, healthCheckTimeout, healthCheckType,
-                instances, memory, name, packageState, packageUpdatedAt, production, spaceId, stackId,
-                stagingFailedDescription, stagingFailedReason, stagingTaskId, state, version);
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
+                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
+                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+
+        this.detectedBuildpack = detectedBuildpack;
+        this.enableSsh = enableSsh;
         this.eventsUrl = eventsUrl;
+        this.packageState = packageState;
+        this.packageUpdatedAt = packageUpdatedAt;
         this.routesUrl = routesUrl;
         this.serviceBindingsUrl = serviceBindingsUrl;
         this.spaceUrl = spaceUrl;
         this.stackUrl = stackUrl;
+        this.stagingTaskId = stagingTaskId;
+        this.version = version;
     }
 
 }
