@@ -17,21 +17,23 @@
 package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * Base class for responses that contain applications
+ * The response payload for the Get Application operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public abstract class ApplicationResource extends Resource<ApplicationEntity> {
+public final class GetApplicationResponse extends Resource<ApplicationEntity> {
 
-    protected ApplicationResource(@JsonProperty("entity") ApplicationEntity entity,
-                                  @JsonProperty("metadata") Metadata metadata) {
+    @Builder
+    GetApplicationResponse(@JsonProperty("entity") ApplicationEntity entity,
+                           @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
 

@@ -19,6 +19,10 @@ package org.cloudfoundry.client.spring.v2.applications;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.domains.Domain;
@@ -36,6 +40,77 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringApplicationsV2Test extends AbstractRestTest {
 
     private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+
+    @Test
+    public void get() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_response.json"));
+
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        GetApplicationResponse expected = GetApplicationResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:20Z")
+                        .id("03f286bb-f17c-42b4-8dcd-b818b0b798af")
+                        .updatedAt("2015-07-27T22:43:20Z")
+                        .url("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af")
+                        .build())
+                .entity(ApplicationEntity.builder()
+                        .console(false)
+                        .detectedStartCommand("")
+                        .diego(false)
+                        .diskQuota(1024)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .enableSsh(true)
+                        .eventsUrl("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/events")
+                        .healthCheckType("port")
+                        .instances(1)
+                        .memory(1024)
+                        .name("name-751")
+                        .packageState("PENDING")
+                        .packageUpdatedAt("2015-07-27T22:43:20Z")
+                        .production(false)
+                        .routesUrl("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/routes")
+                        .serviceBindingsUrl("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/service_bindings")
+                        .spaceId("b10ca4ed-fa71-4597-8567-e7dd1719c0c7")
+                        .spaceUrl("/v2/spaces/b10ca4ed-fa71-4597-8567-e7dd1719c0c7")
+                        .stackId("160fb300-c60e-4682-8527-8500e0318839")
+                        .stackUrl("/v2/stacks/160fb300-c60e-4682-8527-8500e0318839")
+                        .state("STOPPED")
+                        .version("2b0d7e20-ce57-44b4-b0ec-7ca6d1d50e20")
+                        .build())
+                .build();
+
+        GetApplicationResponse actual = Streams.wrap(this.applications.get(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id")
+                .errorResponse());
+
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.get(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getInvalidRequest() {
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.get(request)).next().poll();
+    }
 
     @Test
     public void summary() {
@@ -130,5 +205,4 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
 
         Streams.wrap(this.applications.summary(request)).next().poll();
     }
-
 }

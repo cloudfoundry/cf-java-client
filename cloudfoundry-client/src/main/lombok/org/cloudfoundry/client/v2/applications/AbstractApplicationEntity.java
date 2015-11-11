@@ -64,14 +64,6 @@ public abstract class AbstractApplicationEntity {
     private final Boolean debug;
 
     /**
-     * The detected buildpack
-     *
-     * @param detectedBuildpack the detected buildpack
-     * @return the detected buildpack
-     */
-    private final String detectedBuildpack;
-
-    /**
      * The detected start command
      *
      * @param detectedStartCommand the detected start command
@@ -110,14 +102,6 @@ public abstract class AbstractApplicationEntity {
      * @return the docker image
      */
     private final String dockerImage;
-
-    /**
-     * Enable SSH
-     *
-     * @param enableSsh enable SSH
-     * @return enable SSH
-     */
-    private final Boolean enableSsh;
 
     /**
      * The environment JSONs
@@ -168,22 +152,6 @@ public abstract class AbstractApplicationEntity {
     private final String name;
 
     /**
-     * The package state
-     *
-     * @param packageState the package state
-     * @return the package state
-     */
-    private final String packageState;
-
-    /**
-     * The package updated at
-     *
-     * @param packageUpdatedAt the package updated at
-     * @return the package updated at
-     */
-    private final String packageUpdatedAt;
-
-    /**
      * Production
      *
      * @param production Production
@@ -225,14 +193,6 @@ public abstract class AbstractApplicationEntity {
     private final String stagingFailedReason;
 
     /**
-     * The staging task id
-     *
-     * @param stagingTaskId the staging task id
-     * @return the staging task id
-     */
-    private final String stagingTaskId;
-
-    /**
      * The state
      *
      * @param state the state
@@ -240,26 +200,16 @@ public abstract class AbstractApplicationEntity {
      */
     private final String state;
 
-    /**
-     * The version
-     *
-     * @param version the version
-     * @return the version
-     */
-    private final String version;
-
     protected AbstractApplicationEntity(@JsonProperty("buildpack") String buildpack,
                                         @JsonProperty("command") String command,
                                         @JsonProperty("console") @Deprecated Boolean console,
                                         @JsonProperty("debug") @Deprecated Boolean debug,
-                                        @JsonProperty("detected_buildpack") String detectedBuildpack,
                                         @JsonProperty("detected_start_command") String detectedStartCommand,
                                         @JsonProperty("diego") Boolean diego,
                                         @JsonProperty("disk_quota") Integer diskQuota,
                                         @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
                                                 dockerCredentialsJsons,
                                         @JsonProperty("docker_image") String dockerImage,
-                                        @JsonProperty("enable_ssh") Boolean enableSsh,
                                         @JsonProperty("environment_json") @Singular Map<String, Object>
                                                 environmentJsons,
                                         @JsonProperty("health_check_timeout") Integer healthCheckTimeout,
@@ -267,43 +217,33 @@ public abstract class AbstractApplicationEntity {
                                         @JsonProperty("instances") Integer instances,
                                         @JsonProperty("memory") Integer memory,
                                         @JsonProperty("name") String name,
-                                        @JsonProperty("package_state") String packageState,
-                                        @JsonProperty("package_updated_at") String packageUpdatedAt,
                                         @JsonProperty("production") @Deprecated Boolean production,
                                         @JsonProperty("space_guid") String spaceId,
                                         @JsonProperty("stack_guid") String stackId,
                                         @JsonProperty("staging_failed_description") String stagingFailedDescription,
                                         @JsonProperty("staging_failed_reason") String stagingFailedReason,
-                                        @JsonProperty("staging_task_id") String stagingTaskId,
-                                        @JsonProperty("state") String state,
-                                        @JsonProperty("version") String version) {
+                                        @JsonProperty("state") String state) {
         this.buildpack = buildpack;
         this.command = command;
         this.console = console;
         this.debug = debug;
-        this.detectedBuildpack = detectedBuildpack;
         this.detectedStartCommand = detectedStartCommand;
         this.diego = diego;
         this.diskQuota = diskQuota;
         this.dockerCredentialsJsons = dockerCredentialsJsons;
         this.dockerImage = dockerImage;
-        this.enableSsh = enableSsh;
         this.environmentJsons = environmentJsons;
         this.healthCheckTimeout = healthCheckTimeout;
         this.healthCheckType = healthCheckType;
         this.instances = instances;
         this.memory = memory;
         this.name = name;
-        this.packageState = packageState;
-        this.packageUpdatedAt = packageUpdatedAt;
         this.production = production;
         this.spaceId = spaceId;
         this.stackId = stackId;
         this.stagingFailedDescription = stagingFailedDescription;
         this.stagingFailedReason = stagingFailedReason;
-        this.stagingTaskId = stagingTaskId;
         this.state = state;
-        this.version = version;
     }
 
 }

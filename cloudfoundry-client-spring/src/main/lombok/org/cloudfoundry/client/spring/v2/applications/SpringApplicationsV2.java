@@ -20,6 +20,8 @@ package org.cloudfoundry.client.spring.v2.applications;
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.reactivestreams.Publisher;
@@ -41,6 +43,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
      */
     public SpringApplicationsV2(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
+        return get(request, GetApplicationResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId()));
     }
 
     @Override
