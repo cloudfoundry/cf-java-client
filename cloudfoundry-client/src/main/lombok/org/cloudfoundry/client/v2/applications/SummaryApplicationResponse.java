@@ -19,8 +19,9 @@ package org.cloudfoundry.client.v2.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.Singular;
+import lombok.ToString;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
@@ -32,73 +33,30 @@ import java.util.Map;
  * The response payload for the Get Application Summary operation
  */
 @Data
-public final class SummaryApplicationResponse {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class SummaryApplicationResponse extends AbstractApplicationEntity {
 
     private final List<Domain> availableDomains;
 
-    private final String buildpack;
-
-    private final String command;
-
-    @Getter(onMethod = @__(@Deprecated))
-    private final Boolean console;
-
-    @Getter(onMethod = @__(@Deprecated))
-    private final Boolean debug;
-
     private final String detectedBuildpack;
-
-    private final String detectedStartCommand;
-
-    private final Boolean diego;
-
-    private final Integer diskQuota;
-
-    private final Map<String, Object> dockerCredentialsJsons;
-
-    private final String dockerImage;
 
     private final Boolean enableSsh;
 
-    private final Map<String, Object> environmentJsons;
-
-    private final Integer healthCheckTimeout;
-
-    private final String healthCheckType;
-
     private final String id;
-
-    private final Integer instances;
-
-    private final Integer memory;
-
-    private final String name;
 
     private final String packageState;
 
     private final String packageUpdatedAt;
-
-    @Getter(onMethod = @__(@Deprecated))
-    private final Boolean production;
 
     private final List<Route> routes;
 
     private final Integer runningInstances;
 
     private final List<ServiceInstance> services;
-
-    private final String spaceId;
-
-    private final String stackId;
-
-    private final String stagingFailedDescription;
-
-    private final String stagingFailedReason;
-
+    
     private final String stagingTaskId;
-
-    private final String state;
-
+    
     private final String version;
 
     @Builder
@@ -135,37 +93,20 @@ public final class SummaryApplicationResponse {
                                @JsonProperty("staging_task_id") String stagingTaskId,
                                @JsonProperty("state") String state,
                                @JsonProperty("version") String version) {
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
+                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
+                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+        
         this.availableDomains = availableDomains;
-        this.buildpack = buildpack;
-        this.command = command;
-        this.console = console;
-        this.debug = debug;
         this.detectedBuildpack = detectedBuildpack;
-        this.detectedStartCommand = detectedStartCommand;
-        this.diego = diego;
-        this.diskQuota = diskQuota;
-        this.dockerCredentialsJsons = dockerCredentialsJsons;
-        this.dockerImage = dockerImage;
         this.enableSsh = enableSsh;
-        this.environmentJsons = environmentJsons;
-        this.healthCheckTimeout = healthCheckTimeout;
-        this.healthCheckType = healthCheckType;
         this.id = id;
-        this.instances = instances;
-        this.memory = memory;
-        this.name = name;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
-        this.production = production;
         this.routes = routes;
         this.runningInstances = runningInstances;
         this.services = services;
-        this.spaceId = spaceId;
-        this.stackId = stackId;
-        this.stagingFailedDescription = stagingFailedDescription;
-        this.stagingFailedReason = stagingFailedReason;
         this.stagingTaskId = stagingTaskId;
-        this.state = state;
         this.version = version;
     }
 
