@@ -21,6 +21,8 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
+import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
@@ -30,6 +32,9 @@ import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import reactor.rx.Streams;
+
+import java.util.Collections;
+import java.util.Map;
 
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
@@ -110,6 +115,52 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.get(request)).next().poll();
+    }
+
+    @Test
+    public void instances() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/instances")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_instances_response.json"));
+
+        ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
+                .id("test-id")
+                .build();
+
+        Map<String, ApplicationInstanceInfo> expectedMap = Collections.singletonMap("0",
+                ApplicationInstanceInfo.builder()
+                        .since(1403140717.984577d)
+                        .state("RUNNING")
+                        .build());
+
+        Map<String, ApplicationInstanceInfo> actualMap =
+                Streams.wrap(this.applications.instances(request)).next().get();
+
+        assertEquals(expectedMap, actualMap);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void instancesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/instances")
+                .errorResponse());
+
+        ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.instances(request)).next().get();
+
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void instancesInvalidRequest() {
+        ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.instances(request)).next().get();
     }
 
     @Test

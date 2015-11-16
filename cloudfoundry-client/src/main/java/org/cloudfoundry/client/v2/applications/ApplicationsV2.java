@@ -33,6 +33,16 @@ public interface ApplicationsV2 {
     Publisher<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">Get
+     * the instance information for a STARTED App</a> request
+     *
+     * @param request the Get Instance Information request
+     * @return the response from the Get Application Summary request
+     */
+    Publisher<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_app_summary.html">Get Application Summary</a>
      * request
      *
