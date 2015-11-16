@@ -19,13 +19,30 @@ package org.cloudfoundry.client.v2.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
+import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class ListApplicationsRequestTest {
+public final class ApplicationStatisticsRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID, ListApplicationsRequest.builder().build().isValid().getStatus());
+        ValidationResult result = ApplicationStatisticsRequest.builder()
+                .id("test-id")
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void isValidNoId() {
+        ValidationResult result = ApplicationStatisticsRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }

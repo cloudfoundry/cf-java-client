@@ -51,6 +51,15 @@ public interface ApplicationsV2 {
     Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_detailed_stats_for_a_started_app.html">Get
+     * detailed stats for a STARTED App</a> request
+     *
+     * @param request the Get Statistics request
+     * @return the response from the Get Statistics request
+     */
+    Publisher<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_app_summary.html">Get Application Summary</a>
      * request
      *
