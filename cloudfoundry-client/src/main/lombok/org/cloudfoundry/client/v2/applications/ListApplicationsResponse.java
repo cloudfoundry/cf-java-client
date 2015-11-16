@@ -32,7 +32,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ListApplicationsResponse extends PaginatedResponse<ApplicationResource> {
+public final class ListApplicationsResponse extends PaginatedResponse<ApplicationResource> {
 
     @Builder
     ListApplicationsResponse(@JsonProperty("next_url") String nextUrl,

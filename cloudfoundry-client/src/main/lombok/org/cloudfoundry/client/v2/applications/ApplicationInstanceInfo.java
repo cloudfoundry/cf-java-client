@@ -24,7 +24,7 @@ import lombok.Data;
  * Instance information in Get Application Instance response.
  */
 @Data
-public class ApplicationInstanceInfo {
+public final class ApplicationInstanceInfo {
 
     private final String consoleIp;
 

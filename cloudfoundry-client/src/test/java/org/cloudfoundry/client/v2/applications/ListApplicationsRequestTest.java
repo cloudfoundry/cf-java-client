@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ListApplicationsRequestTest {
+public final class ListApplicationsRequestTest {
 
     @Test
     public void isValid() {
