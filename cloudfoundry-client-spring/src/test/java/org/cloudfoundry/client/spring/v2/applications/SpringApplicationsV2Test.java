@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -297,6 +299,66 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.list(request)).next().get();
+    }
+
+    @Test
+    public void statistics() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/stats")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_stats_response.json"));
+
+        ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
+                .id("test-id")
+                .build();
+
+        Map<String, ApplicationStatisticsResponse.InstanceStats> expectedMap = Collections.singletonMap("0",
+                ApplicationStatisticsResponse.InstanceStats.builder()
+                        .state("RUNNING")
+                        .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
+                                .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
+                                        .disk(66392064l)
+                                        .memory(29880320l)
+                                        .cpu(0.13511219703079957d)
+                                        .time("2014-06-19 22:37:58 +0000")
+                                        .build())
+                                .name("app_name")
+                                .uri("app_name.example.com")
+                                .host("10.0.0.1")
+                                .port(61035)
+                                .uptime(65007l)
+                                .memoryQuota(536870912l)
+                                .diskQuota(1073741824l)
+                                .fdsQuota(16384)
+                                .build())
+                        .build());
+
+        Map<String, ApplicationStatisticsResponse.InstanceStats> actualMap =
+                Streams.wrap(this.applications.statistics(request)).next().get();
+
+        assertEquals(expectedMap, actualMap);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void statisticsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/stats")
+                .errorResponse());
+
+        ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.statistics(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void statisticsInvalidRequest() {
+        ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.statistics(request)).next().poll();
     }
 
     @Test

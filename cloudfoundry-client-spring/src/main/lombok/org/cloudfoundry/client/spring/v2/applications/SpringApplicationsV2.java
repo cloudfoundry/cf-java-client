@@ -23,6 +23,8 @@ import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
+import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
@@ -70,6 +72,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Publisher<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
+        return get(request, ApplicationStatisticsResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "stats"));
     }
 
     @Override
