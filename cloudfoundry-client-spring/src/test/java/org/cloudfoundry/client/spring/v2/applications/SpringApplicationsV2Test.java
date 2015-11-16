@@ -23,8 +23,11 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.domains.Domain;
@@ -161,6 +164,139 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.instances(request)).next().get();
+    }
+
+    @Test
+    public void list() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
+                .status(OK)
+                .responsePayload("v2/apps/GET_apps_response.json"));
+
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
+
+        ListApplicationsResponse expected = ListApplicationsResponse.builder()
+                .totalResults(3)
+                .totalPages(1)
+                .resource(ApplicationResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .id("3d294ed0-105c-4ccd-8f79-5605d6b7198c")
+                                .url("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c")
+                                .createdAt("2015-07-27T22:43:20Z")
+                                .updatedAt("2015-07-27T22:43:20Z")
+                                .build())
+                        .entity(ApplicationEntity.builder()
+                                .console(false)
+                                .detectedStartCommand("")
+                                .diego(false)
+                                .diskQuota(1024)
+                                .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                                .enableSsh(true)
+                                .eventsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/events")
+                                .healthCheckType("port")
+                                .instances(1)
+                                .memory(1024)
+                                .name("name-761")
+                                .packageState("PENDING")
+                                .packageUpdatedAt("2015-07-27T22:43:20Z")
+                                .production(false)
+                                .routesUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/routes")
+                                .serviceBindingsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/service_bindings")
+                                .spaceId("30d5165d-0bef-4103-97cd-72269b9d7a4c")
+                                .spaceUrl("/v2/spaces/30d5165d-0bef-4103-97cd-72269b9d7a4c")
+                                .stackId("d3476df6-534d-4140-b85b-401fa4923234")
+                                .stackUrl("/v2/stacks/d3476df6-534d-4140-b85b-401fa4923234")
+                                .state("STOPPED")
+                                .version("3ca77d11-93e0-4a60-bab5-30f38b8a8649")
+                                .build())
+                        .build())
+                .resource(ApplicationResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .id("522c5382-29e9-48aa-9db0-9f6cfa643ec1")
+                                .url("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1")
+                                .createdAt("2015-07-27T22:43:20Z")
+                                .updatedAt("2015-07-27T22:43:20Z")
+                                .build())
+                        .entity(ApplicationEntity.builder()
+                                .console(false)
+                                .detectedStartCommand("")
+                                .diego(false)
+                                .diskQuota(1024)
+                                .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                                .enableSsh(true)
+                                .eventsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/events")
+                                .healthCheckType("port")
+                                .instances(1)
+                                .memory(1024)
+                                .name("name-766")
+                                .packageState("PENDING")
+                                .packageUpdatedAt("2015-07-27T22:43:20Z")
+                                .production(false)
+                                .routesUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/routes")
+                                .serviceBindingsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/service_bindings")
+                                .spaceId("cf929611-97ab-4c42-93e5-9ec26e26f456")
+                                .spaceUrl("/v2/spaces/cf929611-97ab-4c42-93e5-9ec26e26f456")
+                                .stackId("14b4a0b7-7c7b-4cf2-99f0-cc3ed1473f09")
+                                .stackUrl("/v2/stacks/14b4a0b7-7c7b-4cf2-99f0-cc3ed1473f09")
+                                .state("STOPPED")
+                                .version("cddf0ec1-acf6-48e7-831b-884972cb7ac3")
+                                .build())
+                        .build())
+                .resource(ApplicationResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .id("ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf")
+                                .url("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf")
+                                .createdAt("2015-07-27T22:43:20Z")
+                                .updatedAt("2015-07-27T22:43:20Z")
+                                .build())
+                        .entity(ApplicationEntity.builder()
+                                .console(false)
+                                .detectedStartCommand("")
+                                .diego(false)
+                                .diskQuota(1024)
+                                .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                                .enableSsh(true)
+                                .eventsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/events")
+                                .healthCheckType("port")
+                                .instances(1)
+                                .memory(1024)
+                                .name("name-771")
+                                .packageState("PENDING")
+                                .packageUpdatedAt("2015-07-27T22:43:20Z")
+                                .production(false)
+                                .routesUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/routes")
+                                .serviceBindingsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/service_bindings")
+                                .spaceId("e438b2bf-17d6-4265-8813-18e0ab95c029")
+                                .spaceUrl("/v2/spaces/e438b2bf-17d6-4265-8813-18e0ab95c029")
+                                .stackId("8d42ba27-60df-420e-9208-535e753b706a")
+                                .stackUrl("/v2/stacks/8d42ba27-60df-420e-9208-535e753b706a")
+                                .state("STOPPED")
+                                .version("8e74d312-1bc9-4953-b4fe-d2613ea4972a")
+                                .build())
+                        .build())
+                .build();
+
+        ListApplicationsResponse actual = Streams.wrap(this.applications.list(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
+
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.applications.list(request)).next().get();
     }
 
     @Test

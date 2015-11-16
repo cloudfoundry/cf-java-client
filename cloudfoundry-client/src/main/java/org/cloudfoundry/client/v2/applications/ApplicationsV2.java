@@ -43,6 +43,14 @@ public interface ApplicationsV2 {
     Publisher<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/list_all_apps.html">List all Apps</a> request
+     *
+     * @param request the List Applications request
+     * @return the response from the List Applications request
+     */
+    Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_app_summary.html">Get Application Summary</a>
      * request
      *

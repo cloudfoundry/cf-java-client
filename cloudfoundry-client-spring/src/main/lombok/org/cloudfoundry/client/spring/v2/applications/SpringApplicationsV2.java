@@ -19,11 +19,15 @@ package org.cloudfoundry.client.spring.v2.applications;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.reactivestreams.Publisher;
@@ -57,6 +61,15 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Publisher<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
         return get(request, ApplicationInstancesResponse.class,
                 builder -> builder.pathSegment("v2", "apps", request.getId(), "instances"));
+    }
+
+    @Override
+    public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
+        return get(request, ListApplicationsResponse.class, builder -> {
+            builder.pathSegment("v2", "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+        });
     }
 
     @Override

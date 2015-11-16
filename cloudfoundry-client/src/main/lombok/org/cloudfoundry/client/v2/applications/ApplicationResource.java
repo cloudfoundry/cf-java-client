@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -22,19 +22,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 
 /**
- * Application Resource in spaces responses
+ * Application Resource in responses
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class SpaceApplicationResource extends Resource<ApplicationEntity> {
+public final class ApplicationResource extends Resource<ApplicationEntity> {
 
     @Builder
-    SpaceApplicationResource(@JsonProperty("entity") ApplicationEntity entity,
-                             @JsonProperty("metadata") Metadata metadata) {
+    ApplicationResource(@JsonProperty("entity") ApplicationEntity entity,
+                        @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

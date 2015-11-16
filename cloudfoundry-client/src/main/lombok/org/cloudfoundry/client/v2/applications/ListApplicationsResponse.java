@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -23,24 +23,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
 
 import java.util.List;
 
 /**
- * The response payload for the List all Apps for the Space operation
+ * The response payload for the List all Apps operation.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceApplicationsResponse extends PaginatedResponse<ApplicationResource> {
+public class ListApplicationsResponse extends PaginatedResponse<ApplicationResource> {
 
     @Builder
-    ListSpaceApplicationsResponse(@JsonProperty("next_url") String nextUrl,
-                                  @JsonProperty("prev_url") String previousUrl,
-                                  @JsonProperty("resources") @Singular List<ApplicationResource> resources,
-                                  @JsonProperty("total_pages") Integer totalPages,
-                                  @JsonProperty("total_results") Integer totalResults) {
+    ListApplicationsResponse(@JsonProperty("next_url") String nextUrl,
+                             @JsonProperty("prev_url") String previousUrl,
+                             @JsonProperty("resources") @Singular List<ApplicationResource> resources,
+                             @JsonProperty("total_pages") Integer totalPages,
+                             @JsonProperty("total_results") Integer totalResults) {
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
