@@ -20,6 +20,7 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
@@ -43,7 +44,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
-import org.cloudfoundry.client.v2.spaces.SpaceApplicationResource;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.junit.Test;
 import reactor.rx.Streams;
@@ -581,9 +581,9 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test
     public void list() {
         mockRequest(new RequestContext()
-                        .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
-                        .status(OK)
-                        .responsePayload("v2/spaces/GET_response.json")
+                .method(GET).path("/v2/spaces?q=name%20IN%20test-name&page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_response.json")
         );
 
         ListSpacesRequest request = ListSpacesRequest.builder()
@@ -642,7 +642,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceApplicationsResponse expected = ListSpaceApplicationsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(SpaceApplicationResource.builder()
+                .resource(ApplicationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
                                 .url("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd")
