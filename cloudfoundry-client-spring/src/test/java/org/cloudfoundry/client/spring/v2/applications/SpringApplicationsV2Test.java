@@ -21,6 +21,8 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
@@ -39,6 +41,7 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
@@ -50,6 +53,70 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringApplicationsV2Test extends AbstractRestTest {
 
     private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+
+    @Test
+    public void environment() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/env")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_env_response.json"));
+
+        ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
+                .id("test-id")
+                .build();
+
+        Map<String,Object> limitsMap = new HashMap<String,Object>();
+        limitsMap.put("mem", Integer.valueOf(1024));
+        limitsMap.put("disk", Integer.valueOf(1024));
+        limitsMap.put("fds", Integer.valueOf(16384));
+
+        Map<String,Object> appMap = new HashMap<String,Object>();
+        appMap.put("limits", limitsMap);
+        appMap.put("application_id", "96e63272-5da0-44b8-90a9-63d12b2692bb");
+        appMap.put("application_version", "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4");
+        appMap.put("application_name", "name-897");
+        appMap.put("application_uris", Collections.emptyList());
+        appMap.put("version", "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4");
+        appMap.put("name", "name-897");
+        appMap.put("space_name", "name-898");
+        appMap.put("space_id", "147eef57-aadb-43b0-9518-b355ab4db678");
+        appMap.put("uris", Collections.emptyList());
+        appMap.put("users", null);
+
+        ApplicationEnvironmentResponse expected = ApplicationEnvironmentResponse.builder()
+                .stagingEnvironment(Collections.singletonMap("STAGING_ENV", "staging_value"))
+                .runningEnvironment(Collections.singletonMap("RUNNING_ENV", "running_value"))
+                .environment(Collections.singletonMap("env_var", "env_val"))
+                .systemEnvironment(Collections.singletonMap("VCAP_SERVICES", Collections.emptyMap()))
+                .applicationEnvironment(Collections.singletonMap("VCAP_APPLICATION", appMap))
+                .build();
+
+        ApplicationEnvironmentResponse actual = Streams.wrap(this.applications.environment(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void environmentError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/apps/test-id/env")
+                .errorResponse());
+
+        ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.environment(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void environmentInvalidRequest() {
+        ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.environment(request)).next().poll();
+    }
 
     @Test
     public void get() {

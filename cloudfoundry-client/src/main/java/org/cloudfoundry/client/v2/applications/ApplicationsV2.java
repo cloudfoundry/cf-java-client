@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface ApplicationsV2 {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_env_for_an_app.html">Get the env for an
+     * App</a> request
+     *
+     * @param request the Get Application Environment request
+     * @return the response from the Get Application Environment request
+     */
+    Publisher<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/retrieve_a_particular_app.html">Retrieve a Particular
      * App</a> request
      *
@@ -33,12 +42,12 @@ public interface ApplicationsV2 {
     Publisher<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
-     * Makes the 
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">Get
      * the instance information for a STARTED App</a> request
      *
      * @param request the Get Instance Information request
-     * @return the response from the Get Application Summary request
+     * @return the response from the Get Instance Information request
      */
     Publisher<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request);
 

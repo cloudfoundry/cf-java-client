@@ -21,6 +21,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
@@ -51,6 +53,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
      */
     public SpringApplicationsV2(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
+        return get(request, ApplicationEnvironmentResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "env"));
     }
 
     @Override
