@@ -59,7 +59,7 @@ public final class AssignApplicationDropletRequest implements Validatable {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
         if (this.dropletId == null) {
-            builder.message("dropletId must be specified");
+            builder.message("droplet id must be specified");
         }
 
         if (this.id == null) {

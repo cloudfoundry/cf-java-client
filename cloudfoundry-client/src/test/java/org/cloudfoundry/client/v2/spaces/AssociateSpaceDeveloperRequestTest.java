@@ -44,7 +44,7 @@ public final class AssociateSpaceDeveloperRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("developerId must be specified", result.getMessages().get(0));
+        assertEquals("developer id must be specified", result.getMessages().get(0));
     }
 
     @Test

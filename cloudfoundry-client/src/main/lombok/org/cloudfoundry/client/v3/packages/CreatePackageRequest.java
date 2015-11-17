@@ -73,7 +73,7 @@ public final class CreatePackageRequest implements Validatable {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
         if (this.applicationId == null) {
-            builder.message("applicationId must be specified");
+            builder.message("application id must be specified");
         }
 
         if (this.type == null) {

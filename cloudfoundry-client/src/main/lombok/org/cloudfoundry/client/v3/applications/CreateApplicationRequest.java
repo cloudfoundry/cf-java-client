@@ -86,7 +86,7 @@ public final class CreateApplicationRequest implements Validatable {
         }
 
         if (this.spaceId == null) {
-            builder.message("spaceId must be specified");
+            builder.message("space id must be specified");
         }
 
         return builder.build();

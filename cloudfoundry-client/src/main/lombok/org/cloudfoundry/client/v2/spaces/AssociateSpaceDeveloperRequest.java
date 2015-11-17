@@ -62,7 +62,7 @@ public final class AssociateSpaceDeveloperRequest implements Validatable {
         }
 
         if (this.developerId == null) {
-            builder.message("developerId must be specified");
+            builder.message("developer id must be specified");
         }
 
         return builder.build();

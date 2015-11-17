@@ -44,7 +44,7 @@ public final class AssociateSpaceAuditorRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("auditorId must be specified", result.getMessages().get(0));
+        assertEquals("auditor id must be specified", result.getMessages().get(0));
     }
 
     @Test

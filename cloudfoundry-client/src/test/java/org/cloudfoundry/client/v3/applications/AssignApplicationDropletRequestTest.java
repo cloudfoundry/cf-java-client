@@ -44,7 +44,7 @@ public final class AssignApplicationDropletRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("dropletId must be specified", result.getMessages().get(0));
+        assertEquals("droplet id must be specified", result.getMessages().get(0));
     }
 
     @Test

@@ -62,7 +62,7 @@ public final class AssociateSpaceAuditorRequest implements Validatable {
         }
 
         if (this.auditorId == null) {
-            builder.message("auditorId must be specified");
+            builder.message("auditor id must be specified");
         }
 
         return builder.build();
