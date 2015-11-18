@@ -43,7 +43,6 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import java.util.Collections;
-import java.util.Map;
 
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
@@ -380,8 +379,8 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        Map<String, ApplicationStatisticsResponse.InstanceStats> expectedMap = Collections.singletonMap("0",
-                ApplicationStatisticsResponse.InstanceStats.builder()
+        ApplicationStatisticsResponse expected = ApplicationStatisticsResponse.builder()
+                .instance("0", ApplicationStatisticsResponse.InstanceStats.builder()
                         .state("RUNNING")
                         .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
                                 .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
@@ -399,12 +398,12 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                                 .diskQuota(1073741824l)
                                 .fdsQuota(16384)
                                 .build())
-                        .build());
+                        .build())
+                .build();
 
-        Map<String, ApplicationStatisticsResponse.InstanceStats> actualMap =
-                Streams.wrap(this.applications.statistics(request)).next().get();
+        ApplicationStatisticsResponse actual = Streams.wrap(this.applications.statistics(request)).next().get();
 
-        assertEquals(expectedMap, actualMap);
+        assertEquals(expected, actual);
         verify();
     }
 

@@ -19,15 +19,30 @@ package org.cloudfoundry.client.v2.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Singular;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The response payload for the Get Application Statistics operation.
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public final class ApplicationStatisticsResponse extends HashMap<String, ApplicationStatisticsResponse.InstanceStats> {
+
+    ApplicationStatisticsResponse() {
+        super();
+    }
+
+    @Builder
+    ApplicationStatisticsResponse(@Singular Map<String,InstanceStats> instances) {
+        super(instances);
+    }
 
     @Data
     public static final class InstanceStats {

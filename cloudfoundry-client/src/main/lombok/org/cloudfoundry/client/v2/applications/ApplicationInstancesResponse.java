@@ -16,38 +16,30 @@
 
 package org.cloudfoundry.client.v2.applications;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Singular;
+import lombok.ToString;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * The reponse payload for the Get the instance information operation.
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public final class ApplicationInstancesResponse extends HashMap<String, ApplicationInstanceInfo> {
 
-    public static ApplicationInstancesResponseBuilder builder() {
-        return new ApplicationInstancesResponseBuilder();
+    ApplicationInstancesResponse() {
+        super();
     }
 
-    public static final class ApplicationInstancesResponseBuilder {
-
-        private final Map<String, ApplicationInstanceInfo> instances = new HashMap<>();
-
-        public ApplicationInstancesResponseBuilder instance(String key, ApplicationInstanceInfo info) {
-            this.instances.put(key, info);
-            return this;
-        }
-
-        public ApplicationInstancesResponseBuilder instances(Map<? extends String, ? extends ApplicationInstanceInfo>
-                                                                     infos) {
-            this.instances.putAll(infos);
-            return this;
-        }
-
-        public ApplicationInstancesResponse build() {
-            ApplicationInstancesResponse air = new ApplicationInstancesResponse();
-            air.putAll(this.instances);
-            return air;
-        }
+    @Builder
+    ApplicationInstancesResponse(@Singular Map<String, ApplicationInstanceInfo> instances) {
+        super(instances);
     }
 
 }
