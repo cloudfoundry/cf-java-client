@@ -19,34 +19,46 @@ package org.cloudfoundry.client.v2.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 
 import java.util.Map;
 
 @Data
 public final class ApplicationEnvironmentResponse {
 
-    private final Map<String, Object> applicationEnvironment;
+    private static final String VCAP_APPLICATION_KEY = "VCAP_APPLICATION";
 
-    private final Map<String, String> environment;
+    private final Map<String, Object> applicationEnvironmentJsons;
 
-    private final Map<String, String> runningEnvironment;
+    private final Map<String, Object> environmentJsons;
 
-    private final Map<String, String> stagingEnvironment;
+    private final Map<String, Object> runningEnvironmentJsons;
 
-    private final Map<String, Object> systemEnvironment;
+    private final Map<String, Object> stagingEnvironmentJsons;
+
+    private final Map<String, Object> systemEnvironmentJsons;
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> vcapApplication() {
+        Object vcapAppObj = this.applicationEnvironmentJsons.get(VCAP_APPLICATION_KEY);
+        if (vcapAppObj instanceof Map) {
+            return (Map<String,Object>) vcapAppObj;
+        }
+        return null;
+    }
 
     @Builder
     ApplicationEnvironmentResponse(
-            @JsonProperty("application_env_json") Map<String, Object> applicationEnvironment,
-            @JsonProperty("environment_json") Map<String, String> environment,
-            @JsonProperty("running_env_json") Map<String, String> runningEnvironment,
-            @JsonProperty("staging_env_json") Map<String, String> stagingEnvironment,
-            @JsonProperty("system_env_json") Map<String, Object> systemEnvironment) {
+            @JsonProperty("application_env_json") @Singular Map<String, Object> applicationEnvironmentJsons,
+            @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
+            @JsonProperty("running_env_json") @Singular Map<String, Object> runningEnvironmentJsons,
+            @JsonProperty("staging_env_json") @Singular Map<String, Object> stagingEnvironmentJsons,
+            @JsonProperty("system_env_json") @Singular Map<String, Object> systemEnvironmentJsons) {
 
-        this.applicationEnvironment = applicationEnvironment;
-        this.environment = environment;
-        this.runningEnvironment = runningEnvironment;
-        this.stagingEnvironment = stagingEnvironment;
-        this.systemEnvironment = systemEnvironment;
+        this.applicationEnvironmentJsons = applicationEnvironmentJsons;
+        this.environmentJsons = environmentJsons;
+        this.runningEnvironmentJsons = runningEnvironmentJsons;
+        this.stagingEnvironmentJsons = stagingEnvironmentJsons;
+        this.systemEnvironmentJsons = systemEnvironmentJsons;
     }
 }
