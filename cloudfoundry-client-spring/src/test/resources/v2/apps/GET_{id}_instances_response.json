@@ -1,1 +1,10 @@
-{"0":{"state":"RUNNING","since":1403140717.984577,"debug_ip":null,"debug_port":null,"console_ip":null,"console_port":null}}
+{
+  "0": {
+    "state": "RUNNING",
+    "since": 1403140717.984577,
+    "debug_ip": null,
+    "debug_port": null,
+    "console_ip": null,
+    "console_port": null
+  }
+}

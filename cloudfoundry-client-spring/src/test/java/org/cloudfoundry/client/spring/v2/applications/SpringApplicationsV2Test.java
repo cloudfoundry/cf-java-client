@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
@@ -65,7 +66,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        Map<String,Object> limitsMap = new HashMap<String,Object>();
+        Map<String, Object> limitsMap = new HashMap<String, Object>();
         limitsMap.put("mem", Integer.valueOf(1024));
         limitsMap.put("disk", Integer.valueOf(1024));
         limitsMap.put("fds", Integer.valueOf(16384));
@@ -200,16 +201,18 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        Map<String, ApplicationInstanceInfo> expectedMap = Collections.singletonMap("0",
-                ApplicationInstanceInfo.builder()
-                        .since(1403140717.984577d)
-                        .state("RUNNING")
-                        .build());
+        ApplicationInstancesResponse expected = ApplicationInstancesResponse.builder()
+                .instance("0",
+                        ApplicationInstanceInfo.builder()
+                                .since(1403140717.984577d)
+                                .state("RUNNING")
+                                .build())
+                .build();
 
-        Map<String, ApplicationInstanceInfo> actualMap =
+        ApplicationInstancesResponse actual =
                 Streams.wrap(this.applications.instances(request)).next().get();
 
-        assertEquals(expectedMap, actualMap);
+        assertEquals(expected, actual);
         verify();
     }
 

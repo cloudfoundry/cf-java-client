@@ -17,10 +17,37 @@
 package org.cloudfoundry.client.v2.applications;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The reponse payload for the Get the instance information operation.
  */
 public final class ApplicationInstancesResponse extends HashMap<String, ApplicationInstanceInfo> {
+
+    public static ApplicationInstancesResponseBuilder builder() {
+        return new ApplicationInstancesResponseBuilder();
+    }
+
+    public static final class ApplicationInstancesResponseBuilder {
+
+        private final Map<String, ApplicationInstanceInfo> instances = new HashMap<>();
+
+        public ApplicationInstancesResponseBuilder instance(String key, ApplicationInstanceInfo info) {
+            this.instances.put(key, info);
+            return this;
+        }
+
+        public ApplicationInstancesResponseBuilder instances(Map<? extends String, ? extends ApplicationInstanceInfo>
+                                                                     infos) {
+            this.instances.putAll(infos);
+            return this;
+        }
+
+        public ApplicationInstancesResponse build() {
+            ApplicationInstancesResponse air = new ApplicationInstancesResponse();
+            air.putAll(this.instances);
+            return air;
+        }
+    }
 
 }
