@@ -24,6 +24,23 @@ import org.reactivestreams.Publisher;
 public interface ApplicationsV2 {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request
+     *
+     * @param request the Create Application request
+     * @return the response from the Create Application request
+     */
+    Publisher<CreateApplicationResponse> create(CreateApplicationRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/delete_a_particular_app.html">Delete the App</a>
+     * request
+     *
+     * @param request the Delete Application request
+     * @return the response from the Delete Application request
+     */
+    Publisher<Void> delete(DeleteApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_env_for_an_app.html">Get the env for an
      * App</a> request
      *
@@ -40,15 +57,6 @@ public interface ApplicationsV2 {
      * @return the response from the Get Application request
      */
     Publisher<GetApplicationResponse> get(GetApplicationRequest request);
-
-    /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request
-     *
-     * @param request the Create Application request
-     * @return the response from the Create Application request
-     */
-    Publisher<CreateApplicationResponse> create(CreateApplicationRequest request);
 
     /**
      * Makes the

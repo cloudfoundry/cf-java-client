@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -61,6 +62,11 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return post(request, CreateApplicationResponse.class,
                 builder -> builder.pathSegment("v2", "apps"));
+    }
+
+    @Override
+    public Publisher<Void> delete(DeleteApplicationRequest request) {
+        return delete(request, builder -> builder.pathSegment("v2", "apps", request.getId()));
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -49,8 +50,11 @@ import java.util.Collections;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationsV2Test extends AbstractRestTest {
@@ -62,7 +66,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         mockRequest(new RequestContext()
                 .method(POST).path("/v2/apps")
                 .requestPayload("v2/apps/POST_request.json")
-                .status(OK)
+                .status(CREATED)
                 .responsePayload("v2/apps/POST_response.json"));
 
         CreateApplicationRequest request = CreateApplicationRequest.builder()
@@ -129,7 +133,44 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
 
         Streams.wrap(this.applications.create(request)).next().poll();
     }
-@Test
+
+    @Test
+    public void delete() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v2/apps/test-id")
+                .status(NO_CONTENT));
+
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.delete(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v2/apps/test-id")
+                .errorResponse());
+
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.delete(request)).next().poll();
+    }
+
+    @Test
     public void environment() {
         mockRequest(new RequestContext()
                 .method(GET).path("/v2/apps/test-id/env")
