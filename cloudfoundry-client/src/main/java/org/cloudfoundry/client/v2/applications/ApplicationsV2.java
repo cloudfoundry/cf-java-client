@@ -43,6 +43,15 @@ public interface ApplicationsV2 {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request
+     *
+     * @param request the Create Application request
+     * @return the response from the Create Application request
+     */
+    Publisher<CreateApplicationResponse> create(CreateApplicationRequest request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">Get
      * the instance information for a STARTED App</a> request
      *

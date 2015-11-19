@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -53,6 +55,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
      */
     public SpringApplicationsV2(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
+        return post(request, CreateApplicationResponse.class,
+                builder -> builder.pathSegment("v2", "apps"));
     }
 
     @Override

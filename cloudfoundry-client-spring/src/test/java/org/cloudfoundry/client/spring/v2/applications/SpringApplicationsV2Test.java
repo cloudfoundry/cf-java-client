@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
@@ -48,6 +50,7 @@ import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.S
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationsV2Test extends AbstractRestTest {
@@ -55,6 +58,78 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
 
     @Test
+    public void create() {
+        mockRequest(new RequestContext()
+                .method(POST).path("/v2/apps")
+                .requestPayload("v2/apps/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/apps/POST_response.json"));
+
+        CreateApplicationRequest request = CreateApplicationRequest.builder()
+                .name("my_super_app")
+                .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                .build();
+
+        CreateApplicationResponse expected = CreateApplicationResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:20Z")
+                        .id("508f0995-cbec-494c-99d1-f8c238117817")
+                        .url("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817")
+                        .build())
+                .entity(ApplicationEntity.builder()
+                        .console(false)
+                        .detectedStartCommand("")
+                        .diego(false)
+                        .diskQuota(1024)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .enableSsh(true)
+                        .eventsUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/events")
+                        .healthCheckType("port")
+                        .instances(1)
+                        .memory(1024)
+                        .name("my_super_app")
+                        .packageState("PENDING")
+                        .production(false)
+                        .routesUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/routes")
+                        .serviceBindingsUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/service_bindings")
+                        .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                        .spaceUrl("/v2/spaces/86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                        .stackId("d449ecea-669f-448a-a9e7-ec84d51e2fdb")
+                        .stackUrl("/v2/stacks/d449ecea-669f-448a-a9e7-ec84d51e2fdb")
+                        .state("STOPPED")
+                        .version("5d8a5c4a-9e74-4958-af55-abc8b8d1968d")
+                        .build())
+                .build();
+
+        CreateApplicationResponse actual = Streams.wrap(this.applications.create(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void createError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("/v2/apps")
+                .requestPayload("v2/apps/POST_request.json")
+                .errorResponse());
+
+        CreateApplicationRequest request = CreateApplicationRequest.builder()
+                .name("my_super_app")
+                .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                .build();
+
+        Streams.wrap(this.applications.create(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void createInvalidRequest() {
+        CreateApplicationRequest request = CreateApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.create(request)).next().poll();
+    }
+@Test
     public void environment() {
         mockRequest(new RequestContext()
                 .method(GET).path("/v2/apps/test-id/env")

@@ -54,6 +54,6 @@ public final class CreateApplicationRequestTest {
                 .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("spaceId must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 }
