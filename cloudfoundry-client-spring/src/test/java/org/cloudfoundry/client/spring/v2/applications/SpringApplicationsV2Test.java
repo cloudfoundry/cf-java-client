@@ -62,7 +62,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         mockRequest(new RequestContext()
                 .method(POST).path("/v2/apps")
                 .requestPayload("v2/apps/POST_request.json")
-                .status(OK)
+                .status(CREATED)
                 .responsePayload("v2/apps/POST_response.json"));
 
         CreateApplicationRequest request = CreateApplicationRequest.builder()
