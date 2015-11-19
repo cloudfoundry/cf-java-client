@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.cloudfoundry.client.v2.organizations.auditors.Auditors;
 import org.reactivestreams.Publisher;
 
 /**
@@ -25,11 +24,14 @@ import org.reactivestreams.Publisher;
 public interface Organizations {
 
     /**
-     * Main entry point to the Cloud Foundry Organization Auditors Client API
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_auditor_with_the_organization.html">Associate
+     * Auditor with the Organization</a> request
      *
-     * @return the Cloud Foundry Organization Auditors Client API
+     * @param request the Associate Auditor request
+     * @return the response from the Associate Auditor request
      */
-    Auditors auditors();
+    Publisher<AssociateAuditorResponse> associateAuditor(AssociateAuditorRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List

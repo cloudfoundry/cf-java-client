@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.organizations.auditors.AuditorResource;
 
 import java.util.List;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations.auditors;
+package org.cloudfoundry.client.v2.organizations;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateAuditorRequestTest {
+public final class AssociateAuditorRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateAuditorRequest.builder()
+        ValidationResult result = AssociateAuditorRequest.builder()
                 .auditorId("test-auditor-id")
                 .organizationId("test-organization-id")
                 .build()
@@ -38,7 +38,7 @@ public final class CreateAuditorRequestTest {
 
     @Test
     public void isValidNoAuditorId() {
-        ValidationResult result = CreateAuditorRequest.builder()
+        ValidationResult result = AssociateAuditorRequest.builder()
                 .organizationId("test-organization-id")
                 .build()
                 .isValid();
@@ -49,7 +49,7 @@ public final class CreateAuditorRequestTest {
 
     @Test
     public void isValidNoOrganizationId() {
-        ValidationResult result = CreateAuditorRequest.builder()
+        ValidationResult result = AssociateAuditorRequest.builder()
                 .auditorId("test-auditor-id")
                 .build()
                 .isValid();
