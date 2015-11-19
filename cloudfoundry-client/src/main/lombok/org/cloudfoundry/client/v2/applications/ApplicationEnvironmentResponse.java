@@ -26,8 +26,6 @@ import java.util.Map;
 @Data
 public final class ApplicationEnvironmentResponse {
 
-    private static final String VCAP_APPLICATION_KEY = "VCAP_APPLICATION";
-
     private final Map<String, Object> applicationEnvironmentJsons;
 
     private final Map<String, Object> environmentJsons;
@@ -37,15 +35,6 @@ public final class ApplicationEnvironmentResponse {
     private final Map<String, Object> stagingEnvironmentJsons;
 
     private final Map<String, Object> systemEnvironmentJsons;
-
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> vcapApplication() {
-        Object vcapAppObj = this.applicationEnvironmentJsons.get(VCAP_APPLICATION_KEY);
-        if (vcapAppObj instanceof Map) {
-            return (Map<String,Object>) vcapAppObj;
-        }
-        return null;
-    }
 
     @Builder
     ApplicationEnvironmentResponse(
