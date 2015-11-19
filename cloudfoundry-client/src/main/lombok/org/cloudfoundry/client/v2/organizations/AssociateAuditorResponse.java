@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations.auditors;
+package org.cloudfoundry.client.v2.organizations;
 
-import org.reactivestreams.Publisher;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
- * Main entry point to the Cloud Foundry Organization Auditors Client API
+ * The response payload for the Associate Auditor operation
  */
-public interface Auditors {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class AssociateAuditorResponse extends AuditorResource {
 
-    /**
-     * Makes the <a
-     * href="http://apidocs.cloudfoundry.org/214/organizations/associate_auditor_with_the_organization.html">Create
-     * Auditor</a> request
-     *
-     * @param request the List Organizations request
-     * @return the response from the List Organizations request
-     */
-    Publisher<CreateAuditorResponse> create(CreateAuditorRequest request);
-
+    @Builder
+    AssociateAuditorResponse(@JsonProperty("entity") AuditorEntity entity,
+                             @JsonProperty("metadata") Metadata metadata) {
+        super(entity, metadata);
+    }
 }

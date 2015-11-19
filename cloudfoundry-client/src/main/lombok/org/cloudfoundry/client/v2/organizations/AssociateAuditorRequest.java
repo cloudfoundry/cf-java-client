@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.organizations.auditors;
+package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
@@ -24,10 +24,10 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the Create Auditor operation
+ * The request payload for the Associate Auditor operation
  */
 @Data
-public final class CreateAuditorRequest implements Validatable {
+public final class AssociateAuditorRequest implements Validatable {
 
     /**
      * The auditor id
@@ -48,7 +48,7 @@ public final class CreateAuditorRequest implements Validatable {
     private final String organizationId;
 
     @Builder
-    CreateAuditorRequest(String auditorId, String organizationId) {
+    AssociateAuditorRequest(String auditorId, String organizationId) {
         this.auditorId = auditorId;
         this.organizationId = organizationId;
     }

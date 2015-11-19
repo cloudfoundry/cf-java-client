@@ -16,8 +16,12 @@
 
 package org.cloudfoundry.client.spring.v2.organizations;
 
+import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.organizations.AuditorResource;
+import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.Test;
@@ -26,11 +30,78 @@ import reactor.rx.Streams;
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationsTest extends AbstractRestTest {
 
     private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+    @Test
+    public void associateAuditor() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
+                .status(CREATED)
+                .responsePayload("v2/organizations/auditors/PUT_{id}_response.json"));
+
+        AssociateAuditorRequest request = AssociateAuditorRequest.builder()
+                .auditorId("uaa-id-71")
+                .organizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
+                .build();
+
+        AssociateAuditorResponse expected = AssociateAuditorResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
+                        .url("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
+                        .createdAt("2015-07-27T22:43:10Z")
+                        .build())
+                .entity(AuditorResource.AuditorEntity.builder()
+                        .name("name-187")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("1d18a00b-4e36-412b-9308-2f5f2402e880")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/1d18a00b-4e36-412b-9308-2f5f2402e880")
+                        .spacesUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/spaces")
+                        .domainsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/domains")
+                        .privateDomainsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/private_domains")
+                        .usersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/users")
+                        .managersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/managers")
+                        .billingManagersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/billing_managers")
+                        .auditorsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors")
+                        .applicationEventsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/space_quota_definitions")
+                        .build())
+                .build();
+
+        AssociateAuditorResponse actual = Streams.wrap(this.organizations.associateAuditor(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateAuditorError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
+                .errorResponse());
+
+        AssociateAuditorRequest request = AssociateAuditorRequest.builder()
+                .auditorId("uaa-id-71")
+                .organizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
+                .build();
+
+        Streams.wrap(this.organizations.associateAuditor(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateAuditorInvalidRequest() throws Throwable {
+        AssociateAuditorRequest request = AssociateAuditorRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.associateAuditor(request)).next().get();
+    }
 
     @Test
     public void list() {
