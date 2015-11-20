@@ -168,8 +168,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             RestOperations bootstrapRestOperations) {
 
         ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
-        details.setClientId(Optional.of(clientId).orElse("cf"));
-        details.setClientSecret(Optional.of(clientSecret).orElse(""));
+        details.setClientId(Optional.ofNullable(clientId).orElse("cf"));
+        details.setClientSecret(Optional.ofNullable(clientSecret).orElse(""));
         details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations));
         details.setUsername(username);
         details.setPassword(password);
