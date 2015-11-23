@@ -64,7 +64,7 @@
       <module name="cloudfoundry-client" target="1.8" />
       <module name="cloudfoundry-client-spring" target="1.8" />
       <module name="cloudfoundry-gradle-plugin" target="1.8" />
-      <module name="cloudfoundry-java-client" target="1.5" />
+      <module name="cloudfoundry-java-client" target="1.6" />
       <module name="cloudfoundry-maven-plugin" target="1.8" />
       <module name="cloudfoundry-operations" target="1.8" />
       <module name="integration-test" target="1.8" />
