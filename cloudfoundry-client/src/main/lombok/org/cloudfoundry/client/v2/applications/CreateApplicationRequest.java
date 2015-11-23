@@ -16,15 +16,18 @@
 
 package org.cloudfoundry.client.v2.applications;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 import java.util.Map;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * The request payload for the v2 Create Application request
@@ -37,7 +40,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return buildpack to build the app
      */
-    @JsonProperty("buildpack")
+    @Getter(onMethod = @__(@JsonProperty("buildpack")))
     private final String buildpack;
 
     /**
@@ -45,7 +48,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the command to start the app
      */
-    @JsonProperty("command")
+    @Getter(onMethod = @__(@JsonProperty("command")))
     private final String command;
 
     /**
@@ -53,8 +56,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return whether to open the console port
      */
-    @JsonProperty("console")
-    @Deprecated
+    @Getter(onMethod = @__({@JsonProperty("console"), @Deprecated}))
     private final Boolean console;
 
     /**
@@ -62,8 +64,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return whether to open the debug port
      */
-    @JsonProperty("debug")
-    @Deprecated
+    @Getter(onMethod = @__({@JsonProperty("debug"), @Deprecated}))
     private final Boolean debug;
 
     /**
@@ -71,7 +72,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return whether to use diego
      */
-    @JsonProperty("diego")
+    @Getter(onMethod = @__(@JsonProperty("diego")))
     private final Boolean diego;
 
     /**
@@ -79,7 +80,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the maximum amount of disk available to an instance
      */
-    @JsonProperty("disk_quota")
+    @Getter(onMethod = @__(@JsonProperty("disk_quota")))
     private final Integer diskQuota;
 
     /**
@@ -87,8 +88,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return docker credentials
      */
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_EMPTY)
-    @JsonProperty("docker_credentials_json")
+    @Getter(onMethod = @__({@JsonProperty("docker_credentials_json"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> dockerCredentialsJsons;
 
     /**
@@ -96,7 +96,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return name of the Docker image
      */
-    @JsonProperty("docker_image")
+    @Getter(onMethod = @__(@JsonProperty("docker_image")))
     private final String dockerImage;
 
     /**
@@ -105,8 +105,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the environment variables to run in your app
      */
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_EMPTY)
-    @JsonProperty("environment_json")
+    @Getter(onMethod = @__({@JsonProperty("environment_json"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> environmentJsons;
 
     /**
@@ -114,7 +113,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return timeout for health checking
      */
-    @JsonProperty("health_check_timeout")
+    @Getter(onMethod = @__(@JsonProperty("health_check_timeout")))
     private final Integer healthCheckTimeout;
 
     /**
@@ -122,7 +121,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return type of health check to perform
      */
-    @JsonProperty("health_check_type")
+    @Getter(onMethod = @__(@JsonProperty("health_check_type")))
     private final String healthCheckType;
 
     /**
@@ -131,7 +130,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the number of instances to run
      */
-    @JsonProperty("instances")
+    @Getter(onMethod = @__(@JsonProperty("instances")))
     private final Integer instances;
 
     /**
@@ -139,7 +138,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the amount of memory each instance should have
      */
-    @JsonProperty("memory")
+    @Getter(onMethod = @__(@JsonProperty("memory")))
     private final Integer memory;
 
     /**
@@ -147,11 +146,10 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the name of the app
      */
-    @JsonProperty("name")
+    @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
-    @JsonProperty("production")
-    @Deprecated
+    @Getter(onMethod = @__({@JsonProperty("production"), @Deprecated}))
     private final Boolean production;
 
     /**
@@ -159,7 +157,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the id of the associated space
      */
-    @JsonProperty("space_guid")
+    @Getter(onMethod = @__(@JsonProperty("space_guid")))
     private final String spaceId;
 
     /**
@@ -167,7 +165,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the id of the associated stack
      */
-    @JsonProperty("stack_guid")
+    @Getter(onMethod = @__(@JsonProperty("stack_guid")))
     private final String stackId;
 
     /**
@@ -175,7 +173,7 @@ public final class CreateApplicationRequest implements Validatable {
      *
      * @return the current desired state of the app
      */
-    @JsonProperty("state")
+    @Getter(onMethod = @__(@JsonProperty("state")))
     private final String state;
 
     @Builder
