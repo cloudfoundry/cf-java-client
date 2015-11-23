@@ -41,7 +41,7 @@ public final class UploadPackageRequestTest {
     @Test
     public void isValidNoFile() {
         ValidationResult result = UploadPackageRequest.builder()
-                .id("-id")
+                .id("test-id")
                 .build()
                 .isValid();
 
