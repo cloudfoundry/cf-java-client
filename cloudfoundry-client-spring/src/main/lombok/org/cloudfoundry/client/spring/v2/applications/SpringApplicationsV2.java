@@ -116,8 +116,8 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Publisher<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
-        return delete(request, builder -> builder.pathSegment("v2", "apps", request.getId(), "instances",
-                request.getIndex().toString()));
+        return delete(request, builder ->
+                builder.pathSegment("v2", "apps", request.getId(), "instances", request.getIndex()));
     }
 
     @Override
@@ -132,7 +132,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
                     body.add("application", new FileSystemResource(request.getApplication()));
                     return body;
                 },
-                UploadApplicationResponse.class, 
+                UploadApplicationResponse.class,
                 builder -> builder.pathSegment("v2", "apps", request.getId(), "bits")
         );
     }
