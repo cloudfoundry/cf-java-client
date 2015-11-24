@@ -60,7 +60,7 @@ public abstract class AbstractSpringOperations {
             URI uri = builder.build().toUri();
 
             this.logger.debug("DELETE {}", uri);
-            this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class).getBody();
+            this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class);
             return null;
         });
     }
@@ -76,7 +76,11 @@ public abstract class AbstractSpringOperations {
             }
 
             try {
-                subscriber.onNext(exchange.get());
+                T result = exchange.get();
+                if (result != null) {
+                    subscriber.onNext(result);
+                }
+
                 subscriber.onComplete();
             } catch (HttpStatusCodeException e) {
                 subscriber.onError(CloudFoundryExceptionBuilder.build(e));
@@ -124,7 +128,7 @@ public abstract class AbstractSpringOperations {
 
     protected final <T> Stream<T> put(Validatable request, Class<T> responseType,
                                       Consumer<UriComponentsBuilder> builderCallback) {
-        return put(request, ()-> request, responseType, builderCallback);
+        return put(request, () -> request, responseType, builderCallback);
     }
 
     protected final <T, B> Stream<T> put(Validatable request,
