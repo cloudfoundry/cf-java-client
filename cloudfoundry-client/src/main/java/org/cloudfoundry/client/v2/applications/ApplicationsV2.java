@@ -94,4 +94,13 @@ public interface ApplicationsV2 {
      */
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload Application
+     * Bits</a> request
+     *
+     * @param request the Upload Application Bits request
+     * @return the response from the Upload Application Bits request
+     */
+    Publisher<UploadApplicationBitsResponse> upload(UploadApplicationBitsRequest request);
+
 }
