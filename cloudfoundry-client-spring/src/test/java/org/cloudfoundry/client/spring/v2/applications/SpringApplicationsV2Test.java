@@ -49,7 +49,6 @@ import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
 import java.io.IOException;
@@ -654,12 +653,12 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     @Test
     public void terminateInstance() {
         mockRequest(new RequestContext()
-                .method(DELETE).path("/v2/apps/test-id/instances/-1")
+                .method(DELETE).path("/v2/apps/test-id/instances/test-index")
                 .status(NO_CONTENT));
 
         TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
                 .id("test-id")
-                .index(-1)
+                .index("test-index")
                 .build();
 
         Streams.wrap(this.applications.terminateInstance(request)).next().get();
@@ -668,12 +667,12 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void terminateInstanceError() {
         mockRequest(new RequestContext()
-                .method(DELETE).path("/v2/apps/test-id/instances/-1")
+                .method(DELETE).path("/v2/apps/test-id/instances/test-index")
                 .errorResponse());
 
         TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
                 .id("test-id")
-                .index(-1)
+                .index("test-index")
                 .build();
 
         Streams.wrap(this.applications.terminateInstance(request)).next().get();

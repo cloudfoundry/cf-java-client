@@ -45,10 +45,10 @@ public final class TerminateApplicationInstanceRequest implements Validatable {
      * @return the index
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final Integer index;
+    private final String index;
 
     @Builder
-    TerminateApplicationInstanceRequest(String id, Integer index) {
+    TerminateApplicationInstanceRequest(String id, String index) {
         this.id = id;
         this.index = index;
     }
