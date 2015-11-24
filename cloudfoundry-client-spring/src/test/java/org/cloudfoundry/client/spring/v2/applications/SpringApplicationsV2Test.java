@@ -39,6 +39,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationBitsRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse.UploadApplicationBitsEntity;
@@ -645,6 +646,42 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.summary(request)).next().poll();
+    }
+
+    @Test
+    public void terminateInstance() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v2/apps/test-id/instances/-1")
+                .status(NO_CONTENT));
+
+        TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index(-1)
+                .build();
+
+        Streams.wrap(this.applications.terminateInstance(request)).next().get();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void terminateInstanceError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("/v2/apps/test-id/instances/-1")
+                .errorResponse());
+
+        TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
+                .id("test-id")
+                .index(-1)
+                .build();
+
+        Streams.wrap(this.applications.terminateInstance(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void terminateInstanceInvalidRequest() {
+        TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.terminateInstance(request)).next().get();
     }
 
     @Test
