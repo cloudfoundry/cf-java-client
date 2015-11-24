@@ -24,34 +24,16 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Upload Application Bits operation.
+ * The response payload for the Upload Application request.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class UploadApplicationBitsResponse
-        extends Resource<UploadApplicationBitsResponse.UploadApplicationBitsEntity> {
+public final class UploadApplicationResponse extends Resource<JobEntity> {
 
     @Builder
-    UploadApplicationBitsResponse(@JsonProperty("entity") UploadApplicationBitsEntity entity,
-                                  @JsonProperty("metadata") Metadata metadata) {
+    UploadApplicationResponse(@JsonProperty("entity") JobEntity entity,
+                              @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
-
-    @Data
-    public static final class UploadApplicationBitsEntity {
-
-        private final String id;
-
-        private final String status;
-
-        @Builder
-        UploadApplicationBitsEntity(@JsonProperty("guid") String id,
-                                    @JsonProperty("status") String status) {
-            this.id = id;
-            this.status = status;
-        }
-
-    }
-
 }

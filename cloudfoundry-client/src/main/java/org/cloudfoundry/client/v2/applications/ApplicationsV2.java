@@ -59,7 +59,7 @@ public interface ApplicationsV2 {
     Publisher<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">Get
      * the instance information for a STARTED App</a> request
      *
@@ -105,12 +105,12 @@ public interface ApplicationsV2 {
     Publisher<Void> terminateInstance(TerminateApplicationInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload Application
-     * Bits</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload the bits
+     * for an App</a> request
      *
-     * @param request the Upload Application Bits request
-     * @return the response from the Upload Application Bits request
+     * @param request the Upload Application request
+     * @return the response from the Upload Application request
      */
-    Publisher<UploadApplicationBitsResponse> upload(UploadApplicationBitsRequest request);
+    Publisher<UploadApplicationResponse> upload(UploadApplicationRequest request);
 
 }

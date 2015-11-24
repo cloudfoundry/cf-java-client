@@ -35,19 +35,21 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.JobEntity;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.applications.ResourceFingerprint;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
-import org.cloudfoundry.client.v2.applications.UploadApplicationBitsRequest;
-import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse;
-import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse.UploadApplicationBitsEntity;
+import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
 import java.io.IOException;
@@ -57,6 +59,7 @@ import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.S
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -685,7 +688,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    public void uploadAsync() throws IOException {
         mockRequest(new RequestContext()
                 .method(PUT).path("/v2/apps/test-id/bits")
                 .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
@@ -693,24 +696,34 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .status(CREATED)
                 .responsePayload("v2/apps/PUT_{id}_bits_response.json"));
 
-        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
-                .application(new ClassPathResource("v2/apps/test-file").getFile())
+        UploadApplicationRequest request = UploadApplicationRequest.builder()
+                .application(new ClassPathResource("v2/apps/application.zip").getFile())
                 .id("test-id")
+                .resource(ResourceFingerprint.builder()
+                        .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
+                        .path("path/to/content.txt")
+                        .size(123)
+                        .build())
+                .resource(ResourceFingerprint.builder()
+                        .hash("ff84f89760317996b9dd180ab996b079f418396f")
+                        .path("path/to/code.jar")
+                        .size(123)
+                        .build())
                 .build();
 
-        UploadApplicationBitsResponse expected = UploadApplicationBitsResponse.builder()
-                .metadata(Resource.Metadata.builder()
-                        .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
-                        .createdAt("2015-07-27T22:43:33Z")
-                        .url("/v2/jobs/eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
-                        .build())
-                .entity(UploadApplicationBitsEntity.builder()
+        UploadApplicationResponse expected = UploadApplicationResponse.builder()
+                .entity(JobEntity.builder()
                         .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
                         .status("queued")
                         .build())
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                        .url("/v2/jobs/eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                        .build())
                 .build();
 
-        UploadApplicationBitsResponse actual = Streams.wrap(this.applications.upload(request)).next().get();
+        UploadApplicationResponse actual = Streams.wrap(this.applications.upload(request)).next().get();
 
         assertEquals(expected, actual);
         verify();
@@ -724,8 +737,8 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .anyRequestPayload()
                 .errorResponse());
 
-        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
-                .application(new ClassPathResource("v2/apps/test-file").getFile())
+        UploadApplicationRequest request = UploadApplicationRequest.builder()
+                .application(new ClassPathResource("v2/apps/application.zip").getFile())
                 .id("test-id")
                 .build();
 
@@ -734,9 +747,39 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
 
     @Test(expected = RequestValidationException.class)
     public void uploadInvalidRequest() {
-        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
+        UploadApplicationRequest request = UploadApplicationRequest.builder()
                 .build();
 
         Streams.wrap(this.applications.upload(request)).next().poll();
     }
+
+    @Test
+    public void uploadSync() throws IOException {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/apps/test-id/bits")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .status(CREATED));
+
+        UploadApplicationRequest request = UploadApplicationRequest.builder()
+                .application(new ClassPathResource("v2/apps/application.zip").getFile())
+                .id("test-id")
+                .resource(ResourceFingerprint.builder()
+                        .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
+                        .path("path/to/content.txt")
+                        .size(123)
+                        .build())
+                .resource(ResourceFingerprint.builder()
+                        .hash("ff84f89760317996b9dd180ab996b079f418396f")
+                        .path("path/to/code.jar")
+                        .size(123)
+                        .build())
+                .build();
+
+        UploadApplicationResponse actual = Streams.wrap(this.applications.upload(request)).next().get();
+
+        assertNull(actual);
+        verify();
+    }
+
 }

@@ -25,14 +25,14 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class UploadApplicationBitsRequestTest {
+public class UploadApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
-                .application(new File(""))
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
                 .id("test-id")
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+                .resource(ResourceFingerprint.builder()
                         .hash("test-hash")
                         .path("test-path")
                         .size(-1)
@@ -45,9 +45,9 @@ public final class UploadApplicationBitsRequestTest {
 
     @Test
     public void isValidNoApplication() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
+        ValidationResult result = UploadApplicationRequest.builder()
                 .id("test-id")
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+                .resource(ResourceFingerprint.builder()
                         .hash("test-hash")
                         .path("test-path")
                         .size(-1)
@@ -61,9 +61,9 @@ public final class UploadApplicationBitsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
-                .application(new File(""))
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
+                .resource(ResourceFingerprint.builder()
                         .hash("test-hash")
                         .path("test-path")
                         .size(-1)
@@ -77,10 +77,10 @@ public final class UploadApplicationBitsRequestTest {
 
     @Test
     public void isValidNoResourceHash() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
-                .application(new File(""))
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
                 .id("test-id")
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+                .resource(ResourceFingerprint.builder()
                         .path("test-path")
                         .size(-1)
                         .build())
@@ -93,10 +93,10 @@ public final class UploadApplicationBitsRequestTest {
 
     @Test
     public void isValidNoResourcePath() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
-                .application(new File(""))
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
                 .id("test-id")
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+                .resource(ResourceFingerprint.builder()
                         .hash("test-hash")
                         .size(-1)
                         .build())
@@ -109,10 +109,10 @@ public final class UploadApplicationBitsRequestTest {
 
     @Test
     public void isValidNoResourceSize() {
-        ValidationResult result = UploadApplicationBitsRequest.builder()
-                .application(new File(""))
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
                 .id("test-id")
-                .resource(UploadApplicationBitsRequest.Resource.builder()
+                .resource(ResourceFingerprint.builder()
                         .hash("test-hash")
                         .path("test-path")
                         .build())
@@ -121,6 +121,17 @@ public final class UploadApplicationBitsRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("resource size must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoResources() {
+        ValidationResult result = UploadApplicationRequest.builder()
+                .application(new File("test-file"))
+                .id("test-id")
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }
