@@ -39,23 +39,32 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationBitsRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationBitsResponse.UploadApplicationBitsEntity;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 import reactor.rx.Streams;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 
 public final class SpringApplicationsV2Test extends AbstractRestTest {
 
@@ -636,5 +645,61 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.summary(request)).next().poll();
+    }
+
+    @Test
+    public void upload() throws IOException {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/apps/test-id/bits")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .status(CREATED)
+                .responsePayload("v2/apps/PUT_{id}_bits_response.json"));
+
+        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
+                .application(new ClassPathResource("v2/apps/test-file").getFile())
+                .id("test-id")
+                .build();
+
+        UploadApplicationBitsResponse expected = UploadApplicationBitsResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .url("/v2/jobs/eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                        .build())
+                .entity(UploadApplicationBitsEntity.builder()
+                        .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                        .status("queued")
+                        .build())
+                .build();
+
+        UploadApplicationBitsResponse actual = Streams.wrap(this.applications.upload(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void uploadError() throws IOException {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/apps/test-id/bits")
+                .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
+                .anyRequestPayload()
+                .errorResponse());
+
+        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
+                .application(new ClassPathResource("v2/apps/test-file").getFile())
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.upload(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void uploadInvalidRequest() {
+        UploadApplicationBitsRequest request = UploadApplicationBitsRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.upload(request)).next().poll();
     }
 }
