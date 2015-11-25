@@ -128,21 +128,13 @@ public abstract class AbstractSpringOperations {
 
     protected final <T> Stream<T> put(Validatable request, Class<T> responseType,
                                       Consumer<UriComponentsBuilder> builderCallback) {
-        return put(request, () -> request, responseType, builderCallback);
-    }
-
-    protected final <T, B> Stream<T> put(Validatable request,
-                                         Supplier<B> bodySupplier,
-                                         Class<T> responseType,
-                                         Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("PUT {}", uri);
-            return this.restOperations.exchange(new RequestEntity<B>(bodySupplier.get(), null, PUT, uri),
-                    responseType).getBody();
+            return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
         });
 
     }

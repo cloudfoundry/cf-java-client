@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -67,13 +68,13 @@ public final class UploadApplicationRequest implements Validatable {
      * @return the fingerprints of application bits
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final List<ResourceFingerprint> resources;
+    private final List<Resource> resources;
 
     @Builder
     UploadApplicationRequest(File application,
                              Boolean async,
                              String id,
-                             @Singular List<ResourceFingerprint> resources) {
+                             @Singular List<Resource> resources) {
         this.application = application;
         this.async = async;
         this.id = id;
@@ -93,11 +94,52 @@ public final class UploadApplicationRequest implements Validatable {
         }
 
         this.resources.stream()
-                .map(ResourceFingerprint::isValid)
+                .map(Resource::isValid)
                 .map(ValidationResult::getMessages)
                 .forEach(builder::messages);
 
         return builder.build();
     }
 
+    /**
+     * The request payload for the resources
+     */
+    @Data
+    public static final class Resource implements Validatable {
+
+        @Getter(onMethod = @__(@JsonProperty("sha1")))
+        private final String hash;
+
+        @Getter(onMethod = @__(@JsonProperty("fn")))
+        private final String path;
+
+        @Getter(onMethod = @__(@JsonProperty("size")))
+        private final Integer size;
+
+        @Builder
+        Resource(String hash, String path, Integer size) {
+            this.path = path;
+            this.hash = hash;
+            this.size = size;
+        }
+
+        @Override
+        public ValidationResult isValid() {
+            ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+            if (this.hash == null) {
+                builder.message("resource hash must be specified");
+            }
+
+            if (this.path == null) {
+                builder.message("resource path must be specified");
+            }
+
+            if (this.size == null) {
+                builder.message("resource size must be specified");
+            }
+
+            return builder.build();
+        }
+    }
 }

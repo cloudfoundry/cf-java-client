@@ -38,7 +38,6 @@ import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.JobEntity;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v2.applications.ResourceFingerprint;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponseEntity;
@@ -61,7 +60,6 @@ import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.S
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -767,12 +765,12 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         UploadApplicationRequest request = UploadApplicationRequest.builder()
                 .application(new ClassPathResource("v2/apps/application.zip").getFile())
                 .id("test-id")
-                .resource(ResourceFingerprint.builder()
+                .resource(UploadApplicationRequest.Resource.builder()
                         .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
                         .path("path/to/content.txt")
                         .size(123)
                         .build())
-                .resource(ResourceFingerprint.builder()
+                .resource(UploadApplicationRequest.Resource.builder()
                         .hash("ff84f89760317996b9dd180ab996b079f418396f")
                         .path("path/to/code.jar")
                         .size(123)
@@ -832,21 +830,20 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         UploadApplicationRequest request = UploadApplicationRequest.builder()
                 .application(new ClassPathResource("v2/apps/application.zip").getFile())
                 .id("test-id")
-                .resource(ResourceFingerprint.builder()
+                .resource(UploadApplicationRequest.Resource.builder()
                         .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
                         .path("path/to/content.txt")
                         .size(123)
                         .build())
-                .resource(ResourceFingerprint.builder()
+                .resource(UploadApplicationRequest.Resource.builder()
                         .hash("ff84f89760317996b9dd180ab996b079f418396f")
                         .path("path/to/code.jar")
                         .size(123)
                         .build())
                 .build();
 
-        UploadApplicationResponse actual = Streams.wrap(this.applications.upload(request)).next().get();
+        Streams.wrap(this.applications.upload(request)).next().get();
 
-        assertNull(actual);
         verify();
     }
 
