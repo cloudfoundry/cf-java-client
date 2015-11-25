@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.spring.v2.applications;
 
-
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
@@ -43,18 +42,26 @@ import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceReque
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.RequestEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+
+import static org.springframework.http.HttpMethod.PUT;
 
 /**
  * The Spring-based implementation of {@link ApplicationsV2}
  */
 @ToString(callSuper = true)
 public final class SpringApplicationsV2 extends AbstractSpringOperations implements ApplicationsV2 {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Creates an instance
@@ -130,19 +137,24 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Publisher<UploadApplicationResponse> upload(UploadApplicationRequest request) {
-        return put(request,
-                () -> {
-                    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                    if (request.getAsync() != null) {
-                        body.add("async", request.getAsync());
-                    }
-                    body.add("resources", request.getResources());
-                    body.add("application", new FileSystemResource(request.getApplication()));
-                    return body;
-                },
-                UploadApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "bits")
-        );
+        return exchange(request, () -> {
+            URI uri = UriComponentsBuilder.fromUri(this.root)
+                    .pathSegment("v2", "apps", request.getId(), "bits")
+                    .build().toUri();
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+            if (request.getAsync() != null) {
+                body.add("async", request.getAsync());
+            }
+
+            body.add("resources", request.getResources());
+            body.add("application", new FileSystemResource(request.getApplication()));
+
+            this.logger.debug("PUT {}", uri);
+            return this.restOperations.exchange(new RequestEntity<MultiValueMap<String, Object>>(body, PUT, uri),
+                    UploadApplicationResponse.class).getBody();
+        });
     }
 
 }
