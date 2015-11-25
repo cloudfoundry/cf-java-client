@@ -77,6 +77,14 @@ public interface ApplicationsV2 {
     Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
+     *
+     * @param request the Restage an Application request
+     * @return the response from the Restage an Application request
+     */
+    Publisher<RestageApplicationResponse> restage(RestageApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_detailed_stats_for_a_started_app.html">Get
      * detailed stats for a STARTED App</a> request
      *

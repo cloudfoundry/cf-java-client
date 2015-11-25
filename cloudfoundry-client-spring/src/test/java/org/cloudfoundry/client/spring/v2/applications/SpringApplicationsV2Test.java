@@ -39,6 +39,9 @@ import org.cloudfoundry.client.v2.applications.JobEntity;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.ResourceFingerprint;
+import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
+import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
+import org.cloudfoundry.client.v2.applications.RestageApplicationResponseEntity;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -494,6 +497,72 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.list(request)).next().get();
+    }
+
+    @Test
+    public void restage() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/apps/test-id/restage")
+                .status(OK)
+                .responsePayload("v2/apps/POST_{id}_restage_response.json"));
+
+        RestageApplicationRequest request = RestageApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        RestageApplicationResponse expected = RestageApplicationResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .id("2c6b3d3c-47bb-4060-be49-a56496ab57d4")
+                        .url("/v2/apps/2c6b3d3c-47bb-4060-be49-a56496ab57d4")
+                        .updatedAt("2015-07-27T22:43:33Z")
+                        .build())
+                .entity(RestageApplicationResponseEntity.builder()
+                        .name("name-2307")
+                        .production(false)
+                        .spaceId("1b59d670-770e-48b7-9056-b2eb64c8445d")
+                        .stackId("ae6c816a-887f-44a4-af1a-a611902ba09c")
+                        .memory(1024)
+                        .instances(1)
+                        .diskQuota(1024)
+                        .state("STARTED")
+                        .version("102573ce-4e28-4271-b042-3539098c7b30")
+                        .console(false)
+                        .packageState("PENDING")
+                        .healthCheckType("port")
+                        .diego(false)
+                        .packageUpdatedAt("2015-07-27T22:43:33Z")
+                        .detectedStartCommand("")
+                        .enableSsh(true)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .build())
+                .build();
+
+        RestageApplicationResponse actual = Streams.wrap(this.applications.restage(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void restageError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/apps/test-id/restage")
+                .errorResponse());
+
+        RestageApplicationRequest request = RestageApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.restage(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void restageInvalidRequest() {
+        RestageApplicationRequest request = RestageApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.restage(request)).next().get();
     }
 
     @Test
