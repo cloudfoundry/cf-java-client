@@ -35,6 +35,8 @@ import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
+import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -100,6 +102,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Publisher<RestageApplicationResponse> restage(RestageApplicationRequest request) {
+        return post(request, RestageApplicationResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "restage"));
     }
 
     @Override
