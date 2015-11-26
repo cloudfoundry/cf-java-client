@@ -86,6 +86,15 @@ public interface ApplicationsV2 {
     Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/list_all_routes_for_the_app.html">List all Routes
+     * for the Application</a> request
+     *
+     * @param request the List all Routes for the Application request
+     * @return the response from the List all Routes for the Application request
+     */
+    Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
      *
      * @param request the Restage an Application request

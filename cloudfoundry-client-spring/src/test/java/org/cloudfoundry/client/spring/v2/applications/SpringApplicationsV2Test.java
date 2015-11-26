@@ -38,11 +38,13 @@ import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.JobEntity;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
-import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -50,6 +52,8 @@ import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -570,6 +574,69 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.list(request)).next().get();
+    }
+
+    @Test
+    public void listRoutes() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/routes?page=-1&route_guid=test-route-id")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_routes_response.json"));
+
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .page(-1)
+                .build();
+
+        ListApplicationRoutesResponse expected = ListApplicationRoutesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .createdAt("2015-07-27T22:43:19Z")
+                                .id("ea95782f-e852-42a1-83dd-7d266ad9f32d")
+                                .url("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d")
+                                .build())
+                        .entity(RouteEntity.builder()
+                                .applicationURL("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d/apps")
+                                .domainId("1f36d1d3-fcba-49dc-9320-d60ead679d35")
+                                .domainUrl("/v2/domains/1f36d1d3-fcba-49dc-9320-d60ead679d35")
+                                .host("host-14")
+                                .path("")
+                                .spaceId("dd314ba4-3690-48d1-becb-25abe5da801c")
+                                .spaceURL("/v2/spaces/dd314ba4-3690-48d1-becb-25abe5da801c")
+                                .build())
+                        .build())
+                .build();
+
+        ListApplicationRoutesResponse actual = Streams.wrap(this.applications.listRoutes(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listRoutesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/routes?page=-1&route_guid=test-route-id")
+                .errorResponse());
+
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.applications.listRoutes(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listRoutesInvalidRequest() {
+        ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listRoutes(request)).next().get();
     }
 
     @Test
