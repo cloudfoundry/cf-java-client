@@ -86,13 +86,23 @@ public interface ApplicationsV2 {
     Publisher<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/list_all_routes_for_the_app.html">List all Routes
-     * for the Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/list_all_routes_for_the_app.html">List all Routes for
+     * the Application</a> request
      *
      * @param request the List all Routes for the Application request
      * @return the response from the List all Routes for the Application request
      */
     Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/list_all_service_bindings_for_the_app.html">List all
+     * Service Bindings for the App</a> request
+     *
+     * @param request the List Service Bindings request
+     * @return the response from the List Service Bindings request
+     */
+    Publisher<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest 
+                                                                                  request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
@@ -121,7 +131,7 @@ public interface ApplicationsV2 {
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/apps/terminate_the_running_app_instance_at_the_given_index.html">
      * Terminate Application Instance</a> request
      *
@@ -131,8 +141,8 @@ public interface ApplicationsV2 {
     Publisher<Void> terminateInstance(TerminateApplicationInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload the bits
-     * for an App</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload the bits for
+     * an App</a> request
      *
      * @param request the Upload Application request
      * @return the response from the Upload Application request
