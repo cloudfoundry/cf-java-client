@@ -40,6 +40,8 @@ import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.JobEntity;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
@@ -54,6 +56,8 @@ import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceBindingEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -637,6 +641,69 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.listRoutes(request)).next().get();
+    }
+
+    @Test
+    public void listServiceBindings() {
+        mockRequest(new RequestContext()
+                .method(GET)
+                .path("v2/apps/test-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_service_bindings_response.json"));
+
+        ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
+                .id("test-id")
+                .serviceInstanceId("test-instance-id")
+                .page(-1)
+                .build();
+
+        ListApplicationServiceBindingsResponse expected = ListApplicationServiceBindingsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceBindingResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .createdAt("2015-07-27T22:43:20Z")
+                                .id("42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                                .url("/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226")
+                                .build())
+                        .entity(ServiceBindingEntity.builder()
+                                .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
+                                .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                                .credential("creds-key-356", "creds-val-356")
+                                .gatewayName("")
+                                .applicationUrl("/v2/apps/26ddc1de-3eeb-424b-82f3-f7f30a38b610")
+                                .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                                .build())
+                        .build())
+                .build();
+
+        ListApplicationServiceBindingsResponse actual = Streams.wrap(this.applications.listServiceBindings(request))
+                .next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listServiceBindingsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/service_bindings?page=-1")
+                .errorResponse());
+
+        ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.applications.listServiceBindings(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listServiceBindingsInvalidRequest() {
+        ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.listServiceBindings(request)).next().get();
     }
 
     @Test
