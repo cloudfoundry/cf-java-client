@@ -42,7 +42,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
-import org.cloudfoundry.client.v2.applications.RestageApplicationResponseEntity;
+import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -590,7 +590,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                         .url("/v2/apps/2c6b3d3c-47bb-4060-be49-a56496ab57d4")
                         .updatedAt("2015-07-27T22:43:33Z")
                         .build())
-                .entity(RestageApplicationResponseEntity.builder()
+                .entity(RestageApplicationEntity.builder()
                         .name("name-2307")
                         .production(false)
                         .spaceId("1b59d670-770e-48b7-9056-b2eb64c8445d")
