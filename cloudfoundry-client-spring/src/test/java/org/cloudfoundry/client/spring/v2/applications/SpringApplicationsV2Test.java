@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
+import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
+import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
@@ -73,6 +75,79 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 public final class SpringApplicationsV2Test extends AbstractRestTest {
 
     private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+
+    @Test
+    public void associateRoute() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/apps/test-id/routes/test-route-id")
+                .status(OK)
+                .responsePayload("v2/apps/PUT_{id}_routes_{route-id}_response.json"));
+
+        AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build();
+
+        AssociateApplicationRouteResponse expected = AssociateApplicationRouteResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:19Z")
+                        .id("638e90b6-502f-47a8-a3bf-b18fdf3fb70a")
+                        .url("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a")
+                        .updatedAt("2015-07-27T22:43:19Z")
+                        .build())
+                .entity(ApplicationEntity.builder()
+                        .console(false)
+                        .detectedStartCommand("")
+                        .diego(false)
+                        .diskQuota(1024)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .enableSsh(true)
+                        .eventsUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/events")
+                        .healthCheckType("port")
+                        .instances(1)
+                        .memory(1024)
+                        .name("name-657")
+                        .packageState("PENDING")
+                        .packageUpdatedAt("2015-07-27T22:43:19Z")
+                        .production(false)
+                        .routesUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/routes")
+                        .serviceBindingsUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/service_bindings")
+                        .spaceId("bc900bc3-df1f-4842-9621-e69b90207ad1")
+                        .spaceUrl("/v2/spaces/bc900bc3-df1f-4842-9621-e69b90207ad1")
+                        .stackId("46576b60-3d3e-42a6-bdb3-171bc2dedfc4")
+                        .stackUrl("/v2/stacks/46576b60-3d3e-42a6-bdb3-171bc2dedfc4")
+                        .state("STOPPED")
+                        .version("eee05ab9-9d6c-490c-932a-996d061b5fe4")
+                        .build())
+                .build();
+
+        AssociateApplicationRouteResponse actual = Streams.wrap(this.applications.associateRoute(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateRouteError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/apps/test-id/routes/test-route-id")
+                .errorResponse());
+
+        AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build();
+
+        Streams.wrap(this.applications.associateRoute(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateRouteInvalidRequest() {
+        AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.associateRoute(request)).next().get();
+    }
 
     @Test
     public void create() {
