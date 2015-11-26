@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
@@ -114,6 +116,15 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, builder -> {
             builder.pathSegment("v2", "apps");
+            FilterBuilder.augment(builder, request);
+            QueryBuilder.augment(builder, request);
+        });
+    }
+
+    @Override
+    public Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, builder -> {
+            builder.pathSegment("v2", "apps", request.getId(), "routes");
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
