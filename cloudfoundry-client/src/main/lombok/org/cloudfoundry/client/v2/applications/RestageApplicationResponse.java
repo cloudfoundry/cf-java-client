@@ -29,10 +29,10 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class RestageApplicationResponse extends Resource<RestageApplicationResponseEntity> {
+public final class RestageApplicationResponse extends Resource<RestageApplicationEntity> {
 
     @Builder
-    RestageApplicationResponse(@JsonProperty("entity") RestageApplicationResponseEntity entity,
+    RestageApplicationResponse(@JsonProperty("entity") RestageApplicationEntity entity,
                               @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
