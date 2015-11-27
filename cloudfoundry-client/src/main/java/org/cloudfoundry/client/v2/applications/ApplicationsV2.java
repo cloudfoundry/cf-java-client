@@ -105,6 +105,15 @@ public interface ApplicationsV2 {
                                                                                   request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_route_from_the_app.html">Remove Route from
+     * the Application</a> request
+     *
+     * @param request the Remove Route from the Application request
+     * @return the response from the Remove Route from the Application request
+     */
+    Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
      *
      * @param request the Restage an Application request
