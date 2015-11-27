@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.v2.applications;
 
 import lombok.ToString;
+import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
@@ -40,6 +41,8 @@ import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsReq
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
@@ -56,9 +59,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.rx.Stream;
 
 import java.net.URI;
+import java.util.function.Consumer;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PUT;
 
 /**
@@ -94,6 +100,18 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     @Override
     public Publisher<Void> delete(DeleteApplicationRequest request) {
         return delete(request, builder -> builder.pathSegment("v2", "apps", request.getId()));
+    }
+
+    private <T> Stream<T> deleteWithResponse(Validatable request, Class<T> responseType,
+                                             Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, () -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
+
+            this.logger.debug("DELETE {}", uri);
+            return this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
+        });
     }
 
     @Override
@@ -140,6 +158,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             FilterBuilder.augment(builder, request);
             QueryBuilder.augment(builder, request);
         });
+    }
+
+    @Override
+    public Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request) {
+        return deleteWithResponse(request, RemoveApplicationRouteResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
     }
 
     @Override

@@ -44,6 +44,8 @@ import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsReq
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
@@ -704,6 +706,79 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.listServiceBindings(request)).next().get();
+    }
+
+    @Test
+    public void removeRoute() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/apps/test-id/routes/test-route-id")
+                .status(OK)
+                .responsePayload("v2/apps/DELETE_{id}_routes_{route-id}_response.json"));
+
+        RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build();
+
+        RemoveApplicationRouteResponse expected = RemoveApplicationRouteResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:19Z")
+                        .id("0367bfcb-0165-4610-a84b-bee22a0d60cf")
+                        .url("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf")
+                        .updatedAt("2015-07-27T22:43:19Z")
+                        .build())
+                .entity(ApplicationEntity.builder()
+                        .console(false)
+                        .detectedStartCommand("")
+                        .diego(false)
+                        .diskQuota(1024)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .enableSsh(true)
+                        .eventsUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/events")
+                        .healthCheckType("port")
+                        .instances(1)
+                        .memory(1024)
+                        .name("name-687")
+                        .packageState("PENDING")
+                        .packageUpdatedAt("2015-07-27T22:43:19Z")
+                        .production(false)
+                        .routesUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/routes")
+                        .serviceBindingsUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/service_bindings")
+                        .spaceId("cbbf4dd7-6929-49eb-9e32-7f18161073da")
+                        .spaceUrl("/v2/spaces/cbbf4dd7-6929-49eb-9e32-7f18161073da")
+                        .stackId("22ea9914-b1fa-4e4b-8cbb-c9810f0416f1")
+                        .stackUrl("/v2/stacks/22ea9914-b1fa-4e4b-8cbb-c9810f0416f1")
+                        .state("STOPPED")
+                        .version("25277461-277a-4d77-b942-570520b5cf4e")
+                        .build())
+                .build();
+
+        RemoveApplicationRouteResponse actual = Streams.wrap(this.applications.removeRoute(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeRouteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/apps/test-id/routes/test-route-id")
+                .errorResponse());
+
+        RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
+                .id("test-id")
+                .routeId("test-route-id")
+                .build();
+
+        Streams.wrap(this.applications.removeRoute(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeRouteInvalidRequest() {
+        RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.removeRoute(request)).next().get();
     }
 
     @Test
