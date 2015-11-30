@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
@@ -159,6 +161,60 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.associateRoute(request)).next().get();
+    }
+
+    @Test
+    public void copy() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/apps/test-id/copy_bits")
+                .requestPayload("v2/apps/POST_{id}_copy_bits_request.json")
+                .status(OK)
+                .responsePayload("v2/apps/POST_{id}_copy_bits_response.json"));
+
+        CopyApplicationRequest request = CopyApplicationRequest.builder()
+                .id("test-id")
+                .sourceAppId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
+                .build();
+
+        CopyApplicationResponse expected = CopyApplicationResponse.builder()
+                .entity(JobEntity.builder()
+                        .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
+                        .status("queued")
+                        .build())
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:34Z")
+                        .id("c900719e-c70a-4c75-9e6a-9535f118acc3")
+                        .url("/v2/jobs/c900719e-c70a-4c75-9e6a-9535f118acc3")
+                        .build())
+                .build();
+
+        CopyApplicationResponse actual = Streams.wrap(this.applications.copy(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void copyError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/apps/test-id/copy_bits")
+                .requestPayload("v2/apps/POST_{id}_copy_bits_request.json")
+                .errorResponse());
+
+        CopyApplicationRequest request = CopyApplicationRequest.builder()
+                .id("test-id")
+                .sourceAppId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
+                .build();
+
+        Streams.wrap(this.applications.copy(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void copyInvalidRequest() {
+        CopyApplicationRequest request = CopyApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.copy(request)).next().get();
     }
 
     @Test
