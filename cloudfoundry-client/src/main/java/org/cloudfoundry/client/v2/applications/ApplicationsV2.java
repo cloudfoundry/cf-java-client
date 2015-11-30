@@ -33,6 +33,15 @@ public interface ApplicationsV2 {
     Publisher<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/copy_the_app_bits_for_an_app.html">Copy the app bits
+     * for an Application</a> request
+     *
+     * @param request the Copy Application request
+     * @return the response from the Copy Application request
+     */
+    Publisher<CopyApplicationResponse> copy(CopyApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request
      *
      * @param request the Create Application request

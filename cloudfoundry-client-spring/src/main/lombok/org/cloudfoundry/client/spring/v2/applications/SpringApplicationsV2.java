@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
@@ -91,6 +93,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Publisher<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request) {
         return put(request, AssociateApplicationRouteResponse.class,
                 builder -> builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
+    }
+
+    @Override
+    public Publisher<CopyApplicationResponse> copy(CopyApplicationRequest request) {
+        return post(request, CopyApplicationResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "copy_bits"));
     }
 
     @Override
