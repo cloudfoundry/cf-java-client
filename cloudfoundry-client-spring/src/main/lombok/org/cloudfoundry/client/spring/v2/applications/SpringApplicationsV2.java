@@ -43,6 +43,8 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
@@ -164,6 +166,14 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request) {
         return deleteWithResponse(request, RemoveApplicationRouteResponse.class,
                 builder -> builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
+    }
+
+    @Override
+    public Publisher<RemoveApplicationServiceBindingResponse> removeServiceBinding
+            (RemoveApplicationServiceBindingRequest request) {
+        return deleteWithResponse(request, RemoveApplicationServiceBindingResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId(), "service_bindings",
+                        request.getServiceBindingId()));
     }
 
     @Override
