@@ -46,6 +46,8 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
@@ -779,6 +781,79 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.removeRoute(request)).next().get();
+    }
+
+    @Test
+    public void removeServiceBinding() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/apps/test-id/service_bindings/test-service-binding-id")
+                .status(OK)
+                .responsePayload("v2/apps/DELETE_{id}_service-bindings_{service-binding-id}_response.json"));
+
+        RemoveApplicationServiceBindingRequest request = RemoveApplicationServiceBindingRequest.builder()
+                .id("test-id")
+                .serviceBindingId("test-service-binding-id")
+                .build();
+
+        RemoveApplicationServiceBindingResponse expected = RemoveApplicationServiceBindingResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:19Z")
+                        .id("045ad377-c172-4594-abb5-f85667ca0bf1")
+                        .url("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1")
+                        .updatedAt("2015-07-27T22:43:19Z")
+                        .build())
+                .entity(ApplicationEntity.builder()
+                        .console(false)
+                        .detectedStartCommand("")
+                        .diego(false)
+                        .diskQuota(1024)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .enableSsh(true)
+                        .eventsUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/events")
+                        .healthCheckType("port")
+                        .instances(1)
+                        .memory(1024)
+                        .name("name-702")
+                        .packageState("PENDING")
+                        .packageUpdatedAt("2015-07-27T22:43:19Z")
+                        .production(false)
+                        .routesUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/routes")
+                        .serviceBindingsUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/service_bindings")
+                        .spaceId("46215b5f-dc5c-427f-8333-171bd1a23ca7")
+                        .spaceUrl("/v2/spaces/46215b5f-dc5c-427f-8333-171bd1a23ca7")
+                        .stackId("47aa9ebe-e770-498a-a8ba-82e82b2dbfe8")
+                        .stackUrl("/v2/stacks/47aa9ebe-e770-498a-a8ba-82e82b2dbfe8")
+                        .state("STOPPED")
+                        .version("92259849-088d-458c-8073-48b95ca6d941")
+                        .build())
+                .build();
+
+        RemoveApplicationServiceBindingResponse actual = Streams.wrap(this.applications.removeServiceBinding(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeServiceBindingError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/apps/test-id/service_bindings/test-service-binding-id")
+                .errorResponse());
+
+        RemoveApplicationServiceBindingRequest request = RemoveApplicationServiceBindingRequest.builder()
+                .id("test-id")
+                .serviceBindingId("test-service-binding-id")
+                .build();
+
+        Streams.wrap(this.applications.removeServiceBinding(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeServiceBindingInvalidRequest() {
+        RemoveApplicationServiceBindingRequest request = RemoveApplicationServiceBindingRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.removeServiceBinding(request)).next().get();
     }
 
     @Test

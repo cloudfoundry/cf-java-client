@@ -68,9 +68,8 @@ public interface ApplicationsV2 {
     Publisher<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
-     * Makes the 
-     * <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">Get
-     * the instance information for a STARTED App</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_instance_information_for_a_started_app.html">
+     * Get the instance information for a STARTED App</a> request
      *
      * @param request the Get Instance Information request
      * @return the response from the Get Instance Information request
@@ -101,17 +100,27 @@ public interface ApplicationsV2 {
      * @param request the List Service Bindings request
      * @return the response from the List Service Bindings request
      */
-    Publisher<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest 
+    Publisher<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest
                                                                                   request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_route_from_the_app.html">Remove Route from
-     * the Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_route_from_the_app.html">Remove Route from the
+     * Application</a> request
      *
      * @param request the Remove Route from the Application request
      * @return the response from the Remove Route from the Application request
      */
     Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_service_binding_from_the_app.html">Remove
+     * Service Binding from the Application</a> request
+     *
+     * @param request the Remove a Service Binding from an Application request
+     * @return the response from the Remove a Service Binding from an Application request
+     */
+    Publisher<RemoveApplicationServiceBindingResponse> removeServiceBinding(RemoveApplicationServiceBindingRequest
+                                                                                    request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
@@ -140,7 +149,7 @@ public interface ApplicationsV2 {
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
     /**
-     * Makes the 
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/apps/terminate_the_running_app_instance_at_the_given_index.html">
      * Terminate Application Instance</a> request
      *
