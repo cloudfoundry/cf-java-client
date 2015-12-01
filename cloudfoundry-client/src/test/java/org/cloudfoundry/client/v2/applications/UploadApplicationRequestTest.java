@@ -25,7 +25,7 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public class UploadApplicationRequestTest {
+public final class UploadApplicationRequestTest {
 
     @Test
     public void isValid() {

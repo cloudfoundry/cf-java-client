@@ -52,6 +52,8 @@ import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.reactivestreams.Publisher;
@@ -110,18 +112,6 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     @Override
     public Publisher<Void> delete(DeleteApplicationRequest request) {
         return delete(request, builder -> builder.pathSegment("v2", "apps", request.getId()));
-    }
-
-    private <T> Stream<T> deleteWithResponse(Validatable request, Class<T> responseType,
-                                             Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
-
-            this.logger.debug("DELETE {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
-        });
     }
 
     @Override
@@ -209,6 +199,12 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
+    public Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
+        return put(request, UpdateApplicationResponse.class,
+                builder -> builder.pathSegment("v2", "apps", request.getId()));
+    }
+
+    @Override
     public Publisher<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return exchange(request, () -> {
             URI uri = UriComponentsBuilder.fromUri(this.root)
@@ -227,6 +223,18 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             this.logger.debug("PUT {}", uri);
             return this.restOperations.exchange(new RequestEntity<MultiValueMap<String, Object>>(body, PUT, uri),
                     UploadApplicationResponse.class).getBody();
+        });
+    }
+
+    private <T> Stream<T> deleteWithResponse(Validatable request, Class<T> responseType,
+                                             Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, () -> {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
+            builderCallback.accept(builder);
+            URI uri = builder.build().toUri();
+
+            this.logger.debug("DELETE {}", uri);
+            return this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
         });
     }
 
