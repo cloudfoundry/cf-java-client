@@ -55,7 +55,7 @@ public final class RestageApplicationEntity extends AbstractApplicationEntity {
                              @JsonProperty("diego") Boolean diego,
                              @JsonProperty("disk_quota") Integer diskQuota,
                              @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
-                                             dockerCredentialsJsons,
+                                     dockerCredentialsJsons,
                              @JsonProperty("docker_image") String dockerImage,
                              @JsonProperty("enable_ssh") Boolean enableSsh,
                              @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,

@@ -645,13 +645,12 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     @Test
     public void listRoutes() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/apps/test-id/routes?page=-1&route_guid=test-route-id")
+                .method(GET).path("v2/apps/test-id/routes?page=-1")
                 .status(OK)
                 .responsePayload("v2/apps/GET_{id}_routes_response.json"));
 
         ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
                 .id("test-id")
-                .routeId("test-route-id")
                 .page(-1)
                 .build();
 
@@ -665,13 +664,13 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                                 .url("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d")
                                 .build())
                         .entity(RouteEntity.builder()
-                                .applicationURL("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d/apps")
+                                .applicationUrl("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d/apps")
                                 .domainId("1f36d1d3-fcba-49dc-9320-d60ead679d35")
                                 .domainUrl("/v2/domains/1f36d1d3-fcba-49dc-9320-d60ead679d35")
                                 .host("host-14")
                                 .path("")
                                 .spaceId("dd314ba4-3690-48d1-becb-25abe5da801c")
-                                .spaceURL("/v2/spaces/dd314ba4-3690-48d1-becb-25abe5da801c")
+                                .spaceUrl("/v2/spaces/dd314ba4-3690-48d1-becb-25abe5da801c")
                                 .build())
                         .build())
                 .build();
@@ -685,12 +684,11 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listRoutesError() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/apps/test-id/routes?page=-1&route_guid=test-route-id")
+                .method(GET).path("v2/apps/test-id/routes?page=-1")
                 .errorResponse());
 
         ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
                 .id("test-id")
-                .routeId("test-route-id")
                 .page(-1)
                 .build();
 

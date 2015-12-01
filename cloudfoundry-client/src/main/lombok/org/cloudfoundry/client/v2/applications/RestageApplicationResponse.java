@@ -33,7 +33,7 @@ public final class RestageApplicationResponse extends Resource<RestageApplicatio
 
     @Builder
     RestageApplicationResponse(@JsonProperty("entity") RestageApplicationEntity entity,
-                              @JsonProperty("metadata") Resource.Metadata metadata) {
+                               @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
 
