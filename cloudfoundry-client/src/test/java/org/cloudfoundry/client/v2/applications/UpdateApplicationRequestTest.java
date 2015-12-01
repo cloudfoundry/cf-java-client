@@ -23,13 +23,12 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateApplicationRequestTest {
-    
+public final class UpdateApplicationRequestTest {
+
     @Test
     public void isValid() {
-        ValidationResult result = CreateApplicationRequest.builder()
-                .name("test-name")
-                .spaceId("test-space-id")
+        ValidationResult result = UpdateApplicationRequest.builder()
+                .id("test-id")
                 .build()
                 .isValid();
 
@@ -37,25 +36,14 @@ public final class CreateApplicationRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateApplicationRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidNoSpaceId() {
-        ValidationResult result = CreateApplicationRequest.builder()
+    public void isValidNoId() {
+        ValidationResult result = UpdateApplicationRequest.builder()
                 .name("test-name")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("space id must be specified", result.getMessages().get(0));
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }

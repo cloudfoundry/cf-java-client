@@ -158,7 +158,7 @@ public interface ApplicationsV2 {
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/apps/terminate_the_running_app_instance_at_the_given_index.html">
      * Terminate Application Instance</a> request
      *
@@ -166,6 +166,14 @@ public interface ApplicationsV2 {
      * @return the response form the Terminate Application Instance request
      */
     Publisher<Void> terminateInstance(TerminateApplicationInstanceRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/updating_an_app.html">Updating an App</a> request
+     *
+     * @param request the Update Application request
+     * @return the response from the Update Application request
+     */
+    Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/uploads_the_bits_for_an_app.html">Upload the bits for

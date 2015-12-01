@@ -56,6 +56,8 @@ import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.domains.Domain;
@@ -884,7 +886,8 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                         .build())
                 .build();
 
-        RemoveApplicationServiceBindingResponse actual = Streams.wrap(this.applications.removeServiceBinding(request)).next().get();
+        RemoveApplicationServiceBindingResponse actual = Streams.wrap(this.applications.removeServiceBinding(request))
+                .next().get();
 
         assertEquals(expected, actual);
         verify();
@@ -1166,6 +1169,80 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.terminateInstance(request)).next().get();
+    }
+
+    @Test
+    public void update() throws IOException {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/apps/test-id")
+                .requestPayload("v2/apps/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("v2/apps/PUT_{id}_response.json"));
+
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .id("test-id")
+                .name("new_name")
+                .build();
+
+        UpdateApplicationResponse expected = UpdateApplicationResponse.builder()
+                .entity(ApplicationEntity.builder()
+                        .name("new_name")
+                        .production(false)
+                        .spaceId("701aebe5-92fd-44cf-a7e6-bc54685c32ea")
+                        .stackId("2cdc06a4-cb6e-4191-9ce8-b6bca4a16aaf")
+                        .memory(1024)
+                        .instances(1)
+                        .diskQuota(1024)
+                        .state("STOPPED")
+                        .version("89c2beaa-5f16-49f2-bf8c-cbe49edf555b")
+                        .console(false)
+                        .packageState("PENDING")
+                        .healthCheckType("port")
+                        .diego(false)
+                        .packageUpdatedAt("2015-07-27T22:43:21Z")
+                        .detectedStartCommand("")
+                        .enableSsh(true)
+                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .spaceUrl("/v2/spaces/701aebe5-92fd-44cf-a7e6-bc54685c32ea")
+                        .stackUrl("/v2/stacks/2cdc06a4-cb6e-4191-9ce8-b6bca4a16aaf")
+                        .eventsUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/events")
+                        .serviceBindingsUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/service_bindings")
+                        .routesUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/routes")
+                        .build())
+                .metadata(Resource.Metadata.builder()
+                        .updatedAt("2015-07-27T22:43:21Z")
+                        .createdAt("2015-07-27T22:43:21Z")
+                        .id("0c71909b-3d44-49c3-b65d-13894d70972c")
+                        .url("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c")
+                        .build())
+                .build();
+
+        UpdateApplicationResponse actual = Streams.wrap(this.applications.update(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void updateError() throws IOException {
+        mockRequest(new RequestContext()
+                .method(PUT).path("/v2/apps/test-id")
+                .anyRequestPayload()
+                .errorResponse());
+
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.update(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void updateInvalidRequest() {
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.update(request)).next().poll();
     }
 
     @Test
