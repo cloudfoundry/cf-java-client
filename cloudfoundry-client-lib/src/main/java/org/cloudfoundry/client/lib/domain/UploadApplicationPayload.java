@@ -16,14 +16,14 @@
 
 package org.cloudfoundry.client.lib.domain;
 
+import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.io.DynamicZipInputStream;
+import org.cloudfoundry.client.lib.io.DynamicZipInputStream.Entry;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Set;
-
-import org.cloudfoundry.client.lib.archive.ApplicationArchive;
-import org.cloudfoundry.client.lib.io.DynamicZipInputStream;
-import org.cloudfoundry.client.lib.io.DynamicZipInputStream.Entry;
 
 /**
  * A payload used to upload application data. The payload data is built from a source {@link ApplicationArchive},
@@ -42,11 +42,12 @@ public class UploadApplicationPayload {
     /**
      * Create a new {@link UploadApplicationPayload}.
      *
-     * @param archive the source archive
+     * @param archive              the source archive
      * @param knownRemoteResources resources that are already known on the remote server
      * @throws IOException
      */
-    public UploadApplicationPayload(ApplicationArchive archive, CloudResources knownRemoteResources) throws IOException {
+    public UploadApplicationPayload(ApplicationArchive archive, CloudResources knownRemoteResources) throws
+            IOException {
         this.archive = archive;
         this.totalUncompressedSize = 0;
         Set<String> matches = knownRemoteResources.getFilenames();
@@ -61,6 +62,7 @@ public class UploadApplicationPayload {
 
     /**
      * Returns the source archive.
+     *
      * @return the archive
      */
     public ApplicationArchive getArchive() {
@@ -68,27 +70,28 @@ public class UploadApplicationPayload {
     }
 
     /**
-     * Returns the total size of the entries to be transfered (before compression).
-     * @return the uncompressed size of the entries.
-     */
-    public int getTotalUncompressedSize() {
-        return totalUncompressedSize;
-    }
-
-    /**
-     *
-     * @return The total number of entries to upload
-     */
-    public int getNumEntries() {
-		return entriesToUpload.size();
-    }
-
-    /**
      * Returns the payload data as an input stream.
+     *
      * @return the payload data
      */
     public InputStream getInputStream() {
         return new DynamicZipInputStream(entriesToUpload);
+    }
+
+    /**
+     * @return The total number of entries to upload
+     */
+    public int getNumEntries() {
+        return entriesToUpload.size();
+    }
+
+    /**
+     * Returns the total size of the entries to be transfered (before compression).
+     *
+     * @return the uncompressed size of the entries.
+     */
+    public int getTotalUncompressedSize() {
+        return totalUncompressedSize;
     }
 
     /**
@@ -102,12 +105,12 @@ public class UploadApplicationPayload {
             this.entry = entry;
         }
 
-        public String getName() {
-            return entry.getName();
-        }
-
         public InputStream getInputStream() throws IOException {
             return entry.getInputStream();
+        }
+
+        public String getName() {
+            return entry.getName();
         }
     }
 }

@@ -9,48 +9,52 @@ import java.util.UUID;
  * @author Scott Frederick
  */
 public class CloudServiceBinding extends CloudEntity {
-	private UUID appGuid;
-	private Map<String, Object> credentials;
-	private Map<String, Object> bindingOptions;
-	private String syslogDrainUrl;
 
-	public CloudServiceBinding() {
-		super();
-	}
+    private UUID appGuid;
 
-	public CloudServiceBinding(Meta meta, String name) {
-		super(meta, name);
-	}
+    private Map<String, Object> bindingOptions;
 
-	public UUID getAppGuid() {
-		return appGuid;
-	}
+    private Map<String, Object> credentials;
 
-	public void setAppGuid(UUID appGuid) {
-		this.appGuid = appGuid;
-	}
+    private String syslogDrainUrl;
 
-	public Map<String, Object> getCredentials() {
-		return credentials;
-	}
+    public CloudServiceBinding() {
+        super();
+    }
 
-	public void setCredentials(Map<String, Object> credentials) {
-		this.credentials = credentials;
-	}
+    public CloudServiceBinding(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public Map<String, Object> getBindingOptions() {
-		return bindingOptions;
-	}
+    public UUID getAppGuid() {
+        return appGuid;
+    }
 
-	public void setBindingOptions(Map<String, Object> bindingOptions) {
-		this.bindingOptions = bindingOptions;
-	}
+    public void setAppGuid(UUID appGuid) {
+        this.appGuid = appGuid;
+    }
 
-	public String getSyslogDrainUrl() {
-		return syslogDrainUrl;
-	}
+    public Map<String, Object> getBindingOptions() {
+        return bindingOptions;
+    }
 
-	public void setSyslogDrainUrl(String syslogDrainUrl) {
-		this.syslogDrainUrl = syslogDrainUrl;
-	}
+    public void setBindingOptions(Map<String, Object> bindingOptions) {
+        this.bindingOptions = bindingOptions;
+    }
+
+    public Map<String, Object> getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(Map<String, Object> credentials) {
+        this.credentials = credentials;
+    }
+
+    public String getSyslogDrainUrl() {
+        return syslogDrainUrl;
+    }
+
+    public void setSyslogDrainUrl(String syslogDrainUrl) {
+        this.syslogDrainUrl = syslogDrainUrl;
+    }
 }

@@ -17,124 +17,125 @@
 package org.cloudfoundry.client.lib.domain;
 
 /**
- * The staging information related to an application. Used for creating the
- * application
+ * The staging information related to an application. Used for creating the application
  *
  * @author Jennifer Hickey
  * @author Ramnivas Laddad
  * @author Scott Frederick
- *
  */
 public class Staging {
-	private String command;
-	private String buildpackUrl;
-	private String detectedBuildpack;
-	private String stack;
-	private Integer healthCheckTimeout;
 
-	/**
-	 * Default staging: No command, default buildpack
-	 */
-	public Staging() {
-		
-	}
-	
-	/**
-	 *
-	 * @param command the application command; may be null
-	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
-	 */
-	public Staging(String command, String buildpackUrl) {
-		this.command = command;
-		this.buildpackUrl = buildpackUrl;
-	}
-	
-	/**
-	 *
-	 * @param command the application command; may be null
-	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
-	 * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property, and should not be set except when parsing a response. May be null.
-	 */
-	public Staging(String command, String buildpackUrl, String detectedBuildpack) {
-		this(command, buildpackUrl);
-		this.detectedBuildpack = detectedBuildpack;
-	}
+    private String buildpackUrl;
 
-	/**
-	 *
-	 * @param command the application command; may be null
-	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
-	 * @param stack the stack to use when staging the application; may be null
-	 * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
-	 */
-	public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout) {
-		this(command, buildpackUrl);
-		this.stack = stack;
-		this.healthCheckTimeout = healthCheckTimeout;
-	}
-	
-	/**
-	 *
-	 * @param command the application command; may be null
-	 * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be null
-	 * @param stack the stack to use when staging the application; may be null
-	 * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be null
-	 * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property, and should not be set except when parsing a response. May be null.
-	 */
-	public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout, String detectedBuildpack) {
-		this(command, buildpackUrl, stack, healthCheckTimeout);
-		this.detectedBuildpack = detectedBuildpack;
-	}
+    private String command;
 
-	/**
-	 *
-	 * @return The start command to use
-	 */
-	public String getCommand() {
-		return command;
-	}
+    private String detectedBuildpack;
 
-	/**
-	 *
-	 * @return The buildpack url, or null to use the default
-	 *         buildpack detected based on application content
-	 */
-	public String getBuildpackUrl() {
-		return buildpackUrl;
-	}
+    private Integer healthCheckTimeout;
 
-	/**
-	 *
-	 * @return Raw, free-form information regarding a detected buildpack, or
-	 *         null if no detected buildpack was resolved. For example, if the
-	 *         application is stopped, the detected buildpack may be null.
-	 */
-	public String getDetectedBuildpack() {
-		return detectedBuildpack;
-	}
-	
-	/**
-	 *
-	 * @return the stack to use when staging the application, or null to use the default stack
-	 */
-	public String getStack() {
-		return stack;
-	}
+    private String stack;
 
-	/**
-	 *
-	 * @return the health check timeout value
-	 */
-	public Integer getHealthCheckTimeout() {
-		return healthCheckTimeout;
-	}
+    /**
+     * Default staging: No command, default buildpack
+     */
+    public Staging() {
 
-	@Override
-	public String toString() {
-		return "Staging [command=" + getCommand() +
-				" buildpack=" + getBuildpackUrl() +
-				" stack=" + getStack() +
-				" healthCheckTimeout=" + getHealthCheckTimeout() +
-				"]";
-	}
+    }
+
+    /**
+     * @param command      the application command; may be null
+     * @param buildpackUrl a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be
+     *                     null
+     */
+    public Staging(String command, String buildpackUrl) {
+        this.command = command;
+        this.buildpackUrl = buildpackUrl;
+    }
+
+    /**
+     * @param command           the application command; may be null
+     * @param buildpackUrl      a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may be
+     *                          null
+     * @param detectedBuildpack raw, free-form information regarding a detected buildpack. It is a read-only property,
+     *                          and should not be set except when parsing a response. May be null.
+     */
+    public Staging(String command, String buildpackUrl, String detectedBuildpack) {
+        this(command, buildpackUrl);
+        this.detectedBuildpack = detectedBuildpack;
+    }
+
+    /**
+     * @param command            the application command; may be null
+     * @param buildpackUrl       a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may
+     *                           be null
+     * @param stack              the stack to use when staging the application; may be null
+     * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be
+     *                           null
+     */
+    public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout) {
+        this(command, buildpackUrl);
+        this.stack = stack;
+        this.healthCheckTimeout = healthCheckTimeout;
+    }
+
+    /**
+     * @param command            the application command; may be null
+     * @param buildpackUrl       a custom buildpack url (e.g. https://github.com/cloudfoundry/java-buildpack.git); may
+     *                           be null
+     * @param stack              the stack to use when staging the application; may be null
+     * @param healthCheckTimeout the amount of time the platform should wait when verifying that an app started; may be
+     *                           null
+     * @param detectedBuildpack  raw, free-form information regarding a detected buildpack. It is a read-only property,
+     *                           and should not be set except when parsing a response. May be null.
+     */
+    public Staging(String command, String buildpackUrl, String stack, Integer healthCheckTimeout, String
+            detectedBuildpack) {
+        this(command, buildpackUrl, stack, healthCheckTimeout);
+        this.detectedBuildpack = detectedBuildpack;
+    }
+
+    /**
+     * @return The buildpack url, or null to use the default buildpack detected based on application content
+     */
+    public String getBuildpackUrl() {
+        return buildpackUrl;
+    }
+
+    /**
+     * @return The start command to use
+     */
+    public String getCommand() {
+        return command;
+    }
+
+    /**
+     * @return Raw, free-form information regarding a detected buildpack, or null if no detected buildpack was resolved.
+     * For example, if the application is stopped, the detected buildpack may be null.
+     */
+    public String getDetectedBuildpack() {
+        return detectedBuildpack;
+    }
+
+    /**
+     * @return the health check timeout value
+     */
+    public Integer getHealthCheckTimeout() {
+        return healthCheckTimeout;
+    }
+
+    /**
+     * @return the stack to use when staging the application, or null to use the default stack
+     */
+    public String getStack() {
+        return stack;
+    }
+
+    @Override
+    public String toString() {
+        return "Staging [command=" + getCommand() +
+                " buildpack=" + getBuildpackUrl() +
+                " stack=" + getStack() +
+                " healthCheckTimeout=" + getHealthCheckTimeout() +
+                "]";
+    }
 }

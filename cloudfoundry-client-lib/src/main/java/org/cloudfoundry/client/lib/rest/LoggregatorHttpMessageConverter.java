@@ -20,49 +20,49 @@ import java.util.Map;
  */
 public class LoggregatorHttpMessageConverter extends AbstractHttpMessageConverter<ApplicationLogs> {
 
-	private LoggregatorMessageParser messageParser = new LoggregatorMessageParser();
+    private LoggregatorMessageParser messageParser = new LoggregatorMessageParser();
 
-	public LoggregatorHttpMessageConverter() {
-		super(new MediaType("multipart", "x-protobuf"));
-	}
+    public LoggregatorHttpMessageConverter() {
+        super(new MediaType("multipart", "x-protobuf"));
+    }
 
-	@Override
-	protected boolean supports(Class<?> clazz) {
-		return ApplicationLogs.class.equals(clazz);
-	}
+    @Override
+    public boolean canWrite(MediaType mediaType) {
+        return false;
+    }
 
-	@Override
-	public boolean canWrite(MediaType mediaType) {
-		return false;
-	}
+    @Override
+    protected ApplicationLogs readInternal(Class<? extends ApplicationLogs> clazz, HttpInputMessage inputMessage)
+            throws IOException, HttpMessageNotReadableException {
+        String boundary = getMessageBoundary(inputMessage);
 
-	@Override
-	protected ApplicationLogs readInternal(Class<? extends ApplicationLogs> clazz, HttpInputMessage inputMessage)
-			throws IOException, HttpMessageNotReadableException {
-		String boundary = getMessageBoundary(inputMessage);
+        Multipart multipart = new Multipart(inputMessage.getBody(), boundary);
 
-		Multipart multipart = new Multipart(inputMessage.getBody(), boundary);
+        ApplicationLogs logs = new ApplicationLogs();
 
-		ApplicationLogs logs = new ApplicationLogs();
+        Multipart.Part part;
+        while ((part = multipart.nextPart()) != null) {
+            ApplicationLog log = messageParser.parseMessage(part.getContent());
+            logs.add(log);
+        }
 
-		Multipart.Part part;
-		while ((part = multipart.nextPart()) != null) {
-			ApplicationLog log = messageParser.parseMessage(part.getContent());
-			logs.add(log);
-		}
+        return logs;
+    }
 
-		return logs;
-	}
+    @Override
+    protected boolean supports(Class<?> clazz) {
+        return ApplicationLogs.class.equals(clazz);
+    }
 
-	@Override
-	protected void writeInternal(ApplicationLogs logs, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException {
-		throw new UnsupportedOperationException("Writing to LoggregatorHttpMessageConverter is not supported");
-	}
+    @Override
+    protected void writeInternal(ApplicationLogs logs, HttpOutputMessage outputMessage)
+            throws IOException, HttpMessageNotWritableException {
+        throw new UnsupportedOperationException("Writing to LoggregatorHttpMessageConverter is not supported");
+    }
 
-	private String getMessageBoundary(HttpInputMessage inputMessage) {
-		MediaType mediaType = inputMessage.getHeaders().getContentType();
-		Map<String, String> parameters = mediaType.getParameters();
-		return parameters.get("boundary");
-	}
+    private String getMessageBoundary(HttpInputMessage inputMessage) {
+        MediaType mediaType = inputMessage.getHeaders().getContentType();
+        Map<String, String> parameters = mediaType.getParameters();
+        return parameters.get("boundary");
+    }
 }

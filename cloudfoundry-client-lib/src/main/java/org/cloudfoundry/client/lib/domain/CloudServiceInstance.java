@@ -26,67 +26,71 @@ import java.util.Map;
  */
 public class CloudServiceInstance extends CloudEntity {
 
-	private CloudService service;
-	private CloudServicePlan servicePlan;
+    private List<CloudServiceBinding> bindings;
 
-	private String type;
-	private String dashboardUrl;
-	private Map<String, Object> credentials;
-	private List<CloudServiceBinding> bindings;
+    private Map<String, Object> credentials;
 
-	public CloudServiceInstance() {
-		super();
-	}
+    private String dashboardUrl;
 
-	public CloudServiceInstance(Meta meta, String name) {
-		super(meta, name);
-	}
+    private CloudService service;
 
-	public String getType() {
-		return type;
-	}
+    private CloudServicePlan servicePlan;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    private String type;
 
-	public String getDashboardUrl() {
-		return dashboardUrl;
-	}
+    public CloudServiceInstance() {
+        super();
+    }
 
-	public void setDashboardUrl(String dashboardUrl) {
-		this.dashboardUrl = dashboardUrl;
-	}
+    public CloudServiceInstance(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public Map<String, Object> getCredentials() {
-		return credentials;
-	}
+    public List<CloudServiceBinding> getBindings() {
+        return bindings;
+    }
 
-	public void setCredentials(Map<String, Object> credentials) {
-		this.credentials = credentials;
-	}
+    public void setBindings(List<CloudServiceBinding> bindings) {
+        this.bindings = bindings;
+    }
 
-	public List<CloudServiceBinding> getBindings() {
-		return bindings;
-	}
+    public Map<String, Object> getCredentials() {
+        return credentials;
+    }
 
-	public void setBindings(List<CloudServiceBinding> bindings) {
-		this.bindings = bindings;
-	}
+    public void setCredentials(Map<String, Object> credentials) {
+        this.credentials = credentials;
+    }
 
-	public CloudService getService() {
-		return service;
-	}
+    public String getDashboardUrl() {
+        return dashboardUrl;
+    }
 
-	public void setService(CloudService service) {
-		this.service = service;
-	}
+    public void setDashboardUrl(String dashboardUrl) {
+        this.dashboardUrl = dashboardUrl;
+    }
 
-	public CloudServicePlan getServicePlan() {
-		return servicePlan;
-	}
+    public CloudService getService() {
+        return service;
+    }
 
-	public void setServicePlan(CloudServicePlan servicePlan) {
-		this.servicePlan = servicePlan;
-	}
+    public void setService(CloudService service) {
+        this.service = service;
+    }
+
+    public CloudServicePlan getServicePlan() {
+        return servicePlan;
+    }
+
+    public void setServicePlan(CloudServicePlan servicePlan) {
+        this.servicePlan = servicePlan;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

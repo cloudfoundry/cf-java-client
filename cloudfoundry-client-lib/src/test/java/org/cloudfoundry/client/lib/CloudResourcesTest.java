@@ -16,9 +16,14 @@
 
 package org.cloudfoundry.client.lib;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import org.cloudfoundry.client.lib.archive.ApplicationArchive;
+import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
+import org.cloudfoundry.client.lib.domain.CloudResource;
+import org.cloudfoundry.client.lib.domain.CloudResources;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,14 +35,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipFile;
 
-import org.cloudfoundry.client.lib.archive.ApplicationArchive;
-import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
-import org.cloudfoundry.client.lib.domain.CloudResource;
-import org.cloudfoundry.client.lib.domain.CloudResources;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Test;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link org.cloudfoundry.client.lib.domain.CloudResources}.
@@ -48,16 +48,21 @@ public class CloudResourcesTest {
 
     private static final String SHA = "677E1B9BCA206D6534054348511BF41129744839";
 
-    private static final String JSON = "[{\"size\":93,\"sha1\":\"" + SHA + "\",\"fn\":\"index.html\"}]";
+    private static final String JSON = "[{\"sha1\":\"" + SHA + "\",\"size\":93,\"fn\":\"index.html\"}]";
 
     private ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    public void shouldSerialize() throws Exception {
-        CloudResource r = new CloudResource("index.html", 93L, SHA);
-        CloudResources o = new CloudResources(Collections.singleton(r));
-        String s = mapper.writeValueAsString(o);
-        assertThat(s, is(equalTo(JSON)));
+    public void shouldCreateFromIterator() throws Exception {
+        Iterator<? extends CloudResource> i = Collections.singleton(new CloudResource("index.html", 93L, SHA))
+                .iterator();
+        CloudResources o = new CloudResources(i);
+        List<CloudResource> l = o.asList();
+        assertThat(l.size(), is(1));
+        CloudResource r = l.get(0);
+        assertThat(r.getFilename(), is("index.html"));
+        assertThat(r.getSha1(), is(SHA));
+        assertThat(r.getSize(), is(93L));
     }
 
     @Test
@@ -72,15 +77,13 @@ public class CloudResourcesTest {
     }
 
     @Test
-    public void shouldCreateFromIterator() throws Exception {
-        Iterator<? extends CloudResource> i = Collections.singleton(new CloudResource("index.html", 93L, SHA)).iterator();
-        CloudResources o = new CloudResources(i);
-        List<CloudResource> l = o.asList();
-        assertThat(l.size(), is(1));
-        CloudResource r = l.get(0);
-        assertThat(r.getFilename(), is("index.html"));
-        assertThat(r.getSha1(), is(SHA));
-        assertThat(r.getSize(), is(93L));
+    public void shouldGetFilenames() throws Exception {
+        List<CloudResource> resources = new ArrayList<CloudResource>();
+        resources.add(new CloudResource("1", 93L, SHA));
+        resources.add(new CloudResource("2", 93L, SHA));
+        CloudResources o = new CloudResources(resources);
+        Set<String> expected = new HashSet<String>(Arrays.asList("1", "2"));
+        assertThat(o.getFilenames(), is(expected));
     }
 
     @Test
@@ -98,12 +101,10 @@ public class CloudResourcesTest {
     }
 
     @Test
-    public void shouldGetFilenames() throws Exception {
-        List<CloudResource> resources = new ArrayList<CloudResource>();
-        resources.add(new CloudResource("1", 93L, SHA));
-        resources.add(new CloudResource("2", 93L, SHA));
-        CloudResources o = new CloudResources(resources);
-        Set<String> expected = new HashSet<String>(Arrays.asList("1", "2"));
-        assertThat(o.getFilenames(), is(expected));
+    public void shouldSerialize() throws Exception {
+        CloudResource r = new CloudResource("index.html", 93L, SHA);
+        CloudResources o = new CloudResources(Collections.singleton(r));
+        String s = mapper.writeValueAsString(o);
+        assertThat(s, is(equalTo(JSON)));
     }
 }

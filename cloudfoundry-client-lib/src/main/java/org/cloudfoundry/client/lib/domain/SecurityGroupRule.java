@@ -13,72 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.client.lib.domain;
 
 /**
  * A single rule within a security group. See <a href="http://docs.cloudfoundry.org/adminguide/app-sec-groups.html">
  * http://docs.cloudfoundry.org/adminguide/app-sec-groups.html</a> for more details.
- * 
+ *
  * @author David Ehringer
  * @see http://docs.cloudfoundry.org/adminguide/app-sec-groups.html
  */
 public class SecurityGroupRule {
 
-	private final String protocol;
-	private final String ports;
-	private final String destination;
-	private final Boolean log;
-	private final Integer type;
-	private final Integer code;
-	
-	public SecurityGroupRule(String protocol, String ports, String destination) {
-		this(protocol, ports, destination, null);
-	}
-	
-	public SecurityGroupRule(String protocol, String ports, String destination, Boolean log) {
-		this(protocol, ports, destination, log, null, null);
-	}
-	
-	/**
-	 * 
-	 * @param protocol network protocol (tcp,icmp,udp,all)
-	 * @param ports port or port range (applicable for tcp,udp,all), may be conditionally <code>null</code>
-	 * @param destination destination CIDR or destination range
-	 * @param log enables logging for the egress rule, may be <code>null</code>
-	 * @param type control signal for icmp, may be <code>null</code>
-	 * @param code control signal for icmp, may be <code>null</code>
-	 */
-	public SecurityGroupRule(String protocol, String ports, String destination, Boolean log, Integer type, Integer code) {
-		this.protocol = protocol;
-		this.ports = ports;
-		this.destination = destination;
-		this.log = log;
-		this.type = type;
-		this.code = code;
-	}
+    private final Integer code;
 
-	public String getProtocol() {
-		return protocol;
-	}
-	
-	public String getPorts() {
-		return ports;
-	}
-	
-	public String getDestination() {
-		return destination;
-	}
+    private final String destination;
 
-	public Boolean getLog() {
-		return log;
-	}
+    private final Boolean log;
 
-	public Integer getType() {
-		return type;
-	}
+    private final String ports;
 
-	public Integer getCode() {
-		return code;
-	}
-	
+    private final String protocol;
+
+    private final Integer type;
+
+    public SecurityGroupRule(String protocol, String ports, String destination) {
+        this(protocol, ports, destination, null);
+    }
+
+    public SecurityGroupRule(String protocol, String ports, String destination, Boolean log) {
+        this(protocol, ports, destination, log, null, null);
+    }
+
+    /**
+     * @param protocol    network protocol (tcp,icmp,udp,all)
+     * @param ports       port or port range (applicable for tcp,udp,all), may be conditionally <code>null</code>
+     * @param destination destination CIDR or destination range
+     * @param log         enables logging for the egress rule, may be <code>null</code>
+     * @param type        control signal for icmp, may be <code>null</code>
+     * @param code        control signal for icmp, may be <code>null</code>
+     */
+    public SecurityGroupRule(String protocol, String ports, String destination, Boolean log, Integer type, Integer
+            code) {
+        this.protocol = protocol;
+        this.ports = ports;
+        this.destination = destination;
+        this.log = log;
+        this.type = type;
+        this.code = code;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public Boolean getLog() {
+        return log;
+    }
+
+    public String getPorts() {
+        return ports;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
 }

@@ -16,7 +16,8 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,231 +25,245 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility
+        .NONE)
 public class CloudApplication extends CloudEntity {
 
-	private static final String COMMAND_KEY = "command";
-	private static final String BUILDPACK_URL_KEY = "buildpack";
-	private static final String DETECTED_BUILDPACK_KEY = "detected_buildpack";
-	private static final String MEMORY_KEY = "memory";
-	private static final String DISK_KEY = "disk_quota";
+    private static final String BUILDPACK_URL_KEY = "buildpack";
 
-	private CloudSpace space;
-	private Staging staging;
-	private int instances;
-	private int memory;
-	private int diskQuota;
-	private List<String> uris;
-	private List<String> services;
-	private AppState state;
-	private DebugMode debug;
-	private int runningInstances;
-	private List<String> env = new ArrayList<String>();
+    private static final String COMMAND_KEY = "command";
 
-	public CloudApplication(Meta meta, String name) {
-		super(meta, name);
-	}
+    private static final String DETECTED_BUILDPACK_KEY = "detected_buildpack";
 
-	public CloudApplication(String name, String command, String buildpackUrl, int memory, int instances,
-						List<String> uris, List<String> serviceNames,
-						AppState state) {
-		super(CloudEntity.Meta.defaultMeta(), name);
-		this.staging = new Staging(command, buildpackUrl);
-		this.memory = memory;
-		this.instances = instances;
-		this.uris = uris;
-		this.services = serviceNames;
-		this.state = state;
-	}
+    private static final String DISK_KEY = "disk_quota";
 
-	@SuppressWarnings("unchecked")
-	public CloudApplication(Map<String, Object> attributes) {
-		super(CloudEntity.Meta.defaultMeta(), parse(attributes.get("name")));
-		instances = (Integer)attributes.get("instances");
-		Integer runningInstancesAttribute = (Integer) attributes.get("runningInstances");
-		if (runningInstancesAttribute != null) {
-			runningInstances = runningInstancesAttribute;
-		}
-		uris = (List<String>)attributes.get("uris");
-		services = (List<String>)attributes.get("services");
-		state = AppState.valueOf((String) attributes.get("state"));
-		if (attributes.containsKey("memory")) {
-			memory = (Integer) attributes.get("memory");
-		}
-		if (attributes.containsKey("disk_quota")) {
-			diskQuota = (Integer) attributes.get("disk_quota");
-		}
-		env = (List<String>) attributes.get("env");
+    private static final String MEMORY_KEY = "memory";
 
-		Map<String, Object> metaValue = parse(Map.class,
-				attributes.get("meta"));
-		if (metaValue != null) {
-			String debugAttribute = (String) metaValue.get("debug");
-			if (debugAttribute != null) {
-				debug = DebugMode.valueOf(debugAttribute);
-			}
-			long created = parse(Long.class, metaValue.get("created"));
-			Date createdDate = created != 0 ? new Date(created * 1000) : null;
-			setMeta(new Meta(null, createdDate, null));
+    private DebugMode debug;
 
-			String command = null;
-			if (metaValue.containsKey(COMMAND_KEY)) {
-				command = (String) metaValue.get(COMMAND_KEY);
-			}
-			String buildpackUrl = null;
-			if (metaValue.containsKey(BUILDPACK_URL_KEY)) {
-				buildpackUrl = (String) metaValue.get(BUILDPACK_URL_KEY);
-			}
-			String detectedBuildpack = null;
-			if (metaValue.containsKey(DETECTED_BUILDPACK_KEY)) {
-				detectedBuildpack = (String) metaValue.get(DETECTED_BUILDPACK_KEY);
-			}
-			
-			setStaging(new Staging(command, buildpackUrl, detectedBuildpack));
-		}
-	}
+    private int diskQuota;
 
-	public CloudSpace getSpace() {
-		return space;
-	}
+    private List<String> env = new ArrayList<String>();
 
-	public void setSpace(CloudSpace space) {
-		this.space = space;
-	}
+    private int instances;
 
-	public enum AppState {
-		UPDATING, STARTED, STOPPED
-	}
+    private int memory;
 
-	public enum DebugMode {
-		run,
-		suspend
-	}
+    private int runningInstances;
 
-	public Staging getStaging() {
-		return staging;
-	}
+    private List<String> services;
 
-	public void setStaging(Staging staging) {
-		this.staging = staging;
-	}
+    private CloudSpace space;
 
-	// for backward compatibility
-	public Map<String,Integer> getResources() {
-		Map<String, Integer> resources = new HashMap<String, Integer>();
-		resources.put(MEMORY_KEY, memory);
-		resources.put(DISK_KEY, diskQuota);
-		return resources;
-	}
+    private Staging staging;
 
-	public int getInstances() {
-		return instances;
-	}
+    private AppState state;
 
-	public void setInstances(int instances) {
-		this.instances = instances;
-	}
+    private List<String> uris;
 
-	public int getDiskQuota() {
-		return diskQuota;
-	}
+    public CloudApplication(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public void setDiskQuota(int diskQuota) {
-		this.diskQuota = diskQuota;
-	}
+    public CloudApplication(String name, String command, String buildpackUrl, int memory, int instances,
+                            List<String> uris, List<String> serviceNames,
+                            AppState state) {
+        super(CloudEntity.Meta.defaultMeta(), name);
+        this.staging = new Staging(command, buildpackUrl);
+        this.memory = memory;
+        this.instances = instances;
+        this.uris = uris;
+        this.services = serviceNames;
+        this.state = state;
+    }
 
-	public int getMemory() {
-		return memory;
-	}
+    @SuppressWarnings("unchecked")
+    public CloudApplication(Map<String, Object> attributes) {
+        super(CloudEntity.Meta.defaultMeta(), parse(attributes.get("name")));
+        instances = (Integer) attributes.get("instances");
+        Integer runningInstancesAttribute = (Integer) attributes.get("runningInstances");
+        if (runningInstancesAttribute != null) {
+            runningInstances = runningInstancesAttribute;
+        }
+        uris = (List<String>) attributes.get("uris");
+        services = (List<String>) attributes.get("services");
+        state = AppState.valueOf((String) attributes.get("state"));
+        if (attributes.containsKey("memory")) {
+            memory = (Integer) attributes.get("memory");
+        }
+        if (attributes.containsKey("disk_quota")) {
+            diskQuota = (Integer) attributes.get("disk_quota");
+        }
+        env = (List<String>) attributes.get("env");
 
-	public void setMemory(int memory) {
-		this.memory = memory;
-	}
+        Map<String, Object> metaValue = parse(Map.class,
+                attributes.get("meta"));
+        if (metaValue != null) {
+            String debugAttribute = (String) metaValue.get("debug");
+            if (debugAttribute != null) {
+                debug = DebugMode.valueOf(debugAttribute);
+            }
+            long created = parse(Long.class, metaValue.get("created"));
+            Date createdDate = created != 0 ? new Date(created * 1000) : null;
+            setMeta(new Meta(null, createdDate, null));
 
-	public List<String> getUris() {
-		return uris;
-	}
+            String command = null;
+            if (metaValue.containsKey(COMMAND_KEY)) {
+                command = (String) metaValue.get(COMMAND_KEY);
+            }
+            String buildpackUrl = null;
+            if (metaValue.containsKey(BUILDPACK_URL_KEY)) {
+                buildpackUrl = (String) metaValue.get(BUILDPACK_URL_KEY);
+            }
+            String detectedBuildpack = null;
+            if (metaValue.containsKey(DETECTED_BUILDPACK_KEY)) {
+                detectedBuildpack = (String) metaValue.get(DETECTED_BUILDPACK_KEY);
+            }
 
-	public void setUris(List<String> uris) {
-		this.uris = uris;
-	}
+            setStaging(new Staging(command, buildpackUrl, detectedBuildpack));
+        }
+    }
 
-	public AppState getState() {
-		return state;
-	}
+    public DebugMode getDebug() {
+        return debug;
+    }
 
-	public void setState(AppState state) {
-		this.state = state;
-	}
+    public void setDebug(DebugMode debug) {
+        this.debug = debug;
+    }
 
-	public DebugMode getDebug() {
-		return debug;
-	}
+    public int getDiskQuota() {
+        return diskQuota;
+    }
 
-	public void setDebug(DebugMode debug) {
-		this.debug = debug;
-	}
+    public void setDiskQuota(int diskQuota) {
+        this.diskQuota = diskQuota;
+    }
 
-	public List<String> getServices() {
-		return services;
-	}
+    public List<String> getEnv() {
+        return env;
+    }
 
-	public void setServices(List<String> services) {
-		this.services = services;
-	}
+    public void setEnv(Map<Object, Object> env) {
+        List<String> joined = new ArrayList<String>();
+        for (Map.Entry<Object, Object> entry : env.entrySet()) {
+            // skip this environment variable if the key is null
+            if (null == entry.getKey()) {
+                continue;
+            }
 
-	public int getRunningInstances() {
-		return runningInstances;
-	}
+            String value;
+            // check that there is a value. If it is null, the value should be an empty string
+            if (null == entry.getValue()) {
+                value = "";
+            } else {
+                value = entry.getValue().toString();
+            }
 
-	public void setRunningInstances(int runningInstances) {
-		this.runningInstances = runningInstances;
-	}
+            joined.add(entry.getKey().toString() + '=' + value);
+        }
 
-	public Map<String, String> getEnvAsMap() {
-		Map<String, String> envMap = new HashMap<String, String>();
-		for (String nameAndValue : env) {
-			String[] parts = nameAndValue.split("=", 2);
-			envMap.put(parts[0], parts.length == 2 && parts[1].length() > 0 ? parts[1] : null);
-		}
-		return envMap;
-	}
+        this.env = joined;
+    }
 
-	public List<String> getEnv() {
-		return env;
-	}
+    public Map<String, String> getEnvAsMap() {
+        Map<String, String> envMap = new HashMap<String, String>();
+        for (String nameAndValue : env) {
+            String[] parts = nameAndValue.split("=", 2);
+            envMap.put(parts[0], parts.length == 2 && parts[1].length() > 0 ? parts[1] : null);
+        }
+        return envMap;
+    }
 
-	public void setEnv(Map<Object, Object> env) {
-		List<String> joined = new ArrayList<String>();
-		for (Map.Entry<Object, Object> entry : env.entrySet()) {
-			// skip this environment variable if the key is null
-			if (null == entry.getKey()) {
-				continue;
-			}
+    public int getInstances() {
+        return instances;
+    }
 
-			String value;
-			// check that there is a value. If it is null, the value should be an empty string
-			if(null == entry.getValue()) {
-				value = "";
-			} else {
-				value = entry.getValue().toString();
-			}
+    public void setInstances(int instances) {
+        this.instances = instances;
+    }
 
-			joined.add(entry.getKey().toString() + '=' + value);
-		}
+    public int getMemory() {
+        return memory;
+    }
 
-		this.env = joined;
-	}
+    public void setMemory(int memory) {
+        this.memory = memory;
+    }
 
-	@Override
-	public String toString() {
-		return "CloudApplication [staging=" + staging + ", instances="
-				+ instances + ", name=" + getName() 
-				+ ", memory=" + memory + ", diskQuota=" + diskQuota
-				+ ", state=" + state + ", debug=" + debug + ", uris=" + uris + ", services=" + services
-				+ ", env=" + env + ", space=" + space.getName() + "]";
-	}
+    // for backward compatibility
+    public Map<String, Integer> getResources() {
+        Map<String, Integer> resources = new HashMap<String, Integer>();
+        resources.put(MEMORY_KEY, memory);
+        resources.put(DISK_KEY, diskQuota);
+        return resources;
+    }
+
+    public int getRunningInstances() {
+        return runningInstances;
+    }
+
+    public void setRunningInstances(int runningInstances) {
+        this.runningInstances = runningInstances;
+    }
+
+    public List<String> getServices() {
+        return services;
+    }
+
+    public void setServices(List<String> services) {
+        this.services = services;
+    }
+
+    public CloudSpace getSpace() {
+        return space;
+    }
+
+    public void setSpace(CloudSpace space) {
+        this.space = space;
+    }
+
+    public Staging getStaging() {
+        return staging;
+    }
+
+    public void setStaging(Staging staging) {
+        this.staging = staging;
+    }
+
+    public AppState getState() {
+        return state;
+    }
+
+    public void setState(AppState state) {
+        this.state = state;
+    }
+
+    public List<String> getUris() {
+        return uris;
+    }
+
+    public void setUris(List<String> uris) {
+        this.uris = uris;
+    }
+
+    @Override
+    public String toString() {
+        return "CloudApplication [staging=" + staging + ", instances="
+                + instances + ", name=" + getName()
+                + ", memory=" + memory + ", diskQuota=" + diskQuota
+                + ", state=" + state + ", debug=" + debug + ", uris=" + uris + ", services=" + services
+                + ", env=" + env + ", space=" + space.getName() + "]";
+    }
+
+    public enum AppState {
+        UPDATING, STARTED, STOPPED
+    }
+
+    public enum DebugMode {
+        run,
+        suspend
+    }
 }

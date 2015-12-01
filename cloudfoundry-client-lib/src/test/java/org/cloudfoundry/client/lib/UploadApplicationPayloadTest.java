@@ -16,14 +16,6 @@
 
 package org.cloudfoundry.client.lib;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipFile;
-
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
 import org.cloudfoundry.client.lib.domain.CloudResource;
@@ -31,6 +23,14 @@ import org.cloudfoundry.client.lib.domain.CloudResources;
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipFile;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests for {@link org.cloudfoundry.client.lib.domain.UploadApplicationPayload}.

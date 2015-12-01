@@ -1,0 +1,33 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="non-ascii-file-name:war exploded">
+    <output-path>$PROJECT_DIR$/cf-java-client-test-apps/non-ascii-file-name/target/non-ascii-file-name-0.1.0.BUILD-SNAPSHOT</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="non-ascii-file-name" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.springframework:spring-context:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-aop:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: aopalliance:aopalliance:1.0" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-beans:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-core:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-expression:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-web:3.2.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.aspectj:aspectjrt:1.6.9" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.5.10" />
+          <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.5.10" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-log4j12:1.5.10" />
+          <element id="library" level="project" name="Maven: log4j:log4j:1.2.15" />
+          <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
+          <element id="library" level="project" name="Maven: javax.servlet:jstl:1.2" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/cf-java-client-test-apps/non-ascii-file-name/target/non-ascii-file-name-0.1.0.BUILD-SNAPSHOT/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="non-ascii-file-name/web/Web" />
+    </root>
+  </artifact>
+</component>

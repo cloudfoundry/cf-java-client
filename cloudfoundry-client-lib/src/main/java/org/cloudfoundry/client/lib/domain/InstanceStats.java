@@ -27,133 +27,146 @@ import static org.cloudfoundry.client.lib.util.CloudUtil.parse;
 
 public class InstanceStats {
 
-	public static class Usage {
+    private int cores;
 
-		private double cpu;
-		private long disk;
-		private long mem;
-		private Date time;
+    private long diskQuota;
 
-		public Usage(Map<String, Object> attributes) {
-			this.time = parseDate(parse(String.class, attributes.get("time")));
-			this.cpu = parse(Double.class, attributes.get("cpu"));
-			this.disk = parse(Long.class, attributes.get("disk"));
-			this.mem = parse(Long.class, attributes.get("mem"));
-		}
+    private int fdsQuota;
 
-		public double getCpu() {
-			return cpu;
-		}
+    private String host;
 
-		public long getDisk() {
-			return disk;
-		}
+    private String id;
 
-		public long getMem() {
-			return mem;
-		}
+    private long memQuota;
 
-		public Date getTime() {
-			return time;
-		}
-	}
+    private String name;
 
-	private int cores;
-	private long diskQuota;
-	private int fdsQuota;
-	private String host;
-	private String id;
-	private long memQuota;
-	private String name;
-	private int port;
-	private InstanceState state;
-	private double uptime;
-	private List<String> uris;
-	private Usage usage;
+    private int port;
 
-	@SuppressWarnings("unchecked")
-	public InstanceStats(String id, Map<String, Object> attributes) {
-		this.id = id;
-		String instanceState = parse(String.class, attributes.get("state"));
-		this.state = InstanceState.valueOfWithDefault(instanceState);
-		Map<String, Object> stats = parse(Map.class, attributes.get("stats"));
-		if (stats != null) {
-			this.cores = parse(Integer.class, stats.get("cores"));
-			this.name = parse(String.class, stats.get("name"));
-			Map<String, Object> usageValue = parse(Map.class,
-					stats.get("usage"));
-			if (usageValue != null) {
-				this.usage = new Usage(usageValue);
-			}
-			this.diskQuota = parse(Long.class, stats.get("disk_quota"));
-			this.port = parse(Integer.class, stats.get("port"));
-			this.memQuota = parse(Long.class, stats.get("mem_quota"));
-			List<String> statsValue = parse(List.class, stats.get("uris"));
-			if (statsValue != null) {
-				this.uris = Collections.unmodifiableList(statsValue);
-			}
-			this.fdsQuota = parse(Integer.class, stats.get("fds_quota"));
-			this.host = parse(String.class, stats.get("host"));
-			this.uptime = parse(Double.class, stats.get("uptime"));
-		}
-	}
+    private InstanceState state;
 
-	private static Date parseDate(String date) {
-		// dates will be of the form 2011-04-07 09:11:50 +0000
-		try {
-			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss ZZZZZ").parse(date);
-		}
-		catch (ParseException e) {
-			// TODO - not sure how best to handle this error
-			return null;
-		}
-	}
+    private double uptime;
 
-	public int getCores() {
-		return cores;
-	}
+    private List<String> uris;
 
-	public long getDiskQuota() {
-		return diskQuota;
-	}
+    private Usage usage;
 
-	public int getFdsQuota() {
-		return fdsQuota;
-	}
+    @SuppressWarnings("unchecked")
+    public InstanceStats(String id, Map<String, Object> attributes) {
+        this.id = id;
+        String instanceState = parse(String.class, attributes.get("state"));
+        this.state = InstanceState.valueOfWithDefault(instanceState);
+        Map<String, Object> stats = parse(Map.class, attributes.get("stats"));
+        if (stats != null) {
+            this.cores = parse(Integer.class, stats.get("cores"));
+            this.name = parse(String.class, stats.get("name"));
+            Map<String, Object> usageValue = parse(Map.class,
+                    stats.get("usage"));
+            if (usageValue != null) {
+                this.usage = new Usage(usageValue);
+            }
+            this.diskQuota = parse(Long.class, stats.get("disk_quota"));
+            this.port = parse(Integer.class, stats.get("port"));
+            this.memQuota = parse(Long.class, stats.get("mem_quota"));
+            List<String> statsValue = parse(List.class, stats.get("uris"));
+            if (statsValue != null) {
+                this.uris = Collections.unmodifiableList(statsValue);
+            }
+            this.fdsQuota = parse(Integer.class, stats.get("fds_quota"));
+            this.host = parse(String.class, stats.get("host"));
+            this.uptime = parse(Double.class, stats.get("uptime"));
+        }
+    }
 
-	public String getHost() {
-		return host;
-	}
+    private static Date parseDate(String date) {
+        // dates will be of the form 2011-04-07 09:11:50 +0000
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss ZZZZZ").parse(date);
+        } catch (ParseException e) {
+            // TODO - not sure how best to handle this error
+            return null;
+        }
+    }
 
-	public String getId() {
-		return id;
-	}
+    public int getCores() {
+        return cores;
+    }
 
-	public long getMemQuota() {
-		return memQuota;
-	}
+    public long getDiskQuota() {
+        return diskQuota;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public int getFdsQuota() {
+        return fdsQuota;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public InstanceState getState() {
-		return state;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public double getUptime() {
-		return uptime;
-	}
+    public long getMemQuota() {
+        return memQuota;
+    }
 
-	public List<String> getUris() {
-		return uris;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Usage getUsage() {
-		return usage;
-	}
+    public int getPort() {
+        return port;
+    }
+
+    public InstanceState getState() {
+        return state;
+    }
+
+    public double getUptime() {
+        return uptime;
+    }
+
+    public List<String> getUris() {
+        return uris;
+    }
+
+    public Usage getUsage() {
+        return usage;
+    }
+
+    public static class Usage {
+
+        private double cpu;
+
+        private long disk;
+
+        private long mem;
+
+        private Date time;
+
+        public Usage(Map<String, Object> attributes) {
+            this.time = parseDate(parse(String.class, attributes.get("time")));
+            this.cpu = parse(Double.class, attributes.get("cpu"));
+            this.disk = parse(Long.class, attributes.get("disk"));
+            this.mem = parse(Long.class, attributes.get("mem"));
+        }
+
+        public double getCpu() {
+            return cpu;
+        }
+
+        public long getDisk() {
+            return disk;
+        }
+
+        public long getMem() {
+            return mem;
+        }
+
+        public Date getTime() {
+            return time;
+        }
+    }
 }

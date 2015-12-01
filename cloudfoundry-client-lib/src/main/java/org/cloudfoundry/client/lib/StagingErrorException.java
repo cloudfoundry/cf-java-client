@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.client.lib;
 
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ import org.springframework.http.HttpStatus;
 @SuppressWarnings("serial")
 public class StagingErrorException extends CloudFoundryException {
 
-	public static final int ERROR_CODE = 170001;
+    public static final int ERROR_CODE = 170001;
 
-	public StagingErrorException(HttpStatus statusCode, String statusText) {
-		super(statusCode, statusText, ERROR_CODE);
-	}
+    public StagingErrorException(HttpStatus statusCode, String statusText) {
+        super(statusCode, statusText, ERROR_CODE);
+    }
 
 }

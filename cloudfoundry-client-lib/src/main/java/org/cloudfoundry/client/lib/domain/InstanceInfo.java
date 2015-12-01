@@ -22,38 +22,43 @@ import java.util.Date;
 import java.util.Map;
 
 public class InstanceInfo {
-	private final Date since;
-	private final int index;
-	private final InstanceState state;
-	private final String debugIp;
-	private final int debugPort;
 
-	public InstanceInfo(Map<String, Object> infoMap) {
-		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
-		index = CloudUtil.parse(Integer.class, infoMap.get("index"));
-		String instanceState = CloudUtil.parse(String.class, infoMap.get("state"));
-		state = InstanceState.valueOfWithDefault(instanceState);
-		debugIp = CloudUtil.parse(String.class, infoMap.get("debug_ip"));
-		debugPort = CloudUtil.parse(Integer.class, infoMap.get("debug_port"));
-	}
+    private final String debugIp;
 
-	public Date getSince() {
-		return since;
-	}
+    private final int debugPort;
 
-	public int getIndex() {
-		return index;
-	}
+    private final int index;
 
-	public InstanceState getState() {
-		return state;
-	}
+    private final Date since;
 
-	public String getDebugIp() {
-		return debugIp;
-	}
+    private final InstanceState state;
 
-	public int getDebugPort() {
-		return debugPort;
-	}
+    public InstanceInfo(Map<String, Object> infoMap) {
+        since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
+        index = CloudUtil.parse(Integer.class, infoMap.get("index"));
+        String instanceState = CloudUtil.parse(String.class, infoMap.get("state"));
+        state = InstanceState.valueOfWithDefault(instanceState);
+        debugIp = CloudUtil.parse(String.class, infoMap.get("debug_ip"));
+        debugPort = CloudUtil.parse(Integer.class, infoMap.get("debug_port"));
+    }
+
+    public String getDebugIp() {
+        return debugIp;
+    }
+
+    public int getDebugPort() {
+        return debugPort;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public Date getSince() {
+        return since;
+    }
+
+    public InstanceState getState() {
+        return state;
+    }
 }

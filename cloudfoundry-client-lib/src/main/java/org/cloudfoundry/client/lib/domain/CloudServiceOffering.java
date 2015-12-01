@@ -21,96 +21,105 @@ import java.util.List;
 
 public class CloudServiceOffering extends CloudEntity {
 
-	//Note name is used for label
-	private String provider;
-	private String version;
-	private String description;
-	private boolean active;
-	private boolean bindable;
-	private String url;
-	private String infoUrl;
-	private String uniqueId;
-	private String extra;
-	private String docUrl;
-	
-	private List<CloudServicePlan> cloudServicePlans = new ArrayList<CloudServicePlan>();
+    private boolean active;
 
-	public CloudServiceOffering(Meta meta, String name) {
-		super(meta, name);
-	}
+    private boolean bindable;
 
-	public CloudServiceOffering(Meta meta, String name, String provider, String version) {
-		super(meta, name);
-		this.provider = provider;
-		this.version = version;
-	}
+    private List<CloudServicePlan> cloudServicePlans = new ArrayList<CloudServicePlan>();
 
-	public CloudServiceOffering(Meta meta, String name, String provider, String version, 
-								String description, boolean active, boolean bindable,
-								String url, String infoUrl, String uniqueId, String extra,
-								String docUrl) {
-		super(meta, name);
-		this.provider = provider;
-		this.version = version;
-		this.description = description;
-		this.active = active;
-		this.bindable = bindable;
-		this.url = url;
-		this.infoUrl = infoUrl;
-		this.uniqueId = uniqueId;
-		this.extra = extra;
-		this.docUrl = docUrl;
-	}
+    private String description;
 
-	public String getLabel() {
-		return getName();
-	}
+    private String docUrl;
 
-	public String getDescription() {
-		return description;
-	}
+    private String extra;
 
-	public String getProvider() {
-		return provider;
-	}
+    private String infoUrl;
 
-	public String getVersion() {
-		return version;
-	}
+    //Note name is used for label
+    private String provider;
 
-	public boolean isActive() {
-		return active;
-	}
+    private String uniqueId;
 
-	public boolean isBindable() {
-		return bindable;
-	}
+    private String url;
 
-	public String getUrl() {
-		return url;
-	}
+    private String version;
 
-	public String getInfoUrl() {
-		return infoUrl;
-	}
+    public CloudServiceOffering(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public String getUniqueId() {
-		return uniqueId;
-	}
+    public CloudServiceOffering(Meta meta, String name, String provider, String version) {
+        super(meta, name);
+        this.provider = provider;
+        this.version = version;
+    }
 
-	public String getExtra() {
-		return extra;
-	}
+    public CloudServiceOffering(Meta meta, String name, String provider, String version,
+                                String description, boolean active, boolean bindable,
+                                String url, String infoUrl, String uniqueId, String extra,
+                                String docUrl) {
+        super(meta, name);
+        this.provider = provider;
+        this.version = version;
+        this.description = description;
+        this.active = active;
+        this.bindable = bindable;
+        this.url = url;
+        this.infoUrl = infoUrl;
+        this.uniqueId = uniqueId;
+        this.extra = extra;
+        this.docUrl = docUrl;
+    }
 
-	public String getDocumentationUrl() {
-		return docUrl;
-	}
+    public void addCloudServicePlan(CloudServicePlan cloudServicePlan) {
+        this.cloudServicePlans.add(cloudServicePlan);
+    }
 
-	public List<CloudServicePlan> getCloudServicePlans() {
-		return cloudServicePlans;
-	}
+    public List<CloudServicePlan> getCloudServicePlans() {
+        return cloudServicePlans;
+    }
 
-	public void addCloudServicePlan(CloudServicePlan cloudServicePlan) {
-		this.cloudServicePlans.add(cloudServicePlan);
-	}
+    public String getDescription() {
+        return description;
+    }
+
+    public String getDocumentationUrl() {
+        return docUrl;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public String getInfoUrl() {
+        return infoUrl;
+    }
+
+    public String getLabel() {
+        return getName();
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public boolean isBindable() {
+        return bindable;
+    }
 }

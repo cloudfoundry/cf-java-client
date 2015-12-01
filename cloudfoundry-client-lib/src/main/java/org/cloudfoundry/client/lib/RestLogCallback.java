@@ -24,9 +24,9 @@ package org.cloudfoundry.client.lib;
  */
 public interface RestLogCallback {
 
-	/**
-	 * Called once for each log entry.
-	 */
-	void onNewLogEntry(RestLogEntry logEntry);
+    /**
+     * Called once for each log entry.
+     */
+    void onNewLogEntry(RestLogEntry logEntry);
 
 }

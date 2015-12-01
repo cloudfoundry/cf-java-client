@@ -17,110 +17,114 @@ import java.util.concurrent.atomic.AtomicInteger;
  * corporate proxy.
  */
 class ChainedProxyConnectHandler extends ConnectHandler {
-	private static final Logger logger = Log.getLogger(ChainedProxyConnectHandler.class);
 
-	private HttpProxyConfiguration httpProxyConfiguration;
-	private AtomicInteger nbReceivedRequests;
+    private static final Logger logger = Log.getLogger(ChainedProxyConnectHandler.class);
 
-	public ChainedProxyConnectHandler(HttpProxyConfiguration httpProxyConfiguration, AtomicInteger nbReceivedRequests) {
-		this.httpProxyConfiguration = httpProxyConfiguration;
-		this.nbReceivedRequests = nbReceivedRequests;
-	}
+    private HttpProxyConfiguration httpProxyConfiguration;
 
-	protected SocketChannel connect(HttpServletRequest request, String host, int port) throws IOException {
-		nbReceivedRequests.incrementAndGet();
+    private AtomicInteger nbReceivedRequests;
 
-		if (httpProxyConfiguration == null) {
-			return super.connect(request, host, port);
-		} else {
-			SocketChannel channel = super.connect(request, httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort());
+    public ChainedProxyConnectHandler(HttpProxyConfiguration httpProxyConfiguration, AtomicInteger nbReceivedRequests) {
+        this.httpProxyConfiguration = httpProxyConfiguration;
+        this.nbReceivedRequests = nbReceivedRequests;
+    }
 
-			Socket socket = channel.socket();
-			establishConnectHandshake(host, port, socket.getOutputStream(), socket.getInputStream());
-			return channel;
-		}
-	}
+    protected SocketChannel connect(HttpServletRequest request, String host, int port) throws IOException {
+        nbReceivedRequests.incrementAndGet();
 
-	private void establishConnectHandshake(String host, int port, OutputStream out, InputStream in) throws IOException {
-		String connectMessage = "CONNECT " + host + ":" + port + " HTTP/1.0\r\n"
-				+ "Proxy-Connection: Keep-Alive\r\n"
-				+ "User-Agent: Mozilla/4.0\r\n";
+        if (httpProxyConfiguration == null) {
+            return super.connect(request, host, port);
+        } else {
+            SocketChannel channel = super.connect(request, httpProxyConfiguration.getProxyHost(),
+                    httpProxyConfiguration.getProxyPort());
 
-		logger.debug(">>> {}", connectMessage);
+            Socket socket = channel.socket();
+            establishConnectHandshake(host, port, socket.getOutputStream(), socket.getInputStream());
+            return channel;
+        }
+    }
 
-		out.write(str2byte(connectMessage));
-		out.write(str2byte("\r\n"));
-		out.flush();
+    byte[] str2byte(String str, String encoding) {
+        if (str == null)
+            return null;
+        try {
+            return str.getBytes(encoding);
+        } catch (java.io.UnsupportedEncodingException e) {
+            return str.getBytes();
+        }
+    }
 
-		int foo = 0;
+    byte[] str2byte(String str) {
+        return str2byte(str, "UTF-8");
+    }
 
-		StringBuilder sb = new StringBuilder();
-		while (foo >= 0) {
-			foo = in.read();
-			if (foo != 13) {
-				sb.append((char) foo);
-				continue;
-			}
-			foo = in.read();
-			if (foo != 10) {
-				continue;
-			}
-			break;
-		}
-		if (foo < 0) {
-			throw new IOException();
-		}
+    private void establishConnectHandshake(String host, int port, OutputStream out, InputStream in) throws IOException {
+        String connectMessage = "CONNECT " + host + ":" + port + " HTTP/1.0\r\n"
+                + "Proxy-Connection: Keep-Alive\r\n"
+                + "User-Agent: Mozilla/4.0\r\n";
 
-		String response = sb.toString();
-		logger.debug("<<< {}", response);
+        logger.debug(">>> {}", connectMessage);
 
-		String reason = "Unknown reason";
-		int code = -1;
-		try {
-			foo = response.indexOf(' ');
-			int bar = response.indexOf(' ', foo + 1);
-			code = Integer.parseInt(response.substring(foo + 1, bar));
-			reason = response.substring(bar + 1);
-		} catch (Exception e) {
-		}
-		if (code != 200) {
-			logger.warn("Unable to handshake with upstream proxy to CONNECT to host=" + host + " port=" + port + " reason:" + reason);
-			throw new IOException("proxy error: " + reason);
-		}
+        out.write(str2byte(connectMessage));
+        out.write(str2byte("\r\n"));
+        out.flush();
 
-		int count = 0;
-		while (true) {
-			count = 0;
-			while (foo >= 0) {
-				foo = in.read();
-				if (foo != 13) {
-					count++;
-					continue;
-				}
-				foo = in.read();
-				if (foo != 10) {
-					continue;
-				}
-				break;
-			}
-			if (foo < 0) {
-				throw new IOException();
-			}
-			if (count == 0) break;
-		}
-	}
+        int foo = 0;
 
-	byte[] str2byte(String str, String encoding) {
-		if (str == null)
-			return null;
-		try {
-			return str.getBytes(encoding);
-		} catch (java.io.UnsupportedEncodingException e) {
-			return str.getBytes();
-		}
-	}
+        StringBuilder sb = new StringBuilder();
+        while (foo >= 0) {
+            foo = in.read();
+            if (foo != 13) {
+                sb.append((char) foo);
+                continue;
+            }
+            foo = in.read();
+            if (foo != 10) {
+                continue;
+            }
+            break;
+        }
+        if (foo < 0) {
+            throw new IOException();
+        }
 
-	byte[] str2byte(String str) {
-		return str2byte(str, "UTF-8");
-	}
+        String response = sb.toString();
+        logger.debug("<<< {}", response);
+
+        String reason = "Unknown reason";
+        int code = -1;
+        try {
+            foo = response.indexOf(' ');
+            int bar = response.indexOf(' ', foo + 1);
+            code = Integer.parseInt(response.substring(foo + 1, bar));
+            reason = response.substring(bar + 1);
+        } catch (Exception e) {
+        }
+        if (code != 200) {
+            logger.warn("Unable to handshake with upstream proxy to CONNECT to host=" + host + " port=" + port + " " +
+                    "reason:" + reason);
+            throw new IOException("proxy error: " + reason);
+        }
+
+        int count = 0;
+        while (true) {
+            count = 0;
+            while (foo >= 0) {
+                foo = in.read();
+                if (foo != 13) {
+                    count++;
+                    continue;
+                }
+                foo = in.read();
+                if (foo != 10) {
+                    continue;
+                }
+                break;
+            }
+            if (foo < 0) {
+                throw new IOException();
+            }
+            if (count == 0) break;
+        }
+    }
 }

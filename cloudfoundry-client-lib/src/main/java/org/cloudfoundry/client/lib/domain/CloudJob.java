@@ -20,72 +20,77 @@ package org.cloudfoundry.client.lib.domain;
  * @author Scott Frederick
  */
 public class CloudJob extends CloudEntity {
-	public enum Status {
-		FAILED("failed"), FINISHED("finished"), QUEUED("queued"), RUNNING("running");
 
-		private final String status;
+    private final ErrorDetails errorDetails;
 
-		Status(String status) {
-			this.status = status;
-		}
+    private final Status status;
 
-		@Override
-		public String toString() {
-			return status;
-		}
+    public CloudJob(Meta meta, Status status) {
+        this(meta, status, null);
+    }
 
-		public static Status getEnum(String status) {
-			for (Status value : Status.values()) {
-				if (value.status.equals(status)) {
-					return value;
-				}
-			}
-			throw new IllegalArgumentException("Invalid Status value: " + status);
-		}
-	}
+    public CloudJob(Meta meta, Status status, ErrorDetails errorDetails) {
+        super(meta);
+        this.status = status;
+        this.errorDetails = errorDetails;
+    }
 
-	public static class ErrorDetails {
-		private long code;
-		private String description;
-		private String errorCode;
+    public ErrorDetails getErrorDetails() {
+        return errorDetails;
+    }
 
-		public ErrorDetails(long code, String description, String errorCode) {
-			this.code = code;
-			this.description = description;
-			this.errorCode = errorCode;
-		}
+    public Status getStatus() {
+        return status;
+    }
 
-		public long getCode() {
-			return code;
-		}
+    public enum Status {
+        FAILED("failed"), FINISHED("finished"), QUEUED("queued"), RUNNING("running");
 
-		public String getDescription() {
-			return description;
-		}
+        private final String status;
 
-		public String getErrorCode() {
-			return errorCode;
-		}
-	}
+        Status(String status) {
+            this.status = status;
+        }
 
-	private final Status status;
-	private final ErrorDetails errorDetails;
+        public static Status getEnum(String status) {
+            for (Status value : Status.values()) {
+                if (value.status.equals(status)) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException("Invalid Status value: " + status);
+        }
 
-	public CloudJob(Meta meta, Status status) {
-		this(meta, status, null);
-	}
+        @Override
+        public String toString() {
+            return status;
+        }
+    }
 
-	public CloudJob(Meta meta, Status status, ErrorDetails errorDetails) {
-		super(meta);
-		this.status = status;
-		this.errorDetails = errorDetails;
-	}
+    public static class ErrorDetails {
 
-	public Status getStatus() {
-		return status;
-	}
+        private long code;
 
-	public ErrorDetails getErrorDetails() {
-		return errorDetails;
-	}
+        private String description;
+
+        private String errorCode;
+
+        public ErrorDetails(long code, String description, String errorCode) {
+            this.code = code;
+            this.description = description;
+            this.errorCode = errorCode;
+        }
+
+        public long getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getErrorCode() {
+            return errorCode;
+        }
+    }
 }

@@ -24,53 +24,55 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class CloudService extends CloudEntity {
 
-	private String version;
-	private String provider;
+    private String label;
 
-	private String label;
-	private String plan;
+    private String plan;
 
-	public CloudService() {
-		super();
-	}
+    private String provider;
 
-	public CloudService(Meta meta, String name) {
-		super(meta, name);
-	}
+    private String version;
 
-	public boolean isUserProvided() {
-		return plan == null && provider == null && version == null;
-	}
+    public CloudService() {
+        super();
+    }
 
-	public String getVersion() {
-		return version;
-	}
+    public CloudService(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public String getProvider() {
-		return provider;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public String getPlan() {
-		return plan;
-	}
+    public String getPlan() {
+        return plan;
+    }
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
+    public void setPlan(String plan) {
+        this.plan = plan;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public String getProvider() {
+        return provider;
+    }
 
-	public void setProvider(String provider) {
-		this.provider = provider;
-	}
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
-	public void setPlan(String plan) {
-		this.plan = plan;
-	}
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public boolean isUserProvided() {
+        return plan == null && provider == null && version == null;
+    }
 }

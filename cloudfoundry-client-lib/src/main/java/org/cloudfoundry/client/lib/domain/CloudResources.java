@@ -16,15 +16,6 @@
 
 package org.cloudfoundry.client.lib.domain;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
@@ -37,6 +28,15 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * JSON Object that contains details of a list of {@link org.cloudfoundry.client.lib.domain.CloudResource}s.
@@ -93,6 +93,26 @@ public class CloudResources {
         }
     }
 
+    private static String bytesToHex(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        final StringBuilder hex = new StringBuilder(2 * bytes.length);
+        for (final byte b : bytes) {
+            hex.append(HEX_CHARS.charAt((b & 0xF0) >> 4)).append(HEX_CHARS.charAt((b & 0x0F)));
+        }
+        return hex.toString();
+    }
+
+    /**
+     * Returns the list of {@link CloudResource}s.
+     *
+     * @return the resources as a list
+     */
+    public List<CloudResource> asList() {
+        return Collections.unmodifiableList(resources);
+    }
+
     /**
      * Returns a set of all resource {@link CloudResource#getFilename() filenames}.
      *
@@ -107,23 +127,18 @@ public class CloudResources {
     }
 
     /**
-     * Returns the list of {@link CloudResource}s.
-     *
-     * @return the resources as a list
+     * Internal JSON Deserializer.
      */
-    public List<CloudResource> asList() {
-        return Collections.unmodifiableList(resources);
-    }
+    public static class Deserializer extends JsonDeserializer<CloudResources> {
 
-    private static String bytesToHex(byte[] bytes) {
-        if (bytes == null) {
-            return null;
+        @SuppressWarnings("unchecked")
+        @Override
+        public CloudResources deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,
+                JsonProcessingException {
+            TypeReference<List<CloudResource>> ref = new TypeReference<List<CloudResource>>() {
+            };
+            return new CloudResources((Collection<? extends CloudResource>) jp.readValueAs(ref));
         }
-        final StringBuilder hex = new StringBuilder(2 * bytes.length);
-        for (final byte b : bytes) {
-            hex.append(HEX_CHARS.charAt((b & 0xF0) >> 4)).append(HEX_CHARS.charAt((b & 0x0F)));
-        }
-        return hex.toString();
     }
 
     /**
@@ -132,22 +147,9 @@ public class CloudResources {
     public static class Serializer extends JsonSerializer<CloudResources> {
 
         @Override
-        public void serialize(CloudResources value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+        public void serialize(CloudResources value, JsonGenerator jgen, SerializerProvider provider) throws
+                IOException, JsonProcessingException {
             jgen.writeObject(value.asList());
-        }
-    }
-
-    /**
-     * Internal JSON Deserializer.
-     */
-    public static class Deserializer extends JsonDeserializer<CloudResources> {
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public CloudResources deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-            TypeReference<List<CloudResource>> ref = new TypeReference<List<CloudResource>>() {
-            };
-            return new CloudResources((Collection<? extends CloudResource>) jp.readValueAs(ref));
         }
     }
 }

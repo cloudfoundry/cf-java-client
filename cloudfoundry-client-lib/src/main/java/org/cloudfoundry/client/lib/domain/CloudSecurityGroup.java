@@ -13,62 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.client.lib.domain;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Application security groups act as virtual firewalls to control outbound
- * traffic from the applications in your deployment. A security group consists
- * of a list of network egress access rules.
- * <p/>
- * An administrator can assign one or more security groups to a Cloud Foundry
- * deployment or to a specific space in an org within a deployment.
- * 
+ * Application security groups act as virtual firewalls to control outbound traffic from the applications in your
+ * deployment. A security group consists of a list of network egress access rules. <p/> An administrator can assign one
+ * or more security groups to a Cloud Foundry deployment or to a specific space in an org within a deployment.
+ *
  * @author David Ehringer
  * @see http://docs.cloudfoundry.org/adminguide/app-sec-groups.html
  */
 public class CloudSecurityGroup extends CloudEntity {
 
-	private final boolean runningDefault;
-	private final boolean stagingDefault;
-	private final List<SecurityGroupRule> rules = new ArrayList<SecurityGroupRule>();
+    private final List<SecurityGroupRule> rules = new ArrayList<SecurityGroupRule>();
 
-	public CloudSecurityGroup(String name, List<SecurityGroupRule> rules) {
-		this(CloudEntity.Meta.defaultMeta(), name, rules);
-	}
+    private final boolean runningDefault;
 
-	public CloudSecurityGroup(Meta meta, String name,
-			List<SecurityGroupRule> rules) {
-		this(meta, name, rules, false, false);
-	}
+    private final boolean stagingDefault;
 
-	public CloudSecurityGroup(String name, List<SecurityGroupRule> rules,
-			boolean runningDefault, boolean stagingDefault) {
-		this(CloudEntity.Meta.defaultMeta(), name, rules, runningDefault,
-				stagingDefault);
-	}
+    public CloudSecurityGroup(String name, List<SecurityGroupRule> rules) {
+        this(CloudEntity.Meta.defaultMeta(), name, rules);
+    }
 
-	public CloudSecurityGroup(Meta meta, String name,
-			List<SecurityGroupRule> rules, boolean runningDefault,
-			boolean stagingDefault) {
-		super(meta, name);
-		this.rules.addAll(rules);
-		this.runningDefault = runningDefault;
-		this.stagingDefault = stagingDefault;
-	}
+    public CloudSecurityGroup(Meta meta, String name,
+                              List<SecurityGroupRule> rules) {
+        this(meta, name, rules, false, false);
+    }
 
-	public List<SecurityGroupRule> getRules() {
-		return rules;
-	}
+    public CloudSecurityGroup(String name, List<SecurityGroupRule> rules,
+                              boolean runningDefault, boolean stagingDefault) {
+        this(CloudEntity.Meta.defaultMeta(), name, rules, runningDefault,
+                stagingDefault);
+    }
 
-	public boolean isRunningDefault() {
-		return runningDefault;
-	}
+    public CloudSecurityGroup(Meta meta, String name,
+                              List<SecurityGroupRule> rules, boolean runningDefault,
+                              boolean stagingDefault) {
+        super(meta, name);
+        this.rules.addAll(rules);
+        this.runningDefault = runningDefault;
+        this.stagingDefault = stagingDefault;
+    }
 
-	public boolean isStagingDefault() {
-		return stagingDefault;
-	}
+    public List<SecurityGroupRule> getRules() {
+        return rules;
+    }
+
+    public boolean isRunningDefault() {
+        return runningDefault;
+    }
+
+    public boolean isStagingDefault() {
+        return stagingDefault;
+    }
 
 }

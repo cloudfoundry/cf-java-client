@@ -38,83 +38,84 @@ import java.util.Map;
  * Some JSON helper utilities used by the Cloud Foundry Java client.
  *
  * @author Thomas Risberg
- *
  */
 public class JsonUtil {
 
-	protected static final Log logger = LogFactory.getLog(JsonUtil.class);
+    public static final MediaType JSON_MEDIA_TYPE = new MediaType(
+            MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getSubtype(),
+            Charset.forName("UTF-8"));
 
-	private final static ObjectMapper mapper = new ObjectMapper();
+    protected static final Log logger = LogFactory.getLog(JsonUtil.class);
 
-	public static final MediaType JSON_MEDIA_TYPE = new MediaType(
-			MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(),
-			Charset.forName("UTF-8"));
+    private final static ObjectMapper mapper = new ObjectMapper();
 
-	public static Map<String, Object> convertJsonToMap(String json) {
-		Map<String, Object> retMap = new HashMap<String, Object>();
-		if (json != null) {
-			try {
-				retMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-			} catch (IOException e) {
-				logger.warn("Error while reading Java Map from JSON response: " + json, e);
-			}
-		}
-		return retMap;
-	}
+    public static List<CloudResource> convertJsonToCloudResourceList(String json) {
+        List<CloudResource> retList = new ArrayList<CloudResource>();
+        if (json != null) {
+            try {
+                retList = mapper.readValue(json, new TypeReference<List<CloudResource>>() {
+                });
+            } catch (IOException e) {
+                logger.warn("Error while reading Java List from JSON response: " + json, e);
+            }
+        }
+        return retList;
+    }
 
-	public static List<String> convertJsonToList(String json) {
-		List<String> retList = new ArrayList<String>();
-		if (json != null) {
-			try {
-				retList = mapper.readValue(json, new TypeReference<List<String>>() {});
-			} catch (IOException e) {
-				logger.warn("Error while reading Java List from JSON response: " + json, e);
-			}
-		}
-		return retList;
-	}
+    public static List<String> convertJsonToList(String json) {
+        List<String> retList = new ArrayList<String>();
+        if (json != null) {
+            try {
+                retList = mapper.readValue(json, new TypeReference<List<String>>() {
+                });
+            } catch (IOException e) {
+                logger.warn("Error while reading Java List from JSON response: " + json, e);
+            }
+        }
+        return retList;
+    }
 
-	public static List<CloudResource> convertJsonToCloudResourceList(String json) {
-		List<CloudResource> retList = new ArrayList<CloudResource>();
-		if (json != null) {
-			try {
-				retList = mapper.readValue(json, new TypeReference<List<CloudResource>>() {});
-			} catch (IOException e) {
-				logger.warn("Error while reading Java List from JSON response: " + json, e);
-			}
-		}
-		return retList;
-	}
+    public static Map<String, Object> convertJsonToMap(String json) {
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        if (json != null) {
+            try {
+                retMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
+                });
+            } catch (IOException e) {
+                logger.warn("Error while reading Java Map from JSON response: " + json, e);
+            }
+        }
+        return retMap;
+    }
 
-	public static String convertToJson(Object value) {
-		if (mapper.canSerialize(value.getClass())) {
-			try {
-				return mapper.writeValueAsString(value);
-			} catch (IOException e) {
-				logger.warn("Error while serializing " + value + " to JSON", e);
-				return null;
-			}
-		}
-		else {
-			throw new IllegalArgumentException("Value of type " + value.getClass().getName() +
-					" can not be serialized to JSON.");
-		}
-	}
+    public static String convertToJson(Object value) {
+        if (mapper.canSerialize(value.getClass())) {
+            try {
+                return mapper.writeValueAsString(value);
+            } catch (IOException e) {
+                logger.warn("Error while serializing " + value + " to JSON", e);
+                return null;
+            }
+        } else {
+            throw new IllegalArgumentException("Value of type " + value.getClass().getName() +
+                    " can not be serialized to JSON.");
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public static List<Map<String, Object>> convertToJsonList(InputStream jsonInputStream){
-		try {
-			return mapper.readValue(jsonInputStream, List.class);
-		} catch (JsonParseException e) {
-			logger.error("Unable to parse JSON from InputStream", e);
-			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
-		} catch (JsonMappingException e) {
-			logger.error("Unable to parse JSON from InputStream", e);
-			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
-		} catch (IOException e) {
-			logger.error("Unable to process InputStream", e);
-			throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public static List<Map<String, Object>> convertToJsonList(InputStream jsonInputStream) {
+        try {
+            return mapper.readValue(jsonInputStream, List.class);
+        } catch (JsonParseException e) {
+            logger.error("Unable to parse JSON from InputStream", e);
+            throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+        } catch (JsonMappingException e) {
+            logger.error("Unable to parse JSON from InputStream", e);
+            throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+        } catch (IOException e) {
+            logger.error("Unable to process InputStream", e);
+            throw new IllegalArgumentException("Unable to parse JSON from InputStream", e);
+        }
+    }
 }

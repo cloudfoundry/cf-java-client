@@ -4,105 +4,114 @@ package org.cloudfoundry.client.lib.domain;
  * @author Mark Seidenstricker
  */
 
-import java.util.*;
-
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
+import java.util.Date;
+import java.util.UUID;
+
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility
+        .NONE)
 public class CloudEvent extends CloudEntity {
 
-	private String type;
-	private String actor;
-	private String actor_type;
-	private String actor_name;
-	private String actee;
-	private String actee_type;
-	private String actee_name;
-	private Date timestamp;
+    private String actee;
 
-	public CloudEvent(Meta meta, String name) {
-		super(meta, name);
-	}
+    private String actee_name;
 
-	public String getType() {
-		return type;
-	}
+    private String actee_type;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    private String actor;
 
-	public String getActor() {
-		return actor;
-	}
+    private String actor_name;
 
-	public UUID getActorGuid() {
-		try {
-			return UUID.fromString(actor);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    private String actor_type;
 
-	public void setActor(String actor) {
-		this.actor = actor;
-	}
+    private Date timestamp;
 
-	public String getActorType() {
-		return actor_type;
-	}
+    private String type;
 
-	public void setActorType(String actorType) {
-		this.actor_type = actorType;
-	}
+    public CloudEvent(Meta meta, String name) {
+        super(meta, name);
+    }
 
-	public String getActorName() {
-		return actor_name;
-	}
+    public String getActee() {
+        return actee;
+    }
 
-	public void setActorName(String actorName) {
-		this.actor_name = actorName;
-	}
+    public void setActee(String actee) {
+        this.actee = actee;
+    }
 
-	public String getActee() {
-		return actee;
-	}
+    public UUID getActeeGuid() {
+        try {
+            return UUID.fromString(actee);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
-	public UUID getActeeGuid() {
-		try {
-			return UUID.fromString(actee);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    public String getActeeName() {
+        return actee_name;
+    }
 
-	public void setActee(String actee) {
-		this.actee = actee;
-	}
+    public void setActeeName(String acteeName) {
+        this.actee_name = acteeName;
+    }
 
-	public String getActeeType() {
-		return actee_type;
-	}
+    public String getActeeType() {
+        return actee_type;
+    }
 
-	public void setActeeType(String acteeType) {
-		this.actee_type = acteeType;
-	}
+    public void setActeeType(String acteeType) {
+        this.actee_type = acteeType;
+    }
 
-	public String getActeeName() {
-		return actee_name;
-	}
+    public String getActor() {
+        return actor;
+    }
 
-	public void setActeeName(String acteeName) {
-		this.actee_name = acteeName;
-	}
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
 
-	public Date getTimestamp() {
-		return timestamp;
-	}
+    public UUID getActorGuid() {
+        try {
+            return UUID.fromString(actor);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
+    public String getActorName() {
+        return actor_name;
+    }
+
+    public void setActorName(String actorName) {
+        this.actor_name = actorName;
+    }
+
+    public String getActorType() {
+        return actor_type;
+    }
+
+    public void setActorType(String actorType) {
+        this.actor_type = actorType;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
 }

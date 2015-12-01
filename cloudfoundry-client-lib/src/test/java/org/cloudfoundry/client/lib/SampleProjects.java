@@ -16,7 +16,11 @@
 
 package org.cloudfoundry.client.lib;
 
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,11 +29,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.FileCopyUtils;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Provides access to sample projects.
@@ -43,29 +43,17 @@ public class SampleProjects {
 
     private static final String TEST_APP_DIR = "src/test/resources/apps";
 
-    /**
-     * Returns the spring travel MVC reference application.
-     *
-     * @return the spring travel reference WAR file
-     * @throws IOException
-     */
-    public static File springTravel() throws IOException {
-        File file = new File(TEST_APP_DIR + "/travelapp/swf-booking-mvc.war");
-        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
-        return file;
-    }
+    public static File appWithScmMetaData(TemporaryFolder temporaryFolder) throws IOException {
+        File appDirectory = new File(TEST_APP_DIR + "/app-with-scm-metadata");
+        File tmpAppDirectory = copyAppToTempDir(temporaryFolder, appDirectory);
+        addExampleGitRepo(tmpAppDirectory);
 
-    /**
-     * Returns a simple spring application.
-     *
-     * @return the simple-spring-app WAR file
-     * @throws IOException
-     */
-    public static File simpleSpringApp() throws IOException {
-		ClassPathResource cpr = new ClassPathResource("simple-spring-app.war");
-		File file = cpr.getFile();
-        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
-        return file;
+        // For the scenario of having a repo in a subdirectory
+        File subProject = new File(tmpAppDirectory, "sub-project");
+        subProject.mkdir();
+        addExampleGitRepo(subProject);
+
+        return tmpAppDirectory;
     }
 
     /**
@@ -75,8 +63,8 @@ public class SampleProjects {
      * @throws IOException
      */
     public static File badSpringApp() throws IOException {
-		ClassPathResource cpr = new ClassPathResource("bad-spring-app.war");
-		File file = cpr.getFile();
+        ClassPathResource cpr = new ClassPathResource("bad-spring-app.war");
+        File file = cpr.getFile();
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }
@@ -88,8 +76,8 @@ public class SampleProjects {
      * @throws IOException
      */
     public static File nonAsciFileName() throws IOException {
-		ClassPathResource cpr = new ClassPathResource("non-ascii-file-name.war");
-		File file = cpr.getFile();
+        ClassPathResource cpr = new ClassPathResource("non-ascii-file-name.war");
+        File file = cpr.getFile();
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }
@@ -108,23 +96,26 @@ public class SampleProjects {
     }
 
     /**
+     * Returns a simple spring application.
      *
-     * @return The directory containing a simple standalone Ruby script
+     * @return the simple-spring-app WAR file
      * @throws IOException
      */
-    public static File standaloneRuby() throws IOException {
-		File file = new File(TEST_APP_DIR + "/standalone-ruby-app");
+    public static File simpleSpringApp() throws IOException {
+        ClassPathResource cpr = new ClassPathResource("simple-spring-app.war");
+        File file = cpr.getFile();
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }
 
     /**
+     * Returns the spring travel MVC reference application.
      *
-     * @return The directory containign a simple standalone Node app
+     * @return the spring travel reference WAR file
      * @throws IOException
      */
-    public static File standaloneNode() throws IOException {
-		File file = new File(TEST_APP_DIR + "/standalone-node-app");
+    public static File springTravel() throws IOException {
+        File file = new File(TEST_APP_DIR + "/travelapp/swf-booking-mvc.war");
         assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
         return file;
     }
@@ -139,36 +130,31 @@ public class SampleProjects {
     public static File springTravelUnpacked(TemporaryFolder temporaryFolder) throws IOException {
         return explodeTestApp(springTravel(), temporaryFolder);
     }
-    
-    
-    public static File appWithScmMetaData(TemporaryFolder temporaryFolder) throws IOException {
-        File appDirectory = new File(TEST_APP_DIR + "/app-with-scm-metadata");
-        File tmpAppDirectory = copyAppToTempDir(temporaryFolder, appDirectory);
-        addExampleGitRepo(tmpAppDirectory);
-        
-        // For the scenario of having a repo in a subdirectory
-        File subProject = new File(tmpAppDirectory, "sub-project");
-        subProject.mkdir();
-        addExampleGitRepo(subProject);
-        
-        return tmpAppDirectory;
+
+    /**
+     * @return The directory containign a simple standalone Node app
+     * @throws IOException
+     */
+    public static File standaloneNode() throws IOException {
+        File file = new File(TEST_APP_DIR + "/standalone-node-app");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
     }
 
-    private static File copyAppToTempDir(TemporaryFolder temporaryFolder,
-            File file) throws IOException {
-        File tmpDir = temporaryFolder.newFolder(file.getName());
-        if (tmpDir.exists()) {
-            FileUtils.forceDelete(tmpDir);
-        }
-        tmpDir.mkdirs();
-        FileUtils.copyDirectory(file, tmpDir);
-        return tmpDir;
+    /**
+     * @return The directory containing a simple standalone Ruby script
+     * @throws IOException
+     */
+    public static File standaloneRuby() throws IOException {
+        File file = new File(TEST_APP_DIR + "/standalone-ruby-app");
+        assertTrue("Expected test app at " + file.getCanonicalPath(), file.exists());
+        return file;
     }
 
     private static void addExampleGitRepo(File directory) throws IOException {
-        // You can't add a Git repository to a Git repo so we have to create 
+        // You can't add a Git repository to a Git repo so we have to create
         // files that look like a repo on the fly.
-        File repo =  new File(directory, ".git");
+        File repo = new File(directory, ".git");
         repo.mkdir();
         new File(repo, "HEAD").createNewFile();
         new File(repo, "branches").mkdir();
@@ -181,6 +167,17 @@ public class SampleProjects {
         new File(repo, "objects").mkdir();
         new File(repo, "packed-refs").createNewFile();
         new File(repo, "refs").mkdir();
+    }
+
+    private static File copyAppToTempDir(TemporaryFolder temporaryFolder,
+                                         File file) throws IOException {
+        File tmpDir = temporaryFolder.newFolder(file.getName());
+        if (tmpDir.exists()) {
+            FileUtils.forceDelete(tmpDir);
+        }
+        tmpDir.mkdirs();
+        FileUtils.copyDirectory(file, tmpDir);
+        return tmpDir;
     }
 
     private static File explodeTestApp(File file, TemporaryFolder temporaryFolder) throws IOException {

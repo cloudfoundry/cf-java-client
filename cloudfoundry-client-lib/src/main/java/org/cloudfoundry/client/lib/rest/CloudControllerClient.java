@@ -16,14 +16,6 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
@@ -35,25 +27,33 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
 import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Interface defining operations available for the cloud controller REST client implementations
@@ -62,251 +62,252 @@ import org.springframework.web.client.ResponseErrorHandler;
  */
 public interface CloudControllerClient {
 
-	// User and Info methods
+    // User and Info methods
 
-	void setResponseErrorHandler(ResponseErrorHandler errorHandler);
+    void addDomain(String domainName);
 
-	URL getCloudControllerUrl();
+    void addRoute(String host, String domainName);
 
-	CloudInfo getInfo();
+    void associateAuditorWithSpace(String orgName, String spaceName, String userGuid);
 
-	List<CloudSpace> getSpaces();
+    void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid);
 
-	List<CloudOrganization> getOrganizations();
+    void associateManagerWithSpace(String orgName, String spaceName, String userGuid);
 
-	OAuth2AccessToken login();
+    void bindRunningSecurityGroup(String securityGroupName);
 
-	void logout();
+    void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
-	void register(String email, String password);
+    void bindService(String appName, String serviceName);
 
-	void updatePassword(String newPassword);
+    void bindStagingSecurityGroup(String securityGroupName);
 
-	void updatePassword(CloudCredentials credentials, String newPassword);
+    void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
+                           List<String> serviceNames);
 
-	void unregister();
+    void createApplication(String appName, Staging staging, Integer disk, Integer memory,
+                           List<String> uris, List<String> serviceNames);
 
-	// Service methods
+    // Service methods
 
-	List<CloudService> getServices();
+    void createQuota(CloudQuota quota);
 
-	void createService(CloudService service);
+    void createSecurityGroup(CloudSecurityGroup securityGroup);
 
-	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+    void createSecurityGroup(String name, InputStream jsonRulesFile);
 
-	void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl);
-
-	CloudService getService(String service);
-
-	CloudServiceInstance getServiceInstance(String serviceName);
-
-	void deleteService(String service);
-
-	void deleteAllServices();
-
-	List<CloudServiceOffering> getServiceOfferings();
-
-	List<CloudServiceBroker> getServiceBrokers();
-
-    CloudServiceBroker getServiceBroker(String name);
+    void createService(CloudService service);
 
     void createServiceBroker(CloudServiceBroker serviceBroker);
 
-    void updateServiceBroker(CloudServiceBroker serviceBroker);
+    void createSpace(String spaceName);
 
-    void deleteServiceBroker(String name);
+    void createUserProvidedService(CloudService service, Map<String, Object> credentials);
 
-    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+    void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl);
+
+    void debugApplication(String appName, CloudApplication.DebugMode mode);
+
+    void deleteAllApplications();
+
+    void deleteAllServices();
+
+    void deleteApplication(String appName);
+
+    void deleteDomain(String domainName);
+
+    List<CloudRoute> deleteOrphanedRoutes();
+
+    void deleteQuota(String quotaName);
 
     // App methods
 
-	List<CloudApplication> getApplications();
+    void deleteRoute(String host, String domainName);
 
-	CloudApplication getApplication(String appName);
+    void deleteSecurityGroup(String securityGroupName);
 
-	CloudApplication getApplication(UUID appGuid);
+    void deleteService(String service);
 
-	ApplicationStats getApplicationStats(String appName);
+    void deleteServiceBroker(String name);
 
-	Map<String, Object> getApplicationEnvironment(UUID appGuid);
+    void deleteSpace(String spaceName);
 
-	Map<String, Object> getApplicationEnvironment(String appName);
+    CloudApplication getApplication(String appName);
 
-    void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
-	                       List<String> serviceNames);
+    CloudApplication getApplication(UUID appGuid);
 
-	void createApplication(String appName, Staging staging, Integer disk, Integer memory,
-	                       List<String> uris, List<String> serviceNames);
+    Map<String, Object> getApplicationEnvironment(UUID appGuid);
 
-	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
+    Map<String, Object> getApplicationEnvironment(String appName);
 
-	void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException;
+    List<CloudEvent> getApplicationEvents(String appName);
 
-	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
+    InstancesInfo getApplicationInstances(String appName);
 
-	StartingInfo startApplication(String appName);
+    InstancesInfo getApplicationInstances(CloudApplication app);
 
-	void debugApplication(String appName, CloudApplication.DebugMode mode);
+    ApplicationStats getApplicationStats(String appName);
 
-	void stopApplication(String appName);
+    List<CloudApplication> getApplications();
 
-	StartingInfo restartApplication(String appName);
+    URL getCloudControllerUrl();
 
-	void deleteApplication(String appName);
+    Map<String, String> getCrashLogs(String appName);
 
-	void deleteAllApplications();
+    CrashesInfo getCrashes(String appName);
 
-	void updateApplicationDiskQuota(String appName, int disk);
+    CloudDomain getDefaultDomain();
 
-	void updateApplicationMemory(String appName, int memory);
+    List<CloudDomain> getDomains();
 
-	void updateApplicationInstances(String appName, int instances);
+    List<CloudDomain> getDomainsForOrg();
 
-	void updateApplicationServices(String appName, List<String> services);
+    List<CloudEvent> getEvents();
 
-	void updateApplicationStaging(String appName, Staging staging);
+    String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
 
-	void updateApplicationUris(String appName, List<String> uris);
+    CloudInfo getInfo();
 
-	void updateApplicationEnv(String appName, Map<String, String> env);
+    Map<String, String> getLogs(String appName);
 
-	void updateApplicationEnv(String appName, List<String> env);
+    // Quota operations
+    CloudOrganization getOrgByName(String orgName, boolean required);
 
-	List<CloudEvent> getEvents();
+    Map<String, CloudUser> getOrganizationUsers(String orgName);
 
-	List<CloudEvent> getApplicationEvents(String appName);
+    List<CloudOrganization> getOrganizations();
 
-	Map<String, String> getLogs(String appName);
+    List<CloudDomain> getPrivateDomains();
 
-	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+    CloudQuota getQuotaByName(String quotaName, boolean required);
 
-	List<ApplicationLog> getRecentLogs(String appName);
+    List<CloudQuota> getQuotas();
 
-	Map<String, String> getCrashLogs(String appName);
+    List<ApplicationLog> getRecentLogs(String appName);
 
-	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
+    List<CloudRoute> getRoutes(String domainName);
 
-	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
+    List<CloudSecurityGroup> getRunningSecurityGroups();
 
-	void bindService(String appName, String serviceName);
+    CloudSecurityGroup getSecurityGroup(String securityGroupName);
 
-	void unbindService(String appName, String serviceName);
+    List<CloudSecurityGroup> getSecurityGroups();
 
-	InstancesInfo getApplicationInstances(String appName);
+    CloudService getService(String service);
 
-	InstancesInfo getApplicationInstances(CloudApplication app);
+    CloudServiceBroker getServiceBroker(String name);
 
-	CrashesInfo getCrashes(String appName);
+    List<CloudServiceBroker> getServiceBrokers();
 
-	void rename(String appName, String newName);
+    CloudServiceInstance getServiceInstance(String serviceName);
 
-	String getStagingLogs(StartingInfo info, int offset);
+    List<CloudServiceOffering> getServiceOfferings();
 
-	List<CloudStack> getStacks();
+    List<CloudService> getServices();
 
-	CloudStack getStack(String name);
+    List<CloudDomain> getSharedDomains();
 
-	// Space management
+    // Space management
 
-	void createSpace(String spaceName);
+    CloudSpace getSpace(String spaceName);
 
-	CloudSpace getSpace(String spaceName);
+    List<UUID> getSpaceAuditors(String orgName, String spaceName);
 
-	void deleteSpace(String spaceName);
+    List<UUID> getSpaceDevelopers(String orgName, String spaceName);
 
-	// Domains and routes management
+    // Domains and routes management
 
+    List<UUID> getSpaceManagers(String orgName, String spaceName);
 
-	List<CloudDomain> getDomainsForOrg();
+    List<CloudSpace> getSpaces();
 
-	List<CloudDomain> getDomains();
+    List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName);
 
-	List<CloudDomain> getPrivateDomains();
+    CloudStack getStack(String name);
 
-	List<CloudDomain> getSharedDomains();
+    List<CloudStack> getStacks();
 
-	CloudDomain getDefaultDomain();
+    String getStagingLogs(StartingInfo info, int offset);
 
-	void addDomain(String domainName);
+    List<CloudSecurityGroup> getStagingSecurityGroups();
 
-	void deleteDomain(String domainName);
+    OAuth2AccessToken login();
 
-	void removeDomain(String domainName);
+    void logout();
 
-	List<CloudRoute> getRoutes(String domainName);
+    void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
 
-	void addRoute(String host, String domainName);
+    void register(String email, String password);
 
-	void deleteRoute(String host, String domainName);
+    void registerRestLogListener(RestLogCallback callBack);
 
-	List<CloudRoute> deleteOrphanedRoutes();
+    // Misc. utility methods
 
-	// Misc. utility methods
+    void removeDomain(String domainName);
 
-	void registerRestLogListener(RestLogCallback callBack);
+    void rename(String appName, String newName);
 
-	void unRegisterRestLogListener(RestLogCallback callBack);
+    StartingInfo restartApplication(String appName);
 
-	// Quota operations
-	CloudOrganization getOrgByName(String orgName, boolean required);
+    void setQuotaToOrg(String orgName, String quotaName);
 
-	List<CloudQuota> getQuotas();
+    void setResponseErrorHandler(ResponseErrorHandler errorHandler);
 
-	CloudQuota getQuotaByName(String quotaName, boolean required);
+    StartingInfo startApplication(String appName);
 
-	void createQuota(CloudQuota quota);
+    void stopApplication(String appName);
 
-	void updateQuota(CloudQuota quota, String name);
+    StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
 
-	void deleteQuota(String quotaName);
+    void unRegisterRestLogListener(RestLogCallback callBack);
 
-	void setQuotaToOrg(String orgName, String quotaName);
+    void unbindRunningSecurityGroup(String securityGroupName);
 
-	List<UUID> getSpaceManagers(String orgName, String spaceName);
+    void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
 
-	List<UUID> getSpaceDevelopers(String orgName, String spaceName);
+    void unbindService(String appName, String serviceName);
 
-	List<UUID> getSpaceAuditors(String orgName, String spaceName);
+    void unbindStagingSecurityGroup(String securityGroupName);
 
-	void associateManagerWithSpace(String orgName, String spaceName, String userGuid);
+    void unregister();
 
-	void associateDeveloperWithSpace(String orgName, String spaceName, String userGuid);
+    void updateApplicationDiskQuota(String appName, int disk);
 
-	void associateAuditorWithSpace(String orgName, String spaceName, String userGuid);
+    // Security Group Operations
 
-	// Security Group Operations
+    void updateApplicationEnv(String appName, Map<String, String> env);
 
-	List<CloudSecurityGroup> getSecurityGroups();
+    void updateApplicationEnv(String appName, List<String> env);
 
-	CloudSecurityGroup getSecurityGroup(String securityGroupName);
+    void updateApplicationInstances(String appName, int instances);
 
-	void createSecurityGroup(CloudSecurityGroup securityGroup);
+    void updateApplicationMemory(String appName, int memory);
 
-	void createSecurityGroup(String name, InputStream jsonRulesFile);
+    void updateApplicationServices(String appName, List<String> services);
 
-	void updateSecurityGroup(CloudSecurityGroup securityGroup);
+    void updateApplicationStaging(String appName, Staging staging);
 
-	void updateSecurityGroup(String name, InputStream jsonRulesFile);
+    void updateApplicationUris(String appName, List<String> uris);
 
-	void deleteSecurityGroup(String securityGroupName);
+    void updatePassword(String newPassword);
 
-	List<CloudSecurityGroup> getStagingSecurityGroups();
+    void updatePassword(CloudCredentials credentials, String newPassword);
 
-	void bindStagingSecurityGroup(String securityGroupName);
+    void updateQuota(CloudQuota quota, String name);
 
-	void unbindStagingSecurityGroup(String securityGroupName);
+    void updateSecurityGroup(CloudSecurityGroup securityGroup);
 
-	List<CloudSecurityGroup> getRunningSecurityGroups();
+    void updateSecurityGroup(String name, InputStream jsonRulesFile);
 
-	void bindRunningSecurityGroup(String securityGroupName);
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
 
-	void unbindRunningSecurityGroup(String securityGroupName);
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
 
-	List<CloudSpace> getSpacesBoundToSecurityGroup(String securityGroupName);
+    void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
 
-	void bindSecurityGroup(String orgName, String spaceName, String securityGroupName);
+    void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback)
+            throws IOException;
 
-	void unbindSecurityGroup(String orgName, String spaceName, String securityGroupName);
-
-	Map<String, CloudUser> getOrganizationUsers(String orgName);
+    void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws
+            IOException;
 }

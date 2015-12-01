@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib.archive;
 
+import org.springframework.util.Assert;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +28,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.springframework.util.Assert;
-
 /**
  * Implementation of {@link ApplicationArchive} backed by a {@link ZipFile}.
  *
@@ -35,14 +35,15 @@ import org.springframework.util.Assert;
  */
 public class ZipApplicationArchive implements ApplicationArchive {
 
-    private ZipFile zipFile;
-
     private List<Entry> entries;
 
     private String fileName;
 
+    private ZipFile zipFile;
+
     /**
      * Create a new {@link ZipApplicationArchive} instance for the given <tt>zipFile</tt>.
+     *
      * @param zipFile The underling zip file
      */
     public ZipApplicationArchive(ZipFile zipFile) {
@@ -50,6 +51,14 @@ public class ZipApplicationArchive implements ApplicationArchive {
         this.zipFile = zipFile;
         this.entries = adaptZipEntries(zipFile);
         this.fileName = new File(zipFile.getName()).getName();
+    }
+
+    public Iterable<Entry> getEntries() {
+        return entries;
+    }
+
+    public String getFilename() {
+        return fileName;
     }
 
     private List<Entry> adaptZipEntries(ZipFile zipFile) {
@@ -61,14 +70,6 @@ public class ZipApplicationArchive implements ApplicationArchive {
         return Collections.unmodifiableList(entries);
     }
 
-    public Iterable<Entry> getEntries() {
-        return entries;
-    }
-
-    public String getFilename() {
-        return fileName;
-    }
-
     private class EntryAdapter extends AbstractApplicationArchiveEntry {
 
         private ZipEntry entry;
@@ -77,8 +78,11 @@ public class ZipApplicationArchive implements ApplicationArchive {
             this.entry = entry;
         }
 
-        public boolean isDirectory() {
-            return entry.isDirectory();
+        public InputStream getInputStream() throws IOException {
+            if (isDirectory()) {
+                return null;
+            }
+            return zipFile.getInputStream(entry);
         }
 
         public String getName() {
@@ -89,11 +93,8 @@ public class ZipApplicationArchive implements ApplicationArchive {
             return entry.getSize();
         }
 
-        public InputStream getInputStream() throws IOException {
-            if(isDirectory()) {
-                return null;
-            }
-            return zipFile.getInputStream(entry);
+        public boolean isDirectory() {
+            return entry.isDirectory();
         }
     }
 }
