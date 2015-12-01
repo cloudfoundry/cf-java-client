@@ -29,10 +29,10 @@ public final class RouteEntity {
     /**
      * The applications url
      *
-     * @param applicationURL the application URL
-     * @return the application URL
+     * @param applicationURL the application url
+     * @return the application url
      */
-    private final String applicationURL;
+    private final String applicationUrl;
 
     /**
      * The domain id
@@ -80,23 +80,23 @@ public final class RouteEntity {
      * @param spaceURL the space url
      * @return the space url
      */
-    private final String spaceURL;
+    private final String spaceUrl;
 
     @Builder
-    RouteEntity(@JsonProperty("apps_url") String applicationURL,
+    RouteEntity(@JsonProperty("apps_url") String applicationUrl,
                 @JsonProperty("domain_guid") String domainId,
                 @JsonProperty("domain_url") String domainUrl,
                 @JsonProperty("host") String host,
                 @JsonProperty("path") String path,
                 @JsonProperty("space_guid") String spaceId,
-                @JsonProperty("space_url") String spaceURL) {
+                @JsonProperty("space_url") String spaceUrl) {
 
-        this.applicationURL = applicationURL;
+        this.applicationUrl = applicationUrl;
         this.domainId = domainId;
         this.domainUrl = domainUrl;
         this.host = host;
         this.path = path;
         this.spaceId = spaceId;
-        this.spaceURL = spaceURL;
+        this.spaceUrl = spaceUrl;
     }
 }

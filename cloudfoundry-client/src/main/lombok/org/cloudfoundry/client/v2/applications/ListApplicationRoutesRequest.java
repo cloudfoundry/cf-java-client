@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.FilterParameter;
@@ -84,15 +83,6 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     @Getter(onMethod = @__(@FilterParameter("path")))
     private volatile List<String> paths;
 
-    /**
-     * The route id
-     *
-     * @param routeId the route id
-     * @return the route id
-     */
-    @Getter(onMethod = @__(@QueryParameter("route_guid")))
-    private volatile String routeId;
-
     @Builder
     ListApplicationRoutesRequest(OrderDirection orderDirection,
                                  Integer page,
@@ -101,15 +91,13 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
                                  String id,
                                  @Singular List<String> hosts,
                                  @Singular List<String> organizationIds,
-                                 @Singular List<String> paths,
-                                 String routeId) {
+                                 @Singular List<String> paths) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
         this.id = id;
         this.hosts = hosts;
         this.organizationIds = organizationIds;
         this.paths = paths;
-        this.routeId = routeId;
     }
 
     @Override
