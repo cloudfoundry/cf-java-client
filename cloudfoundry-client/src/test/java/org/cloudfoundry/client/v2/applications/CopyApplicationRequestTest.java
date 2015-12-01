@@ -45,6 +45,17 @@ public final class CopyApplicationRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
+
+    @Test
+    public void isValidNoSourceAppId() {
+        ValidationResult result = CopyApplicationRequest.builder()
+                .id("test-id")
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("source app id must be specified", result.getMessages().get(0));
+    }
 
 }
