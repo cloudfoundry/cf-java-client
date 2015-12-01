@@ -23,17 +23,17 @@ import java.util.Map;
 
 public class InstancesInfo {
 
-	private final List<InstanceInfo> instances;
+    private final List<InstanceInfo> instances;
 
-	public InstancesInfo(List<Map<String, Object>> attributes) {
-		List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
-		for (Map<String, Object> data : attributes) {
-			instances.add(new InstanceInfo(data));
-		}
-		this.instances = Collections.unmodifiableList(instances);
-	}
+    public InstancesInfo(List<Map<String, Object>> attributes) {
+        List<InstanceInfo> instances = new ArrayList<InstanceInfo>(attributes.size());
+        for (Map<String, Object> data : attributes) {
+            instances.add(new InstanceInfo(data));
+        }
+        this.instances = Collections.unmodifiableList(instances);
+    }
 
-	public List<InstanceInfo> getInstances() {
-		return instances;
-	}
+    public List<InstanceInfo> getInstances() {
+        return instances;
+    }
 }

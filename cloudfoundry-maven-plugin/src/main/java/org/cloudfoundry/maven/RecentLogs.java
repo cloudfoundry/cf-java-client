@@ -18,7 +18,6 @@
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.springframework.http.HttpStatus;
@@ -31,32 +30,31 @@ import static org.cloudfoundry.maven.common.UiUtils.renderApplicationLogEntry;
  * Shows recent application logs
  *
  * @author Scott Frederick
- * @since 1.0.3
-
  * @goal recentLogs
  * @phase process-sources
+ * @since 1.0.3
  */
 
 public class RecentLogs extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		try {
-			getLog().info(String.format("Getting logs for '%s'", getAppname()));
+        try {
+            getLog().info(String.format("Getting logs for '%s'", getAppname()));
 
-			List<ApplicationLog> logEntries = getClient().getRecentLogs(getAppname());
-			for (ApplicationLog logEntry : logEntries) {
-				getLog().info(renderApplicationLogEntry(logEntry));
-			}
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist",
-						getAppname()), e);
-			} else {
-				throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error message: '%s'. Description: '%s'",
-						getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-		}
-	}
+            List<ApplicationLog> logEntries = getClient().getRecentLogs(getAppname());
+            for (ApplicationLog logEntry : logEntries) {
+                getLog().info(renderApplicationLogEntry(logEntry));
+            }
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("Application '%s' does not exist",
+                        getAppname()), e);
+            } else {
+                throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error message: '%s'. Description: '%s'",
+                        getAppname(), e.getMessage(), e.getDescription()), e);
+            }
+        }
+    }
 }

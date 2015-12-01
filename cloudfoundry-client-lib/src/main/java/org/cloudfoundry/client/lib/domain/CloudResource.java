@@ -25,18 +25,16 @@ import org.codehaus.jackson.annotate.JsonProperty;
  *
  * @author Phillip Webb
  */
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility.NONE)
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, creatorVisibility = Visibility
+        .NONE)
 public class CloudResource {
 
     @JsonProperty("fn")
     private String filename;
 
-    private long size;
-
     private String sha1;
 
-    protected CloudResource() {
-    }
+    private long size;
 
     public CloudResource(String filename, long size, String sha1) {
         super();
@@ -45,15 +43,18 @@ public class CloudResource {
         this.sha1 = sha1;
     }
 
+    protected CloudResource() {
+    }
+
     public String getFilename() {
         return filename;
     }
 
-    public long getSize() {
-        return size;
-    }
-
     public String getSha1() {
         return sha1;
+    }
+
+    public long getSize() {
+        return size;
     }
 }

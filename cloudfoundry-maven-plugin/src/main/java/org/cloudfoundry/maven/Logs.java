@@ -21,10 +21,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.CloudFoundryException;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.maven.common.UiUtils;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
 
 import static org.cloudfoundry.maven.common.UiUtils.renderApplicationLogEntry;
 
@@ -33,55 +30,56 @@ import static org.cloudfoundry.maven.common.UiUtils.renderApplicationLogEntry;
  *
  * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
-
  * @goal logs
  * @phase process-sources
+ * @since 1.0.0
  */
 
 public class Logs extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		try {
-			getLog().info(String.format("Getting logs for '%s'", getAppname()));
+        try {
+            getLog().info(String.format("Getting logs for '%s'", getAppname()));
 
-			LoggingListener listener = new LoggingListener();
-			getClient().streamLogs(getAppname(), listener);
-			synchronized (listener) {
-				try {
-					listener.wait();
-				} catch (InterruptedException e) {
-					throw new MojoExecutionException("Interrupted while streaming logs", e);
-				}
-			}
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist",
-						getAppname()), e);
-			} else {
-				throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error message: '%s'. Description: '%s'",
-						getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-		}
-	}
+            LoggingListener listener = new LoggingListener();
+            getClient().streamLogs(getAppname(), listener);
+            synchronized (listener) {
+                try {
+                    listener.wait();
+                } catch (InterruptedException e) {
+                    throw new MojoExecutionException("Interrupted while streaming logs", e);
+                }
+            }
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("Application '%s' does not exist",
+                        getAppname()), e);
+            } else {
+                throw new MojoExecutionException(String.format("Error getting logs for application '%s'. Error " +
+                        "message: '%s'. Description: '%s'",
+                        getAppname(), e.getMessage(), e.getDescription()), e);
+            }
+        }
+    }
 
-	private class LoggingListener implements ApplicationLogListener {
-		public void onMessage(ApplicationLog logEntry) {
-			getLog().info(renderApplicationLogEntry(logEntry));
-		}
+    private class LoggingListener implements ApplicationLogListener {
 
-		public void onError(Throwable e) {
-			synchronized (this) {
-				this.notify();
-			}
-		}
+        public void onComplete() {
+            synchronized (this) {
+                this.notify();
+            }
+        }
 
-		public void onComplete() {
-			synchronized (this) {
-				this.notify();
-			}
-		}
-	}
+        public void onError(Throwable e) {
+            synchronized (this) {
+                this.notify();
+            }
+        }
+
+        public void onMessage(ApplicationLog logEntry) {
+            getLog().info(renderApplicationLogEntry(logEntry));
+        }
+    }
 }

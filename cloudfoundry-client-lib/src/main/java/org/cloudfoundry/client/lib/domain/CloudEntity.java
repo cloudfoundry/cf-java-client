@@ -26,73 +26,74 @@ import java.util.UUID;
  */
 public class CloudEntity {
 
-	@JsonIgnore
-	private Meta meta;
+    @JsonIgnore
+    private Meta meta;
 
-	private String name;
+    private String name;
 
-	public CloudEntity() {
-	}
+    public CloudEntity() {
+    }
 
-	public CloudEntity(Meta meta, String name) {
-		if (meta != null) {
-			this.meta = meta;
-		}
-		else {
-			this.meta = Meta.defaultMeta();
-		}
-		this.name = name;
-	}
+    public CloudEntity(Meta meta, String name) {
+        if (meta != null) {
+            this.meta = meta;
+        } else {
+            this.meta = Meta.defaultMeta();
+        }
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Meta getMeta() {
+        return meta;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setMeta(Meta meta) {
+        this.meta = meta;
+    }
 
-	public Meta getMeta() {
-		return meta;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setMeta(Meta meta) {
-		this.meta = meta;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName() + ": (" +
-				(meta == null || meta.getGuid() == null ? "-" : meta.getGuid()) + ") " +
-				getName();
-	}
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": (" +
+                (meta == null || meta.getGuid() == null ? "-" : meta.getGuid()) + ") " +
+                getName();
+    }
 
-	public static class Meta {
+    public static class Meta {
 
-		private UUID guid;
-		private Date created;
-		private Date updated;
+        private Date created;
 
-		public Meta(UUID guid, Date created, Date updated) {
-			this.guid = guid;
-			this.created = created;
-			this.updated = updated;
-		}
+        private UUID guid;
 
-		public UUID getGuid() {
-			return guid;
-		}
+        private Date updated;
 
-		public Date getCreated() {
-			return created;
-		}
+        public Meta(UUID guid, Date created, Date updated) {
+            this.guid = guid;
+            this.created = created;
+            this.updated = updated;
+        }
 
-		public Date getUpdated() {
-			return updated;
-		}
+        public static Meta defaultMeta() {
+            return new Meta(null, null, null);
+        }
 
-		public static Meta defaultMeta() {
-			return new Meta(null, null, null);
-		}
-	}
+        public Date getCreated() {
+            return created;
+        }
+
+        public UUID getGuid() {
+            return guid;
+        }
+
+        public Date getUpdated() {
+            return updated;
+        }
+    }
 }

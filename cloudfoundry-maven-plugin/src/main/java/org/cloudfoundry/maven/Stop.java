@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,25 +24,24 @@ import org.springframework.http.HttpStatus;
  * Stops an application.
  *
  * @author Gunnar Hillert
- * @since 1.0.0
- *
  * @goal stop
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Stop extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		getLog().info(String.format("Stopping application '%s'", getAppname()));
+        getLog().info(String.format("Stopping application '%s'", getAppname()));
 
-		try {
-			getClient().stopApplication(getAppname());
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist",
-						getAppname()), e);
-			}
-		}
-	}
+        try {
+            getClient().stopApplication(getAppname());
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("Application '%s' does not exist",
+                        getAppname()), e);
+            }
+        }
+    }
 }

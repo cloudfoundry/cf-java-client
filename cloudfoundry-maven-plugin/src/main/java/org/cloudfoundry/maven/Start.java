@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,36 +27,35 @@ import org.springframework.http.HttpStatus;
  *
  * @author Gunnar Hillert
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal start
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Start extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		try {
-			CloudApplication application = getClient().getApplication(getAppname());
+        try {
+            CloudApplication application = getClient().getApplication(getAppname());
 
-			if (application.getRunningInstances() > 0) {
-				getLog().info(String.format("Application '%s' is already started", getAppname()));
-			} else {
-				getLog().info(String.format("Starting application '%s'", getAppname()));
+            if (application.getRunningInstances() > 0) {
+                getLog().info(String.format("Application '%s' is already started", getAppname()));
+            } else {
+                getLog().info(String.format("Starting application '%s'", getAppname()));
 
-				final StartingInfo startingInfo = getClient().startApplication(getAppname());
-				showStagingStatus(startingInfo);
+                final StartingInfo startingInfo = getClient().startApplication(getAppname());
+                showStagingStatus(startingInfo);
 
-				application = getClient().getApplication(getAppname());
-				showStartingStatus(application);
-				showStartResults(application, getAllUris());
-			}
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist",
-						getAppname()), e);
-			}
-		}
-	}
+                application = getClient().getApplication(getAppname());
+                showStartingStatus(application);
+                showStartResults(application, getAllUris());
+            }
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("Application '%s' does not exist",
+                        getAppname()), e);
+            }
+        }
+    }
 }

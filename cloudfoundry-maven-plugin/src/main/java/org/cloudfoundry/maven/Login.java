@@ -19,13 +19,11 @@ package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.client.lib.tokens.TokensFile;
+import org.cloudfoundry.maven.common.Assert;
 import org.cloudfoundry.maven.common.SystemProperties;
-
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import java.util.List;
@@ -35,46 +33,46 @@ import java.util.List;
  *
  * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal login
  * @requiresProject false
+ * @since 1.0.0
  */
 public class Login extends AbstractCloudFoundryMojo {
-	public Login() {
-	}
 
-	public Login(TokensFile tokensFile) {
-		this.tokensFile = tokensFile;
-	}
+    public Login() {
+    }
 
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
-		Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
-		Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
+    public Login(TokensFile tokensFile) {
+        this.tokensFile = tokensFile;
+    }
 
-		super.execute();
-	}
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        Assert.configurationNotNull(getUsername(), "username", SystemProperties.USERNAME);
+        Assert.configurationNotNull(getPassword(), "password", SystemProperties.PASSWORD);
+        Assert.configurationNotNull(getTarget(), "target", SystemProperties.TARGET);
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		final OAuth2AccessToken token = getClient().login();
-		final CloudInfo cloudInfo = getClient().getCloudInfo();
-		final CloudSpace space = getCurrentSpace();
+        super.execute();
+    }
 
-		tokensFile.saveToken(getTarget(), token, cloudInfo, space);
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        final OAuth2AccessToken token = getClient().login();
+        final CloudInfo cloudInfo = getClient().getCloudInfo();
+        final CloudSpace space = getCurrentSpace();
 
-		getLog().info("Authentication successful");
-	}
+        tokensFile.saveToken(getTarget(), token, cloudInfo, space);
 
-	protected CloudSpace getCurrentSpace() {
-		List<CloudSpace> spaces = client.getSpaces();
-		for (CloudSpace space : spaces) {
-			if (space.getName().equals(getSpace())) {
-				return space;
-			}
-		}
-		return null;
-	}
+        getLog().info("Authentication successful");
+    }
+
+    protected CloudSpace getCurrentSpace() {
+        List<CloudSpace> spaces = client.getSpaces();
+        for (CloudSpace space : spaces) {
+            if (space.getName().equals(getSpace())) {
+                return space;
+            }
+        }
+        return null;
+    }
 }

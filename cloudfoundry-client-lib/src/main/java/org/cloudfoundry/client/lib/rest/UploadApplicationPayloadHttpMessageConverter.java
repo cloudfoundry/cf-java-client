@@ -16,14 +16,6 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-
 import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -34,65 +26,74 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.FileCopyUtils;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Implementation of {@link HttpMessageConverter} that can write {@link org.cloudfoundry.client.lib.domain.UploadApplicationPayload}s. The {@code Content-Type}
- * of written resources is {@code application/octet-stream}.
+ * Implementation of
+ * {@link HttpMessageConverter} that can write {@link org.cloudfoundry.client.lib.domain.UploadApplicationPayload}s.
+ * The {@code Content-Type} of written resources is {@code application/octet-stream}.
  *
  * @author Phillip Webb
  */
 public class UploadApplicationPayloadHttpMessageConverter implements HttpMessageConverter<UploadApplicationPayload> {
 
-	public boolean canRead(Class<?> clazz, MediaType mediaType) {
-		return false;
-	}
+    public boolean canRead(Class<?> clazz, MediaType mediaType) {
+        return false;
+    }
 
-	public boolean canWrite(Class<?> clazz, MediaType mediaType) {
-		return UploadApplicationPayload.class.isAssignableFrom(clazz);
-	}
+    public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+        return UploadApplicationPayload.class.isAssignableFrom(clazz);
+    }
 
-	public List<MediaType> getSupportedMediaTypes() {
-		return Collections.singletonList(MediaType.ALL);
-	}
+    public List<MediaType> getSupportedMediaTypes() {
+        return Collections.singletonList(MediaType.ALL);
+    }
 
-	public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage)
-		throws IOException, HttpMessageNotReadableException {
-		throw new UnsupportedOperationException();
-	}
+    public UploadApplicationPayload read(Class<? extends UploadApplicationPayload> clazz, HttpInputMessage inputMessage)
+            throws IOException, HttpMessageNotReadableException {
+        throw new UnsupportedOperationException();
+    }
 
-	public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage)
-		throws IOException, HttpMessageNotWritableException {
-		setOutputContentType(contentType, outputMessage);
+    public void write(UploadApplicationPayload t, MediaType contentType, HttpOutputMessage outputMessage)
+            throws IOException, HttpMessageNotWritableException {
+        setOutputContentType(contentType, outputMessage);
 
-		FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
-		outputMessage.getBody().flush();
+        FileCopyUtils.copy(t.getInputStream(), outputMessage.getBody());
+        outputMessage.getBody().flush();
 
-		writeApplicationZipToFile(t.getInputStream());
-	}
+        writeApplicationZipToFile(t.getInputStream());
+    }
 
-	private void setOutputContentType(MediaType contentType, HttpOutputMessage outputMessage) {
-		HttpHeaders headers = outputMessage.getHeaders();
-		if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
-			contentType = MediaType.APPLICATION_OCTET_STREAM;
-		}
-		if (contentType != null) {
-			headers.setContentType(contentType);
-		}
-	}
+    private void setOutputContentType(MediaType contentType, HttpOutputMessage outputMessage) {
+        HttpHeaders headers = outputMessage.getHeaders();
+        if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+        if (contentType != null) {
+            headers.setContentType(contentType);
+        }
+    }
 
-	private void writeApplicationZipToFile(InputStream inputStream) {
-		// for testing/debugging purposes, write the zip file being uploaded to a path specified
-		// in the following environment variable
-		String uploadFilePath = System.getenv("CF_APP_UPLOAD_FILE");
-		if (uploadFilePath != null) {
-			try {
-				File outputFile = new File(uploadFilePath);
-				BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-				FileCopyUtils.copy(inputStream, outputStream);
-				outputStream.close();
-			} catch (IOException e) {
-				System.err.println("Error writing application upload to file: " + e);
-			}
-		}
-	}
+    private void writeApplicationZipToFile(InputStream inputStream) {
+        // for testing/debugging purposes, write the zip file being uploaded to a path specified
+        // in the following environment variable
+        String uploadFilePath = System.getenv("CF_APP_UPLOAD_FILE");
+        if (uploadFilePath != null) {
+            try {
+                File outputFile = new File(uploadFilePath);
+                BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+                FileCopyUtils.copy(inputStream, outputStream);
+                outputStream.close();
+            } catch (IOException e) {
+                System.err.println("Error writing application upload to file: " + e);
+            }
+        }
+    }
 
 }

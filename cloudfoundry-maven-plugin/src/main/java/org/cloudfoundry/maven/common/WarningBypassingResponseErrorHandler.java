@@ -8,21 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WarningBypassingResponseErrorHandler extends CloudControllerResponseErrorHandler {
-	private List<HttpStatus> expectedStatusCodes = new ArrayList<HttpStatus>();
 
-	public void addExpectedStatus(HttpStatus status) {
-		expectedStatusCodes.add(status);
-	}
+    private List<HttpStatus> expectedStatusCodes = new ArrayList<HttpStatus>();
 
-	public void clearExpectedStatus() {
-		expectedStatusCodes.clear();
-	}
+    public void addExpectedStatus(HttpStatus status) {
+        expectedStatusCodes.add(status);
+    }
 
-	@Override
-	protected boolean hasError(HttpStatus statusCode) {
-		if (expectedStatusCodes.contains(statusCode)) {
-			throw new CloudFoundryException(statusCode);
-		}
-		return super.hasError(statusCode);
-	}
+    public void clearExpectedStatus() {
+        expectedStatusCodes.clear();
+    }
+
+    @Override
+    protected boolean hasError(HttpStatus statusCode) {
+        if (expectedStatusCodes.contains(statusCode)) {
+            throw new CloudFoundryException(statusCode);
+        }
+        return super.hasError(statusCode);
+    }
 }

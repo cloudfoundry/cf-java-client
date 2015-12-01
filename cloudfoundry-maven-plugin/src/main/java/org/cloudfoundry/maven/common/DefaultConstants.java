@@ -13,33 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven.common;
 
 
 /**
  * Provides Default values for several Maven plugin configuration parameters.
  *
- * For instance if for certain parameters neither system properties nor pom.xml
- * configuration parameters are provided, then the below default values are used.
+ * For instance if for certain parameters neither system properties nor pom.xml configuration parameters are provided,
+ * then the below default values are used.
  *
  * See {@link SystemProperties}
  *
  * @author Gunnar Hillert
  * @author Scott Frederick
  * @since 1.0.0
- *
  */
 public final class DefaultConstants {
 
-	public static final String MAVEN_DEFAULT_SERVER = "cloud-foundry-credentials";
-	public static final Boolean NO_START = Boolean.FALSE;
-	public static final Boolean MERGE_ENV = Boolean.FALSE;
-	public static final Integer DEFAULT_INSTANCE = 1;
+    public static final Integer DEFAULT_INSTANCE = 1;
 
-	/**
-	 * Prevent instantiation.
-	 */
-	private DefaultConstants() {
-		throw new AssertionError();
-	}
+    public static final String MAVEN_DEFAULT_SERVER = "cloud-foundry-credentials";
+
+    public static final Boolean MERGE_ENV = Boolean.FALSE;
+
+    public static final Boolean NO_START = Boolean.FALSE;
+
+    /**
+     * Prevent instantiation.
+     */
+    private DefaultConstants() {
+        throw new AssertionError();
+    }
 }

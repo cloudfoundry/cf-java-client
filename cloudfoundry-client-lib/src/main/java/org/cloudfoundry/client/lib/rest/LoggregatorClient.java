@@ -24,87 +24,93 @@ import java.util.Map;
 import java.util.UUID;
 
 public class LoggregatorClient {
-	private static final UriTemplate loggregatorStreamUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
-	private static final UriTemplate loggregatorRecentUriTemplate = new UriTemplate("{scheme}://{host}/recent");
 
-	private boolean trustSelfSignedCerts;
+    private static final UriTemplate loggregatorRecentUriTemplate = new UriTemplate("{scheme}://{host}/recent");
 
-	public LoggregatorClient(boolean trustSelfSignedCerts) {
-		this.trustSelfSignedCerts = trustSelfSignedCerts;
-	}
+    private static final UriTemplate loggregatorStreamUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
 
-	public String getRecentHttpEndpoint(String endpoint) {
-		URI uri = stringToUri(endpoint);
+    private boolean trustSelfSignedCerts;
 
-		String scheme = uri.getScheme();
-		String host = uri.getHost();
+    public LoggregatorClient(boolean trustSelfSignedCerts) {
+        this.trustSelfSignedCerts = trustSelfSignedCerts;
+    }
 
-		if ("wss".equals(scheme)) {
-			scheme = "https";
-		} else {
-			scheme = "http";
-		}
+    public StreamingLogTokenImpl connectToLoggregator(String endpoint, String mode, UUID appId,
+                                                      ApplicationLogListener listener,
+                                                      ClientEndpointConfig.Configurator configurator) {
+        URI loggregatorUri = loggregatorStreamUriTemplate.expand(endpoint, mode, appId);
 
-		return loggregatorRecentUriTemplate.expand(scheme, host).toString();
-	}
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            ClientEndpointConfig config = buildClientConfig(configurator);
+            Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
+            return new StreamingLogTokenImpl(session);
+        } catch (DeploymentException e) {
+            throw new CloudOperationException(e);
+        } catch (IOException e) {
+            throw new CloudOperationException(e);
+        }
+    }
 
-	private URI stringToUri(String endPoint) {
-		try {
-			return new URI(endPoint);
-		} catch (URISyntaxException e) {
-			throw new CloudOperationException("Unable to parse Loggregator endpoint " + endPoint);
-		}
-	}
+    public String getRecentHttpEndpoint(String endpoint) {
+        URI uri = stringToUri(endpoint);
 
-	public StreamingLogTokenImpl connectToLoggregator(String endpoint, String mode, UUID appId,
-	                                                  ApplicationLogListener listener,
-	                                                  ClientEndpointConfig.Configurator configurator) {
-		URI loggregatorUri = loggregatorStreamUriTemplate.expand(endpoint, mode, appId);
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
 
-		try {
-			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-			ClientEndpointConfig config = buildClientConfig(configurator);
-			Session session = container.connectToServer(new LoggregatorEndpoint(listener), config, loggregatorUri);
-			return new StreamingLogTokenImpl(session);
-		} catch (DeploymentException e) {
-			throw new CloudOperationException(e);
-		} catch (IOException e) {
-			throw new CloudOperationException(e);
-		}
-	}
+        if ("wss".equals(scheme)) {
+            scheme = "https";
+        } else {
+            scheme = "http";
+        }
 
-	private ClientEndpointConfig buildClientConfig(ClientEndpointConfig.Configurator configurator) {
-		ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
+        return loggregatorRecentUriTemplate.expand(scheme, host).toString();
+    }
 
-		if (trustSelfSignedCerts) {
-			SSLContext sslContext = createSslContext();
-			Map<String, Object> userProperties = config.getUserProperties();
-			userProperties.put(WsWebSocketContainer.SSL_CONTEXT_PROPERTY, sslContext);
-		}
+    private ClientEndpointConfig buildClientConfig(ClientEndpointConfig.Configurator configurator) {
+        ClientEndpointConfig config = ClientEndpointConfig.Builder.create().configurator(configurator).build();
 
-		return config;
-	}
+        if (trustSelfSignedCerts) {
+            SSLContext sslContext = createSslContext();
+            Map<String, Object> userProperties = config.getUserProperties();
+            userProperties.put(WsWebSocketContainer.SSL_CONTEXT_PROPERTY, sslContext);
+        }
 
-	private SSLContext createSslContext() {
-		try {
-			TrustManager[] trustManagers = new TrustManager[] { new X509TrustManager() {
-				public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-				}
-				public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-				}
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-			}};
+        return config;
+    }
 
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustManagers, null);
+    private SSLContext createSslContext() {
+        try {
+            TrustManager[] trustManagers = new TrustManager[]{new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws
+                        CertificateException {
+                }
 
-			return sslContext;
-		} catch (NoSuchAlgorithmException e) {
-			throw new CloudOperationException(e);
-		} catch (KeyManagementException e) {
-			throw new CloudOperationException(e);
-		}
-	}
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws
+                        CertificateException {
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            }};
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagers, null);
+
+            return sslContext;
+        } catch (NoSuchAlgorithmException e) {
+            throw new CloudOperationException(e);
+        } catch (KeyManagementException e) {
+            throw new CloudOperationException(e);
+        }
+    }
+
+    private URI stringToUri(String endPoint) {
+        try {
+            return new URI(endPoint);
+        } catch (URISyntaxException e) {
+            throw new CloudOperationException("Unable to parse Loggregator endpoint " + endPoint);
+        }
+    }
 }

@@ -40,71 +40,71 @@ import java.util.Set;
  */
 public class LoggingRestTemplate extends RestTemplate {
 
-	private Set<RestLogCallback> listeners = new LinkedHashSet<RestLogCallback>();
+    private Set<RestLogCallback> listeners = new LinkedHashSet<RestLogCallback>();
 
-	@Override
-	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback, final ResponseExtractor<T> responseExtractor) throws RestClientException {
-		final String[] status = new String[1];
-		final HttpStatus[] httpStatus = new HttpStatus[1];
-		final Object[] headers = new Object[1];
-		final String[] message = new String[1];
-		T results = null;
-		RestClientException exception = null;
-		try {
-			results = super.doExecute(url, method, requestCallback,
-					new ResponseExtractor<T>() {
-						@SuppressWarnings("rawtypes")
-						public T extractData(ClientHttpResponse response) throws IOException {
-							httpStatus[0] = response.getStatusCode();
-							headers[0] = response.getHeaders();
-							T data = null;
-							if (responseExtractor != null && (data = responseExtractor.extractData(response)) != null) {
-								if (data instanceof String) {
-									message[0] = ((String)data).length() + " bytes";
-								} else if (data instanceof Map) {
-									message[0] = ((Map)data).keySet().toString();
-								} else {
-									message[0] = data.getClass().getName();
-								}
-								return data;
-							}
-							else {
-								message[0] = "<no data>";
-								return null;
-							}
-						}
-					});
-			status[0] = "OK";
-		} catch (RestClientException e) {
-			status[0] = "ERROR";
-			message[0] = e.getMessage();
-			exception = e;
-			if (e instanceof HttpStatusCodeException) {
-				httpStatus[0] = ((HttpStatusCodeException)e).getStatusCode();
-			}
-		}
-		addLogMessage(method, url, status[0], httpStatus[0], message[0]);
-		if (exception != null) {
-			throw exception;
-		}
-		return results;
-	}
+    public void addLogMessage(HttpMethod method, URI url, String status, HttpStatus httpStatus, String message) {
+        RestLogEntry logEntry = new RestLogEntry(method, url, status, httpStatus, message);
+        for (RestLogCallback callback : listeners) {
+            callback.onNewLogEntry(logEntry);
+        }
+    }
 
-	public void addLogMessage(HttpMethod method, URI url, String status, HttpStatus httpStatus, String message) {
-		RestLogEntry logEntry = new RestLogEntry(method, url, status, httpStatus, message);
-		for (RestLogCallback callback : listeners) {
-			callback.onNewLogEntry(logEntry);
-		}
-	}
+    @Override
+    protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback, final ResponseExtractor<T>
+            responseExtractor) throws RestClientException {
+        final String[] status = new String[1];
+        final HttpStatus[] httpStatus = new HttpStatus[1];
+        final Object[] headers = new Object[1];
+        final String[] message = new String[1];
+        T results = null;
+        RestClientException exception = null;
+        try {
+            results = super.doExecute(url, method, requestCallback,
+                    new ResponseExtractor<T>() {
+                        @SuppressWarnings("rawtypes")
+                        public T extractData(ClientHttpResponse response) throws IOException {
+                            httpStatus[0] = response.getStatusCode();
+                            headers[0] = response.getHeaders();
+                            T data = null;
+                            if (responseExtractor != null && (data = responseExtractor.extractData(response)) != null) {
+                                if (data instanceof String) {
+                                    message[0] = ((String) data).length() + " bytes";
+                                } else if (data instanceof Map) {
+                                    message[0] = ((Map) data).keySet().toString();
+                                } else {
+                                    message[0] = data.getClass().getName();
+                                }
+                                return data;
+                            } else {
+                                message[0] = "<no data>";
+                                return null;
+                            }
+                        }
+                    });
+            status[0] = "OK";
+        } catch (RestClientException e) {
+            status[0] = "ERROR";
+            message[0] = e.getMessage();
+            exception = e;
+            if (e instanceof HttpStatusCodeException) {
+                httpStatus[0] = ((HttpStatusCodeException) e).getStatusCode();
+            }
+        }
+        addLogMessage(method, url, status[0], httpStatus[0], message[0]);
+        if (exception != null) {
+            throw exception;
+        }
+        return results;
+    }
 
-	void registerRestLogListener(RestLogCallback callBack) {
-		if (callBack != null) {
-			listeners.add(callBack);
-		}
-	}
+    void registerRestLogListener(RestLogCallback callBack) {
+        if (callBack != null) {
+            listeners.add(callBack);
+        }
+    }
 
-	void unRegisterRestLogListener(RestLogCallback callBack) {
-		listeners.remove(callBack);
-	}
+    void unRegisterRestLogListener(RestLogCallback callBack) {
+        listeners.remove(callBack);
+    }
 
 }

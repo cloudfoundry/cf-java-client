@@ -23,23 +23,23 @@ import java.util.Map;
 
 public class ApplicationStats {
 
-	private final List<InstanceStats> records;
+    private final List<InstanceStats> records;
 
-	public ApplicationStats(Map<String, Object> attributes) {
-		List<InstanceStats> records = new ArrayList<InstanceStats>(attributes.size());
-		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-			@SuppressWarnings("unchecked")
-			InstanceStats record = new InstanceStats(entry.getKey(), (Map<String, Object>)entry.getValue());
-			records.add(record);
-		}
-		this.records = Collections.unmodifiableList(records);
-	}
+    public ApplicationStats(Map<String, Object> attributes) {
+        List<InstanceStats> records = new ArrayList<InstanceStats>(attributes.size());
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            @SuppressWarnings("unchecked")
+            InstanceStats record = new InstanceStats(entry.getKey(), (Map<String, Object>) entry.getValue());
+            records.add(record);
+        }
+        this.records = Collections.unmodifiableList(records);
+    }
 
-	public ApplicationStats(List<InstanceStats> instanceStats) {
-		this.records = Collections.unmodifiableList(instanceStats);
-	}
+    public ApplicationStats(List<InstanceStats> instanceStats) {
+        this.records = Collections.unmodifiableList(instanceStats);
+    }
 
-	public List<InstanceStats> getRecords() {
-		return records;
-	}
+    public List<InstanceStats> getRecords() {
+        return records;
+    }
 }

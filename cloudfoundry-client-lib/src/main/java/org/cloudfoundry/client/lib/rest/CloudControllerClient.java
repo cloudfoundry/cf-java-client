@@ -16,14 +16,6 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
@@ -51,6 +43,14 @@ import org.cloudfoundry.client.lib.domain.Staging;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Interface defining operations available for the cloud controller REST client implementations
  *
@@ -58,193 +58,194 @@ import org.springframework.web.client.ResponseErrorHandler;
  */
 public interface CloudControllerClient {
 
-	// User and Info methods
+    // User and Info methods
 
-	void setResponseErrorHandler(ResponseErrorHandler errorHandler);
+    void addDomain(String domainName);
 
-	URL getCloudControllerUrl();
+    void addRoute(String host, String domainName);
 
-	CloudInfo getInfo();
+    void bindService(String appName, String serviceName);
 
-	List<CloudSpace> getSpaces();
+    void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
+                           List<String> serviceNames);
 
-	List<CloudOrganization> getOrganizations();
+    void createApplication(String appName, Staging staging, Integer disk, Integer memory,
+                           List<String> uris, List<String> serviceNames);
 
-	OAuth2AccessToken login();
+    void createQuota(CloudQuota quota);
 
-	void logout();
-
-	void register(String email, String password);
-
-	void updatePassword(String newPassword);
-
-	void updatePassword(CloudCredentials credentials, String newPassword);
-
-	void unregister();
-
-	// Service methods
-
-	List<CloudService> getServices();
-
-	void createService(CloudService service);
-
-	void createUserProvidedService(CloudService service, Map<String, Object> credentials);
-
-	void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl);
-
-	CloudService getService(String service);
-
-	void deleteService(String service);
-
-	void deleteAllServices();
-
-	List<CloudServiceOffering> getServiceOfferings();
-
-	List<CloudServiceBroker> getServiceBrokers();
-
-    CloudServiceBroker getServiceBroker(String name);
+    void createService(CloudService service);
 
     void createServiceBroker(CloudServiceBroker serviceBroker);
 
-    void updateServiceBroker(CloudServiceBroker serviceBroker);
+    void createSpace(String spaceName);
+
+    void createUserProvidedService(CloudService service, Map<String, Object> credentials);
+
+    void createUserProvidedService(CloudService service, Map<String, Object> credentials, String syslogDrainUrl);
+
+    // Service methods
+
+    void debugApplication(String appName, CloudApplication.DebugMode mode);
+
+    void deleteAllApplications();
+
+    void deleteAllServices();
+
+    void deleteApplication(String appName);
+
+    void deleteDomain(String domainName);
+
+    List<CloudRoute> deleteOrphanedRoutes();
+
+    void deleteQuota(String quotaName);
+
+    void deleteRoute(String host, String domainName);
+
+    void deleteService(String service);
 
     void deleteServiceBroker(String name);
 
-    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+    void deleteSpace(String spaceName);
+
+    CloudApplication getApplication(String appName);
+
+    CloudApplication getApplication(UUID appGuid);
+
+    InstancesInfo getApplicationInstances(String appName);
 
     // App methods
 
-	List<CloudApplication> getApplications();
+    InstancesInfo getApplicationInstances(CloudApplication app);
 
-	CloudApplication getApplication(String appName);
-	
-	CloudApplication getApplication(UUID appGuid);
+    ApplicationStats getApplicationStats(String appName);
 
-	ApplicationStats getApplicationStats(String appName);
+    List<CloudApplication> getApplications();
 
-	void createApplication(String appName, Staging staging, Integer memory, List<String> uris,
-	                       List<String> serviceNames);
+    URL getCloudControllerUrl();
 
-	void createApplication(String appName, Staging staging, Integer disk, Integer memory,
-	                       List<String> uris, List<String> serviceNames);
+    Map<String, String> getCrashLogs(String appName);
 
-	void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
+    CrashesInfo getCrashes(String appName);
 
-	void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback) throws IOException;
+    CloudDomain getDefaultDomain();
 
-	void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws IOException;
+    List<CloudDomain> getDomains();
 
-	StartingInfo startApplication(String appName);
+    List<CloudDomain> getDomainsForOrg();
 
-	void debugApplication(String appName, CloudApplication.DebugMode mode);
+    String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
 
-	void stopApplication(String appName);
+    CloudInfo getInfo();
 
-	StartingInfo restartApplication(String appName);
+    Map<String, String> getLogs(String appName);
 
-	void deleteApplication(String appName);
+    // Quota operations
+    CloudOrganization getOrgByName(String orgName, boolean required);
 
-	void deleteAllApplications();
+    List<CloudOrganization> getOrganizations();
 
-	void updateApplicationDiskQuota(String appName, int disk);
+    List<CloudDomain> getPrivateDomains();
 
-	void updateApplicationMemory(String appName, int memory);
+    CloudQuota getQuotaByName(String quotaName, boolean required);
 
-	void updateApplicationInstances(String appName, int instances);
+    List<CloudQuota> getQuotas();
 
-	void updateApplicationServices(String appName, List<String> services);
+    List<ApplicationLog> getRecentLogs(String appName);
 
-	void updateApplicationStaging(String appName, Staging staging);
+    List<CloudRoute> getRoutes(String domainName);
 
-	void updateApplicationUris(String appName, List<String> uris);
+    CloudService getService(String service);
 
-	void updateApplicationEnv(String appName, Map<String, String> env);
+    CloudServiceBroker getServiceBroker(String name);
 
-	void updateApplicationEnv(String appName, List<String> env);
+    List<CloudServiceBroker> getServiceBrokers();
 
-	Map<String, String> getLogs(String appName);
+    List<CloudServiceOffering> getServiceOfferings();
 
-	StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
+    List<CloudService> getServices();
 
-	List<ApplicationLog> getRecentLogs(String appName);
+    List<CloudDomain> getSharedDomains();
 
-	Map<String, String> getCrashLogs(String appName);
+    CloudSpace getSpace(String spaceName);
 
-	String getFile(String appName, int instanceIndex, String filePath, int startPosition, int endPosition);
+    List<CloudSpace> getSpaces();
 
-	void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
+    CloudStack getStack(String name);
 
-	void bindService(String appName, String serviceName);
+    List<CloudStack> getStacks();
 
-	void unbindService(String appName, String serviceName);
+    String getStagingLogs(StartingInfo info, int offset);
 
-	InstancesInfo getApplicationInstances(String appName);
+    OAuth2AccessToken login();
 
-	InstancesInfo getApplicationInstances(CloudApplication app);
+    void logout();
 
-	CrashesInfo getCrashes(String appName);
+    void openFile(String appName, int instanceIndex, String filePath, ClientHttpResponseCallback callback);
 
-	void rename(String appName, String newName);
+    void register(String email, String password);
 
-	String getStagingLogs(StartingInfo info, int offset);
+    void registerRestLogListener(RestLogCallback callBack);
 
-	List<CloudStack> getStacks();
+    void removeDomain(String domainName);
 
-	CloudStack getStack(String name);
+    void rename(String appName, String newName);
 
-	// Space management	
-	
-	void createSpace(String spaceName);
-	
-	CloudSpace getSpace(String spaceName);
-	
-	void deleteSpace(String spaceName);
-	
-	// Domains and routes management
+    StartingInfo restartApplication(String appName);
 
+    // Space management
 
-	List<CloudDomain> getDomainsForOrg();
+    void setQuotaToOrg(String orgName, String quotaName);
 
-	List<CloudDomain> getDomains();
+    void setResponseErrorHandler(ResponseErrorHandler errorHandler);
 
-	List<CloudDomain> getPrivateDomains();
+    StartingInfo startApplication(String appName);
 
-	List<CloudDomain> getSharedDomains();
+    // Domains and routes management
 
-	CloudDomain getDefaultDomain();
+    void stopApplication(String appName);
 
-	void addDomain(String domainName);
+    StreamingLogToken streamLogs(String appName, ApplicationLogListener listener);
 
-	void deleteDomain(String domainName);
+    void unRegisterRestLogListener(RestLogCallback callBack);
 
-	void removeDomain(String domainName);
+    void unbindService(String appName, String serviceName);
 
-	List<CloudRoute> getRoutes(String domainName);
+    void unregister();
 
-	void addRoute(String host, String domainName);
+    void updateApplicationDiskQuota(String appName, int disk);
 
-	void deleteRoute(String host, String domainName);
+    void updateApplicationEnv(String appName, Map<String, String> env);
 
-	List<CloudRoute> deleteOrphanedRoutes();
+    void updateApplicationEnv(String appName, List<String> env);
 
-	// Misc. utility methods
+    void updateApplicationInstances(String appName, int instances);
 
-	void registerRestLogListener(RestLogCallback callBack);
+    void updateApplicationMemory(String appName, int memory);
 
-	void unRegisterRestLogListener(RestLogCallback callBack);
+    void updateApplicationServices(String appName, List<String> services);
 
-	// Quota operations
-	CloudOrganization getOrgByName(String orgName, boolean required);
+    void updateApplicationStaging(String appName, Staging staging);
 
-	List<CloudQuota> getQuotas();
+    // Misc. utility methods
 
-	CloudQuota getQuotaByName(String quotaName, boolean required);
+    void updateApplicationUris(String appName, List<String> uris);
 
-	void createQuota(CloudQuota quota);
+    void updatePassword(String newPassword);
 
-	void updateQuota(CloudQuota quota, String name);
+    void updatePassword(CloudCredentials credentials, String newPassword);
 
-	void deleteQuota(String quotaName);
+    void updateQuota(CloudQuota quota, String name);
 
-	void setQuotaToOrg(String orgName, String quotaName);
+    void updateServiceBroker(CloudServiceBroker serviceBroker);
+
+    void updateServicePlanVisibilityForBroker(String name, boolean visibility);
+
+    void uploadApplication(String appName, File file, UploadStatusCallback callback) throws IOException;
+
+    void uploadApplication(String appName, String fileName, InputStream inputStream, UploadStatusCallback callback)
+            throws IOException;
+
+    void uploadApplication(String appName, ApplicationArchive archive, UploadStatusCallback callback) throws
+            IOException;
 }

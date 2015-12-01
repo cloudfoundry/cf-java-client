@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cloudfoundry.maven;
 
-import java.util.List;
+package org.cloudfoundry.maven;
 
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
+import java.util.List;
+
 /**
- * Lists your applications. Displays all deployed applications, along with
- * information about health, instance count, bound services, and associated URLs.
+ * Lists your applications. Displays all deployed applications, along with information about health, instance count,
+ * bound services, and associated URLs.
  *
  * @author Gunnar Hillert
- * @since 1.0.0
- *
  * @goal apps
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Apps extends AbstractCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
+    @Override
+    protected void doExecute() {
 
-		final List<CloudApplication> applications = getClient().getApplications();
+        final List<CloudApplication> applications = getClient().getApplications();
 
-		getLog().info("\n" + UiUtils.renderCloudApplicationsDataAsTable(applications));
+        getLog().info("\n" + UiUtils.renderCloudApplicationsDataAsTable(applications));
 
-	}
+    }
 
 }

@@ -19,98 +19,99 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class TokensFile {
-	public OAuth2AccessToken retrieveToken(URI target) {
-		TargetInfos targetInfos = getTokensFromFile();
 
-		if (targetInfos == null) {
-			return null;
-		}
+    public String getTokensFilePath() {
+        return System.getProperty("user.home") + "/.cf/tokens.yml";
+    }
 
-		HashMap<String, String> targetInfo = targetInfos.get(target);
+    public void removeToken(URI target) {
+        TargetInfos targetInfos = getTokensFromFile();
+        targetInfos.remove(target);
+        saveTokensToFile(targetInfos);
+    }
 
-		if (targetInfo == null) {
-			return null;
-		}
+    public OAuth2AccessToken retrieveToken(URI target) {
+        TargetInfos targetInfos = getTokensFromFile();
 
-		DefaultOAuth2RefreshToken refreshToken = targetInfos.getRefreshToken(targetInfo);
-		DefaultOAuth2AccessToken token = targetInfos.getToken(targetInfo);
-		token.setRefreshToken(refreshToken);
+        if (targetInfos == null) {
+            return null;
+        }
 
-		return token;
-	}
+        HashMap<String, String> targetInfo = targetInfos.get(target);
 
-	public void saveToken(URI target, OAuth2AccessToken token, CloudInfo cloudInfo, CloudSpace space) {
-		TargetInfos targetInfos = getTokensFromFile();
+        if (targetInfo == null) {
+            return null;
+        }
 
-		if (targetInfos == null) {
-			targetInfos = new TargetInfos();
-		}
+        DefaultOAuth2RefreshToken refreshToken = targetInfos.getRefreshToken(targetInfo);
+        DefaultOAuth2AccessToken token = targetInfos.getToken(targetInfo);
+        token.setRefreshToken(refreshToken);
 
-		HashMap<String, String> targetInfo = targetInfos.get(target);
+        return token;
+    }
 
-		if (targetInfo == null) {
-			targetInfo = new LinkedHashMap<String, String>();
-		}
+    public void saveToken(URI target, OAuth2AccessToken token, CloudInfo cloudInfo, CloudSpace space) {
+        TargetInfos targetInfos = getTokensFromFile();
 
-		targetInfos.putToken(targetInfo, token);
-		targetInfos.putRefreshToken(targetInfo, token.getRefreshToken());
-		targetInfos.putVersion(targetInfo, cloudInfo.getVersion());
-		targetInfos.putSpace(targetInfo, space.getMeta().getGuid().toString());
-		targetInfos.putOrganization(targetInfo, space.getOrganization().getMeta().getGuid().toString());
+        if (targetInfos == null) {
+            targetInfos = new TargetInfos();
+        }
 
-		targetInfos.put(target, targetInfo);
+        HashMap<String, String> targetInfo = targetInfos.get(target);
 
-		saveTokensToFile(targetInfos);
-	}
+        if (targetInfo == null) {
+            targetInfo = new LinkedHashMap<String, String>();
+        }
 
-	public void removeToken(URI target) {
-		TargetInfos targetInfos = getTokensFromFile();
-		targetInfos.remove(target);
-		saveTokensToFile(targetInfos);
-	}
+        targetInfos.putToken(targetInfo, token);
+        targetInfos.putRefreshToken(targetInfo, token.getRefreshToken());
+        targetInfos.putVersion(targetInfo, cloudInfo.getVersion());
+        targetInfos.putSpace(targetInfo, space.getMeta().getGuid().toString());
+        targetInfos.putOrganization(targetInfo, space.getOrganization().getMeta().getGuid().toString());
 
-	public String getTokensFilePath() {
-		return System.getProperty("user.home") + "/.cf/tokens.yml";
-	}
+        targetInfos.put(target, targetInfo);
 
-	protected TargetInfos getTokensFromFile() {
-		final File tokensFile = getTokensFile();
-		try {
-			YamlReader reader = new YamlReader(new FileReader(tokensFile));
-			return reader.read(TargetInfos.class);
-		} catch (FileNotFoundException fnfe) {
-			return new TargetInfos();
-		} catch (IOException e) {
-			throw new RuntimeException("An error occurred reading the tokens file at " +
-					tokensFile.getPath() + ":" + e.getMessage(), e);
-		}
+        saveTokensToFile(targetInfos);
+    }
 
-	}
+    protected File getTokensFile() {
+        return new File(getTokensFilePath());
+    }
 
-	protected void saveTokensToFile(TargetInfos targetInfos) {
-		final File tokensFile = getTokensFile();
-		tokensFile.getParentFile().mkdirs();
-		try {
-			FileWriter fileWriter = new FileWriter(tokensFile);
+    protected TargetInfos getTokensFromFile() {
+        final File tokensFile = getTokensFile();
+        try {
+            YamlReader reader = new YamlReader(new FileReader(tokensFile));
+            return reader.read(TargetInfos.class);
+        } catch (FileNotFoundException fnfe) {
+            return new TargetInfos();
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred reading the tokens file at " +
+                    tokensFile.getPath() + ":" + e.getMessage(), e);
+        }
 
-			YamlConfig config = new YamlConfig();
-			config.writeConfig.setAlwaysWriteClassname(false);
-			config.writeConfig.setWriteRootElementTags(false);
-			config.writeConfig.setWriteRootTags(false);
-			config.writeConfig.setExplicitFirstDocument(true);
-			YamlWriter yamlWriter = new YamlWriter(fileWriter, config);
+    }
 
-			yamlWriter.write(targetInfos);
+    protected void saveTokensToFile(TargetInfos targetInfos) {
+        final File tokensFile = getTokensFile();
+        tokensFile.getParentFile().mkdirs();
+        try {
+            FileWriter fileWriter = new FileWriter(tokensFile);
 
-			yamlWriter.close();
-			fileWriter.close();
-		} catch (IOException e) {
-			throw new RuntimeException("An error occurred writing the tokens file at " +
-					tokensFile.getPath() + ":" + e.getMessage(), e);
-		}
-	}
+            YamlConfig config = new YamlConfig();
+            config.writeConfig.setAlwaysWriteClassname(false);
+            config.writeConfig.setWriteRootElementTags(false);
+            config.writeConfig.setWriteRootTags(false);
+            config.writeConfig.setExplicitFirstDocument(true);
+            YamlWriter yamlWriter = new YamlWriter(fileWriter, config);
 
-	protected File getTokensFile() {
-		return new File(getTokensFilePath());
-	}
+            yamlWriter.write(targetInfos);
+
+            yamlWriter.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred writing the tokens file at " +
+                    tokensFile.getPath() + ":" + e.getMessage(), e);
+        }
+    }
 }

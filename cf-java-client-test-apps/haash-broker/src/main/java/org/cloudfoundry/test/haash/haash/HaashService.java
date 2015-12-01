@@ -19,9 +19,9 @@ public class HaashService {
         hashMaps.remove(id);
     }
 
-    public void put(String id, Object key, Object value) {
+    public void delete(String id, Object key) {
         Map<Object, Object> mapInstance = hashMaps.get(id);
-        mapInstance.put(key, value);
+        mapInstance.remove(key);
     }
 
     public Object get(String id, Object key) {
@@ -29,9 +29,9 @@ public class HaashService {
         return mapInstance.get(key);
     }
 
-    public void delete(String id, Object key) {
+    public void put(String id, Object key, Object value) {
         Map<Object, Object> mapInstance = hashMaps.get(id);
-        mapInstance.remove(key);
+        mapInstance.put(key, value);
     }
 
 }

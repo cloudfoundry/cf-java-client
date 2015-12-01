@@ -13,43 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven.common;
+
+import junit.framework.Assert;
+import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
-
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-
-import org.junit.Test;
 
 /**
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Scott Frederick
- *
  */
 public class CommonUtilsTest {
 
-	@Test
-	public void testValidEmailAddress() {
-		Assert.assertTrue(CommonUtils.isValidEmail("test@cloudfoundry.com"));
-	}
+    @Test
+    public void testInValidEmailAddress() {
+        Assert.assertFalse(CommonUtils.isValidEmail("test123"));
+    }
 
-	@Test
-	public void testInValidEmailAddress() {
-		Assert.assertFalse(CommonUtils.isValidEmail("test123"));
-	}
+    @Test
+    public void testServiceConfigurationsToCommaDelimitedString() {
+        List<CloudServiceOffering> list = new ArrayList<CloudServiceOffering>();
+        list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
 
-	@Test
-	public void testServiceConfigurationsToCommaDelimitedString() {
-		List<CloudServiceOffering> list = new ArrayList<CloudServiceOffering>();
-		list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
+        Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql");
 
-		Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql");
+        list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
+        Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql, mysql");
+    }
 
-		list.add(new CloudServiceOffering(null, "mysql", "vendor", "version"));
-		Assert.assertEquals(CommonUtils.serviceOfferingsToCommaDelimitedString(list), "mysql, mysql");
-	}
+    @Test
+    public void testValidEmailAddress() {
+        Assert.assertTrue(CommonUtils.isValidEmail("test@cloudfoundry.com"));
+    }
 }

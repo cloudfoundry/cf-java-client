@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.client.lib.archive;
 
-import java.util.zip.ZipFile;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.zip.ZipFile;
 
 /**
  * Tests for {@link ZipApplicationArchive}.

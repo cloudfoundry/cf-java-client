@@ -24,16 +24,15 @@ import org.apache.maven.plugin.MojoExecutionException;
  *
  * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal create-services
  * @phase process-sources
+ * @since 1.0.0
  */
 
 public class CreateServices extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		createServices();
-	}
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        createServices();
+    }
 }

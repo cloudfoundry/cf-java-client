@@ -7,139 +7,145 @@ import java.util.Arrays;
 
 public class Multipart {
 
-	public static final String CRLF = "\r\n";
-	public static final String DASHES = "--";
+    public static final String CRLF = "\r\n";
 
-	private final InputStream input;
-	private final String boundary;
-	private final String eomBoundary;
+    public static final String DASHES = "--";
 
-	private boolean firstPart = true;
+    private final String boundary;
 
-	private ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream(1024);
-	private byte[] prevHeader;
+    private final String eomBoundary;
 
-	public Multipart(InputStream input, String boundary) {
-		this.input = input;
-		this.boundary = DASHES + boundary + CRLF;
-		this.eomBoundary = DASHES + boundary + DASHES;
-	}
+    private final InputStream input;
 
-	public Part nextPart() {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream(1024);
 
-		byte[] line = readLine(input);
+    private boolean firstPart = true;
 
-		while (line.length > 0) {
-			if (isBoundaryLine(line)) {
-				byte[] header = trimCRLF(readLine(input));
+    private byte[] prevHeader;
 
-				if (firstPart) {
-					// found the first boundary maker, continue to get the first part
-					firstPart = false;
-					prevHeader = header;
-				} else {
-					Part part = new Part(trimCRLF(output.toByteArray()), prevHeader);
-					prevHeader = header;
-					return part;
-				}
-			} else if (isEomBoundaryLine(line)) {
-				drainInput();
-				if (firstPart) {
-					return null;
-				} else {
-					return new Part(trimCRLF(output.toByteArray()), prevHeader);
-				}
-			} else {
-				try {
-					output.write(line);
-				} catch (IOException e) {
-					rethrow(e);
-				}
-			}
+    public Multipart(InputStream input, String boundary) {
+        this.input = input;
+        this.boundary = DASHES + boundary + CRLF;
+        this.eomBoundary = DASHES + boundary + DASHES;
+    }
 
-			line = readLine(input);
-		}
+    public Part nextPart() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		byte[] content = output.toByteArray();
-		if (content.length > 0) {
-			return new Part(content, prevHeader);
-		} else {
-			return null;
-		}
-	}
+        byte[] line = readLine(input);
 
-	private byte[] readLine(InputStream input) {
-		byteBuffer.reset();
+        while (line.length > 0) {
+            if (isBoundaryLine(line)) {
+                byte[] header = trimCRLF(readLine(input));
 
-		try {
-			int value;
-			while ((value = input.read()) != -1) {
-				byteBuffer.write(value);
+                if (firstPart) {
+                    // found the first boundary maker, continue to get the first part
+                    firstPart = false;
+                    prevHeader = header;
+                } else {
+                    Part part = new Part(trimCRLF(output.toByteArray()), prevHeader);
+                    prevHeader = header;
+                    return part;
+                }
+            } else if (isEomBoundaryLine(line)) {
+                drainInput();
+                if (firstPart) {
+                    return null;
+                } else {
+                    return new Part(trimCRLF(output.toByteArray()), prevHeader);
+                }
+            } else {
+                try {
+                    output.write(line);
+                } catch (IOException e) {
+                    rethrow(e);
+                }
+            }
 
-				if (value == '\n') {
-					break;
-				}
-			}
-		} catch (IOException e) {
-			return rethrow(e);
-		}
+            line = readLine(input);
+        }
 
-		return byteBuffer.toByteArray();
-	}
+        byte[] content = output.toByteArray();
+        if (content.length > 0) {
+            return new Part(content, prevHeader);
+        } else {
+            return null;
+        }
+    }
 
-	private void drainInput() {
-		try {
-			input.skip(input.available());
-		} catch (IOException e) {
-			rethrow(e);
-		}
-	}
+    private void drainInput() {
+        try {
+            input.skip(input.available());
+        } catch (IOException e) {
+            rethrow(e);
+        }
+    }
 
-	private byte[] trimCRLF(byte[] bytes) {
-		if (endsWithCRLF(bytes)) {
-			return Arrays.copyOf(bytes, bytes.length - 2);
-		}
-		return bytes;
-	}
+    private boolean endsWithCRLF(byte[] bytes) {
+        int length = bytes.length;
 
-	private boolean endsWithCRLF(byte[] bytes) {
-		int length = bytes.length;
+        if (length < 2) {
+            return false;
+        }
 
-		if (length < 2) {
-			return false;
-		}
+        return bytes[length - 2] == '\r' && bytes[length - 1] == '\n';
+    }
 
-		return bytes[length - 2] == '\r' && bytes[length - 1] == '\n';
-	}
+    private boolean isBoundaryLine(byte[] line) {
+        return new String(line).equals(boundary);
+    }
 
-	private boolean isBoundaryLine(byte[] line) {
-		return new String(line).equals(boundary);
-	}
+    private boolean isEomBoundaryLine(byte[] line) {
+        return new String(line).startsWith(eomBoundary);
+    }
 
-	private boolean isEomBoundaryLine(byte[] line) {
-		return new String(line).startsWith(eomBoundary);
-	}
+    private byte[] readLine(InputStream input) {
+        byteBuffer.reset();
 
-	private byte[] rethrow(IOException e) {
-		throw new RuntimeException("Error reading multipart message", e);
-	}
+        try {
+            int value;
+            while ((value = input.read()) != -1) {
+                byteBuffer.write(value);
 
-	public class Part {
-		private byte[] content;
-		private String header;
+                if (value == '\n') {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            return rethrow(e);
+        }
 
-		Part(byte[] content, byte[] header) {
-			this.content = content;
-			this.header = new String(header);
-		}
+        return byteBuffer.toByteArray();
+    }
 
-		public byte[] getContent() {
-			return content;
-		}
+    private byte[] rethrow(IOException e) {
+        throw new RuntimeException("Error reading multipart message", e);
+    }
 
-		public String getHeader() {
-			return header;
-		}
-	}
+    private byte[] trimCRLF(byte[] bytes) {
+        if (endsWithCRLF(bytes)) {
+            return Arrays.copyOf(bytes, bytes.length - 2);
+        }
+        return bytes;
+    }
+
+    public class Part {
+
+        private byte[] content;
+
+        private String header;
+
+        Part(byte[] content, byte[] header) {
+            this.content = content;
+            this.header = new String(header);
+        }
+
+        public byte[] getContent() {
+            return content;
+        }
+
+        public String getHeader() {
+            return header;
+        }
+    }
 }

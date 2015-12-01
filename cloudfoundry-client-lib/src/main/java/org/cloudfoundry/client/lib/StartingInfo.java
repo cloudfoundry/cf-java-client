@@ -17,27 +17,24 @@
 package org.cloudfoundry.client.lib;
 
 /**
- * Starting info contains values from response headers when an application is
- * first started. One of the possible header values may be the location of the
- * staging log when starting an application.
- * 
+ * Starting info contains values from response headers when an application is first started. One of the possible header
+ * values may be the location of the staging log when starting an application.
+ *
  * @author Nieraj Singh.
- * 
  */
 public class StartingInfo {
 
-	private final String stagingFile;
+    private final String stagingFile;
 
-	public StartingInfo(String stagingFile) {
-		this.stagingFile = stagingFile;
-	}
+    public StartingInfo(String stagingFile) {
+        this.stagingFile = stagingFile;
+    }
 
-	/**
-	 * 
-	 * @return URL value of the file location for the staging log, or null if not available.
-	 */
-	public String getStagingFile() {
-		return stagingFile;
-	}
+    /**
+     * @return URL value of the file location for the staging log, or null if not available.
+     */
+    public String getStagingFile() {
+        return stagingFile;
+    }
 
 }

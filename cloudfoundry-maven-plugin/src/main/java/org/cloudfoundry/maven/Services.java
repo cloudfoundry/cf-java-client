@@ -17,52 +17,50 @@
 
 package org.cloudfoundry.maven;
 
+import org.cloudfoundry.client.lib.domain.CloudApplication;
+import org.cloudfoundry.client.lib.domain.CloudService;
+import org.cloudfoundry.maven.common.UiUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudService;
-
-import org.cloudfoundry.maven.common.UiUtils;
 
 /**
  * Displays information about provisioned service instances.
  *
  * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal services
  * @phase process-sources
+ * @since 1.0.0
  */
 
 public class Services extends AbstractCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		final List<CloudService> services = getClient().getServices();
-		final List<CloudApplication> apps = getClient().getApplications();
-		final Map<String, List<String>> servicesToApps = mapServicesToApps(services, apps);
-		getLog().info("Services instances");
-		getLog().info("\n" + UiUtils.renderServiceDataAsTable(services, servicesToApps));
-	}
+    @Override
+    protected void doExecute() {
+        final List<CloudService> services = getClient().getServices();
+        final List<CloudApplication> apps = getClient().getApplications();
+        final Map<String, List<String>> servicesToApps = mapServicesToApps(services, apps);
+        getLog().info("Services instances");
+        getLog().info("\n" + UiUtils.renderServiceDataAsTable(services, servicesToApps));
+    }
 
-	protected Map<String, List<String>> mapServicesToApps(List<CloudService> services, List<CloudApplication> apps) {
-		Map<String, List<String>> servicesToApps = new HashMap<String, List<String>>(services.size());
+    protected Map<String, List<String>> mapServicesToApps(List<CloudService> services, List<CloudApplication> apps) {
+        Map<String, List<String>> servicesToApps = new HashMap<String, List<String>>(services.size());
 
-		for (CloudApplication app : apps) {
-			for (String serviceName : app.getServices()) {
-				List<String> appNames = servicesToApps.get(serviceName);
-				if (appNames == null) {
-					appNames = new ArrayList<String>();
-				}
-				appNames.add(app.getName());
-				servicesToApps.put(serviceName, appNames);
-			}
-		}
+        for (CloudApplication app : apps) {
+            for (String serviceName : app.getServices()) {
+                List<String> appNames = servicesToApps.get(serviceName);
+                if (appNames == null) {
+                    appNames = new ArrayList<String>();
+                }
+                appNames.add(app.getName());
+                servicesToApps.put(serviceName, appNames);
+            }
+        }
 
-		return servicesToApps;
-	}
+        return servicesToApps;
+    }
 }

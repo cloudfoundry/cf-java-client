@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.client.lib;
 
-import java.net.URI;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+
+import java.net.URI;
 
 /**
  * RestLogEntry containing the values logged for each REST call
@@ -28,37 +28,41 @@ import org.springframework.http.HttpStatus;
  */
 public class RestLogEntry {
 
-	private HttpMethod method;
-	private URI uri;
-	private String status;
-	private HttpStatus httpStatus;
-	private String message;
+    private HttpStatus httpStatus;
 
-	public RestLogEntry(HttpMethod method, URI uri, String status, HttpStatus httpStatus, String message) {
-		this.method = method;
-		this.uri = uri;
-		this.status = status;
-		this.httpStatus = httpStatus;
-		this.message = message;
-	}
+    private String message;
 
-	public HttpMethod getMethod() {
-		return method;
-	}
+    private HttpMethod method;
 
-	public URI getUri() {
-		return uri;
-	}
+    private String status;
 
-	public String getStatus() {
-		return status;
-	}
+    private URI uri;
 
-	public HttpStatus getHttpStatus() {
-		return httpStatus;
-	}
+    public RestLogEntry(HttpMethod method, URI uri, String status, HttpStatus httpStatus, String message) {
+        this.method = method;
+        this.uri = uri;
+        this.status = status;
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public URI getUri() {
+        return uri;
+    }
 }

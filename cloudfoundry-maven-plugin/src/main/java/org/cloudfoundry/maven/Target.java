@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.cloudfoundry.client.lib.domain.CloudInfo;
-
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
@@ -28,17 +27,15 @@ import org.cloudfoundry.maven.common.UiUtils;
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
  * @author Scott Frederick
- *
- * @since 1.0.0
- *
  * @goal target
  * @requiresProject false
+ * @since 1.0.0
  */
 public class Target extends AbstractCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		final CloudInfo cloudInfo = getClient().getCloudInfo();
-		getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, getTarget().toString(), getOrg(), getSpace()));
-	}
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        final CloudInfo cloudInfo = getClient().getCloudInfo();
+        getLog().info(UiUtils.renderCloudInfoFormattedAsString(cloudInfo, getTarget().toString(), getOrg(), getSpace()));
+    }
 }

@@ -23,17 +23,17 @@ import java.util.Map;
 
 public class CrashesInfo {
 
-	private final List<CrashInfo> crashes;
+    private final List<CrashInfo> crashes;
 
-	public CrashesInfo(List<Map<String, Object>> attributes) {
-		List<CrashInfo> crashes = new ArrayList<CrashInfo>(attributes.size());
-		for (Map<String, Object> data : attributes) {
-			crashes.add(new CrashInfo(data));
-		}
-		this.crashes = Collections.unmodifiableList(crashes);
-	}
+    public CrashesInfo(List<Map<String, Object>> attributes) {
+        List<CrashInfo> crashes = new ArrayList<CrashInfo>(attributes.size());
+        for (Map<String, Object> data : attributes) {
+            crashes.add(new CrashInfo(data));
+        }
+        this.crashes = Collections.unmodifiableList(crashes);
+    }
 
-	public List<CrashInfo> getCrashes() {
-		return crashes;
-	}
+    public List<CrashInfo> getCrashes() {
+        return crashes;
+    }
 }

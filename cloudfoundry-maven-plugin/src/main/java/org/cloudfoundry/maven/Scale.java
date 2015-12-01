@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,30 +25,29 @@ import org.cloudfoundry.maven.common.SystemProperties;
  * Scale the application instances up or down.
  *
  * @author Gunnar Hillert
- * @since 1.0.0
- *
  * @goal scale
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Scale extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
+    @Override
+    protected void doExecute() throws MojoExecutionException {
 
-		final Integer instances = getInstances();
-		final String appname = getAppname();
+        final Integer instances = getInstances();
+        final String appname = getAppname();
 
-		Assert.configurationNotNull(instances, "instances", SystemProperties.INSTANCES);
+        Assert.configurationNotNull(instances, "instances", SystemProperties.INSTANCES);
 
-		getLog().info(String.format("Setting number of instances for application '%s' to '%s'", appname, instances));
+        getLog().info(String.format("Setting number of instances for application '%s' to '%s'", appname, instances));
 
-		try {
-			getClient().updateApplicationInstances(appname, instances);
-		} catch (CloudFoundryException e) {
-			throw new MojoExecutionException(
-					String.format("Error setting  number of instances for " +
-							"application '%s'. Error message: '%s'. Description: '%s'",
-							getAppname(), e.getMessage(), e.getDescription()), e);
-		}
-	}
+        try {
+            getClient().updateApplicationInstances(appname, instances);
+        } catch (CloudFoundryException e) {
+            throw new MojoExecutionException(
+                    String.format("Error setting  number of instances for " +
+                                    "application '%s'. Error message: '%s'. Description: '%s'",
+                            getAppname(), e.getMessage(), e.getDescription()), e);
+        }
+    }
 }

@@ -13,65 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
-import java.io.File;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.maven.common.SystemProperties;
 
+import java.io.File;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
 /**
  * Test the existence of several default parameter values.
  *
  * @author Gunnar Hillert
  * @since 1.0.0
- *
  */
 public class CheckDefaultParametersMojosTest extends AbstractMojoTestCase {
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+    /**
+     * @throws Exception
+     */
+    public void testDefaultParametersOfPushMojoGoal() throws Exception {
 
-	/**
-	 * @throws Exception
-	 */
-	public void testDefaultParametersOfPushMojoGoal() throws Exception {
+        File testPom = new File(getBasedir(), "src/test/resources/test-pom.xml");
 
-		File testPom = new File( getBasedir(), "src/test/resources/test-pom.xml" );
+        Push unspiedMojo = (Push) lookupMojo("push", testPom);
 
-		Push unspiedMojo = (Push) lookupMojo ( "push", testPom );
+        Push mojo = spy(unspiedMojo);
 
-		Push mojo = spy(unspiedMojo);
+        /**
+         * Injecting some test values as expressions are not evaluated.
+         */
+        setVariableValueToObject(mojo, "artifactId", "cf-maven-tests");
+        setVariableValueToObject(mojo, "artifact", "someGAV");
 
-		/**
-		 * Injecting some test values as expressions are not evaluated.
-		 */
-		setVariableValueToObject( mojo, "artifactId", "cf-maven-tests" );
-		setVariableValueToObject( mojo, "artifact", "someGAV");
+        CloudFoundryClient client = mock(CloudFoundryClient.class);
+        doReturn(new CloudDomain(null, "apps.cloudfoundry.com", null)).when(client).getDefaultDomain();
+        doReturn(client).when(mojo).getClient();
 
-		CloudFoundryClient client = mock(CloudFoundryClient.class);
-		doReturn(new CloudDomain(null, "apps.cloudfoundry.com", null)).when(client).getDefaultDomain();
-		doReturn(client).when(mojo).getClient();
+        doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
 
-		doReturn(null).when(mojo).getCommandlineProperty(any(SystemProperties.class));
+        assertEquals("cf-maven-tests", mojo.getAppname());
+        assertNull(mojo.getMemory());
+        assertNull("Password by default is null.", mojo.getPassword());
+        assertEquals("cloud-foundry-credentials", mojo.getServer());
+        assertTrue(mojo.getServices().isEmpty());
+        assertNull("Target Url is not backed by a default value.", mojo.getTarget());
+        assertNull("Username by default is null.", mojo.getUsername());
+    }
 
-		assertEquals("cf-maven-tests", mojo.getAppname());
-		assertNull(mojo.getMemory());
-		assertNull("Password by default is null.", mojo.getPassword());
-		assertEquals("cloud-foundry-credentials", mojo.getServer());
-		assertTrue(mojo.getServices().isEmpty());
-		assertNull("Target Url is not backed by a default value.", mojo.getTarget());
-		assertNull("Username by default is null.", mojo.getUsername());
-	}
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
 }

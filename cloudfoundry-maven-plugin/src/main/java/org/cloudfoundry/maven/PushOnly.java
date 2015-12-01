@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 /**
- * Push and optionally start an application without forking the build to execute 'package'. 
+ * Push and optionally start an application without forking the build to execute 'package'.
  *
  * @author Gunnar Hillert
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
  * @author Mike Youngstrom
- *
- * @since 1.0.0
- *
  * @goal push-only
+ * @since 1.0.0
  */
 public class PushOnly extends AbstractPush {
+
 }

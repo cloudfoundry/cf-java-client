@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven.common;
 
 import java.util.HashMap;
@@ -25,36 +26,36 @@ import java.util.Map;
  *
  * @author Gunnar Hillert
  * @since 1.0.0
- *
  */
 public class TableRow {
 
-	/** Holds the data for the column */
-	private Map<Integer, String> data = new HashMap<Integer, String>();
+    /**
+     * Holds the data for the column
+     */
+    private Map<Integer, String> data = new HashMap<Integer, String>();
 
-	public void setData(Map<Integer, String> data) {
-		this.data = data;
-	}
+    /**
+     * Add a value to the to the specified column within this row.
+     *
+     * @param column
+     * @param value
+     */
+    public void addValue(Integer column, String value) {
+        this.data.put(column, value);
+    }
 
-	/**
-	 * Return a value from this row.
-	 *
-	 * @param key Column for which to return the value for
-	 * @return Value of the specified column within this row
-	 *
-	 */
-	public String getValue(Integer key) {
-		return data.get(key);
-	}
+    /**
+     * Return a value from this row.
+     *
+     * @param key Column for which to return the value for
+     * @return Value of the specified column within this row
+     */
+    public String getValue(Integer key) {
+        return data.get(key);
+    }
 
-	/**
-	 * Add a value to the to the specified column within this row.
-	 *
-	 * @param column
-	 * @param value
-	 */
-	public void addValue(Integer column, String value) {
-		this.data.put(column, value);
-	}
+    public void setData(Map<Integer, String> data) {
+        this.data = data;
+    }
 
 }

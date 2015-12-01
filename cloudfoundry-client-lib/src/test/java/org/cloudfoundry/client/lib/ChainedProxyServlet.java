@@ -11,47 +11,50 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * An http proxy implementation that is able to chain request to another proxy. Usefull when starting an InJvm proxy chained to another
- * corporate proxy.
+ * An http proxy implementation that is able to chain request to another proxy. Usefull when starting an InJvm proxy
+ * chained to another corporate proxy.
  */
 public class ChainedProxyServlet extends ProxyServlet {
-	private AtomicInteger nbReceivedRequests;
-	/**
-	 * If ever this junit test needs a proxy to reach the Cf instance, we direct to it.
-	 */
-	private HttpProxyConfiguration httpProxyConfiguration;
 
-	public ChainedProxyServlet(HttpProxyConfiguration httpProxyConfiguration, AtomicInteger nbReceivedRequests) {
-		this.httpProxyConfiguration = httpProxyConfiguration;
-		this.nbReceivedRequests = nbReceivedRequests;
-	}
+    /**
+     * If ever this junit test needs a proxy to reach the Cf instance, we direct to it.
+     */
+    private HttpProxyConfiguration httpProxyConfiguration;
 
-	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-		nbReceivedRequests.incrementAndGet();
-		super.service(req, res);
-	}
+    private AtomicInteger nbReceivedRequests;
 
-	@Override
-	protected HttpClient createHttpClientInstance() {
-		HttpClient httpClient = super.createHttpClientInstance();
-		if (httpProxyConfiguration != null) {
-			httpClient.setProxy(new Address(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort()));
-		}
-		return httpClient;
-	}
+    public ChainedProxyServlet(HttpProxyConfiguration httpProxyConfiguration, AtomicInteger nbReceivedRequests) {
+        this.httpProxyConfiguration = httpProxyConfiguration;
+        this.nbReceivedRequests = nbReceivedRequests;
+    }
 
-	/** jetty 9 impl variant which imposes upgrade to java 7
+    @Override
+    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+        nbReceivedRequests.incrementAndGet();
+        super.service(req, res);
+    }
+
+    @Override
+    protected HttpClient createHttpClientInstance() {
+        HttpClient httpClient = super.createHttpClientInstance();
+        if (httpProxyConfiguration != null) {
+            httpClient.setProxy(new Address(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration
+                    .getProxyPort()));
+        }
+        return httpClient;
+    }
+
+    /** jetty 9 impl variant which imposes upgrade to java 7
 
 
-	@Override
-	protected HttpClient createHttpClient() throws ServletException {
-		HttpClient httpClient = super.createHttpClient();
-		if (httpProxyConfiguration != null) {
-			ProxyConfiguration proxyConfiguration = new ProxyConfiguration(httpProxyConfiguration.getProxyHost(), httpProxyConfiguration.getProxyPort());
-			httpClient.setProxyConfiguration(proxyConfiguration);
-		}
-		return httpClient;
-	}
-	*/
+     @Override protected HttpClient createHttpClient() throws ServletException {
+     HttpClient httpClient = super.createHttpClient();
+     if (httpProxyConfiguration != null) {
+     ProxyConfiguration proxyConfiguration = new ProxyConfiguration(httpProxyConfiguration.getProxyHost(),
+     httpProxyConfiguration.getProxyPort());
+     httpClient.setProxyConfiguration(proxyConfiguration);
+     }
+     return httpClient;
+     }
+     */
 }

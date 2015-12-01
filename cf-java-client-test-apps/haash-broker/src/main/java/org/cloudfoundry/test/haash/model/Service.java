@@ -1,6 +1,11 @@
 package org.cloudfoundry.test.haash.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,21 +13,33 @@ import java.util.Set;
 @Table(name = "services")
 public class Service {
 
+    @Column(nullable = false)
+    private boolean bindable;
+
+    @Column(nullable = false)
+    private String description;
+
     @Id
     private String id;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
-    private boolean bindable;
-
     @OneToMany(orphanRemoval = true)
     @JoinColumn(name = "service_id")
     private Set<Plan> plans = new HashSet<>();
+
+    public void addPlan(Plan plan) {
+        this.plans.add(plan);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getId() {
         return id;
@@ -40,22 +57,6 @@ public class Service {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isBindable() {
-        return bindable;
-    }
-
-    public void setBindable(boolean bindable) {
-        this.bindable = bindable;
-    }
-
     public Set<Plan> getPlans() {
         return plans;
     }
@@ -64,7 +65,11 @@ public class Service {
         this.plans = plans;
     }
 
-    public void addPlan(Plan plan) {
-        this.plans.add(plan);
+    public boolean isBindable() {
+        return bindable;
+    }
+
+    public void setBindable(boolean bindable) {
+        this.bindable = bindable;
     }
 }

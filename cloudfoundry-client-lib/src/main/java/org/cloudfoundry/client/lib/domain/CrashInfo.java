@@ -22,19 +22,21 @@ import java.util.Date;
 import java.util.Map;
 
 public class CrashInfo {
-	private final Date since;
-	private final String instance;
 
-	public CrashInfo(Map<String, Object> infoMap) {
-		since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
-		instance = CloudUtil.parse(String.class, infoMap.get("instance"));
-	}
+    private final String instance;
 
-	public Date getSince() {
-		return since;
-	}
+    private final Date since;
 
-	public String getInstance() {
-		return instance;
-	}
+    public CrashInfo(Map<String, Object> infoMap) {
+        since = new Date(CloudUtil.parse(Long.class, infoMap.get("since")) * 1000);
+        instance = CloudUtil.parse(String.class, infoMap.get("instance"));
+    }
+
+    public String getInstance() {
+        return instance;
+    }
+
+    public Date getSince() {
+        return since;
+    }
 }

@@ -32,18 +32,28 @@ public abstract class AbstractApplicationArchiveEntry implements ApplicationArch
 
     private static final int BUFFER_SIZE = 4096;
 
-    private long size = UNDEFINED_SIZE;
-
     private byte[] sha1Digest;
 
+    private long size = UNDEFINED_SIZE;
+
+    public byte[] getSha1Digest() {
+        if (isDirectory()) {
+            return null;
+        }
+        if (sha1Digest == null) {
+            deduceMissingData();
+        }
+        return sha1Digest;
+    }
+
     /**
-     * Sets the size that should be returned. If this method is not called the size will be deduced by reading the
-     * stream.
+     * Sets the SHA1 digest that should be returned. If this method is not called the digest will be deduced by reading
+     * the stream.
      *
-     * @param size the size.
+     * @param sha1Digest
      */
-    protected void setSize(long size) {
-        this.size = size;
+    protected void setSha1Digest(byte[] sha1Digest) {
+        this.sha1Digest = sha1Digest;
     }
 
     public long getSize() {
@@ -57,23 +67,13 @@ public abstract class AbstractApplicationArchiveEntry implements ApplicationArch
     }
 
     /**
-     * Sets the SHA1 digest that should be returned. If this method is not called the digest will be deduced by reading
-     * the stream.
+     * Sets the size that should be returned. If this method is not called the size will be deduced by reading the
+     * stream.
      *
-     * @param sha1Digest
+     * @param size the size.
      */
-    protected void setSha1Digest(byte[] sha1Digest) {
-        this.sha1Digest = sha1Digest;
-    }
-
-    public byte[] getSha1Digest() {
-        if (isDirectory()) {
-            return null;
-        }
-        if (sha1Digest == null) {
-            deduceMissingData();
-        }
-        return sha1Digest;
+    protected void setSize(long size) {
+        this.size = size;
     }
 
     private void deduceMissingData() {

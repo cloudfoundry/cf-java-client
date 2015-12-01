@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cf-java-client.iml" filepath="$PROJECT_DIR$/cf-java-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cf-java-client-test-apps/cf-java-client-test-apps.iml" filepath="$PROJECT_DIR$/cf-java-client-test-apps/cf-java-client-test-apps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloudfoundry-maven-plugin/cf-maven-plugin.iml" filepath="$PROJECT_DIR$/cloudfoundry-maven-plugin/cf-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloudfoundry-client-lib/cloudfoundry-client-lib.iml" filepath="$PROJECT_DIR$/cloudfoundry-client-lib/cloudfoundry-client-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cf-java-client-test-apps/haash-broker/haash-broker.iml" filepath="$PROJECT_DIR$/cf-java-client-test-apps/haash-broker/haash-broker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cf-java-client-test-apps/non-ascii-file-name/non-ascii-file-name.iml" filepath="$PROJECT_DIR$/cf-java-client-test-apps/non-ascii-file-name/non-ascii-file-name.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cf-java-client-test-apps/simple-spring-app/simple-spring-app.iml" filepath="$PROJECT_DIR$/cf-java-client-test-apps/simple-spring-app/simple-spring-app.iml" />
+    </modules>
+  </component>
+</project>

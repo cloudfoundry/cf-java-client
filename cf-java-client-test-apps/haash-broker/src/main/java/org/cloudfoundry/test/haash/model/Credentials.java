@@ -16,13 +16,13 @@ public class Credentials {
     private String id;
 
     @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String uri;
 
     @Column(nullable = false)
     private String username;
-
-    @Column(nullable = false)
-    private String password;
 
     public String getId() {
         return id;
@@ -30,6 +30,14 @@ public class Credentials {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getUri() {
@@ -46,13 +54,5 @@ public class Credentials {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

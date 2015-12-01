@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.lib.archive;
 
+import org.springframework.util.Assert;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipFile;
-
-import org.springframework.util.Assert;
 
 /**
  * Implementation of {@link ApplicationArchive} backed by a {@link ZipFile}.
@@ -48,9 +48,17 @@ public class DirectoryApplicationArchive implements ApplicationArchive {
         this.entries = Collections.unmodifiableList(entries);
     }
 
+    public Iterable<Entry> getEntries() {
+        return entries;
+    }
+
+    public String getFilename() {
+        return directory.getName();
+    }
+
     private void collectEntries(List<Entry> entries, File directory) {
         for (File child : directory.listFiles()) {
-            if(!exclude(child)){
+            if (!exclude(child)) {
                 entries.add(new EntryAdapter(child));
                 if (child.isDirectory()) {
                     collectEntries(entries, child);
@@ -60,38 +68,23 @@ public class DirectoryApplicationArchive implements ApplicationArchive {
     }
 
     private boolean exclude(File file) {
-        return file.getName().startsWith(".git") || 
-               file.getName().startsWith(".svn") || 
-               file.getName().startsWith(".darcs");
-    }
-
-    public String getFilename() {
-        return directory.getName();
-    }
-
-    public Iterable<Entry> getEntries() {
-        return entries;
+        return file.getName().startsWith(".git") ||
+                file.getName().startsWith(".svn") ||
+                file.getName().startsWith(".darcs");
     }
 
     private class EntryAdapter extends AbstractApplicationArchiveEntry {
 
         private File file;
+
         private String name;
 
         public EntryAdapter(File file) {
             this.file = file;
-            this.name = file.getAbsolutePath().substring(directory.getAbsolutePath().length()+1);
+            this.name = file.getAbsolutePath().substring(directory.getAbsolutePath().length() + 1);
             if (isDirectory()) {
                 this.name = this.name + File.separatorChar;
             }
-        }
-
-        public boolean isDirectory() {
-            return file.isDirectory();
-        }
-
-        public String getName() {
-            return name;
         }
 
         public InputStream getInputStream() throws IOException {
@@ -99,6 +92,14 @@ public class DirectoryApplicationArchive implements ApplicationArchive {
                 return null;
             }
             return new FileInputStream(file);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isDirectory() {
+            return file.isDirectory();
         }
     }
 }
