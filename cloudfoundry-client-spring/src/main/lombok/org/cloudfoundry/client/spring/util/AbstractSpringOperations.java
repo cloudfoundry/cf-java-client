@@ -53,7 +53,7 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final <T> Stream<T> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
+    protected final Stream<Void> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -148,7 +148,7 @@ public abstract class AbstractSpringOperations {
             URI uri = builder.build().toUri();
 
             this.logger.debug("PUT {}", uri);
-            return this.restOperations.exchange(new RequestEntity<B>(bodySupplier.get(), null, PUT, uri),
+            return this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri),
                     responseType).getBody();
         });
 
