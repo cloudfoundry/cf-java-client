@@ -1,15 +1,16 @@
 package org.cloudfoundry.client.lib.domain;
 
-public class CloudStack  extends CloudEntity {
-	private String description;
+public class CloudStack extends CloudEntity {
 
-	public CloudStack(Meta meta, String name, String description) {
-		setMeta(meta);
-		setName(name);
-		this.description = description;
-	}
+    private String description;
 
-	public String getDescription() {
-		return description;
-	}
+    public CloudStack(Meta meta, String name, String description) {
+        setMeta(meta);
+        setName(name);
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

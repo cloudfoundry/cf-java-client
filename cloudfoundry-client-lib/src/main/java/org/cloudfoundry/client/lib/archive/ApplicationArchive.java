@@ -28,18 +28,18 @@ import java.io.InputStream;
 public interface ApplicationArchive {
 
     /**
-     * Returns the filename of the archive (excluding any path).
-     *
-     * @return the filename (for example myproject.war)
-     */
-    String getFilename();
-
-    /**
      * Returns {@link Entry entries} that the archive contains.
      *
      * @return a collection of entries.
      */
     Iterable<Entry> getEntries();
+
+    /**
+     * Returns the filename of the archive (excluding any path).
+     *
+     * @return the filename (for example myproject.war)
+     */
+    String getFilename();
 
     /**
      * A single entry contained within an {@link ApplicationArchive}. Entries are used to represent both files and
@@ -48,11 +48,13 @@ public interface ApplicationArchive {
     public static interface Entry {
 
         /**
-         * Returns <tt>true</tt> if the entry represents a directory.
+         * Returns the content of the entry or <tt>null</tt> if the entry is a {@link #isDirectory() directory}. The
+         * caller is responsible for closing the stream.
          *
-         * @return if the entry is a directory.
+         * @return the file contents
+         * @throws IOException
          */
-        boolean isDirectory();
+        InputStream getInputStream() throws IOException;
 
         /**
          * Returns the name of entry including a path. The <tt>'/'</tt> character should be used as a path separator.
@@ -63,13 +65,6 @@ public interface ApplicationArchive {
         String getName();
 
         /**
-         * Returns the size of entry or <tt>0</tt> if the entry is a {@link #isDirectory() directory}.
-         *
-         * @return the size
-         */
-        long getSize();
-
-        /**
          * Returns a SHA1 digest over the {@link #getInputStream() contents} of the entry or <tt>null</tt> if the entry
          * is a {@link #isDirectory() directory}.
          *
@@ -78,12 +73,17 @@ public interface ApplicationArchive {
         byte[] getSha1Digest();
 
         /**
-         * Returns the content of the entry or <tt>null</tt> if the entry is a {@link #isDirectory() directory}. The
-         * caller is responsible for closing the stream.
+         * Returns the size of entry or <tt>0</tt> if the entry is a {@link #isDirectory() directory}.
          *
-         * @return the file contents
-         * @throws IOException
+         * @return the size
          */
-        InputStream getInputStream() throws IOException;
+        long getSize();
+
+        /**
+         * Returns <tt>true</tt> if the entry represents a directory.
+         *
+         * @return if the entry is a directory.
+         */
+        boolean isDirectory();
     }
 }

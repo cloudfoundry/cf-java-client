@@ -26,18 +26,17 @@ import java.util.List;
  * Displays information about available services.
  *
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal service-plans
  * @phase process-sources
+ * @since 1.0.0
  */
 
 public class ServicePlans extends AbstractCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		final List<CloudServiceOffering> serviceOfferings = getClient().getServiceOfferings();
-		getLog().info("Available Services");
-		getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
-	}
+    @Override
+    protected void doExecute() {
+        final List<CloudServiceOffering> serviceOfferings = getClient().getServiceOfferings();
+        getLog().info("Available Services");
+        getLog().info("\n" + UiUtils.renderServiceOfferingDataAsTable(serviceOfferings));
+    }
 }

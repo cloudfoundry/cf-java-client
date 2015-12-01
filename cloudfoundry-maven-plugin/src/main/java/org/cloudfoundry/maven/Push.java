@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 /**
@@ -22,13 +23,9 @@ package org.cloudfoundry.maven;
  * @author Stephan Oudmaijer
  * @author Ali Moghadam
  * @author Scott Frederick
- *
- * @since 1.0.0
- *
  * @goal push
- *
- * @execute phase="package"
- * *
+ * @execute phase="package" *
+ * @since 1.0.0
  */
 public class Push extends AbstractPush {
 

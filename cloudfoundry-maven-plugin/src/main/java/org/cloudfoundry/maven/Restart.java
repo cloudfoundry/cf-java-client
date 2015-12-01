@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,29 +27,28 @@ import org.springframework.http.HttpStatus;
  *
  * @author Gunnar Hillert
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal restart
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Restart extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		try {
-			getLog().info(String.format("Restarting application '%s'", getAppname()));
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        try {
+            getLog().info(String.format("Restarting application '%s'", getAppname()));
 
-			final StartingInfo startingInfo = getClient().restartApplication(getAppname());
-			showStagingStatus(startingInfo);
+            final StartingInfo startingInfo = getClient().restartApplication(getAppname());
+            showStagingStatus(startingInfo);
 
-			final CloudApplication application = getClient().getApplication(getAppname());
-			showStartingStatus(application);
-			showStartResults(application, getAllUris());
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				throw new MojoExecutionException(String.format("Application '%s' does not exist",
-						getAppname()), e);
-			}
-		}
-	}
+            final CloudApplication application = getClient().getApplication(getAppname());
+            showStartingStatus(application);
+            showStartResults(application, getAllUris());
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                throw new MojoExecutionException(String.format("Application '%s' does not exist",
+                        getAppname()), e);
+            }
+        }
+    }
 }

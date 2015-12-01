@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="non-ascii-file-name:war">
+    <output-path>$PROJECT_DIR$/cf-java-client-test-apps/non-ascii-file-name/target</output-path>
+    <root id="archive" name="non-ascii-file-name.war">
+      <element id="artifact" artifact-name="non-ascii-file-name:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -22,15 +22,15 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class CloudSpace extends CloudEntity {
 
-	private CloudOrganization organization;
+    private CloudOrganization organization;
 
-	public CloudSpace(Meta meta, String name, CloudOrganization organization) {
-		super(meta, name);
-		this.organization = organization;
-	}
+    public CloudSpace(Meta meta, String name, CloudOrganization organization) {
+        super(meta, name);
+        this.organization = organization;
+    }
 
-	public CloudOrganization getOrganization() {
-		return organization;
-	}
+    public CloudOrganization getOrganization() {
+        return organization;
+    }
 
 }

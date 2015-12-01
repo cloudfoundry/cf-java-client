@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
@@ -23,21 +24,19 @@ import org.cloudfoundry.maven.common.UiUtils;
  * Display environment variables set for the application.
  *
  * @author Scott Frederick
- *
- * @since 1.0.0
- *
  * @goal env
  * @requiresProject false
+ * @since 1.0.0
  */
 public class Env extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		try {
-			final CloudApplication application = getClient().getApplication(getAppname());
-			getLog().info("\n" + UiUtils.renderEnvVarDataAsTable(application));
-		} catch (CloudFoundryException e) {
-			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
-		}
-	}
+    @Override
+    protected void doExecute() {
+        try {
+            final CloudApplication application = getClient().getApplication(getAppname());
+            getLog().info("\n" + UiUtils.renderEnvVarDataAsTable(application));
+        } catch (CloudFoundryException e) {
+            getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
+        }
+    }
 }

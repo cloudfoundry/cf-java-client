@@ -21,19 +21,19 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class CloudDomain extends CloudEntity {
 
-	private CloudOrganization owner;
+    private CloudOrganization owner;
 
-	public CloudDomain(Meta meta, String name, CloudOrganization owner) {
-		super(meta, name);
-		this.owner = owner;
-	}
+    public CloudDomain(Meta meta, String name, CloudOrganization owner) {
+        super(meta, name);
+        this.owner = owner;
+    }
 
-	public CloudOrganization getOwner() {
-		return owner;
-	}
+    public CloudOrganization getOwner() {
+        return owner;
+    }
 
-	@Override
-	public String toString() {
-		return getName() + " (" + (owner != null ? owner.getName() : "-") + ")";
-	}
+    @Override
+    public String toString() {
+        return getName() + " (" + (owner != null ? owner.getName() : "-") + ")";
+    }
 }

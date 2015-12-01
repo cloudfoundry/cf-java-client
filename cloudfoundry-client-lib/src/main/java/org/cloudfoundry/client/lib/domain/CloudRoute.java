@@ -21,37 +21,37 @@ package org.cloudfoundry.client.lib.domain;
  */
 public class CloudRoute extends CloudEntity {
 
-	private String host;
+    private int appsUsingRoute;
 
-	private CloudDomain domain;
+    private CloudDomain domain;
 
-	private int appsUsingRoute;
+    private String host;
 
-	public CloudRoute(Meta meta, String host, CloudDomain domain, int appsUsingRoute) {
-		super(meta, host + "." + domain.getName());
-		this.host = host;
-		this.domain = domain;
-		this.appsUsingRoute = appsUsingRoute;
-	}
+    public CloudRoute(Meta meta, String host, CloudDomain domain, int appsUsingRoute) {
+        super(meta, host + "." + domain.getName());
+        this.host = host;
+        this.domain = domain;
+        this.appsUsingRoute = appsUsingRoute;
+    }
 
-	public String getHost() {
-		return host;
-	}
+    public int getAppsUsingRoute() {
+        return appsUsingRoute;
+    }
 
-	public CloudDomain getDomain() {
-		return domain;
-	}
+    public CloudDomain getDomain() {
+        return domain;
+    }
 
-	public int getAppsUsingRoute() {
-		return appsUsingRoute;
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public boolean inUse() {
-		return appsUsingRoute > 0;
-	}
+    public boolean inUse() {
+        return appsUsingRoute > 0;
+    }
 
-	@Override
-	public String toString() {
-		return getName();
-	}
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

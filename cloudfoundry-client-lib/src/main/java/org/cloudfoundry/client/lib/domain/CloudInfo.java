@@ -28,188 +28,208 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class CloudInfo {
 
-	private Limits limits;
-	private Usage usage;
-	private String name;
-	private String support;
-	private String build;
-	private String version;
-	private String user;
-	private String description;
-	private String authorizationEndpoint;
-	private boolean allowDebug;
+    private boolean allowDebug;
+
+    private String authorizationEndpoint;
+
+    private String build;
+
+    private String description;
+
+    private Limits limits;
+
     private String loggregatorEndpoint;
 
-	@SuppressWarnings("unchecked")
-	public CloudInfo(Map<String, Object> infoMap) {
-		name = CloudUtil.parse(String.class, infoMap.get("name"));
-		support = CloudUtil.parse(String.class, infoMap.get("support"));
-		build = CloudUtil.parse(String.class, infoMap.get("build"));
-		version = CloudUtil.parse(String.class, infoMap.get("version"));
-		if (version == null) {
-			Number iVersion = CloudUtil.parse(Number.class, infoMap.get("version"));
-			if (iVersion != null) {
-				version = iVersion.toString();
-			}
-		}
-		user = CloudUtil.parse(String.class, infoMap.get("user"));
-		description = CloudUtil.parse(String.class, infoMap.get("description"));
-		authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
-		loggregatorEndpoint = CloudUtil.parse(String.class, infoMap.get("logging_endpoint"));
+    private String name;
 
-		Object allowDebugValue = infoMap.get("allow_debug");
-		if (allowDebugValue != null) {
-			allowDebug = CloudUtil.parse(Boolean.class, allowDebugValue);
-		} else {
-			allowDebug = false; // default to false
-		}
+    private String support;
 
-		Map<String, Object> limitsMap = CloudUtil.parse(Map.class, infoMap.get("limits"));
-		if (limitsMap != null) {
-			limits = new Limits(limitsMap);
-		} else {
-			limits = new Limits();
-		}
+    private Usage usage;
 
-		Map<String, Object> usageMap = CloudUtil.parse(Map.class, infoMap.get("usage"));
-		if (usageMap != null) {
-			usage = new Usage(usageMap);
-		} else {
-			usage = new Usage();
-		}
-	}
+    private String user;
 
-	public CloudInfo(String name, String support, String authorizationEndpoint, String build, String version,
-			String user, String description, Limits limits, Usage usage, boolean allowDebug, String loggregatorEndpoint) {
-		this.name = name;
-		this.support = support;
-		this.authorizationEndpoint = authorizationEndpoint;
+    private String version;
+
+    @SuppressWarnings("unchecked")
+    public CloudInfo(Map<String, Object> infoMap) {
+        name = CloudUtil.parse(String.class, infoMap.get("name"));
+        support = CloudUtil.parse(String.class, infoMap.get("support"));
+        build = CloudUtil.parse(String.class, infoMap.get("build"));
+        version = CloudUtil.parse(String.class, infoMap.get("version"));
+        if (version == null) {
+            Number iVersion = CloudUtil.parse(Number.class, infoMap.get("version"));
+            if (iVersion != null) {
+                version = iVersion.toString();
+            }
+        }
+        user = CloudUtil.parse(String.class, infoMap.get("user"));
+        description = CloudUtil.parse(String.class, infoMap.get("description"));
+        authorizationEndpoint = CloudUtil.parse(String.class, infoMap.get("authorization_endpoint"));
+        loggregatorEndpoint = CloudUtil.parse(String.class, infoMap.get("logging_endpoint"));
+
+        Object allowDebugValue = infoMap.get("allow_debug");
+        if (allowDebugValue != null) {
+            allowDebug = CloudUtil.parse(Boolean.class, allowDebugValue);
+        } else {
+            allowDebug = false; // default to false
+        }
+
+        Map<String, Object> limitsMap = CloudUtil.parse(Map.class, infoMap.get("limits"));
+        if (limitsMap != null) {
+            limits = new Limits(limitsMap);
+        } else {
+            limits = new Limits();
+        }
+
+        Map<String, Object> usageMap = CloudUtil.parse(Map.class, infoMap.get("usage"));
+        if (usageMap != null) {
+            usage = new Usage(usageMap);
+        } else {
+            usage = new Usage();
+        }
+    }
+
+    public CloudInfo(String name, String support, String authorizationEndpoint, String build, String version,
+                     String user, String description, Limits limits, Usage usage, boolean allowDebug, String
+                             loggregatorEndpoint) {
+        this.name = name;
+        this.support = support;
+        this.authorizationEndpoint = authorizationEndpoint;
         this.loggregatorEndpoint = loggregatorEndpoint;
-		this.build = build;
-		this.version = version;
-		this.user = user;
-		this.description = description;
-		this.limits = limits;
-		this.usage = usage;
-		this.allowDebug = allowDebug;
-	}
+        this.build = build;
+        this.version = version;
+        this.user = user;
+        this.description = description;
+        this.limits = limits;
+        this.usage = usage;
+        this.allowDebug = allowDebug;
+    }
 
-	public Limits getLimits() {
-		return limits;
-	}
+    public boolean getAllowDebug() {
+        return allowDebug;
+    }
 
-	public Usage getUsage() {
-		return usage;
-	}
+    public String getAuthorizationEndpoint() {
+        return authorizationEndpoint;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getBuild() {
+        return build;
+    }
 
-	public String getSupport() {
-		return support;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getAuthorizationEndpoint() {
-		return authorizationEndpoint;
-	}
-	
-	public String getLoggregatorEndpoint() {
-	    return loggregatorEndpoint;
-	}
+    public Limits getLimits() {
+        return limits;
+    }
 
-	public String getBuild() {
-		return build;
-	}
+    public String getLoggregatorEndpoint() {
+        return loggregatorEndpoint;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getUser() {
-		return user;
-	}
+    public String getSupport() {
+        return support;
+    }
 
-	public String getVersion() {
-		return version;
-	}
+    public Usage getUsage() {
+        return usage;
+    }
 
-	public boolean getAllowDebug() {
-		return allowDebug;
-	}
-	public static class Limits {
-		private int maxApps;
-		private int maxTotalMemory;
-		private int maxUrisPerApp;
-		private int maxServices;
+    public String getUser() {
+        return user;
+    }
 
-		public Limits(Map<String, Object> limitMap) {
-			maxApps = CloudUtil.parse(Integer.class, limitMap.get("apps"));
-			maxTotalMemory = CloudUtil.parse(Integer.class, limitMap.get("memory"));
-			maxUrisPerApp = CloudUtil.parse(Integer.class, limitMap.get("app_uris"));
-			maxServices = CloudUtil.parse(Integer.class, limitMap.get("services"));
-		}
+    public String getVersion() {
+        return version;
+    }
 
-		Limits() {
-			maxApps = Integer.MAX_VALUE;
-			maxTotalMemory = Integer.MAX_VALUE;
-			maxUrisPerApp = Integer.MAX_VALUE;
-			maxServices = Integer.MAX_VALUE;
-		}
+    public static class Limits {
 
-		public int getMaxApps() {
-			return maxApps;
-		}
+        private int maxApps;
 
-		public int getMaxTotalMemory() {
-			return maxTotalMemory;
-		}
+        private int maxServices;
 
-		public int getMaxUrisPerApp() {
-			return maxUrisPerApp;
-		}
+        private int maxTotalMemory;
 
-		public int getMaxServices() {
-			return maxServices;
-		}
-	}
+        private int maxUrisPerApp;
 
-	public static class Usage {
-		private int apps;
-		private int totalMemory;
-		private int urisPerApp;
-		private int services;
+        public Limits(Map<String, Object> limitMap) {
+            maxApps = CloudUtil.parse(Integer.class, limitMap.get("apps"));
+            maxTotalMemory = CloudUtil.parse(Integer.class, limitMap.get("memory"));
+            maxUrisPerApp = CloudUtil.parse(Integer.class, limitMap.get("app_uris"));
+            maxServices = CloudUtil.parse(Integer.class, limitMap.get("services"));
+        }
 
-		public Usage(Map<String, Object> data) {
-			if (data != null && !data.isEmpty()) {
-				apps = CloudUtil.parse(Integer.class, data.get("apps"));
-				totalMemory = CloudUtil.parse(Integer.class, data.get("memory"));
-				urisPerApp = CloudUtil.parse(Integer.class, data.get("app_uris"));
-				services = CloudUtil.parse(Integer.class, data.get("services"));
-			}
-		}
+        Limits() {
+            maxApps = Integer.MAX_VALUE;
+            maxTotalMemory = Integer.MAX_VALUE;
+            maxUrisPerApp = Integer.MAX_VALUE;
+            maxServices = Integer.MAX_VALUE;
+        }
 
-		Usage() {
-			apps = Integer.MAX_VALUE;
-			totalMemory = Integer.MAX_VALUE;
-			urisPerApp = Integer.MAX_VALUE;
-			services = Integer.MAX_VALUE;
-		}
+        public int getMaxApps() {
+            return maxApps;
+        }
 
-		public int getApps() {
-			return apps;
-		}
+        public int getMaxServices() {
+            return maxServices;
+        }
 
-		public int getTotalMemory() {
-			return totalMemory;
-		}
+        public int getMaxTotalMemory() {
+            return maxTotalMemory;
+        }
 
-		public int getUrisPerApp() {
-			return urisPerApp;
-		}
+        public int getMaxUrisPerApp() {
+            return maxUrisPerApp;
+        }
+    }
 
-		public int getServices() {
-			return services;
-		}
-	}
+    public static class Usage {
+
+        private int apps;
+
+        private int services;
+
+        private int totalMemory;
+
+        private int urisPerApp;
+
+        public Usage(Map<String, Object> data) {
+            if (data != null && !data.isEmpty()) {
+                apps = CloudUtil.parse(Integer.class, data.get("apps"));
+                totalMemory = CloudUtil.parse(Integer.class, data.get("memory"));
+                urisPerApp = CloudUtil.parse(Integer.class, data.get("app_uris"));
+                services = CloudUtil.parse(Integer.class, data.get("services"));
+            }
+        }
+
+        Usage() {
+            apps = Integer.MAX_VALUE;
+            totalMemory = Integer.MAX_VALUE;
+            urisPerApp = Integer.MAX_VALUE;
+            services = Integer.MAX_VALUE;
+        }
+
+        public int getApps() {
+            return apps;
+        }
+
+        public int getServices() {
+            return services;
+        }
+
+        public int getTotalMemory() {
+            return totalMemory;
+        }
+
+        public int getUrisPerApp() {
+            return urisPerApp;
+        }
+    }
 }

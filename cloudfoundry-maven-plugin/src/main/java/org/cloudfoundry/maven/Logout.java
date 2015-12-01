@@ -26,29 +26,29 @@ import org.cloudfoundry.client.lib.tokens.TokensFile;
  *
  * @author Ali Moghadam
  * @author Scott Frederick
- * @since 1.0.0
- *
  * @goal logout
  * @requiresProject false
+ * @since 1.0.0
  */
 public class Logout extends AbstractCloudFoundryMojo {
-	public Logout() {
-	}
 
-	public Logout(TokensFile tokensFile) {
-		super(tokensFile);
-	}
+    public Logout() {
+    }
 
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (getClient() != null) {
-			getClient().logout();
-		}
-		doExecute();
-	}
+    public Logout(TokensFile tokensFile) {
+        super(tokensFile);
+    }
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		tokensFile.removeToken(getTarget());
-	}
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (getClient() != null) {
+            getClient().logout();
+        }
+        doExecute();
+    }
+
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        tokensFile.removeToken(getTarget());
+    }
 }

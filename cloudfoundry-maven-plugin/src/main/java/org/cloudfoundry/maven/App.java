@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.cloudfoundry.client.lib.CloudFoundryException;
@@ -21,25 +22,24 @@ import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.maven.common.UiUtils;
 
 /**
- * Application information. Displays the info of deployed application via name, along with
- * information about health, instance count, bound services, and associated URLs.
+ * Application information. Displays the info of deployed application via name, along with information about health,
+ * instance count, bound services, and associated URLs.
  *
  * @author Ali Moghadam
- * @since 1.0.0
- *
  * @goal app
  * @phase process-sources
+ * @since 1.0.0
  */
 public class App extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() {
-		try {
-			final CloudApplication application = getClient().getApplication(getAppname());
-			final ApplicationStats stats = getClient().getApplicationStats(getAppname());
-			getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application, stats));
-		} catch (CloudFoundryException e) {
-			getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
-		}
-	}
+    @Override
+    protected void doExecute() {
+        try {
+            final CloudApplication application = getClient().getApplication(getAppname());
+            final ApplicationStats stats = getClient().getApplicationStats(getAppname());
+            getLog().info("\n" + UiUtils.renderCloudApplicationDataAsTable(application, stats));
+        } catch (CloudFoundryException e) {
+            getLog().info(String.format("Application '%s' doesn't exist", getAppname()));
+        }
+    }
 }

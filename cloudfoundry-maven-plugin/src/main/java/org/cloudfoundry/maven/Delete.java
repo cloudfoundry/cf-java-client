@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,27 +24,27 @@ import org.springframework.http.HttpStatus;
  * Deletes an application.
  *
  * @author Gunnar Hillert
- * @since 1.0.0
- *
  * @goal delete
  * @phase process-sources
+ * @since 1.0.0
  */
 public class Delete extends AbstractApplicationAwareCloudFoundryMojo {
 
-	@Override
-	protected void doExecute() throws MojoExecutionException {
-		getLog().info("Deleting application '" + getAppname() + "'");
+    @Override
+    protected void doExecute() throws MojoExecutionException {
+        getLog().info("Deleting application '" + getAppname() + "'");
 
-		try {
-			getClient().getApplication(getAppname());
-			getClient().deleteApplication(getAppname());
-		} catch (CloudFoundryException e) {
-			if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-				getLog().info("Application '" + getAppname() + "' does not exist");
-			} else {
-				throw new MojoExecutionException(String.format("Error while deleting application '%s'. Error message: '%s'. Description: '%s'",
-						getAppname(), e.getMessage(), e.getDescription()), e);
-			}
-		}
-	}
+        try {
+            getClient().getApplication(getAppname());
+            getClient().deleteApplication(getAppname());
+        } catch (CloudFoundryException e) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+                getLog().info("Application '" + getAppname() + "' does not exist");
+            } else {
+                throw new MojoExecutionException(String.format("Error while deleting application '%s'. Error message:" +
+                        " '%s'. Description: '%s'",
+                        getAppname(), e.getMessage(), e.getDescription()), e);
+            }
+        }
+    }
 }

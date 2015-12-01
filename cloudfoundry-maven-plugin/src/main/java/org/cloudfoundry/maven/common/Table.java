@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.cloudfoundry.maven.common;
 
 import java.util.ArrayList;
@@ -21,30 +22,30 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Provide a basic concept of a table structure containing a map of column headers
- * and a collection of rows. Used to render text-based tables (console output).
+ * Provide a basic concept of a table structure containing a map of column headers and a collection of rows. Used to
+ * render text-based tables (console output).
  *
  * {@link UiUtils}
  *
  * @author Gunnar Hillert
  * @since 1.0.0
- *
  */
 public class Table {
 
-	private Map<Integer, TableHeader> headers = new TreeMap<Integer, TableHeader>();
-	private List<TableRow> rows = new ArrayList<TableRow>(0);
+    private Map<Integer, TableHeader> headers = new TreeMap<Integer, TableHeader>();
 
-	public List<TableRow> getRows() {
-		return rows;
-	}
+    private List<TableRow> rows = new ArrayList<TableRow>(0);
 
-	public void setRows(List<TableRow> rows) {
-		this.rows = rows;
-	}
+    public Map<Integer, TableHeader> getHeaders() {
+        return headers;
+    }
 
-	public Map<Integer, TableHeader> getHeaders() {
-		return headers;
-	}
+    public List<TableRow> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<TableRow> rows) {
+        this.rows = rows;
+    }
 
 }

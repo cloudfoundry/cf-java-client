@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="simple-spring-app:war">
+    <output-path>$PROJECT_DIR$/cf-java-client-test-apps/simple-spring-app/target</output-path>
+    <root id="archive" name="simple-spring-app.war">
+      <element id="artifact" artifact-name="simple-spring-app:war exploded" />
+    </root>
+  </artifact>
+</component>

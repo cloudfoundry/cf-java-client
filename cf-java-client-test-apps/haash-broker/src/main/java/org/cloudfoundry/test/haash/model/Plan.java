@@ -1,10 +1,16 @@
 package org.cloudfoundry.test.haash.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "plans")
 public class Plan {
+
+    @Column(nullable = false)
+    private String description;
 
     @Id
     private String id;
@@ -12,8 +18,13 @@ public class Plan {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getId() {
         return id;
@@ -29,13 +40,5 @@ public class Plan {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

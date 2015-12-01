@@ -16,10 +16,13 @@
 
 package org.cloudfoundry.client.lib.archive;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import org.cloudfoundry.client.lib.SampleProjects;
+import org.cloudfoundry.client.lib.archive.ApplicationArchive.Entry;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,30 +33,26 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import org.cloudfoundry.client.lib.SampleProjects;
-import org.cloudfoundry.client.lib.archive.ApplicationArchive.Entry;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.util.FileCopyUtils;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
- * Abstract base class for {@link ApplicationArchive} tests. All tests are based against
- * {@link SampleProjects#springTravel()}.
- *
- * @see ZipApplicationArchiveTest
- * @see DirectoryApplicationArchiveTest
+ * Abstract base class for {@link ApplicationArchive} tests. All tests are based against {@link
+ * SampleProjects#springTravel()}.
  *
  * @author Phillip Webb
+ * @see ZipApplicationArchiveTest
+ * @see DirectoryApplicationArchiveTest
  */
 public abstract class AbstractApplicationArchiveTest {
-
-    private ZipFile zipFile;
 
     private ApplicationArchive archive;
 
     private HashMap<String, Entry> archiveEntries;
+
+    private ZipFile zipFile;
 
     @Before
     public void setup() throws ZipException, IOException {
@@ -63,20 +62,6 @@ public abstract class AbstractApplicationArchiveTest {
         for (ApplicationArchive.Entry entry : archive.getEntries()) {
             archiveEntries.put(entry.getName(), entry);
         }
-    }
-
-    /**
-     * Factory method used to create a new {@link ApplicationArchive}.
-     *
-     * @param fileFile the zip file used for comparisons
-     * @return the archive
-     * @throws IOException
-     */
-    protected abstract ApplicationArchive newApplicationArchive(ZipFile fileFile) throws IOException;
-
-    @After
-    public void tearDown() throws IOException {
-        zipFile.close();
     }
 
     @Test
@@ -94,18 +79,6 @@ public abstract class AbstractApplicationArchiveTest {
     }
 
     @Test
-    public void shouldGetNameFromZipFileNameWithoutPath() throws Exception {
-        assertThat(archive.getFilename(), is("swf-booking-mvc.war"));
-    }
-
-    @Test
-    public void shouldCalculateSha1() throws Exception {
-        byte[] digest = archiveEntries.get("index.html").getSha1Digest();
-        String digestString = String.format("%x", new BigInteger(digest));
-        assertThat(digestString, is("677e1b9bca206d6534054348511bf41129744839"));
-    }
-
-    @Test
     public void shouldBeAbleToGetInputStreamTwice() throws Exception {
         Entry entry = archiveEntries.get("index.html");
         ByteArrayOutputStream s1 = new ByteArrayOutputStream();
@@ -116,4 +89,30 @@ public abstract class AbstractApplicationArchiveTest {
         assertThat(s2.toByteArray().length, is(93));
         assertThat(s1.toByteArray(), is(equalTo(s2.toByteArray())));
     }
+
+    @Test
+    public void shouldCalculateSha1() throws Exception {
+        byte[] digest = archiveEntries.get("index.html").getSha1Digest();
+        String digestString = String.format("%x", new BigInteger(digest));
+        assertThat(digestString, is("677e1b9bca206d6534054348511bf41129744839"));
+    }
+
+    @Test
+    public void shouldGetNameFromZipFileNameWithoutPath() throws Exception {
+        assertThat(archive.getFilename(), is("swf-booking-mvc.war"));
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        zipFile.close();
+    }
+
+    /**
+     * Factory method used to create a new {@link ApplicationArchive}.
+     *
+     * @param fileFile the zip file used for comparisons
+     * @return the archive
+     * @throws IOException
+     */
+    protected abstract ApplicationArchive newApplicationArchive(ZipFile fileFile) throws IOException;
 }

@@ -30,12 +30,13 @@ import java.util.List;
  * @since 1.0.4
  */
 public class OrphanedRoutesDeletion extends AbstractApplicationAwareCloudFoundryMojo {
-	@Override
-	protected void doExecute() throws MojoExecutionException, MojoFailureException {
-		getLog().info("Getting routes");
-		List<CloudRoute> routes = getClient().deleteOrphanedRoutes();
-		for (CloudRoute route : routes) {
-			getLog().info(String.format("Deleted route '%s'", route.getName()));
-		}
-	}
+
+    @Override
+    protected void doExecute() throws MojoExecutionException, MojoFailureException {
+        getLog().info("Getting routes");
+        List<CloudRoute> routes = getClient().deleteOrphanedRoutes();
+        for (CloudRoute route : routes) {
+            getLog().info(String.format("Deleted route '%s'", route.getName()));
+        }
+    }
 }

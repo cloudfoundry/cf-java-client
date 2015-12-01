@@ -24,46 +24,46 @@ package org.cloudfoundry.client.lib;
  */
 public class HttpProxyConfiguration {
 
-	private String proxyHost;
+    private boolean authRequired;
 
-	private int proxyPort;
+    private String password;
 
-	private boolean authRequired;
+    private String proxyHost;
 
-	private String username;
+    private int proxyPort;
 
-	private String password;
+    private String username;
 
-	public HttpProxyConfiguration(String proxyHost, int proxyPort) {
-		this(proxyHost, proxyPort, false, null, null);
-	}
+    public HttpProxyConfiguration(String proxyHost, int proxyPort) {
+        this(proxyHost, proxyPort, false, null, null);
+    }
 
-	public HttpProxyConfiguration(String proxyHost, int proxyPort,
-		boolean authRequired, String username, String password) {
-		this.proxyHost = proxyHost;
-		this.proxyPort = proxyPort;
-		this.authRequired = authRequired;
-		this.username = username;
-		this.password = password;
-	}
+    public HttpProxyConfiguration(String proxyHost, int proxyPort,
+                                  boolean authRequired, String username, String password) {
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
+        this.authRequired = authRequired;
+        this.username = username;
+        this.password = password;
+    }
 
-	public String getProxyHost() {
-		return proxyHost;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public int getProxyPort() {
-		return proxyPort;
-	}
+    public String getProxyHost() {
+        return proxyHost;
+    }
 
-	public boolean isAuthRequired() {
-	    return authRequired;
-	}
+    public int getProxyPort() {
+        return proxyPort;
+    }
 
-	public String getUsername() {
-	    return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getPassword() {
-	    return password;
-	}
+    public boolean isAuthRequired() {
+        return authRequired;
+    }
 }

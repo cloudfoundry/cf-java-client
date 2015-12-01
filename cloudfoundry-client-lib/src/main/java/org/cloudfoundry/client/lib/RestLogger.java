@@ -26,23 +26,23 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RestLogger implements RestLogCallback {
 
-	private final Log logger;
+    private final Log logger;
 
-	public RestLogger(String category) {
-		logger = LogFactory.getLog(category == null ? getClass().getName() : category);
-	}
+    public RestLogger(String category) {
+        logger = LogFactory.getLog(category == null ? getClass().getName() : category);
+    }
 
-	public void onNewLogEntry(RestLogEntry logEntry) {
-		if (logger.isDebugEnabled()) {
-			logger.debug(formatLogMessage(logEntry));
-		}
-	}
+    public void onNewLogEntry(RestLogEntry logEntry) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(formatLogMessage(logEntry));
+        }
+    }
 
-	private String formatLogMessage(RestLogEntry restLogEntry) {
-		return restLogEntry.getStatus() +
-				" :: HTTP STATUS: " + restLogEntry.getHttpStatus() +
-				" :: REQUEST: " + restLogEntry.getMethod() + " " + restLogEntry.getUri() +
-				" :: " + restLogEntry.getMessage();
-	}
+    private String formatLogMessage(RestLogEntry restLogEntry) {
+        return restLogEntry.getStatus() +
+                " :: HTTP STATUS: " + restLogEntry.getHttpStatus() +
+                " :: REQUEST: " + restLogEntry.getMethod() + " " + restLogEntry.getUri() +
+                " :: " + restLogEntry.getMessage();
+    }
 
 }
