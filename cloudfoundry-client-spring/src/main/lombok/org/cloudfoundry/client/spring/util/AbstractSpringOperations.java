@@ -53,7 +53,7 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final Stream<Void> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Stream<T> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
@@ -116,25 +116,40 @@ public abstract class AbstractSpringOperations {
 
     protected final <T> Stream<T> post(Validatable request, Class<T> responseType,
                                        Consumer<UriComponentsBuilder> builderCallback) {
+        return postWithBody(request, () -> request, responseType, builderCallback);
+    }
+
+    protected final <T, B> Stream<T> postWithBody(Validatable request,
+                                                  Supplier<B> bodySupplier,
+                                                  Class<T> responseType,
+                                                  Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("POST {}", uri);
-            return this.restOperations.postForObject(uri, request, responseType);
+            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
         });
     }
 
     protected final <T> Stream<T> put(Validatable request, Class<T> responseType,
                                       Consumer<UriComponentsBuilder> builderCallback) {
+        return putWithBody(request, () -> request, responseType, builderCallback);
+    }
+
+    protected final <T, B> Stream<T> putWithBody(Validatable request,
+                                                 Supplier<B> bodySupplier,
+                                                 Class<T> responseType,
+                                                 Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, () -> {
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
             builderCallback.accept(builder);
             URI uri = builder.build().toUri();
 
             this.logger.debug("PUT {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(request, PUT, uri), responseType).getBody();
+            return this.restOperations.exchange(new RequestEntity<B>(bodySupplier.get(), null, PUT, uri),
+                    responseType).getBody();
         });
 
     }
