@@ -62,6 +62,10 @@ public final class CopyApplicationRequest implements Validatable {
             builder.message("id must be specified");
         }
 
+        if (this.sourceAppId == null) {
+            builder.message("source app id must be specified");
+        }
+
         return builder.build();
     }
 
