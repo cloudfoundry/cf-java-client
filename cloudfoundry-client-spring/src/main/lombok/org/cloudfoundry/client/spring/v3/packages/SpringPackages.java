@@ -35,13 +35,8 @@ import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
@@ -50,8 +45,6 @@ import java.net.URI;
  */
 @ToString(callSuper = true)
 public final class SpringPackages extends AbstractSpringOperations implements Packages {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Creates an instance
@@ -103,17 +96,10 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Publisher<UploadPackageResponse> upload(UploadPackageRequest request) {
-        return exchange(request, () -> {
-            URI uri = UriComponentsBuilder.fromUri(this.root)
-                    .pathSegment("v3", "packages", request.getId(), "upload")
-                    .build().toUri();
-
-            MultiValueMap<String, Resource> body = CollectionUtils.singletonMultiValueMap("bits",
-                    new FileSystemResource(request.getFile()));
-
-            this.logger.debug("POST {}", uri);
-            return this.restOperations.postForObject(uri, body, UploadPackageResponse.class);
-        });
+        return postWithBody(request,
+                () -> CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile())),
+                UploadPackageResponse.class,
+                builder -> builder.pathSegment("v3", "packages", request.getId(), "upload"));
     }
 
 }
