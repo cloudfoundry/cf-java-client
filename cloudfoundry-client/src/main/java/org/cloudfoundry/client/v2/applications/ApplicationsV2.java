@@ -113,23 +113,22 @@ public interface ApplicationsV2 {
                                                                                   request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_route_from_the_app.html">Remove Route from the
+     * Makes the <a href="http://apidocs.cloudfoundry.org/223/apps/remove_route_from_the_app.html">Remove Route from the
      * Application</a> request
      *
      * @param request the Remove Route from the Application request
      * @return the response from the Remove Route from the Application request
      */
-    Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request);
+    Publisher<Void> removeRoute(RemoveApplicationRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/remove_service_binding_from_the_app.html">Remove
+     * Makes the <a href="http://apidocs.cloudfoundry.org/223/apps/remove_service_binding_from_the_app.html">Remove
      * Service Binding from the Application</a> request
      *
      * @param request the Remove a Service Binding from an Application request
      * @return the response from the Remove a Service Binding from an Application request
      */
-    Publisher<RemoveApplicationServiceBindingResponse> removeServiceBinding(RemoveApplicationServiceBindingRequest
-                                                                                    request);
+    Publisher<Void> removeServiceBinding(RemoveApplicationServiceBindingRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/restage_an_app.html">Restage an App</a> request
@@ -158,7 +157,7 @@ public interface ApplicationsV2 {
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
     /**
-     * Makes the 
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/apps/terminate_the_running_app_instance_at_the_given_index.html">
      * Terminate Application Instance</a> request
      *

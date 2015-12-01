@@ -47,9 +47,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRes
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
-import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
-import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationEntity;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
@@ -770,50 +768,15 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     public void removeRoute() {
         mockRequest(new RequestContext()
                 .method(DELETE).path("v2/apps/test-id/routes/test-route-id")
-                .status(OK)
-                .responsePayload("v2/apps/DELETE_{id}_routes_{route-id}_response.json"));
+                .status(NO_CONTENT));
 
         RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
                 .id("test-id")
                 .routeId("test-route-id")
                 .build();
 
-        RemoveApplicationRouteResponse expected = RemoveApplicationRouteResponse.builder()
-                .metadata(Resource.Metadata.builder()
-                        .createdAt("2015-07-27T22:43:19Z")
-                        .id("0367bfcb-0165-4610-a84b-bee22a0d60cf")
-                        .url("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf")
-                        .updatedAt("2015-07-27T22:43:19Z")
-                        .build())
-                .entity(ApplicationEntity.builder()
-                        .console(false)
-                        .detectedStartCommand("")
-                        .diego(false)
-                        .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
-                        .enableSsh(true)
-                        .eventsUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/events")
-                        .healthCheckType("port")
-                        .instances(1)
-                        .memory(1024)
-                        .name("name-687")
-                        .packageState("PENDING")
-                        .packageUpdatedAt("2015-07-27T22:43:19Z")
-                        .production(false)
-                        .routesUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/routes")
-                        .serviceBindingsUrl("/v2/apps/0367bfcb-0165-4610-a84b-bee22a0d60cf/service_bindings")
-                        .spaceId("cbbf4dd7-6929-49eb-9e32-7f18161073da")
-                        .spaceUrl("/v2/spaces/cbbf4dd7-6929-49eb-9e32-7f18161073da")
-                        .stackId("22ea9914-b1fa-4e4b-8cbb-c9810f0416f1")
-                        .stackUrl("/v2/stacks/22ea9914-b1fa-4e4b-8cbb-c9810f0416f1")
-                        .state("STOPPED")
-                        .version("25277461-277a-4d77-b942-570520b5cf4e")
-                        .build())
-                .build();
+        Streams.wrap(this.applications.removeRoute(request)).next().get();
 
-        RemoveApplicationRouteResponse actual = Streams.wrap(this.applications.removeRoute(request)).next().get();
-
-        assertEquals(expected, actual);
         verify();
     }
 
@@ -843,51 +806,15 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     public void removeServiceBinding() {
         mockRequest(new RequestContext()
                 .method(DELETE).path("v2/apps/test-id/service_bindings/test-service-binding-id")
-                .status(OK)
-                .responsePayload("v2/apps/DELETE_{id}_service-bindings_{service-binding-id}_response.json"));
+                .status(NO_CONTENT));
 
         RemoveApplicationServiceBindingRequest request = RemoveApplicationServiceBindingRequest.builder()
                 .id("test-id")
                 .serviceBindingId("test-service-binding-id")
                 .build();
 
-        RemoveApplicationServiceBindingResponse expected = RemoveApplicationServiceBindingResponse.builder()
-                .metadata(Resource.Metadata.builder()
-                        .createdAt("2015-07-27T22:43:19Z")
-                        .id("045ad377-c172-4594-abb5-f85667ca0bf1")
-                        .url("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1")
-                        .updatedAt("2015-07-27T22:43:19Z")
-                        .build())
-                .entity(ApplicationEntity.builder()
-                        .console(false)
-                        .detectedStartCommand("")
-                        .diego(false)
-                        .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
-                        .enableSsh(true)
-                        .eventsUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/events")
-                        .healthCheckType("port")
-                        .instances(1)
-                        .memory(1024)
-                        .name("name-702")
-                        .packageState("PENDING")
-                        .packageUpdatedAt("2015-07-27T22:43:19Z")
-                        .production(false)
-                        .routesUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/routes")
-                        .serviceBindingsUrl("/v2/apps/045ad377-c172-4594-abb5-f85667ca0bf1/service_bindings")
-                        .spaceId("46215b5f-dc5c-427f-8333-171bd1a23ca7")
-                        .spaceUrl("/v2/spaces/46215b5f-dc5c-427f-8333-171bd1a23ca7")
-                        .stackId("47aa9ebe-e770-498a-a8ba-82e82b2dbfe8")
-                        .stackUrl("/v2/stacks/47aa9ebe-e770-498a-a8ba-82e82b2dbfe8")
-                        .state("STOPPED")
-                        .version("92259849-088d-458c-8073-48b95ca6d941")
-                        .build())
-                .build();
+        Streams.wrap(this.applications.removeServiceBinding(request)).next().get();
 
-        RemoveApplicationServiceBindingResponse actual = Streams.wrap(this.applications.removeServiceBinding(request))
-                .next().get();
-
-        assertEquals(expected, actual);
         verify();
     }
 
@@ -1145,6 +1072,8 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.terminateInstance(request)).next().get();
+
+        verify();
     }
 
     @Test(expected = CloudFoundryException.class)
