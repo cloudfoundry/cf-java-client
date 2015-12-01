@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring.v2.applications;
 
 import lombok.ToString;
-import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
@@ -44,9 +43,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRes
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
-import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
-import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingResponse;
 import org.cloudfoundry.client.v2.applications.RestageApplicationRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
@@ -65,12 +62,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.rx.Stream;
 
 import java.net.URI;
-import java.util.function.Consumer;
 
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PUT;
 
 /**
@@ -161,17 +155,15 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<RemoveApplicationRouteResponse> removeRoute(RemoveApplicationRouteRequest request) {
-        return deleteWithResponse(request, RemoveApplicationRouteResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
+    public Publisher<Void> removeRoute(RemoveApplicationRouteRequest request) {
+        return delete(request, builder ->
+                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
     }
 
     @Override
-    public Publisher<RemoveApplicationServiceBindingResponse> removeServiceBinding
-            (RemoveApplicationServiceBindingRequest request) {
-        return deleteWithResponse(request, RemoveApplicationServiceBindingResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "service_bindings",
-                        request.getServiceBindingId()));
+    public Publisher<Void> removeServiceBinding (RemoveApplicationServiceBindingRequest request) {
+        return delete(request, builder ->
+                builder.pathSegment("v2", "apps", request.getId(), "service_bindings", request.getServiceBindingId()));
     }
 
     @Override
@@ -223,18 +215,6 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             this.logger.debug("PUT {}", uri);
             return this.restOperations.exchange(new RequestEntity<MultiValueMap<String, Object>>(body, PUT, uri),
                     UploadApplicationResponse.class).getBody();
-        });
-    }
-
-    private <T> Stream<T> deleteWithResponse(Validatable request, Class<T> responseType,
-                                             Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
-
-            this.logger.debug("DELETE {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
         });
     }
 
