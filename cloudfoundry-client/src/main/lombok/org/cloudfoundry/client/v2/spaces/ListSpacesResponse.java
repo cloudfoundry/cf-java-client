@@ -32,30 +32,15 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpacesResponse extends PaginatedResponse<ListSpacesResponse.ListSpacesResponseResource> {
+public final class ListSpacesResponse extends PaginatedResponse<SpaceResource> {
 
     @Builder
     ListSpacesResponse(@JsonProperty("next_url") String nextUrl,
                        @JsonProperty("prev_url") String previousUrl,
-                       @JsonProperty("resources") @Singular List<ListSpacesResponseResource> resources,
+                       @JsonProperty("resources") @Singular List<SpaceResource> resources,
                        @JsonProperty("total_pages") Integer totalPages,
                        @JsonProperty("total_results") Integer totalResults) {
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
-    }
-
-    /**
-     * The resource response payload for the List Spaces operation
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static final class ListSpacesResponseResource extends SpaceResource {
-
-        @Builder
-        ListSpacesResponseResource(@JsonProperty("entity") SpaceEntity entity,
-                                   @JsonProperty("metadata") Metadata metadata) {
-            super(entity, metadata);
-        }
     }
 
 }

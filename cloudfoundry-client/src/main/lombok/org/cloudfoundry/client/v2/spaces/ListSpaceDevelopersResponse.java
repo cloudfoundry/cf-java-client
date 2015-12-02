@@ -27,19 +27,19 @@ import org.cloudfoundry.client.v2.PaginatedResponse;
 import java.util.List;
 
 /**
- * The response payload for the List all Auditors for the Space operation
+ * The response payload for the List all Developers for the Space operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceAuditorsResponse extends PaginatedResponse<ListSpaceMembersResource> {
+public final class ListSpaceDevelopersResponse extends PaginatedResponse<ListSpaceMembersResource> {
 
     @Builder
-    ListSpaceAuditorsResponse(@JsonProperty("next_url") String nextUrl,
-                              @JsonProperty("prev_url") String previousUrl,
-                              @JsonProperty("resources") @Singular List<ListSpaceMembersResource> resources,
-                              @JsonProperty("total_pages") Integer totalPages,
-                              @JsonProperty("total_results") Integer totalResults) {
+    ListSpaceDevelopersResponse(@JsonProperty("next_url") String nextUrl,
+                                @JsonProperty("prev_url") String previousUrl,
+                                @JsonProperty("resources") @Singular List<ListSpaceMembersResource> resources,
+                                @JsonProperty("total_pages") Integer totalPages,
+                                @JsonProperty("total_results") Integer totalResults) {
 
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
