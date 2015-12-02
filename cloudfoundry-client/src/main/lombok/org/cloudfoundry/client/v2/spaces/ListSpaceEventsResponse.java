@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.events;
+package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -22,24 +22,27 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
+
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.events.EventResource;
 
 import java.util.List;
 
 /**
- * The response payload for the List Events operation
+ * The response payload for the List all Events for the Space operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListEventsResponse extends PaginatedResponse<EventResource> {
+public final class ListSpaceEventsResponse extends PaginatedResponse<EventResource> {
 
     @Builder
-    ListEventsResponse(@JsonProperty("next_url") String nextUrl,
-                       @JsonProperty("prev_url") String previousUrl,
-                       @JsonProperty("resources") @Singular List<EventResource> resources,
-                       @JsonProperty("total_pages") Integer totalPages,
-                       @JsonProperty("total_results") Integer totalResults) {
+    ListSpaceEventsResponse(@JsonProperty("next_url") String nextUrl,
+                            @JsonProperty("prev_url") String previousUrl,
+                            @JsonProperty("resources") @Singular List<EventResource> resources,
+                            @JsonProperty("total_pages") Integer totalPages,
+                            @JsonProperty("total_results") Integer totalResults) {
+
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
