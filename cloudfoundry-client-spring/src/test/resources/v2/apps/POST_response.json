@@ -1,25 +1,24 @@
 {
   "metadata": {
-    "guid": "508f0995-cbec-494c-99d1-f8c238117817",
-    "url": "/v2/apps/508f0995-cbec-494c-99d1-f8c238117817",
+    "guid": "78d1a119-2ded-405f-8675-421d8dade602",
+    "url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602",
     "created_at": "2015-07-27T22:43:20Z",
     "updated_at": null
   },
   "entity": {
-    "name": "my_super_app",
+    "name": "docker_app",
     "production": false,
-    "space_guid": "86dc4dc4-a2f7-438a-9f85-19a35bd15165",
+    "space_guid": "6ef4e580-c189-49c8-959e-4a3d021b3307",
     "stack_guid": "d449ecea-669f-448a-a9e7-ec84d51e2fdb",
     "buildpack": null,
     "detected_buildpack": null,
     "environment_json": {
-
     },
     "memory": 1024,
     "instances": 1,
     "disk_quota": 1024,
     "state": "STOPPED",
-    "version": "5d8a5c4a-9e74-4958-af55-abc8b8d1968d",
+    "version": "69ebcffe-d79b-482a-91b6-39dfc86e7692",
     "command": null,
     "console": false,
     "debug": null,
@@ -29,18 +28,18 @@
     "health_check_timeout": null,
     "staging_failed_reason": null,
     "staging_failed_description": null,
-    "diego": false,
-    "docker_image": null,
-    "package_updated_at": null,
+    "diego": true,
+    "docker_image": "cloudfoundry/hello:latest",
+    "package_updated_at": "2015-07-27T22:43:20Z",
     "detected_start_command": "",
     "enable_ssh": true,
     "docker_credentials_json": {
       "redacted_message": "[PRIVATE DATA HIDDEN]"
     },
-    "space_url": "/v2/spaces/86dc4dc4-a2f7-438a-9f85-19a35bd15165",
+    "space_url": "/v2/spaces/6ef4e580-c189-49c8-959e-4a3d021b3307",
     "stack_url": "/v2/stacks/d449ecea-669f-448a-a9e7-ec84d51e2fdb",
-    "events_url": "/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/events",
-    "service_bindings_url": "/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/service_bindings",
-    "routes_url": "/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/routes"
+    "events_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/events",
+    "service_bindings_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/service_bindings",
+    "routes_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/routes"
   }
 }

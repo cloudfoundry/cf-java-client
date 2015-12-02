@@ -1,4 +1,6 @@
 {
-  "name": "my_super_app",
-  "space_guid": "86dc4dc4-a2f7-438a-9f85-19a35bd15165"
+  "name": "docker_app",
+  "space_guid": "6ef4e580-c189-49c8-959e-4a3d021b3307",
+  "docker_image": "cloudfoundry/hello",
+  "diego": true
 }

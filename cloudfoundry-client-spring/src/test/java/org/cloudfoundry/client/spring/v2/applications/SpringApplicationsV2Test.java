@@ -226,38 +226,42 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .responsePayload("v2/apps/POST_response.json"));
 
         CreateApplicationRequest request = CreateApplicationRequest.builder()
-                .name("my_super_app")
-                .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                .diego(true)
+                .dockerImage("cloudfoundry/hello")
+                .name("docker_app")
+                .spaceId("6ef4e580-c189-49c8-959e-4a3d021b3307")
                 .build();
 
         CreateApplicationResponse expected = CreateApplicationResponse.builder()
                 .metadata(Resource.Metadata.builder()
                         .createdAt("2015-07-27T22:43:20Z")
-                        .id("508f0995-cbec-494c-99d1-f8c238117817")
-                        .url("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817")
+                        .id("78d1a119-2ded-405f-8675-421d8dade602")
+                        .url("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602")
                         .build())
                 .entity(ApplicationEntity.builder()
                         .console(false)
                         .detectedStartCommand("")
-                        .diego(false)
+                        .diego(true)
                         .diskQuota(1024)
                         .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerImage("cloudfoundry/hello:latest")
                         .enableSsh(true)
-                        .eventsUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/events")
+                        .eventsUrl("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/events")
                         .healthCheckType("port")
                         .instances(1)
                         .memory(1024)
-                        .name("my_super_app")
+                        .name("docker_app")
                         .packageState("PENDING")
+                        .packageUpdatedAt("2015-07-27T22:43:20Z")
                         .production(false)
-                        .routesUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/routes")
-                        .serviceBindingsUrl("/v2/apps/508f0995-cbec-494c-99d1-f8c238117817/service_bindings")
-                        .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
-                        .spaceUrl("/v2/spaces/86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                        .routesUrl("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/routes")
+                        .serviceBindingsUrl("/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/service_bindings")
+                        .spaceId("6ef4e580-c189-49c8-959e-4a3d021b3307")
+                        .spaceUrl("/v2/spaces/6ef4e580-c189-49c8-959e-4a3d021b3307")
                         .stackId("d449ecea-669f-448a-a9e7-ec84d51e2fdb")
                         .stackUrl("/v2/stacks/d449ecea-669f-448a-a9e7-ec84d51e2fdb")
                         .state("STOPPED")
-                        .version("5d8a5c4a-9e74-4958-af55-abc8b8d1968d")
+                        .version("69ebcffe-d79b-482a-91b6-39dfc86e7692")
                         .build())
                 .build();
 
@@ -275,8 +279,10 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .errorResponse());
 
         CreateApplicationRequest request = CreateApplicationRequest.builder()
-                .name("my_super_app")
-                .spaceId("86dc4dc4-a2f7-438a-9f85-19a35bd15165")
+                .diego(true)
+                .dockerImage("cloudfoundry/hello")
+                .name("docker_app")
+                .spaceId("6ef4e580-c189-49c8-959e-4a3d021b3307")
                 .build();
 
         Streams.wrap(this.applications.create(request)).next().get();

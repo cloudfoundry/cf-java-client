@@ -42,7 +42,9 @@ public interface ApplicationsV2 {
     Publisher<CopyApplicationResponse> copy(CopyApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/creating_an_app.html">Creating an App</a> request and
+     * the <a href="http://apidocs.cloudfoundry.org/214/apps/creating_a_docker_app_%28experimental%29.html">Creating a
+     * Docker App</a> request.
      *
      * @param request the Create Application request
      * @return the response from the Create Application request
