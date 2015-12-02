@@ -21,8 +21,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
-import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
-import org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
 import reactor.Publishers;
 
@@ -151,7 +151,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
-                .resource(ListSpacesResponseResource.builder()
+                .resource(SpaceResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-space-id")
                                 .build())

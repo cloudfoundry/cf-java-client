@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the Creating a Space operation
@@ -28,7 +29,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateSpaceResponse extends SpaceResource {
+public final class CreateSpaceResponse extends Resource<SpaceEntity> {
 
     @Builder
     CreateSpaceResponse(@JsonProperty("entity") SpaceEntity entity,

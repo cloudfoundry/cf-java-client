@@ -42,9 +42,14 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -54,8 +59,6 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder;
-import static org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
-import static org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -594,7 +597,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpacesResponse expected = ListSpacesResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpacesResponseResource.builder()
+                .resource(SpaceResource.builder()
                         .metadata(Metadata.builder()
                                 .id("b4293b09-8316-472c-a29a-6468a3adff59")
                                 .url("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59")
@@ -721,13 +724,13 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceAuditorsResponse expected = ListSpaceAuditorsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpaceAuditorsResponse.ListSpaceAuditorsResponseResource.builder()
+                .resource(ListSpaceMembersResource.builder()
                         .metadata(Metadata.builder()
                                 .id("uaa-id-15")
                                 .url("/v2/users/uaa-id-15")
                                 .createdAt("2015-07-27T22:43:07Z")
                                 .build())
-                        .entity(ListSpaceAuditorsResponse.ListSpaceAuditorsResponseEntity.builder()
+                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
                                 .admin(false)
                                 .active(false)
                                 .defaultSpaceId(null)
@@ -770,6 +773,73 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listAuditors(request)).next().get();
+    }
+
+    @Test
+    public void listDevelopers() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/developers?developer_guid=test-developer-id&page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_developers_response.json"));
+
+        ListSpaceDevelopersRequest request = ListSpaceDevelopersRequest.builder()
+                .developerId("test-developer-id")
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceDevelopersResponse expected = ListSpaceDevelopersResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ListSpaceMembersResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-24")
+                                .url("/v2/users/uaa-id-24")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("developer@example.com")
+                                .spacesUrl("/v2/users/uaa-id-24/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-24/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-24/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-24/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-24/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-24/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-24/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceDevelopersResponse actual = Streams.wrap(this.spaces.listDevelopers(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listDevelopersError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/developers?developer_guid=test-developer-id&page=-1")
+                .errorResponse());
+
+        ListSpaceDevelopersRequest request = ListSpaceDevelopersRequest.builder()
+                .developerId("test-developer-id")
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listDevelopers(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listDevelopersInvalidRequest() {
+        ListSpaceDevelopersRequest request = ListSpaceDevelopersRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listDevelopers(request)).next().get();
     }
 
     @Test(expected = CloudFoundryException.class)

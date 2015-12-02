@@ -19,8 +19,8 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
-import org.cloudfoundry.client.v2.spaces.ListSpacesResponse.ListSpacesResponseResource;
-import org.cloudfoundry.client.v2.spaces.SpaceResource.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -42,7 +42,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     @Test
     public void list() {
         ListSpacesResponse page1 = ListSpacesResponse.builder()
-                .resource(ListSpacesResponseResource.builder()
+                .resource(SpaceResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-id-1")
                                 .build())
@@ -57,7 +57,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
                 .thenReturn(Publishers.just(page1));
 
         ListSpacesResponse page2 = ListSpacesResponse.builder()
-                .resource(ListSpacesResponseResource.builder()
+                .resource(SpaceResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-id-2")
                                 .build())
