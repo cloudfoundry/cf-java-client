@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
+import org.cloudfoundry.client.v2.events.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
@@ -44,6 +46,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
@@ -54,6 +58,8 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
@@ -854,6 +860,74 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.list(request)).next().get();
+    }
+
+    @Test
+    public void listEvents() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/events?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_events_response.json"));
+
+        ListSpaceEventsRequest request = ListSpaceEventsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Map<String, Object> metadatas = new HashMap<>();
+        metadatas.put("request", Collections.singletonMap("name", "new_name"));
+
+        ListSpaceEventsResponse expected = ListSpaceEventsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(EventResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("cbb42f10-2737-4522-95dc-3ada35056fa8")
+                                .url("/v2/events/cbb42f10-2737-4522-95dc-3ada35056fa8")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(EventEntity.builder()
+                                .type("audit.space.update")
+                                .actor("uaa-id-10")
+                                .actorType("user")
+                                .actorName("user@example.com")
+                                .actee("33d44b03-6203-47a7-b71c-9bf6fcaeb54a")
+                                .acteeType("space")
+                                .acteeName("name-56")
+                                .timestamp("2015-07-27T22:43:07Z")
+                                .metadatas(metadatas)
+                                .spaceId("33d44b03-6203-47a7-b71c-9bf6fcaeb54a")
+                                .organizationId("ab7dff90-0bc7-4ce0-be5b-b8ecc676bc4a")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceEventsResponse actual = Streams.wrap(this.spaces.listEvents(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listEventsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/events?page=-1")
+                .errorResponse());
+
+        ListSpaceEventsRequest request = ListSpaceEventsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listEvents(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listEventsInvalidRequest() {
+        ListSpaceEventsRequest request = ListSpaceEventsRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listEvents(request)).next().get();
     }
 
 }
