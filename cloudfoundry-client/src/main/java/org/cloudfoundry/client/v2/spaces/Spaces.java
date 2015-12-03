@@ -138,4 +138,13 @@ public interface Spaces {
      */
     Publisher<ListSpaceEventsResponse> listEvents(ListSpaceEventsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_managers_for_the_space.html">List all
+     * Managers for the Space</a> request
+     *
+     * @param request the List all Managers for the Space request
+     * @return the response from the List all Managers for the Space request
+     */
+    Publisher<ListSpaceManagersResponse> listManagers(ListSpaceManagersRequest request);
+
 }

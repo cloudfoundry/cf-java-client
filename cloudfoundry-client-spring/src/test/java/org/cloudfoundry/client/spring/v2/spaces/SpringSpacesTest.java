@@ -48,6 +48,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
@@ -924,6 +926,71 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listEvents(request)).next().get();
+    }
+
+    @Test
+    public void listManagers() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/managers?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_managers_response.json"));
+
+        ListSpaceManagersRequest request = ListSpaceManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceManagersResponse expected = ListSpaceManagersResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ListSpaceMembersResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-35")
+                                .url("/v2/users/uaa-id-35")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("manager@example.com")
+                                .spacesUrl("/v2/users/uaa-id-35/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-35/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-35/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-35/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-35/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-35/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-35/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceManagersResponse actual = Streams.wrap(this.spaces.listManagers(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listManagersError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/managers?page=-1")
+                .errorResponse());
+
+        ListSpaceManagersRequest request = ListSpaceManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listManagers(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listManagersInvalidRequest() {
+        ListSpaceManagersRequest request = ListSpaceManagersRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listManagers(request)).next().get();
     }
 
 }
