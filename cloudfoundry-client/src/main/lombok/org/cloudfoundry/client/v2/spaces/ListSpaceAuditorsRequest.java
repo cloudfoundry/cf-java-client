@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.FilterParameter;
@@ -56,15 +55,6 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      */
     @Getter(onMethod = @__(@FilterParameter("audited_space_guid")))
     private volatile List<String> auditedSpaceIds;
-
-    /**
-     * The auditor id
-     *
-     * @param auditorId the auditor id
-     * @return the auditor id
-     */
-    @Getter(onMethod = @__(@QueryParameter("auditor_guid")))
-    private volatile String auditorId;
 
     /**
      * The billing managed organization ids
@@ -122,14 +112,17 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
 
     @Builder
     ListSpaceAuditorsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                             @Singular List<String> auditedOrganizationIds, @Singular List<String> auditedSpaceIds,
-                             String auditorId, @Singular List<String> billingManagedOrganizationIds, String id,
-                             @Singular List<String> managedOrganizationIds, @Singular List<String> managedSpaceIds,
-                             @Singular List<String> organizationIds, @Singular List<String> spaceIds) {
+                             @Singular List<String> auditedOrganizationIds,
+                             @Singular List<String> auditedSpaceIds,
+                             @Singular List<String> billingManagedOrganizationIds,
+                             String id,
+                             @Singular List<String> managedOrganizationIds,
+                             @Singular List<String> managedSpaceIds,
+                             @Singular List<String> organizationIds,
+                             @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
-        this.auditorId = auditorId;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;
         this.id = id;
         this.managedOrganizationIds = managedOrganizationIds;

@@ -28,7 +28,6 @@ public final class ListSpaceAuditorsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceAuditorsRequest.builder()
-                .auditorId("test-auditor-id")
                 .id("test-id")
                 .build()
                 .isValid();
@@ -39,7 +38,6 @@ public final class ListSpaceAuditorsRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceAuditorsRequest.builder()
-                .auditorId("test-auditor-id")
                 .build()
                 .isValid();
 

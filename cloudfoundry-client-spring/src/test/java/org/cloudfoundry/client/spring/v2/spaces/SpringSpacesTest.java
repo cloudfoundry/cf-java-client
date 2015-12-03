@@ -717,12 +717,11 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test
     public void listAuditors() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/spaces/test-id/auditors?auditor_guid=test-auditor-id&page=-1")
+                .method(GET).path("v2/spaces/test-id/auditors?page=-1")
                 .status(OK)
                 .responsePayload("v2/spaces/GET_{id}_auditors_response.json"));
 
         ListSpaceAuditorsRequest request = ListSpaceAuditorsRequest.builder()
-                .auditorId("test-auditor-id")
                 .id("test-id")
                 .page(-1)
                 .build();
@@ -761,11 +760,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listAuditorsError() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/spaces/test-id/auditors?auditor_guid=test-auditor-id&page=-1")
+                .method(GET).path("v2/spaces/test-id/auditors?page=-1")
                 .errorResponse());
 
         ListSpaceAuditorsRequest request = ListSpaceAuditorsRequest.builder()
-                .auditorId("test-auditor-id")
                 .id("test-id")
                 .page(-1)
                 .build();
@@ -784,12 +782,11 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test
     public void listDevelopers() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/spaces/test-id/developers?developer_guid=test-developer-id&page=-1")
+                .method(GET).path("v2/spaces/test-id/developers?page=-1")
                 .status(OK)
                 .responsePayload("v2/spaces/GET_{id}_developers_response.json"));
 
         ListSpaceDevelopersRequest request = ListSpaceDevelopersRequest.builder()
-                .developerId("test-developer-id")
                 .id("test-id")
                 .page(-1)
                 .build();
@@ -828,11 +825,10 @@ public final class SpringSpacesTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listDevelopersError() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/spaces/test-id/developers?developer_guid=test-developer-id&page=-1")
+                .method(GET).path("v2/spaces/test-id/developers?page=-1")
                 .errorResponse());
 
         ListSpaceDevelopersRequest request = ListSpaceDevelopersRequest.builder()
-                .developerId("test-developer-id")
                 .id("test-id")
                 .page(-1)
                 .build();
