@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.FilterParameter;
@@ -65,15 +64,6 @@ public final class ListSpaceDevelopersRequest extends PaginatedRequest implement
      */
     @Getter(onMethod = @__(@FilterParameter("billing_managed_organization_guid")))
     private volatile List<String> billingManagedOrganizationIds;
-
-    /**
-     * The developer id
-     *
-     * @param developerId the developer id
-     * @return the developer id
-     */
-    @Getter(onMethod = @__(@QueryParameter("developer_guid")))
-    private volatile String developerId;
 
     /**
      * The id
@@ -125,7 +115,6 @@ public final class ListSpaceDevelopersRequest extends PaginatedRequest implement
                                @Singular List<String> auditedOrganizationIds,
                                @Singular List<String> auditedSpaceIds,
                                @Singular List<String> billingManagedOrganizationIds,
-                               String developerId,
                                String id,
                                @Singular List<String> managedOrganizationIds,
                                @Singular List<String> managedSpaceIds,
@@ -137,7 +126,6 @@ public final class ListSpaceDevelopersRequest extends PaginatedRequest implement
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;
-        this.developerId = developerId;
         this.id = id;
         this.managedOrganizationIds = managedOrganizationIds;
         this.managedSpaceIds = managedSpaceIds;
