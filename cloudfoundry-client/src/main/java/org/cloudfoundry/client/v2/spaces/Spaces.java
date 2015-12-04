@@ -148,6 +148,15 @@ public interface Spaces {
     Publisher<ListSpaceManagersResponse> listManagers(ListSpaceManagersRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_routes_for_the_space.html">List all Routes
+     * for the Space</a> request
+     *
+     * @param request the List all Routes for the Space request
+     * @return the response from the List all Routes for the Space request
+     */
+    Publisher<ListSpaceRoutesResponse> listRoutes(ListSpaceRoutesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_security_groups_for_the_space.html">List
      * all Security Groups for the Space</a> request
      *
