@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -47,20 +49,30 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateAuditorResponse> associateAuditor(AssociateAuditorRequest request) {
-        return put(request, AssociateAuditorResponse.class,
-                builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors",
-                        request.getAuditorId()));
-    }
+    public Publisher<AssociateAuditorResponse> associateAuditor(final AssociateAuditorRequest request) {
+        return put(request, AssociateAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
 
-    @Override
-    public Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
-        return get(request, ListOrganizationsResponse.class, builder -> {
-            builder.pathSegment("v2", "organizations");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors",
+                        request.getAuditorId());
+            }
+
         });
     }
 
+    @Override
+    public Publisher<ListOrganizationsResponse> list(final ListOrganizationsRequest request) {
+        return get(request, ListOrganizationsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
 
 }

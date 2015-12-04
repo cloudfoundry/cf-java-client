@@ -18,21 +18,25 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import reactor.fn.Function;
 import reactor.rx.Streams;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
  */
 public final class CloudFoundryOperationsBuilder {
 
-    private volatile Optional<CloudFoundryClient> cloudFoundryClient = Optional.empty();
+    private volatile CloudFoundryClient cloudFoundryClient;
 
-    private volatile Optional<String> organization = Optional.empty();
+    private volatile String organization;
 
-    private volatile Optional<String> space = Optional.empty();
+    private volatile String space;
 
     /**
      * Builds a new instance of the default implementation of the {@link CloudFoundryOperations} using the information
@@ -42,13 +46,14 @@ public final class CloudFoundryOperationsBuilder {
      * @throws IllegalArgumentException if {@code cloudFoundryClient} has not been set
      */
     public CloudFoundryOperations build() {
-        CloudFoundryClient cloudFoundryClient = this.cloudFoundryClient
-                .orElseThrow(() -> new IllegalArgumentException("CloudFoundryClient must be set"));
+        if (this.cloudFoundryClient == null) {
+            throw new IllegalArgumentException("CloudFoundryClient must be set");
+        }
 
-        Optional<String> organizationId = getOrganizationId(cloudFoundryClient);
-        Optional<String> spaceId = getSpaceId(cloudFoundryClient, organizationId);
+        String organizationId = getOrganizationId(this.cloudFoundryClient);
+        String spaceId = getSpaceId(this.cloudFoundryClient, organizationId);
 
-        return new DefaultCloudFoundryOperations(cloudFoundryClient, organizationId, spaceId);
+        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, organizationId, spaceId);
     }
 
     /**
@@ -58,7 +63,7 @@ public final class CloudFoundryOperationsBuilder {
      * @return {@code this}
      */
     public CloudFoundryOperationsBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = Optional.of(cloudFoundryClient);
+        this.cloudFoundryClient = cloudFoundryClient;
         return this;
     }
 
@@ -70,8 +75,8 @@ public final class CloudFoundryOperationsBuilder {
      * @return {@code this}
      */
     public CloudFoundryOperationsBuilder target(String organization, String space) {
-        this.organization = Optional.of(organization);
-        this.space = Optional.of(space);
+        this.organization = organization;
+        this.space = space;
         return this;
     }
 
@@ -82,41 +87,78 @@ public final class CloudFoundryOperationsBuilder {
      * @return {@code this}
      */
     public CloudFoundryOperationsBuilder target(String organization) {
-        this.organization = Optional.of(organization);
+        this.organization = organization;
         return this;
     }
 
-    private Optional<String> getOrganizationId(CloudFoundryClient cloudFoundryClient) {
-        return this.organization.map(name -> {
-            ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                    .name(name)
-                    .build();
+    private String getOrganizationId(CloudFoundryClient cloudFoundryClient) {
+        if (this.organization == null) {
+            return null;
+        }
 
-            return Streams.wrap(cloudFoundryClient.organizations().list(request))
-                    .map(response -> response.getResources().stream())
-                    .map(stream -> stream.findFirst().map(resource -> resource.getMetadata().getId()))
-                    .observe(id -> id.orElseThrow(() -> new IllegalArgumentException(
-                                    String.format("Organization '%s' does not exist", name)))
-                    )
-                    .next().poll();
-        }).orElse(Optional.empty());
+        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                .name(this.organization)
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.organizations().list(request))
+                .map(new Function<ListOrganizationsResponse, List<ListOrganizationsResponse.Resource>>() {
+
+                    @Override
+                    public List<ListOrganizationsResponse.Resource> apply(ListOrganizationsResponse response) {
+                        return response.getResources();
+                    }
+
+                }).map(new Function<List<ListOrganizationsResponse.Resource>, String>() {
+
+                    @Override
+                    public String apply(List<ListOrganizationsResponse.Resource> resources) {
+                        if (resources.isEmpty()) {
+                            throw new IllegalArgumentException(String.format("Organization '%s' does not exist",
+                                    CloudFoundryOperationsBuilder.this.organization));
+
+                        }
+
+                        return resources.get(0).getMetadata().getId();
+                    }
+
+                }).next().poll();
     }
 
-    private Optional<String> getSpaceId(CloudFoundryClient cloudFoundryClient, Optional<String> organizationId) {
-        return organizationId.map(orgId -> this.space.map(name -> {
-            ListSpacesRequest request = ListSpacesRequest.builder()
-                    .organizationId(orgId)
-                    .name(name)
-                    .build();
+    private String getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        if (organizationId == null) {
+            return null;
+        }
 
-            return Streams.wrap(cloudFoundryClient.spaces().list(request))
-                    .map(response -> response.getResources().stream())
-                    .map(stream -> stream.findFirst().map(resource -> resource.getMetadata().getId()))
-                    .observe(id -> id.orElseThrow(() -> new IllegalArgumentException(
-                                    String.format("Space '%s' does not exist", name)))
-                    )
-                    .next().poll();
-        }).orElse(Optional.empty())).orElse(Optional.empty());
+        if (this.space == null) {
+            return null;
+        }
+
+        ListSpacesRequest request = ListSpacesRequest.builder()
+                .organizationId(organizationId)
+                .name(this.space)
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.spaces().list(request))
+                .map(new Function<ListSpacesResponse, List<SpaceResource>>() {
+
+                    @Override
+                    public List<SpaceResource> apply(ListSpacesResponse response) {
+                        return response.getResources();
+                    }
+
+                }).map(new Function<List<SpaceResource>, String>() {
+
+                    @Override
+                    public String apply(List<SpaceResource> resources) {
+                        if (resources.isEmpty()) {
+                            throw new IllegalArgumentException(String.format("Space '%s' does not exist",
+                                    CloudFoundryOperationsBuilder.this.space));
+                        }
+
+                        return resources.get(0).getMetadata().getId();
+                    }
+
+                }).next().poll();
     }
 
 }

@@ -36,7 +36,11 @@ import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
+import reactor.fn.Supplier;
 
 import java.net.URI;
 
@@ -57,49 +61,96 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<CopyPackageResponse> copy(CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class,
-                builder -> {
-                    builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
-                    QueryBuilder.augment(builder, request);
-                });
+    public Publisher<CopyPackageResponse> copy(final CopyPackageRequest request) {
+        return post(request, CopyPackageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<CreatePackageResponse> create(CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+    public Publisher<CreatePackageResponse> create(final CreatePackageRequest request) {
+        return post(request, CreatePackageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> delete(DeletePackageRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "packages", request.getId()));
+    public Publisher<Void> delete(final DeletePackageRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<GetPackageResponse> get(GetPackageRequest request) {
-        return get(request, GetPackageResponse.class,
-                builder -> builder.pathSegment("v3", "packages", request.getId()));
+    public Publisher<GetPackageResponse> get(final GetPackageRequest request) {
+        return get(request, GetPackageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListPackagesResponse> list(ListPackagesRequest request) {
-        return get(request, ListPackagesResponse.class,
-                builder -> builder.pathSegment("v3", "packages"));
+    public Publisher<ListPackagesResponse> list(final ListPackagesRequest request) {
+        return get(request, ListPackagesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<StagePackageResponse> stage(StagePackageRequest request) {
-        return post(request, StagePackageResponse.class,
-                builder -> builder.pathSegment("v3", "packages", request.getId(), "droplets"));
+    public Publisher<StagePackageResponse> stage(final StagePackageRequest request) {
+        return post(request, StagePackageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages", request.getId(), "droplets");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<UploadPackageResponse> upload(UploadPackageRequest request) {
-        return postWithBody(request,
-                () -> CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile())),
-                UploadPackageResponse.class,
-                builder -> builder.pathSegment("v3", "packages", request.getId(), "upload"));
+    public Publisher<UploadPackageResponse> upload(final UploadPackageRequest request) {
+        return postWithBody(request, new Supplier<MultiValueMap<String, FileSystemResource>>() {
+
+            @Override
+            public MultiValueMap<String, FileSystemResource> get() {
+                return CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile
+                        ()));
+            }
+
+        }, UploadPackageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages", request.getId(), "upload");
+            }
+
+        });
     }
 
 }

@@ -16,7 +16,11 @@
 
 package org.cloudfoundry.client.spring.util;
 
+import org.reactivestreams.Subscriber;
 import reactor.Publishers;
+import reactor.core.subscriber.SubscriberWithContext;
+import reactor.fn.Consumer;
+import reactor.fn.Function;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
@@ -34,29 +38,39 @@ public final class Multipart {
 
     private static final String DASHES = "--";
 
-    public static Stream<byte[]> from(InputStream inputStream, String boundary) {
-        return Streams.wrap(Publishers.create(subscriber -> {
-            byte[] part = new byte[0];
+    public static Stream<byte[]> from(final InputStream inputStream, final String boundary) {
+        return Streams.wrap(Publishers.create(new Consumer<SubscriberWithContext<byte[], Void>>() {
 
-            try {
-                part = getPart(inputStream, boundary);
+            @Override
+            public void accept(SubscriberWithContext<byte[], Void> subscriber) {
+                byte[] part = new byte[0];
 
-                if (part == null) {
-                    subscriber.onComplete();
-                } else {
-                    subscriber.onNext(part);
+                try {
+                    part = getPart(inputStream, boundary);
+
+                    if (part == null) {
+                        subscriber.onComplete();
+                    } else {
+                        subscriber.onNext(part);
+                    }
+                } catch (IOException e) {
+                    subscriber.onError(e);
                 }
-            } catch (IOException e) {
-                subscriber.onError(e);
-            }
-        }, subscriber -> {
-            try {
-                primeStream(inputStream, boundary);
-            } catch (IOException e) {
-                subscriber.onError(e);
             }
 
-            return null;
+        }, new Function<Subscriber<? super byte[]>, Void>() {
+
+            @Override
+            public Void apply(Subscriber<? super byte[]> subscriber) {
+                try {
+                    primeStream(inputStream, boundary);
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+                return null;
+            }
+
         }));
     }
 

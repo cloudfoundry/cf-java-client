@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * An exception indicating that a request was invalid
@@ -35,7 +35,20 @@ public final class RequestValidationException extends RuntimeException {
     }
 
     private static String getMessage(ValidationResult validationResult) {
-        return "Request is invalid: " + validationResult.getMessages().stream().collect(Collectors.joining(", "));
+        return "Request is invalid: " + join(validationResult.getMessages(), ", ");
+    }
+
+    private static String join(List<String> list, String conjunction) {
+        if (list.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder().append(list.get(0));
+        for (String item : list.subList(1, list.size())) {
+            sb.append(conjunction).append(item);
+        }
+
+        return sb.toString();
     }
 
 }

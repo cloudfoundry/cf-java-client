@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations;
+package org.cloudfoundry.client.spring.util;
 
-import org.junit.Test;
+import java.lang.reflect.Method;
+import java.util.Comparator;
 
-import static org.junit.Assert.assertNotNull;
+public final class MethodNameComparator implements Comparator<Method> {
 
-public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
+    public static final MethodNameComparator INSTANCE = new MethodNameComparator();
 
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(
-            this.cloudFoundryClient, null, null);
-
-    @Test
-    public void organizations() {
-        assertNotNull(this.operations.organizations());
+    private MethodNameComparator() {
     }
 
-    @Test
-    public void spaces() {
-        assertNotNull(this.operations.spaces());
+    @Override
+    public int compare(Method a, Method b) {
+        return a.getName().compareTo(b.getName());
     }
 
 }

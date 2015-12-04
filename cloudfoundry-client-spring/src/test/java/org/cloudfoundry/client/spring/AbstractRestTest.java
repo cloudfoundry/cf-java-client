@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring;
 
+import lombok.Getter;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.springframework.core.io.ClassPathResource;
@@ -33,12 +34,12 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.RequestMatcher;
 import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -61,36 +62,35 @@ public abstract class AbstractRestTest {
 
     {
         List<HttpMessageConverter<?>> messageConverters = this.restTemplate.getMessageConverters();
-
-        messageConverters.stream()
-                .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-                .map(converter -> (MappingJackson2HttpMessageConverter) converter)
-                .findFirst()
-                .ifPresent(converter -> {
-                    converter.getObjectMapper()
-                            .setSerializationInclusion(NON_NULL);
-                });
+        for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
+                ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
+                        .setSerializationInclusion(NON_NULL);
+            }
+        }
 
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
     }
 
     protected final void mockRequest(RequestContext requestContext) {
-        HttpMethod method = requestContext.getMethod()
-                .orElseThrow(() -> new IllegalStateException("method must be set"));
+        HttpMethod method = requestContext.getMethod();
+        Assert.notNull(method, "method must be set");
 
-        String uri = requestContext.getPath()
-                .map(path -> UriComponentsBuilder.fromUri(this.root).path(path).build(false).toString())
-                .orElseThrow(() -> new IllegalStateException("path must be set"));
+        Assert.notNull(requestContext.getPath(), "path must be set");
+        String uri = UriComponentsBuilder.fromUri(this.root).path(requestContext.getPath()).build(false).toString();
 
         ResponseActions responseActions = this.mockServer
                 .expect(method(method))
                 .andExpect(requestTo(uri));
 
-        if (!requestContext.getAnyRequestPayload()) {
-            RequestMatcher payloadMatcher = requestContext.getRequestPayload()
-                    .map(ContentMatchers::jsonPayload)
-                    .orElse(content().string(""));
+        if (!requestContext.isAnyRequestPayload()) {
+            RequestMatcher payloadMatcher;
+            if (requestContext.getRequestPayload() != null) {
+                payloadMatcher = ContentMatchers.jsonPayload(requestContext.getRequestPayload());
+            } else {
+                payloadMatcher = content().string("");
+            }
 
             responseActions = responseActions.andExpect(payloadMatcher);
         }
@@ -99,15 +99,17 @@ public abstract class AbstractRestTest {
             responseActions = responseActions.andExpect(requestMatcher);
         }
 
-        HttpStatus status = requestContext.getStatus()
-                .orElseThrow(() -> new IllegalStateException("status must be set"));
+        HttpStatus status = requestContext.getStatus();
+        Assert.notNull(status, "status must be set");
 
-        MediaType contentType = requestContext.getContentType()
-                .orElse(APPLICATION_JSON);
+        MediaType contentType = requestContext.getContentType();
 
-        ResponseCreator responseCreator = requestContext.getResponsePayload()
-                .map(resource -> withStatus(status).contentType(contentType).body(resource))
-                .orElse(withStatus(status));
+        ResponseCreator responseCreator;
+        if (requestContext.getResponsePayload() != null) {
+            responseCreator = withStatus(status).contentType(contentType).body(requestContext.getResponsePayload());
+        } else {
+            responseCreator = withStatus(status);
+        }
 
         responseActions.andRespond(responseCreator);
     }
@@ -116,23 +118,24 @@ public abstract class AbstractRestTest {
         this.mockServer.verify();
     }
 
+    @Getter
     public static final class RequestContext {
 
         private final List<RequestMatcher> requestMatchers = new ArrayList<>();
 
-        private volatile boolean anyRequestPayload = false;
+        private volatile boolean anyRequestPayload;
 
-        private volatile Optional<MediaType> contentType = Optional.empty();
+        private volatile MediaType contentType = APPLICATION_JSON;
 
-        private volatile Optional<HttpMethod> method = Optional.empty();
+        private volatile HttpMethod method;
 
-        private volatile Optional<String> path = Optional.empty();
+        private volatile String path;
 
-        private volatile Optional<Resource> requestPayload = Optional.empty();
+        private volatile Resource requestPayload;
 
-        private volatile Optional<Resource> responsePayload = Optional.empty();
+        private volatile Resource responsePayload;
 
-        private volatile Optional<HttpStatus> status = Optional.empty();
+        private volatile HttpStatus status;
 
         public RequestContext anyRequestPayload() {
             this.anyRequestPayload = true;
@@ -140,7 +143,7 @@ public abstract class AbstractRestTest {
         }
 
         public RequestContext contentType(MediaType contentType) {
-            this.contentType = Optional.of(contentType);
+            this.contentType = contentType;
             return this;
         }
 
@@ -151,12 +154,12 @@ public abstract class AbstractRestTest {
         }
 
         public RequestContext method(HttpMethod method) {
-            this.method = Optional.of(method);
+            this.method = method;
             return this;
         }
 
         public RequestContext path(String path) {
-            this.path = Optional.of(path);
+            this.path = path;
             return this;
         }
 
@@ -166,50 +169,24 @@ public abstract class AbstractRestTest {
         }
 
         public RequestContext requestPayload(String path) {
-            this.requestPayload = Optional.of(path).map(ClassPathResource::new);
+            if (path != null) {
+                this.requestPayload = new ClassPathResource(path);
+            }
+
             return this;
         }
 
         public RequestContext responsePayload(String path) {
-            this.responsePayload = Optional.of(path).map(ClassPathResource::new);
+            if (path != null) {
+                this.responsePayload = new ClassPathResource(path);
+            }
+
             return this;
         }
 
         public RequestContext status(HttpStatus status) {
-            this.status = Optional.of(status);
+            this.status = status;
             return this;
-        }
-
-        Boolean getAnyRequestPayload() {
-            return this.anyRequestPayload;
-        }
-
-        Optional<MediaType> getContentType() {
-            return this.contentType;
-        }
-
-        Optional<HttpMethod> getMethod() {
-            return this.method;
-        }
-
-        Optional<String> getPath() {
-            return this.path;
-        }
-
-        List<RequestMatcher> getRequestMatchers() {
-            return this.requestMatchers;
-        }
-
-        Optional<Resource> getRequestPayload() {
-            return this.requestPayload;
-        }
-
-        Optional<Resource> getResponsePayload() {
-            return this.responsePayload;
-        }
-
-        Optional<HttpStatus> getStatus() {
-            return this.status;
         }
 
     }

@@ -37,6 +37,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Publishers;
+import reactor.core.subscriber.SubscriberWithContext;
+import reactor.fn.BiConsumer;
+import reactor.fn.Consumer;
+import reactor.fn.Function;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
@@ -48,10 +52,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * The Spring-based implementation of {@link LoggregatorClient}
@@ -94,42 +95,85 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
     private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
         return Streams.wrap(cloudFoundryClient.info().get())
-                .map(GetInfoResponse::getLoggingEndpoint)
-                .map(loggingEndpoint ->
-                        UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri())
+                .map(new Function<GetInfoResponse, String>() {
+
+                    @Override
+                    public String apply(GetInfoResponse getInfoResponse) {
+                        return getInfoResponse.getLoggingEndpoint();
+                    }
+
+                })
+                .map(new Function<String, URI>() {
+
+                    @Override
+                    public URI apply(String loggingEndpoint) {
+                        return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
+                    }
+
+                })
                 .next().poll();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Publisher<LoggregatorMessage> recent(RecentLogsRequest request) {
-        return get(request, Stream.class, builder -> builder.pathSegment("recent").queryParam("app", request.getId()))
-                .flatMap(stream -> stream);
+    public Publisher<LoggregatorMessage> recent(final RecentLogsRequest request) {
+        return get(request, Stream.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("recent").queryParam("app", request.getId());
+            }
+
+        }).flatMap(new Function<Stream, Publisher<? extends LoggregatorMessage>>() {
+
+            @Override
+            public Publisher<? extends LoggregatorMessage> apply(Stream stream) {
+                return stream;
+            }
+
+        });
     }
 
     @Override
-    public Publisher<LoggregatorMessage> stream(StreamLogsRequest request) {
-        return ws(request,
-                builder -> builder.path("tail/").queryParam("app", request.getId()),
-                LoggregatorMessageHandler::new);
+    public Publisher<LoggregatorMessage> stream(final StreamLogsRequest request) {
+        return ws(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.path("tail/").queryParam("app", request.getId());
+            }
+
+        }, new Function<Subscriber<LoggregatorMessage>, MessageHandler>() {
+
+            @Override
+            public MessageHandler apply(Subscriber<LoggregatorMessage> subscriber) {
+                return new LoggregatorMessageHandler(subscriber);
+            }
+
+        });
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Stream<T> exchange(Validatable request, Consumer<Subscriber<T>> exchange) {
-        return Streams.wrap(Publishers.createWithDemand((n, subscriber) -> {
-            if (n != Long.MAX_VALUE) {
-                subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-            }
+    private <T> Stream<T> exchange(final Validatable request, final Consumer<Subscriber<T>> exchange) {
+        return Streams.wrap(Publishers.createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
-            if (request != null) {
-                ValidationResult validationResult = request.isValid();
-                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                    subscriber.onError(new RequestValidationException(validationResult));
-                    return;
+            @Override
+            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
+                if (n != Long.MAX_VALUE) {
+                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
                 }
+
+                if (request != null) {
+                    ValidationResult validationResult = request.isValid();
+                    if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                        subscriber.onError(new RequestValidationException(validationResult));
+                        return;
+                    }
+                }
+
+                exchange.accept(subscriber);
             }
 
-            exchange.accept(subscriber);
         }));
     }
 
@@ -138,34 +182,45 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         return ClientEndpointConfig.Builder.create().configurator(configurator).build();
     }
 
-    private <T> Stream<T> ws(Validatable request, Consumer<UriComponentsBuilder> builderCallback,
-                             Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
+    private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback,
+                             final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
 
-        AtomicReference<Session> session = new AtomicReference<>();
+        final AtomicReference<Session> session = new AtomicReference<>();
 
-        Stream<T> exchange = exchange(request, subscriber -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+        Stream<T> exchange = exchange(request, new Consumer<Subscriber<T>>() {
+            @Override
+            public void accept(Subscriber<T> subscriber) {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(SpringLoggregatorClient.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
 
-            MessageHandler messageHandler = messageHandlerCreator.apply(subscriber);
-            ReactiveEndpoint<T> endpoint = new ReactiveEndpoint<>(messageHandler, subscriber);
+                MessageHandler messageHandler = messageHandlerCreator.apply(subscriber);
+                ReactiveEndpoint<T> endpoint = new ReactiveEndpoint<>(messageHandler, subscriber);
 
-            try {
-                this.logger.debug("WS {}", uri);
-                session.set(this.webSocketContainer.connectToServer(endpoint, this.clientEndpointConfig, uri));
-            } catch (DeploymentException | IOException e) {
-                subscriber.onError(e);
+                try {
+                    SpringLoggregatorClient.this.logger.debug("WS {}", uri);
+                    session.set(SpringLoggregatorClient.this.webSocketContainer.connectToServer(endpoint,
+                            SpringLoggregatorClient.this.clientEndpointConfig, uri));
+                } catch (DeploymentException | IOException e) {
+                    subscriber.onError(e);
+                }
             }
         });
 
-        return exchange.observeCancel(r -> Optional.ofNullable(session.get()).ifPresent(s -> {
-            try {
-                s.close();
-            } catch (IOException e) {
-                this.logger.warn("Failure closing session", e);
+        return exchange.observeCancel(new Consumer<Void>() {
+
+            @Override
+            public void accept(Void v) {
+                if (session.get() != null) {
+                    try {
+                        session.get().close();
+                    } catch (IOException e) {
+                        SpringLoggregatorClient.this.logger.warn("Failure closing session", e);
+                    }
+                }
             }
-        }));
+
+        });
     }
 
 }

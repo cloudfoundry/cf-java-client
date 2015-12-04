@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.util;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import reactor.fn.Function;
 
 import java.io.IOException;
 
@@ -32,12 +33,17 @@ public final class MultipartTest {
     @Test
     public void test() throws IOException {
         Long count = Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
-                .map(part -> {
-                    try {
-                        return LogMessage.parseFrom(part);
-                    } catch (InvalidProtocolBufferException e) {
-                        throw new RuntimeException(e);
+                .map(new Function<byte[], Object>() {
+
+                    @Override
+                    public Object apply(byte[] part) {
+                        try {
+                            return LogMessage.parseFrom(part);
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+
                 })
                 .count()
                 .next().get();

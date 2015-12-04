@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2;
 
+import org.cloudfoundry.client.spring.util.MethodNameComparator;
 import org.cloudfoundry.client.v2.FilterParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -25,7 +26,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * A builder for Cloud Foundry V2 filters
@@ -42,20 +42,21 @@ public final class FilterBuilder {
      * @param instance the instance to inspect and invoke
      */
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(ReflectionUtils.getAllDeclaredMethods(instance.getClass()))
-                .sorted((a, b) -> a.getName().compareTo(b.getName()))
-                .forEach(method -> {
-                    FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
-                    if (filterParameter == null) {
-                        return;
-                    }
+        Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
+        Arrays.sort(methods, MethodNameComparator.INSTANCE);
 
-                    Object value = getValue(method, instance);
+        for(Method method: methods) {
+            FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
+            if (filterParameter == null) {
+                continue;
+            }
 
-                    if (value != null) {
-                        builder.queryParam("q", getFilter(filterParameter) + filterParameter.operation() + value);
-                    }
-                });
+            Object value = getValue(method, instance);
+
+            if (value != null) {
+                builder.queryParam("q", getFilter(filterParameter) + filterParameter.operation() + value);
+            }
+        }
     }
 
     private static String getFilter(FilterParameter filterParameter) {
@@ -83,7 +84,7 @@ public final class FilterBuilder {
             return null;
         }
 
-        return collection.stream().collect(Collectors.joining(","));
+        return StringUtils.collectionToCommaDelimitedString(collection);
     }
 
 }

@@ -20,7 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
@@ -98,6 +98,24 @@ public class ApplicationEvents {
             this.cloudFoundryClient = cloudFoundryClient;
         }
 
+        private Stream<ListOrganizationsResponse> listOrganizations() {
+            return paginate(
+                    page -> ListOrganizationsRequest.builder().page(page).build(),
+                    request -> this.cloudFoundryClient.organizations().list(request));
+        }
+
+        private <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
+                Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
+
+            return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
+                    .concatMap(responseStream -> responseStream
+                            .take(1)
+                            .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
+                                    .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
+                                    .startWith(response)
+                            ));
+        }
+
         private void run() throws IOException {
             Map<String, String> organizations = new HashMap<>();
 
@@ -124,7 +142,7 @@ public class ApplicationEvents {
                         .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
                         .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
                         .map(r -> {
-                            EventResource.EventEntity entity = r.getEntity();
+                            EventEntity entity = r.getEntity();
 
                             String id = r.getMetadata().getId();
                             String timestamp = entity.getTimestamp();
@@ -145,24 +163,6 @@ public class ApplicationEvents {
                                 System.out::println,
                                 r -> this.logger.info("Finished"));
             }
-        }
-
-        private <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
-                Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
-
-            return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
-                    .concatMap(responseStream -> responseStream
-                            .take(1)
-                            .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
-                                            .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
-                                            .startWith(response)
-                            ));
-        }
-
-        private Stream<ListOrganizationsResponse> listOrganizations() {
-            return paginate(
-                    page -> ListOrganizationsRequest.builder().page(page).build(),
-                    request -> this.cloudFoundryClient.organizations().list(request));
         }
     }
 

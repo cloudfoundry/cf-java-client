@@ -27,17 +27,15 @@ import reactor.rx.Streams;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest extends AbstractOperationsTest {
 
-    private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient,
-            Optional.of("test-organization-id"));
+    private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, "test-organization-id");
 
-    private DefaultSpaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, Optional.empty());
+    private DefaultSpaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
 
     @Test
     public void list() {

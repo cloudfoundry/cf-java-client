@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -47,17 +49,28 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
     }
 
     @Override
-    public Publisher<GetEventResponse> get(GetEventRequest request) {
-        return get(request, GetEventResponse.class,
-                builder -> builder.pathSegment("v2", "events", request.getId()));
+    public Publisher<GetEventResponse> get(final GetEventRequest request) {
+        return get(request, GetEventResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "events", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListEventsResponse> list(ListEventsRequest request) {
-        return get(request, ListEventsResponse.class, builder -> {
-            builder.pathSegment("v2", "events");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListEventsResponse> list(final ListEventsRequest request) {
+        return get(request, ListEventsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "events");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 

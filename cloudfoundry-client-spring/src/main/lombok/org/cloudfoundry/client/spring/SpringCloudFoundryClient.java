@@ -63,7 +63,6 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -107,7 +106,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                              String username, String password, RestOperations bootstrapRestOperations,
                              SslCertificateTruster sslCertificateTruster) {
 
-        if (Optional.ofNullable(skipSslValidation).orElse(false)) {
+
+        if (skipSslValidation != null && skipSslValidation) {
             try {
                 sslCertificateTruster.trust(host, 443, 5, SECONDS);
             } catch (GeneralSecurityException | IOException e) {
@@ -168,8 +168,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             RestOperations bootstrapRestOperations) {
 
         ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
-        details.setClientId(Optional.ofNullable(clientId).orElse("cf"));
-        details.setClientSecret(Optional.ofNullable(clientSecret).orElse(""));
+        details.setClientId(clientId != null ? clientId : "cf");
+        details.setClientSecret(clientSecret != null ? clientSecret : "");
         details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations));
         details.setUsername(username);
         details.setPassword(password);
@@ -188,16 +188,15 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
 
-        messageConverters.stream()
-                .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-                .map(converter -> (MappingJackson2HttpMessageConverter) converter)
-                .findFirst()
-                .ifPresent(converter -> {
-                    LOGGER.debug("Modifying ObjectMapper configuration");
-                    converter.getObjectMapper()
-                            .addHandler(new LoggingDeserializationProblemHandler())
-                            .setSerializationInclusion(NON_NULL);
-                });
+        for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
+                LOGGER.debug("Modifying ObjectMapper configuration");
+
+                ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
+                        .addHandler(new LoggingDeserializationProblemHandler())
+                        .setSerializationInclusion(NON_NULL);
+            }
+        }
 
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());

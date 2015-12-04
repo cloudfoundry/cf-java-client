@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v3;
 
+import org.cloudfoundry.client.spring.util.MethodNameComparator;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -38,29 +39,30 @@ public final class FilterBuilder {
      */
     @SuppressWarnings("unchecked")
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(ReflectionUtils.getAllDeclaredMethods(instance.getClass()))
-                .sorted((a, b) -> a.getName().compareTo(b.getName()))
-                .forEach(method -> {
-                    FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
-                    if (filterParameter == null) {
-                        return;
-                    }
+        Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
+        Arrays.sort(methods, MethodNameComparator.INSTANCE);
 
-                    Object value = getValue(method, instance);
-                    if (value == null) {
-                        return;
-                    }
+        for (Method method : methods) {
+            FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
+            if (filterParameter == null) {
+                continue;
+            }
 
-                    if (!(value instanceof Collection)) {
-                        builder.queryParam(filterParameter.value(), value);
-                        return;
-                    }
+            Object value = getValue(method, instance);
+            if (value == null) {
+                continue;
+            }
 
-                    String name = String.format("%s[]", filterParameter.value());
-                    ((Collection) value).stream().forEach(item -> {
-                        builder.queryParam(name, item);
-                    });
-                });
+            if (!(value instanceof Collection)) {
+                builder.queryParam(filterParameter.value(), value);
+                continue;
+            }
+
+            String name = String.format("%s[]", filterParameter.value());
+            for (Object item : (Collection) value) {
+                builder.queryParam(name, item);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

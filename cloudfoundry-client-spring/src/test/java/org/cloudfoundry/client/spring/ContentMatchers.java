@@ -18,9 +18,11 @@ package org.cloudfoundry.client.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.Resource;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.test.web.client.RequestMatcher;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -29,14 +31,19 @@ public final class ContentMatchers {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static RequestMatcher jsonPayload(Resource resource) {
-        return request -> {
-            MockClientHttpRequest mockRequest = (MockClientHttpRequest) request;
+    public static RequestMatcher jsonPayload(final Resource resource) {
+        return new RequestMatcher() {
 
-            Map expected = OBJECT_MAPPER.readValue(resource.getInputStream(), Map.class);
-            Map actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
+            @Override
+            public void match(ClientHttpRequest request) throws IOException, AssertionError {
+                MockClientHttpRequest mockRequest = (MockClientHttpRequest) request;
 
-            assertEquals(expected, actual);
+                Map expected = OBJECT_MAPPER.readValue(resource.getInputStream(), Map.class);
+                Map actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
+
+                assertEquals(expected, actual);
+            }
+
         };
     }
 

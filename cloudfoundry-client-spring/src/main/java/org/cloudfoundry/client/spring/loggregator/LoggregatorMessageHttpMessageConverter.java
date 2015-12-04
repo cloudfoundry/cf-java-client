@@ -25,6 +25,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.util.TypeUtils;
+import reactor.fn.Function;
 import reactor.rx.Stream;
 
 import java.io.IOException;
@@ -49,15 +50,19 @@ public final class LoggregatorMessageHttpMessageConverter
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
 
         return Multipart.from(inputMessage.getBody(), boundary)
-                .map(part -> {
-                    try {
-                        LogMessage logMessage = LogMessage.parseFrom(part);
-                        return LoggregatorMessage.from(logMessage);
-                    } catch (InvalidProtocolBufferException e) {
-                        throw new RuntimeException(e);
+                .map(new Function<byte[], LoggregatorMessage>() {
+
+                    @Override
+                    public LoggregatorMessage apply(byte[] part) {
+                        try {
+                            LogMessage logMessage = LogMessage.parseFrom(part);
+                            return LoggregatorMessage.from(logMessage);
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+
                 });
-//                .toList().poll();
     }
 
     @Override

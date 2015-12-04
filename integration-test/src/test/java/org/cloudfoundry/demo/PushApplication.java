@@ -119,6 +119,69 @@ public class PushApplication {
             this.space = space;
         }
 
+        private Stream<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
+            Resource.Metadata metadata = response.getResources().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Could not find space " + this.space))
+                    .getMetadata();
+
+            CreateApplicationRequest request = CreateApplicationRequest.builder()
+                    .spaceId(metadata.getId())
+                    .name(this.application)
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().create(request))
+                    .observeStart(s -> this.logger.info("Creating application"))
+                    .observe(r -> this.logger.info("Created application"));
+        }
+
+        private Publisher<CreatePackageResponse> createPackage(CreateApplicationResponse response) {
+            CreatePackageRequest request = CreatePackageRequest.builder()
+                    .applicationId(response.getId())
+                    .type(BITS)
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.packages().create(request))
+                    .observeStart(s -> this.logger.info("Creating package"))
+                    .observe(r -> this.logger.info("Created package"));
+        }
+
+        private Publisher<Void> deleteApplication(ListApplicationsResponse.Resource resource) {
+            DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                    .id(resource.getId())
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().delete(request))
+                    .observeStart(s -> this.logger.info("Deleting application"))
+                    .observe(r -> this.logger.info("Deleted application"));
+        }
+
+        private void handleError(Throwable exception) {
+            this.logger.error("Error encountered: {}", exception.getMessage());
+        }
+
+        private void ignoreResponse(Object response) {
+        }
+
+        private Stream<ListApplicationsResponse> listApplications() {
+            ListApplicationsRequest request = ListApplicationsRequest.builder()
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request));
+        }
+
+        private Stream<ListSpacesResponse> listSpaces() {
+            ListSpacesRequest request = ListSpacesRequest.builder()
+                    .name(this.space)
+                    .build();
+
+            return Streams.wrap(this.cloudFoundryClient.spaces().list(request));
+        }
+
+        private void printLog(LoggregatorMessage m) {
+            this.logger.info("[{}/{}] {} {}", m.getSourceName(), m.getSourceId(), m.getMessageType(), m.getMessage());
+        }
+
         private void run() throws InterruptedException {
             listApplications()
                     .flatMap(response -> Streams.from(response.getResources()))
@@ -152,69 +215,6 @@ public class PushApplication {
             stagePackageStream.subscribe(async);
         }
 
-        private void handleError(Throwable exception) {
-            this.logger.error("Error encountered: {}", exception.getMessage());
-        }
-
-        private void ignoreResponse(Object response) {
-        }
-
-        private void printLog(LoggregatorMessage m) {
-            this.logger.info("[{}/{}] {} {}", m.getSourceName(), m.getSourceId(), m.getMessageType(), m.getMessage());
-        }
-
-        private Stream<CreateApplicationResponse> createApplication(ListSpacesResponse response) {
-            Resource.Metadata metadata = response.getResources().stream()
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Could not find space " + this.space))
-                    .getMetadata();
-
-            CreateApplicationRequest request = CreateApplicationRequest.builder()
-                    .spaceId(metadata.getId())
-                    .name(this.application)
-                    .build();
-
-            return Streams.wrap(this.cloudFoundryClient.applicationsV3().create(request))
-                    .observeSubscribe(s -> this.logger.info("Creating application"))
-                    .observe(r -> this.logger.info("Created application"));
-        }
-
-        private Publisher<CreatePackageResponse> createPackage(CreateApplicationResponse response) {
-            CreatePackageRequest request = CreatePackageRequest.builder()
-                    .applicationId(response.getId())
-                    .type(BITS)
-                    .build();
-
-            return Streams.wrap(this.cloudFoundryClient.packages().create(request))
-                    .observeSubscribe(s -> this.logger.info("Creating package"))
-                    .observe(r -> this.logger.info("Created package"));
-        }
-
-        private Publisher<Void> deleteApplication(ListApplicationsResponse.Resource resource) {
-            DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                    .id(resource.getId())
-                    .build();
-
-            return Streams.wrap(this.cloudFoundryClient.applicationsV3().delete(request))
-                    .observeSubscribe(s -> this.logger.info("Deleting application"))
-                    .observe(r -> this.logger.info("Deleted application"));
-        }
-
-        private Stream<ListApplicationsResponse> listApplications() {
-            ListApplicationsRequest request = ListApplicationsRequest.builder()
-                    .build();
-
-            return Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request));
-        }
-
-        private Stream<ListSpacesResponse> listSpaces() {
-            ListSpacesRequest request = ListSpacesRequest.builder()
-                    .name(this.space)
-                    .build();
-
-            return Streams.wrap(this.cloudFoundryClient.spaces().list(request));
-        }
-
         private Publisher<StagePackageResponse> stagePackage(UploadPackageResponse response) {
             StagePackageRequest request = StagePackageRequest.builder()
                     .id(response.getId())
@@ -240,7 +240,7 @@ public class PushApplication {
                     .build();
 
             return Streams.wrap(this.cloudFoundryClient.packages().upload(request))
-                    .observeSubscribe(s -> this.logger.info("Uploading package"));
+                    .observeStart(s -> this.logger.info("Uploading package"));
         }
 
         private Publisher<StagePackageResponse> waitForPackageStagingProcessing(StagePackageResponse response) {
@@ -264,7 +264,7 @@ public class PushApplication {
             })).retryWhen(errors -> errors.flatMap(throwable -> {
                         if (throwable instanceof ProcessingIncomplete) {
                             return Streams.timer(1, SECONDS)
-                                    .observeSubscribe(s -> this.logger.info("Waiting for package staging processing"));
+                                    .observeStart(s -> this.logger.info("Waiting for package staging processing"));
                         } else {
                             return Publishers.error(throwable);
                         }
@@ -293,7 +293,7 @@ public class PushApplication {
             })).retryWhen(errors -> errors.flatMap(throwable -> {
                         if (throwable instanceof ProcessingIncomplete) {
                             return Streams.timer(1, SECONDS)
-                                    .observeSubscribe(s -> this.logger.info("Waiting for package upload processing"));
+                                    .observeStart(s -> this.logger.info("Waiting for package upload processing"));
                         } else {
                             return Publishers.error(throwable);
                         }

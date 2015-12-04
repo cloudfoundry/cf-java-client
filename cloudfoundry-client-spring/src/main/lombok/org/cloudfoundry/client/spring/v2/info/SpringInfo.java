@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -44,7 +46,14 @@ public final class SpringInfo extends AbstractSpringOperations implements Info {
 
     @Override
     public Publisher<GetInfoResponse> get() {
-        return get(null, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"));
+        return get(null, GetInfoResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "info");
+            }
+
+        });
     }
 
 }

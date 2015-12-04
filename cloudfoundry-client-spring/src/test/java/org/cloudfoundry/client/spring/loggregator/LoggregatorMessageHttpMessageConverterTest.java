@@ -44,8 +44,9 @@ public final class LoggregatorMessageHttpMessageConverterTest {
 
     @Test
     public void mediaType() {
-        this.messageConverter.getSupportedMediaTypes().stream()
-                .forEach(mediaType -> assertTrue(mediaType.isCompatibleWith(MEDIA_TYPE)));
+        for (MediaType mediaType : this.messageConverter.getSupportedMediaTypes()) {
+            assertTrue(mediaType.isCompatibleWith(MEDIA_TYPE));
+        }
     }
 
     @Test
