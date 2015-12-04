@@ -101,15 +101,6 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
     @Getter(onMethod = @__(@FilterParameter("organization_guid")))
     private volatile List<String> organizationIds;
 
-    /**
-     * The space ids
-     *
-     * @param spaceIds the space ids
-     * @return the space ids
-     */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
-    private volatile List<String> spaceIds;
-
     @Builder
     ListSpaceManagersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                              @Singular List<String> auditedOrganizationIds,
@@ -118,8 +109,7 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
                              String id,
                              @Singular List<String> managedOrganizationIds,
                              @Singular List<String> managedSpaceIds,
-                             @Singular List<String> organizationIds,
-                             @Singular List<String> spaceIds) {
+                             @Singular List<String> organizationIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.auditedOrganizationIds = auditedOrganizationIds;
@@ -129,7 +119,6 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
         this.managedOrganizationIds = managedOrganizationIds;
         this.managedSpaceIds = managedSpaceIds;
         this.organizationIds = organizationIds;
-        this.spaceIds = spaceIds;
     }
 
     @Override
