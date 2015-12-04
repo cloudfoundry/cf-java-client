@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceinstances;
+package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -22,24 +22,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
+
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 
 import java.util.List;
 
 /**
- * The response payload for the List Service Instances operation
+ * The response payload for the List all Service Instances for the Space operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListServiceInstancesResponse extends PaginatedResponse<ServiceInstanceResource> {
+public final class ListSpaceServiceInstancesResponse extends PaginatedResponse<ServiceInstanceResource> {
 
     @Builder
-    ListServiceInstancesResponse(@JsonProperty("next_url") String nextUrl,
-                                 @JsonProperty("prev_url") String previousUrl,
-                                 @JsonProperty("resources") @Singular List<ServiceInstanceResource> resources,
-                                 @JsonProperty("total_pages") Integer totalPages,
-                                 @JsonProperty("total_results") Integer totalResults) {
+    ListSpaceServiceInstancesResponse(@JsonProperty("next_url") String nextUrl,
+                                      @JsonProperty("prev_url") String previousUrl,
+                                      @JsonProperty("resources") @Singular List<ServiceInstanceResource> resources,
+                                      @JsonProperty("total_pages") Integer totalPages,
+                                      @JsonProperty("total_results") Integer totalResults) {
 
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
