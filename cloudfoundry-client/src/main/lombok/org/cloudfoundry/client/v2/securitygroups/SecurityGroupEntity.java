@@ -19,6 +19,9 @@ package org.cloudfoundry.client.v2.securitygroups;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+
+import java.util.List;
 
 /**
  * The entity response payload for the Route resource
@@ -40,7 +43,7 @@ public final class SecurityGroupEntity {
      * @param rules
      * @return rules
      */
-    private final RuleEntity[] rules;
+    private final List<RuleEntity> rules;
 
     /**
      * The running default
@@ -68,7 +71,7 @@ public final class SecurityGroupEntity {
 
     @Builder
     SecurityGroupEntity(@JsonProperty("name") String name,
-                        @JsonProperty("rules") RuleEntity[] rules,
+                        @JsonProperty("rules") @Singular List<RuleEntity> rules,
                         @JsonProperty("running_default") boolean runningDefault,
                         @JsonProperty("spaces_url") String spacesUrl,
                         @JsonProperty("staging_default") boolean stagingDefault) {

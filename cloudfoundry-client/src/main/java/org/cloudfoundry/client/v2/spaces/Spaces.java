@@ -165,4 +165,13 @@ public interface Spaces {
      */
     Publisher<ListSpaceSecurityGroupsResponse> listSecurityGroups(ListSpaceSecurityGroupsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_service_instances_for_the_space.html">List
+     * all Service Instances for the Space</a> request
+     *
+     * @param request the List all Service Instances for the Space request
+     * @return the response from the List all Service Instances for the Space request
+     */
+    Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request);
+
 }

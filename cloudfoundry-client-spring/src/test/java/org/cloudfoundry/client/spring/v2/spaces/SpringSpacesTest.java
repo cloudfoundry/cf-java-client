@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -60,6 +62,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -1086,11 +1090,11 @@ public final class SpringSpacesTest extends AbstractRestTest {
                                 .build())
                         .entity(SecurityGroupEntity.builder()
                                 .name("name-47")
-                                .rules(new SecurityGroupEntity.RuleEntity[]{SecurityGroupEntity.RuleEntity.builder()
+                                .rule(SecurityGroupEntity.RuleEntity.builder()
                                         .destination("198.41.191.47/1")
                                         .ports("8080")
                                         .protocol("udp")
-                                        .build()})
+                                        .build())
                                 .runningDefault(false)
                                 .spacesUrl("/v2/security_groups/a3728437-fe41-42c1-875c-b59cffc7498c/spaces")
                                 .stagingDefault(false)
@@ -1124,6 +1128,73 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listSecurityGroups(request)).next().get();
+    }
+
+    @Test
+    public void listServiceInstances() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/service_instances?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_service_instances_response.json"));
+
+        ListSpaceServiceInstancesRequest request = ListSpaceServiceInstancesRequest.builder()
+                .id("test-id")
+                .returnUserProvidedServiceInstances(true)
+                .page(-1)
+                .build();
+
+        ListSpaceServiceInstancesResponse expected = ListSpaceServiceInstancesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceInstanceResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("7046d37c-8a50-49d5-ba53-abb103a92142")
+                                .url("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142")
+                                .createdAt("2015-07-27T22:43:08Z")
+                                .build())
+                        .entity(ServiceInstanceEntity.builder()
+                                .name("name-97")
+                                .credential("creds-key-52", "creds-val-52")
+                                .servicePlanId("77157c85-203a-4fac-b9a3-003988ff879a")
+                                .spaceId("aead50c9-0d45-410c-befd-431c8b7b3e30")
+                                .type("managed_service_instance")
+                                .spaceUrl("/v2/spaces/aead50c9-0d45-410c-befd-431c8b7b3e30")
+                                .servicePlanUrl("/v2/service_plans/77157c85-203a-4fac-b9a3-003988ff879a")
+                                .serviceBindingsUrl
+                                        ("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_bindings")
+                                .serviceKeysUrl
+                                        ("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_keys")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceServiceInstancesResponse actual = Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listServiceInstancesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/service_instances?page=-1")
+                .errorResponse());
+
+        ListSpaceServiceInstancesRequest request = ListSpaceServiceInstancesRequest.builder()
+                .id("test-id")
+                .returnUserProvidedServiceInstances(true)
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listServiceInstancesInvalidRequest() {
+        ListSpaceServiceInstancesRequest request = ListSpaceServiceInstancesRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
     }
 
 }

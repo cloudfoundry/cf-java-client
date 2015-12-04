@@ -20,15 +20,12 @@ import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
-import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse.ListServiceInstancesResponseEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse
-        .ListServiceInstancesResponseEntity.LastOperation;
-import static org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse
-        .ListServiceInstancesResponseResource;
 import static org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse.builder;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
@@ -53,19 +50,19 @@ public final class SpringServiceInstancesTest extends AbstractRestTest {
         ListServiceInstancesResponse expected = builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListServiceInstancesResponseResource.builder()
+                .resource(ServiceInstanceResource.builder()
                         .metadata(Metadata.builder()
                                 .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
                                 .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
                                 .createdAt("2015-07-27T22:43:08Z")
                                 .build())
-                        .entity(ListServiceInstancesResponseEntity.builder()
+                        .entity(ServiceInstanceEntity.builder()
                                 .name("name-133")
                                 .credential("creds-key-72", "creds-val-72")
                                 .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
                                 .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
                                 .type("managed_service_instance")
-                                .lastOperation(LastOperation.builder()
+                                .lastOperation(ServiceInstanceEntity.LastOperation.builder()
                                         .type("create")
                                         .state("succeeded")
                                         .description("service broker-provided description")

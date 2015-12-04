@@ -20,28 +20,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.PaginatedResponse;
-
-import java.util.List;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the List Service Instances operation
+ * The resource response payload for Service Instances
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListServiceInstancesResponse extends PaginatedResponse<ServiceInstanceResource> {
+public final class ServiceInstanceResource extends Resource<ServiceInstanceEntity> {
 
     @Builder
-    ListServiceInstancesResponse(@JsonProperty("next_url") String nextUrl,
-                                 @JsonProperty("prev_url") String previousUrl,
-                                 @JsonProperty("resources") @Singular List<ServiceInstanceResource> resources,
-                                 @JsonProperty("total_pages") Integer totalPages,
-                                 @JsonProperty("total_results") Integer totalResults) {
-
-        super(nextUrl, previousUrl, resources, totalPages, totalResults);
+    ServiceInstanceResource(@JsonProperty("entity") ServiceInstanceEntity entity,
+                            @JsonProperty("metadata") Metadata metadata) {
+        super(entity, metadata);
     }
-
 }
