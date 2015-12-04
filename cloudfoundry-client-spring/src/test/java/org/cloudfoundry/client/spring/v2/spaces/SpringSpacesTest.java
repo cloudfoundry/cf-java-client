@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
+import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -51,6 +53,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
+import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -991,6 +995,69 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listManagers(request)).next().get();
+    }
+
+    @Test
+    public void listSecurityGroups() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/security_groups?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_security_groups_response.json"));
+
+        ListSpaceSecurityGroupsRequest request = ListSpaceSecurityGroupsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceSecurityGroupsResponse expected = ListSpaceSecurityGroupsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SecurityGroupResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("a3728437-fe41-42c1-875c-b59cffc7498c")
+                                .url("/v2/security_groups/a3728437-fe41-42c1-875c-b59cffc7498c")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(SecurityGroupEntity.builder()
+                                .name("name-47")
+                                .rules(new SecurityGroupEntity.RuleEntity[]{SecurityGroupEntity.RuleEntity.builder()
+                                        .destination("198.41.191.47/1")
+                                        .ports("8080")
+                                        .protocol("udp")
+                                        .build()})
+                                .runningDefault(false)
+                                .spacesUrl("/v2/security_groups/a3728437-fe41-42c1-875c-b59cffc7498c/spaces")
+                                .stagingDefault(false)
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceSecurityGroupsResponse actual = Streams.wrap(this.spaces.listSecurityGroups(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listSecurityGroupsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/security_groups?page=-1")
+                .errorResponse());
+
+        ListSpaceSecurityGroupsRequest request = ListSpaceSecurityGroupsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listSecurityGroups(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listSecurityGroupsInvalidRequest() {
+        ListSpaceSecurityGroupsRequest request = ListSpaceSecurityGroupsRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listSecurityGroups(request)).next().get();
     }
 
 }
