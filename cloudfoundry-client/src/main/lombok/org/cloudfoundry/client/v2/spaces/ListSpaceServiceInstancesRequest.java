@@ -111,14 +111,6 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
     @Getter(onMethod = @__(@FilterParameter("service_plan_guid")))
     private volatile List<String> servicePlanIds;
 
-    /**
-     * The space ids
-     *
-     * @param spaceIds the space ids
-     * @return the space ids
-     */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
-    private volatile List<String> spaceIds;
 
     @Builder
     ListSpaceServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
@@ -129,8 +121,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
                                      boolean returnUserProvidedServiceInstances,
                                      @Singular List<String> serviceBindingIds,
                                      @Singular List<String> serviceKeyIds,
-                                     @Singular List<String> servicePlanIds,
-                                     @Singular List<String> spaceIds) {
+                                     @Singular List<String> servicePlanIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.gatewayNames = gatewayNames;
@@ -141,7 +132,6 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
         this.serviceBindingIds = serviceBindingIds;
         this.serviceKeyIds = serviceKeyIds;
         this.servicePlanIds = servicePlanIds;
-        this.spaceIds = spaceIds;
     }
 
     @Override
