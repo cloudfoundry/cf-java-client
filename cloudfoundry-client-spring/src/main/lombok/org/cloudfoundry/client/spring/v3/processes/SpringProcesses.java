@@ -31,6 +31,8 @@ import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -51,34 +53,63 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<Void> deleteInstance(DeleteProcessInstanceRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "processes", request.getId(),
-                "instances", request.getIndex()));
-    }
+    public Publisher<Void> deleteInstance(final DeleteProcessInstanceRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
 
-    @Override
-    public Publisher<GetProcessResponse> get(GetProcessRequest request) {
-        return get(request, GetProcessResponse.class,
-                builder -> builder.pathSegment("v3", "processes", request.getId()));
-    }
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes", request.getId(), "instances", request.getIndex());
+            }
 
-    @Override
-    public Publisher<ListProcessesResponse> list(ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, builder -> {
-            builder.pathSegment("v3", "processes");
-            QueryBuilder.augment(builder, request);
         });
     }
 
-    public Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request) {
-        return put(request, ScaleProcessResponse.class,
-                builder -> builder.pathSegment("v3", "processes", request.getId(), "scale"));
+    @Override
+    public Publisher<GetProcessResponse> get(final GetProcessRequest request) {
+        return get(request, GetProcessResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<UpdateProcessResponse> update(UpdateProcessRequest request) {
-        return patch(request, UpdateProcessResponse.class,
-                builder -> builder.pathSegment("v3", "processes", request.getId()));
+    public Publisher<ListProcessesResponse> list(final ListProcessesRequest request) {
+        return get(request, ListProcessesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes");
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    public Publisher<ScaleProcessResponse> scale(final ScaleProcessRequest request) {
+        return put(request, ScaleProcessResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes", request.getId(), "scale");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<UpdateProcessResponse> update(final UpdateProcessRequest request) {
+        return patch(request, UpdateProcessResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes", request.getId());
+            }
+
+        });
     }
 
 }

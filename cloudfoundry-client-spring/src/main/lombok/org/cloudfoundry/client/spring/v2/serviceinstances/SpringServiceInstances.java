@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -45,11 +47,16 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
     }
 
     @Override
-    public Publisher<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-        return get(request, ListServiceInstancesResponse.class, builder -> {
-            builder.pathSegment("v2", "service_instances");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListServiceInstancesResponse> list(final ListServiceInstancesRequest request) {
+        return get(request, ListServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 

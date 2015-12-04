@@ -56,6 +56,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -76,142 +78,229 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request) {
-        return put(request, AssociateSpaceAuditorResponse.class,
-                builder -> builder.pathSegment("v2",
-                        "spaces", request.getId(),
-                        "auditors", request.getAuditorId()));
+    public Publisher<AssociateSpaceAuditorResponse> associateAuditor(final AssociateSpaceAuditorRequest request) {
+        return put(request, AssociateSpaceAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<AssociateSpaceDeveloperResponse> associateDeveloper(AssociateSpaceDeveloperRequest request) {
-        return put(request, AssociateSpaceDeveloperResponse.class,
-                builder -> builder.pathSegment("v2",
-                        "spaces", request.getId(),
-                        "developers", request.getDeveloperId()));
+    public Publisher<AssociateSpaceDeveloperResponse> associateDeveloper(final AssociateSpaceDeveloperRequest request) {
+        return put(request, AssociateSpaceDeveloperResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "developers", request.getDeveloperId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request) {
-        return put(request, AssociateSpaceManagerResponse.class,
-                builder -> builder.pathSegment("v2",
-                        "spaces", request.getId(),
-                        "managers", request.getManagerId()));
+    public Publisher<AssociateSpaceManagerResponse> associateManager(final AssociateSpaceManagerRequest request) {
+        return put(request, AssociateSpaceManagerResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId());
+            }
+
+        });
     }
 
     @Override
     public Publisher<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(
-            AssociateSpaceSecurityGroupRequest request) {
-        return put(request, AssociateSpaceSecurityGroupResponse.class,
-                builder -> builder.pathSegment("v2",
-                        "spaces", request.getId(),
-                        "security_groups", request.getSecurityGroupId()));
-    }
+            final AssociateSpaceSecurityGroupRequest request) {
 
-    @Override
-    public Publisher<CreateSpaceResponse> create(CreateSpaceRequest request) {
-        return post(request, CreateSpaceResponse.class,
-                builder -> builder.pathSegment("v2", "spaces"));
-    }
+        return put(request, AssociateSpaceSecurityGroupResponse.class, new Consumer<UriComponentsBuilder>() {
 
-    @Override
-    public Publisher<Void> delete(DeleteSpaceRequest request) {
-        return delete(request, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId());
-            QueryBuilder.augment(builder, request);
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "security_groups", request.getSecurityGroupId());
+            }
+
         });
     }
 
     @Override
-    public Publisher<GetSpaceResponse> get(GetSpaceRequest request) {
-        return get(request, GetSpaceResponse.class,
-                builder -> builder.pathSegment("v2", "spaces", request.getId()));
-    }
+    public Publisher<CreateSpaceResponse> create(final CreateSpaceRequest request) {
+        return post(request, CreateSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
 
-    @Override
-    public Publisher<GetSpaceSummaryResponse> getSummary(GetSpaceSummaryRequest request) {
-        return get(request, GetSpaceSummaryResponse.class,
-                builder -> builder.pathSegment("v2", "spaces", request.getId(), "summary"));
-    }
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces");
+            }
 
-    @Override
-    public Publisher<ListSpacesResponse> list(ListSpacesRequest request) {
-        return get(request, ListSpacesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Publisher<ListSpaceApplicationsResponse> listApplications(ListSpaceApplicationsRequest request) {
-        return get(request, ListSpaceApplicationsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<Void> delete(final DeleteSpaceRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId());
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceAuditorsResponse> listAuditors(ListSpaceAuditorsRequest request) {
-        return get(request, ListSpaceAuditorsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "auditors");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<GetSpaceResponse> get(final GetSpaceRequest request) {
+        return get(request, GetSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId());
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceDevelopersResponse> listDevelopers(ListSpaceDevelopersRequest request) {
-        return get(request, ListSpaceDevelopersResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "developers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<GetSpaceSummaryResponse> getSummary(final GetSpaceSummaryRequest request) {
+        return get(request, GetSpaceSummaryResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "summary");
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceEventsResponse> listEvents(ListSpaceEventsRequest request) {
-        return get(request, ListSpaceEventsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "events");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListSpacesResponse> list(final ListSpacesRequest request) {
+        return get(request, ListSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceManagersResponse> listManagers(ListSpaceManagersRequest request) {
-        return get(request, ListSpaceManagersResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "managers");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListSpaceApplicationsResponse> listApplications(final ListSpaceApplicationsRequest request) {
+        return get(request, ListSpaceApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "apps");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceRoutesResponse> listRoutes(ListSpaceRoutesRequest request) {
-        return get(request, ListSpaceRoutesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "routes");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListSpaceAuditorsResponse> listAuditors(final ListSpaceAuditorsRequest request) {
+        return get(request, ListSpaceAuditorsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceSecurityGroupsResponse> listSecurityGroups(ListSpaceSecurityGroupsRequest request) {
-        return get(request, ListSpaceSecurityGroupsResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "security_groups");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListSpaceDevelopersResponse> listDevelopers(final ListSpaceDevelopersRequest request) {
+        return get(request, ListSpaceDevelopersResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "developers");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request) {
-        return get(request, ListSpaceServiceInstancesResponse.class, builder -> {
-            builder.pathSegment("v2", "spaces", request.getId(), "service_instances");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ListSpaceEventsResponse> listEvents(final ListSpaceEventsRequest request) {
+        return get(request, ListSpaceEventsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "events");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceManagersResponse> listManagers(final ListSpaceManagersRequest request) {
+        return get(request, ListSpaceManagersResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "managers");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceRoutesResponse> listRoutes(final ListSpaceRoutesRequest request) {
+        return get(request, ListSpaceRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "routes");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceSecurityGroupsResponse> listSecurityGroups(final ListSpaceSecurityGroupsRequest request) {
+        return get(request, ListSpaceSecurityGroupsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "security_groups");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(
+            final ListSpaceServiceInstancesRequest request) {
+
+        return get(request, ListSpaceServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "service_instances");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 

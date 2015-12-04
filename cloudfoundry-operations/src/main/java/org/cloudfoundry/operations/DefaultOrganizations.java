@@ -18,7 +18,9 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.reactivestreams.Publisher;
+import reactor.fn.Function;
 import reactor.rx.Streams;
 
 final class DefaultOrganizations extends AbstractOperations implements Organizations {
@@ -31,12 +33,36 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
 
     @Override
     public Publisher<Organization> list() {
-        return paginate(
-                page -> ListOrganizationsRequest.builder().page(page).build(),
-                request -> this.cloudFoundryClient.organizations().list(request))
-                .flatMap(r -> Streams.from(r.getResources()))
-                .map(resource -> Organization.builder().id(resource.getMetadata().getId())
-                        .name(resource.getEntity().getName()).build());
+        return paginate(new Function<Integer, ListOrganizationsRequest>() {
+
+            @Override
+            public ListOrganizationsRequest apply(Integer page) {
+                return ListOrganizationsRequest.builder().page(page).build();
+            }
+
+        }, new Function<ListOrganizationsRequest, Publisher<ListOrganizationsResponse>>() {
+
+            @Override
+            public Publisher<ListOrganizationsResponse> apply(ListOrganizationsRequest request) {
+                return DefaultOrganizations.this.cloudFoundryClient.organizations().list(request);
+            }
+
+        }).flatMap(new Function<ListOrganizationsResponse, Publisher<ListOrganizationsResponse.Resource>>() {
+
+            @Override
+            public Publisher<ListOrganizationsResponse.Resource> apply(ListOrganizationsResponse r) {
+                return Streams.from(r.getResources());
+            }
+
+        }).map(new Function<ListOrganizationsResponse.Resource, Organization>() {
+
+            @Override
+            public Organization apply(ListOrganizationsResponse.Resource resource) {
+                return Organization.builder().id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName()).build();
+            }
+
+        });
     }
 
 }

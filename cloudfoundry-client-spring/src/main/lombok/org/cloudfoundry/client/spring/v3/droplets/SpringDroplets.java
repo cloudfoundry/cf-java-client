@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -46,19 +48,39 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Publisher<Void> delete(DeleteDropletRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "droplets", request.getId()));
+    public Publisher<Void> delete(final DeleteDropletRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "droplets", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<GetDropletResponse> get(GetDropletRequest request) {
-        return get(request, GetDropletResponse.class,
-                builder -> builder.pathSegment("v3", "droplets", request.getId()));
+    public Publisher<GetDropletResponse> get(final GetDropletRequest request) {
+        return get(request, GetDropletResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "droplets", request.getId());
+            }
+
+        });
     }
 
     @Override
     public Publisher<ListDropletsResponse> list(ListDropletsRequest request) {
-        return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("v3", "droplets"));
+        return get(request, ListDropletsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "droplets");
+            }
+
+        });
     }
 
 }

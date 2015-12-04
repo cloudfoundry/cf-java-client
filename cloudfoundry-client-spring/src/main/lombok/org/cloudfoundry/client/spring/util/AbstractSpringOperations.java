@@ -28,12 +28,13 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Publishers;
+import reactor.core.subscriber.SubscriberWithContext;
+import reactor.fn.Consumer;
+import reactor.fn.Supplier;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import java.net.URI;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -53,104 +54,152 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final Stream<Void> delete(Validatable request, Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+    protected final Stream<Void> delete(final Validatable request,
+                                        final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Supplier<Void>() {
 
-            this.logger.debug("DELETE {}", uri);
-            this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class);
-            return null;
+            @Override
+            public Void get() {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("DELETE {}", uri);
+                AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri),
+                        Void.class);
+                return null;
+            }
+
         });
     }
 
-    protected final <T> Stream<T> exchange(Validatable request, Supplier<T> exchange) {
-        return Streams.wrap(Publishers.create(subscriber -> {
-            if (request != null) {
-                ValidationResult validationResult = request.isValid();
-                if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                    subscriber.onError(new RequestValidationException(validationResult));
-                    return;
+    protected final <T> Stream<T> exchange(final Validatable request, final Supplier<T> exchange) {
+        return Streams.wrap(Publishers.create(new Consumer<SubscriberWithContext<T, Void>>() {
+
+            @Override
+            public void accept(SubscriberWithContext<T, Void> subscriber) {
+                if (request != null) {
+                    ValidationResult validationResult = request.isValid();
+                    if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+                        subscriber.onError(new RequestValidationException(validationResult));
+                        return;
+                    }
+                }
+
+                try {
+                    T result = exchange.get();
+                    if (result != null) {
+                        subscriber.onNext(result);
+                    }
+
+                    subscriber.onComplete();
+                } catch (HttpStatusCodeException e) {
+                    subscriber.onError(CloudFoundryExceptionBuilder.build(e));
+                } catch (Exception e) {
+                    subscriber.onError(e);
                 }
             }
 
-            try {
-                T result = exchange.get();
-                if (result != null) {
-                    subscriber.onNext(result);
-                }
-
-                subscriber.onComplete();
-            } catch (HttpStatusCodeException e) {
-                subscriber.onError(CloudFoundryExceptionBuilder.build(e));
-            } catch (Exception e) {
-                subscriber.onError(e);
-            }
         }));
     }
 
-    protected final <T> Stream<T> get(Validatable request, Class<T> responseType,
-                                      Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+    protected final <T> Stream<T> get(Validatable request, final Class<T> responseType,
+                                      final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Supplier<T>() {
 
-            this.logger.debug("GET {}", uri);
-            return this.restOperations.getForObject(uri, responseType);
+            @Override
+            public T get() {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("GET {}", uri);
+                return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
+            }
+
         });
     }
 
-    protected final <T> Stream<T> patch(Validatable request, Class<T> responseType,
-                                        Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+    protected final <T> Stream<T> patch(final Validatable request, final Class<T> responseType,
+                                        final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Supplier<T>() {
 
-            this.logger.debug("PATCH {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
+            @Override
+            public T get() {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("PATCH {}", uri);
+                return AbstractSpringOperations.this.restOperations.exchange(
+                        new RequestEntity<>(request, PATCH, uri), responseType).getBody();
+            }
+
         });
     }
 
-    protected final <T> Stream<T> post(Validatable request, Class<T> responseType,
+    protected final <T> Stream<T> post(final Validatable request, Class<T> responseType,
                                        Consumer<UriComponentsBuilder> builderCallback) {
-        return postWithBody(request, () -> request, responseType, builderCallback);
+        return postWithBody(request, new Supplier<Validatable>() {
+
+            @Override
+            public Validatable get() {
+                return request;
+            }
+
+        }, responseType, builderCallback);
     }
 
     protected final <T, B> Stream<T> postWithBody(Validatable request,
-                                                  Supplier<B> bodySupplier,
-                                                  Class<T> responseType,
-                                                  Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+                                                  final Supplier<B> bodySupplier,
+                                                  final Class<T> responseType,
+                                                  final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Supplier<T>() {
 
-            this.logger.debug("POST {}", uri);
-            return this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
+            @Override
+            public T get() {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("POST {}", uri);
+                return AbstractSpringOperations.this.restOperations.postForObject(
+                        uri, bodySupplier.get(), responseType);
+            }
+
         });
     }
 
-    protected final <T> Stream<T> put(Validatable request, Class<T> responseType,
+    protected final <T> Stream<T> put(final Validatable request, Class<T> responseType,
                                       Consumer<UriComponentsBuilder> builderCallback) {
-        return putWithBody(request, () -> request, responseType, builderCallback);
+        return putWithBody(request, new Supplier<Validatable>() {
+
+            @Override
+            public Validatable get() {
+                return request;
+            }
+
+        }, responseType, builderCallback);
     }
 
     protected final <T, B> Stream<T> putWithBody(Validatable request,
-                                                 Supplier<B> bodySupplier,
-                                                 Class<T> responseType,
-                                                 Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, () -> {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(this.root);
-            builderCallback.accept(builder);
-            URI uri = builder.build().toUri();
+                                                 final Supplier<B> bodySupplier,
+                                                 final Class<T> responseType,
+                                                 final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Supplier<T>() {
 
-            this.logger.debug("PUT {}", uri);
-            return this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri),
-                    responseType).getBody();
+            @Override
+            public T get() {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("PUT {}", uri);
+                return AbstractSpringOperations.this.restOperations.exchange(
+                        new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
+            }
+
         });
-
     }
+
 }

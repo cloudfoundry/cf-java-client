@@ -19,23 +19,45 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.reactivestreams.Publisher;
+import reactor.fn.Function;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
-import java.util.function.Function;
 
 abstract class AbstractOperations {
 
     protected final <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
-            Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
+            final Function<Integer, T> requestProvider, final Function<T, Publisher<U>> operationExecutor) {
 
         return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
-                .concatMap(responseStream -> responseStream
-                        .take(1)
-                        .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
-                                        .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
-                                        .startWith(response)
-                        ));
+                .concatMap(new Function<Stream<U>, Publisher<? extends U>>() {
+
+                    @Override
+                    public Publisher<? extends U> apply(Stream<U> responseStream) {
+                        return responseStream
+                                .take(1)
+                                .concatMap(new Function<U, Publisher<? extends U>>() {
+
+                                               @Override
+                                               public Publisher<? extends U> apply(U response) {
+                                                   return Streams.range(2, response.getTotalPages() - 1)
+                                                           .flatMap(new Function<Integer, Publisher<? extends U>>() {
+
+                                                               @Override
+                                                               public Publisher<? extends U> apply(Integer page) {
+                                                                   return operationExecutor.apply(requestProvider
+                                                                           .apply(page));
+                                                               }
+
+                                                           })
+                                                           .startWith(response);
+                                               }
+
+                                           }
+                                );
+                    }
+
+                });
     }
 
 }

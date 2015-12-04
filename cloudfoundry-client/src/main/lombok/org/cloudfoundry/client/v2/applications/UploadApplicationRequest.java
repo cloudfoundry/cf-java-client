@@ -93,10 +93,9 @@ public final class UploadApplicationRequest implements Validatable {
             builder.message("id must be specified");
         }
 
-        this.resources.stream()
-                .map(Resource::isValid)
-                .map(ValidationResult::getMessages)
-                .forEach(builder::messages);
+        for(Resource resource : this.resources) {
+            builder.messages(resource.isValid().getMessages());
+        }
 
         return builder.build();
     }

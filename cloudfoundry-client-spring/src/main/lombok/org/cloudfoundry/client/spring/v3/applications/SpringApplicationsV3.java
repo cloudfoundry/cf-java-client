@@ -55,6 +55,8 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 
@@ -75,115 +77,224 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
-        return put(request, AssignApplicationDropletResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "current_droplet"));
+    public Publisher<AssignApplicationDropletResponse> assignDroplet(final AssignApplicationDropletRequest request) {
+        return put(request, AssignApplicationDropletResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "current_droplet");
+            }
+
+        });
     }
 
     @Override
     public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
+        return post(request, CreateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> delete(DeleteApplicationRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "apps", request.getId()));
+    public Publisher<Void> delete(final DeleteApplicationRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> deleteInstance(DeleteApplicationInstanceRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "apps", request.getId(), "processes",
-                request.getType(), "instances", request.getIndex()));
+    public Publisher<Void> deleteInstance(final DeleteApplicationInstanceRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "instances",
+                        request.getIndex());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId()));
+    public Publisher<GetApplicationResponse> get(final GetApplicationRequest request) {
+        return get(request, GetApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
-        return get(request, GetApplicationEnvironmentResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "env"));
+    public Publisher<GetApplicationEnvironmentResponse> getEnvironment(final GetApplicationEnvironmentRequest request) {
+        return get(request, GetApplicationEnvironmentResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "env");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
-        return get(request, GetApplicationProcessResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType()));
+    public Publisher<GetApplicationProcessResponse> getProcess(final GetApplicationProcessRequest request) {
+        return get(request, GetApplicationProcessResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class,
-                builder -> {
-                    builder.pathSegment("v3", "apps");
-                    FilterBuilder.augment(builder, request);
-                    QueryBuilder.augment(builder, request);
-                });
+    public Publisher<ListApplicationsResponse> list(final ListApplicationsRequest request) {
+        return get(request, ListApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
-        return get(request, ListApplicationDropletsResponse.class,
-                builder -> {
-                    builder.pathSegment("v3", "apps", request.getId(), "droplets");
-                    FilterBuilder.augment(builder, request);
-                    QueryBuilder.augment(builder, request);
-                });
+    public Publisher<ListApplicationDropletsResponse> listDroplets(final ListApplicationDropletsRequest request) {
+        return get(request, ListApplicationDropletsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "droplets");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
-        return get(request, ListApplicationPackagesResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "packages"));
+    public Publisher<ListApplicationPackagesResponse> listPackages(final ListApplicationPackagesRequest request) {
+        return get(request, ListApplicationPackagesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "packages");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
-        return get(request, ListApplicationProcessesResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes"));
+    public Publisher<ListApplicationProcessesResponse> listProcesses(final ListApplicationProcessesRequest request) {
+        return get(request, ListApplicationProcessesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "processes");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "routes"));
+    public Publisher<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "routes");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> mapRoute(MapApplicationRouteRequest request) {
-        return put(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getId(), "routes"));
+    public Publisher<Void> mapRoute(final MapApplicationRouteRequest request) {
+        return put(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "routes");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
-        return put(request, ScaleApplicationResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "scale"));
+    public Publisher<ScaleApplicationResponse> scale(final ScaleApplicationRequest request) {
+        return put(request, ScaleApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "scale");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<StartApplicationResponse> start(StartApplicationRequest request) {
-        return put(request, StartApplicationResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "start"));
+    public Publisher<StartApplicationResponse> start(final StartApplicationRequest request) {
+        return put(request, StartApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "start");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<StopApplicationResponse> stop(StopApplicationRequest request) {
-        return put(request, StopApplicationResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId(), "stop"));
+    public Publisher<StopApplicationResponse> stop(final StopApplicationRequest request) {
+        return put(request, StopApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "stop");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> unmapRoute(UnmapApplicationRouteRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "apps", request.getId(), "routes"));
+    public Publisher<Void> unmapRoute(final UnmapApplicationRouteRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "routes");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return patch(request, UpdateApplicationResponse.class,
-                builder -> builder.pathSegment("v3", "apps", request.getId()));
+    public Publisher<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
+        return patch(request, UpdateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId());
+            }
+
+        });
     }
 
 }

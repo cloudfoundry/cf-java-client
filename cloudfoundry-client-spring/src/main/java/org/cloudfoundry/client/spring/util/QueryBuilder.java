@@ -21,6 +21,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
@@ -38,21 +39,22 @@ public final class QueryBuilder {
      * @param instance the instance to inspect and invoke
      */
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(ReflectionUtils.getAllDeclaredMethods(instance.getClass()))
-                .sorted((a, b) -> a.getName().compareTo(b.getName()))
-                .forEach(method -> {
-                    QueryParameter queryParameter = AnnotationUtils.getAnnotation(method, QueryParameter.class);
-                    if (queryParameter == null) {
-                        return;
-                    }
+        Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
+        Arrays.sort(methods, MethodNameComparator.INSTANCE);
 
-                    ReflectionUtils.makeAccessible(method);
-                    Object value = ReflectionUtils.invokeMethod(method, instance);
+        for (Method method : methods) {
+            QueryParameter queryParameter = AnnotationUtils.getAnnotation(method, QueryParameter.class);
+            if (queryParameter == null) {
+                continue;
+            }
 
-                    if (value != null) {
-                        builder.queryParam(queryParameter.value(), value);
-                    }
-                });
+            ReflectionUtils.makeAccessible(method);
+            Object value = ReflectionUtils.invokeMethod(method, instance);
+
+            if (value != null) {
+                builder.queryParam(queryParameter.value(), value);
+            }
+        }
     }
 
 }

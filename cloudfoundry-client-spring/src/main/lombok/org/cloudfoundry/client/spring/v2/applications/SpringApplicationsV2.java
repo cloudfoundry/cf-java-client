@@ -58,6 +58,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
+import reactor.fn.Supplier;
 
 import java.net.URI;
 
@@ -78,130 +81,240 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request) {
-        return put(request, AssociateApplicationRouteResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
+    public Publisher<AssociateApplicationRouteResponse> associateRoute(final AssociateApplicationRouteRequest request) {
+        return put(request, AssociateApplicationRouteResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<CopyApplicationResponse> copy(CopyApplicationRequest request) {
-        return post(request, CopyApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "copy_bits"));
+    public Publisher<CopyApplicationResponse> copy(final CopyApplicationRequest request) {
+        return post(request, CopyApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "copy_bits");
+            }
+
+        });
     }
 
     @Override
     public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps"));
-    }
+        return post(request, CreateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
-    @Override
-    public Publisher<Void> delete(DeleteApplicationRequest request) {
-        return delete(request, builder -> builder.pathSegment("v2", "apps", request.getId()));
-    }
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps");
+            }
 
-    @Override
-    public Publisher<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
-        return get(request, ApplicationEnvironmentResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "env"));
-    }
-
-    @Override
-    public Publisher<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId()));
-    }
-
-    @Override
-    public Publisher<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
-        return get(request, ApplicationInstancesResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "instances"));
-    }
-
-    @Override
-    public Publisher<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> {
-            builder.pathSegment("v2", "apps");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
         });
     }
 
     @Override
-    public Publisher<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, builder -> {
-            builder.pathSegment("v2", "apps", request.getId(), "routes");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<Void> delete(final DeleteApplicationRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId());
+            }
+
         });
     }
 
     @Override
-    public Publisher<ListApplicationServiceBindingsResponse> listServiceBindings
-            (ListApplicationServiceBindingsRequest request) {
-        return get(request, ListApplicationServiceBindingsResponse.class, builder -> {
-            builder.pathSegment("v2", "apps", request.getId(), "service_bindings");
-            FilterBuilder.augment(builder, request);
-            QueryBuilder.augment(builder, request);
+    public Publisher<ApplicationEnvironmentResponse> environment(final ApplicationEnvironmentRequest request) {
+        return get(request, ApplicationEnvironmentResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "env");
+            }
+
         });
     }
 
     @Override
-    public Publisher<Void> removeRoute(RemoveApplicationRouteRequest request) {
-        return delete(request, builder ->
-                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId()));
+    public Publisher<GetApplicationResponse> get(final GetApplicationRequest request) {
+        return get(request, GetApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> removeServiceBinding(RemoveApplicationServiceBindingRequest request) {
-        return delete(request, builder ->
-                builder.pathSegment("v2", "apps", request.getId(), "service_bindings", request.getServiceBindingId()));
+    public Publisher<ApplicationInstancesResponse> instances(final ApplicationInstancesRequest request) {
+        return get(request, ApplicationInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "instances");
+            }
+
+        });
     }
 
     @Override
-    public Publisher<RestageApplicationResponse> restage(RestageApplicationRequest request) {
-        return post(request, RestageApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "restage"));
+    public Publisher<ListApplicationsResponse> list(final ListApplicationsRequest request) {
+        return get(request, ListApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
-        return get(request, ApplicationStatisticsResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "stats"));
+    public Publisher<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "routes");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request) {
-        return get(request, SummaryApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "summary"));
+    public Publisher<ListApplicationServiceBindingsResponse> listServiceBindings(
+            final ListApplicationServiceBindingsRequest request) {
+
+        return get(request, ListApplicationServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "service_bindings");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
-    public Publisher<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
-        return delete(request, builder ->
-                builder.pathSegment("v2", "apps", request.getId(), "instances", request.getIndex()));
+    public Publisher<Void> removeRoute(final RemoveApplicationRouteRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return put(request, UpdateApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId()));
+    public Publisher<Void> removeServiceBinding(final RemoveApplicationServiceBindingRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "service_bindings", request.getServiceBindingId());
+            }
+
+        });
     }
 
     @Override
-    public Publisher<UploadApplicationResponse> upload(UploadApplicationRequest request) {
-        return putWithBody(request,
-                () -> {
-                    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                    if (request.getAsync() != null) {
-                        body.add("async", request.getAsync());
+    public Publisher<RestageApplicationResponse> restage(final RestageApplicationRequest request) {
+        return post(request, RestageApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "restage");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ApplicationStatisticsResponse> statistics(final ApplicationStatisticsRequest request) {
+        return get(request, ApplicationStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "stats");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<SummaryApplicationResponse> summary(final SummaryApplicationRequest request) {
+        return get(request, SummaryApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "summary");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId(), "instances", request.getIndex());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
+        return put(request, UpdateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<UploadApplicationResponse> upload(final UploadApplicationRequest request) {
+        return putWithBody(request, new Supplier<MultiValueMap<String, Object>>() {
+
+                    @Override
+                    public MultiValueMap<String, Object> get() {
+                        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                        if (request.getAsync() != null) {
+                            body.add("async", request.getAsync());
+                        }
+                        body.add("resources", request.getResources());
+                        body.add("application", new FileSystemResource(request.getApplication()));
+                        return body;
                     }
-                    body.add("resources", request.getResources());
-                    body.add("application", new FileSystemResource(request.getApplication()));
-                    return body;
-                },
-                UploadApplicationResponse.class,
-                builder -> builder.pathSegment("v2", "apps", request.getId(), "bits")
+
+                }, UploadApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+                    @Override
+                    public void accept(UriComponentsBuilder builder) {
+                        builder.pathSegment("v2", "apps", request.getId(), "bits");
+                    }
+
+                }
         );
     }
 
