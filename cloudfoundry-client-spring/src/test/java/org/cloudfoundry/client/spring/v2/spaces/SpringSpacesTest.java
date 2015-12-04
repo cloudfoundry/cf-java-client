@@ -19,12 +19,15 @@ package org.cloudfoundry.client.spring.v2.spaces;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
@@ -53,6 +56,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
+import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -995,6 +1000,67 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listManagers(request)).next().get();
+    }
+
+    @Test
+    public void listRoutes() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/routes?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_routes_response.json"));
+
+        ListSpaceRoutesRequest request = ListSpaceRoutesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceRoutesResponse expected = ListSpaceRoutesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .id("cab98364-2ccb-42e0-b901-765c4e915d49")
+                                .url("/v2/routes/cab98364-2ccb-42e0-b901-765c4e915d49")
+                                .build())
+                        .entity(RouteEntity.builder()
+                                .applicationUrl("/v2/routes/cab98364-2ccb-42e0-b901-765c4e915d49/apps")
+                                .domainId("64aaa8e0-af71-4d7e-afef-e2efdbd66552")
+                                .domainUrl("/v2/domains/64aaa8e0-af71-4d7e-afef-e2efdbd66552")
+                                .host("host-1")
+                                .path("")
+                                .spaceId("8af29896-2f0d-42b4-a24c-169343b2aad9")
+                                .spaceUrl("/v2/spaces/8af29896-2f0d-42b4-a24c-169343b2aad9")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceRoutesResponse actual = Streams.wrap(this.spaces.listRoutes(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listRoutesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/routes?page=-1")
+                .errorResponse());
+
+        ListSpaceRoutesRequest request = ListSpaceRoutesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listRoutes(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listRoutesInvalidRequest() {
+        ListSpaceRoutesRequest request = ListSpaceRoutesRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listRoutes(request)).next().get();
     }
 
     @Test
