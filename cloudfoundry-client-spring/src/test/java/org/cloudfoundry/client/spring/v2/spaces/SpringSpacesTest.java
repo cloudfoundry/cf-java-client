@@ -66,6 +66,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -1195,6 +1196,44 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
+    }
+
+    @Test
+    public void removeAuditor() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/auditors/test-auditor-id")
+                .status(NO_CONTENT));
+
+        RemoveSpaceAuditorRequest request = RemoveSpaceAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeAuditor(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeAuditorError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/auditors/test-auditor-id")
+                .errorResponse());
+
+        RemoveSpaceAuditorRequest request = RemoveSpaceAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeAuditor(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeAuditorInvalidRequest() {
+        RemoveSpaceAuditorRequest request = RemoveSpaceAuditorRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.removeAuditor(request)).next().get();
     }
 
 }

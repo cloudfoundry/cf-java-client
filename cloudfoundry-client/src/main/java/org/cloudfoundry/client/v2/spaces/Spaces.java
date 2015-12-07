@@ -174,4 +174,13 @@ public interface Spaces {
      */
     Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_auditor_from_the_space.html">Remove Auditor
+     * from the Space</a> request
+     *
+     * @param request the Remove Auditor from the Space request
+     * @return the response from the Remove Auditor from the Space request
+     */
+    Publisher<Void> removeAuditor(RemoveSpaceAuditorRequest request);
+
 }

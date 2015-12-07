@@ -53,6 +53,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
@@ -299,6 +300,18 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
                 builder.pathSegment("v2", "spaces", request.getId(), "service_instances");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> removeAuditor(final RemoveSpaceAuditorRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
             }
 
         });
