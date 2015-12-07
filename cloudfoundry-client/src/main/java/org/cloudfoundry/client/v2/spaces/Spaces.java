@@ -183,4 +183,13 @@ public interface Spaces {
      */
     Publisher<Void> removeAuditor(RemoveSpaceAuditorRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_developer_from_the_space.html">Remove
+     * Developer from the Space</a> request
+     *
+     * @param request the Remove Developer from the Space request
+     * @return the response from the Remove Developer from the Space request
+     */
+    Publisher<Void> removeDeveloper(RemoveSpaceDeveloperRequest request);
+
 }

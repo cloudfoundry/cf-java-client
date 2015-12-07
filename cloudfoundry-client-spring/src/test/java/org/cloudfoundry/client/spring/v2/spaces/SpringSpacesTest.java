@@ -67,6 +67,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -1234,6 +1235,44 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.removeAuditor(request)).next().get();
+    }
+
+    @Test
+    public void removeDeveloper() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/developers/test-developer-id")
+                .status(NO_CONTENT));
+
+        RemoveSpaceDeveloperRequest request = RemoveSpaceDeveloperRequest.builder()
+                .developerId("test-developer-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeDeveloper(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeDeveloperError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/developers/test-developer-id")
+                .errorResponse());
+
+        RemoveSpaceDeveloperRequest request = RemoveSpaceDeveloperRequest.builder()
+                .developerId("test-developer-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeDeveloper(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeDeveloperInvalidRequest() {
+        RemoveSpaceDeveloperRequest request = RemoveSpaceDeveloperRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.removeDeveloper(request)).next().get();
     }
 
 }
