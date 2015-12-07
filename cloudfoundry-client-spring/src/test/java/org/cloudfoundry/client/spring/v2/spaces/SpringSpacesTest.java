@@ -68,6 +68,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -1273,6 +1274,44 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.removeDeveloper(request)).next().get();
+    }
+
+    @Test
+    public void removeManager() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/managers/test-manager-id")
+                .status(NO_CONTENT));
+
+        RemoveSpaceManagerRequest request = RemoveSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeManager(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeManagerError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/managers/test-manager-id")
+                .errorResponse());
+
+        RemoveSpaceManagerRequest request = RemoveSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeManager(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeManagerInvalidRequest() {
+        RemoveSpaceManagerRequest request = RemoveSpaceManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.removeManager(request)).next().get();
     }
 
 }
