@@ -201,4 +201,13 @@ public interface Spaces {
      */
     Publisher<Void> removeManager(RemoveSpaceManagerRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_security_group_from_the_space.html">Remove
+     * Security Group from the Space</a> request
+     *
+     * @param request the Remove Security Group from the Space request
+     * @return the response from the Remove Security Group from the Space request
+     */
+    Publisher<Void> removeSecurityGroup(RemoveSpaceSecurityGroupRequest request);
+
 }

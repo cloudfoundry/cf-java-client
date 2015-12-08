@@ -69,6 +69,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -1313,5 +1314,44 @@ public final class SpringSpacesTest extends AbstractRestTest {
 
         Streams.wrap(this.spaces.removeManager(request)).next().get();
     }
+
+    @Test
+    public void removeSecurityGroup() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/security_groups/test-security-group-id")
+                .status(NO_CONTENT));
+
+        RemoveSpaceSecurityGroupRequest request = RemoveSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .securityGroupId("test-security-group-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeSecurityGroup(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeSecurityGroupError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/spaces/test-id/security_groups/test-security-group-id")
+                .errorResponse());
+
+        RemoveSpaceSecurityGroupRequest request = RemoveSpaceSecurityGroupRequest.builder()
+                .id("test-id")
+                .securityGroupId("test-security-group-id")
+                .build();
+
+        Streams.wrap(this.spaces.removeSecurityGroup(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeSecurityGroupInvalidRequest() {
+        RemoveSpaceSecurityGroupRequest request = RemoveSpaceSecurityGroupRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.removeSecurityGroup(request)).next().get();
+    }
+
 
 }
