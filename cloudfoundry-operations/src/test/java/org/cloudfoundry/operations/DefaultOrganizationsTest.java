@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.junit.Test;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -40,7 +41,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                         .metadata(Metadata.builder()
                                 .id("test-id-1")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("test-name-1")
                                 .build())
                         .build())
@@ -54,7 +55,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                         .metadata(Metadata.builder()
                                 .id("test-id-2")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("test-name-2")
                                 .build())
                         .build())

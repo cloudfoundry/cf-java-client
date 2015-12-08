@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Associate Auditor operation
+ * The response payload for the Associate Billing Manager with the Organization operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateAuditorResponse extends OrganizationResource {
+public final class AssociateBillingManagerResponse extends OrganizationResource {
 
     @Builder
-    AssociateAuditorResponse(@JsonProperty("entity") OrganizationEntity entity,
-                             @JsonProperty("metadata") Metadata metadata) {
+    AssociateBillingManagerResponse(@JsonProperty("entity") OrganizationEntity entity,
+                                    @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

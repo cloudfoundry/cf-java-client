@@ -17,22 +17,22 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Associate Auditor operation
+ * Base class for resources that contain auditors
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateAuditorResponse extends OrganizationResource {
+public abstract class OrganizationResource extends Resource<OrganizationEntity> {
 
-    @Builder
-    AssociateAuditorResponse(@JsonProperty("entity") OrganizationEntity entity,
-                             @JsonProperty("metadata") Metadata metadata) {
+    protected OrganizationResource(@JsonProperty("entity") OrganizationEntity entity,
+                                   @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }
