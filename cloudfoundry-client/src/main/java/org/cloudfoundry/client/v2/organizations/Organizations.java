@@ -35,13 +35,23 @@ public interface Organizations {
 
     /**
      * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_billing_manager_with_the_organization.html">Associate
-     * Billing Manager with the Organization</a> request
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_billing_manager_with_the_organization.html">
+     * Associate Billing Manager with the Organization</a> request
      *
      * @param request the Associate Billing Manager with the Organization request
      * @return the response from the Associate Billing Manager with the Organization request
      */
     Publisher<AssociateBillingManagerResponse> associateBillingManager(AssociateBillingManagerRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_manager_with_the_organization.html">Associate
+     * Manager with the Organization</a> request
+     *
+     * @param request the Associate Manager with the Organization request
+     * @return the response from the Associate Manager with the Organization request
+     */
+    Publisher<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List

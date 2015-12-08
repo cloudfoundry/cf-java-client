@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -65,12 +67,24 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Publisher<AssociateBillingManagerResponse> associateBillingManager(final AssociateBillingManagerRequest
-                                                                                          request) {
+                                                                                      request) {
         return put(request, AssociateBillingManagerResponse.class, new Consumer<UriComponentsBuilder>() {
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
                         .getBillingManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<AssociateSpaceManagerResponse> associateManager(final AssociateSpaceManagerRequest request) {
+        return put(request, AssociateSpaceManagerResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "managers", request.getManagerId());
             }
 
         });
