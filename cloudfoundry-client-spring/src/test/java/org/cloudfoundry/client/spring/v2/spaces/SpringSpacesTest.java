@@ -64,6 +64,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
@@ -75,6 +77,8 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
+import org.cloudfoundry.client.v2.spaces.UserRoleEntity;
+import org.cloudfoundry.client.v2.spaces.UserRoleResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -1201,6 +1205,75 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
+    }
+
+    @Test
+    public void listUserRoles() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/user_roles?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_user_roles_response.json"));
+
+        ListSpaceUserRolesRequest request = ListSpaceUserRolesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceUserRolesResponse expected = ListSpaceUserRolesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(UserRoleResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-8")
+                                .url("/v2/users/uaa-id-8")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(UserRoleEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceGuid(null)
+                                .username("everything@example.com")
+                                .spaceRole("space_developer")
+                                .spaceRole("space_manager")
+                                .spaceRole("space_auditor")
+                                .spacesUrl("/v2/users/uaa-id-8/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-8/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-8/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-8/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-8/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-8/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-8/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceUserRolesResponse actual = Streams.wrap(this.spaces.listUserRoles(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listUserRolesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/user_roles?page=-1")
+                .errorResponse());
+
+        ListSpaceUserRolesRequest request = ListSpaceUserRolesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listUserRoles(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listUserRolesInvalidRequest() {
+        ListSpaceUserRolesRequest request = ListSpaceUserRolesRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listUserRoles(request)).next().get();
     }
 
     @Test

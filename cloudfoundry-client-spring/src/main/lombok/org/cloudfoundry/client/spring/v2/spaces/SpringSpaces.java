@@ -51,6 +51,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
@@ -304,6 +306,19 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "service_instances");
                 FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceUserRolesResponse> listUserRoles(final ListSpaceUserRolesRequest request) {
+        return get(request, ListSpaceUserRolesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "user_roles");
                 QueryBuilder.augment(builder, request);
             }
 
