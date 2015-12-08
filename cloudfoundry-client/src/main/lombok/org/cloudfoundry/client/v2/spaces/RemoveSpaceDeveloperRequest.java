@@ -17,17 +17,11 @@
 package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
-import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-
-import java.util.List;
 
 /**
  * The request payload for the Remove Developer from the Space operation
@@ -38,6 +32,7 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
     /**
      * The developer id
      *
+     * @param developerId the id
      * @return the developer id
      */
     @Getter(onMethod = @__(@JsonIgnore))
@@ -46,6 +41,7 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
     /**
      * The id
      *
+     * @param id the id
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
