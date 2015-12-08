@@ -38,6 +38,7 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadDropletRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.JobEntity;
@@ -414,6 +415,45 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
 
         assertArrayEquals(expected, actual);
         verify();
+    }
+
+    @Test
+    public void downloadDroplet() throws IOException {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/droplet/download")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_download_response.bin"));
+
+        DownloadDropletRequest request = DownloadDropletRequest.builder()
+                .id("test-id")
+                .build();
+
+        byte[] expected = toByteArray(new ClassPathResource("v2/apps/GET_{id}_download_response.bin").getInputStream());
+        byte[] actual = accumulateBytes(Streams.wrap(this.applications.downloadDroplet(request)));
+
+        assertArrayEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void downloadDropletError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/droplet/download")
+                .errorResponse());
+
+        DownloadDropletRequest request = DownloadDropletRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.downloadDroplet(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void downloadDropletInvalidRequest() {
+        DownloadDropletRequest request = DownloadDropletRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.downloadDroplet(request)).next().get();
     }
 
     @Test(expected = CloudFoundryException.class)
