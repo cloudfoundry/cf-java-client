@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
@@ -126,6 +127,17 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
             }
 
         });
+    }
+
+    @Override
+    public Publisher<byte[]> download(final DownloadApplicationRequest request) {
+        return getStream(request,
+                new Consumer<UriComponentsBuilder>() {
+                    @Override
+                    public void accept(UriComponentsBuilder builder) {
+                        builder.pathSegment("v2", "apps", request.getId(), "download");
+                    }
+                });
     }
 
     @Override
