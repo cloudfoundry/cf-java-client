@@ -73,6 +73,8 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -1353,5 +1355,71 @@ public final class SpringSpacesTest extends AbstractRestTest {
         Streams.wrap(this.spaces.removeSecurityGroup(request)).next().get();
     }
 
+    @Test
+    public void update() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/spaces/test-id")
+                .requestPayload("v2/spaces/PUT_{id}_request.json")
+                .status(OK)
+                .responsePayload("v2/spaces/PUT_{id}_response.json"));
+
+        UpdateSpaceRequest request = UpdateSpaceRequest.builder()
+                .id("test-id")
+                .name("New Space Name")
+                .build();
+
+        UpdateSpaceResponse expected = UpdateSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("e7b9e252-88cb-415c-ace4-2864922e550c")
+                        .url("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c")
+                        .createdAt("2015-07-27T22:43:08Z")
+                        .updatedAt("2015-07-27T22:43:08Z")
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("New Space Name")
+                        .organizationId("71c72756-e8b8-4c4a-b832-b3f9e3052c70")
+                        .allowSsh(true)
+                        .organizationUrl("/v2/organizations/71c72756-e8b8-4c4a-b832-b3f9e3052c70")
+                        .developersUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/developers")
+                        .managersUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/managers")
+                        .auditorsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/auditors")
+                        .applicationsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/apps")
+                        .routesUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/routes")
+                        .domainsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/domains")
+                        .serviceInstancesUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/service_instances")
+                        .applicationEventsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/app_events")
+                        .eventsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/events")
+                        .securityGroupsUrl("/v2/spaces/e7b9e252-88cb-415c-ace4-2864922e550c/security_groups")
+                        .build())
+                .build();
+
+        UpdateSpaceResponse actual = Streams.wrap(this.spaces.update(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void updateError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/spaces/test-id")
+                .requestPayload("v2/spaces/PUT_{id}_request.json")
+                .errorResponse());
+
+        UpdateSpaceRequest request = UpdateSpaceRequest.builder()
+                .id("test-id")
+                .name("New Space Name")
+                .build();
+
+        Streams.wrap(this.spaces.update(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void updateInvalidRequest() {
+        UpdateSpaceRequest request = UpdateSpaceRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.update(request)).next().get();
+    }
 
 }
