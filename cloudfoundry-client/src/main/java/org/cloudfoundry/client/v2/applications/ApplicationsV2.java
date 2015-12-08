@@ -61,6 +61,15 @@ public interface ApplicationsV2 {
     Publisher<Void> delete(DeleteApplicationRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/downloads_the_bits_for_an_app.html">Downloads the
+     * bits for an App</a> request
+     *
+     * @param request the Download Application request
+     * @return the response from the Download Application request
+     */
+    Publisher<byte[]> download(DownloadApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_env_for_an_app.html">Get the env for an
      * App</a> request
      *
@@ -159,7 +168,7 @@ public interface ApplicationsV2 {
     Publisher<SummaryApplicationResponse> summary(SummaryApplicationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/apps/terminate_the_running_app_instance_at_the_given_index.html">
      * Terminate Application Instance</a> request
      *

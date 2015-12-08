@@ -37,6 +37,7 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.JobEntity;
@@ -67,14 +68,23 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import reactor.fn.BiFunction;
+import reactor.fn.Function;
+import reactor.fn.Supplier;
+import reactor.fn.tuple.Tuple2;
+import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -89,6 +99,62 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 public final class SpringApplicationsV2Test extends AbstractRestTest {
 
     private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+
+    private static byte[] accumulateBytes(Stream<byte[]> stream) {
+        final ArrayList<byte[]> byteArrays = new ArrayList<>();
+
+        int actualLength = stream
+                .map(new Function<byte[], Integer>() {
+                    @Override
+                    public Integer apply(byte[] bytes) {
+                        byteArrays.add(bytes);
+                        return bytes.length;
+                    }
+                })
+                .reduce(new BiFunction<Integer, Integer, Integer>() {
+                    @Override
+                    public Integer apply(Integer l1, Integer l2) {
+                        return l1 + l2;
+                    }
+                })
+                .consumeNext().get();
+
+        return Streams.from(byteArrays)
+                .map(new Function<byte[], Tuple2<Integer, byte[]>>() {
+                    @Override
+                    public Tuple2<Integer, byte[]> apply(byte[] bytes) {
+                        return Tuple2.of(bytes.length, bytes);
+                    }
+                })
+                .reduce(Tuple2.of(0, new byte[actualLength]),
+                        new BiFunction<Tuple2<Integer, byte[]>, Tuple2<Integer, byte[]>, Tuple2<Integer, byte[]>>() {
+                            @Override
+                            public Tuple2<Integer, byte[]> apply(Tuple2<Integer, byte[]> b1,
+                                                                 Tuple2<Integer, byte[]> b2) {
+                                System.arraycopy(b2.getT2(), 0, b1.getT2(), b1.getT1(), b2.getT2().length);
+                                return Tuple2.of(b1.getT2().length + b2.getT2().length, b1.getT2());
+                            }
+                        })
+                .consumeNext().get().getT2();
+    }
+
+    private static byte[] toByteArray(final InputStream inputStream) throws IOException {
+        final byte[] byteBuffer = new byte[16384];
+
+        return accumulateBytes(Streams.generate(new Supplier<byte[]>() {
+            @Override
+            public byte[] get() {
+                try {
+                    int bytesRead = inputStream.read(byteBuffer, 0, byteBuffer.length);
+                    if (bytesRead > 0) {
+                        return Arrays.copyOf(byteBuffer, bytesRead);
+                    }
+                } catch (IOException ignored) {
+                }
+                return null;
+            }
+        }));
+    }
 
     @Test
     public void associateRoute() {
@@ -330,6 +396,45 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.applications.delete(request)).next().poll();
+    }
+
+    @Test
+    public void download() throws IOException {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/download")
+                .status(OK)
+                .responsePayload("v2/apps/GET_{id}_download_response.bin"));
+
+        DownloadApplicationRequest request = DownloadApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        byte[] expected = toByteArray(new ClassPathResource("v2/apps/GET_{id}_download_response.bin").getInputStream());
+        byte[] actual = accumulateBytes(Streams.wrap(this.applications.download(request)));
+
+        assertArrayEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void downloadError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/apps/test-id/download")
+                .errorResponse());
+
+        DownloadApplicationRequest request = DownloadApplicationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.applications.download(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void downloadInvalidRequest() {
+        DownloadApplicationRequest request = DownloadApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.applications.download(request)).next().get();
     }
 
     @Test

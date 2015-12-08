@@ -23,18 +23,25 @@ import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Publishers;
 import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.Consumer;
+import reactor.fn.Function;
 import reactor.fn.Supplier;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -56,10 +63,9 @@ public abstract class AbstractSpringOperations {
 
     protected final Stream<Void> delete(final Validatable request,
                                         final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Supplier<Void>() {
-
+        return exchange(request, new Function<SubscriberWithContext<Void, Void>, Void>() {
             @Override
-            public Void get() {
+            public Void apply(SubscriberWithContext<Void, Void> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().toUri();
@@ -69,11 +75,11 @@ public abstract class AbstractSpringOperations {
                         Void.class);
                 return null;
             }
-
         });
     }
 
-    protected final <T> Stream<T> exchange(final Validatable request, final Supplier<T> exchange) {
+    protected final <T> Stream<T> exchange(final Validatable request, final Function<SubscriberWithContext<T, Void>,
+            T> exchange) {
         return Streams.wrap(Publishers.create(new Consumer<SubscriberWithContext<T, Void>>() {
 
             @Override
@@ -85,13 +91,11 @@ public abstract class AbstractSpringOperations {
                         return;
                     }
                 }
-
                 try {
-                    T result = exchange.get();
+                    T result = exchange.apply(subscriber);
                     if (result != null) {
                         subscriber.onNext(result);
                     }
-
                     subscriber.onComplete();
                 } catch (HttpStatusCodeException e) {
                     subscriber.onError(CloudFoundryExceptionBuilder.build(e));
@@ -99,16 +103,14 @@ public abstract class AbstractSpringOperations {
                     subscriber.onError(e);
                 }
             }
-
         }));
     }
 
     protected final <T> Stream<T> get(Validatable request, final Class<T> responseType,
                                       final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Supplier<T>() {
-
+        return exchange(request, new Function<SubscriberWithContext<T, Void>, T>() {
             @Override
-            public T get() {
+            public T apply(SubscriberWithContext<T, Void> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().toUri();
@@ -116,16 +118,43 @@ public abstract class AbstractSpringOperations {
                 AbstractSpringOperations.this.logger.debug("GET {}", uri);
                 return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
             }
+        });
+    }
 
+    protected final Stream<byte[]> getStream(final Validatable request,
+                                             final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Function<SubscriberWithContext<byte[], Void>, byte[]>() {
+            @Override
+            public byte[] apply(final SubscriberWithContext<byte[], Void> subscriber) {
+                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
+                builderCallback.accept(builder);
+                URI uri = builder.build().toUri();
+
+                AbstractSpringOperations.this.logger.debug("GET {}", uri);
+                return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null,
+                        new ResponseExtractor<byte[]>() {
+                            @Override
+                            public byte[] extractData(ClientHttpResponse response) throws IOException {
+                                try (InputStream in = response.getBody()) {
+                                    int len;
+                                    byte[] buffer = new byte[8192];
+
+                                    while ((len = in.read(buffer)) != -1) {
+                                        subscriber.onNext(Arrays.copyOf(buffer, len));
+                                    }
+                                    return null;
+                                }
+                            }
+                        });
+            }
         });
     }
 
     protected final <T> Stream<T> patch(final Validatable request, final Class<T> responseType,
                                         final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Supplier<T>() {
-
+        return exchange(request, new Function<SubscriberWithContext<T, Void>, T>() {
             @Override
-            public T get() {
+            public T apply(SubscriberWithContext<T, Void> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().toUri();
@@ -134,19 +163,16 @@ public abstract class AbstractSpringOperations {
                 return AbstractSpringOperations.this.restOperations.exchange(
                         new RequestEntity<>(request, PATCH, uri), responseType).getBody();
             }
-
         });
     }
 
     protected final <T> Stream<T> post(final Validatable request, Class<T> responseType,
                                        Consumer<UriComponentsBuilder> builderCallback) {
         return postWithBody(request, new Supplier<Validatable>() {
-
             @Override
             public Validatable get() {
                 return request;
             }
-
         }, responseType, builderCallback);
     }
 
@@ -154,10 +180,9 @@ public abstract class AbstractSpringOperations {
                                                   final Supplier<B> bodySupplier,
                                                   final Class<T> responseType,
                                                   final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Supplier<T>() {
-
+        return exchange(request, new Function<SubscriberWithContext<T, Void>, T>() {
             @Override
-            public T get() {
+            public T apply(SubscriberWithContext<T, Void> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().toUri();
@@ -166,19 +191,16 @@ public abstract class AbstractSpringOperations {
                 return AbstractSpringOperations.this.restOperations.postForObject(
                         uri, bodySupplier.get(), responseType);
             }
-
         });
     }
 
     protected final <T> Stream<T> put(final Validatable request, Class<T> responseType,
                                       Consumer<UriComponentsBuilder> builderCallback) {
         return putWithBody(request, new Supplier<Validatable>() {
-
             @Override
             public Validatable get() {
                 return request;
             }
-
         }, responseType, builderCallback);
     }
 
@@ -186,10 +208,9 @@ public abstract class AbstractSpringOperations {
                                                  final Supplier<B> bodySupplier,
                                                  final Class<T> responseType,
                                                  final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Supplier<T>() {
-
+        return exchange(request, new Function<SubscriberWithContext<T, Void>, T>() {
             @Override
-            public T get() {
+            public T apply(SubscriberWithContext<T, Void> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().toUri();
@@ -198,7 +219,6 @@ public abstract class AbstractSpringOperations {
                 return AbstractSpringOperations.this.restOperations.exchange(
                         new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
             }
-
         });
     }
 
