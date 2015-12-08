@@ -19,9 +19,11 @@ package org.cloudfoundry.client.spring.v2.organizations;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.organizations.AuditorResource;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AuditorResource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.Test;
@@ -101,6 +103,72 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.associateAuditor(request)).next().get();
+    }
+
+    @Test
+    public void associateBillingManager() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                .status(OK)
+                .responsePayload("v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json"));
+
+        AssociateBillingManagerRequest request = AssociateBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .id("test-id")
+                .build();
+
+        AssociateBillingManagerResponse expected = AssociateBillingManagerResponse.builder()
+                .entity(AuditorResource.AuditorEntity.builder()
+                        .applicationEventsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/app_events")
+                        .auditorsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/auditors")
+                        .billingEnabled(false)
+                        .billingManagersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/billing_managers")
+                        .domainsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/domains")
+                        .managersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/managers")
+                        .name("name-200")
+                        .privateDomainsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/private_domains")
+                        .quotaDefinitionId("ab51f0d8-1920-4bfc-9401-cd0e978e8c5e")
+                        .quotaDefinitionUrl("/v2/quota_definitions/ab51f0d8-1920-4bfc-9401-cd0e978e8c5e")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/space_quota_definitions")
+                        .spacesUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/spaces")
+                        .status("active")
+                        .usersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/users")
+                        .build())
+                .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:10Z")
+                        .id("39ab104d-79f9-4bac-82e0-35b826a236b8")
+                        .url("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8")
+                        .build())
+                .build();
+
+        AssociateBillingManagerResponse actual = Streams.wrap(this.organizations.associateBillingManager(request))
+                .next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateBillingManagerError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                .errorResponse());
+
+        AssociateBillingManagerRequest request = AssociateBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.associateBillingManager(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateBillingManagerInvalidRequest() {
+        AssociateBillingManagerRequest request = AssociateBillingManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.associateBillingManager(request)).next().get();
     }
 
     @Test
