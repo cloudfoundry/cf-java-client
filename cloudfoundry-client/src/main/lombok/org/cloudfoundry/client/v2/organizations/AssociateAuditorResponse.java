@@ -28,10 +28,10 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateAuditorResponse extends AuditorResource {
+public final class AssociateAuditorResponse extends OrganizationResource {
 
     @Builder
-    AssociateAuditorResponse(@JsonProperty("entity") AuditorEntity entity,
+    AssociateAuditorResponse(@JsonProperty("entity") OrganizationEntity entity,
                              @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }

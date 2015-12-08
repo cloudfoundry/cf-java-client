@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
@@ -73,7 +74,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("test-name")
                                 .build())
                         .build())
@@ -99,7 +100,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("test-name")
                                 .build())
                         .build())
@@ -136,7 +137,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("test-name")
                                 .build())
                         .build())

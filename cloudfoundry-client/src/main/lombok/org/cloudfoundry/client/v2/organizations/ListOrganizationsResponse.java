@@ -51,10 +51,10 @@ public final class ListOrganizationsResponse
     @Data
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    public static final class Resource extends AuditorResource {
+    public static final class Resource extends OrganizationResource {
 
         @Builder
-        Resource(@JsonProperty("entity") AuditorEntity entity,
+        Resource(@JsonProperty("entity") OrganizationEntity entity,
                  @JsonProperty("metadata") Metadata metadata) {
             super(entity, metadata);
         }

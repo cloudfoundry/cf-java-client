@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
-import org.cloudfoundry.client.v2.organizations.AuditorResource;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                         .url("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
                         .createdAt("2015-07-27T22:43:10Z")
                         .build())
-                .entity(AuditorResource.AuditorEntity.builder()
+                .entity(OrganizationEntity.builder()
                         .name("name-187")
                         .billingEnabled(false)
                         .quotaDefinitionId("1d18a00b-4e36-412b-9308-2f5f2402e880")
@@ -118,7 +118,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         AssociateBillingManagerResponse expected = AssociateBillingManagerResponse.builder()
-                .entity(AuditorResource.AuditorEntity.builder()
+                .entity(OrganizationEntity.builder()
                         .applicationEventsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/app_events")
                         .auditorsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/auditors")
                         .billingEnabled(false)
@@ -192,7 +192,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                                 .url("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a")
                                 .createdAt("2015-07-27T22:43:05Z")
                                 .build())
-                        .entity(ListOrganizationsResponse.Resource.AuditorEntity.builder()
+                        .entity(OrganizationEntity.builder()
                                 .name("the-system_domain-org-name")
                                 .billingEnabled(false)
                                 .quotaDefinitionId("9b56a1ec-4981-4a1e-9348-0d78eeca842c")
