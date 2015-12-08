@@ -51,6 +51,16 @@ public interface Packages {
     Publisher<Void> delete(DeletePackageRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/download_the_bits_for_a_package.html">Download
+     * the bits for a package</a> request
+     *
+     * @param request the Download Package request
+     * @return the response from the Download Package request
+     */
+    Publisher<byte[]> download(DownloadPackageRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/get_a_package.html">Get
      * Package</a> request
      *
@@ -78,8 +88,8 @@ public interface Packages {
     Publisher<StagePackageResponse> stage(StagePackageRequest request);
 
     /**
-     * Makes the <a
-     * href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
      * Upload Package</a> request
      *
      * @param request the Upload Package request

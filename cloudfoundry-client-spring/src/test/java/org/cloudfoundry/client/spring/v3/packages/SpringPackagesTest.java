@@ -18,6 +18,7 @@ package org.cloudfoundry.client.spring.v3.packages;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
+import org.cloudfoundry.client.spring.util.StreamBytes;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
@@ -27,6 +28,7 @@ import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
+import org.cloudfoundry.client.v3.packages.DownloadPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
@@ -45,6 +47,7 @@ import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageTy
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -211,6 +214,47 @@ public final class SpringPackagesTest extends AbstractRestTest {
 
         Streams.wrap(this.packages.delete(request)).next().get();
     }
+
+    @Test
+    public void download() throws IOException {
+        mockRequest(new RequestContext()
+                .method(GET).path("v3/packages/test-id/download")
+                .status(OK)
+                .responsePayload("v3/packages/GET_{id}_download_response.bin"));
+
+        DownloadPackageRequest request = DownloadPackageRequest.builder()
+                .id("test-id")
+                .build();
+
+        byte[] expected = StreamBytes.toByteArray(new ClassPathResource("v3/packages/GET_{id}_download_response.bin")
+                .getInputStream());
+        byte[] actual = StreamBytes.accumulateBytes(Streams.wrap(this.packages.download(request)));
+
+        assertArrayEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void downloadError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v3/packages/test-id/download")
+                .errorResponse());
+
+        DownloadPackageRequest request = DownloadPackageRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.packages.download(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void downloadInvalidRequest() {
+        DownloadPackageRequest request = DownloadPackageRequest.builder()
+                .build();
+
+        Streams.wrap(this.packages.download(request)).next().get();
+    }
+
 
     @Test
     public void get() {

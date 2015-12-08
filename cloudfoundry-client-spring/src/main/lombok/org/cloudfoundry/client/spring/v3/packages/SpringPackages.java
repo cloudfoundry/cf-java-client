@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
+import org.cloudfoundry.client.v3.packages.DownloadPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
@@ -95,6 +96,17 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
             }
 
         });
+    }
+
+    @Override
+    public Publisher<byte[]> download(final DownloadPackageRequest request) {
+        return getStream(request,
+                new Consumer<UriComponentsBuilder>() {
+                    @Override
+                    public void accept(UriComponentsBuilder builder) {
+                        builder.pathSegment("v3", "packages", request.getId(), "download");
+                    }
+                });
     }
 
     @Override
