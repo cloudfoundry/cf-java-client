@@ -78,16 +78,6 @@ public class InstanceStats {
         }
     }
 
-    private static Date parseDate(String date) {
-        // dates will be of the form 2011-04-07 09:11:50 +0000
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss ZZZZZ").parse(date);
-        } catch (ParseException e) {
-            // TODO - not sure how best to handle this error
-            return null;
-        }
-    }
-
     public int getCores() {
         return cores;
     }
@@ -136,6 +126,15 @@ public class InstanceStats {
         return usage;
     }
 
+    private static Date parseDate(String date) {
+        try {
+            // dates will be of the form 2011-04-07 09:11:50 +0000
+            return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss ZZZZZ").parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
     public static class Usage {
 
         private double cpu;
@@ -147,7 +146,12 @@ public class InstanceStats {
         private Date time;
 
         public Usage(Map<String, Object> attributes) {
-            this.time = parseDate(parse(String.class, attributes.get("time")));
+            Object timeAttribute = attributes.get("time");
+            if (timeAttribute != null) {
+                this.time = parseDate(timeAttribute.toString());
+            } else {
+                this.time = null;
+            }
             this.cpu = parse(Double.class, attributes.get("cpu"));
             this.disk = parse(Long.class, attributes.get("disk"));
             this.mem = parse(Long.class, attributes.get("mem"));
