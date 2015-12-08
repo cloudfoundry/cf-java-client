@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.services.ServiceEntity;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -66,6 +68,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
@@ -1205,6 +1209,67 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listServiceInstances(request)).next().get();
+    }
+
+    @Test
+    public void listServices() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/services?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_services_response.json"));
+
+        ListSpaceServicesRequest request = ListSpaceServicesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceServicesResponse expected = ListSpaceServicesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("fcc4261f-da9a-40ba-9194-6919e0ab87f8")
+                                .url("/v2/services/fcc4261f-da9a-40ba-9194-6919e0ab87f8")
+                                .createdAt("2015-07-27T22:43:07Z")
+                                .build())
+                        .entity(ServiceEntity.builder()
+                                .label("label-5")
+                                .description("desc-14")
+                                .active(true)
+                                .bindable(true)
+                                .uniqueId("666902ad-81dc-41e9-a351-58e1055e3ab2")
+                                .serviceBrokerId("15f1c3a0-910c-4b92-9386-377acada14cb")
+                                .planUpdateable(false)
+                                .servicePlansUrl("/v2/services/fcc4261f-da9a-40ba-9194-6919e0ab87f8/service_plans")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceServicesResponse actual = Streams.wrap(this.spaces.listServices(request)).next().get();
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listServicesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/services?page=-1")
+                .errorResponse());
+
+        ListSpaceServicesRequest request = ListSpaceServicesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listServices(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listServicesInvalidRequest() {
+        ListSpaceServicesRequest request = ListSpaceServicesRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listServices(request)).next().get();
     }
 
     @Test
