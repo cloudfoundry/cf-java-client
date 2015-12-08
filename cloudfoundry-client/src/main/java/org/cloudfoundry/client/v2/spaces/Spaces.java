@@ -210,4 +210,12 @@ public interface Spaces {
      */
     Publisher<Void> removeSecurityGroup(RemoveSpaceSecurityGroupRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/update_a_space.html">Update a Space</a> request
+     *
+     * @param request the Update a Space request
+     * @return the response from the Update a Space request
+     */
+    Publisher<UpdateSpaceResponse> update(UpdateSpaceRequest request);
+
 }
