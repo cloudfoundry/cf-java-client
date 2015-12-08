@@ -1,0 +1,34 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "uaa-id-8",
+        "url": "/v2/users/uaa-id-8",
+        "created_at": "2015-07-27T22:43:07Z",
+        "updated_at": null
+      },
+      "entity": {
+        "admin": false,
+        "active": false,
+        "default_space_guid": null,
+        "username": "everything@example.com",
+        "space_roles": [
+          "space_developer",
+          "space_manager",
+          "space_auditor"
+        ],
+        "spaces_url": "/v2/users/uaa-id-8/spaces",
+        "organizations_url": "/v2/users/uaa-id-8/organizations",
+        "managed_organizations_url": "/v2/users/uaa-id-8/managed_organizations",
+        "billing_managed_organizations_url": "/v2/users/uaa-id-8/billing_managed_organizations",
+        "audited_organizations_url": "/v2/users/uaa-id-8/audited_organizations",
+        "managed_spaces_url": "/v2/users/uaa-id-8/managed_spaces",
+        "audited_spaces_url": "/v2/users/uaa-id-8/audited_spaces"
+      }
+    }
+  ]
+}

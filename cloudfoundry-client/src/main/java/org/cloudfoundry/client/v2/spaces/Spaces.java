@@ -175,6 +175,16 @@ public interface Spaces {
     Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieving_the_roles_of_all_users_in_the_space.html">
+     * Retrieving the roles of all Users in the Space</a> request
+     *
+     * @param request the Retrieving the roles of all Users in the Space request
+     * @return the response from the Retrieving the roles of all Users in the Space request
+     */
+    Publisher<ListSpaceUserRolesResponse> listUserRoles(ListSpaceUserRolesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_auditor_from_the_space.html">Remove Auditor
      * from the Space</a> request
      *
