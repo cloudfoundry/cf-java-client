@@ -23,9 +23,11 @@ import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
-import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -169,6 +171,71 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.associateBillingManager(request)).next().get();
+    }
+
+    @Test
+    public void associateManager() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/managers/test-manager-id")
+                .status(OK)
+                .responsePayload("v2/organizations/PUT_{id}_managers_{manager-id}_response.json"));
+
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        AssociateSpaceManagerResponse expected = AssociateSpaceManagerResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("cc7c5224-f973-4358-a95a-dd72decbb20f")
+                        .url("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f")
+                        .createdAt("2015-07-27T22:43:10Z")
+                        .build())
+                .entity(OrganizationEntity.builder()
+                        .name("name-218")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("57f59bb7-7581-4257-9502-cbd60bb92d99")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/57f59bb7-7581-4257-9502-cbd60bb92d99")
+                        .spacesUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/spaces")
+                        .domainsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/domains")
+                        .privateDomainsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/private_domains")
+                        .usersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/users")
+                        .managersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/managers")
+                        .billingManagersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/billing_managers")
+                        .auditorsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/auditors")
+                        .applicationEventsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/space_quota_definitions")
+                        .build())
+                .build();
+
+        AssociateSpaceManagerResponse actual = Streams.wrap(this.organizations.associateManager(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateManagerError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/managers/test-manager-id")
+                .errorResponse());
+
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        Streams.wrap(this.organizations.associateManager(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateManagerInvalidRequest() {
+        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.associateManager(request)).next().get();
     }
 
     @Test
