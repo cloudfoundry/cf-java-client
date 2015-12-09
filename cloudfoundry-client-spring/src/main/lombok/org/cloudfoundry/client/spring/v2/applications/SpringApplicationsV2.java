@@ -82,6 +82,10 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
         super(restOperations, root);
     }
 
+    SpringApplicationsV2(int byteArrayBufferLength, RestOperations restOperations, URI root) {
+        super(byteArrayBufferLength, restOperations, root);
+    }
+
     @Override
     public Publisher<AssociateApplicationRouteResponse> associateRoute(final AssociateApplicationRouteRequest request) {
         return put(request, AssociateApplicationRouteResponse.class, new Consumer<UriComponentsBuilder>() {

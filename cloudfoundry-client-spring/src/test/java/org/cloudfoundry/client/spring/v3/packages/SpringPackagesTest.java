@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring.v3.packages;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.util.StreamBytes;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
@@ -47,7 +46,6 @@ import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageTy
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -226,11 +224,9 @@ public final class SpringPackagesTest extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        byte[] expected = StreamBytes.toByteArray(new ClassPathResource("v3/packages/GET_{id}_download_response.bin")
-                .getInputStream());
-        byte[] actual = StreamBytes.accumulateBytes(Streams.wrap(this.packages.download(request)));
+        assertBytesEqual(new ClassPathResource("v3/packages/GET_{id}_download_response.bin").getInputStream(),
+                Streams.wrap(this.packages.download(request)));
 
-        assertArrayEquals(expected, actual);
         verify();
     }
 

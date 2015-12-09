@@ -36,12 +36,19 @@ import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.fn.Consumer;
+import reactor.rx.Stream;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -71,6 +78,35 @@ public abstract class AbstractRestTest {
 
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
+    }
+
+    protected static void assertBytesEqual(final InputStream in, Stream<byte[]> byteArrayStream) {
+        byteArrayStream.consume(new Consumer<byte[]>() {
+            @Override
+            public void accept(byte[] actual) {
+                try {
+                    byte[] expected = new byte[actual.length];
+                    int bytesRead = in.read(expected);
+                    int totalBytesRead = 0;
+                    while (bytesRead > 0 && totalBytesRead < actual.length) {
+                        totalBytesRead += bytesRead;
+                        bytesRead = in.read(expected, totalBytesRead, actual.length - totalBytesRead);
+                    }
+                    if (totalBytesRead != actual.length) {
+                        fail("more bytes in byteArrayStream than in InputStream " + in);
+                    } else {
+                        assertArrayEquals(expected, actual);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        try {
+            assertEquals("more bytes in InputStream " + in + " than in byteArrayStream", -1, in.read());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected final void mockRequest(RequestContext requestContext) {
