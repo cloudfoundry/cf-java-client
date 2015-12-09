@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
@@ -37,6 +39,7 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -304,6 +307,73 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.associateUser(request)).next().get();
+    }
+
+    @Test
+    public void create() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/organizations")
+                .requestPayload("v2/organizations/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/organizations/POST_response.json"));
+
+        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                .name("my-org-name")
+                .quotaDefinitionId("ffc919cd-3e21-43a6-9e4e-62802d149cdb")
+                .build();
+
+        CreateOrganizationResponse expected = CreateOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("137bfc86-5a2f-4759-9c0c-59ef614cd0be")
+                        .url("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be")
+                        .createdAt("2015-07-27T22:43:11Z")
+                        .build())
+                .entity(OrganizationEntity.builder()
+                        .name("my-org-name")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("ffc919cd-3e21-43a6-9e4e-62802d149cdb")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/ffc919cd-3e21-43a6-9e4e-62802d149cdb")
+                        .spacesUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/spaces")
+                        .domainsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/domains")
+                        .privateDomainsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/private_domains")
+                        .usersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/users")
+                        .managersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/managers")
+                        .billingManagersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/billing_managers")
+                        .auditorsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/auditors")
+                        .applicationEventsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/space_quota_definitions")
+                        .build())
+                .build();
+
+        CreateOrganizationResponse actual = Streams.wrap(this.organizations.create(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void createError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/organizations")
+                .requestPayload("v2/organizations/POST_request.json")
+                .errorResponse());
+
+        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                .name("my-org-name")
+                .quotaDefinitionId("ffc919cd-3e21-43a6-9e4e-62802d149cdb")
+                .build();
+
+        Streams.wrap(this.organizations.create(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void createInvalidRequest() {
+        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.create(request)).next().get();
     }
 
     @Test
