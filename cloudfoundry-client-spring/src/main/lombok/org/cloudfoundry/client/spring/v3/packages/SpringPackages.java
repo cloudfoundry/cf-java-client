@@ -61,6 +61,10 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
         super(restOperations, root);
     }
 
+    SpringPackages(int byteArrayBufferLength, RestOperations restOperations, URI root) {
+        super(byteArrayBufferLength, restOperations, root);
+    }
+
     @Override
     public Publisher<CopyPackageResponse> copy(final CopyPackageRequest request) {
         return post(request, CopyPackageResponse.class, new Consumer<UriComponentsBuilder>() {

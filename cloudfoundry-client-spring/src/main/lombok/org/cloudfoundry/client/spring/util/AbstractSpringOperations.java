@@ -50,13 +50,22 @@ import static org.springframework.http.HttpMethod.PUT;
 @ToString
 public abstract class AbstractSpringOperations {
 
+    private static final int DEFAULT_BYTE_ARRAY_BUFFER_LENGTH = 8192;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected final RestOperations restOperations;
 
     protected final URI root;
 
+    private final int byteArrayBufferLength;
+
     protected AbstractSpringOperations(RestOperations restOperations, URI root) {
+        this(DEFAULT_BYTE_ARRAY_BUFFER_LENGTH, restOperations, root);
+    }
+
+    protected AbstractSpringOperations(int byteArrayBufferLength, RestOperations restOperations, URI root) {
+        this.byteArrayBufferLength = byteArrayBufferLength;
         this.restOperations = restOperations;
         this.root = root;
     }
@@ -137,9 +146,9 @@ public abstract class AbstractSpringOperations {
                             public byte[] extractData(ClientHttpResponse response) throws IOException {
                                 try (InputStream in = response.getBody()) {
                                     int len;
-                                    byte[] buffer = new byte[8192];
+                                    byte[] buffer = new byte[AbstractSpringOperations.this.byteArrayBufferLength];
 
-                                    while ((len = in.read(buffer)) != -1) {
+                                    while (!subscriber.isCancelled() && (len = in.read(buffer)) != -1) {
                                         subscriber.onNext(Arrays.copyOf(buffer, len));
                                     }
                                     return null;

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring.v2.applications;
 
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.util.StreamBytes;
 import org.cloudfoundry.client.spring.util.StringMap;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
@@ -78,7 +77,6 @@ import java.util.Collections;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.Service;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan.builder;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -347,11 +345,9 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        byte[] expected = StreamBytes.toByteArray(new ClassPathResource("v2/apps/GET_{id}_download_response.bin")
-                .getInputStream());
-        byte[] actual = StreamBytes.accumulateBytes(Streams.wrap(this.applications.download(request)));
+        assertBytesEqual(new ClassPathResource("v2/apps/GET_{id}_download_response.bin").getInputStream(),
+                Streams.wrap(this.applications.download(request)));
 
-        assertArrayEquals(expected, actual);
         verify();
     }
 
@@ -366,11 +362,9 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                 .id("test-id")
                 .build();
 
-        byte[] expected = StreamBytes.toByteArray(new ClassPathResource("v2/apps/GET_{id}_download_response.bin")
-                .getInputStream());
-        byte[] actual = StreamBytes.accumulateBytes(Streams.wrap(this.applications.downloadDroplet(request)));
+        assertBytesEqual(new ClassPathResource("v2/apps/GET_{id}_download_response.bin").getInputStream(),
+                Streams.wrap(this.applications.downloadDroplet(request)));
 
-        assertArrayEquals(expected, actual);
         verify();
     }
 
