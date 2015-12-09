@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "guid": "137bfc86-5a2f-4759-9c0c-59ef614cd0be",
+    "url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be",
+    "created_at": "2015-07-27T22:43:11Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "my-org-name",
+    "billing_enabled": false,
+    "quota_definition_guid": "ffc919cd-3e21-43a6-9e4e-62802d149cdb",
+    "status": "active",
+    "quota_definition_url": "/v2/quota_definitions/ffc919cd-3e21-43a6-9e4e-62802d149cdb",
+    "spaces_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/spaces",
+    "domains_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/domains",
+    "private_domains_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/private_domains",
+    "users_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/users",
+    "managers_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/managers",
+    "billing_managers_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/billing_managers",
+    "auditors_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/auditors",
+    "app_events_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/app_events",
+    "space_quota_definitions_url": "/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/space_quota_definitions"
+  }
+}

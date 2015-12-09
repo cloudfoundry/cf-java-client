@@ -64,6 +64,15 @@ public interface Organizations {
     Publisher<AssociateOrganizationUserResponse> associateUser(AssociateOrganizationUserRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/creating_an_organization.html">Creating an
+     * Organization</a> request
+     *
+     * @param request the Creating an Organization request
+     * @return the response from the Creating an Organization request
+     */
+    Publisher<CreateOrganizationResponse> create(CreateOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
      * Organizations</a> request
      *
