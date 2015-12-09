@@ -24,16 +24,16 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Associate Manager with the Organization operation
+ * The response payload for the Associate User with the Organization operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateSpaceManagerResponse extends Resource<OrganizationEntity> {
+public final class AssociateOrganizationUserResponse extends Resource<OrganizationEntity> {
 
     @Builder
-    AssociateSpaceManagerResponse(@JsonProperty("entity") OrganizationEntity entity,
-                                  @JsonProperty("metadata") Resource.Metadata metadata) {
+    AssociateOrganizationUserResponse(@JsonProperty("entity") OrganizationEntity entity,
+                                      @JsonProperty("metadata") Resource.Metadata metadata) {
 
         super(entity, metadata);
     }

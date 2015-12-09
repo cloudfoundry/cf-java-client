@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class AssociateSpaceManagerRequestTest {
+public final class AssociateOrganizationManagerRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = AssociateSpaceManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationManagerRequest.builder()
                 .id("test-id")
                 .managerId("test-manager-id")
                 .build()
@@ -38,7 +38,7 @@ public final class AssociateSpaceManagerRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = AssociateSpaceManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationManagerRequest.builder()
                 .managerId("test-manager-id")
                 .build()
                 .isValid();
@@ -49,7 +49,7 @@ public final class AssociateSpaceManagerRequestTest {
 
     @Test
     public void isValidNoManagerId() {
-        ValidationResult result = AssociateSpaceManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationManagerRequest.builder()
                 .id("test-id")
                 .build()
                 .isValid();
