@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
+import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -84,12 +86,26 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Publisher<AssociateOrganizationManagerResponse> associateManager(final AssociateOrganizationManagerRequest
-                                                                                        request) {
+                                                                                    request) {
         return put(request, AssociateOrganizationManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "managers", request.getManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(final AssociatePrivateDomainRequest
+                                                                                    request) {
+        return put(request, AssociatePrivateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "private_domains", request
+                        .getPrivateDomainId());
             }
 
         });
@@ -106,7 +122,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
         });
     }
-
+    
     @Override
     public Publisher<CreateOrganizationResponse> create(final CreateOrganizationRequest request) {
         return post(request, CreateOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
