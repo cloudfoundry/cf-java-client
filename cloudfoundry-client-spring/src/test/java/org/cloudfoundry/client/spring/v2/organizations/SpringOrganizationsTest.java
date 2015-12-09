@@ -23,8 +23,10 @@ import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
-import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateSpaceManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
@@ -180,12 +182,12 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/organizations/PUT_{id}_managers_{manager-id}_response.json"));
 
-        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+        AssociateOrganizationManagerRequest request = AssociateOrganizationManagerRequest.builder()
                 .id("test-id")
                 .managerId("test-manager-id")
                 .build();
 
-        AssociateSpaceManagerResponse expected = AssociateSpaceManagerResponse.builder()
+        AssociateOrganizationManagerResponse expected = AssociateOrganizationManagerResponse.builder()
                 .metadata(Metadata.builder()
                         .id("cc7c5224-f973-4358-a95a-dd72decbb20f")
                         .url("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f")
@@ -210,7 +212,8 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                         .build())
                 .build();
 
-        AssociateSpaceManagerResponse actual = Streams.wrap(this.organizations.associateManager(request)).next().get();
+        AssociateOrganizationManagerResponse actual = Streams.wrap(this.organizations.associateManager(request)).next
+                ().get();
 
         assertEquals(expected, actual);
         verify();
@@ -222,7 +225,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .method(PUT).path("v2/organizations/test-id/managers/test-manager-id")
                 .errorResponse());
 
-        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+        AssociateOrganizationManagerRequest request = AssociateOrganizationManagerRequest.builder()
                 .id("test-id")
                 .managerId("test-manager-id")
                 .build();
@@ -232,10 +235,75 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
 
     @Test(expected = RequestValidationException.class)
     public void associateManagerInvalidRequest() {
-        AssociateSpaceManagerRequest request = AssociateSpaceManagerRequest.builder()
+        AssociateOrganizationManagerRequest request = AssociateOrganizationManagerRequest.builder()
                 .build();
 
         Streams.wrap(this.organizations.associateManager(request)).next().get();
+    }
+
+    @Test
+    public void associateUser() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/users/test-user-id")
+                .status(OK)
+                .responsePayload("v2/organizations/PUT_{id}_users_{user-id}_response.json"));
+
+        AssociateOrganizationUserRequest request = AssociateOrganizationUserRequest.builder()
+                .id("test-id")
+                .userId("test-user-id")
+                .build();
+
+        AssociateOrganizationUserResponse expected = AssociateOrganizationUserResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("584664d0-e5bb-449b-bfe5-0136c30c4ff8")
+                        .url("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8")
+                        .createdAt("2015-07-27T22:43:11Z")
+                        .build())
+                .entity(OrganizationEntity.builder()
+                        .name("name-234")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("51a2f10b-9803-4f35-ad69-0350ff4b66d4")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/51a2f10b-9803-4f35-ad69-0350ff4b66d4")
+                        .spacesUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/spaces")
+                        .domainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/domains")
+                        .privateDomainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/private_domains")
+                        .usersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/users")
+                        .managersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/managers")
+                        .billingManagersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/billing_managers")
+                        .auditorsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/auditors")
+                        .applicationEventsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/space_quota_definitions")
+                        .build())
+                .build();
+
+        AssociateOrganizationUserResponse actual = Streams.wrap(this.organizations.associateUser(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateUserError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/users/test-user-id")
+                .errorResponse());
+
+        AssociateOrganizationUserRequest request = AssociateOrganizationUserRequest.builder()
+                .id("test-id")
+                .userId("test-user-id")
+                .build();
+
+        Streams.wrap(this.organizations.associateUser(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateUserInvalidRequest() {
+        AssociateOrganizationUserRequest request = AssociateOrganizationUserRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.associateUser(request)).next().get();
     }
 
     @Test

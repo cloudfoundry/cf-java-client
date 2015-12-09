@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Associate Manager with the Organization operation
  */
 @Data
-public final class AssociateSpaceManagerRequest implements Validatable {
+public final class AssociateOrganizationManagerRequest implements Validatable {
 
     /**
      * The id
@@ -48,7 +48,7 @@ public final class AssociateSpaceManagerRequest implements Validatable {
     private volatile String managerId;
 
     @Builder
-    AssociateSpaceManagerRequest(String id, String managerId) {
+    AssociateOrganizationManagerRequest(String id, String managerId) {
         this.id = id;
         this.managerId = managerId;
     }

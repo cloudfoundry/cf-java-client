@@ -51,7 +51,17 @@ public interface Organizations {
      * @param request the Associate Manager with the Organization request
      * @return the response from the Associate Manager with the Organization request
      */
-    Publisher<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request);
+    Publisher<AssociateOrganizationManagerResponse> associateManager(AssociateOrganizationManagerRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_user_with_the_organization.html">Associate
+     * User with the Organization</a> request
+     *
+     * @param request the Associate User with the Organization request
+     * @return the response from the Associate User with the Organization request
+     */
+    Publisher<AssociateOrganizationUserResponse> associateUser(AssociateOrganizationUserRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
