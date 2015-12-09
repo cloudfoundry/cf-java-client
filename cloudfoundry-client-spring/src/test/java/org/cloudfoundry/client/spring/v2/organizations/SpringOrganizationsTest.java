@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
+import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -245,6 +247,72 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
     }
 
     @Test
+    public void associatePrivateDomain() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                .status(OK)
+                .responsePayload("v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json"));
+
+        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+                .id("test-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
+
+        AssociatePrivateDomainResponse expected = AssociatePrivateDomainResponse.builder()
+                .entity(OrganizationEntity.builder()
+                        .name("name-228")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("855b0cb8-5c58-4ebc-8189-6582c37060e6")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/855b0cb8-5c58-4ebc-8189-6582c37060e6")
+                        .spacesUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/spaces")
+                        .domainsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/domains")
+                        .privateDomainsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/private_domains")
+                        .usersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/users")
+                        .managersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/managers")
+                        .billingManagersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/billing_managers")
+                        .auditorsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/auditors")
+                        .applicationEventsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/space_quota_definitions")
+                        .build())
+                .metadata(Metadata.builder()
+                        .createdAt("2015-07-27T22:43:10Z")
+                        .id("676f9ff8-8c35-49ed-8ebf-fdf3db34cde7")
+                        .url("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7")
+                        .build())
+                .build();
+
+        AssociatePrivateDomainResponse actual = Streams.wrap(this.organizations.associatePrivateDomain(request)).next
+                ().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associatePrivateDomainError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                .errorResponse());
+
+        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+                .id("test-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
+
+        Streams.wrap(this.organizations.associatePrivateDomain(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associatePrivateDomainInvalidRequest() {
+        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.associatePrivateDomain(request)).next().get();
+    }
+
+	@Test
     public void associateUser() {
         mockRequest(new RequestContext()
                 .method(PUT).path("v2/organizations/test-id/users/test-user-id")

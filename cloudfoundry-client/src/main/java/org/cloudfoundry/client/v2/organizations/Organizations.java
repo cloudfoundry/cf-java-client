@@ -73,6 +73,16 @@ public interface Organizations {
     Publisher<CreateOrganizationResponse> create(CreateOrganizationRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
+     * Private Domain with the Organization</a> request
+     *
+     * @param request the Associate Private Domain with the Organization request
+     * @return the response from the Associate Private Domain with the Organization request
+     */
+    Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(AssociatePrivateDomainRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
      * Organizations</a> request
      *
