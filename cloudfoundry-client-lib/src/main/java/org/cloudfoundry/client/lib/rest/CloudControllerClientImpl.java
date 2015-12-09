@@ -466,7 +466,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
     @Override
     public void deleteService(String serviceName) {
         CloudService cloudService = getService(serviceName);
-        doDeleteService(cloudService);
+        if (cloudService != null) {
+            doDeleteService(cloudService);
+        }
     }
 
     @Override
