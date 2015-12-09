@@ -17,12 +17,18 @@
 package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+
+import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * The request payload for the Update a Space operation
@@ -37,7 +43,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the allow ssh
      */
     @Getter(onMethod = @__(@JsonProperty("allow_ssh")))
-    private volatile String allowSsh;
+    private volatile Boolean allowSsh;
 
     /**
      * The auditor ids
@@ -45,8 +51,8 @@ public final class UpdateSpaceRequest implements Validatable {
      * @param auditorIds the auditor ids
      * @return the auditor ids
      */
-    @Getter(onMethod = @__(@JsonProperty("auditor_guids")))
-    private volatile String auditorIds;
+    @Getter(onMethod = @__({@JsonProperty("auditor_guids"), @JsonInclude(NON_EMPTY)}))
+    private volatile List<String> auditorIds;
 
     /**
      * The developer ids
@@ -54,8 +60,8 @@ public final class UpdateSpaceRequest implements Validatable {
      * @param developerIds the developer ids
      * @return the developer ids
      */
-    @Getter(onMethod = @__(@JsonProperty("developer_guids")))
-    private volatile String developerIds;
+    @Getter(onMethod = @__({@JsonProperty("developer_guids"), @JsonInclude(NON_EMPTY)}))
+    private volatile List<String> developerIds;
 
     /**
      * The domain ids
@@ -63,8 +69,8 @@ public final class UpdateSpaceRequest implements Validatable {
      * @param domainIds the domain ids
      * @return the domain ids
      */
-    @Getter(onMethod = @__(@JsonProperty("domain_guids")))
-    private volatile String domainIds;
+    @Getter(onMethod = @__({@JsonProperty("domain_guids"), @JsonInclude(NON_EMPTY)}))
+    private volatile List<String> domainIds;
 
     /**
      * The id
@@ -81,8 +87,8 @@ public final class UpdateSpaceRequest implements Validatable {
      * @param managerIds the manager ids
      * @return the manager ids
      */
-    @Getter(onMethod = @__(@JsonProperty("manager_guids")))
-    private volatile String managerIds;
+    @Getter(onMethod = @__({@JsonProperty("manager_guids"), @JsonInclude(NON_EMPTY)}))
+    private volatile List<String> managerIds;
 
     /**
      * The name
@@ -108,12 +114,19 @@ public final class UpdateSpaceRequest implements Validatable {
      * @param securityGroupIds the security group ids
      * @return the security group ids
      */
-    @Getter(onMethod = @__(@JsonProperty("security_group_guids")))
-    private volatile String securityGroupIds;
+    @Getter(onMethod = @__({@JsonProperty("security_group_guids"), @JsonInclude(NON_EMPTY)}))
+    private volatile List<String> securityGroupIds;
 
     @Builder
-    UpdateSpaceRequest(String allowSsh, String auditorIds, String developerIds, String domainIds, String id, String
-            managerIds, String name, String organizationId, String securityGroupIds) {
+    UpdateSpaceRequest(Boolean allowSsh,
+                       @Singular List<String> auditorIds,
+                       @Singular List<String> developerIds,
+                       @Singular List<String> domainIds,
+                       String id,
+                       @Singular List<String> managerIds,
+                       String name,
+                       String organizationId,
+                       @Singular List<String> securityGroupIds) {
         this.allowSsh = allowSsh;
         this.auditorIds = auditorIds;
         this.developerIds = developerIds;
