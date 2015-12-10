@@ -84,9 +84,12 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
     private volatile List<String> serviceBrokerIds;
 
     @Builder
-    ListSpaceServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, @Singular
-    List<String> actives, String id, @Singular List<String> labels, @Singular List<String> providers, @Singular
-                             List<String> serviceBrokerIds) {
+    ListSpaceServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                             @Singular List<String> actives,
+                             String id,
+                             @Singular List<String> labels,
+                             @Singular List<String> providers,
+                             @Singular List<String> serviceBrokerIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.actives = actives;
