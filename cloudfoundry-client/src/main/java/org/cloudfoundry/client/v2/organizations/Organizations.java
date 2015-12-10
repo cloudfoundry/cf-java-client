@@ -133,16 +133,6 @@ public interface Organizations {
     Publisher<ListOrganizationManagersResponse> listManagers(ListOrganizationManagersRequest request);
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_spaces_for_the_organization.html">List
-     * all Spaces for the Organization</a> request
-     *
-     * @param request the List all Spaces for the Organization request
-     * @return the response from the List all Spaces for the Organization request
-     */
-    Publisher<ListOrganizationSpacesResponse> listSpaces(ListOrganizationSpacesRequest request);
-
-    /**
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_space_quota_definitions_for_the_organization.html">List
      * all Space Quota Definitions for the Organization</a> request
      *
@@ -151,6 +141,16 @@ public interface Organizations {
      */
     Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions
     (ListOrganizationSpaceQuotaDefinitionsRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_spaces_for_the_organization.html">List
+     * all Spaces for the Organization</a> request
+     *
+     * @param request the List all Spaces for the Organization request
+     * @return the response from the List all Spaces for the Organization request
+     */
+    Publisher<ListOrganizationSpacesResponse> listSpaces(ListOrganizationSpacesRequest request);
 
     /**
      * Makes the
@@ -173,6 +173,15 @@ public interface Organizations {
     Publisher<Void> removeAuditor(RemoveOrganizationAuditorRequest request);
 
     /**
+     * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_billing_manager_from_the_organization.html">Remove
+     * Billing Manager from the Organization</a> request
+     *
+     * @param request the Remove Billing Manager from the Organization request
+     * @return the response from the Remove Billing Manager from the Organization request
+     */
+    Publisher<Void> removeBillingManager(RemoveOrganizationBillingManagerRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/get_organization_summary.html">Get
      * Organization summary</a> request
      *
@@ -180,4 +189,5 @@ public interface Organizations {
      * @return the response from the Organization summary request
      */
     Publisher<SummaryOrganizationResponse> summary(SummaryOrganizationRequest request);
+
 }
