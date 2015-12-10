@@ -38,6 +38,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
@@ -48,6 +50,8 @@ import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
@@ -780,7 +784,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
 
         Streams.wrap(this.organizations.listManagers(request)).next().get();
     }
-    
+
     @Test
     public void listSpaces() {
         mockRequest(new RequestContext()
@@ -914,6 +918,70 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listUsers(request)).next().get();
+    }
+
+    @Test
+    public void listSpaceQuotaDefinitions() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_space_quota_definitions_response.json"));
+
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationSpaceQuotaDefinitionsResponse expected = ListOrganizationSpaceQuotaDefinitionsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceQuotaDefinitionResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
+                                .url("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(SpaceQuotaDefinitionEntity.builder()
+                                .instanceMemoryLimit(-1)
+                                .memoryLimit(20480)
+                                .name("name-199")
+                                .nonBasicServicesAllowed(true)
+                                .organizationId("a163840f-5bd5-48a0-8736-1d837bda1353")
+                                .organizationUrl("/v2/organizations/a163840f-5bd5-48a0-8736-1d837bda1353")
+                                .spacesUrl("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9/spaces")
+                                .totalRoutes(1000)
+                                .totalServices(60)
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationSpaceQuotaDefinitionsResponse actual = Streams.wrap(this.organizations
+                .listSpaceQuotaDefinitions(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listSpaceQuotaDefinitionsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                .errorResponse());
+
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listSpaceQuotaDefinitionsInvalidRequest() {
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
     }
 
     @Test
