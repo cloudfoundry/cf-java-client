@@ -163,6 +163,16 @@ public interface Organizations {
     Publisher<ListOrganizationUsersResponse> listUsers(ListOrganizationUsersRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/remove_auditor_from_the_organization.html">Remove
+     * Auditor from the Organization</a> request
+     *
+     * @param request the Remove Auditor from the Organization request
+     * @return the response from the Remove Auditor from the Organization request
+     */
+    Publisher<Void> removeAuditor(RemoveOrganizationAuditorRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/get_organization_summary.html">Get
      * Organization summary</a> request
      *

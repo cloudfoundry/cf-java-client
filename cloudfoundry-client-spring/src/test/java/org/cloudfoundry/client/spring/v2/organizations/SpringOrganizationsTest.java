@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -786,6 +787,70 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
     }
 
     @Test
+    public void listSpaceQuotaDefinitions() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_space_quota_definitions_response.json"));
+
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationSpaceQuotaDefinitionsResponse expected = ListOrganizationSpaceQuotaDefinitionsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceQuotaDefinitionResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
+                                .url("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(SpaceQuotaDefinitionEntity.builder()
+                                .instanceMemoryLimit(-1)
+                                .memoryLimit(20480)
+                                .name("name-199")
+                                .nonBasicServicesAllowed(true)
+                                .organizationId("a163840f-5bd5-48a0-8736-1d837bda1353")
+                                .organizationUrl("/v2/organizations/a163840f-5bd5-48a0-8736-1d837bda1353")
+                                .spacesUrl("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9/spaces")
+                                .totalRoutes(1000)
+                                .totalServices(60)
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationSpaceQuotaDefinitionsResponse actual = Streams.wrap(this.organizations
+                .listSpaceQuotaDefinitions(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listSpaceQuotaDefinitionsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                .errorResponse());
+
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listSpaceQuotaDefinitionsInvalidRequest() {
+        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
+    }
+
+    @Test
     public void listSpaces() {
         mockRequest(new RequestContext()
                 .method(GET).path("v2/organizations/test-id/spaces?page=-1")
@@ -921,67 +986,41 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
     }
 
     @Test
-    public void listSpaceQuotaDefinitions() {
+    public void removeAuditor() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
-                .status(OK)
-                .responsePayload("v2/organizations/GET_{id}_space_quota_definitions_response.json"));
+                .method(DELETE).path("v2/organizations/test-id/auditors/test-auditor-id")
+                .status(NO_CONTENT));
 
-        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+        RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
+                .auditorId("test-auditor-id")
                 .id("test-id")
-                .page(-1)
                 .build();
 
-        ListOrganizationSpaceQuotaDefinitionsResponse expected = ListOrganizationSpaceQuotaDefinitionsResponse.builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(SpaceQuotaDefinitionResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
-                                .url("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9")
-                                .createdAt("2015-07-27T22:43:10Z")
-                                .build())
-                        .entity(SpaceQuotaDefinitionEntity.builder()
-                                .instanceMemoryLimit(-1)
-                                .memoryLimit(20480)
-                                .name("name-199")
-                                .nonBasicServicesAllowed(true)
-                                .organizationId("a163840f-5bd5-48a0-8736-1d837bda1353")
-                                .organizationUrl("/v2/organizations/a163840f-5bd5-48a0-8736-1d837bda1353")
-                                .spacesUrl("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9/spaces")
-                                .totalRoutes(1000)
-                                .totalServices(60)
-                                .build())
-                        .build())
-                .build();
+        Streams.wrap(this.organizations.removeAuditor(request)).next().get();
 
-        ListOrganizationSpaceQuotaDefinitionsResponse actual = Streams.wrap(this.organizations
-                .listSpaceQuotaDefinitions(request)).next().get();
-
-        assertEquals(expected, actual);
         verify();
     }
 
     @Test(expected = CloudFoundryException.class)
-    public void listSpaceQuotaDefinitionsError() {
+    public void removeAuditorError() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                .method(DELETE).path("v2/organizations/test-id/auditors/test-auditor-id")
                 .errorResponse());
 
-        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+        RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
+                .auditorId("test-auditor-id")
                 .id("test-id")
-                .page(-1)
                 .build();
 
-        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
+        Streams.wrap(this.organizations.removeAuditor(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
-    public void listSpaceQuotaDefinitionsInvalidRequest() {
-        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+    public void removeAuditorInvalidRequest() {
+        RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
                 .build();
 
-        Streams.wrap(this.organizations.listSpaceQuotaDefinitions(request)).next().get();
+        Streams.wrap(this.organizations.removeAuditor(request)).next().get();
     }
 
     @Test

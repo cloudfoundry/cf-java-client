@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.reactivestreams.Publisher;
@@ -219,6 +220,20 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
+    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(final
+                                                                                              ListOrganizationSpaceQuotaDefinitionsRequest request) {
+        return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "space_quota_definitions");
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
     public Publisher<ListOrganizationSpacesResponse> listSpaces(final ListOrganizationSpacesRequest request) {
         return get(request, ListOrganizationSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
 
@@ -247,14 +262,12 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(final
-                                                                                              ListOrganizationSpaceQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Publisher<Void> removeAuditor(final RemoveOrganizationAuditorRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "space_quota_definitions");
-                QueryBuilder.augment(builder, request);
+                builder.pathSegment("v2", "organizations", request.getId(), "auditors", request.getAuditorId());
             }
 
         });
