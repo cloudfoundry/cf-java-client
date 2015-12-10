@@ -45,7 +45,7 @@ public final class ListSpaceSecurityGroupsRequest extends PaginatedRequest imple
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The names
@@ -54,7 +54,7 @@ public final class ListSpaceSecurityGroupsRequest extends PaginatedRequest imple
      * @return the names
      */
     @Getter(onMethod = @__(@FilterParameter("name")))
-    private volatile List<String> names;
+    private final List<String> names;
 
     @Builder
     ListSpaceSecurityGroupsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

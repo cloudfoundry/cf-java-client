@@ -45,7 +45,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @return the actees
      */
     @Getter(onMethod = @__(@FilterParameter("actee")))
-    private volatile List<String> actees;
+    private final List<String> actees;
 
     /**
      * The id
@@ -54,7 +54,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The timestamps
@@ -63,7 +63,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @return the timestamps
      */
     @Getter(onMethod = @__(@FilterParameter("timestamp")))
-    private volatile List<String> timestamps;
+    private final List<String> timestamps;
 
     /**
      * The types
@@ -72,7 +72,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @return the types
      */
     @Getter(onMethod = @__(@FilterParameter("type")))
-    private volatile List<String> types;
+    private final List<String> types;
 
     @Builder
     ListSpaceEventsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

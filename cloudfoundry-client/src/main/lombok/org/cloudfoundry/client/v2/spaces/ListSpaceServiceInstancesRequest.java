@@ -46,7 +46,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the gateway names
      */
     @Getter(onMethod = @__(@FilterParameter("gateway_name")))
-    private volatile List<String> gatewayNames;
+    private final List<String> gatewayNames;
 
     /**
      * The id
@@ -55,7 +55,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The names
@@ -64,7 +64,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the names
      */
     @Getter(onMethod = @__(@FilterParameter("name")))
-    private volatile List<String> names;
+    private final List<String> names;
 
     /**
      * The organization ids
@@ -73,7 +73,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("organization_guid")))
-    private volatile List<String> organizationIds;
+    private final List<String> organizationIds;
 
     /**
      * The return user provided service instances
@@ -82,7 +82,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the return user provided service instances
      */
     @Getter(onMethod = @__(@JsonProperty("return_user_provided_service_instances")))
-    private volatile boolean returnUserProvidedServiceInstances;
+    private final boolean returnUserProvidedServiceInstances;
 
     /**
      * The service binding ids
@@ -91,7 +91,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the service binding ids
      */
     @Getter(onMethod = @__(@FilterParameter("service_binding_guid")))
-    private volatile List<String> serviceBindingIds;
+    private final List<String> serviceBindingIds;
 
     /**
      * The service key ids
@@ -100,7 +100,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the service key ids
      */
     @Getter(onMethod = @__(@FilterParameter("service_key_guid")))
-    private volatile List<String> serviceKeyIds;
+    private final List<String> serviceKeyIds;
 
     /**
      * The service plan ids
@@ -109,7 +109,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the service plan ids
      */
     @Getter(onMethod = @__(@FilterParameter("service_plan_guid")))
-    private volatile List<String> servicePlanIds;
+    private final List<String> servicePlanIds;
 
 
     @Builder

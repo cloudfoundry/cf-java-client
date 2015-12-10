@@ -36,7 +36,7 @@ public final class RemoveApplicationServiceBindingRequest implements Validatable
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The service binding id
@@ -45,7 +45,7 @@ public final class RemoveApplicationServiceBindingRequest implements Validatable
      * @return the service binding id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String serviceBindingId;
+    private final String serviceBindingId;
 
     @Builder
     RemoveApplicationServiceBindingRequest(String id, String serviceBindingId) {

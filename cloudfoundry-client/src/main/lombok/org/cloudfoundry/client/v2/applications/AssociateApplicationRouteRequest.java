@@ -38,7 +38,7 @@ public final class AssociateApplicationRouteRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The route id
@@ -47,7 +47,7 @@ public final class AssociateApplicationRouteRequest implements Validatable {
      * @return the route id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String routeId;
+    private final String routeId;
 
     @Builder
     AssociateApplicationRouteRequest(String id, String routeId) {

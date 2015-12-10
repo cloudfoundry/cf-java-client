@@ -42,7 +42,7 @@ public final class AssociateBillingManagerRequest implements Validatable {
      * @return the billing manager id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String billingManagerId;
+    private final String billingManagerId;
 
     /**
      * The id
@@ -51,7 +51,7 @@ public final class AssociateBillingManagerRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     AssociateBillingManagerRequest(String billingManagerId, String id) {

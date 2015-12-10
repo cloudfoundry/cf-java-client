@@ -37,7 +37,7 @@ public final class CopyApplicationRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The source app id
@@ -46,7 +46,7 @@ public final class CopyApplicationRequest implements Validatable {
      * @return the source app id
      */
     @Getter(onMethod = @__(@JsonProperty("source_app_guid")))
-    private volatile String sourceAppId;
+    private final String sourceAppId;
 
     @Builder
     CopyApplicationRequest(String id, String sourceAppId) {

@@ -36,7 +36,7 @@ public final class RestageApplicationRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     RestageApplicationRequest(String id) {

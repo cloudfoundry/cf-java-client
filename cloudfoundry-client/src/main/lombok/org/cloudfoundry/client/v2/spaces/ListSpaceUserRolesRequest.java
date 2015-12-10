@@ -41,7 +41,7 @@ public final class ListSpaceUserRolesRequest extends PaginatedRequest implements
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     ListSpaceUserRolesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

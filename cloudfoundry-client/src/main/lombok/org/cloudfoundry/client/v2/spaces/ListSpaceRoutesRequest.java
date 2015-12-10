@@ -45,7 +45,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @return the domain ids
      */
     @Getter(onMethod = @__(@FilterParameter("domain_guid")))
-    private volatile List<String> domainIds;
+    private final List<String> domainIds;
 
     /**
      * The hosts
@@ -54,7 +54,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @return the hosts
      */
     @Getter(onMethod = @__(@FilterParameter("host")))
-    private volatile List<String> hosts;
+    private final List<String> hosts;
 
     /**
      * The id
@@ -63,7 +63,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The organization ids
@@ -72,7 +72,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @return the organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("organization_guid")))
-    private volatile List<String> organizationIds;
+    private final List<String> organizationIds;
 
     /**
      * The paths
@@ -81,7 +81,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @return the paths
      */
     @Getter(onMethod = @__(@FilterParameter("path")))
-    private volatile List<String> paths;
+    private final List<String> paths;
 
     @Builder
     ListSpaceRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

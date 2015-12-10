@@ -45,7 +45,7 @@ public final class ListApplicationServiceBindingsRequest extends PaginatedReques
      * @return the ids of the service instances to filter on
      */
     @Getter(onMethod = @__(@FilterParameter("service_instance_guid")))
-    private volatile List<String> serviceInstanceIds;
+    private final List<String> serviceInstanceIds;
 
     /**
      * The id of the App
@@ -54,7 +54,7 @@ public final class ListApplicationServiceBindingsRequest extends PaginatedReques
      * @return the id of the App
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     ListApplicationServiceBindingsRequest(OrderDirection orderDirection,
