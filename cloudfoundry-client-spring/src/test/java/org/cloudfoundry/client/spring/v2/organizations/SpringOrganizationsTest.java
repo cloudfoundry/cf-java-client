@@ -32,9 +32,13 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.users.UserEntity;
+import org.cloudfoundry.client.v2.users.UserResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -547,6 +551,71 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.list(request)).next().get();
+    }
+
+    @Test
+    public void listAuditors() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/auditors?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_auditors_response.json"));
+
+        ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationAuditorsResponse expected = ListOrganizationAuditorsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-73")
+                                .url("/v2/users/uaa-id-73")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(UserEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("auditor@example.com")
+                                .spacesUrl("/v2/users/uaa-id-73/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-73/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-73/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-73/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-73/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-73/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-73/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationAuditorsResponse actual = Streams.wrap(this.organizations.listAuditors(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listAuditorsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/auditors?page=-1")
+                .errorResponse());
+
+        ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listAuditors(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listAuditorsInvalidRequest() {
+        ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listAuditors(request)).next().get();
     }
 
 }

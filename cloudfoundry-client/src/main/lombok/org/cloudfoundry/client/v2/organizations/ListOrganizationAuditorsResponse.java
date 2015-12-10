@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -22,25 +22,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
+
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
 
 import java.util.List;
 
 /**
- * The response payload for the List all Developers for the Space operation
+ * The response payload for the List all Auditors for the Organization operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceDevelopersResponse extends PaginatedResponse<UserResource> {
+public final class ListOrganizationAuditorsResponse extends PaginatedResponse<UserResource> {
 
     @Builder
-    ListSpaceDevelopersResponse(@JsonProperty("next_url") String nextUrl,
-                                @JsonProperty("prev_url") String previousUrl,
-                                @JsonProperty("resources") @Singular List<UserResource> resources,
-                                @JsonProperty("total_pages") Integer totalPages,
-                                @JsonProperty("total_results") Integer totalResults) {
+    ListOrganizationAuditorsResponse(@JsonProperty("next_url") String nextUrl,
+                                     @JsonProperty("prev_url") String previousUrl,
+                                     @JsonProperty("resources") @Singular List<UserResource> resources,
+                                     @JsonProperty("total_pages") Integer totalPages,
+                                     @JsonProperty("total_results") Integer totalResults) {
 
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
