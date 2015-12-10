@@ -45,7 +45,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the audited organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("audited_organization_guid")))
-    private volatile List<String> auditedOrganizationIds;
+    private final List<String> auditedOrganizationIds;
 
     /**
      * The audited space ids
@@ -54,7 +54,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the audited space ids
      */
     @Getter(onMethod = @__(@FilterParameter("audited_space_guid")))
-    private volatile List<String> auditedSpaceIds;
+    private final List<String> auditedSpaceIds;
 
     /**
      * The billing managed organization ids
@@ -63,7 +63,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the billing managed organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("billing_managed_organization_guid")))
-    private volatile List<String> billingManagedOrganizationIds;
+    private final List<String> billingManagedOrganizationIds;
 
     /**
      * The id
@@ -72,7 +72,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The managed organization ids
@@ -81,7 +81,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the managed organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("managed_organization_guid")))
-    private volatile List<String> managedOrganizationIds;
+    private final List<String> managedOrganizationIds;
 
     /**
      * The managed space ids
@@ -90,7 +90,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the managed space ids
      */
     @Getter(onMethod = @__(@FilterParameter("managed_space_guid")))
-    private volatile List<String> managedSpaceIds;
+    private final List<String> managedSpaceIds;
 
     /**
      * The organization ids
@@ -99,7 +99,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("organization_guid")))
-    private volatile List<String> organizationIds;
+    private final List<String> organizationIds;
 
     /**
      * The space ids
@@ -108,7 +108,7 @@ public final class ListOrganizationManagersRequest extends PaginatedRequest impl
      * @return the space ids
      */
     @Getter(onMethod = @__(@FilterParameter("space_guid")))
-    private volatile List<String> spaceIds;
+    private final List<String> spaceIds;
 
     @Builder
     ListOrganizationManagersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

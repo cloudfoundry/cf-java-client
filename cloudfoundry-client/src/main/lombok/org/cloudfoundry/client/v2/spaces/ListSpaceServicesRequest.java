@@ -45,7 +45,7 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
      * @return the actives
      */
     @Getter(onMethod = @__(@FilterParameter("active")))
-    private volatile List<String> actives;
+    private final List<String> actives;
 
     /**
      * The id
@@ -54,7 +54,7 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The labels
@@ -63,7 +63,7 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
      * @return the labels
      */
     @Getter(onMethod = @__(@FilterParameter("label")))
-    private volatile List<String> labels;
+    private final List<String> labels;
 
     /**
      * The providers
@@ -72,7 +72,7 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
      * @return the providers
      */
     @Getter(onMethod = @__(@FilterParameter("provider")))
-    private volatile List<String> providers;
+    private final List<String> providers;
 
     /**
      * The service broker ids
@@ -81,7 +81,7 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
      * @return the service broker ids
      */
     @Getter(onMethod = @__(@FilterParameter("service_broker_guid")))
-    private volatile List<String> serviceBrokerIds;
+    private final List<String> serviceBrokerIds;
 
     @Builder
     ListSpaceServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,

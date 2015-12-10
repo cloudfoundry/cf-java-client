@@ -36,7 +36,7 @@ public final class AssociatePrivateDomainRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The private domain id
@@ -45,7 +45,7 @@ public final class AssociatePrivateDomainRequest implements Validatable {
      * @return the private domain id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String privateDomainId;
+    private final String privateDomainId;
 
     @Builder
     AssociatePrivateDomainRequest(String id, String privateDomainId) {

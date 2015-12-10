@@ -45,7 +45,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      * @return the app ids
      */
     @Getter(onMethod = @__(@FilterParameter("app_guid")))
-    private volatile List<String> appIds;
+    private final List<String> appIds;
 
     /**
      * The developer ids
@@ -54,7 +54,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      * @return the developer ids
      */
     @Getter(onMethod = @__(@FilterParameter("developer_guid")))
-    private volatile List<String> developerIds;
+    private final List<String> developerIds;
 
     /**
      * The id
@@ -63,7 +63,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The names
@@ -72,7 +72,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      * @return the names
      */
     @Getter(onMethod = @__(@FilterParameter("name")))
-    private volatile List<String> names;
+    private final List<String> names;
 
     /**
      * The organization ids
@@ -81,7 +81,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      * @return the organization ids
      */
     @Getter(onMethod = @__(@FilterParameter("organization_guid")))
-    private volatile List<String> organizationIds;
+    private final List<String> organizationIds;
 
     @Builder
     ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, @Singular

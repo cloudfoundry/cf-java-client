@@ -36,7 +36,7 @@ public final class RemoveSpaceSecurityGroupRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The security group id
@@ -45,7 +45,7 @@ public final class RemoveSpaceSecurityGroupRequest implements Validatable {
      * @return the security group id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String securityGroupId;
+    private final String securityGroupId;
 
     @Builder
     RemoveSpaceSecurityGroupRequest(String id, String securityGroupId) {

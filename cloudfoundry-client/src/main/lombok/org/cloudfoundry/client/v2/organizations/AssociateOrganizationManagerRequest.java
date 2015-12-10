@@ -36,7 +36,7 @@ public final class AssociateOrganizationManagerRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The manager id
@@ -45,7 +45,7 @@ public final class AssociateOrganizationManagerRequest implements Validatable {
      * @return the manager id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String managerId;
+    private final String managerId;
 
     @Builder
     AssociateOrganizationManagerRequest(String id, String managerId) {

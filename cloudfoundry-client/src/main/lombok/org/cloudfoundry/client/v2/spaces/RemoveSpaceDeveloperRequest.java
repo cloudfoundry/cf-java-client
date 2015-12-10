@@ -36,7 +36,7 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
      * @return the developer id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String developerId;
+    private final String developerId;
 
     /**
      * The id
@@ -45,7 +45,7 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     RemoveSpaceDeveloperRequest(String developerId, String id) {

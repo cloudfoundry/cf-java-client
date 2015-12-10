@@ -36,7 +36,7 @@ public final class CreateOrganizationRequest implements Validatable {
      * @return the name
      */
     @Getter(onMethod = @__(@JsonProperty("name")))
-    private volatile String name;
+    private final String name;
 
     /**
      * The quota definition id
@@ -45,7 +45,7 @@ public final class CreateOrganizationRequest implements Validatable {
      * @return the quota definition id
      */
     @Getter(onMethod = @__(@JsonProperty("quota_definition_guid")))
-    private volatile String quotaDefinitionId;
+    private final String quotaDefinitionId;
 
     /**
      * The status
@@ -54,7 +54,7 @@ public final class CreateOrganizationRequest implements Validatable {
      * @return the status
      */
     @Getter(onMethod = @__(@JsonProperty("status")))
-    private volatile String status;
+    private final String status;
 
     @Builder
     CreateOrganizationRequest(String name, String quotaDefinitionId, String status) {

@@ -43,7 +43,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the allow ssh
      */
     @Getter(onMethod = @__(@JsonProperty("allow_ssh")))
-    private volatile Boolean allowSsh;
+    private final Boolean allowSsh;
 
     /**
      * The auditor ids
@@ -52,7 +52,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the auditor ids
      */
     @Getter(onMethod = @__({@JsonProperty("auditor_guids"), @JsonInclude(NON_EMPTY)}))
-    private volatile List<String> auditorIds;
+    private final List<String> auditorIds;
 
     /**
      * The developer ids
@@ -61,7 +61,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the developer ids
      */
     @Getter(onMethod = @__({@JsonProperty("developer_guids"), @JsonInclude(NON_EMPTY)}))
-    private volatile List<String> developerIds;
+    private final List<String> developerIds;
 
     /**
      * The domain ids
@@ -70,7 +70,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the domain ids
      */
     @Getter(onMethod = @__({@JsonProperty("domain_guids"), @JsonInclude(NON_EMPTY)}))
-    private volatile List<String> domainIds;
+    private final List<String> domainIds;
 
     /**
      * The id
@@ -79,7 +79,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     /**
      * The manager ids
@@ -88,7 +88,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the manager ids
      */
     @Getter(onMethod = @__({@JsonProperty("manager_guids"), @JsonInclude(NON_EMPTY)}))
-    private volatile List<String> managerIds;
+    private final List<String> managerIds;
 
     /**
      * The name
@@ -97,7 +97,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the name
      */
     @Getter(onMethod = @__(@JsonProperty("name")))
-    private volatile String name;
+    private final String name;
 
     /**
      * The organization id
@@ -106,7 +106,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the organization id
      */
     @Getter(onMethod = @__(@JsonProperty("organization_guid")))
-    private volatile String organizationId;
+    private final String organizationId;
 
     /**
      * The security group ids
@@ -115,7 +115,7 @@ public final class UpdateSpaceRequest implements Validatable {
      * @return the security group ids
      */
     @Getter(onMethod = @__({@JsonProperty("security_group_guids"), @JsonInclude(NON_EMPTY)}))
-    private volatile List<String> securityGroupIds;
+    private final List<String> securityGroupIds;
 
     @Builder
     UpdateSpaceRequest(Boolean allowSsh,
