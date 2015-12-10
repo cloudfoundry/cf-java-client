@@ -41,7 +41,7 @@ public final class ListOrganizationSpaceQuotaDefinitionsRequest extends Paginate
      * @return the id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private volatile String id;
+    private final String id;
 
     @Builder
     ListOrganizationSpaceQuotaDefinitionsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
