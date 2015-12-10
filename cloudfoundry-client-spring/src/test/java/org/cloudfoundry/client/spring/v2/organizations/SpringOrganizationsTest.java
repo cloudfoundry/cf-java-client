@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
@@ -39,10 +40,12 @@ import reactor.rx.Streams;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationsTest extends AbstractRestTest {
@@ -312,7 +315,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         Streams.wrap(this.organizations.associatePrivateDomain(request)).next().get();
     }
 
-	@Test
+    @Test
     public void associateUser() {
         mockRequest(new RequestContext()
                 .method(PUT).path("v2/organizations/test-id/users/test-user-id")
@@ -442,6 +445,44 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.create(request)).next().get();
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id?async=true")
+                .status(NO_CONTENT));
+
+        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                .async(true)
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.delete(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id?async=true")
+                .errorResponse());
+
+        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                .async(true)
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.delete(request)).next().get();
     }
 
     @Test
