@@ -54,6 +54,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.reactivestreams.Publisher;
@@ -196,8 +197,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(final
-                                                                                  ListOrganizationBillingManagersRequest request) {
+    public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(
+            final ListOrganizationBillingManagersRequest request) {
         return get(request, ListOrganizationBillingManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -315,6 +316,18 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
                         .getBillingManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> removeManager(final RemoveOrganizationManagerRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "managers", request.getManagerId());
             }
 
         });

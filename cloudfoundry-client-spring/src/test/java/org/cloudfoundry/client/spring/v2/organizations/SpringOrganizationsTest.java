@@ -54,6 +54,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
@@ -1182,6 +1183,44 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.removeBillingManager(request)).next().get();
+    }
+
+    @Test
+    public void removeManager() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/managers/test-manager-id")
+                .status(NO_CONTENT));
+
+        RemoveOrganizationManagerRequest request = RemoveOrganizationManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeManager(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeManagerError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/managers/test-manager-id")
+                .errorResponse());
+
+        RemoveOrganizationManagerRequest request = RemoveOrganizationManagerRequest.builder()
+                .id("test-id")
+                .managerId("test-manager-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeManager(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeManagerInvalidRequest() {
+        RemoveOrganizationManagerRequest request = RemoveOrganizationManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.removeManager(request)).next().get();
     }
 
     @Test
