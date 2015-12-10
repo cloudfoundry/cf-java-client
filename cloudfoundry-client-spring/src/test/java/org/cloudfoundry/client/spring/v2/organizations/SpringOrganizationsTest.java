@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -541,20 +543,6 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         verify();
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
-                .errorResponse());
-
-        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.organizations.list(request)).next().get();
-    }
-
     @Test
     public void listAuditors() {
         mockRequest(new RequestContext()
@@ -618,6 +606,86 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listAuditors(request)).next().get();
+    }
+
+    @Test
+    public void listBillingManagers() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/billing_managers?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_billing_managers_response.json"));
+
+        ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationBillingManagersResponse expected = ListOrganizationBillingManagersResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-84")
+                                .url("/v2/users/uaa-id-84")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(UserEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("billing_manager@example.com")
+                                .spacesUrl("/v2/users/uaa-id-84/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-84/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-84/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-84/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-84/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-84/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-84/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationBillingManagersResponse actual = Streams.wrap(this.organizations.listBillingManagers(request)
+        ).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listBillingManagersError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/billing_managers?page=-1")
+                .errorResponse());
+
+        ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listBillingManagers(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listBillingManagersInvalidRequest() {
+        ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listBillingManagers(request)).next().get();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/organizations?q=name%20IN%20test-name&page=-1")
+                .errorResponse());
+
+        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.list(request)).next().get();
     }
 
     @Test

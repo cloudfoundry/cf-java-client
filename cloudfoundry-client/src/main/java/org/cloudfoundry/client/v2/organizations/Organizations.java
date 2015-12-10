@@ -113,6 +113,17 @@ public interface Organizations {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_billing_managers_for_the_organization.html">List
+     * all Billing Managers for the Organization</a> request
+     *
+     * @param request the List all Billing Managers for the Organization request
+     * @return the response from the List all Billing Managers for the Organization request
+     */
+    Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(ListOrganizationBillingManagersRequest
+                                                                                   request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_managers_for_the_organization.html">List
      * all Managers for the Organization</a> request
      *
