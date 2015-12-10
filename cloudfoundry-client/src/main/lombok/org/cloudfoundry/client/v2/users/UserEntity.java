@@ -27,14 +27,6 @@ import lombok.Data;
 public final class UserEntity {
 
     /**
-     * The admin property
-     *
-     * @param admin the admin boolean
-     * @return admin
-     */
-    private final boolean admin;
-
-    /**
      * The active property
      *
      * @param active the active boolean
@@ -43,52 +35,12 @@ public final class UserEntity {
     private final boolean active;
 
     /**
-     * The Default Space Id
+     * The admin property
      *
-     * @param defaultSpaceId default Space Id
-     * @return default Space Id
+     * @param admin the admin boolean
+     * @return admin
      */
-    private final String defaultSpaceId;
-
-    /**
-     * The username
-     *
-     * @param username the username
-     * @return the username
-     */
-    private final String username;
-
-    /**
-     * The spaces url
-     *
-     * @param spacesUrl the spaces url
-     * @return the spaces url
-     */
-    private final String spacesUrl;
-
-    /**
-     * The organizations url
-     *
-     * @param organizationsUrl the organizations url
-     * @return the organizations url
-     */
-    private final String organizationsUrl;
-
-    /**
-     * The managed organizations url
-     *
-     * @param managedOrganizationsUrl the managed organizations url
-     * @return the managed organizations url
-     */
-    private final String managedOrganizationsUrl;
-
-    /**
-     * The billing managed organizations url
-     *
-     * @param billingManagedOrganizationsUrl the billing managed organizations url
-     * @return the billing managed organizations url
-     */
-    private final String billingManagedOrganizationsUrl;
+    private final boolean admin;
 
     /**
      * The audited organizations url
@@ -99,6 +51,38 @@ public final class UserEntity {
     private final String auditedOrganizationsUrl;
 
     /**
+     * The audited spaces url
+     *
+     * @param auditedSpacesUrl the audited spaces url
+     * @return the audited spaces url
+     */
+    private final String auditedSpacesUrl;
+
+    /**
+     * The billing managed organizations url
+     *
+     * @param billingManagedOrganizationsUrl the billing managed organizations url
+     * @return the billing managed organizations url
+     */
+    private final String billingManagedOrganizationsUrl;
+
+    /**
+     * The Default Space Id
+     *
+     * @param defaultSpaceId default Space Id
+     * @return default Space Id
+     */
+    private final String defaultSpaceId;
+
+    /**
+     * The managed organizations url
+     *
+     * @param managedOrganizationsUrl the managed organizations url
+     * @return the managed organizations url
+     */
+    private final String managedOrganizationsUrl;
+
+    /**
      * The managed spaces url
      *
      * @param managedSpacesUrl the managed spaces url
@@ -107,37 +91,53 @@ public final class UserEntity {
     private final String managedSpacesUrl;
 
     /**
-     * The audited spaces url
+     * The organizations url
      *
-     * @param auditedSpacesUrl the audited spaces url
-     * @return the audited spaces url
+     * @param organizationsUrl the organizations url
+     * @return the organizations url
      */
-    private final String auditedSpacesUrl;
+    private final String organizationsUrl;
+
+    /**
+     * The spaces url
+     *
+     * @param spacesUrl the spaces url
+     * @return the spaces url
+     */
+    private final String spacesUrl;
+
+    /**
+     * The username
+     *
+     * @param username the username
+     * @return the username
+     */
+    private final String username;
 
     @Builder
-    UserEntity(@JsonProperty("admin") boolean admin,
-               @JsonProperty("active") boolean active,
-               @JsonProperty("default_space_guid") String defaultSpaceId,
-               @JsonProperty("username") String username,
-               @JsonProperty("spaces_url") String spacesUrl,
-               @JsonProperty("organizations_url") String organizationsUrl,
-               @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
-               @JsonProperty("billing_managed_organizations_url") String
-                                           billingManagedOrganizationsUrl,
+    UserEntity(@JsonProperty("active") boolean active,
+               @JsonProperty("admin") boolean admin,
                @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
+               @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
+               @JsonProperty("billing_managed_organizations_url") String
+                       billingManagedOrganizationsUrl,
+               @JsonProperty("default_space_guid") String defaultSpaceId,
+               @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
                @JsonProperty("managed_spaces_url") String managedSpacesUrl,
-               @JsonProperty("audited_spaces_url") String auditedSpacesUrl) {
-        this.admin = admin;
+               @JsonProperty("organizations_url") String organizationsUrl,
+               @JsonProperty("spaces_url") String spacesUrl,
+               @JsonProperty("username") String username) {
         this.active = active;
-        this.defaultSpaceId = defaultSpaceId;
-        this.username = username;
-        this.spacesUrl = spacesUrl;
-        this.organizationsUrl = organizationsUrl;
-        this.managedOrganizationsUrl = managedOrganizationsUrl;
-        this.billingManagedOrganizationsUrl = billingManagedOrganizationsUrl;
+        this.admin = admin;
         this.auditedOrganizationsUrl = auditedOrganizationsUrl;
-        this.managedSpacesUrl = managedSpacesUrl;
         this.auditedSpacesUrl = auditedSpacesUrl;
+        this.billingManagedOrganizationsUrl = billingManagedOrganizationsUrl;
+        this.defaultSpaceId = defaultSpaceId;
+        this.managedOrganizationsUrl = managedOrganizationsUrl;
+        this.managedSpacesUrl = managedSpacesUrl;
+        this.organizationsUrl = organizationsUrl;
+        this.spacesUrl = spacesUrl;
+        this.username = username;
     }
 
 }
