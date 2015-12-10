@@ -38,6 +38,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -52,6 +54,8 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.services.ServiceEntity;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
@@ -785,6 +789,60 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listManagers(request)).next().get();
+    }
+
+    @Test
+    public void listServices() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/services?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_services_response.json"));
+
+        ListOrganizationServicesRequest request = ListOrganizationServicesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationServicesResponse expected = ListOrganizationServicesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("5529fa75-d2f3-426c-b864-4ae45c3622da")
+                                .url("/v2/services/5529fa75-d2f3-426c-b864-4ae45c3622da")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(ServiceEntity.builder()
+                                .label("label-16")
+                                .description("desc-39")
+                                .active(true)
+                                .bindable(true)
+                                .uniqueId("4d4e8356-f753-433e-8514-88ee78c4e153")
+                                .serviceBrokerId("bf5b5cf7-acac-426b-8e79-cc57a227cd3c")
+                                .planUpdateable(false)
+                                .servicePlansUrl("/v2/services/5529fa75-d2f3-426c-b864-4ae45c3622da/service_plans")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationServicesResponse actual = Streams.wrap(this.organizations.listServices(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listServicesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/services?page=-1")
+                .errorResponse());
+
+        ListOrganizationServicesRequest request = ListOrganizationServicesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listServices(request)).next().get();
     }
 
     @Test
