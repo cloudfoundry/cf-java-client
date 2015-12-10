@@ -24,7 +24,7 @@ import org.reactivestreams.Publisher;
 public interface Organizations {
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_auditor_with_the_organization.html">Associate
      * Auditor with the Organization</a> request
      *
@@ -34,7 +34,7 @@ public interface Organizations {
     Publisher<AssociateAuditorResponse> associateAuditor(AssociateAuditorRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_billing_manager_with_the_organization.html">
      * Associate Billing Manager with the Organization</a> request
      *
@@ -44,7 +44,7 @@ public interface Organizations {
     Publisher<AssociateBillingManagerResponse> associateBillingManager(AssociateBillingManagerRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_manager_with_the_organization.html">Associate
      * Manager with the Organization</a> request
      *
@@ -54,7 +54,7 @@ public interface Organizations {
     Publisher<AssociateOrganizationManagerResponse> associateManager(AssociateOrganizationManagerRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
      * Private Domain with the Organization</a> request
      *
@@ -64,7 +64,7 @@ public interface Organizations {
     Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(AssociatePrivateDomainRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_user_with_the_organization.html">Associate
      * User with the Organization</a> request
      *
@@ -83,7 +83,7 @@ public interface Organizations {
     Publisher<CreateOrganizationResponse> create(CreateOrganizationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/delete_a_particular_organization.html">Delete
      * a Particular Organization</a> request
      *
@@ -102,7 +102,7 @@ public interface Organizations {
     Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_auditors_for_the_organization.html">List
      * all Auditors for the Organization</a> request
      *
@@ -112,7 +112,7 @@ public interface Organizations {
     Publisher<ListOrganizationAuditorsResponse> listAuditors(ListOrganizationAuditorsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_billing_managers_for_the_organization.html">List
      * all Billing Managers for the Organization</a> request
      *
@@ -123,7 +123,7 @@ public interface Organizations {
                                                                                    request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_managers_for_the_organization.html">List
      * all Managers for the Organization</a> request
      *
@@ -132,4 +132,12 @@ public interface Organizations {
      */
     Publisher<ListOrganizationManagersResponse> listManagers(ListOrganizationManagersRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/get_organization_summary.html">Get
+     * Organization summary</a> request
+     *
+     * @param request the Organization summary request
+     * @return the response from the Organization summary request
+     */
+    Publisher<SummaryOrganizationResponse> summary(SummaryOrganizationRequest request);
 }

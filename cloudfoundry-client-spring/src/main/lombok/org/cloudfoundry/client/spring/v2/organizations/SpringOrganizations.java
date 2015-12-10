@@ -42,6 +42,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -158,14 +160,12 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     @Override
     public Publisher<ListOrganizationsResponse> list(final ListOrganizationsRequest request) {
         return get(request, ListOrganizationsResponse.class, new Consumer<UriComponentsBuilder>() {
-
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
-
         });
     }
 
@@ -185,7 +185,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(final
-                                                                                      ListOrganizationBillingManagersRequest request) {
+                                                                                  ListOrganizationBillingManagersRequest request) {
         return get(request, ListOrganizationBillingManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -209,6 +209,16 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
                 QueryBuilder.augment(builder, request);
             }
 
+        });
+    }
+
+    @Override
+    public Publisher<SummaryOrganizationResponse> summary(final SummaryOrganizationRequest request) {
+        return get(request, SummaryOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "summary");
+            }
         });
     }
 

@@ -1,0 +1,15 @@
+{
+  "guid": "525a6450-9202-4ea1-beca-6fdda210710e",
+  "name": "name-357",
+  "status": "active",
+  "spaces": [
+    {
+      "guid": "dec1c7b0-8ea6-488a-9410-f73649d30228",
+      "name": "name-359",
+      "service_count": 0,
+      "app_count": 0,
+      "mem_dev_total": 0,
+      "mem_prod_total": 0
+    }
+  ]
+}

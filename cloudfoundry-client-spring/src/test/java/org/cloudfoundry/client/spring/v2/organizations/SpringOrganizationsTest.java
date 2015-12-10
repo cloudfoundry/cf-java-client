@@ -41,6 +41,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.junit.Test;
@@ -772,4 +775,55 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         Streams.wrap(this.organizations.listManagers(request)).next().get();
     }
 
+    @Test
+    public void summary() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/organizations/test-id/summary")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_summary_response.json"));
+
+        SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
+                .id("test-id")
+                .build();
+
+        SummaryOrganizationResponse expected = SummaryOrganizationResponse.builder()
+                .id("525a6450-9202-4ea1-beca-6fdda210710e")
+                .name("name-357")
+                .status("active")
+                .space(OrganizationSpaceSummary.builder()
+                        .id("dec1c7b0-8ea6-488a-9410-f73649d30228")
+                        .name("name-359")
+                        .serviceCount(0)
+                        .appCount(0)
+                        .memDevTotal(0)
+                        .memProdTotal(0)
+                        .build()
+                ).build();
+
+        SummaryOrganizationResponse actual = Streams.wrap(this.organizations.summary(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void summaryError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("/v2/organizations/test-id/summary")
+                .errorResponse());
+
+        SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.summary(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void summaryInvalidRequest() {
+        SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.summary(request)).next().get();
+    }
 }

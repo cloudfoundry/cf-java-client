@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateOrganizationRequestTest {
+public final class SummaryOrganizationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateOrganizationRequest.builder()
-                .name("test-name")
+        ValidationResult result = SummaryOrganizationRequest.builder()
+                .id("test-id")
                 .build()
                 .isValid();
 
@@ -36,13 +36,13 @@ public final class CreateOrganizationRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateOrganizationRequest.builder()
+    public void isValidNoId() {
+        ValidationResult result = SummaryOrganizationRequest.builder()
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
 }
