@@ -94,9 +94,10 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateBillingManagerResponse> associateBillingManager(final AssociateBillingManagerRequest
-                                                                                      request) {
+    public Publisher<AssociateBillingManagerResponse> associateBillingManager(
+            final AssociateBillingManagerRequest request) {
         return put(request, AssociateBillingManagerResponse.class, new Consumer<UriComponentsBuilder>() {
+
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
@@ -107,8 +108,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationManagerResponse> associateManager(final AssociateOrganizationManagerRequest
-                                                                                    request) {
+    public Publisher<AssociateOrganizationManagerResponse> associateManager(
+            final AssociateOrganizationManagerRequest request) {
         return put(request, AssociateOrganizationManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -120,8 +121,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(final AssociatePrivateDomainRequest
-                                                                                    request) {
+    public Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(
+            final AssociatePrivateDomainRequest request) {
         return put(request, AssociatePrivateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -336,10 +337,12 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     @Override
     public Publisher<SummaryOrganizationResponse> summary(final SummaryOrganizationRequest request) {
         return get(request, SummaryOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
+
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "summary");
             }
+
         });
     }
 
