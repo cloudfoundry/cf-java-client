@@ -358,7 +358,9 @@ public class CloudEntityResourceMapper {
         serviceInstance.setCredentials(getEntityAttribute(resource, "credentials", Map.class));
 
         Map<String, Object> servicePlanResource = getEmbeddedResource(resource, "service_plan");
-        serviceInstance.setServicePlan(mapServicePlanResource(servicePlanResource));
+        if (servicePlanResource != null) {
+            serviceInstance.setServicePlan(mapServicePlanResource(servicePlanResource));
+        }
 
         CloudService service = mapServiceResource(resource);
         serviceInstance.setService(service);
