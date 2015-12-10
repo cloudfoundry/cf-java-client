@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -1021,6 +1022,44 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.removeAuditor(request)).next().get();
+    }
+
+    @Test
+    public void removeBillingManager() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                .status(NO_CONTENT));
+
+        RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeBillingManager(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeBillingManagerError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                .errorResponse());
+
+        RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeBillingManager(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeBillingManagerInvalidRequest() {
+        RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.removeBillingManager(request)).next().get();
     }
 
     @Test
