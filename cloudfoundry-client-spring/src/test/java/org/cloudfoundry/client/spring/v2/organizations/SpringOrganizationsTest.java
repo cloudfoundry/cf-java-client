@@ -38,6 +38,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -54,6 +56,8 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -789,6 +793,66 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listManagers(request)).next().get();
+    }
+
+    @Test
+    public void listPrivateDomains() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/private_domains?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_private_domains_response.json"));
+
+        ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationPrivateDomainsResponse expected = ListOrganizationPrivateDomainsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(PrivateDomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("4625debe-c7ac-4d8e-84d2-448691c30ebc")
+                                .url("/v2/private_domains/4625debe-c7ac-4d8e-84d2-448691c30ebc")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(PrivateDomainEntity.builder()
+                                .name("domain-2.example.com")
+                                .owningOrganizationId("09beeba3-f2ed-4e45-90f9-fc2119e02e9e")
+                                .owningOrganizationUrl("/v2/organizations/09beeba3-f2ed-4e45-90f9-fc2119e02e9e")
+                                .sharedOrganizationsUrl
+                                        ("/v2/private_domains/4625debe-c7ac-4d8e-84d2-448691c30ebc/shared_organizations")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationPrivateDomainsResponse actual = Streams.wrap(this.organizations.listPrivateDomains(request))
+                .next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listPrivateDomainsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/private_domains?page=-1")
+                .errorResponse());
+
+        ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listPrivateDomains(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listPrivateDomainsInvalidRequest() {
+        ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listPrivateDomains(request)).next().get();
     }
 
     @Test
