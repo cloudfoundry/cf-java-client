@@ -143,6 +143,16 @@ public interface Organizations {
     Publisher<ListOrganizationSpacesResponse> listSpaces(ListOrganizationSpacesRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_users_for_the_organization.html">List
+     * all Users for the Organization</a> request
+     *
+     * @param request the List all Users for the Organization request
+     * @return the response from the List all Users for the Organization request
+     */
+    Publisher<ListOrganizationUsersResponse> listUsers(ListOrganizationUsersRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/get_organization_summary.html">Get
      * Organization summary</a> request
      *
