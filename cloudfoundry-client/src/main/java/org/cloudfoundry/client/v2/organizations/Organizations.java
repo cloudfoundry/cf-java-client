@@ -55,6 +55,16 @@ public interface Organizations {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
+     * Private Domain with the Organization</a> request
+     *
+     * @param request the Associate Private Domain with the Organization request
+     * @return the response from the Associate Private Domain with the Organization request
+     */
+    Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(AssociatePrivateDomainRequest request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_user_with_the_organization.html">Associate
      * User with the Organization</a> request
      *
@@ -74,13 +84,13 @@ public interface Organizations {
 
     /**
      * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
-     * Private Domain with the Organization</a> request
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/delete_a_particular_organization.html">Delete
+     * a Particular Organization</a> request
      *
-     * @param request the Associate Private Domain with the Organization request
-     * @return the response from the Associate Private Domain with the Organization request
+     * @param request the Delete a Particular Organization request
+     * @return the response from the Delete a Particular Organization request
      */
-    Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(AssociatePrivateDomainRequest request);
+    Publisher<Void> delete(DeleteOrganizationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
