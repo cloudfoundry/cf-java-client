@@ -112,11 +112,14 @@ public final class ListOrganizationBillingManagersRequest extends PaginatedReque
 
     @Builder
     ListOrganizationBillingManagersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                           @Singular List<String> auditedOrganizationIds, @Singular List<String>
-                                                   auditedSpaceIds, @Singular List<String>
-                                                   billingManagedOrganizationIds, String id, @Singular List<String>
-                                                   managedOrganizationIds, @Singular List<String> managedSpaceIds,
-                                           @Singular List<String> organizationIds, @Singular List<String> spaceIds) {
+                                           @Singular List<String> auditedOrganizationIds,
+                                           @Singular List<String> auditedSpaceIds,
+                                           @Singular List<String> billingManagedOrganizationIds,
+                                           String id,
+                                           @Singular List<String> managedOrganizationIds,
+                                           @Singular List<String> managedSpaceIds,
+                                           @Singular List<String> organizationIds,
+                                           @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.auditedOrganizationIds = auditedOrganizationIds;

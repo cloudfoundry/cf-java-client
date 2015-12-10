@@ -52,8 +52,12 @@ public final class StagePackageRequest implements Validatable {
     private final String stack;
 
     @Builder
-    StagePackageRequest(String buildpack, Integer diskLimit, @Singular Map<String, Object> environmentVariables,
-                        String id, Integer memoryLimit, String stack) {
+    StagePackageRequest(String buildpack,
+                        Integer diskLimit,
+                        @Singular Map<String, Object> environmentVariables,
+                        String id,
+                        Integer memoryLimit,
+                        String stack) {
         this.buildpack = buildpack;
         this.diskLimit = diskLimit;
         this.environmentVariables = environmentVariables;

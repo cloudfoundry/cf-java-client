@@ -94,8 +94,11 @@ public final class ListSpaceApplicationsRequest extends PaginatedRequest impleme
 
     @Builder
     ListSpaceApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                 @Singular List<Boolean> diegos, String id, @Singular List<String> names,
-                                 @Singular List<String> organizationIds, @Singular List<String> spaceIds,
+                                 @Singular List<Boolean> diegos,
+                                 String id,
+                                 @Singular List<String> names,
+                                 @Singular List<String> organizationIds,
+                                 @Singular List<String> spaceIds,
                                  @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
         this.diegos = diegos;

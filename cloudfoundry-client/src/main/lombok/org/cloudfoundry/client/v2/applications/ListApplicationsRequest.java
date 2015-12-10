@@ -84,8 +84,10 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
 
     @Builder
     ListApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                            @Singular List<Boolean> diegos, @Singular List<String> names,
-                            @Singular List<String> organizationIds, @Singular List<String> spaceIds,
+                            @Singular List<Boolean> diegos,
+                            @Singular List<String> names,
+                            @Singular List<String> organizationIds,
+                            @Singular List<String> spaceIds,
                             @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
 

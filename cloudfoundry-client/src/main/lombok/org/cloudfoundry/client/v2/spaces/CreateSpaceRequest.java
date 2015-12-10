@@ -117,9 +117,15 @@ public final class CreateSpaceRequest implements Validatable {
     private final String spaceQuotaDefinitionId;
 
     @Builder
-    CreateSpaceRequest(Boolean allowSsh, @Singular List<String> auditorIds, @Singular List<String> developerIds,
-                       @Singular List<String> domainIds, @Singular List<String> managerIds, String name,
-                       String organizationId, @Singular List<String> securityGroupIds, String spaceQuotaDefinitionId) {
+    CreateSpaceRequest(Boolean allowSsh,
+                       @Singular List<String> auditorIds,
+                       @Singular List<String> developerIds,
+                       @Singular List<String> domainIds,
+                       @Singular List<String> managerIds,
+                       String name,
+                       String organizationId,
+                       @Singular List<String> securityGroupIds,
+                       String spaceQuotaDefinitionId) {
         this.allowSsh = allowSsh;
         this.auditorIds = auditorIds;
         this.developerIds = developerIds;

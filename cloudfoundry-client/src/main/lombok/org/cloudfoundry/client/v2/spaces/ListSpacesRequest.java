@@ -75,8 +75,10 @@ public final class ListSpacesRequest extends PaginatedRequest implements Validat
 
     @Builder
     ListSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                      @Singular List<String> applicationIds, @Singular List<String> developerIds,
-                      @Singular List<String> names, @Singular List<String> organizationIds) {
+                      @Singular List<String> applicationIds,
+                      @Singular List<String> developerIds,
+                      @Singular List<String> names,
+                      @Singular List<String> organizationIds) {
         super(orderDirection, page, resultsPerPage);
         this.applicationIds = applicationIds;
         this.developerIds = developerIds;

@@ -48,15 +48,6 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     private final List<String> domainIds;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The hosts
      *
      * @param hosts the hosts
@@ -64,6 +55,15 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
      */
     @Getter(onMethod = @__(@FilterParameter("host")))
     private final List<String> hosts;
+
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String id;
 
     /**
      * The organization ids
@@ -84,9 +84,7 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     private final List<String> paths;
 
     @Builder
-    ListApplicationRoutesRequest(OrderDirection orderDirection,
-                                 Integer page,
-                                 Integer resultsPerPage,
+    ListApplicationRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                  @Singular List<String> domainIds,
                                  String id,
                                  @Singular List<String> hosts,

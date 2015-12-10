@@ -84,9 +84,12 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
     private final List<String> organizationIds;
 
     @Builder
-    ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, @Singular
-    List<String> appIds, @Singular List<String> developerIds, String id, @Singular List<String> names, @Singular
-    List<String> organizationIds) {
+    ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                                  @Singular List<String> appIds,
+                                  @Singular List<String> developerIds,
+                                  String id,
+                                  @Singular List<String> names,
+                                  @Singular List<String> organizationIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.appIds = appIds;
