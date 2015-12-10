@@ -37,7 +37,7 @@ public final class ServiceEntity {
      * @param active service can be provisioned
      * @return active status
      */
-    private final boolean active;
+    private final Boolean active;
 
     /**
      * The bindable status
@@ -45,7 +45,7 @@ public final class ServiceEntity {
      * @param bindable the service can be bound
      * @return bindable status
      */
-    private final boolean bindable;
+    private final Boolean bindable;
 
     /**
      * The description
@@ -104,7 +104,7 @@ public final class ServiceEntity {
      * @param planUpdateable the plan updateable status
      * @return the plan updateable status
      */
-    private final boolean planUpdateable;
+    private final Boolean planUpdateable;
 
     /**
      * The name of the service provider
@@ -174,15 +174,15 @@ public final class ServiceEntity {
     private final String version;
 
     @Builder
-    ServiceEntity(@JsonProperty("active") boolean active,
-                  @JsonProperty("bindable") boolean bindable,
+    ServiceEntity(@JsonProperty("active") Boolean active,
+                  @JsonProperty("bindable") Boolean bindable,
                   @JsonProperty("description") String description,
                   @JsonProperty("documentation_url") @Deprecated String documentationUrl,
                   @JsonProperty("extra") String extra,
                   @JsonProperty("info_url") @Deprecated String infoUrl,
                   @JsonProperty("label") String label,
                   @JsonProperty("long_description") @Deprecated String longDescription,
-                  @JsonProperty("plan_updateable") boolean planUpdateable,
+                  @JsonProperty("plan_updateable") Boolean planUpdateable,
                   @JsonProperty("provider") @Deprecated String provider,
                   @JsonProperty("requires") @Singular List<String> requires,
                   @JsonProperty("service_broker_guid") String serviceBrokerId,
