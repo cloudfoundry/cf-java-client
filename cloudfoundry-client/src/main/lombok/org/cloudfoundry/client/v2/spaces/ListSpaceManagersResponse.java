@@ -24,6 +24,7 @@ import lombok.Singular;
 import lombok.ToString;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.users.UserResource;
 
 import java.util.List;
 
@@ -33,12 +34,12 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceManagersResponse extends PaginatedResponse<ListSpaceMembersResource> {
+public final class ListSpaceManagersResponse extends PaginatedResponse<UserResource> {
 
     @Builder
     ListSpaceManagersResponse(@JsonProperty("next_url") String nextUrl,
                               @JsonProperty("prev_url") String previousUrl,
-                              @JsonProperty("resources") @Singular List<ListSpaceMembersResource> resources,
+                              @JsonProperty("resources") @Singular List<UserResource> resources,
                               @JsonProperty("total_pages") Integer totalPages,
                               @JsonProperty("total_results") Integer totalResults) {
 

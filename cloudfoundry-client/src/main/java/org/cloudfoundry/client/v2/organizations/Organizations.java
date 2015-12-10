@@ -100,4 +100,15 @@ public interface Organizations {
      * @return the response from the List Organizations request
      */
     Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_auditors_for_the_organization.html">List
+     * all Auditors for the Organization</a> request
+     *
+     * @param request the List all Auditors for the Organization request
+     * @return the response from the List all Auditors for the Organization request
+     */
+    Publisher<ListOrganizationAuditorsResponse> listAuditors(ListOrganizationAuditorsRequest request);
+
 }

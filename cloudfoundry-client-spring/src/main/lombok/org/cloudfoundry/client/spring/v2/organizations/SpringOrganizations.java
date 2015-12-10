@@ -33,6 +33,8 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -123,7 +125,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
         });
     }
-    
+
     @Override
     public Publisher<CreateOrganizationResponse> create(final CreateOrganizationRequest request) {
         return post(request, CreateOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
@@ -156,6 +158,20 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListOrganizationAuditorsResponse> listAuditors(final ListOrganizationAuditorsRequest request) {
+        return get(request, ListOrganizationAuditorsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "auditors");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }

@@ -59,7 +59,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
-import org.cloudfoundry.client.v2.spaces.ListSpaceMembersResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
@@ -83,6 +82,8 @@ import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.UserRoleEntity;
 import org.cloudfoundry.client.v2.spaces.UserRoleResource;
+import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.client.v2.users.UserEntity;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -758,13 +759,13 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceAuditorsResponse expected = ListSpaceAuditorsResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpaceMembersResource.builder()
+                .resource(UserResource.builder()
                         .metadata(Metadata.builder()
                                 .id("uaa-id-15")
                                 .url("/v2/users/uaa-id-15")
                                 .createdAt("2015-07-27T22:43:07Z")
                                 .build())
-                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
+                        .entity(UserEntity.builder()
                                 .admin(false)
                                 .active(false)
                                 .defaultSpaceId(null)
@@ -823,13 +824,13 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceDevelopersResponse expected = ListSpaceDevelopersResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpaceMembersResource.builder()
+                .resource(UserResource.builder()
                         .metadata(Metadata.builder()
                                 .id("uaa-id-24")
                                 .url("/v2/users/uaa-id-24")
                                 .createdAt("2015-07-27T22:43:07Z")
                                 .build())
-                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
+                        .entity(UserEntity.builder()
                                 .admin(false)
                                 .active(false)
                                 .defaultSpaceId(null)
@@ -970,13 +971,13 @@ public final class SpringSpacesTest extends AbstractRestTest {
         ListSpaceManagersResponse expected = ListSpaceManagersResponse.builder()
                 .totalResults(1)
                 .totalPages(1)
-                .resource(ListSpaceMembersResource.builder()
+                .resource(UserResource.builder()
                         .metadata(Metadata.builder()
                                 .id("uaa-id-35")
                                 .url("/v2/users/uaa-id-35")
                                 .createdAt("2015-07-27T22:43:07Z")
                                 .build())
-                        .entity(ListSpaceMembersResource.ListSpaceMembersResourceEntity.builder()
+                        .entity(UserEntity.builder()
                                 .admin(false)
                                 .active(false)
                                 .defaultSpaceId(null)
