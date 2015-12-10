@@ -39,15 +39,6 @@ import java.util.List;
 public final class ListApplicationServiceBindingsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The ids of the service instances
-     *
-     * @param serviceInstanceIds the ids of the service instances to filter on
-     * @return the ids of the service instances to filter on
-     */
-    @Getter(onMethod = @__(@FilterParameter("service_instance_guid")))
-    private final List<String> serviceInstanceIds;
-
-    /**
      * The id of the App
      *
      * @param id the id of the App
@@ -56,10 +47,17 @@ public final class ListApplicationServiceBindingsRequest extends PaginatedReques
     @Getter(onMethod = @__(@JsonIgnore))
     private final String id;
 
+    /**
+     * The ids of the service instances
+     *
+     * @param serviceInstanceIds the ids of the service instances to filter on
+     * @return the ids of the service instances to filter on
+     */
+    @Getter(onMethod = @__(@FilterParameter("service_instance_guid")))
+    private final List<String> serviceInstanceIds;
+
     @Builder
-    ListApplicationServiceBindingsRequest(OrderDirection orderDirection,
-                                          Integer page,
-                                          Integer resultsPerPage,
+    ListApplicationServiceBindingsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                           @Singular List<String> serviceInstanceIds,
                                           String id) {
         super(orderDirection, page, resultsPerPage);

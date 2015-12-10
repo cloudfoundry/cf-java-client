@@ -102,9 +102,12 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
 
     @Builder
     ListOrganizationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                             @Singular List<String> auditorIds, @Singular List<String> billingManagerIds,
-                             @Singular List<String> managerIds, @Singular List<String> names,
-                             @Singular List<String> spaceIds, @Singular List<String> statuses,
+                             @Singular List<String> auditorIds,
+                             @Singular List<String> billingManagerIds,
+                             @Singular List<String> managerIds,
+                             @Singular List<String> names,
+                             @Singular List<String> spaceIds,
+                             @Singular List<String> statuses,
                              @Singular List<String> userIds) {
         super(orderDirection, page, resultsPerPage);
         this.auditorIds = auditorIds;

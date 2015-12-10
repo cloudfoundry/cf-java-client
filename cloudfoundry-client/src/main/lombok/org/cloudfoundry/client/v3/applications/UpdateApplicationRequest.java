@@ -70,7 +70,9 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String name;
 
     @Builder
-    UpdateApplicationRequest(String buildpack, @Singular Map<String, String> environmentVariables, String id,
+    UpdateApplicationRequest(String buildpack,
+                             @Singular Map<String, String> environmentVariables,
+                             String id,
                              String name) {
         this.buildpack = buildpack;
         this.environmentVariables = environmentVariables;

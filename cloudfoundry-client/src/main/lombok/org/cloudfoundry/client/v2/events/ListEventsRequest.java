@@ -67,7 +67,9 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
 
     @Builder
     ListEventsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                      @Singular List<String> actees, @Singular List<String> timestamps, @Singular List<String> types) {
+                      @Singular List<String> actees,
+                      @Singular List<String> timestamps,
+                      @Singular List<String> types) {
         super(orderDirection, page, resultsPerPage);
         this.actees = actees;
         this.timestamps = timestamps;

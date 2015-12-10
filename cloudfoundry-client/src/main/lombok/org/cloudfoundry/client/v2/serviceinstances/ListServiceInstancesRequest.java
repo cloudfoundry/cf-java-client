@@ -102,9 +102,12 @@ public final class ListServiceInstancesRequest extends PaginatedRequest implemen
 
     @Builder
     ListServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                @Singular List<String> gatewayNames, @Singular List<String> names,
-                                @Singular List<String> organizationIds, @Singular List<String> serviceBindingIds,
-                                @Singular List<String> serviceKeyIds, @Singular List<String> servicePlanIds,
+                                @Singular List<String> gatewayNames,
+                                @Singular List<String> names,
+                                @Singular List<String> organizationIds,
+                                @Singular List<String> serviceBindingIds,
+                                @Singular List<String> serviceKeyIds,
+                                @Singular List<String> servicePlanIds,
                                 @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.gatewayNames = gatewayNames;

@@ -111,11 +111,15 @@ public final class ListOrganizationUsersRequest extends PaginatedRequest impleme
     private final List<String> spaceIds;
 
     @Builder
-    ListOrganizationUsersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, @Singular
-    List<String> auditedOrganizationIds, @Singular List<String> auditedSpaceIds, @Singular List<String>
-                                         billingManagedOrganizationIds, String id, @Singular List<String>
-                                         managedOrganizationIds, @Singular
-                                 List<String> managedSpaceIds, @Singular List<String> organizationIds, @Singular
+    ListOrganizationUsersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                                 @Singular List<String> auditedOrganizationIds,
+                                 @Singular List<String> auditedSpaceIds,
+                                 @Singular List<String> billingManagedOrganizationIds,
+                                 String id,
+                                 @Singular List<String> managedOrganizationIds,
+                                 @Singular List<String> managedSpaceIds,
+                                 @Singular List<String> organizationIds,
+                                 @Singular
                                  List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
 

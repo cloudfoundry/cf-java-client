@@ -69,7 +69,9 @@ public final class CreateApplicationRequest implements Validatable {
     private final String spaceId;
 
     @Builder
-    CreateApplicationRequest(String buildpack, @Singular Map<String, String> environmentVariables, String name,
+    CreateApplicationRequest(String buildpack,
+                             @Singular Map<String, String> environmentVariables,
+                             String name,
                              String spaceId) {
         this.buildpack = buildpack;
         this.environmentVariables = environmentVariables;
