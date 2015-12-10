@@ -39,6 +39,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -205,6 +207,20 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "managers");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListOrganizationSpacesResponse> listSpaces(final ListOrganizationSpacesRequest request) {
+        return get(request, ListOrganizationSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "spaces");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }

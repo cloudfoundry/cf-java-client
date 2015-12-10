@@ -38,12 +38,16 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.junit.Test;
@@ -773,6 +777,76 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listManagers(request)).next().get();
+    }
+    
+    @Test
+    public void listSpaces() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/spaces?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_spaces_response.json"));
+
+        ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationSpacesResponse expected = ListOrganizationSpacesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("9f6ce6e0-e3db-42ae-9572-bbc38f4f541b")
+                                .url("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(SpaceEntity.builder()
+                                .name("name-215")
+                                .organizationId("4df92169-5b8d-489b-ba0f-7114168aa476")
+                                .spaceQuotaDefinitionId(null)
+                                .allowSsh(true)
+                                .organizationUrl("/v2/organizations/4df92169-5b8d-489b-ba0f-7114168aa476")
+                                .developersUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/developers")
+                                .managersUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/managers")
+                                .auditorsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/auditors")
+                                .applicationsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/apps")
+                                .routesUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/routes")
+                                .domainsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/domains")
+                                .serviceInstancesUrl
+                                        ("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/service_instances")
+                                .applicationEventsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/app_events")
+                                .eventsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/events")
+                                .securityGroupsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/security_groups")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationSpacesResponse actual = Streams.wrap(this.organizations.listSpaces(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listSpacesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/spaces?page=-1")
+                .errorResponse());
+
+        ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listSpaces(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listSpacesInvalidRequest() {
+        ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listSpaces(request)).next().get();
     }
 
     @Test
