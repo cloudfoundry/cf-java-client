@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
@@ -616,6 +618,90 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.listAuditors(request)).next().get();
+    }
+
+    @Test
+    public void listManagers() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/managers?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_managers_response.json"));
+
+        ListOrganizationManagersRequest request = ListOrganizationManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListOrganizationManagersResponse expected = ListOrganizationManagersResponse.builder()
+                .totalResults(2)
+                .totalPages(1)
+                .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-99")
+                                .url("/v2/users/uaa-id-99")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(UserEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("manager@example.com")
+                                .spacesUrl("/v2/users/uaa-id-99/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-99/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-99/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-99/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-99/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-99/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-99/audited_spaces")
+                                .build())
+                        .build())
+                .resource(UserResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-100")
+                                .url("/v2/users/uaa-id-100")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(UserEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .spacesUrl("/v2/users/uaa-id-100/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-100/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-100/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-100/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-100/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-100/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-100/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        ListOrganizationManagersResponse actual = Streams.wrap(this.organizations.listManagers(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listManagersError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/managers?page=-1")
+                .errorResponse());
+
+        ListOrganizationManagersRequest request = ListOrganizationManagersRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.listManagers(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listManagersInvalidRequest() {
+        ListOrganizationManagersRequest request = ListOrganizationManagersRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.listManagers(request)).next().get();
     }
 
 }
