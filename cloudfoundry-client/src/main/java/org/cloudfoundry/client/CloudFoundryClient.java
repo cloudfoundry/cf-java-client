@@ -17,6 +17,7 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -46,16 +47,23 @@ public interface CloudFoundryClient {
     ApplicationsV3 applicationsV3();
 
     /**
-     * Main entry point to the Cloud Foundry Applications Droplets API
+     * Main entry point to the Cloud Foundry Droplets Client API
      *
-     * @return the Cloud Foundry Application Droplets API
+     * @return the Cloud Foundry Droplets Client API
+     */
+    Domains domains();
+
+    /**
+     * Main entry point to the Cloud Foundry Droplets Client API
+     *
+     * @return the Cloud Foundry Application Droplets Client API
      */
     Droplets droplets();
 
     /**
-     * Main entry point to the Cloud Foundry Applications Events API
+     * Main entry point to the Cloud Foundry Events Client API
      *
-     * @return the Cloud Foundry Application Events API
+     * @return the Cloud Foundry Application Events Client API
      */
     Events events();
 

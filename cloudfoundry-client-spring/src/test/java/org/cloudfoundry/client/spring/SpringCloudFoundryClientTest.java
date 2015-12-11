@@ -71,6 +71,20 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void builderNullSkipSslVerification() throws GeneralSecurityException, IOException {
+        mockRequest(new RequestContext()
+                .method(GET).path("/info")
+                .status(OK)
+                .responsePayload("info_GET_response.json"));
+
+        new SpringCloudFoundryClient("api.run.pivotal.io", null, "test-client-id", "test-client-secret",
+                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster);
+
+        verifyZeroInteractions(this.sslCertificateTruster);
+        verify();
+    }
+
+    @Test
     public void builderSkipSslVerification() throws GeneralSecurityException, IOException {
         mockRequest(new RequestContext()
                 .method(GET).path("/info")
@@ -85,17 +99,8 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void builderNullSkipSslVerification() throws GeneralSecurityException, IOException {
-        mockRequest(new RequestContext()
-                .method(GET).path("/info")
-                .status(OK)
-                .responsePayload("info_GET_response.json"));
-
-        new SpringCloudFoundryClient("api.run.pivotal.io", null, "test-client-id", "test-client-secret",
-                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster);
-
-        verifyZeroInteractions(this.sslCertificateTruster);
-        verify();
+    public void domains() {
+        assertNotNull(this.client.domains());
     }
 
     @Test
