@@ -57,6 +57,8 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManager
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -341,6 +343,18 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "summary");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<UpdateOrganizationResponse> update(final UpdateOrganizationRequest request) {
+        return put(request, UpdateOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId());
             }
 
         });

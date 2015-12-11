@@ -57,6 +57,8 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManager
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -1274,4 +1276,75 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
 
         Streams.wrap(this.organizations.summary(request)).next().get();
     }
+
+    @Test
+    public void update() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id")
+                .requestPayload("v2/organizations/PUT_{id}_request.json")
+                .status(OK)
+                .responsePayload("v2/organizations/PUT_{id}_response.json"));
+
+        UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
+                .id("test-id")
+                .name("New Organization Name")
+                .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
+                .build();
+
+        UpdateOrganizationResponse expected = UpdateOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("31a539be-dbfd-4db6-aec1-6565ebe975ed")
+                        .url("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed")
+                        .createdAt("2015-07-27T22:43:11Z")
+                        .updatedAt("2015-07-27T22:43:11Z")
+                        .build())
+                .entity(OrganizationEntity.builder()
+                        .name("New Organization Name")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/7df44b58-1834-486f-aed8-d5d97126e603")
+                        .spacesUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/spaces")
+                        .domainsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/domains")
+                        .privateDomainsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/private_domains")
+                        .usersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/users")
+                        .managersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/managers")
+                        .billingManagersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/billing_managers")
+                        .auditorsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/auditors")
+                        .applicationEventsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/space_quota_definitions")
+                        .build())
+                .build();
+
+        UpdateOrganizationResponse actual = Streams.wrap(this.organizations.update(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void updateError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/organizations/test-id")
+                .requestPayload("v2/organizations/PUT_{id}_request.json")
+                .errorResponse());
+
+        UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
+                .id("test-id")
+                .name("New Organization Name")
+                .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
+                .build();
+
+        Streams.wrap(this.organizations.update(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void updateInvalidRequest() {
+        UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.update(request)).next().get();
+    }
+
 }
