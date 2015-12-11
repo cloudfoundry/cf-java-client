@@ -18,6 +18,7 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
+import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -36,7 +37,12 @@ public abstract class AbstractOperationsTest {
 
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class);
 
+    protected final Domains domains = mock(Domains.class);
+
     protected final Organizations organizations = mock(Organizations.class);
+
+    protected final org.cloudfoundry.client.v2.routes.Routes routes = mock(org.cloudfoundry.client.v2.routes.Routes
+            .class);
 
     protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class);
 
@@ -45,7 +51,9 @@ public abstract class AbstractOperationsTest {
     @Before
     public void mockClient() throws Exception {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
+        when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
+        when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
     }

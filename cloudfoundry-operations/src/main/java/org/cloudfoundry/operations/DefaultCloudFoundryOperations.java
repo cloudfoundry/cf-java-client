@@ -26,11 +26,14 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     
     private final SpaceQuotas spaceQuotas;
 
+    private final Routes routes;
+
     private final Spaces spaces;
 
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
+        this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
         this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
     }
@@ -43,6 +46,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Organizations organizations() {
         return this.organizations;
+    }
+
+    @Override
+    public Routes routes() {
+        return this.routes;
     }
 
     @Override

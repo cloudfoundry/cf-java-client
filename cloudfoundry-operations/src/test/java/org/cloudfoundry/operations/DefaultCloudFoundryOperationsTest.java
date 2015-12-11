@@ -36,6 +36,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
+    public void routes() {
+        assertNotNull(this.operations.routes());
+    }
+
+    @Test
     public void spaces() {
         assertNotNull(this.operations.spaces());
     }
