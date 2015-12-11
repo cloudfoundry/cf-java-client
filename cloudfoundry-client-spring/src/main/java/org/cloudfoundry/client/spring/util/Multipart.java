@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring.util;
 
 import org.reactivestreams.Subscriber;
-import reactor.Publishers;
 import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -39,14 +38,12 @@ public final class Multipart {
     private static final String DASHES = "--";
 
     public static Stream<byte[]> from(final InputStream inputStream, final String boundary) {
-        return Streams.wrap(Publishers.create(new Consumer<SubscriberWithContext<byte[], Void>>() {
+        return Streams.create(new Consumer<SubscriberWithContext<byte[], Void>>() {
 
             @Override
             public void accept(SubscriberWithContext<byte[], Void> subscriber) {
-                byte[] part = new byte[0];
-
                 try {
-                    part = getPart(inputStream, boundary);
+                    byte[] part = getPart(inputStream, boundary);
 
                     if (part == null) {
                         subscriber.onComplete();
@@ -71,7 +68,7 @@ public final class Multipart {
                 return null;
             }
 
-        }));
+        });
     }
 
     private static void discardHeader(InputStream in) throws IOException {

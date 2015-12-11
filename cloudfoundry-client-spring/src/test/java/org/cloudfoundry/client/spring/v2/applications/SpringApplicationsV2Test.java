@@ -1257,6 +1257,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void uploadAsync() throws IOException {
         mockRequest(new RequestContext()
                 .method(PUT).path("/v2/apps/test-id/bits")
@@ -1299,6 +1300,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     }
 
     @Test(expected = CloudFoundryException.class)
+    @SuppressWarnings("unchecked")
     public void uploadError() throws IOException {
         mockRequest(new RequestContext()
                 .method(PUT).path("/v2/apps/test-id/bits")
@@ -1323,6 +1325,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void uploadSync() throws IOException {
         mockRequest(new RequestContext()
                 .method(PUT).path("/v2/apps/test-id/bits")

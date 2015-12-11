@@ -27,6 +27,8 @@ import java.util.Map;
  */
 public final class StringMap extends HashMap<String, Object> {
 
+    private static final long serialVersionUID = -776863221302025181L;
+
     @Builder
     StringMap(@Singular Map<String, Object> entries) {
         super(entries);

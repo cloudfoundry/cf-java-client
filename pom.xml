@@ -60,6 +60,13 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.3</version>
                     <configuration>
+                        <compilerArgs>
+                            <arg>-Werror</arg>
+                            <arg>-Xlint:all</arg>
+                            <arg>-Xlint:-options</arg>
+                            <arg>-Xlint:-processing</arg>
+                        </compilerArgs>
+                        <showWarnings>true</showWarnings>
                         <source>1.7</source>
                         <target>1.7</target>
                     </configuration>

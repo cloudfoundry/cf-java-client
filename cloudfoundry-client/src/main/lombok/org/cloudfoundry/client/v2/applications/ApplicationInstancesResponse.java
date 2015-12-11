@@ -33,6 +33,8 @@ import java.util.Map;
 @ToString(callSuper = true)
 public final class ApplicationInstancesResponse extends HashMap<String, ApplicationInstanceInfo> {
 
+    private static final long serialVersionUID = 7561486569934101780L;
+
     ApplicationInstancesResponse() {
         super();
     }

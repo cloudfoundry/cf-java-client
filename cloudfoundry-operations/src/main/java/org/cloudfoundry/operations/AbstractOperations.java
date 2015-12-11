@@ -26,7 +26,7 @@ import reactor.rx.Streams;
 
 abstract class AbstractOperations {
 
-    protected final <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
+    protected final <T extends PaginatedRequest, U extends PaginatedResponse<?>> Stream<U> paginate(
             final Function<Integer, T> requestProvider, final Function<T, Publisher<U>> operationExecutor) {
 
         return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))

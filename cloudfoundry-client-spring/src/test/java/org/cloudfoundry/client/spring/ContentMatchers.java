@@ -38,8 +38,8 @@ public final class ContentMatchers {
             public void match(ClientHttpRequest request) throws IOException, AssertionError {
                 MockClientHttpRequest mockRequest = (MockClientHttpRequest) request;
 
-                Map expected = OBJECT_MAPPER.readValue(resource.getInputStream(), Map.class);
-                Map actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
+                Map<?,?> expected = OBJECT_MAPPER.readValue(resource.getInputStream(), Map.class);
+                Map<?,?> actual = OBJECT_MAPPER.readValue(mockRequest.getBodyAsBytes(), Map.class);
 
                 assertEquals(expected, actual);
             }
