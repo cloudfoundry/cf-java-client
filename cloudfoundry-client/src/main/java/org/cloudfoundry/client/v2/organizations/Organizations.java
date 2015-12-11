@@ -129,8 +129,8 @@ public interface Organizations {
      * @param request the List all Billing Managers for the Organization request
      * @return the response from the List all Billing Managers for the Organization request
      */
-    Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(ListOrganizationBillingManagersRequest
-                                                                                   request);
+    Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(
+            ListOrganizationBillingManagersRequest request);
 
     /**
      * Makes the
@@ -162,14 +162,15 @@ public interface Organizations {
     Publisher<ListOrganizationServicesResponse> listServices(ListOrganizationServicesRequest request);
 
     /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_space_quota_definitions_for_the_organization.html">List
      * all Space Quota Definitions for the Organization</a> request
      *
      * @param request the List all Space Quota Definitions for the Organization request
      * @return the response from the List all Space Quota Definitions for the Organization request
      */
-    Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>
-    listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest request);
+    Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(
+            ListOrganizationSpaceQuotaDefinitionsRequest request);
 
     /**
      * Makes the
