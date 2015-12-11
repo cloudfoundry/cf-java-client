@@ -38,6 +38,12 @@ import java.util.List;
 @ToString(callSuper = true)
 public final class ListOrganizationServicesRequest extends PaginatedRequest implements Validatable {
 
+    /**
+     * The actives
+     *
+     * @param actives the actives
+     * @return the actives
+     */
     @Getter(onMethod = @__(@FilterParameter("active")))
     private final List<Boolean> actives;
 
@@ -50,12 +56,30 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
     @Getter(onMethod = @__(@JsonIgnore))
     private final String id;
 
+    /**
+     * The labels
+     *
+     * @param labels the labels
+     * @return the labels
+     */
     @Getter(onMethod = @__(@FilterParameter("label")))
     private final List<String> labels;
 
+    /**
+     * The providers
+     *
+     * @param providers the providers
+     * @return the providers
+     */
     @Getter(onMethod = @__(@FilterParameter("provider")))
     private final List<String> providers;
 
+    /**
+     * The service broker ids
+     *
+     * @param serviceBrokerIds the service broker ids
+     * @return the service broker ids
+     */
     @Getter(onMethod = @__(@FilterParameter("service_broker_guid")))
     private final List<String> serviceBrokerIds;
 
