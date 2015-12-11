@@ -93,6 +93,16 @@ public interface Organizations {
     Publisher<Void> delete(DeleteOrganizationRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_the_roles_of_all_users_in_the_organization.html">Retrieving
+     * the roles of all Users in the Organization</a> request
+     *
+     * @param request the Retrieving the roles of all Users in the Organization request
+     * @return the response from the Retrieving the roles of all Users in the Organization request
+     */
+    Publisher<GetOrganizationUserRolesResponse> getUserRoles(GetOrganizationUserRolesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_organizations.html">List
      * Organizations</a> request
      *

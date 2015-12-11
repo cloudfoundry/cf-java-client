@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
@@ -59,6 +61,8 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.UserOrganizationRoleEntity;
+import org.cloudfoundry.client.v2.organizations.UserOrganizationRoleResource;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -517,6 +521,76 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.delete(request)).next().get();
+    }
+
+    @Test
+    public void getUserRoles() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/user_roles?page=-1")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_user_roles_response.json"));
+
+        GetOrganizationUserRolesRequest request = GetOrganizationUserRolesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        GetOrganizationUserRolesResponse expected = GetOrganizationUserRolesResponse.builder()
+                .totalResults(2)
+                .totalPages(2)
+                .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc&page=2&results-per-page=1")
+                .resource(UserOrganizationRoleResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("uaa-id-92")
+                                .url("/v2/users/uaa-id-92")
+                                .createdAt("2015-07-27T22:43:10Z")
+                                .build())
+                        .entity(UserOrganizationRoleEntity.builder()
+                                .admin(false)
+                                .active(false)
+                                .defaultSpaceId(null)
+                                .username("everything@example.com")
+                                .organizationRole("org_user")
+                                .organizationRole("org_manager")
+                                .organizationRole("org_auditor")
+                                .organizationRole("billing_manager")
+                                .spacesUrl("/v2/users/uaa-id-92/spaces")
+                                .organizationsUrl("/v2/users/uaa-id-92/organizations")
+                                .managedOrganizationsUrl("/v2/users/uaa-id-92/managed_organizations")
+                                .billingManagedOrganizationsUrl("/v2/users/uaa-id-92/billing_managed_organizations")
+                                .auditedOrganizationsUrl("/v2/users/uaa-id-92/audited_organizations")
+                                .managedSpacesUrl("/v2/users/uaa-id-92/managed_spaces")
+                                .auditedSpacesUrl("/v2/users/uaa-id-92/audited_spaces")
+                                .build())
+                        .build())
+                .build();
+
+        GetOrganizationUserRolesResponse actual = Streams.wrap(this.organizations.getUserRoles(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getUserRolesError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/user_roles?page=-1")
+                .errorResponse());
+
+        GetOrganizationUserRolesRequest request = GetOrganizationUserRolesRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.organizations.getUserRoles(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getUserRolesInvalidRequest() {
+        GetOrganizationUserRolesRequest request = GetOrganizationUserRolesRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.getUserRoles(request)).next().get();
     }
 
     @Test

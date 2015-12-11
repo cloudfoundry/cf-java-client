@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spaces;
+package org.cloudfoundry.client.v2.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
-
-import java.util.List;
 
 /**
- * The entity response payload for the Route resource
+ * The entity response payload for the User resource
  */
 @Data
-public final class UserRoleEntity {
+public abstract class AbstractUserEntity {
 
     /**
      * The active property
      *
-     * @param active the active property
-     * @return the active property
+     * @param active the active boolean
+     * @return active
      */
     private final Boolean active;
 
     /**
      * The admin property
      *
-     * @param admin the admin property
-     * @return the admin property
+     * @param admin the admin boolean
+     * @return admin
      */
     private final Boolean admin;
 
@@ -56,7 +52,7 @@ public final class UserRoleEntity {
     /**
      * The audited spaces url
      *
-     * @param auditedSpacesURL the audited spaces url
+     * @param auditedSpacesUrl the audited spaces url
      * @return the audited spaces url
      */
     private final String auditedSpacesUrl;
@@ -70,12 +66,12 @@ public final class UserRoleEntity {
     private final String billingManagedOrganizationsUrl;
 
     /**
-     * The default space guid
+     * The Default Space Id
      *
-     * @param defaultSpaceGuid the default space guid
-     * @return the default space guid
+     * @param defaultSpaceId default Space Id
+     * @return default Space Id
      */
-    private final String defaultSpaceGuid;
+    private final String defaultSpaceId;
 
     /**
      * The managed organizations url
@@ -88,7 +84,7 @@ public final class UserRoleEntity {
     /**
      * The managed spaces url
      *
-     * @param managedSpacesURL the managed spaces url
+     * @param managedSpacesUrl the managed spaces url
      * @return the managed spaces url
      */
     private final String managedSpacesUrl;
@@ -102,17 +98,9 @@ public final class UserRoleEntity {
     private final String organizationsUrl;
 
     /**
-     * The space roles
-     *
-     * @param spaceRoles the space roles
-     * @return the space roles
-     */
-    private final List<String> spaceRoles;
-
-    /**
      * The spaces url
      *
-     * @param spacesURL the spaces url
+     * @param spacesUrl the spaces url
      * @return the spaces url
      */
     private final String spacesUrl;
@@ -125,30 +113,29 @@ public final class UserRoleEntity {
      */
     private final String username;
 
-    @Builder
-    UserRoleEntity(@JsonProperty("active") Boolean active,
-                   @JsonProperty("admin") Boolean admin,
-                   @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
-                   @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
-                   @JsonProperty("billing_managed_organizations_url") String billingManagedOrganizationsUrl,
-                   @JsonProperty("default_space_guid") String defaultSpaceGuid,
-                   @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
-                   @JsonProperty("managed_spaces_url") String managedSpacesUrl,
-                   @JsonProperty("organizations_url") String organizationsUrl,
-                   @JsonProperty("space_roles") @Singular List<String> spaceRoles,
-                   @JsonProperty("spaces_url") String spacesUrl,
-                   @JsonProperty("username") String username) {
+    public AbstractUserEntity(@JsonProperty("active") Boolean active,
+                              @JsonProperty("admin") Boolean admin,
+                              @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
+                              @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
+                              @JsonProperty("billing_managed_organizations_url") String
+                                      billingManagedOrganizationsUrl,
+                              @JsonProperty("default_space_guid") String defaultSpaceId,
+                              @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
+                              @JsonProperty("managed_spaces_url") String managedSpacesUrl,
+                              @JsonProperty("organizations_url") String organizationsUrl,
+                              @JsonProperty("spaces_url") String spacesUrl,
+                              @JsonProperty("username") String username) {
         this.active = active;
         this.admin = admin;
         this.auditedOrganizationsUrl = auditedOrganizationsUrl;
         this.auditedSpacesUrl = auditedSpacesUrl;
         this.billingManagedOrganizationsUrl = billingManagedOrganizationsUrl;
-        this.defaultSpaceGuid = defaultSpaceGuid;
+        this.defaultSpaceId = defaultSpaceId;
         this.managedOrganizationsUrl = managedOrganizationsUrl;
         this.managedSpacesUrl = managedSpacesUrl;
         this.organizationsUrl = organizationsUrl;
-        this.spaceRoles = spaceRoles;
         this.spacesUrl = spacesUrl;
         this.username = username;
     }
+
 }
