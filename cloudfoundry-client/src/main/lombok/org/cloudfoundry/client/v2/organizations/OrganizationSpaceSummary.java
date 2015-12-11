@@ -26,6 +26,12 @@ import lombok.Data;
 @Data
 public final class OrganizationSpaceSummary {
 
+    /**
+     * The app count
+     *
+     * @param appCount the app count
+     * @return the app count
+     */
     private final Integer appCount;
 
     /**
@@ -36,8 +42,20 @@ public final class OrganizationSpaceSummary {
      */
     private final String id;
 
+    /**
+     * The mem_dev_total
+     *
+     * @param memDevTotal the mem_dev_total
+     * @return the mem_dev_total
+     */
     private final Integer memDevTotal;
 
+    /**
+     * The mem_prod_total
+     *
+     * @param memProdTotal the mem_prod_total
+     * @return the mem_prod_total
+     */
     private final Integer memProdTotal;
 
     /**
@@ -48,6 +66,12 @@ public final class OrganizationSpaceSummary {
      */
     private final String name;
 
+    /**
+     * The service count
+     *
+     * @param serviceCount the service count
+     * @return the service count
+     */
     private final Integer serviceCount;
 
     @Builder
