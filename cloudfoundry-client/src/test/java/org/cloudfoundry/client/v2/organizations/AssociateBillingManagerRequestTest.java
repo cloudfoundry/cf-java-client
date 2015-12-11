@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public final class AssociateBillingManagerRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("billing manager id must be specified", result.getMessages().get(0));
-    }        
+    }
 
     @Test
     public void isValidNoId() {
@@ -56,6 +56,6 @@ public final class AssociateBillingManagerRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }
