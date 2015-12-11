@@ -218,4 +218,13 @@ public interface Organizations {
      */
     Publisher<SummaryOrganizationResponse> summary(SummaryOrganizationRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/update_an_organization.html">Update an
+     * Organization</a> request
+     *
+     * @param request the Update an Organization request
+     * @return the response from the Update an Organization request
+     */
+    Publisher<UpdateOrganizationResponse> update(UpdateOrganizationRequest request);
+
 }
