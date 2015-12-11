@@ -56,7 +56,7 @@ public final class SpaceQuotaDefinitionEntity {
      * @param nonBasicServicesAllowed the non basic services allowed boolean
      * @return the nonBasicServicesAllowed
      */
-    private final boolean nonBasicServicesAllowed;
+    private final Boolean nonBasicServicesAllowed;
 
     /**
      * The organization id
@@ -102,7 +102,7 @@ public final class SpaceQuotaDefinitionEntity {
     SpaceQuotaDefinitionEntity(@JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
                                @JsonProperty("memory_limit") Integer memoryLimit,
                                @JsonProperty("name") String name,
-                               @JsonProperty("non_basic_services_allowed") boolean nonBasicServicesAllowed,
+                               @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
                                @JsonProperty("organization_guid") String organizationId,
                                @JsonProperty("organization_url") String organizationUrl,
                                @JsonProperty("spaces_url") String spacesUrl,
