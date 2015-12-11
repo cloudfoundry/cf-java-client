@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
@@ -25,6 +26,7 @@ import org.cloudfoundry.client.ValidationResult;
 /**
  * The request payload for the Get the env for an App operation.
  */
+@Data
 public final class ApplicationEnvironmentRequest implements Validatable {
 
     /**
