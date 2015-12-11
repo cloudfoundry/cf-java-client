@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +20,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.PaginatedResponse;
-
-import java.util.List;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Retrieving the roles of all Users in the Space operation
+ * User Role Resource in responses
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceUserRolesResponse extends PaginatedResponse<UserSpaceRoleResource> {
+public final class UserSpaceRoleResource extends Resource<UserSpaceRoleEntity> {
 
     @Builder
-    ListSpaceUserRolesResponse(@JsonProperty("next_url") String nextUrl,
-                               @JsonProperty("prev_url") String previousUrl,
-                               @JsonProperty("resources") @Singular List<UserSpaceRoleResource> resources,
-                               @JsonProperty("total_pages") Integer totalPages,
-                               @JsonProperty("total_results") Integer totalResults) {
-
-        super(nextUrl, previousUrl, resources, totalPages, totalResults);
+    UserSpaceRoleResource(@JsonProperty("entity") UserSpaceRoleEntity entity,
+                          @JsonProperty("metadata") Resource.Metadata metadata) {
+        super(entity, metadata);
     }
-
-
 }

@@ -33,6 +33,8 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
@@ -167,6 +169,19 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId());
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<GetOrganizationUserRolesResponse> getUserRoles(final GetOrganizationUserRolesRequest request) {
+        return get(request, GetOrganizationUserRolesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "user_roles");
                 QueryBuilder.augment(builder, request);
             }
 
