@@ -51,7 +51,7 @@ public final class SecurityGroupEntity {
      * @param runningDefault the running default
      * @return the running default
      */
-    private final boolean runningDefault;
+    private final Boolean runningDefault;
 
     /**
      * The spaces url
@@ -67,14 +67,14 @@ public final class SecurityGroupEntity {
      * @param stagingDefault the staging default
      * @return the staging default
      */
-    private final boolean stagingDefault;
+    private final Boolean stagingDefault;
 
     @Builder
     SecurityGroupEntity(@JsonProperty("name") String name,
                         @JsonProperty("rules") @Singular List<RuleEntity> rules,
-                        @JsonProperty("running_default") boolean runningDefault,
+                        @JsonProperty("running_default") Boolean runningDefault,
                         @JsonProperty("spaces_url") String spacesUrl,
-                        @JsonProperty("staging_default") boolean stagingDefault) {
+                        @JsonProperty("staging_default") Boolean stagingDefault) {
 
         this.name = name;
         this.rules = rules;

@@ -32,7 +32,7 @@ public final class UserEntity {
      * @param active the active boolean
      * @return active
      */
-    private final boolean active;
+    private final Boolean active;
 
     /**
      * The admin property
@@ -40,7 +40,7 @@ public final class UserEntity {
      * @param admin the admin boolean
      * @return admin
      */
-    private final boolean admin;
+    private final Boolean admin;
 
     /**
      * The audited organizations url
@@ -115,8 +115,8 @@ public final class UserEntity {
     private final String username;
 
     @Builder
-    UserEntity(@JsonProperty("active") boolean active,
-               @JsonProperty("admin") boolean admin,
+    UserEntity(@JsonProperty("active") Boolean active,
+               @JsonProperty("admin") Boolean admin,
                @JsonProperty("audited_organizations_url") String auditedOrganizationsUrl,
                @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
                @JsonProperty("billing_managed_organizations_url") String

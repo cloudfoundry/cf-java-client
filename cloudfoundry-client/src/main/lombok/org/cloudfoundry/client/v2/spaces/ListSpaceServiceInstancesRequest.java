@@ -82,7 +82,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @return the return user provided service instances
      */
     @Getter(onMethod = @__(@JsonProperty("return_user_provided_service_instances")))
-    private final boolean returnUserProvidedServiceInstances;
+    private final Boolean returnUserProvidedServiceInstances;
 
     /**
      * The service binding ids
@@ -118,7 +118,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
                                      String id,
                                      @Singular List<String> names,
                                      @Singular List<String> organizationIds,
-                                     boolean returnUserProvidedServiceInstances,
+                                     Boolean returnUserProvidedServiceInstances,
                                      @Singular List<String> serviceBindingIds,
                                      @Singular List<String> serviceKeyIds,
                                      @Singular List<String> servicePlanIds) {
