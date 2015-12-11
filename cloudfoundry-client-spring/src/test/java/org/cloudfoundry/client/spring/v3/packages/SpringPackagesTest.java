@@ -485,6 +485,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void upload() throws IOException {
         mockRequest(new RequestContext()
                 .method(POST).path("/v3/packages/test-id/upload")
@@ -534,6 +535,7 @@ public final class SpringPackagesTest extends AbstractRestTest {
     }
 
     @Test(expected = CloudFoundryException.class)
+    @SuppressWarnings("unchecked")
     public void uploadError() throws IOException {
         mockRequest(new RequestContext()
                 .method(POST).path("/v3/packages/test-id/upload")

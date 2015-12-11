@@ -115,7 +115,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Publisher<LoggregatorMessage> recent(final RecentLogsRequest request) {
         return get(request, Stream.class, new Consumer<UriComponentsBuilder>() {
 
@@ -124,14 +124,16 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                 builder.pathSegment("recent").queryParam("app", request.getId());
             }
 
-        }).flatMap(new Function<Stream, Publisher<? extends LoggregatorMessage>>() {
+        })
+                .take(1)
+                .flatMap(new Function<Stream, Publisher<? extends LoggregatorMessage>>() {
 
-            @Override
-            public Publisher<? extends LoggregatorMessage> apply(Stream stream) {
-                return stream;
-            }
+                    @Override
+                    public Publisher<? extends LoggregatorMessage> apply(Stream stream) {
+                        return stream;
+                    }
 
-        });
+                });
     }
 
     @Override

@@ -21,6 +21,8 @@ package org.cloudfoundry.client;
  */
 public final class LoggregatorException extends RuntimeException {
 
+    private static final long serialVersionUID = 6197301178034905524L;
+
     /**
      * Creates a new instance
      *

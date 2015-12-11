@@ -78,7 +78,7 @@ public final class FilterBuilder {
             return value;
         }
 
-        Collection collection = (Collection) value;
+        Collection<?> collection = (Collection) value;
 
         if (collection.isEmpty()) {
             return null;

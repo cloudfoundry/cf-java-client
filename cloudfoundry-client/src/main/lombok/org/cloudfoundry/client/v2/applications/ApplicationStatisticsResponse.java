@@ -35,12 +35,14 @@ import java.util.Map;
 @ToString(callSuper = true)
 public final class ApplicationStatisticsResponse extends HashMap<String, ApplicationStatisticsResponse.InstanceStats> {
 
+    private static final long serialVersionUID = 5833542672981662359L;
+
     ApplicationStatisticsResponse() {
         super();
     }
 
     @Builder
-    ApplicationStatisticsResponse(@Singular Map<String,InstanceStats> instances) {
+    ApplicationStatisticsResponse(@Singular Map<String, InstanceStats> instances) {
         super(instances);
     }
 
