@@ -47,9 +47,9 @@ public interface CloudFoundryClient {
     ApplicationsV3 applicationsV3();
 
     /**
-     * Main entry point to the Cloud Foundry Droplets Client API
+     * Main entry point to the Cloud Foundry Domains Client API
      *
-     * @return the Cloud Foundry Droplets Client API
+     * @return the Cloud Foundry Domains Client API
      */
     Domains domains();
 
