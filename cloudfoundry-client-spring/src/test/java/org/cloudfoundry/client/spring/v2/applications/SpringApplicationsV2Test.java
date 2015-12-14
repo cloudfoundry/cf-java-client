@@ -746,7 +746,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
                                 .url("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d")
                                 .build())
                         .entity(RouteEntity.builder()
-                                .applicationUrl("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d/apps")
+                                .applicationsUrl("/v2/routes/ea95782f-e852-42a1-83dd-7d266ad9f32d/apps")
                                 .domainId("1f36d1d3-fcba-49dc-9320-d60ead679d35")
                                 .domainUrl("/v2/domains/1f36d1d3-fcba-49dc-9320-d60ead679d35")
                                 .host("host-14")

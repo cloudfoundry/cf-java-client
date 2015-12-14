@@ -1043,7 +1043,7 @@ public final class SpringSpacesTest extends AbstractRestTest {
                                 .url("/v2/routes/cab98364-2ccb-42e0-b901-765c4e915d49")
                                 .build())
                         .entity(RouteEntity.builder()
-                                .applicationUrl("/v2/routes/cab98364-2ccb-42e0-b901-765c4e915d49/apps")
+                                .applicationsUrl("/v2/routes/cab98364-2ccb-42e0-b901-765c4e915d49/apps")
                                 .domainId("64aaa8e0-af71-4d7e-afef-e2efdbd66552")
                                 .domainUrl("/v2/domains/64aaa8e0-af71-4d7e-afef-e2efdbd66552")
                                 .host("host-1")
