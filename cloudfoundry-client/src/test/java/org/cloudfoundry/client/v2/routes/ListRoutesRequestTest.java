@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.routes;
 
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class ListApplicationsRequestTest {
+public final class ListRoutesRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(VALID, ListApplicationsRequest.builder().build().isValid().getStatus());
+        assertEquals(VALID, ListRoutesRequest.builder().build().isValid().getStatus());
     }
 
 }
+ 

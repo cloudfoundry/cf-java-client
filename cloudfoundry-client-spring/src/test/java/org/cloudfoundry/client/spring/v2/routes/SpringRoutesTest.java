@@ -24,6 +24,10 @@ import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
+import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -34,6 +38,44 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringRoutesTest extends AbstractRestTest {
 
     private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+
+    @Test
+    public void list() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes?page=-1")
+                .status(OK)
+                .responsePayload("v2/routes/GET_response.json"));
+
+        ListRoutesRequest request = ListRoutesRequest.builder()
+                .page(-1)
+                .build();
+
+        ListRoutesResponse expected = ListRoutesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                                .id("13f2cca3-ea79-4b46-9ffd-99a490c84e2b")
+                                .url("/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b")
+                                .createdAt("2015-07-27T22:43:11Z")
+                                .build())
+                        .entity(RouteEntity.builder()
+                                .host("host-6")
+                                .path("")
+                                .domainId("c3153192-e35d-4d1e-a518-ddaddf39241c")
+                                .spaceId("d56f6482-363c-4de9-9520-d16b3754c389")
+                                .domainUrl("/v2/domains/c3153192-e35d-4d1e-a518-ddaddf39241c")
+                                .spaceUrl("/v2/spaces/d56f6482-363c-4de9-9520-d16b3754c389")
+                                .applicationsUrl("/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b/apps")
+                                .build())
+                        .build())
+                .build();
+
+        ListRoutesResponse actual = Streams.wrap(this.routes.list(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
 
     @Test
     public void listApplications() {
@@ -114,5 +156,17 @@ public final class SpringRoutesTest extends AbstractRestTest {
         Streams.wrap(this.routes.listApplications(request)).next().get();
     }
 
+    @Test(expected = CloudFoundryException.class)
+    public void listError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes?page=-1")
+                .errorResponse());
+
+        ListRoutesRequest request = ListRoutesRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.routes.list(request)).next().get();
+    }
 
 }

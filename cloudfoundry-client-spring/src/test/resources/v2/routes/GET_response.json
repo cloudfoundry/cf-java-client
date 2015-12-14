@@ -1,0 +1,25 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "13f2cca3-ea79-4b46-9ffd-99a490c84e2b",
+        "url": "/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b",
+        "created_at": "2015-07-27T22:43:11Z",
+        "updated_at": null
+      },
+      "entity": {
+        "host": "host-6",
+        "path": "",
+        "domain_guid": "c3153192-e35d-4d1e-a518-ddaddf39241c",
+        "space_guid": "d56f6482-363c-4de9-9520-d16b3754c389",
+        "domain_url": "/v2/domains/c3153192-e35d-4d1e-a518-ddaddf39241c",
+        "space_url": "/v2/spaces/d56f6482-363c-4de9-9520-d16b3754c389",
+        "apps_url": "/v2/routes/13f2cca3-ea79-4b46-9ffd-99a490c84e2b/apps"
+      }
+    }
+  ]
+}
