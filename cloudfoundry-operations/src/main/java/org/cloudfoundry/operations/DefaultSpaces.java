@@ -20,9 +20,9 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.operations.v2.PageUtils;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
-import reactor.rx.Streams;
 
 final class DefaultSpaces extends AbstractOperations implements Spaces {
 
@@ -32,38 +32,29 @@ final class DefaultSpaces extends AbstractOperations implements Spaces {
 
     @Override
     public Publisher<Space> list() {
-        return paginate(new Function<Integer, ListSpacesRequest>() {
+        return PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
 
             @Override
-            public ListSpacesRequest apply(Integer page) {
-                return ListSpacesRequest.builder()
-                        .organizationId(DefaultSpaces.this.getTargetedOrganization())
-                        .page(page)
-                        .build();
+            public Publisher<ListSpacesResponse> apply(Integer page) {
+                return DefaultSpaces.this.cloudFoundryClient.spaces().list(
+                        ListSpacesRequest.builder()
+                                .organizationId(DefaultSpaces.this.getTargetedOrganization())
+                                .page(page)
+                                .build());
             }
 
-        }, new Function<ListSpacesRequest, Publisher<ListSpacesResponse>>() {
+        })
+                .map(new Function<SpaceResource, Space>() {
 
-            @Override
-            public Publisher<ListSpacesResponse> apply(ListSpacesRequest request) {
-                return DefaultSpaces.this.cloudFoundryClient.spaces().list(request);
-            }
+                    @Override
+                    public Space apply(SpaceResource resource) {
+                        return Space.builder()
+                                .id(resource.getMetadata().getId())
+                                .name(resource.getEntity().getName())
+                                .build();
+                    }
 
-        }).flatMap(new Function<ListSpacesResponse, Publisher<SpaceResource>>() {
-
-            @Override
-            public Publisher<SpaceResource> apply(ListSpacesResponse r) {
-                return Streams.from(r.getResources());
-            }
-
-        }).map(new Function<SpaceResource, Space>() {
-
-            @Override
-            public Space apply(SpaceResource resource) {
-                return Space.builder().id(resource.getMetadata().getId()).name(resource.getEntity().getName()).build();
-            }
-
-        });
+                });
     }
 
 }
