@@ -36,25 +36,25 @@ final class DefaultSpaces extends AbstractOperations implements Spaces {
 
             @Override
             public Publisher<ListSpacesResponse> apply(Integer page) {
-                return DefaultSpaces.this.cloudFoundryClient.spaces().list(
-                        ListSpacesRequest.builder()
-                                .organizationId(DefaultSpaces.this.getTargetedOrganization())
-                                .page(page)
-                                .build());
+                ListSpacesRequest request = ListSpacesRequest.builder()
+                        .organizationId(DefaultSpaces.this.getTargetedOrganization())
+                        .page(page)
+                        .build();
+
+                return DefaultSpaces.this.cloudFoundryClient.spaces().list(request);
             }
 
-        })
-                .map(new Function<SpaceResource, Space>() {
+        }).map(new Function<SpaceResource, Space>() {
 
-                    @Override
-                    public Space apply(SpaceResource resource) {
-                        return Space.builder()
-                                .id(resource.getMetadata().getId())
-                                .name(resource.getEntity().getName())
-                                .build();
-                    }
+            @Override
+            public Space apply(SpaceResource resource) {
+                return Space.builder()
+                        .id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName())
+                        .build();
+            }
 
-                });
+        });
     }
 
 }

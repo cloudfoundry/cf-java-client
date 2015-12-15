@@ -32,25 +32,27 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
     @Override
     public Publisher<Organization> list() {
         return PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationsResponse>>() {
+
             @Override
             public Publisher<ListOrganizationsResponse> apply(Integer page) {
-                return DefaultOrganizations.this.cloudFoundryClient.organizations()
-                        .list(ListOrganizationsRequest.builder()
-                                .page(page)
-                                .build());
+                ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                        .page(page)
+                        .build();
+
+                return DefaultOrganizations.this.cloudFoundryClient.organizations().list(request);
             }
-        })
-                .map(new Function<ListOrganizationsResponse.Resource, Organization>() {
 
-                    @Override
-                    public Organization apply(ListOrganizationsResponse.Resource resource) {
-                        return Organization.builder()
-                                .id(resource.getMetadata().getId())
-                                .name(resource.getEntity().getName())
-                                .build();
-                    }
+        }).map(new Function<ListOrganizationsResponse.Resource, Organization>() {
 
-                });
+            @Override
+            public Organization apply(ListOrganizationsResponse.Resource resource) {
+                return Organization.builder()
+                        .id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName())
+                        .build();
+            }
+
+        });
     }
 
 }

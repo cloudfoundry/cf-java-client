@@ -34,9 +34,9 @@ public final class PageUtils {
 
     /**
      * Generate the stream of responses starting from page 1 of an initial paginated response.
-     * 
-     * @param pagePublisher a function from integers to {@link Publisher}s of {@link PaginatedResponse}s. 
-     * @param <U> the type of {@link PaginatedResponse}.
+     *
+     * @param pagePublisher a function from integers to {@link Publisher}s of {@link PaginatedResponse}s.
+     * @param <U>           the type of {@link PaginatedResponse}.
      * @return a stream of <code>U</code> objects.
      */
     public static <U extends PaginatedResponse<?>> Stream<U> pageStream(
@@ -64,9 +64,9 @@ public final class PageUtils {
     /**
      * Generate the stream of resources accumulated from a series of responses obtained from the page publisher.
      *
-     * @param pagePublisher a function from integers to {@link Publisher}s of {@link PaginatedResponse}s. 
-     * @param <R> the type of resource in the list on each {@link PaginatedResponse}.
-     * @param <U> the type of {@link PaginatedResponse}.
+     * @param pagePublisher a function from integers to {@link Publisher}s of {@link PaginatedResponse}s.
+     * @param <R>           the type of resource in the list on each {@link PaginatedResponse}.
+     * @param <U>           the type of {@link PaginatedResponse}.
      * @return a stream of <code>R</code> objects.
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> resourceStream(
