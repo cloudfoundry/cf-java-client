@@ -19,9 +19,9 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.operations.v2.PageUtils;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
-import reactor.rx.Streams;
 
 final class DefaultOrganizations extends AbstractOperations implements Organizations {
 
@@ -31,38 +31,26 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
 
     @Override
     public Publisher<Organization> list() {
-        return paginate(new Function<Integer, ListOrganizationsRequest>() {
-
+        return PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationsResponse>>() {
             @Override
-            public ListOrganizationsRequest apply(Integer page) {
-                return ListOrganizationsRequest.builder()
-                        .page(page)
-                        .build();
+            public Publisher<ListOrganizationsResponse> apply(Integer page) {
+                return DefaultOrganizations.this.cloudFoundryClient.organizations()
+                        .list(ListOrganizationsRequest.builder()
+                                .page(page)
+                                .build());
             }
+        })
+                .map(new Function<ListOrganizationsResponse.Resource, Organization>() {
 
-        }, new Function<ListOrganizationsRequest, Publisher<ListOrganizationsResponse>>() {
+                    @Override
+                    public Organization apply(ListOrganizationsResponse.Resource resource) {
+                        return Organization.builder()
+                                .id(resource.getMetadata().getId())
+                                .name(resource.getEntity().getName())
+                                .build();
+                    }
 
-            @Override
-            public Publisher<ListOrganizationsResponse> apply(ListOrganizationsRequest request) {
-                return DefaultOrganizations.this.cloudFoundryClient.organizations().list(request);
-            }
-
-        }).flatMap(new Function<ListOrganizationsResponse, Publisher<ListOrganizationsResponse.Resource>>() {
-
-            @Override
-            public Publisher<ListOrganizationsResponse.Resource> apply(ListOrganizationsResponse r) {
-                return Streams.from(r.getResources());
-            }
-
-        }).map(new Function<ListOrganizationsResponse.Resource, Organization>() {
-
-            @Override
-            public Organization apply(ListOrganizationsResponse.Resource resource) {
-                return Organization.builder().id(resource.getMetadata().getId())
-                        .name(resource.getEntity().getName()).build();
-            }
-
-        });
+                });
     }
 
 }
