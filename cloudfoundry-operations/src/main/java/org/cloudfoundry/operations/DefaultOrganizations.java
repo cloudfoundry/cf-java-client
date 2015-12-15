@@ -25,10 +25,8 @@ import reactor.rx.Streams;
 
 final class DefaultOrganizations extends AbstractOperations implements Organizations {
 
-    private final CloudFoundryClient cloudFoundryClient;
-
     DefaultOrganizations(CloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = cloudFoundryClient;
+        super(cloudFoundryClient, null, null);
     }
 
     @Override
@@ -37,7 +35,9 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
 
             @Override
             public ListOrganizationsRequest apply(Integer page) {
-                return ListOrganizationsRequest.builder().page(page).build();
+                return ListOrganizationsRequest.builder()
+                        .page(page)
+                        .build();
             }
 
         }, new Function<ListOrganizationsRequest, Publisher<ListOrganizationsResponse>>() {
