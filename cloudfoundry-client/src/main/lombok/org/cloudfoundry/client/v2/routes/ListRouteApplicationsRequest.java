@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.FilterParameter;
@@ -38,15 +37,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public final class ListRouteApplicationsRequest extends PaginatedRequest implements Validatable {
-
-    /**
-     * The app id
-     *
-     * @param appId the app id
-     * @return the app id
-     */
-    @Getter(onMethod = @__(@QueryParameter("app_guid")))
-    private final String appId;
 
     /**
      * The diegos
@@ -104,7 +94,6 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
 
     @Builder
     ListRouteApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                 String appId,
                                  @Singular List<String> diegos,
                                  String id,
                                  @Singular List<String> names,
@@ -113,7 +102,6 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
                                  @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
 
-        this.appId = appId;
         this.diegos = diegos;
         this.id = id;
         this.names = names;
