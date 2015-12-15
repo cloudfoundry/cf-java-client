@@ -114,6 +114,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                              String username, String password, RestOperations bootstrapRestOperations,
                              SslCertificateTruster sslCertificateTruster) {
 
+        LOGGER.debug("Cloud Foundry Connection: {}, skipSslValidation={}", host, skipSslValidation);
+        LOGGER.debug("Cloud Foundry Credentials: {} / {}", username, password);
+        LOGGER.debug("OAuth2 Credentials: {} / {}", clientId, clientSecret);
+
         if (skipSslValidation != null && skipSslValidation) {
             try {
                 sslCertificateTruster.trust(host, 443, 5, SECONDS);
