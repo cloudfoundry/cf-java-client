@@ -2,7 +2,7 @@
 
 set -e
 
-eval connection/domain
+source connection/domain
 export TEST_HOST=$DOMAIN
 
 pushd cf-java-client
