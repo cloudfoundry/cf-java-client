@@ -81,32 +81,39 @@ public abstract class AbstractRestTest {
     }
 
     protected static void assertBytesEqual(final InputStream in, Stream<byte[]> byteArrayStream) {
-        byteArrayStream.consume(new Consumer<byte[]>() {
-            @Override
-            public void accept(byte[] actual) {
-                try {
-                    byte[] expected = new byte[actual.length];
-                    int bytesRead = in.read(expected);
-                    int totalBytesRead = 0;
-                    while (bytesRead > 0 && totalBytesRead < actual.length) {
-                        totalBytesRead += bytesRead;
-                        bytesRead = in.read(expected, totalBytesRead, actual.length - totalBytesRead);
+        byteArrayStream.consume(
+                new Consumer<byte[]>() {
+                    @Override
+                    public void accept(byte[] actual) {
+                        try {
+                            byte[] expected = new byte[actual.length];
+                            int bytesRead = in.read(expected);
+                            int totalBytesRead = 0;
+                            while (bytesRead > 0 && totalBytesRead < actual.length) {
+                                totalBytesRead += bytesRead;
+                                bytesRead = in.read(expected, totalBytesRead, actual.length -
+                                        totalBytesRead);
+                            }
+                            if (totalBytesRead != actual.length) {
+                                fail("more bytes in byteArrayStream than in InputStream " + in);
+                            } else {
+                                assertArrayEquals(expected, actual);
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                    if (totalBytesRead != actual.length) {
-                        fail("more bytes in byteArrayStream than in InputStream " + in);
-                    } else {
-                        assertArrayEquals(expected, actual);
+                }, null,
+                new Consumer<Void>() {
+                    @Override
+                    public void accept(Void aVoid) {
+                        try {
+                            assertEquals("more bytes in InputStream " + in + " than in byteArrayStream", -1, in.read());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        try {
-            assertEquals("more bytes in InputStream " + in + " than in byteArrayStream", -1, in.read());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+                });
     }
 
     protected final void mockRequest(RequestContext requestContext) {
