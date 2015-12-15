@@ -26,6 +26,10 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
 
+    protected final String TEST_ORGANIZATION = "test-organization-id";
+
+    protected final String TEST_SPACE = "test-space-id";
+
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class);
 
     protected final Organizations organizations = mock(Organizations.class);

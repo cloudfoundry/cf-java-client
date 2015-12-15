@@ -26,26 +26,20 @@ import reactor.rx.Streams;
 
 final class DefaultSpaces extends AbstractOperations implements Spaces {
 
-    private final CloudFoundryClient cloudFoundryClient;
-
-    private final String organizationId;
-
     DefaultSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        this.cloudFoundryClient = cloudFoundryClient;
-        this.organizationId = organizationId;
+        super(cloudFoundryClient, organizationId, null);
     }
 
     @Override
     public Publisher<Space> list() {
-        if (this.organizationId == null) {
-            throw new IllegalStateException("No organization targeted");
-        }
-
         return paginate(new Function<Integer, ListSpacesRequest>() {
 
             @Override
             public ListSpacesRequest apply(Integer page) {
-                return ListSpacesRequest.builder().organizationId(DefaultSpaces.this.organizationId).page(page).build();
+                return ListSpacesRequest.builder()
+                        .organizationId(DefaultSpaces.this.getTargetedOrganization())
+                        .page(page)
+                        .build();
             }
 
         }, new Function<ListSpacesRequest, Publisher<ListSpacesResponse>>() {

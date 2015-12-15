@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.reactivestreams.Publisher;
@@ -23,8 +24,33 @@ import reactor.fn.Function;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
-
 abstract class AbstractOperations {
+
+    private final String organizationId;
+
+    private final String spaceId;
+
+    protected final CloudFoundryClient cloudFoundryClient;
+
+    protected AbstractOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
+        this.cloudFoundryClient = cloudFoundryClient;
+        this.organizationId = organizationId;
+        this.spaceId = spaceId;
+    }
+
+    protected final String getTargetedOrganization() {
+        if (this.organizationId == null) {
+            throw new IllegalStateException("No organization targeted");
+        }
+        return this.organizationId;
+    }
+
+    protected final String getTargetedSpace() {
+        if (this.spaceId == null) {
+            throw new IllegalStateException("No space targeted");
+        }
+        return this.spaceId;
+    }
 
     protected final <T extends PaginatedRequest, U extends PaginatedResponse<?>> Stream<U> paginate(
             final Function<Integer, T> requestProvider, final Function<T, Publisher<U>> operationExecutor) {
