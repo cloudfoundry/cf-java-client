@@ -18,13 +18,10 @@ package org.cloudfoundry.demo;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
-import org.cloudfoundry.client.v2.PaginatedRequest;
-import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.operations.v2.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +31,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,7 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_CREATE;
 import static org.cloudfoundry.client.v2.events.Events.AUDIT_APP_DELETE_REQUEST;
@@ -98,29 +92,13 @@ public class ApplicationEvents {
             this.cloudFoundryClient = cloudFoundryClient;
         }
 
-        private Stream<ListOrganizationsResponse> listOrganizations() {
-            return paginate(
-                    page -> ListOrganizationsRequest.builder().page(page).build(),
-                    request -> this.cloudFoundryClient.organizations().list(request));
-        }
-
-        private <T extends PaginatedRequest, U extends PaginatedResponse> Stream<U> paginate(
-                Function<Integer, T> requestProvider, Function<T, Publisher<U>> operationExecutor) {
-
-            return Streams.just(Streams.wrap(operationExecutor.apply(requestProvider.apply(1))))
-                    .concatMap(responseStream -> responseStream
-                            .take(1)
-                            .concatMap(response -> Streams.range(2, response.getTotalPages() - 1)
-                                    .flatMap(page -> operationExecutor.apply(requestProvider.apply(page)))
-                                    .startWith(response)
-                            ));
-        }
-
         private void run() throws IOException {
             Map<String, String> organizations = new HashMap<>();
 
-            listOrganizations()
-                    .flatMap(p -> Streams.from(p.getResources()))
+            PageUtils.resourceStream(page -> {
+                ListOrganizationsRequest request = ListOrganizationsRequest.builder().page(page).build();
+                return this.cloudFoundryClient.organizations().list(request);
+            })
                     .filter(r -> r.getEntity().getName().startsWith("s1-scs-demo-"))
                     .consume(r -> {
                                 String key = r.getMetadata().getId();
@@ -132,14 +110,16 @@ public class ApplicationEvents {
             this.logger.info("{} Organizations Found", organizations.size());
 
             try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
-                paginate(page -> ListEventsRequest.builder()
-                                .types(EVENT_TYPES)
-                                .timestamp("2015-10-01T05:18:38Z")
-                                .page(page)
-                                .resultsPerPage(100)
-                                .build(),
-                        request -> cloudFoundryClient.events().list(request))
-                        .flatMap(eventsPage -> Streams.from(eventsPage.getResources()))
+                PageUtils.resourceStream(page -> {
+                    ListEventsRequest request = ListEventsRequest.builder()
+                            .types(EVENT_TYPES)
+                            .timestamp("2015-10-01T05:18:38Z")
+                            .page(page)
+                            .resultsPerPage(100)
+                            .build();
+
+                    return this.cloudFoundryClient.events().list(request);
+                })
                         .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
                         .map(r -> {
                             EventEntity entity = r.getEntity();

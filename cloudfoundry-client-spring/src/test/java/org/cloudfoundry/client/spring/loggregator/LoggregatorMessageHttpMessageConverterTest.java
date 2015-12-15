@@ -57,7 +57,7 @@ public final class LoggregatorMessageHttpMessageConverterTest {
 
         Long result = this.messageConverter.readInternal(null, inputMessage)
                 .count()
-                .next().poll();
+                .next().get();
 
         assertEquals(Long.valueOf(14), result);
     }

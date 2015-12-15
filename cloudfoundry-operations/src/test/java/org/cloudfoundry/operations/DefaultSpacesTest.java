@@ -74,7 +74,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
                 Space.builder().id("test-id-2").name("test-name-2").build()
         );
 
-        List<Space> actual = Streams.wrap(this.spaces.list()).toList().poll();
+        List<Space> actual = Streams.wrap(this.spaces.list()).toList().get();
 
         assertEquals(expected, actual);
     }

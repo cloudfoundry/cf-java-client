@@ -295,7 +295,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         CreateApplicationRequest request = CreateApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.create(request)).next().poll();
+        Streams.wrap(this.applications.create(request)).next().get();
     }
 
     @Test
@@ -331,7 +331,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         DeleteApplicationRequest request = DeleteApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.delete(request)).next().poll();
+        Streams.wrap(this.applications.delete(request)).next().get();
     }
 
     @Test
@@ -469,7 +469,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.environment(request)).next().poll();
+        Streams.wrap(this.applications.environment(request)).next().get();
     }
 
     @Test
@@ -540,7 +540,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         GetApplicationRequest request = GetApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.get(request)).next().poll();
+        Streams.wrap(this.applications.get(request)).next().get();
     }
 
     @Test
@@ -1047,7 +1047,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.statistics(request)).next().poll();
+        Streams.wrap(this.applications.statistics(request)).next().get();
     }
 
     @Test
@@ -1141,7 +1141,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         SummaryApplicationRequest request = SummaryApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.summary(request)).next().poll();
+        Streams.wrap(this.applications.summary(request)).next().get();
     }
 
     @Test
@@ -1253,7 +1253,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         UpdateApplicationRequest request = UpdateApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.update(request)).next().poll();
+        Streams.wrap(this.applications.update(request)).next().get();
     }
 
     @Test
@@ -1321,7 +1321,7 @@ public final class SpringApplicationsV2Test extends AbstractRestTest {
         UploadApplicationRequest request = UploadApplicationRequest.builder()
                 .build();
 
-        Streams.wrap(this.applications.upload(request)).next().poll();
+        Streams.wrap(this.applications.upload(request)).next().get();
     }
 
     @Test

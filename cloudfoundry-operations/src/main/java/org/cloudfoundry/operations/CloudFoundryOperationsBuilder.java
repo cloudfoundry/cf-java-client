@@ -121,7 +121,7 @@ public final class CloudFoundryOperationsBuilder {
                         return resources.get(0).getMetadata().getId();
                     }
 
-                }).next().poll();
+                }).next().get();
     }
 
     private String getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId) {
@@ -158,7 +158,7 @@ public final class CloudFoundryOperationsBuilder {
                         return resources.get(0).getMetadata().getId();
                     }
 
-                }).next().poll();
+                }).next().get();
     }
 
 }

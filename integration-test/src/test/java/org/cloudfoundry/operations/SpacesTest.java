@@ -36,7 +36,7 @@ public final class SpacesTest {
     public void list() {
         long size = Streams.wrap(this.cloudFoundryOperations.spaces().list())
                 .count()
-                .next().poll();
+                .next().get();
 
         assertEquals(2, size);
     }

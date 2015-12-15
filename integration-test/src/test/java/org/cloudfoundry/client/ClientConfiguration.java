@@ -62,7 +62,7 @@ public class ClientConfiguration {
         return Streams.wrap(cloudFoundryClient.organizations().list(request))
                 .flatMap(response -> Streams.from(response.getResources()))
                 .map(resource -> resource.getMetadata().getId())
-                .next().poll();
+                .next().get();
     }
 
     @Bean
@@ -75,7 +75,7 @@ public class ClientConfiguration {
         return Streams.wrap(cloudFoundryClient.spaces().list(request))
                 .flatMap(response -> Streams.from(response.getResources()))
                 .map(resource -> resource.getMetadata().getId())
-                .next().poll();
+                .next().get();
     }
 
 }

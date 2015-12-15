@@ -18,6 +18,8 @@ package org.cloudfoundry.demo;
 
 final class ProcessingFailed extends Exception {
 
+    private static final long serialVersionUID = 8378966924671992826L;
+
     public ProcessingFailed(String message) {
         super(message);
     }

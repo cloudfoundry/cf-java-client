@@ -17,4 +17,7 @@
 package org.cloudfoundry.demo;
 
 final class ProcessingIncomplete extends Exception {
+
+    private static final long serialVersionUID = 1597696646724710578L;
+
 }

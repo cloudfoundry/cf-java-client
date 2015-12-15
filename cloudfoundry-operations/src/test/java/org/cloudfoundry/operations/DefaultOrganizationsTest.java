@@ -69,7 +69,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                 Organization.builder().id("test-id-2").name("test-name-2").build()
         );
 
-        List<Organization> actual = Streams.wrap(this.organizations.list()).toList().poll();
+        List<Organization> actual = Streams.wrap(this.organizations.list()).toList().get();
 
         assertEquals(expected, actual);
     }

@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.client;
 
-import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,10 +50,10 @@ public final class ApplicationsV3Test {
                 .build();
 
         long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
-                .map(PaginatedResponse::getResources)
+                .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
-                .next().poll();
+                .next().get();
 
         assertEquals("Unexpected applications exist", 0, size);
     }
@@ -66,17 +66,17 @@ public final class ApplicationsV3Test {
                 .build();
 
         Streams.wrap(this.cloudFoundryClient.applicationsV3().create(createRequest))
-                .next().poll();
+                .next().get();
 
         ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
                 .spaceId(this.spaceId)
                 .build();
 
         long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(listRequest))
-                .map(PaginatedResponse::getResources)
+                .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
-                .next().poll();
+                .next().get();
 
         assertEquals(1, size);
     }

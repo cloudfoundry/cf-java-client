@@ -36,7 +36,7 @@ public final class OrganizationsTest {
     public void list() {
         long size = Streams.wrap(this.cloudFoundryOperations.organizations().list())
                 .count()
-                .next().poll();
+                .next().get();
 
         assertEquals(2, size);
     }

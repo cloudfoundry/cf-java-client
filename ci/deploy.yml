@@ -7,3 +7,7 @@ inputs:
 
 run:
   path: cf-java-client/ci/deploy.sh
+
+params:
+  ARTIFACTORY_USERNAME:
+  ARTIFACTORY_PASSWORD:

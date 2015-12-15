@@ -80,8 +80,8 @@ public class OAuthPerformance {
                             .build());
                 }));
 
-                first.add(time(() -> Streams.wrap(client.get().info().get()).next().poll()));
-                subsequent.add(time(() -> Streams.wrap(client.get().info().get()).next().poll()));
+                first.add(time(() -> Streams.wrap(client.get().info().get()).next().get()));
+                subsequent.add(time(() -> Streams.wrap(client.get().info().get()).next().get()));
             }
 
             System.out.printf("Startup:    %f ms %n", startup.stream().collect(Collectors.averagingLong(l -> l)));
