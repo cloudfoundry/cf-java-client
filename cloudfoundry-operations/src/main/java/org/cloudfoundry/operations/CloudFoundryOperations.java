@@ -22,6 +22,13 @@ package org.cloudfoundry.operations;
 public interface CloudFoundryOperations {
 
     /**
+     * Main entry point to the Cloud Foundry Applications Operations API
+     *
+     * @return the Cloud Foundry Applications Operations API
+     */
+    Applications applications();
+
+    /**
      * Main entry point to the Cloud Foundry Organizations Operations API
      *
      * @return the Cloud Foundry Organizations Operations API

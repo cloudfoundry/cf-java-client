@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.junit.Before;
@@ -26,9 +27,11 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
 
-    protected final String TEST_ORGANIZATION = "test-organization-id";
+    protected static final String TEST_ORGANIZATION = "test-organization-id";
 
-    protected final String TEST_SPACE = "test-space-id";
+    protected static final String TEST_SPACE = "test-space-id";
+
+    protected final ApplicationsV2 applications = mock(ApplicationsV2.class);
 
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class);
 
@@ -38,6 +41,7 @@ public abstract class AbstractOperationsTest {
 
     @Before
     public void mockClient() throws Exception {
+        when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
     }

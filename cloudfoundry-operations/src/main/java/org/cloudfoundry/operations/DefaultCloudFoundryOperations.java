@@ -20,13 +20,21 @@ import org.cloudfoundry.client.CloudFoundryClient;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
+    private final Applications applications;
+
     private final Organizations organizations;
 
     private final Spaces spaces;
 
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
+        this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
+    }
+
+    @Override
+    public Applications applications() {
+        return this.applications;
     }
 
     @Override
