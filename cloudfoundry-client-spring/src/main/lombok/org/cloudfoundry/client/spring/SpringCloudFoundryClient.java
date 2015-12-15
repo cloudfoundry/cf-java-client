@@ -30,6 +30,7 @@ import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
+import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplicationsV3;
@@ -40,6 +41,7 @@ import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
@@ -93,6 +95,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Packages packages;
 
+    private final Routes routes;
+
     private final OAuth2RestOperations restOperations;
 
     private final ServiceInstances serviceInstances;
@@ -109,7 +113,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     SpringCloudFoundryClient(String host, Boolean skipSslValidation, String clientId, String clientSecret,
                              String username, String password, RestOperations bootstrapRestOperations,
                              SslCertificateTruster sslCertificateTruster) {
-
 
         if (skipSslValidation != null && skipSslValidation) {
             try {
@@ -133,6 +136,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.info = new SpringInfo(restOperations, root);
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
+        this.routes = new SpringRoutes(restOperations, root);
         this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
     }
@@ -148,6 +152,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.info = new SpringInfo(restOperations, root);
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
+        this.routes = new SpringRoutes(restOperations, root);
         this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
     }
@@ -252,6 +257,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Packages packages() {
         return this.packages;
+    }
+
+    @Override
+    public Routes routes() {
+        return this.routes;
     }
 
     @Override

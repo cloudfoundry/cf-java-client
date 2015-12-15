@@ -80,12 +80,11 @@ public final class SpringRoutesTest extends AbstractRestTest {
     @Test
     public void listApplications() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/routes/test-id/apps?app_guid=test-app-id&page=-1")
+                .method(GET).path("v2/routes/test-id/apps?page=-1")
                 .status(OK)
                 .responsePayload("v2/routes/GET_{id}_apps_response.json"));
 
         ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                .appId("test-app-id")
                 .id("test-id")
                 .page(-1)
                 .build();
@@ -136,11 +135,10 @@ public final class SpringRoutesTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void listApplicationsError() {
         mockRequest(new RequestContext()
-                .method(GET).path("v2/routes/test-id/apps?app_guid=test-app-id&page=-1")
+                .method(GET).path("v2/routes/test-id/apps?page=-1")
                 .errorResponse());
 
         ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                .appId("test-app-id")
                 .id("test-id")
                 .page(-1)
                 .build();
