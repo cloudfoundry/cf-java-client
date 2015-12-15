@@ -38,7 +38,7 @@ public final class OrganizationsTest {
                 .count()
                 .next().get();
 
-        assertEquals(2, size);
+        assertEquals(1, size);
     }
 
 }

@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore("V3 APIs are unstable and prone to breakage")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
 public final class ApplicationsV3Test {

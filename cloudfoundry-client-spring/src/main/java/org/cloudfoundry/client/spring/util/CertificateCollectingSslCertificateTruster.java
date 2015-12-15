@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.util;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
@@ -49,6 +50,8 @@ public final class CertificateCollectingSslCertificateTruster implements SslCert
         if (untrusted != null) {
             appendToTruststore(untrusted);
         }
+
+        HttpsURLConnection.setDefaultHostnameVerifier(new ExplicitHostnameVerifier(host));
     }
 
     private void appendToTruststore(X509Certificate[] chain) throws KeyStoreException, NoSuchAlgorithmException,
