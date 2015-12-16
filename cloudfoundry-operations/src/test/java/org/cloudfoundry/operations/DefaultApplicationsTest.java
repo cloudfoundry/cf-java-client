@@ -98,7 +98,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .build()
         );
 
-        List<Application> actual = Streams.wrap(this.applications.list()).toList().poll();
+        List<Application> actual = Streams.wrap(this.applications.list()).toList().get();
 
         assertEquals(expected, actual);
     }
