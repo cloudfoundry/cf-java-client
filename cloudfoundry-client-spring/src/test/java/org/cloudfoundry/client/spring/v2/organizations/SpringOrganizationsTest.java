@@ -59,6 +59,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
@@ -1363,6 +1364,44 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.removeManager(request)).next().get();
+    }
+
+    @Test
+    public void removeUser() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/users/test-user-id")
+                .status(NO_CONTENT));
+
+        RemoveOrganizationUserRequest request = RemoveOrganizationUserRequest.builder()
+                .id("test-id")
+                .userId("test-user-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeUser(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeUserError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/users/test-user-id")
+                .errorResponse());
+
+        RemoveOrganizationUserRequest request = RemoveOrganizationUserRequest.builder()
+                .id("test-id")
+                .userId("test-user-id")
+                .build();
+
+        Streams.wrap(this.organizations.removeUser(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeUserInvalidRequest() {
+        RemoveOrganizationUserRequest request = RemoveOrganizationUserRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.removeUser(request)).next().get();
     }
 
     @Test
