@@ -16,18 +16,13 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.client.CloudFoundryClient;
-
 abstract class AbstractOperations {
-
-    protected final CloudFoundryClient cloudFoundryClient;
 
     private final String organizationId;
 
     private final String spaceId;
 
-    protected AbstractOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
-        this.cloudFoundryClient = cloudFoundryClient;
+    protected AbstractOperations(String organizationId, String spaceId) {
         this.organizationId = organizationId;
         this.spaceId = spaceId;
     }
