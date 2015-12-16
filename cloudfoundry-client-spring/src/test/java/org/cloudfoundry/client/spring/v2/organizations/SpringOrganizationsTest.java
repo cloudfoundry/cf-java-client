@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
@@ -524,6 +526,69 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
     }
 
     @Test
+    public void get() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_response.json"));
+
+        GetOrganizationRequest request = GetOrganizationRequest.builder()
+                .id("test-id")
+                .build();
+
+        GetOrganizationResponse expected = GetOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("027616f3-66c4-412c-8214-7e43db2d587b")
+                        .url("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b")
+                        .createdAt("2015-07-27T22:43:11Z")
+                        .build())
+                .entity(OrganizationEntity.builder()
+                        .name("name-240")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("f3f0b830-d50a-4265-b8f8-3c430aa0313b")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/f3f0b830-d50a-4265-b8f8-3c430aa0313b")
+                        .spacesUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/spaces")
+                        .domainsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/domains")
+                        .privateDomainsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/private_domains")
+                        .usersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/users")
+                        .managersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/managers")
+                        .billingManagersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/billing_managers")
+                        .auditorsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/auditors")
+                        .applicationEventsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/app_events")
+                        .spaceQuotaDefinitionsUrl
+                                ("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/space_quota_definitions")
+                        .build())
+                .build();
+
+        GetOrganizationResponse actual = Streams.wrap(this.organizations.get(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id")
+                .errorResponse());
+
+        GetOrganizationRequest request = GetOrganizationRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.get(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getInvalidRequest() {
+        GetOrganizationRequest request = GetOrganizationRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.get(request)).next().get();
+    }
+
+    @Test
     public void getUserRoles() {
         mockRequest(new RequestContext()
                 .method(GET).path("v2/organizations/test-id/user_roles?page=-1")
@@ -538,7 +603,8 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
         GetOrganizationUserRolesResponse expected = GetOrganizationUserRolesResponse.builder()
                 .totalResults(2)
                 .totalPages(2)
-                .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc&page=2&results-per-page=1")
+                .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc&page" +
+                        "=2&results-per-page=1")
                 .resource(UserOrganizationRoleResource.builder()
                         .metadata(Metadata.builder()
                                 .id("uaa-id-92")

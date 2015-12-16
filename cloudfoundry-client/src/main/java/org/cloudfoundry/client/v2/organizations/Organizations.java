@@ -94,6 +94,16 @@ public interface Organizations {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieve_a_particular_organization.html">Retrieve
+     * a Particular Organization</a> request
+     *
+     * @param request the Retrieve a Particular Organization request
+     * @return the response from the Retrieve a Particular Organization request
+     */
+    Publisher<GetOrganizationResponse> get(GetOrganizationRequest request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_the_roles_of_all_users_in_the_organization.html">Retrieving
      * the roles of all Users in the Organization</a> request
      *
