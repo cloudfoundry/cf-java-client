@@ -231,6 +231,16 @@ public interface Organizations {
     Publisher<Void> removeManager(RemoveOrganizationManagerRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_user_from_the_organization.html">Remove
+     * User from the Organization</a> request
+     *
+     * @param request the Remove User from the Organization request
+     * @return the response from the Remove User from the Organization request
+     */
+    Publisher<Void> removeUser(RemoveOrganizationUserRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/get_organization_summary.html">Get
      * Organization summary</a> request
      *
