@@ -33,9 +33,9 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest extends AbstractOperationsTest {
 
-    private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, TEST_ORGANIZATION);
+    private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, TEST_ORGANIZATION);
 
-    private DefaultSpaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
+    private Spaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
 
     @Test
     public void list() {
