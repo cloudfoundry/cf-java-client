@@ -20,10 +20,10 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * A Cloud Foundry Space
+ * A Cloud Foundry Space Summary
  */
 @Data
-public final class Space {
+public final class SpaceSummary {
 
     /**
      * The id
@@ -42,7 +42,7 @@ public final class Space {
     private final String name;
 
     @Builder
-    private Space(String id, String name) {
+    SpaceSummary(String id, String name) {
         this.id = id;
         this.name = name;
     }
