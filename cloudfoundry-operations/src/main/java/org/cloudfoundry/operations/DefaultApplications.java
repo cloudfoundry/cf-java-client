@@ -36,36 +36,35 @@ final class DefaultApplications extends AbstractOperations implements Applicatio
     @Override
     public Publisher<Application> list() {
         final GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                .id(DefaultApplications.this.getTargetedSpace())
-                .build();
+                .id(DefaultApplications.this.getTargetedSpace()).build();
 
         return Streams.wrap(this.cloudFoundryClient
                 .spaces()
                 .getSummary(request))
                 .flatMap(new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
 
-            @Override
-            public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
-                return Streams.from(getSpaceSummaryResponse.getApplications());
-            }
+                    @Override
+                    public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
+                        return Streams.from(getSpaceSummaryResponse.getApplications());
+                    }
 
-        }).map(new Function<SpaceApplicationSummary, Application>() {
+                }).map(new Function<SpaceApplicationSummary, Application>() {
 
-            @Override
-            public Application apply(SpaceApplicationSummary applicationSummary) {
-                return Application.builder()
-                        .disk(applicationSummary.getDiskQuota())
-                        .id(applicationSummary.getId())
-                        .instances(applicationSummary.getInstances())
-                        .memory(applicationSummary.getMemory())
-                        .name(applicationSummary.getName())
-                        .requestedState(applicationSummary.getState())
-                        .runningInstances(applicationSummary.getRunningInstances())
-                        .urls(applicationSummary.getUrls())
-                        .build();
-            }
+                    @Override
+                    public Application apply(SpaceApplicationSummary applicationSummary) {
+                        return Application.builder()
+                                .disk(applicationSummary.getDiskQuota())
+                                .id(applicationSummary.getId())
+                                .instances(applicationSummary.getInstances())
+                                .memory(applicationSummary.getMemory())
+                                .name(applicationSummary.getName())
+                                .requestedState(applicationSummary.getState())
+                                .runningInstances(applicationSummary.getRunningInstances())
+                                .urls(applicationSummary.getUrls())
+                                .build();
+                    }
 
-        });
+                });
     }
 
 }
