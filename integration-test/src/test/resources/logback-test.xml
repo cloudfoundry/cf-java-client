@@ -23,8 +23,6 @@
         </encoder>
     </appender>
 
-    <logger name="org.cloudfoundry.client.spring.SpringCloudFoundryClient" level="DEBUG"/>
-
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
