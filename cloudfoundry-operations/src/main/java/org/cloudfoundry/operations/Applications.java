@@ -16,28 +16,18 @@
 
 package org.cloudfoundry.operations;
 
-import org.junit.Test;
+import org.reactivestreams.Publisher;
 
-import static org.junit.Assert.assertNotNull;
+/**
+ * Main entry point to the Cloud Foundry Applications Operations API
+ */
+public interface Applications {
 
-public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
-
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(
-            this.cloudFoundryClient, null, null);
-
-    @Test
-    public void applications() {
-        assertNotNull(this.operations.applications());
-    }
-
-    @Test
-    public void organizations() {
-        assertNotNull(this.operations.organizations());
-    }
-
-    @Test
-    public void spaces() {
-        assertNotNull(this.operations.spaces());
-    }
+    /**
+     * Lists the applications
+     *
+     * @return the applications
+     */
+    Publisher<Application> list();
 
 }
