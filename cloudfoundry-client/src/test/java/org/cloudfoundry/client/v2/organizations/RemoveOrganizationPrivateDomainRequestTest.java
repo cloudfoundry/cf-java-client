@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class AssociatePrivateDomainRequestTest {
+public final class RemoveOrganizationPrivateDomainRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = AssociatePrivateDomainRequest.builder()
+        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
                 .id("test-id")
                 .privateDomainId("test-private-domain-id")
                 .build()
@@ -38,7 +38,7 @@ public final class AssociatePrivateDomainRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = AssociatePrivateDomainRequest.builder()
+        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
                 .privateDomainId("test-private-domain-id")
                 .build()
                 .isValid();
@@ -49,7 +49,7 @@ public final class AssociatePrivateDomainRequestTest {
 
     @Test
     public void isValidNoPrivateDomainId() {
-        ValidationResult result = AssociatePrivateDomainRequest.builder()
+        ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
                 .id("test-id")
                 .build()
                 .isValid();
