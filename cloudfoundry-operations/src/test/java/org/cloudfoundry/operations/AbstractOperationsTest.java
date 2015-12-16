@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.junit.Before;
 
@@ -37,12 +38,15 @@ public abstract class AbstractOperationsTest {
 
     protected final Organizations organizations = mock(Organizations.class);
 
+    protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class);
+
     protected final Spaces spaces = mock(Spaces.class);
 
     @Before
     public void mockClient() throws Exception {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
+        when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
     }
 }

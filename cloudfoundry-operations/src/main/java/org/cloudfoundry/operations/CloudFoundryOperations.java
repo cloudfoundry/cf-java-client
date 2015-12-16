@@ -42,4 +42,11 @@ public interface CloudFoundryOperations {
      */
     Spaces spaces();
 
+    /**
+     * Main entry point to the Cloud Foundry Space Quotas Operations API
+     *
+     * @return the Cloud Foundry Space Quotas Operations API
+     */
+    SpaceQuotas spaceQuotas();
+
 }
