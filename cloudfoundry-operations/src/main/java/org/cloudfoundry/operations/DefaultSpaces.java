@@ -26,8 +26,11 @@ import reactor.fn.Function;
 
 final class DefaultSpaces extends AbstractOperations implements Spaces {
 
+    private final CloudFoundryClient cloudFoundryClient;
+
     DefaultSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        super(cloudFoundryClient, organizationId, null);
+        super(organizationId, null);
+        this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override

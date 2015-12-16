@@ -25,8 +25,11 @@ import reactor.fn.Function;
 
 final class DefaultOrganizations extends AbstractOperations implements Organizations {
 
+    private final CloudFoundryClient cloudFoundryClient;
+
     DefaultOrganizations(CloudFoundryClient cloudFoundryClient) {
-        super(cloudFoundryClient, null, null);
+        super(null, null);
+        this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
