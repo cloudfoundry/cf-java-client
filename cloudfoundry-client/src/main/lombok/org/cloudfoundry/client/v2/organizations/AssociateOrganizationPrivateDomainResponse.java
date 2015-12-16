@@ -29,11 +29,11 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociatePrivateDomainResponse extends Resource<OrganizationEntity> {
+public final class AssociateOrganizationPrivateDomainResponse extends Resource<OrganizationEntity> {
 
     @Builder
-    AssociatePrivateDomainResponse(@JsonProperty("entity") OrganizationEntity entity,
-                                   @JsonProperty("metadata") Resource.Metadata metadata) {
+    AssociateOrganizationPrivateDomainResponse(@JsonProperty("entity") OrganizationEntity entity,
+                                               @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
 

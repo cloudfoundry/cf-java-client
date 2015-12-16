@@ -25,10 +25,10 @@ import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
-import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainRequest;
-import org.cloudfoundry.client.v2.organizations.AssociatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
@@ -59,6 +59,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
@@ -297,12 +298,12 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .status(OK)
                 .responsePayload("v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json"));
 
-        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+        AssociateOrganizationPrivateDomainRequest request = AssociateOrganizationPrivateDomainRequest.builder()
                 .id("test-id")
                 .privateDomainId("test-private-domain-id")
                 .build();
 
-        AssociatePrivateDomainResponse expected = AssociatePrivateDomainResponse.builder()
+        AssociateOrganizationPrivateDomainResponse expected = AssociateOrganizationPrivateDomainResponse.builder()
                 .entity(OrganizationEntity.builder()
                         .name("name-228")
                         .billingEnabled(false)
@@ -327,8 +328,8 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                         .build())
                 .build();
 
-        AssociatePrivateDomainResponse actual = Streams.wrap(this.organizations.associatePrivateDomain(request)).next
-                ().get();
+        AssociateOrganizationPrivateDomainResponse actual = Streams.wrap(this.organizations.associatePrivateDomain
+                (request)).next().get();
 
         assertEquals(expected, actual);
         verify();
@@ -340,7 +341,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .method(PUT).path("v2/organizations/test-id/private_domains/test-private-domain-id")
                 .errorResponse());
 
-        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+        AssociateOrganizationPrivateDomainRequest request = AssociateOrganizationPrivateDomainRequest.builder()
                 .id("test-id")
                 .privateDomainId("test-private-domain-id")
                 .build();
@@ -350,7 +351,7 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
 
     @Test(expected = RequestValidationException.class)
     public void associatePrivateDomainInvalidRequest() {
-        AssociatePrivateDomainRequest request = AssociatePrivateDomainRequest.builder()
+        AssociateOrganizationPrivateDomainRequest request = AssociateOrganizationPrivateDomainRequest.builder()
                 .build();
 
         Streams.wrap(this.organizations.associatePrivateDomain(request)).next().get();
@@ -1364,6 +1365,44 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.removeManager(request)).next().get();
+    }
+
+    @Test
+    public void removePrivateDomain() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                .status(NO_CONTENT));
+
+        RemoveOrganizationPrivateDomainRequest request = RemoveOrganizationPrivateDomainRequest.builder()
+                .id("test-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
+
+        Streams.wrap(this.organizations.removePrivateDomain(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removePrivateDomainError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                .errorResponse());
+
+        RemoveOrganizationPrivateDomainRequest request = RemoveOrganizationPrivateDomainRequest.builder()
+                .id("test-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
+
+        Streams.wrap(this.organizations.removePrivateDomain(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removePrivateDomainInvalidRequest() {
+        RemoveOrganizationPrivateDomainRequest request = RemoveOrganizationPrivateDomainRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.removePrivateDomain(request)).next().get();
     }
 
     @Test

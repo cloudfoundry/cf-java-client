@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Associate Private Domain with the Organization operation
  */
 @Data
-public final class AssociatePrivateDomainRequest implements Validatable {
+public final class AssociateOrganizationPrivateDomainRequest implements Validatable {
 
     /**
      * The id
@@ -48,8 +48,7 @@ public final class AssociatePrivateDomainRequest implements Validatable {
     private final String privateDomainId;
 
     @Builder
-    AssociatePrivateDomainRequest(String id, String privateDomainId) {
-
+    AssociateOrganizationPrivateDomainRequest(String id, String privateDomainId) {
         this.id = id;
         this.privateDomainId = privateDomainId;
     }

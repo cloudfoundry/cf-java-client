@@ -61,7 +61,8 @@ public interface Organizations {
      * @param request the Associate Private Domain with the Organization request
      * @return the response from the Associate Private Domain with the Organization request
      */
-    Publisher<AssociatePrivateDomainResponse> associatePrivateDomain(AssociatePrivateDomainRequest request);
+    Publisher<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(
+            AssociateOrganizationPrivateDomainRequest request);
 
     /**
      * Makes the
@@ -229,6 +230,16 @@ public interface Organizations {
      * @return the response from the Remove Manager from the Organization request
      */
     Publisher<Void> removeManager(RemoveOrganizationManagerRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_private_domain_from_the_organization.html">Remove
+     * Private Domain from the Organization</a> request
+     *
+     * @param request the Remove Private Domain from the Organization request
+     * @return the response from the Remove Private Domain from the Organization request
+     */
+    Publisher<Void> removePrivateDomain(RemoveOrganizationPrivateDomainRequest request);
 
     /**
      * Makes the
