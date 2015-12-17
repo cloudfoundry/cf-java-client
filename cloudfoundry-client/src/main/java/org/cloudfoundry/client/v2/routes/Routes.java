@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Routes {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/associate_app_with_the_route.html">Associate
+     * Application with the Route</a> request
+     *
+     * @param request the Associate an Application with the Route request
+     * @return the response from the Associate an Application with the Route request
+     */
+    Publisher<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/creating_a_route.html">Creating a Route</a>
      * request
      *
