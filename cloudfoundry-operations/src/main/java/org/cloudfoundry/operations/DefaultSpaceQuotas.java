@@ -17,8 +17,8 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.v2.PageUtils;
@@ -29,22 +29,23 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient) {
-        super(null, null);
+    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        super(organizationId, null);
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
     public Publisher<SpaceQuota> list() {
-        return PageUtils.resourceStream(new Function<Integer, Publisher<ListSpaceQuotaDefinitionsResponse>>() {
+        return PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
             @Override
-            public Publisher<ListSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                ListSpaceQuotaDefinitionsRequest request = ListSpaceQuotaDefinitionsRequest.builder()
+            public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                        .id(getTargetedOrganization())
                         .page(page)
                         .build();
 
-                return DefaultSpaceQuotas.this.cloudFoundryClient.spaceQuotaDefinitions().list(request);
+                return DefaultSpaceQuotas.this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request);
             }
 
         }).map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {

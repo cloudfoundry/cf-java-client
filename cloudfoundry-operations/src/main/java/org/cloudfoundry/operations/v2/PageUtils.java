@@ -48,7 +48,12 @@ public final class PageUtils {
 
                     @Override
                     public Publisher<? extends U> apply(U response) {
-                        return Streams.range(2, response.getTotalPages() - 1)
+
+                        Integer totalPages = response.getTotalPages();
+                        if (totalPages==null) {
+                            throw new IllegalStateException("Page response has no total pages set");
+                        }
+                        return Streams.range(2, totalPages - 1)
                                 .flatMap(new Function<Integer, Publisher<? extends U>>() {
 
                                     @Override
