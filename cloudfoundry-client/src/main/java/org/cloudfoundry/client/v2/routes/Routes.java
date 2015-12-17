@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Routes {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/retrieve_a_particular_route.html">Retrieve a
+     * Particular Route</a> request
+     *
+     * @param request the Retrieve a Particular Route request
+     * @return the response from the Retrieve a Particular Route request
+     */
+    Publisher<GetRouteResponse> get(GetRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/routes/list_all_routes.html">List all Routes</a> request
      *
      * @param request the List all Applications for the Route request
