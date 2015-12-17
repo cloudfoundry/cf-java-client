@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRespons
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
@@ -588,6 +590,49 @@ public final class SpringOrganizationsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.organizations.get(request)).next().get();
+    }
+
+    @Test
+    public void getMemoryUsage() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/memory_usage")
+                .status(OK)
+                .responsePayload("v2/organizations/GET_{id}_memory_usage_response.json"));
+
+        GetOrganizationMemoryUsageRequest request = GetOrganizationMemoryUsageRequest.builder()
+                .id("test-id")
+                .build();
+
+        GetOrganizationMemoryUsageResponse expected = GetOrganizationMemoryUsageResponse.builder()
+                .memoryUsageInMb(0)
+                .build();
+
+        GetOrganizationMemoryUsageResponse actual = Streams.wrap(this.organizations.getMemoryUsage(request)).next()
+                .get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getMemoryUsageError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/organizations/test-id/memory_usage")
+                .errorResponse());
+
+        GetOrganizationMemoryUsageRequest request = GetOrganizationMemoryUsageRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.organizations.getMemoryUsage(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getMemoryUsageInvalidRequest() {
+        GetOrganizationMemoryUsageRequest request = GetOrganizationMemoryUsageRequest.builder()
+                .build();
+
+        Streams.wrap(this.organizations.getMemoryUsage(request)).next().get();
     }
 
     @Test
