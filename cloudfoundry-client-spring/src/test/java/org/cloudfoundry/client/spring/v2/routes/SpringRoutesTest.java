@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
@@ -34,10 +35,12 @@ import org.junit.Test;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringRoutesTest extends AbstractRestTest {
 
@@ -169,6 +172,44 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.routes.list(request)).next().get();
+    }
+
+    @Test
+    public void removeApplication() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/routes/test-id/apps/test-app-id")
+                .status(NO_CONTENT));
+
+        RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
+                .appId("test-app-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.routes.removeApplication(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void removeApplicationError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/routes/test-id/apps/test-app-id")
+                .errorResponse());
+
+        RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
+                .appId("test-app-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.routes.removeApplication(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void removeApplicationInvalidRequest() {
+        RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.removeApplication(request)).next().get();
     }
 
     @Test
