@@ -88,4 +88,15 @@ public final class PageUtilsTest {
         assertEquals(expected, actual);
     }
 
+    @Test(expected = IllegalStateException.class)
+    public final void pageStreamNoTotalPages() {
+        PageUtils.pageStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+            @Override
+            public Publisher<ListSpacesResponse> apply(Integer page) {
+                return Streams.just(ListSpacesResponse.builder()
+                        .resource(testSpaceResource(0))
+                        .build());
+            }
+        }).toList().get();
+    }
 }

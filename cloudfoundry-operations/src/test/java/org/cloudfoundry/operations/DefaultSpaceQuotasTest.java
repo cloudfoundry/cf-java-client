@@ -17,8 +17,8 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.v2.Resource.Metadata;
-import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.junit.Test;
@@ -33,10 +33,14 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultSpaceQuotasTest extends AbstractOperationsTest {
 
-    private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient);
+    private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
 
-    private static ListSpaceQuotaDefinitionsResponse getListSpaceQuotaDefinitionsResponse(int page, int numPages) {
-        return ListSpaceQuotaDefinitionsResponse.builder()
+    private final SpaceQuotas spaceQuotasNoOrganization = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
+
+    private static ListOrganizationSpaceQuotaDefinitionsResponse getListOrganizationSpaceQuotaDefinitionsResponse(
+            int page,
+            int numPages) {
+        return ListOrganizationSpaceQuotaDefinitionsResponse.builder()
                 .resource(getSpaceQuotaDefinitionResource(page))
                 .totalPages(numPages)
                 .build();
@@ -72,15 +76,21 @@ public final class DefaultSpaceQuotasTest extends AbstractOperationsTest {
 
     @Test
     public void list() {
-        ListSpaceQuotaDefinitionsResponse page1 = getListSpaceQuotaDefinitionsResponse(1, 2);
-        ListSpaceQuotaDefinitionsResponse page2 = getListSpaceQuotaDefinitionsResponse(2, 2);
+        ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
+        ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
 
-        when(this.cloudFoundryClient.spaceQuotaDefinitions()
-                .list(ListSpaceQuotaDefinitionsRequest.builder().page(1).build()))
+        when(this.cloudFoundryClient.organizations()
+                .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                        .id(TEST_ORGANIZATION)
+                        .page(1)
+                        .build()))
                 .thenReturn(Publishers.just(page1));
 
-        when(this.cloudFoundryClient.spaceQuotaDefinitions()
-                .list(ListSpaceQuotaDefinitionsRequest.builder().page(2).build()))
+        when(this.cloudFoundryClient.organizations()
+                .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                        .id(TEST_ORGANIZATION)
+                        .page(2)
+                        .build()))
                 .thenReturn(Publishers.just(page2));
 
         List<SpaceQuota> expected = Arrays.asList(getSpaceQuota(1), getSpaceQuota(2));
@@ -89,5 +99,11 @@ public final class DefaultSpaceQuotasTest extends AbstractOperationsTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void listNoOrganization() {
+        this.spaceQuotasNoOrganization.list();
+    }
+
 
 }

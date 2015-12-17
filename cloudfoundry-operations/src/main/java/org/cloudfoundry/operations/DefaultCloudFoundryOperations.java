@@ -31,7 +31,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
-        this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient);
+        this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
     }
 

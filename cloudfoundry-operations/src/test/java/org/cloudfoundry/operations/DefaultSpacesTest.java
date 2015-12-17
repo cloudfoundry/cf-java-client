@@ -35,7 +35,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
 
     private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, TEST_ORGANIZATION);
 
-    private Spaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
+    private final Spaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
 
     @Test
     public void list() {
