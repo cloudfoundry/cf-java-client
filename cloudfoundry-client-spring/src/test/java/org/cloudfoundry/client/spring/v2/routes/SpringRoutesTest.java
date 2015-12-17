@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
+import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
@@ -41,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -48,6 +51,68 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringRoutesTest extends AbstractRestTest {
 
     private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+
+    @Test
+    public void create() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/routes")
+                .requestPayload("v2/routes/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/routes/POST_response.json"));
+
+        CreateRouteRequest request = CreateRouteRequest.builder()
+                .domainId("4d9e6314-58ca-4f09-a736-d8bcc903b95e")
+                .port(10000)
+                .spaceId("2f093daf-c030-4b57-99c2-9b8858b200e4")
+                .build();
+
+        CreateRouteResponse expected = CreateRouteResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .id("e689dab1-c4e7-4499-b708-7c649949e86d")
+                        .url("/v2/routes/e689dab1-c4e7-4499-b708-7c649949e86d")
+                        .createdAt("2015-11-30T23:38:55Z")
+                        .build())
+                .entity(RouteEntity.builder()
+                        .host("")
+                        .path("")
+                        .port(10000)
+                        .domainId("4d9e6314-58ca-4f09-a736-d8bcc903b95e")
+                        .spaceId("2f093daf-c030-4b57-99c2-9b8858b200e4")
+                        .domainUrl("/v2/domains/4d9e6314-58ca-4f09-a736-d8bcc903b95e")
+                        .spaceUrl("/v2/spaces/2f093daf-c030-4b57-99c2-9b8858b200e4")
+                        .applicationsUrl("/v2/routes/e689dab1-c4e7-4499-b708-7c649949e86d/apps")
+                        .build())
+                .build();
+
+        CreateRouteResponse actual = Streams.wrap(this.routes.create(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void createError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/routes")
+                .requestPayload("v2/routes/POST_request.json")
+                .errorResponse());
+
+        CreateRouteRequest request = CreateRouteRequest.builder()
+                .domainId("4d9e6314-58ca-4f09-a736-d8bcc903b95e")
+                .port(10000)
+                .spaceId("2f093daf-c030-4b57-99c2-9b8858b200e4")
+                .build();
+
+        Streams.wrap(this.routes.create(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void createInvalidRequest() {
+        CreateRouteRequest request = CreateRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.create(request)).next().get();
+    }
 
     @Test
     public void delete() {
