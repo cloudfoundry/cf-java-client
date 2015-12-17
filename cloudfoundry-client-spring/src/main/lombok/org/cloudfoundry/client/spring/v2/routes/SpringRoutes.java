@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.Routes;
+import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
+import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -71,6 +73,18 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
                 builder.pathSegment("v2", "routes", request.getId(), "apps");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<UpdateRouteResponse> update(final UpdateRouteRequest request) {
+        return put(request, UpdateRouteResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "routes", request.getId());
             }
 
         });

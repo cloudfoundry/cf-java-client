@@ -28,12 +28,16 @@ import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
+import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.junit.Test;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.CREATED;
 
 public final class SpringRoutesTest extends AbstractRestTest {
 
@@ -165,6 +169,67 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.routes.list(request)).next().get();
+    }
+
+    @Test
+    public void update() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/routes/test-id")
+                .requestPayload("v2/routes/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("v2/routes/PUT_{id}_response.json"));
+
+        UpdateRouteRequest request = UpdateRouteRequest.builder()
+                .id("test-id")
+                .port(10000)
+                .build();
+
+        UpdateRouteResponse expected = UpdateRouteResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .id("1df59bcc-a47c-4762-b793-61f1b2e6e5f3")
+                        .url("/v2/routes/1df59bcc-a47c-4762-b793-61f1b2e6e5f3")
+                        .createdAt("2015-11-30T23:38:55Z")
+                        .updatedAt("2015-11-30T23:38:55Z")
+                        .build())
+                .entity(RouteEntity.builder()
+                        .host("host-15")
+                        .path("")
+                        .port(10000)
+                        .domainId("fef11ae6-30cd-4d0e-88b7-ef7737d0c6f6")
+                        .spaceId("8a27c503-19a8-4704-939c-aac293ac3add")
+                        .domainUrl("/v2/domains/fef11ae6-30cd-4d0e-88b7-ef7737d0c6f6")
+                        .spaceUrl("/v2/spaces/8a27c503-19a8-4704-939c-aac293ac3add")
+                        .applicationsUrl("/v2/routes/1df59bcc-a47c-4762-b793-61f1b2e6e5f3/apps")
+                        .build())
+                .build();
+
+        UpdateRouteResponse actual = Streams.wrap(this.routes.update(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void updateError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/routes/test-id")
+                .requestPayload("v2/routes/PUT_{id}_request.json")
+                .errorResponse());
+
+        UpdateRouteRequest request = UpdateRouteRequest.builder()
+                .id("test-id")
+                .port(10000)
+                .build();
+
+        Streams.wrap(this.routes.update(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void updateInvalidRequest() {
+        UpdateRouteRequest request = UpdateRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.update(request)).next().get();
     }
 
 }

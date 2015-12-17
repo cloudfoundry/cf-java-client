@@ -40,4 +40,12 @@ public interface Routes {
      */
     Publisher<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/update_a_route.html">Update a Route</a> request
+     *
+     * @param request the Update a Route request
+     * @return the response from the Update a Route request
+     */
+    Publisher<UpdateRouteResponse> update(UpdateRouteRequest request);
+
 }
