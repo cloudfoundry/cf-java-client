@@ -16,55 +16,40 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
 
+import static org.cloudfoundry.operations.v2.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Organization> {
 
-        private final Organizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationsRequest request1 = ListOrganizationsRequest.builder()
+            ListOrganizationsRequest request1 = fill(ListOrganizationsRequest.builder())
                     .page(1)
                     .build();
-            ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
-                    .resource(OrganizationResource.builder()
-                            .metadata(Metadata.builder()
-                                    .id("test-id-1")
-                                    .build())
-                            .entity(OrganizationEntity.builder()
-                                    .name("test-name-1")
-                                    .build())
-                            .build())
+            ListOrganizationsResponse page1 = fill(ListOrganizationsResponse.builder())
                     .totalPages(2)
+                    .resource(fill(OrganizationResource.builder(), "org1-").build())
                     .build();
             when(this.cloudFoundryClient.organizations().list(request1)).thenReturn(Mono.just(page1));
 
-            ListOrganizationsRequest request2 = ListOrganizationsRequest.builder()
+            ListOrganizationsRequest request2 = fill(ListOrganizationsRequest.builder())
                     .page(2)
                     .build();
             ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
-                    .resource(OrganizationResource.builder()
-                            .metadata(Metadata.builder()
-                                    .id("test-id-2")
-                                    .build())
-                            .entity(OrganizationEntity.builder()
-                                    .name("test-name-2")
-                                    .build())
-                            .build())
                     .totalPages(2)
+                    .resource(fill(OrganizationResource.builder(), "org2-").build())
                     .build();
             when(this.cloudFoundryClient.organizations().list(request2)).thenReturn(Mono.just(page2));
         }
@@ -72,14 +57,8 @@ public final class DefaultOrganizationsTest {
         @Override
         protected void assertions(TestSubscriber<Organization> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(Organization.builder()
-                            .id("test-id-1")
-                            .name("test-name-1")
-                            .build())
-                    .assertEquals(Organization.builder()
-                            .id("test-id-2")
-                            .name("test-name-2")
-                            .build());
+                    .assertEquals(fill(Organization.builder(),"org1-").build())
+                    .assertEquals(fill(Organization.builder(),"org2-").build());
         }
 
         @Override
