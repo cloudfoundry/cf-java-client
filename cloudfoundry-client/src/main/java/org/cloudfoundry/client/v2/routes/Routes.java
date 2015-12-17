@@ -24,6 +24,15 @@ import org.reactivestreams.Publisher;
 public interface Routes {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/delete_a_particular_route.html">Delete a Particular
+     * Route</a> request
+     *
+     * @param request the Delete a Particular Route request
+     * @return the response from the Delete a Particular Route request
+     */
+    Publisher<Void> delete(DeleteRouteRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/retrieve_a_particular_route.html">Retrieve a
      * Particular Route</a> request
      *
