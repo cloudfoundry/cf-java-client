@@ -59,8 +59,9 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest
-                                                                                         request) {
+    public Publisher<AssociateRouteApplicationResponse> associateApplication(
+            final AssociateRouteApplicationRequest request) {
+        
         return put(request, AssociateRouteApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

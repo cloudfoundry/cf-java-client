@@ -36,36 +36,40 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
 
     @Override
     public Publisher<SpaceQuota> list() {
-        return PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+        return PageUtils.resourceStream(
+                new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
-            @Override
-            public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                        .id(getTargetedOrganization())
-                        .page(page)
-                        .build();
+                    @Override
+                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                        ListOrganizationSpaceQuotaDefinitionsRequest request =
+                                ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                                        .id(getTargetedOrganization())
+                                        .page(page)
+                                        .build();
 
-                return DefaultSpaceQuotas.this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request);
-            }
+                        return DefaultSpaceQuotas.this.cloudFoundryClient.organizations()
+                                .listSpaceQuotaDefinitions(request);
+                    }
 
-        }).map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
+                })
+                .map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
 
-            @Override
-            public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
-                SpaceQuotaDefinitionEntity spaceQuotaDefinitionEntity = resource.getEntity();
-                return SpaceQuota.builder()
-                        .id(resource.getMetadata().getId())
-                        .instanceMemoryLimit(spaceQuotaDefinitionEntity.getInstanceMemoryLimit())
-                        .name(spaceQuotaDefinitionEntity.getName())
-                        .organizationId(spaceQuotaDefinitionEntity.getOrganizationId())
-                        .paidServicePlans(spaceQuotaDefinitionEntity.getNonBasicServicesAllowed())
-                        .totalMemoryLimit(spaceQuotaDefinitionEntity.getMemoryLimit())
-                        .totalRoutes(spaceQuotaDefinitionEntity.getTotalRoutes())
-                        .totalServiceInstances(spaceQuotaDefinitionEntity.getTotalServices())
-                        .build();
-            }
+                    @Override
+                    public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
+                        SpaceQuotaDefinitionEntity spaceQuotaDefinitionEntity = resource.getEntity();
+                        return SpaceQuota.builder()
+                                .id(resource.getMetadata().getId())
+                                .instanceMemoryLimit(spaceQuotaDefinitionEntity.getInstanceMemoryLimit())
+                                .name(spaceQuotaDefinitionEntity.getName())
+                                .organizationId(spaceQuotaDefinitionEntity.getOrganizationId())
+                                .paidServicePlans(spaceQuotaDefinitionEntity.getNonBasicServicesAllowed())
+                                .totalMemoryLimit(spaceQuotaDefinitionEntity.getMemoryLimit())
+                                .totalRoutes(spaceQuotaDefinitionEntity.getTotalRoutes())
+                                .totalServiceInstances(spaceQuotaDefinitionEntity.getTotalServices())
+                                .build();
+                    }
 
-        });
+                });
     }
 
 }
