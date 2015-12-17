@@ -41,6 +41,15 @@ public interface Routes {
     Publisher<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/remove_app_from_the_route.html">Remove Application
+     * from the Route</a> request
+     *
+     * @param request the Remove Application from the Route request
+     * @return the response from the Remove Application from the Route request
+     */
+    Publisher<Void> removeApplication(RemoveRouteApplicationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/update_a_route.html">Update a Route</a> request
      *
      * @param request the Update a Route request
