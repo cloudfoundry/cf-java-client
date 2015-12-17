@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "75c16cfe-9b8a-4faf-bb65-02c713c7956f",
+    "url": "/v2/routes/75c16cfe-9b8a-4faf-bb65-02c713c7956f",
+    "created_at": "2015-11-30T23:38:56Z",
+    "updated_at": null
+  },
+  "entity": {
+    "host": "host-18",
+    "path": "",
+    "domain_guid": "a284da28-3a0b-4e46-8c2f-a4b28f76a09b",
+    "space_guid": "b3f94ab9-1520-478b-a6d6-eb467c179ada",
+    "service_instance_guid": "e3db4ea8-ab0c-4c47-adf8-a70a8e990ee4",
+    "port": 0,
+    "domain_url": "/v2/domains/a284da28-3a0b-4e46-8c2f-a4b28f76a09b",
+    "space_url": "/v2/spaces/b3f94ab9-1520-478b-a6d6-eb467c179ada",
+    "service_instance_url": "/v2/service_instances/e3db4ea8-ab0c-4c47-adf8-a70a8e990ee4",
+    "apps_url": "/v2/routes/75c16cfe-9b8a-4faf-bb65-02c713c7956f/apps"
+  }
+}

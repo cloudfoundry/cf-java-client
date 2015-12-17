@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.routes.GetRouteRequest;
+import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
@@ -45,6 +47,62 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringRoutesTest extends AbstractRestTest {
 
     private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+
+    @Test
+    public void get() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes/test-id")
+                .status(OK)
+                .responsePayload("v2/routes/GET_{id}_response.json"));
+
+        GetRouteRequest request = GetRouteRequest.builder()
+                .id("test-id")
+                .build();
+
+        GetRouteResponse expected = GetRouteResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .id("75c16cfe-9b8a-4faf-bb65-02c713c7956f")
+                        .url("/v2/routes/75c16cfe-9b8a-4faf-bb65-02c713c7956f")
+                        .createdAt("2015-11-30T23:38:56Z")
+                        .build())
+                .entity(RouteEntity.builder()
+                        .host("host-18")
+                        .path("")
+                        .port(0)
+                        .domainId("a284da28-3a0b-4e46-8c2f-a4b28f76a09b")
+                        .spaceId("b3f94ab9-1520-478b-a6d6-eb467c179ada")
+                        .domainUrl("/v2/domains/a284da28-3a0b-4e46-8c2f-a4b28f76a09b")
+                        .spaceUrl("/v2/spaces/b3f94ab9-1520-478b-a6d6-eb467c179ada")
+                        .applicationsUrl("/v2/routes/75c16cfe-9b8a-4faf-bb65-02c713c7956f/apps")
+                        .build())
+                .build();
+
+        GetRouteResponse actual = Streams.wrap(this.routes.get(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void getError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes/test-id")
+                .errorResponse());
+
+        GetRouteRequest request = GetRouteRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.routes.get(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void getInvalidRequest() {
+        GetRouteRequest request = GetRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.get(request)).next().get();
+    }
 
     @Test
     public void list() {
