@@ -16,39 +16,28 @@
 
 package org.cloudfoundry.client.v2.routes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The entity response payload for the Route resource
+ * The request payload for the Update a Route operation
  */
 @Data
-public final class RouteEntity {
-
-    /**
-     * The applications url
-     *
-     * @param applicationsURL the applications url
-     * @return the applications url
-     */
-    private final String applicationsUrl;
+public final class UpdateRouteRequest implements Validatable {
 
     /**
      * The domain id
      *
-     * @param domainId
-     * @return domain Id
+     * @param domainId the domain id
+     * @return the domain id
      */
+    @Getter(onMethod = @__(@JsonProperty("domain_guid")))
     private final String domainId;
-
-    /**
-     * The domain url
-     *
-     * @param domainUrl the domain url
-     * @return the domain url
-     */
-    private final String domainUrl;
 
     /**
      * The host
@@ -56,7 +45,17 @@ public final class RouteEntity {
      * @param host the host
      * @return the host
      */
+    @Getter(onMethod = @__(@JsonProperty("host")))
     private final String host;
+
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String id;
 
     /**
      * The path
@@ -64,6 +63,7 @@ public final class RouteEntity {
      * @param path the path
      * @return the path
      */
+    @Getter(onMethod = @__(@JsonProperty("path")))
     private final String path;
 
     /**
@@ -72,6 +72,7 @@ public final class RouteEntity {
      * @param port the port
      * @return the port
      */
+    @Getter(onMethod = @__(@JsonProperty("port")))
     private final Integer port;
 
     /**
@@ -80,33 +81,28 @@ public final class RouteEntity {
      * @param spaceId the space id
      * @return the space id
      */
+    @Getter(onMethod = @__(@JsonProperty("space_guid")))
     private final String spaceId;
 
-    /**
-     * The space url
-     *
-     * @param spaceURL the space url
-     * @return the space url
-     */
-    private final String spaceUrl;
-
     @Builder
-    RouteEntity(@JsonProperty("apps_url") String applicationsUrl,
-                @JsonProperty("domain_guid") String domainId,
-                @JsonProperty("domain_url") String domainUrl,
-                @JsonProperty("host") String host,
-                @JsonProperty("path") String path,
-                @JsonProperty("port") Integer port,
-                @JsonProperty("space_guid") String spaceId,
-                @JsonProperty("space_url") String spaceUrl) {
-
-        this.applicationsUrl = applicationsUrl;
+    UpdateRouteRequest(String domainId, String id, String host, String path, Integer port, String spaceId) {
         this.domainId = domainId;
-        this.domainUrl = domainUrl;
+        this.id = id;
         this.host = host;
         this.path = path;
         this.port = port;
         this.spaceId = spaceId;
-        this.spaceUrl = spaceUrl;
     }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.id == null) {
+            builder.message("id must be specified");
+        }
+
+        return builder.build();
+    }
+
 }
