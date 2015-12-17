@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.rx.Streams;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = OperationsConfiguration.class)
@@ -34,11 +33,10 @@ public final class SpacesTest {
 
     @Test
     public void list() {
-        long size = Streams.wrap(this.cloudFoundryOperations.spaces().list())
+        Streams.wrap(this.cloudFoundryOperations.spaces().list())
                 .count()
-                .next().get();
-
-        assertEquals(1, size);
+                .subscribe(new TestSubscriber<Long>()
+                        .assertEquals(1L));
     }
 
 }

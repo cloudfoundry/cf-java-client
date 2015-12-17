@@ -16,14 +16,15 @@
 
 package org.cloudfoundry.client.spring;
 
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
@@ -39,6 +40,8 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
     private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
 
+    private final List<DeserializationProblemHandler> deserializationProblemHandlers = Collections.emptyList();
+
     @Test
     public void applicationsV2() {
         assertNotNull(this.client.applicationsV2());
@@ -50,14 +53,15 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void builder() throws GeneralSecurityException, IOException {
+    public void builder() throws Exception {
         mockRequest(new RequestContext()
                 .method(GET).path("/info")
                 .status(OK)
                 .responsePayload("info_GET_response.json"));
 
         SpringCloudFoundryClient client = new SpringCloudFoundryClient("api.run.pivotal.io", false, "test-client-id",
-                "test-client-secret", "test-username", "test-password", this.restTemplate, this.sslCertificateTruster);
+                "test-client-secret", "test-username", "test-password", this.restTemplate, this.sslCertificateTruster,
+                this.deserializationProblemHandlers);
 
         OAuth2RestOperations restOperations = client.getRestOperations();
         OAuth2ProtectedResourceDetails details = restOperations.getResource();
@@ -71,28 +75,30 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void builderNullSkipSslVerification() throws GeneralSecurityException, IOException {
+    public void builderNullSkipSslVerification() throws Exception {
         mockRequest(new RequestContext()
                 .method(GET).path("/info")
                 .status(OK)
                 .responsePayload("info_GET_response.json"));
 
         new SpringCloudFoundryClient("api.run.pivotal.io", null, "test-client-id", "test-client-secret",
-                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster);
+                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster,
+                this.deserializationProblemHandlers);
 
         verifyZeroInteractions(this.sslCertificateTruster);
         verify();
     }
 
     @Test
-    public void builderSkipSslVerification() throws GeneralSecurityException, IOException {
+    public void builderSkipSslVerification() throws Exception {
         mockRequest(new RequestContext()
                 .method(GET).path("/info")
                 .status(OK)
                 .responsePayload("info_GET_response.json"));
 
         new SpringCloudFoundryClient("api.run.pivotal.io", true, "test-client-id", "test-client-secret",
-                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster);
+                "test-username", "test-password", this.restTemplate, this.sslCertificateTruster,
+                this.deserializationProblemHandlers);
 
         Mockito.verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
         verify();

@@ -134,33 +134,51 @@ final class DefaultRoutes extends AbstractOperations implements Routes {
     }
 
     private Stream<RouteResource> getTargetedOrganizationRouteResources() {
-        return PageUtils.resourceStream(new Function<Integer,
-                Publisher<ListRoutesResponse>>() {
+        return getTargetedOrganization()
+                .flatMap(new Function<String, Publisher<RouteResource>>() {
 
-            @Override
-            public Publisher<ListRoutesResponse> apply(Integer page) {
-                return DefaultRoutes.this.cloudFoundryClient.routes().list(
-                        org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                                .organizationId(getTargetedOrganization())
-                                .page(page)
-                                .build());
-            }
-        });
+                    @Override
+                    public Publisher<RouteResource> apply(final String organizationId) {
+                        return PageUtils.resourceStream(new Function<Integer,
+                                Publisher<ListRoutesResponse>>() {
+
+                            @Override
+                            public Publisher<ListRoutesResponse> apply(Integer page) {
+                                return DefaultRoutes.this.cloudFoundryClient.routes().list(
+                                        org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                                                .organizationId(organizationId)
+                                                .page(page)
+                                                .build());
+                            }
+
+                        });
+                    }
+
+                });
     }
 
     private Stream<RouteResource> getTargetedSpaceRouteResources() {
-        return PageUtils.resourceStream(new Function<Integer,
-                Publisher<ListSpaceRoutesResponse>>() {
+        return getTargetedSpace()
+                .flatMap(new Function<String, Publisher<RouteResource>>() {
 
-            @Override
-            public Publisher<ListSpaceRoutesResponse> apply(Integer page) {
-                return DefaultRoutes.this.cloudFoundryClient.spaces().listRoutes(
-                        ListSpaceRoutesRequest.builder()
-                                .id(getTargetedSpace())
-                                .organizationId(getTargetedOrganization())
-                                .page(page)
-                                .build());
-            }
-        });
+                    @Override
+                    public Publisher<RouteResource> apply(final String targetedSpace) {
+                        return PageUtils.resourceStream(new Function<Integer,
+                                Publisher<ListSpaceRoutesResponse>>() {
+
+                            @Override
+                            public Publisher<ListSpaceRoutesResponse> apply(Integer page) {
+                                return DefaultRoutes.this.cloudFoundryClient.spaces().listRoutes(
+                                        ListSpaceRoutesRequest.builder()
+                                                .id(targetedSpace)
+                                                .page(page)
+                                                .build());
+                            }
+
+                        });
+                    }
+
+                });
     }
+
 }

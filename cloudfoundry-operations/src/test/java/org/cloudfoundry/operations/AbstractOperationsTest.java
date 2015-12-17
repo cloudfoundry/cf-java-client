@@ -49,7 +49,7 @@ public abstract class AbstractOperationsTest {
     protected final Spaces spaces = mock(Spaces.class);
 
     @Before
-    public void mockClient() throws Exception {
+    public final void mockClient() throws Exception {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
@@ -57,4 +57,5 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
     }
+
 }

@@ -19,93 +19,102 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
-import org.junit.Test;
+import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Before;
+import org.reactivestreams.Publisher;
 import reactor.Publishers;
-import reactor.rx.Streams;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public final class DefaultApplicationsTest extends AbstractOperationsTest {
+public final class DefaultApplicationsTest {
 
-    private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, TEST_SPACE);
+    public static final class List extends AbstractOperationsApiTest<Application> {
 
-    private DefaultApplications applicationsNoSpace = new DefaultApplications(this.cloudFoundryClient, null);
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, TEST_SPACE);
 
-    @Test
-    public void list() {
+        @Before
+        public void setUp() throws Exception {
+            GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                    .id(TEST_SPACE)
+                    .build();
 
-        SpaceApplicationSummary spaceApplicationSummaryOne = SpaceApplicationSummary.builder()
-                .spaceId(TEST_SPACE)
-                .diskQuota(1024)
-                .id("test-id-1")
-                .instances(2)
-                .memory(512)
-                .name("test-name-1")
-                .state("RUNNING")
-                .runningInstances(2)
-                .urls(Collections.singletonList("foo.com"))
-                .build();
+            GetSpaceSummaryResponse response = GetSpaceSummaryResponse.builder()
+                    .id(TEST_SPACE)
+                    .application(SpaceApplicationSummary.builder()
+                            .spaceId(TEST_SPACE)
+                            .diskQuota(1024)
+                            .id("test-id-1")
+                            .instances(2)
+                            .memory(512)
+                            .name("test-name-1")
+                            .state("RUNNING")
+                            .runningInstances(2)
+                            .url("foo.com")
+                            .build())
+                    .application(SpaceApplicationSummary.builder()
+                            .spaceId(TEST_SPACE)
+                            .diskQuota(1024)
+                            .id("test-id-2")
+                            .instances(2)
+                            .memory(512)
+                            .name("test-name-2")
+                            .state("RUNNING")
+                            .runningInstances(2)
+                            .url("bar.com")
+                            .build())
+                    .build();
 
-        SpaceApplicationSummary spaceApplicationSummaryTwo = SpaceApplicationSummary.builder()
-                .spaceId(TEST_SPACE)
-                .diskQuota(1024)
-                .id("test-id-2")
-                .instances(2)
-                .memory(512)
-                .name("test-name-2")
-                .state("RUNNING")
-                .runningInstances(2)
-                .urls(Collections.singletonList("bar.com"))
-                .build();
+            when(this.cloudFoundryClient.spaces().getSummary(request))
+                    .thenReturn(Publishers.just(response));
 
-        GetSpaceSummaryResponse response = GetSpaceSummaryResponse.builder()
-                .id(TEST_SPACE)
-                .application(spaceApplicationSummaryOne)
-                .application(spaceApplicationSummaryTwo)
-                .build();
+        }
 
-        when(this.cloudFoundryClient.spaces().getSummary(
-                GetSpaceSummaryRequest.builder()
-                        .id(TEST_SPACE)
-                        .build()))
-                .thenReturn(Publishers.just(response));
+        @Override
+        protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(Application.builder()
+                    .disk(1024)
+                    .id("test-id-1")
+                    .instances(2)
+                    .memory(512)
+                    .name("test-name-1")
+                    .requestedState("RUNNING")
+                    .runningInstances(2)
+                    .url("foo.com")
+                    .build())
+                    .assertEquals(Application.builder()
+                            .disk(1024)
+                            .id("test-id-2")
+                            .instances(2)
+                            .memory(512)
+                            .name("test-name-2")
+                            .requestedState("RUNNING")
+                            .runningInstances(2)
+                            .url("bar.com")
+                            .build()
+                    );
+        }
 
-        List<Application> expected = Arrays.asList(
-                Application.builder()
-                        .disk(1024)
-                        .id("test-id-1")
-                        .instances(2)
-                        .memory(512)
-                        .name("test-name-1")
-                        .requestedState("RUNNING")
-                        .runningInstances(2)
-                        .urls(Collections.singletonList("foo.com"))
-                        .build(),
-                Application.builder()
-                        .disk(1024)
-                        .id("test-id-2")
-                        .instances(2)
-                        .memory(512)
-                        .name("test-name-2")
-                        .requestedState("RUNNING")
-                        .runningInstances(2)
-                        .urls(Collections.singletonList("bar.com"))
-                        .build()
-        );
-
-        List<Application> actual = Streams.wrap(this.applications.list()).toList().get();
-
-        assertEquals(expected, actual);
+        @Override
+        protected Publisher<Application> invoke() {
+            return this.applications.list();
+        }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listNoSpace() {
-        this.applicationsNoSpace.list();
+    public static final class ListNoSpace extends AbstractOperationsApiTest<Application> {
+
+        private DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, null);
+
+        @Override
+        protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Application> invoke() {
+            return this.applications.list();
+        }
+
     }
 
 }

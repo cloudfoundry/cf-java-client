@@ -36,19 +36,27 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
 
     @Override
     public Publisher<SpaceQuota> list() {
-        return PageUtils.resourceStream(
-                new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+        return getTargetedOrganization()
+                .flatMap(new Function<String, Publisher<SpaceQuotaDefinitionResource>>() {
 
                     @Override
-                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                        ListOrganizationSpaceQuotaDefinitionsRequest request =
-                                ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                                        .id(getTargetedOrganization())
-                                        .page(page)
-                                        .build();
+                    public Publisher<SpaceQuotaDefinitionResource> apply(final String targetedOrganization) {
+                        return PageUtils.resourceStream(
+                                new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
-                        return DefaultSpaceQuotas.this.cloudFoundryClient.organizations()
-                                .listSpaceQuotaDefinitions(request);
+                                    @Override
+                                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                                        ListOrganizationSpaceQuotaDefinitionsRequest request =
+                                                ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                                                        .id(targetedOrganization)
+                                                        .page(page)
+                                                        .build();
+
+                                        return DefaultSpaceQuotas.this.cloudFoundryClient.organizations()
+                                                .listSpaceQuotaDefinitions(request);
+                                    }
+
+                                });
                     }
 
                 })

@@ -35,11 +35,19 @@ final class DefaultApplications extends AbstractOperations implements Applicatio
 
     @Override
     public Publisher<Application> list() {
-        final GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                .id(DefaultApplications.this.getTargetedSpace())
-                .build();
+        return getTargetedSpace()
+                .flatMap(new Function<String, Publisher<GetSpaceSummaryResponse>>() {
 
-        return Streams.wrap(this.cloudFoundryClient.spaces().getSummary(request))
+                    @Override
+                    public Publisher<GetSpaceSummaryResponse> apply(String targetedSpace) {
+                        GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                                .id(targetedSpace)
+                                .build();
+
+                        return DefaultApplications.this.cloudFoundryClient.spaces().getSummary(request);
+                    }
+
+                })
                 .flatMap(new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
 
                     @Override

@@ -19,16 +19,13 @@ package org.cloudfoundry.client.spring.loggregator;
 import com.google.protobuf.ByteString;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers;
-import org.cloudfoundry.client.spring.TestSubscriber;
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.cloudfoundry.client.loggregator.LoggregatorMessage.MessageType.ERR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 public final class LoggregatorMessageHandlerTest {
 
@@ -50,23 +47,25 @@ public final class LoggregatorMessageHandlerTest {
                 .setTimestamp(MILLISECONDS.toNanos(timestamp.getTime()))
                 .build();
 
+        this.subscriber
+                .assertEquals(LoggregatorMessage.builder()
+                        .applicationId("test-app-id")
+                        .drainUrl("test-drain-url")
+                        .message("test-message")
+                        .messageType(ERR)
+                        .sourceId("test-source-id")
+                        .sourceName("test-source-name")
+                        .timestamp(timestamp)
+                        .build());
 
         this.messageHandler.onMessage(logMessage.toByteArray());
-
-        LoggregatorMessage message = this.subscriber.getOnNextEvents().get(0);
-        assertEquals("test-app-id", message.getApplicationId());
-        assertEquals(Collections.singletonList("test-drain-url"), message.getDrainUrls());
-        assertEquals("test-message", message.getMessage());
-        assertEquals(ERR, message.getMessageType());
-        assertEquals("test-source-id", message.getSourceId());
-        assertEquals("test-source-name", message.getSourceName());
-        assertEquals(timestamp, message.getTimestamp());
     }
 
     @Test
     public void onMessageError() {
-        this.messageHandler.onMessage(new byte[0]);
+        this.subscriber
+                .assertError(Exception.class);
 
-        assertFalse(this.subscriber.getOnErrorEvents().isEmpty());
+        this.messageHandler.onMessage(new byte[0]);
     }
 }

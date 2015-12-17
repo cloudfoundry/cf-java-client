@@ -16,9 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2.domains;
 
-import org.cloudfoundry.client.RequestValidationException;
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
@@ -32,313 +30,297 @@ import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.junit.Test;
-import reactor.rx.Streams;
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringDomainsTest extends AbstractRestTest {
+public final class SpringDomainsTest {
 
-    private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+    public static final class Create extends AbstractApiTest<CreateDomainRequest, CreateDomainResponse> {
 
-    @Test
-    public void create() {
-        mockRequest(new RequestContext()
-                .method(POST).path("v2/domains")
-                .requestPayload("v2/domains/POST_request.json")
-                .status(OK)
-                .responsePayload("v2/domains/POST_response.json"));
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
 
-        CreateDomainRequest request = CreateDomainRequest.builder()
-                .name("exmaple.com")
-                .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                .wildcard(true)
-                .build();
+        @Override
+        protected CreateDomainRequest getInvalidRequest() {
+            return CreateDomainRequest.builder()
+                    .build();
+        }
 
-        CreateDomainResponse expected = CreateDomainResponse.builder()
-                .metadata(Metadata.builder()
-                        .id("abb8338f-eaea-4149-85c0-61888bac0737")
-                        .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
-                        .createdAt("2015-07-27T22:43:33Z")
-                        .build())
-                .entity(DomainEntity.builder()
-                        .name("exmaple.com")
-                        .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                        .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                        .sharedOrganizations(Collections.<String>emptyList())
-                        .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
-                        .build())
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(POST).path("v2/domains")
+                    .requestPayload("v2/domains/POST_request.json")
+                    .status(OK)
+                    .responsePayload("v2/domains/POST_response.json");
+        }
 
-        CreateDomainResponse actual = Streams.wrap(this.domains.create(request)).next().get();
+        @Override
+        protected CreateDomainResponse getResponse() {
+            return CreateDomainResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("abb8338f-eaea-4149-85c0-61888bac0737")
+                            .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
+                            .createdAt("2015-07-27T22:43:33Z")
+                            .build())
+                    .entity(DomainEntity.builder()
+                            .name("exmaple.com")
+                            .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                            .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                            .sharedOrganizations(Collections.<String>emptyList())
+                            .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
+                            .build())
+                    .build();
+        }
 
-        assertEquals(expected, actual);
-        verify();
+        @Override
+        protected CreateDomainRequest getValidRequest() throws Exception {
+            return CreateDomainRequest.builder()
+                    .name("exmaple.com")
+                    .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                    .wildcard(true)
+                    .build();
+        }
+
+        @Override
+        protected Publisher<CreateDomainResponse> invoke(CreateDomainRequest request) {
+            return this.domains.create(request);
+        }
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void createError() {
-        mockRequest(new RequestContext()
-                .method(POST).path("v2/domains")
-                .requestPayload("v2/domains/POST_request.json")
-                .errorResponse());
+    public static final class Delete extends AbstractApiTest<DeleteDomainRequest, Void> {
 
-        CreateDomainRequest request = CreateDomainRequest.builder()
-                .name("exmaple.com")
-                .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                .wildcard(true)
-                .build();
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
 
-        Streams.wrap(this.domains.create(request)).next().get();
+        @Override
+        protected DeleteDomainRequest getInvalidRequest() {
+            return DeleteDomainRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/domains/test-id")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteDomainRequest getValidRequest() throws Exception {
+            return DeleteDomainRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(DeleteDomainRequest request) {
+            return this.domains.delete(request);
+        }
     }
 
-    @Test(expected = RequestValidationException.class)
-    public void createInvalidRequest() {
-        CreateDomainRequest request = CreateDomainRequest.builder()
-                .build();
+    public static final class Get extends AbstractApiTest<GetDomainRequest, GetDomainResponse> {
 
-        Streams.wrap(this.domains.create(request)).next().get();
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+
+        @Override
+        protected GetDomainRequest getInvalidRequest() {
+            return GetDomainRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/domains/test-id")
+                    .status(OK)
+                    .responsePayload("v2/domains/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetDomainResponse getResponse() {
+            return GetDomainResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
+                            .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
+                            .createdAt("2015-07-27T22:43:33Z")
+                            .build())
+                    .entity(DomainEntity.builder()
+                            .name("domain-63.example.com")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetDomainRequest getValidRequest() {
+            return GetDomainRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetDomainResponse> invoke(GetDomainRequest request) {
+            return this.domains.get(request);
+        }
+
     }
 
-    @Test
-    public void delete() {
-        mockRequest(new RequestContext()
-                .method(DELETE).path("v2/domains/test-id")
-                .status(NO_CONTENT));
+    public static final class ListDomains extends AbstractApiTest<ListDomainsRequest, ListDomainsResponse> {
 
-        DeleteDomainRequest request = DeleteDomainRequest.builder()
-                .id("test-id")
-                .build();
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
 
-        Streams.wrap(this.domains.delete(request)).next().get();
+        @Override
+        protected ListDomainsRequest getInvalidRequest() {
+            return null;
+        }
 
-        verify();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("v2/domains?page=-1")
+                    .status(OK)
+                    .responsePayload("v2/domains/GET_response.json");
+        }
+
+        @Override
+        protected ListDomainsResponse getResponse() {
+            return ListDomainsResponse.builder()
+                    .totalResults(4)
+                    .totalPages(1)
+                    .resource(DomainResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                                    .url("/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                                    .createdAt("2015-07-27T22:43:31Z")
+                                    .build())
+                            .entity(DomainEntity.builder()
+                                    .name("customer-app-domain1.com")
+                                    .build())
+                            .build())
+                    .resource(DomainResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                                    .url("/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                                    .createdAt("2015-07-27T22:43:31Z")
+                                    .build())
+                            .entity(DomainEntity.builder()
+                                    .name("customer-app-domain2.com")
+                                    .build())
+                            .build())
+                    .resource(DomainResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                                    .url("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                                    .createdAt("2015-07-27T22:43:31Z")
+                                    .build())
+                            .entity(DomainEntity.builder()
+                                    .name("vcap.me")
+                                    .owningOrganizationId("f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                                    .owningOrganizationUrl("/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                                    .spacesUrl("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces")
+                                    .build())
+                            .build())
+                    .resource(DomainResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("b37aab98-5882-420a-a91f-65539e36e860")
+                                    .url("/v2/domains/b37aab98-5882-420a-a91f-65539e36e860")
+                                    .createdAt("2015-07-27T22:43:33Z")
+                                    .build())
+                            .entity(DomainEntity.builder()
+                                    .name("domain-62.example.com")
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected ListDomainsRequest getValidRequest() throws Exception {
+            return ListDomainsRequest.builder()
+                    .page(-1)
+                    .build();
+        }
+
+        @Override
+        protected Publisher<ListDomainsResponse> invoke(ListDomainsRequest request) {
+            return this.domains.listDomains(request);
+        }
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void deleteError() {
-        mockRequest(new RequestContext()
-                .method(DELETE).path("v2/domains/test-id")
-                .errorResponse());
+    public static final class ListSpaces extends AbstractApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
 
-        DeleteDomainRequest request = DeleteDomainRequest.builder()
-                .id("test-id")
-                .build();
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
 
-        Streams.wrap(this.domains.delete(request)).next().get();
-    }
+        @Override
+        protected ListDomainSpacesRequest getInvalidRequest() {
+            return ListDomainSpacesRequest.builder()
+                    .build();
+        }
 
-    @Test(expected = RequestValidationException.class)
-    public void deleteInvalidRequest() {
-        DeleteDomainRequest request = DeleteDomainRequest.builder()
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("v2/domains/test-id/spaces?page=-1")
+                    .status(OK)
+                    .responsePayload("v2/domains/GET_{id}_spaces_response.json");
+        }
 
-        Streams.wrap(this.domains.delete(request)).next().get();
-    }
+        @Override
+        protected ListDomainSpacesResponse getResponse() {
+            return ListDomainSpacesResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(SpaceResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("d1686ef7-59dc-4ada-8900-85e89d749046")
+                                    .url("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046")
+                                    .createdAt("2015-07-27T22:43:33Z")
+                                    .build())
+                            .entity(SpaceEntity.builder()
+                                    .name("name-2311")
+                                    .organizationId("836b112a-30bc-4d55-b8e4-7323849759d1")
+                                    .allowSsh(true)
+                                    .organizationUrl("/v2/organizations/836b112a-30bc-4d55-b8e4-7323849759d1")
+                                    .developersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/developers")
+                                    .managersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/managers")
+                                    .auditorsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/auditors")
+                                    .applicationsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/apps")
+                                    .routesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/routes")
+                                    .domainsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/domains")
+                                    .serviceInstancesUrl
+                                            ("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
+                                    .applicationEventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/app_events")
+                                    .eventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/events")
+                                    .securityGroupsUrl
+                                            ("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
+                                    .build())
+                            .build())
+                    .build();
+        }
 
-    @Test
-    public void get() {
-        mockRequest(new AbstractRestTest.RequestContext()
-                .method(GET).path("/v2/domains/test-id")
-                .status(OK)
-                .responsePayload("v2/domains/GET_{id}_response.json"));
+        @Override
+        protected ListDomainSpacesRequest getValidRequest() throws Exception {
+            return ListDomainSpacesRequest.builder()
+                    .id("test-id")
+                    .page(-1)
+                    .build();
+        }
 
-        GetDomainRequest request = GetDomainRequest.builder()
-                .id("test-id")
-                .build();
+        @Override
+        protected Publisher<ListDomainSpacesResponse> invoke(ListDomainSpacesRequest request) {
+            return this.domains.listSpaces(request);
+        }
 
-        GetDomainResponse expected = GetDomainResponse.builder()
-                .metadata(Metadata.builder()
-                        .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
-                        .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
-                        .createdAt("2015-07-27T22:43:33Z")
-                        .build())
-                .entity(DomainEntity.builder()
-                        .name("domain-63.example.com")
-                        .build())
-                .build();
-
-        GetDomainResponse actual = Streams.wrap(this.domains.get(request)).next().get();
-
-        assertEquals(expected, actual);
-        verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void getError() {
-        mockRequest(new AbstractRestTest.RequestContext()
-                .method(GET).path("/v2/domains/test-id")
-                .errorResponse());
-
-        GetDomainRequest request = GetDomainRequest.builder()
-                .id("test-id")
-                .build();
-
-        Streams.wrap(this.domains.get(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void getInvalidRequest() {
-        GetDomainRequest request = GetDomainRequest.builder()
-                .build();
-
-        Streams.wrap(this.domains.get(request)).next().get();
-    }
-
-    @Test
-    public void listDomains() {
-        mockRequest(new RequestContext()
-                .method(GET).path("v2/domains?page=-1")
-                .status(OK)
-                .responsePayload("v2/domains/GET_response.json"));
-
-        ListDomainsRequest request = ListDomainsRequest.builder()
-                .page(-1)
-                .build();
-
-        ListDomainsResponse expected = ListDomainsResponse.builder()
-                .totalResults(4)
-                .totalPages(1)
-                .resource(DomainResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("c8e670ff-2473-4e21-8047-afc6e0c62ce7")
-                                .url("/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7")
-                                .createdAt("2015-07-27T22:43:31Z")
-                                .build())
-                        .entity(DomainEntity.builder()
-                                .name("customer-app-domain1.com")
-                                .build())
-                        .build())
-                .resource(DomainResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
-                                .url("/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
-                                .createdAt("2015-07-27T22:43:31Z")
-                                .build())
-                        .entity(DomainEntity.builder()
-                                .name("customer-app-domain2.com")
-                                .build())
-                        .build())
-                .resource(DomainResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
-                                .url("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
-                                .createdAt("2015-07-27T22:43:31Z")
-                                .build())
-                        .entity(DomainEntity.builder()
-                                .name("vcap.me")
-                                .owningOrganizationId("f93d5a41-5d35-4e21-ac32-421dfd545d3c")
-                                .owningOrganizationUrl("/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c")
-                                .spacesUrl("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces")
-                                .build())
-                        .build())
-                .resource(DomainResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("b37aab98-5882-420a-a91f-65539e36e860")
-                                .url("/v2/domains/b37aab98-5882-420a-a91f-65539e36e860")
-                                .createdAt("2015-07-27T22:43:33Z")
-                                .build())
-                        .entity(DomainEntity.builder()
-                                .name("domain-62.example.com")
-                                .build())
-                        .build())
-                .build();
-
-        ListDomainsResponse actual = Streams.wrap(this.domains.listDomains(request)).next().get();
-
-        assertEquals(expected, actual);
-        verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void listDomainsError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("v2/domains?page=-1")
-                .errorResponse());
-
-        ListDomainsRequest request = ListDomainsRequest.builder()
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.domains.listDomains(request)).next().get();
-    }
-
-    @Test
-    public void listSpaces() {
-        mockRequest(new RequestContext()
-                .method(GET).path("v2/domains/test-id/spaces?page=-1")
-                .status(OK)
-                .responsePayload("v2/domains/GET_{id}_spaces_response.json"));
-
-        ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                .id("test-id")
-                .page(-1)
-                .build();
-
-        ListDomainSpacesResponse expected = ListDomainSpacesResponse.builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(SpaceResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("d1686ef7-59dc-4ada-8900-85e89d749046")
-                                .url("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046")
-                                .createdAt("2015-07-27T22:43:33Z")
-                                .build())
-                        .entity(SpaceEntity.builder()
-                                .name("name-2311")
-                                .organizationId("836b112a-30bc-4d55-b8e4-7323849759d1")
-                                .allowSsh(true)
-                                .organizationUrl("/v2/organizations/836b112a-30bc-4d55-b8e4-7323849759d1")
-                                .developersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/developers")
-                                .managersUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/managers")
-                                .auditorsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/auditors")
-                                .applicationsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/apps")
-                                .routesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/routes")
-                                .domainsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/domains")
-                                .serviceInstancesUrl
-                                        ("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
-                                .applicationEventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/app_events")
-                                .eventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/events")
-                                .securityGroupsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
-                                .build())
-                        .build())
-                .build();
-
-
-        ListDomainSpacesResponse actual = Streams.wrap(this.domains.listSpaces(request)).next().get();
-
-        assertEquals(expected, actual);
-        verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void listSpacesError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("v2/domains/test-id/spaces?page=-1")
-                .errorResponse());
-
-        ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                .id("test-id")
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.domains.listSpaces(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void listSpacesInvalidRequest() {
-        ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                .build();
-
-        Streams.wrap(this.domains.listSpaces(request)).next().get();
     }
 
 }

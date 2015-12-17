@@ -8,6 +8,7 @@
     <file url="file://$PROJECT_DIR$/cloudfoundry-maven-plugin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/cloudfoundry-operations" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integration-test" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-utils" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

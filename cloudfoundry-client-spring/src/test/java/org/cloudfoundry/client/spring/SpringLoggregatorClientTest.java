@@ -44,7 +44,7 @@ public final class SpringLoggregatorClientTest extends AbstractRestTest {
             this.webSocketContainer, this.restTemplate, this.root);
 
     @Test
-    public void recent() {
+    public void recent() throws Exception {
         mockRequest(new RequestContext()
                 .method(GET).path("/recent?app=test-id")
                 .status(OK)

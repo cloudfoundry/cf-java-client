@@ -16,89 +16,87 @@
 
 package org.cloudfoundry.client.spring.v2.serviceinstances;
 
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
-import org.junit.Test;
-import reactor.rx.Streams;
+import org.reactivestreams.Publisher;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse.builder;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringServiceInstancesTest extends AbstractRestTest {
+public final class SpringServiceInstancesTest {
 
-    private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root);
+    public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
-    @Test
-    public void list() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
-                .status(OK)
-                .responsePayload("v2/service_instances/GET_response.json"));
+        private final SpringServiceInstances serviceInstances =
+                new SpringServiceInstances(this.restTemplate, this.root);
 
-        ListServiceInstancesRequest request = ListServiceInstancesRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build();
+        @Override
+        protected ListServiceInstancesRequest getInvalidRequest() {
+            return null;
+        }
 
-        ListServiceInstancesResponse expected = builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(ServiceInstanceResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
-                                .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
-                                .createdAt("2015-07-27T22:43:08Z")
-                                .build())
-                        .entity(ServiceInstanceEntity.builder()
-                                .name("name-133")
-                                .credential("creds-key-72", "creds-val-72")
-                                .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
-                                .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
-                                .type("managed_service_instance")
-                                .lastOperation(ServiceInstanceEntity.LastOperation.builder()
-                                        .type("create")
-                                        .state("succeeded")
-                                        .description("service broker-provided description")
-                                        .updatedAt("2015-07-27T22:43:08Z")
-                                        .createdAt("2015-07-27T22:43:08Z")
-                                        .build())
-                                .tag("accounting")
-                                .tag("mongodb")
-                                .spaceUrl("/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19")
-                                .servicePlanUrl("/v2/service_plans/2b53255a-8b40-4671-803d-21d3f5d4183a")
-                                .serviceBindingsUrl
-                                        ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings")
-                                .serviceKeysUrl
-                                        ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys")
-                                .build())
-                        .build())
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/service_instances/GET_response.json");
+        }
 
-        ListServiceInstancesResponse actual = Streams.wrap(this.serviceInstances.list(request)).next().get();
+        @Override
+        protected ListServiceInstancesResponse getResponse() {
+            return ListServiceInstancesResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(ServiceInstanceResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
+                                    .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
+                                    .createdAt("2015-07-27T22:43:08Z")
+                                    .build())
+                            .entity(ServiceInstanceEntity.builder()
+                                    .name("name-133")
+                                    .credential("creds-key-72", "creds-val-72")
+                                    .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
+                                    .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
+                                    .type("managed_service_instance")
+                                    .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                                            .type("create")
+                                            .state("succeeded")
+                                            .description("service broker-provided description")
+                                            .updatedAt("2015-07-27T22:43:08Z")
+                                            .createdAt("2015-07-27T22:43:08Z")
+                                            .build())
+                                    .tag("accounting")
+                                    .tag("mongodb")
+                                    .spaceUrl("/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19")
+                                    .servicePlanUrl("/v2/service_plans/2b53255a-8b40-4671-803d-21d3f5d4183a")
+                                    .serviceBindingsUrl
+                                            ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings")
+                                    .serviceKeysUrl
+                                            ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys")
+                                    .build())
+                            .build())
+                    .build();
+        }
 
-        assertEquals(expected, actual);
-        verify();
-    }
+        @Override
+        protected ListServiceInstancesRequest getValidRequest() {
+            return ListServiceInstancesRequest.builder()
+                    .name("test-name")
+                    .page(-1)
+                    .build();
+        }
 
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/service_instances?q=name%20IN%20test-name&page=-1")
-                .errorResponse());
+        @Override
+        protected Publisher<ListServiceInstancesResponse> invoke(ListServiceInstancesRequest request) {
+            return this.serviceInstances.list(request);
+        }
 
-        ListServiceInstancesRequest request = ListServiceInstancesRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.serviceInstances.list(request)).next().get();
     }
 
 }

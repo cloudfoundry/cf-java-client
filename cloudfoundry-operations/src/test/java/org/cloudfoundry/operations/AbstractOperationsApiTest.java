@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.operations;
 
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
-
-public final class LoggingDeserializationProblemHandlerTest {
-
-    private final LoggingDeserializationProblemHandler handler = new LoggingDeserializationProblemHandler();
+public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTest {
 
     @Test
-    public void test() throws IOException {
-        assertTrue(this.handler.handleUnknownProperty(null, null, null, Object.class, "test-property-name"));
+    public final void test() throws Exception {
+        TestSubscriber<T> testSubscriber = new TestSubscriber<>();
+        assertions(testSubscriber);
+
+        invoke().subscribe(testSubscriber);
+        testSubscriber.verify();
     }
+
+    protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;
+
+    protected abstract Publisher<T> invoke();
 
 }

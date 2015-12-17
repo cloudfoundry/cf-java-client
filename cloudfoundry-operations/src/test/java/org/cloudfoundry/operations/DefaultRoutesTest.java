@@ -31,183 +31,243 @@ import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
-import org.junit.Test;
+import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Before;
+import org.reactivestreams.Publisher;
 import reactor.Publishers;
-import reactor.rx.Streams;
 
 import java.util.Arrays;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class DefaultRoutesTest extends AbstractOperationsTest {
 
-    private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, "test-organization-id",
-            "test-space-id");
+    public static final class ListCurrentOrganization extends AbstractOperationsApiTest<RouteInfo> {
 
-    private final DefaultRoutes routesNoOrganization = new DefaultRoutes(this.cloudFoundryClient, null, null);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
 
-    private final DefaultRoutes routesNoSpace = new DefaultRoutes(this.cloudFoundryClient, "test-organization-id",
-            null);
+        @Before
+        public void setUp() throws Exception {
+            when(this.cloudFoundryClient.routes().list(
+                    org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                            .organizationId("test-organization-id")
+                            .page(1)
+                            .build()))
+                    .thenReturn(Publishers.just(
+                            org.cloudfoundry.client.v2.routes.ListRoutesResponse.builder()
+                                    .resource(RouteResource.builder()
+                                            .entity(RouteEntity.builder()
+                                                    .domainId("domain-id")
+                                                    .host("host")
+                                                    .spaceId("test-space-id")
+                                                    .build())
+                                            .metadata(Resource.Metadata.builder()
+                                                    .id("route-id")
+                                                    .build())
+                                            .build())
+                                    .totalPages(1)
+                                    .build()));
 
-    @Test
-    public void listCurrentOrganization() {
-        when(this.cloudFoundryClient.routes().list(
-                org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                        .organizationId("test-organization-id")
-                        .page(1)
-                        .build()))
-                .thenReturn(Publishers.just(
-                        org.cloudfoundry.client.v2.routes.ListRoutesResponse.builder()
-                                .resource(RouteResource.builder()
-                                        .entity(RouteEntity.builder()
-                                                .domainId("domain-id")
-                                                .host("host")
-                                                .spaceId("test-space-id")
-                                                .build())
-                                        .metadata(Resource.Metadata.builder()
-                                                .id("route-id")
-                                                .build())
-                                        .build())
-                                .totalPages(1)
-                                .build()));
+            when(this.cloudFoundryClient.domains().get(
+                    GetDomainRequest.builder()
+                            .id("domain-id")
+                            .build()
+            )).thenReturn(Publishers.just(
+                    GetDomainResponse.builder()
+                            .entity(DomainEntity.builder()
+                                    .name("domain")
+                                    .build())
+                            .build()));
 
-        when(this.cloudFoundryClient.domains().get(
-                GetDomainRequest.builder()
-                        .id("domain-id")
-                        .build()
-        )).thenReturn(Publishers.just(
-                GetDomainResponse.builder()
-                        .entity(DomainEntity.builder()
-                                .name("domain")
-                                .build())
-                        .build()));
+            when(this.cloudFoundryClient.spaces().get(
+                    GetSpaceRequest.builder()
+                            .id("test-space-id")
+                            .build())).thenReturn(Publishers.just(
+                    GetSpaceResponse.builder()
+                            .entity(SpaceEntity.builder()
+                                    .name("test-space")
+                                    .build())
+                            .build()));
 
-        when(this.cloudFoundryClient.spaces().get(
-                GetSpaceRequest.builder()
-                        .id("test-space-id")
-                        .build())).thenReturn(Publishers.just(
-                GetSpaceResponse.builder()
-                        .entity(SpaceEntity.builder()
-                                .name("test-space")
-                                .build())
-                        .build()));
+            when(this.cloudFoundryClient.routes().listApplications(
+                    ListRouteApplicationsRequest.builder()
+                            .id("route-id")
+                            .page(1)
+                            .build())).thenReturn(Publishers.just(
+                    ListRouteApplicationsResponse.builder()
+                            .resource(ApplicationResource.builder()
+                                    .entity(ApplicationEntity.builder()
+                                            .name("application")
+                                            .build())
+                                    .build())
+                            .totalPages(1)
+                            .build()));
+        }
 
-        when(this.cloudFoundryClient.routes().listApplications(
-                ListRouteApplicationsRequest.builder()
-                        .id("route-id")
-                        .page(1)
-                        .build())).thenReturn(Publishers.just(
-                ListRouteApplicationsResponse.builder()
-                        .resource(ApplicationResource.builder()
-                                .entity(ApplicationEntity.builder()
-                                        .name("application")
-                                        .build())
-                                .build())
-                        .totalPages(1)
-                        .build()));
+        @Override
+        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(RouteInfo.builder()
+                            .routeId("route-id")
+                            .applications(Arrays.asList("application"))
+                            .domain("domain")
+                            .host("host")
+                            .space("test-space")
+                            .build());
+        }
 
-        List<RouteInfo> expected = Arrays.asList(
-                RouteInfo.builder()
-                        .routeId("route-id")
-                        .applications(Arrays.asList("application"))
-                        .domain("domain")
-                        .host("host")
-                        .space("test-space")
-                        .build()
-        );
+        @Override
+        protected Publisher<RouteInfo> invoke() {
+            ListRoutesRequest request = ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.Organization)
+                    .build();
 
-        List<RouteInfo> actual = Streams.wrap(this.routes.list(new ListRoutesRequest(
-                ListRoutesRequest.Level.Organization))).toList().get();
-        assertEquals(expected, actual);
+            return this.routes.list(request);
+        }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listCurrentOrganizationNoOrganization() {
-        this.routesNoOrganization.list(new ListRoutesRequest(ListRoutesRequest.Level.Space));
+    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<RouteInfo> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
+
+        @Override
+        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<RouteInfo> invoke() {
+            ListRoutesRequest request = ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.Space)
+                    .build();
+
+            return this.routes.list(request);
+        }
     }
 
-    @Test
-    public void listCurrentSpace() {
-        when(this.cloudFoundryClient.spaces().listRoutes(
-                ListSpaceRoutesRequest.builder()
-                        .id("test-space-id")
-                        .organizationId("test-organization-id")
-                        .page(1)
-                        .build()))
-                .thenReturn(Publishers.just(
-                        ListSpaceRoutesResponse.builder()
-                                .resource(RouteResource.builder()
-                                        .entity(RouteEntity.builder()
-                                                .domainId("domain-id")
-                                                .host("host")
-                                                .spaceId("test-space-id")
-                                                .build())
-                                        .metadata(Resource.Metadata.builder()
-                                                .id("route-id")
-                                                .build())
-                                        .build())
-                                .totalPages(1)
-                                .build()));
+    public static final class ListCurrentSpace extends AbstractOperationsApiTest<RouteInfo> {
 
-        when(this.cloudFoundryClient.domains().get(
-                GetDomainRequest.builder()
-                        .id("domain-id")
-                        .build()
-        )).thenReturn(Publishers.just(
-                GetDomainResponse.builder()
-                        .entity(DomainEntity.builder()
-                                .name("domain")
-                                .build())
-                        .build()));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
 
-        when(this.cloudFoundryClient.spaces().get(
-                GetSpaceRequest.builder()
-                        .id("test-space-id")
-                        .build())).thenReturn(Publishers.just(
-                GetSpaceResponse.builder()
-                        .entity(SpaceEntity.builder()
-                                .name("test-space")
-                                .build())
-                        .build()));
+        @Before
+        public void setUp() throws Exception {
+            when(this.cloudFoundryClient.spaces().listRoutes(
+                    ListSpaceRoutesRequest.builder()
+                            .id("test-space-id")
+                            .page(1)
+                            .build()))
+                    .thenReturn(Publishers.just(
+                            ListSpaceRoutesResponse.builder()
+                                    .resource(RouteResource.builder()
+                                            .entity(RouteEntity.builder()
+                                                    .domainId("domain-id")
+                                                    .host("host")
+                                                    .spaceId("test-space-id")
+                                                    .build())
+                                            .metadata(Resource.Metadata.builder()
+                                                    .id("route-id")
+                                                    .build())
+                                            .build())
+                                    .totalPages(1)
+                                    .build()));
 
-        when(this.cloudFoundryClient.routes().listApplications(
-                ListRouteApplicationsRequest.builder()
-                        .id("route-id")
-                        .page(1)
-                        .build())).thenReturn(Publishers.just(
-                ListRouteApplicationsResponse.builder()
-                        .resource(ApplicationResource.builder()
-                                .entity(ApplicationEntity.builder()
-                                        .name("application")
-                                        .build())
-                                .build())
-                        .totalPages(1)
-                        .build()));
+            when(this.cloudFoundryClient.domains().get(
+                    GetDomainRequest.builder()
+                            .id("domain-id")
+                            .build()
+            )).thenReturn(Publishers.just(
+                    GetDomainResponse.builder()
+                            .entity(DomainEntity.builder()
+                                    .name("domain")
+                                    .build())
+                            .build()));
 
-        List<RouteInfo> expected = Arrays.asList(
-                RouteInfo.builder()
-                        .routeId("route-id")
-                        .applications(Arrays.asList("application"))
-                        .domain("domain")
-                        .host("host")
-                        .space("test-space")
-                        .build()
-        );
+            when(this.cloudFoundryClient.spaces().get(
+                    GetSpaceRequest.builder()
+                            .id("test-space-id")
+                            .build())).thenReturn(Publishers.just(
+                    GetSpaceResponse.builder()
+                            .entity(SpaceEntity.builder()
+                                    .name("test-space")
+                                    .build())
+                            .build()));
 
-        assertEquals(expected, Streams.wrap(this.routes.list(new ListRoutesRequest(
-                ListRoutesRequest.Level.Space))).toList().get());
+            when(this.cloudFoundryClient.routes().listApplications(
+                    ListRouteApplicationsRequest.builder()
+                            .id("route-id")
+                            .page(1)
+                            .build())).thenReturn(Publishers.just(
+                    ListRouteApplicationsResponse.builder()
+                            .resource(ApplicationResource.builder()
+                                    .entity(ApplicationEntity.builder()
+                                            .name("application")
+                                            .build())
+                                    .build())
+                            .totalPages(1)
+                            .build()));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(RouteInfo.builder()
+                            .routeId("route-id")
+                            .applications(Arrays.asList("application"))
+                            .domain("domain")
+                            .host("host")
+                            .space("test-space")
+                            .build());
+        }
+
+        @Override
+        protected Publisher<RouteInfo> invoke() {
+            ListRoutesRequest request = ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.Space)
+                    .build();
+
+            return this.routes.list(request);
+        }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listCurrentSpaceNoOrganization() {
-        this.routesNoOrganization.list(new ListRoutesRequest(ListRoutesRequest.Level.Space));
+    public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<RouteInfo> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
+
+        @Override
+        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<RouteInfo> invoke() {
+            ListRoutesRequest request = ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.Space)
+                    .build();
+
+            return this.routes.list(request);
+        }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listCurrentSpaceNoSpace() {
-        this.routesNoSpace.list(new ListRoutesRequest(ListRoutesRequest.Level.Space));
+    public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<RouteInfo> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, null);
+
+        @Override
+        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<RouteInfo> invoke() {
+            ListRoutesRequest request = ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.Space)
+                    .build();
+
+            return this.routes.list(request);
+        }
     }
 
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -27,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import reactor.rx.Streams;
 
+import java.util.List;
+
 @Configuration
 @EnableAutoConfiguration
 @Lazy
@@ -36,14 +39,21 @@ public class ClientConfiguration {
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password,
-                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
+                                                @Value("${test.skipSslValidation:false}") Boolean skipSslValidation,
+                                                List<DeserializationProblemHandler> deserializationProblemHandlers) {
 
         return SpringCloudFoundryClient.builder()
                 .host(host)
                 .username(username)
                 .password(password)
                 .skipSslValidation(skipSslValidation)
+                .deserializationProblemHandlers(deserializationProblemHandlers)
                 .build();
+    }
+
+    @Bean
+    FailingDeserializationProblemHandler failingDeserializationProblemHandler() {
+        return new FailingDeserializationProblemHandler();
     }
 
     @Bean

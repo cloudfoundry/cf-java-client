@@ -35,29 +35,38 @@ final class DefaultSpaces extends AbstractOperations implements Spaces {
 
     @Override
     public Publisher<Space> list() {
-        return PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+        return getTargetedOrganization()
+                .flatMap(new Function<String, Publisher<SpaceResource>>() {
 
-            @Override
-            public Publisher<ListSpacesResponse> apply(Integer page) {
-                ListSpacesRequest request = ListSpacesRequest.builder()
-                        .organizationId(DefaultSpaces.this.getTargetedOrganization())
-                        .page(page)
-                        .build();
+                    @Override
+                    public Publisher<SpaceResource> apply(final String targetedOrganization) {
+                        return PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
 
-                return DefaultSpaces.this.cloudFoundryClient.spaces().list(request);
-            }
+                            @Override
+                            public Publisher<ListSpacesResponse> apply(Integer page) {
+                                ListSpacesRequest request = ListSpacesRequest.builder()
+                                        .organizationId(targetedOrganization)
+                                        .page(page)
+                                        .build();
 
-        }).map(new Function<SpaceResource, Space>() {
+                                return DefaultSpaces.this.cloudFoundryClient.spaces().list(request);
+                            }
 
-            @Override
-            public Space apply(SpaceResource resource) {
-                return Space.builder()
-                        .id(resource.getMetadata().getId())
-                        .name(resource.getEntity().getName())
-                        .build();
-            }
+                        });
+                    }
 
-        });
+                })
+                .map(new Function<SpaceResource, Space>() {
+
+                    @Override
+                    public Space apply(SpaceResource resource) {
+                        return Space.builder()
+                                .id(resource.getMetadata().getId())
+                                .name(resource.getEntity().getName())
+                                .build();
+                    }
+
+                });
     }
 
 }

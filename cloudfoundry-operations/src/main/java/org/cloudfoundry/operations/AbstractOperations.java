@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations;
 
+import reactor.rx.Stream;
+import reactor.rx.Streams;
+
 abstract class AbstractOperations {
 
     private final String organizationId;
@@ -27,18 +30,20 @@ abstract class AbstractOperations {
         this.spaceId = spaceId;
     }
 
-    protected final String getTargetedOrganization() {
-        if (this.organizationId == null) {
-            throw new IllegalStateException("No organization targeted");
+    protected final Stream<String> getTargetedOrganization() {
+        if (AbstractOperations.this.organizationId == null) {
+            return Streams.fail(new IllegalStateException("No organization targeted"));
+        } else {
+            return Streams.just(this.organizationId);
         }
-        return this.organizationId;
     }
 
-    protected final String getTargetedSpace() {
-        if (this.spaceId == null) {
-            throw new IllegalStateException("No space targeted");
+    protected final Stream<String> getTargetedSpace() {
+        if (AbstractOperations.this.spaceId == null) {
+            return Streams.fail(new IllegalStateException("No space targeted"));
+        } else {
+            return Streams.just(AbstractOperations.this.spaceId);
         }
-        return this.spaceId;
     }
 
 }
