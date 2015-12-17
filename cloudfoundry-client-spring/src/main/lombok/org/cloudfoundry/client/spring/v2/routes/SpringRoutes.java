@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
+import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
@@ -54,6 +56,19 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
      */
     public SpringRoutes(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest
+                                                                                         request) {
+        return put(request, AssociateRouteApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "routes", request.getId(), "apps", request.getAppId());
+            }
+
+        });
     }
 
     @Override

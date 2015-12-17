@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
+import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
@@ -42,8 +44,8 @@ import reactor.rx.Streams;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -51,6 +53,64 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringRoutesTest extends AbstractRestTest {
 
     private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+
+    @Test
+    public void associateApplication() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/routes/test-id/apps/test-app-id")
+                .status(OK)
+                .responsePayload("v2/routes/PUT_{id}_apps_{app-id}_response.json"));
+
+        AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
+                .appId("test-app-id")
+                .id("test-id")
+                .build();
+
+        AssociateRouteApplicationResponse expected = AssociateRouteApplicationResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                        .id("b1b30135-ac98-446e-aee8-48bb5cda0bf1")
+                        .url("/v2/routes/b1b30135-ac98-446e-aee8-48bb5cda0bf1")
+                        .createdAt("2015-11-30T23:38:56Z")
+                        .build())
+                .entity(RouteEntity.builder()
+                        .host("host-21")
+                        .path("")
+                        .port(0)
+                        .domainId("d6833723-9bee-4890-b599-e1c3e50a85c3")
+                        .spaceId("3e12f626-026f-4a07-aef7-bb4b5cd35cca")
+                        .domainUrl("/v2/domains/d6833723-9bee-4890-b599-e1c3e50a85c3")
+                        .spaceUrl("/v2/spaces/3e12f626-026f-4a07-aef7-bb4b5cd35cca")
+                        .applicationsUrl("/v2/routes/b1b30135-ac98-446e-aee8-48bb5cda0bf1/apps")
+                        .build())
+                .build();
+
+        AssociateRouteApplicationResponse actual = Streams.wrap(this.routes.associateApplication(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void associateApplicationError() {
+        mockRequest(new RequestContext()
+                .method(PUT).path("v2/routes/test-id/apps/test-app-id")
+                .errorResponse());
+
+        AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
+                .appId("test-app-id")
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.routes.associateApplication(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void associateApplicationInvalidRequest() {
+        AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.associateApplication(request)).next().get();
+    }
 
     @Test
     public void create() {
