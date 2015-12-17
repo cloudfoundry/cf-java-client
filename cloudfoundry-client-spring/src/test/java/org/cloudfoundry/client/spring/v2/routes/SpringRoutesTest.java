@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
@@ -47,6 +48,44 @@ import static org.springframework.http.HttpStatus.OK;
 public final class SpringRoutesTest extends AbstractRestTest {
 
     private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+
+    @Test
+    public void delete() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/routes/test-id?recursive=test-recursive")
+                .status(NO_CONTENT));
+
+        DeleteRouteRequest request = DeleteRouteRequest.builder()
+                .id("test-id")
+                .recursive("test-recursive")
+                .build();
+
+        Streams.wrap(this.routes.delete(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/routes/test-id?recursive=test-recursive")
+                .errorResponse());
+
+        DeleteRouteRequest request = DeleteRouteRequest.builder()
+                .id("test-id")
+                .recursive("test-recursive")
+                .build();
+
+        Streams.wrap(this.routes.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        DeleteRouteRequest request = DeleteRouteRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.delete(request)).next().get();
+    }
 
     @Test
     public void get() {
