@@ -105,6 +105,16 @@ public interface Organizations {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_organization_memory_usage.html">Retrieving
+     * organization memory usage</a> request
+     *
+     * @param request the Retrieving organization memory usage request
+     * @return the response from the Retrieving organization memory usage request
+     */
+    Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(GetOrganizationMemoryUsageRequest request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_the_roles_of_all_users_in_the_organization.html">Retrieving
      * the roles of all Users in the Organization</a> request
      *
