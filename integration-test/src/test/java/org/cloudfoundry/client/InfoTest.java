@@ -24,13 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
 public final class InfoTest {
-
-    private static final String API_VERSION = "2.44.0";
 
     @Autowired
     private volatile CloudFoundryClient cloudFoundryClient;
@@ -39,7 +38,7 @@ public final class InfoTest {
     public void info() {
         this.cloudFoundryClient.info().get()
                 .subscribe(new TestSubscriber<GetInfoResponse>()
-                        .assertThat(response -> assertEquals(API_VERSION, response.getApiVersion())));
+                        .assertThat(response -> assertEquals(SUPPORTED_API_VERSION, response.getApiVersion())));
     }
 
 }
