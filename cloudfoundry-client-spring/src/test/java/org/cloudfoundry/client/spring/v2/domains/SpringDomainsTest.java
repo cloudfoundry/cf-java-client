@@ -19,7 +19,6 @@ package org.cloudfoundry.client.spring.v2.domains;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
@@ -51,7 +50,7 @@ public final class SpringDomainsTest extends AbstractRestTest {
                 .build();
 
         GetDomainResponse expected = GetDomainResponse.builder()
-                .metadata(Resource.Metadata.builder()
+                .metadata(Metadata.builder()
                         .id("7cd249aa-197c-425c-8831-57cbc24e8e26")
                         .url("/v2/domains/7cd249aa-197c-425c-8831-57cbc24e8e26")
                         .createdAt("2015-07-27T22:43:33Z")

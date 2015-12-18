@@ -14,27 +14,35 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.domains;
+package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.domains.DomainResource;
+
+import java.util.List;
 
 /**
- * The response payload for the Domain resource
+ * The response payload for the deprecated List all Domains for the Space operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class DomainResource extends Resource<DomainEntity> {
+public final class ListSpaceDomainsResponse extends PaginatedResponse<DomainResource> {
 
     @Builder
-    DomainResource(@JsonProperty("entity") DomainEntity entity,
-                   @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+    ListSpaceDomainsResponse(@JsonProperty("next_url") String nextUrl,
+                             @JsonProperty("prev_url") String previousUrl,
+                             @JsonProperty("resources") @Singular List<DomainResource> resources,
+                             @JsonProperty("total_pages") Integer totalPages,
+                             @JsonProperty("total_results") Integer totalResults) {
+
+        super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
 }

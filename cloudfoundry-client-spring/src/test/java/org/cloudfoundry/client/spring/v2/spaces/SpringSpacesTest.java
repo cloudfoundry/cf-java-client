@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.Domain;
+import org.cloudfoundry.client.v2.domains.DomainEntity;
+import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.routes.Route;
@@ -55,6 +57,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
@@ -872,6 +876,71 @@ public final class SpringSpacesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.spaces.listDevelopers(request)).next().get();
+    }
+
+    @Test
+    public void listDomains() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/domains?page=-1")
+                .status(OK)
+                .responsePayload("v2/spaces/GET_{id}_domains_response.json"));
+
+        ListSpaceDomainsRequest request = ListSpaceDomainsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        ListSpaceDomainsResponse expected = ListSpaceDomainsResponse.builder()
+                .totalResults(2)
+                .totalPages(1)
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("08ac844a-e880-48ef-a90c-f95131582fcc")
+                                .url("/v2/domains/08ac844a-e880-48ef-a90c-f95131582fcc")
+                                .createdAt("2015-07-27T22:43:05Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("customer-app-domain1.com")
+                                .build())
+                        .build())
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("973dcea1-5011-4bd0-aa9e-fa232bfaada7")
+                                .url("/v2/domains/973dcea1-5011-4bd0-aa9e-fa232bfaada7")
+                                .createdAt("2015-07-27T22:43:05Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("customer-app-domain2.com")
+                                .build())
+                        .build())
+                .build();
+
+        ListSpaceDomainsResponse actual = Streams.wrap(this.spaces.listDomains(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listDomainsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/spaces/test-id/domains?page=-1")
+                .errorResponse());
+
+        ListSpaceDomainsRequest request = ListSpaceDomainsRequest.builder()
+                .id("test-id")
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.spaces.listDomains(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void listDomainsInvalidRequest() {
+        ListSpaceDomainsRequest request = ListSpaceDomainsRequest.builder()
+                .build();
+
+        Streams.wrap(this.spaces.listDomains(request)).next().get();
     }
 
     @Test(expected = CloudFoundryException.class)

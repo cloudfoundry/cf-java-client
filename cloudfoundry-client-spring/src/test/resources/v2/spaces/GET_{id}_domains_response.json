@@ -1,0 +1,30 @@
+{
+  "total_results": 2,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "08ac844a-e880-48ef-a90c-f95131582fcc",
+        "url": "/v2/domains/08ac844a-e880-48ef-a90c-f95131582fcc",
+        "created_at": "2015-07-27T22:43:05Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain1.com"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "973dcea1-5011-4bd0-aa9e-fa232bfaada7",
+        "url": "/v2/domains/973dcea1-5011-4bd0-aa9e-fa232bfaada7",
+        "created_at": "2015-07-27T22:43:05Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain2.com"
+      }
+    }
+  ]
+}

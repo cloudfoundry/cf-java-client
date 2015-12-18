@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
  * The response payload for the Get Domain operation
@@ -28,7 +29,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetDomainResponse extends DomainResource {
+public final class GetDomainResponse extends Resource<DomainEntity> {
 
     @Builder
     GetDomainResponse(@JsonProperty("entity") DomainEntity entity,
