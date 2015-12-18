@@ -177,12 +177,11 @@ public final class SpringRoutesTest extends AbstractRestTest {
     @Test
     public void delete() {
         mockRequest(new RequestContext()
-                .method(DELETE).path("v2/routes/test-id?recursive=test-recursive")
+                .method(DELETE).path("v2/routes/test-id")
                 .status(NO_CONTENT));
 
         DeleteRouteRequest request = DeleteRouteRequest.builder()
                 .id("test-id")
-                .recursive("test-recursive")
                 .build();
 
         Streams.wrap(this.routes.delete(request)).next().get();
@@ -193,12 +192,11 @@ public final class SpringRoutesTest extends AbstractRestTest {
     @Test(expected = CloudFoundryException.class)
     public void deleteError() {
         mockRequest(new RequestContext()
-                .method(DELETE).path("v2/routes/test-id?recursive=test-recursive")
+                .method(DELETE).path("v2/routes/test-id")
                 .errorResponse());
 
         DeleteRouteRequest request = DeleteRouteRequest.builder()
                 .id("test-id")
-                .recursive("test-recursive")
                 .build();
 
         Streams.wrap(this.routes.delete(request)).next().get();
