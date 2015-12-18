@@ -19,14 +19,15 @@ package org.cloudfoundry.client.v2.domains;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.Getter;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The entity response payload for the Domain resource
+ * The request payload for the deprecated Create a Shared Domain operation
  */
 @Data
-public final class DomainEntity {
+public final class CreateSharedDomainRequest implements Validatable {
 
     /**
      * The name
@@ -34,6 +35,7 @@ public final class DomainEntity {
      * @param name the name
      * @return the name
      */
+    @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
     /**
@@ -42,42 +44,38 @@ public final class DomainEntity {
      * @param owningOrganizationId the owning organization id
      * @return the owning organization id
      */
+    @Getter(onMethod = @__(@JsonProperty("owning_organization_guid")))
     private final String owningOrganizationId;
 
     /**
-     * The owning organization url
+     * The wildcard
      *
-     * @param owningOrganizationUrl the owning organization url
-     * @return the owning organization url
+     * @param wildcard the wildcard
+     * @return the wildcard
      */
-    private final String owningOrganizationUrl;
-
-    /**
-     * The shared organizations
-     *
-     * @param sharedOrganizations the shared organizations
-     * @return the shared organizations
-     */
-    private final List<String> sharedOrganizations;
-
-    /**
-     * The spaces url
-     *
-     * @param spacesUrl the spaces url
-     * @return the spaces url
-     */
-    private final String spacesUrl;
+    @Getter(onMethod = @__(@JsonProperty("wildcard")))
+    private final Boolean wildcard;
 
     @Builder
-    DomainEntity(@JsonProperty("name") String name,
-                 @JsonProperty("owning_organization_guid") String owningOrganizationId,
-                 @JsonProperty("owning_organization_url") String owningOrganizationUrl,
-                 @JsonProperty("shared_organizations") List<String> sharedOrganizations,
-                 @JsonProperty("spaces_url") String spacesUrl) {
+    CreateSharedDomainRequest(String name, String owningOrganizationId, Boolean wildcard) {
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
-        this.owningOrganizationUrl = owningOrganizationUrl;
-        this.sharedOrganizations = sharedOrganizations;
-        this.spacesUrl = spacesUrl;
+        this.wildcard = wildcard;
     }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.name == null) {
+            builder.message("name must be specified");
+        }
+
+        if (this.wildcard == null) {
+            builder.message("wildcard must be specified");
+        }
+
+        return builder.build();
+    }
+
 }

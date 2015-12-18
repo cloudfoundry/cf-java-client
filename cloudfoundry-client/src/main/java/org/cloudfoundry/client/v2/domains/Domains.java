@@ -25,6 +25,16 @@ public interface Domains {
 
     /**
      * Makes the deprecated
+     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">Create
+     * a Shared Domain</a> request
+     *
+     * @param request the Create a Shared Domain request
+     * @return the response from the Create a Shared Domain request
+     */
+    Publisher<CreateSharedDomainResponse> createShared(CreateSharedDomainRequest request);
+
+    /**
+     * Makes the deprecated
      * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/delete_a_particular_domain_%28deprecated%29.html">Delete
      * a Particular Domain</a> request
      *
