@@ -25,13 +25,15 @@ public interface Domains {
 
     /**
      * Makes the deprecated
-     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">Create
-     * a Shared Domain</a> request
+     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/create_a_domain_owned_by_the_given_organization_%28deprecated%29.html">Create
+     * a Domain owned by the given Organization</a> request and the the deprecated <a
+     * href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">
+     * Create a Shared Domain</a> request
      *
-     * @param request the Create a Shared Domain request
-     * @return the response from the Create a Shared Domain request
+     * @param request the Create a Domain request
+     * @return the response from the Create a Domain request
      */
-    Publisher<CreateSharedDomainResponse> createShared(CreateSharedDomainRequest request);
+    Publisher<CreateDomainResponse> create(CreateDomainRequest request);
 
     /**
      * Makes the deprecated
@@ -44,7 +46,7 @@ public interface Domains {
     Publisher<Void> delete(DeleteDomainRequest request);
 
     /**
-     * Makes the
+     * Makes the deprecated
      * <a href="http://apidocs.cloudfoundry.org/214/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">
      * Get Domain</a> request
      *

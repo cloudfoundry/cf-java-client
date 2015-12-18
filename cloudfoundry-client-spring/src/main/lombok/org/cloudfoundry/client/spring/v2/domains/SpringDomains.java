@@ -20,8 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
-import org.cloudfoundry.client.v2.domains.CreateSharedDomainRequest;
-import org.cloudfoundry.client.v2.domains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
+import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
@@ -54,8 +54,8 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<CreateSharedDomainResponse> createShared(final CreateSharedDomainRequest request) {
-        return post(request, CreateSharedDomainResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Publisher<CreateDomainResponse> create(final CreateDomainRequest request) {
+        return post(request, CreateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

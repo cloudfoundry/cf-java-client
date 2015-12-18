@@ -24,16 +24,16 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the deprecated Create a Shared Domain operation
+ * The response payload for the deprecated Create a Domain operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class CreateSharedDomainResponse extends Resource<DomainEntity> {
+public final class CreateDomainResponse extends Resource<DomainEntity> {
 
     @Builder
-    CreateSharedDomainResponse(@JsonProperty("entity") DomainEntity entity,
-                               @JsonProperty("metadata") Metadata metadata) {
+    CreateDomainResponse(@JsonProperty("entity") DomainEntity entity,
+                         @JsonProperty("metadata") Metadata metadata) {
 
         super(entity, metadata);
     }
