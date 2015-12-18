@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v2.domains;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
@@ -34,12 +35,50 @@ import reactor.rx.Streams;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringDomainsTest extends AbstractRestTest {
 
     private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+
+    @Test
+    public void delete() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/domains/test-id")
+                .status(NO_CONTENT));
+
+        DeleteDomainRequest request = DeleteDomainRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.domains.delete(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void deleteError() {
+        mockRequest(new RequestContext()
+                .method(DELETE).path("v2/domains/test-id")
+                .errorResponse());
+
+        DeleteDomainRequest request = DeleteDomainRequest.builder()
+                .id("test-id")
+                .build();
+
+        Streams.wrap(this.domains.delete(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void deleteInvalidRequest() {
+        DeleteDomainRequest request = DeleteDomainRequest.builder()
+                .build();
+
+        Streams.wrap(this.domains.delete(request)).next().get();
+    }
 
     @Test
     public void get() {

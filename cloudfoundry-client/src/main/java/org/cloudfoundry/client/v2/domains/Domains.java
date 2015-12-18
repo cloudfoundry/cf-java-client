@@ -24,6 +24,16 @@ import org.reactivestreams.Publisher;
 public interface Domains {
 
     /**
+     * Makes the deprecated
+     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/delete_a_particular_domain_%28deprecated%29.html">Delete
+     * a Particular Domain</a> request
+     *
+     * @param request the Delete a Particular Domain request
+     * @return the response from the Delete a Particular Domain request
+     */
+    Publisher<Void> delete(DeleteDomainRequest request);
+
+    /**
      * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">
      * Get Domain</a> request
