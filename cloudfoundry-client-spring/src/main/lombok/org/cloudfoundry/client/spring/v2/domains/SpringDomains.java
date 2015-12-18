@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
@@ -48,6 +49,18 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
      */
     public SpringDomains(RestOperations restOperations, URI root) {
         super(restOperations, root);
+    }
+
+    @Override
+    public Publisher<Void> delete(final DeleteDomainRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "domains", request.getId());
+            }
+
+        });
     }
 
     @Override
