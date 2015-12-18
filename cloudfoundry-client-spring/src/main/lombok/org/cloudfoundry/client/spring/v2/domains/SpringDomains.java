@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
+import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,6 +57,20 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
             @Override
             public void accept(UriComponentsBuilder uriComponentsBuilder) {
                 uriComponentsBuilder.pathSegment("v2", "domains", request.getId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListDomainsResponse> listDomains(final ListDomainsRequest request) {
+        return get(request, ListDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "domains");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
             }
 
         });
