@@ -33,4 +33,14 @@ public interface Domains {
      */
     Publisher<GetDomainResponse> get(GetDomainRequest request);
 
+    /**
+     * Makes the deprecated
+     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/list_all_spaces_for_the_domain_%28deprecated%29.html">List
+     * all Spaces for the Domain</a> request
+     *
+     * @param request the List all Spaces for the Domain request
+     * @return the response from the List all Spaces for the Domain request
+     */
+    Publisher<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request);
+
 }

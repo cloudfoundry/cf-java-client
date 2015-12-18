@@ -18,9 +18,13 @@ package org.cloudfoundry.client.spring.v2.domains;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
+import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
+import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -51,6 +55,20 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
             @Override
             public void accept(UriComponentsBuilder uriComponentsBuilder) {
                 uriComponentsBuilder.pathSegment("v2", "domains", request.getId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListDomainSpacesResponse> listSpaces(final ListDomainSpacesRequest request) {
+        return get(request, ListDomainSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "domains", request.getId(), "spaces");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
             }
 
         });
