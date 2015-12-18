@@ -48,20 +48,10 @@ public final class DeleteRouteRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String id;
 
-    /**
-     * The recursive
-     *
-     * @param recursive the recursive
-     * @return the recursive
-     */
-    @Getter(onMethod = @__(@QueryParameter("recursive")))
-    private final String recursive;
-
     @Builder
-    DeleteRouteRequest(String async, String id, String recursive) {
+    DeleteRouteRequest(String async, String id) {
         this.async = async;
         this.id = id;
-        this.recursive = recursive;
     }
 
     @Override
