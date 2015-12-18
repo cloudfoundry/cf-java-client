@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
@@ -208,6 +209,46 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.routes.delete(request)).next().get();
+    }
+
+    @Test
+    public void exists() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
+                .status(NO_CONTENT));
+
+        RouteExistsRequest request = RouteExistsRequest.builder()
+                .domainId("test-domain-id")
+                .host("test-host")
+                .path("test-path")
+                .build();
+
+        Streams.wrap(this.routes.exists(request)).next().get();
+
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void existsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
+                .errorResponse());
+
+        RouteExistsRequest request = RouteExistsRequest.builder()
+                .domainId("test-domain-id")
+                .host("test-host")
+                .path("test-path")
+                .build();
+
+        Streams.wrap(this.routes.exists(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void existsInvalidRequest() {
+        RouteExistsRequest request = RouteExistsRequest.builder()
+                .build();
+
+        Streams.wrap(this.routes.exists(request)).next().get();
     }
 
     @Test
