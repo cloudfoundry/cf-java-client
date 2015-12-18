@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 
 public class DefaultRoutesTest extends AbstractOperationsTest {
 
-    public static final class ListCurrentOrganization extends AbstractOperationsApiTest<RouteInfo> {
+    public static final class ListCurrentOrganization extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
 
@@ -105,9 +105,9 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(RouteInfo.builder()
+                    .assertEquals(Route.builder()
                             .routeId("route-id")
                             .applications(Arrays.asList("application"))
                             .domain("domain")
@@ -117,7 +117,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
 
         @Override
-        protected Publisher<RouteInfo> invoke() {
+        protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
                     .level(ListRoutesRequest.Level.Organization)
                     .build();
@@ -126,18 +126,18 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
     }
 
-    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<RouteInfo> {
+    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
 
         @Override
-        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
                     .assertError(IllegalStateException.class);
         }
 
         @Override
-        protected Publisher<RouteInfo> invoke() {
+        protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
                     .level(ListRoutesRequest.Level.Space)
                     .build();
@@ -146,7 +146,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
     }
 
-    public static final class ListCurrentSpace extends AbstractOperationsApiTest<RouteInfo> {
+    public static final class ListCurrentSpace extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
 
@@ -209,9 +209,9 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(RouteInfo.builder()
+                    .assertEquals(Route.builder()
                             .routeId("route-id")
                             .applications(Arrays.asList("application"))
                             .domain("domain")
@@ -221,7 +221,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
 
         @Override
-        protected Publisher<RouteInfo> invoke() {
+        protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
                     .level(ListRoutesRequest.Level.Space)
                     .build();
@@ -230,18 +230,18 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
     }
 
-    public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<RouteInfo> {
+    public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
 
         @Override
-        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
                     .assertError(IllegalStateException.class);
         }
 
         @Override
-        protected Publisher<RouteInfo> invoke() {
+        protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
                     .level(ListRoutesRequest.Level.Space)
                     .build();
@@ -250,18 +250,18 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
     }
 
-    public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<RouteInfo> {
+    public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, null);
 
         @Override
-        protected void assertions(TestSubscriber<RouteInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
             testSubscriber
                     .assertError(IllegalStateException.class);
         }
 
         @Override
-        protected Publisher<RouteInfo> invoke() {
+        protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
                     .level(ListRoutesRequest.Level.Space)
                     .build();

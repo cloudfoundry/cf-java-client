@@ -49,22 +49,22 @@ final class DefaultRoutes extends AbstractOperations implements Routes {
     }
 
     @Override
-    public Publisher<RouteInfo> list(ListRoutesRequest listRoutesRequest) {
+    public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
         return getRouteResources(listRoutesRequest)
-                .flatMap(new Function<RouteResource, Publisher<RouteInfo>>() {
+                .flatMap(new Function<RouteResource, Publisher<Route>>() {
 
                     @Override
-                    public Publisher<RouteInfo> apply(RouteResource routeResource) {
+                    public Publisher<Route> apply(RouteResource routeResource) {
                         final RouteEntity routeEntity = routeResource.getEntity();
                         final Resource.Metadata routeMetadata = routeResource.getMetadata();
 
                         return Streams.zip(getApplicationNames(routeMetadata), getDomainName(routeEntity),
                                 getSpaceName(routeEntity),
-                                new Function<Tuple3<List<String>, String, String>, RouteInfo>() {
+                                new Function<Tuple3<List<String>, String, String>, Route>() {
 
                                     @Override
-                                    public RouteInfo apply(Tuple3<List<String>, String, String> tuple) {
-                                        return RouteInfo.builder()
+                                    public Route apply(Tuple3<List<String>, String, String> tuple) {
+                                        return Route.builder()
                                                 .applications(tuple.getT1())
                                                 .domain(tuple.getT2())
                                                 .host(routeEntity.getHost())

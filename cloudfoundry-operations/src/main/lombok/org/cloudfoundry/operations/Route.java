@@ -25,7 +25,7 @@ import java.util.List;
  * A route and the applications which are bound to the route.
  */
 @Data
-public class RouteInfo {
+public class Route {
 
     /**
      * The applications bound to this route.
@@ -68,7 +68,7 @@ public class RouteInfo {
     private final String space;
 
     @Builder
-    private RouteInfo(String routeId, List<String> applications, String domain, String host, String space) {
+    private Route(String routeId, List<String> applications, String domain, String host, String space) {
         this.routeId = routeId;
         this.applications = applications;
         this.domain = domain;

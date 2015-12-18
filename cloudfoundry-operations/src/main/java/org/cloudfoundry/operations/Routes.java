@@ -28,6 +28,6 @@ public interface Routes {
      *
      * @return the routes and the applications bound to those routes
      */
-    Publisher<RouteInfo> list(ListRoutesRequest listRoutesRequest);
+    Publisher<Route> list(ListRoutesRequest listRoutesRequest);
 
 }
