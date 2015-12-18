@@ -21,25 +21,18 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.junit.Test;
+import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Before;
+import org.reactivestreams.Publisher;
 import reactor.Publishers;
-import reactor.rx.Streams;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public final class DefaultSpaceQuotasTest extends AbstractOperationsTest {
-
-    private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
-
-    private final SpaceQuotas spaceQuotasNoOrganization = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
+public final class DefaultSpaceQuotasTest {
 
     private static ListOrganizationSpaceQuotaDefinitionsResponse getListOrganizationSpaceQuotaDefinitionsResponse(
-            int page,
-            int numPages) {
+            int page, int numPages) {
+
         return ListOrganizationSpaceQuotaDefinitionsResponse.builder()
                 .resource(getSpaceQuotaDefinitionResource(page))
                 .totalPages(numPages)
@@ -74,36 +67,61 @@ public final class DefaultSpaceQuotasTest extends AbstractOperationsTest {
                 .build();
     }
 
-    @Test
-    public void list() {
-        ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-        ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
+    public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
 
-        when(this.cloudFoundryClient.organizations()
-                .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                        .id(TEST_ORGANIZATION)
-                        .page(1)
-                        .build()))
-                .thenReturn(Publishers.just(page1));
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
 
-        when(this.cloudFoundryClient.organizations()
-                .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                        .id(TEST_ORGANIZATION)
-                        .page(2)
-                        .build()))
-                .thenReturn(Publishers.just(page2));
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationSpaceQuotaDefinitionsResponse page1 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
+            ListOrganizationSpaceQuotaDefinitionsResponse page2 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
 
-        List<SpaceQuota> expected = Arrays.asList(getSpaceQuota(1), getSpaceQuota(2));
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(1)
+                            .build()))
+                    .thenReturn(Publishers.just(page1));
 
-        List<SpaceQuota> actual = Streams.wrap(this.spaceQuotas.list()).toList().get();
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(2)
+                            .build()))
+                    .thenReturn(Publishers.just(page2));
+        }
 
-        assertEquals(expected, actual);
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(getSpaceQuota(1))
+                    .assertEquals(getSpaceQuota(2));
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.list();
+        }
+
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listNoOrganization() {
-        this.spaceQuotasNoOrganization.list();
-    }
+    public static final class ListNoSpace extends AbstractOperationsApiTest<SpaceQuota> {
 
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
+
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.list();
+        }
+
+    }
 
 }

@@ -21,67 +21,86 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.junit.Test;
+import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Before;
+import org.reactivestreams.Publisher;
 import reactor.Publishers;
-import reactor.rx.Streams;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public final class DefaultSpacesTest extends AbstractOperationsTest {
+public final class DefaultSpacesTest {
 
-    private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, TEST_ORGANIZATION);
+    public static final class List extends AbstractOperationsApiTest<Space> {
 
-    private final Spaces spacesNoOrganization = new DefaultSpaces(this.cloudFoundryClient, null);
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, TEST_ORGANIZATION);
 
-    @Test
-    public void list() {
-        ListSpacesResponse page1 = ListSpacesResponse.builder()
-                .resource(SpaceResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-id-1")
-                                .build())
-                        .entity(SpaceEntity.builder()
-                                .name("test-name-1")
-                                .build())
-                        .build())
-                .totalPages(2)
-                .build();
-        when(this.cloudFoundryClient.spaces().list(
-                ListSpacesRequest.builder().organizationId("test-organization-id").page(1).build()))
-                .thenReturn(Publishers.just(page1));
+        @Before
+        public void setUp() throws Exception {
+            ListSpacesResponse page1 = ListSpacesResponse.builder()
+                    .resource(SpaceResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("test-id-1")
+                                    .build())
+                            .entity(SpaceEntity.builder()
+                                    .name("test-name-1")
+                                    .build())
+                            .build())
+                    .totalPages(2)
+                    .build();
+            when(this.cloudFoundryClient.spaces().list(
+                    ListSpacesRequest.builder().organizationId("test-organization-id").page(1).build()))
+                    .thenReturn(Publishers.just(page1));
 
-        ListSpacesResponse page2 = ListSpacesResponse.builder()
-                .resource(SpaceResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-id-2")
-                                .build())
-                        .entity(SpaceEntity.builder()
-                                .name("test-name-2")
-                                .build())
-                        .build())
-                .totalPages(2)
-                .build();
-        when(this.cloudFoundryClient.spaces().list(
-                ListSpacesRequest.builder().organizationId("test-organization-id").page(2).build()))
-                .thenReturn(Publishers.just(page2));
+            ListSpacesResponse page2 = ListSpacesResponse.builder()
+                    .resource(SpaceResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("test-id-2")
+                                    .build())
+                            .entity(SpaceEntity.builder()
+                                    .name("test-name-2")
+                                    .build())
+                            .build())
+                    .totalPages(2)
+                    .build();
+            when(this.cloudFoundryClient.spaces().list(
+                    ListSpacesRequest.builder().organizationId("test-organization-id").page(2).build()))
+                    .thenReturn(Publishers.just(page2));
+        }
 
-        List<Space> expected = Arrays.asList(
-                Space.builder().id("test-id-1").name("test-name-1").build(),
-                Space.builder().id("test-id-2").name("test-name-2").build()
-        );
+        @Override
+        protected void assertions(TestSubscriber<Space> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(Space.builder()
+                            .id("test-id-1")
+                            .name("test-name-1")
+                            .build())
+                    .assertEquals(Space.builder()
+                            .id("test-id-2")
+                            .name("test-name-2")
+                            .build());
+        }
 
-        List<Space> actual = Streams.wrap(this.spaces.list()).toList().get();
-
-        assertEquals(expected, actual);
+        @Override
+        protected Publisher<Space> invoke() {
+            return this.spaces.list();
+        }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listNoOrganization() {
-        this.spacesNoOrganization.list();
+    public static final class ListNoOrganization extends AbstractOperationsApiTest<Space> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, null);
+
+        @Override
+        protected void assertions(TestSubscriber<Space> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Space> invoke() {
+            return this.spaces.list();
+        }
+
     }
 
 }

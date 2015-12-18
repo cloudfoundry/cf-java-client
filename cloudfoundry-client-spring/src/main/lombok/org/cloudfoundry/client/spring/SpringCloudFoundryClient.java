@@ -16,14 +16,16 @@
 
 package org.cloudfoundry.client.spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
-import org.cloudfoundry.client.spring.util.LoggingDeserializationProblemHandler;
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
@@ -109,14 +111,16 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     @Builder
     SpringCloudFoundryClient(@NonNull String host, Boolean skipSslValidation, String clientId, String clientSecret,
-                             @NonNull String username, @NonNull String password) {
+                             @NonNull String username, @NonNull String password,
+                             @Singular List<DeserializationProblemHandler> deserializationProblemHandlers) {
         this(host, skipSslValidation, clientId, clientSecret, username, password, new RestTemplate(),
-                new CertificateCollectingSslCertificateTruster());
+                new CertificateCollectingSslCertificateTruster(), deserializationProblemHandlers);
     }
 
     SpringCloudFoundryClient(String host, Boolean skipSslValidation, String clientId, String clientSecret,
                              String username, String password, RestOperations bootstrapRestOperations,
-                             SslCertificateTruster sslCertificateTruster) {
+                             SslCertificateTruster sslCertificateTruster,
+                             List<DeserializationProblemHandler> deserializationProblemHandlers) {
 
         LOGGER.debug("Cloud Foundry Connection: {}, skipSslValidation={}", host, skipSslValidation);
         LOGGER.debug("Cloud Foundry Credentials: {} / {}", username, password);
@@ -131,7 +135,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         }
 
         OAuth2RestOperations restOperations = getRestOperations(clientId, clientSecret, host, username, password,
-                bootstrapRestOperations);
+                bootstrapRestOperations, deserializationProblemHandlers);
         URI root = getRoot(host);
 
         this.restOperations = restOperations;
@@ -198,9 +202,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return details;
     }
 
-    private static OAuth2RestOperations getRestOperations(String clientId, String clientSecret, String host,
-                                                          String username, String password,
-                                                          RestOperations bootstrapRestOperations) {
+    private static OAuth2RestOperations getRestOperations(
+            String clientId, String clientSecret, String host, String username, String password,
+            RestOperations bootstrapRestOperations,
+            List<DeserializationProblemHandler> deserializationProblemHandlers) {
 
         OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId,
                 clientSecret, host, username, password, bootstrapRestOperations);
@@ -213,9 +218,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
                 LOGGER.debug("Modifying ObjectMapper configuration");
 
-                ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                        .addHandler(new LoggingDeserializationProblemHandler())
+                ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
                         .setSerializationInclusion(NON_NULL);
+
+                for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
+                    objectMapper.addHandler(deserializationProblemHandler);
+                }
             }
         }
 

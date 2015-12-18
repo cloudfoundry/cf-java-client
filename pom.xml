@@ -42,6 +42,7 @@
         <module>cloudfoundry-gradle-plugin</module>
         <module>cloudfoundry-maven-plugin</module>
         <module>cloudfoundry-operations</module>
+        <module>test-utils</module>
     </modules>
 
     <properties>
@@ -107,6 +108,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.18.1</version>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Test$*.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.projectlombok</groupId>

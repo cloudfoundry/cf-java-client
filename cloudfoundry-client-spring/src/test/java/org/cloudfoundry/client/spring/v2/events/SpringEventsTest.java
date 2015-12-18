@@ -16,183 +16,177 @@
 
 package org.cloudfoundry.client.spring.v2.events;
 
-import org.cloudfoundry.client.RequestValidationException;
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.events.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.junit.Test;
-import reactor.rx.Streams;
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringEventsTest extends AbstractRestTest {
+public final class SpringEventsTest {
 
-    private final SpringEvents events = new SpringEvents(this.restTemplate, this.root);
+    public static final class Get extends AbstractApiTest<GetEventRequest, GetEventResponse> {
 
-    @Test
-    public void get() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/events/test-id")
-                .status(OK)
-                .responsePayload("v2/events/GET_{id}_response.json"));
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root);
 
-        GetEventRequest request = GetEventRequest.builder()
-                .id("test-id")
-                .build();
+        @Override
+        protected GetEventRequest getInvalidRequest() {
+            return GetEventRequest.builder()
+                    .build();
+        }
 
-        GetEventResponse expected = GetEventResponse.builder()
-                .metadata(Metadata.builder()
-                        .id("8f1366e5-1fe2-418c-ae33-38bf29ad857a")
-                        .url("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a")
-                        .createdAt("2015-07-27T22:43:23Z")
-                        .build())
-                .entity(EventEntity.builder()
-                        .type("name-1010")
-                        .actor("guid-a01d98f8-ba9a-40b0-86ba-3deacc2978c2")
-                        .actorType("name-1011")
-                        .actorName("name-1012")
-                        .actee("guid-ff2c9780-b8db-4276-ba5f-b06adb724873")
-                        .acteeType("name-1013")
-                        .acteeName("name-1014")
-                        .timestamp("2015-07-27T22:43:23Z")
-                        .metadatas(Collections.<String, Object>emptyMap())
-                        .spaceId("dcb0dcdd-5236-4af3-abc2-1ab0ff424794")
-                        .organizationId("3317f885-4670-4249-9861-7c75d851d492")
-                        .build())
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/events/test-id")
+                    .status(OK)
+                    .responsePayload("v2/events/GET_{id}_response.json");
+        }
 
-        GetEventResponse actual = Streams.wrap(this.events.get(request)).next().get();
+        @Override
+        protected GetEventResponse getResponse() {
+            return GetEventResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("8f1366e5-1fe2-418c-ae33-38bf29ad857a")
+                            .url("/v2/events/8f1366e5-1fe2-418c-ae33-38bf29ad857a")
+                            .createdAt("2015-07-27T22:43:23Z")
+                            .build())
+                    .entity(EventEntity.builder()
+                            .type("name-1010")
+                            .actor("guid-a01d98f8-ba9a-40b0-86ba-3deacc2978c2")
+                            .actorType("name-1011")
+                            .actorName("name-1012")
+                            .actee("guid-ff2c9780-b8db-4276-ba5f-b06adb724873")
+                            .acteeType("name-1013")
+                            .acteeName("name-1014")
+                            .timestamp("2015-07-27T22:43:23Z")
+                            .metadatas(Collections.<String, Object>emptyMap())
+                            .spaceId("dcb0dcdd-5236-4af3-abc2-1ab0ff424794")
+                            .organizationId("3317f885-4670-4249-9861-7c75d851d492")
+                            .build())
+                    .build();
+        }
 
-        assertEquals(expected, actual);
-        verify();
+        @Override
+        protected GetEventRequest getValidRequest() {
+            return GetEventRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetEventResponse> invoke(GetEventRequest request) {
+            return this.events.get(request);
+        }
+
     }
 
-    @Test(expected = CloudFoundryException.class)
-    public void getError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/events/test-id")
-                .errorResponse());
+    public static final class List extends AbstractApiTest<ListEventsRequest, ListEventsResponse> {
 
-        GetEventRequest request = GetEventRequest.builder()
-                .id("test-id")
-                .build();
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root);
 
-        Streams.wrap(this.events.get(request)).next().get();
-    }
+        @Override
+        protected ListEventsRequest getInvalidRequest() {
+            return null;
+        }
 
-    @Test(expected = RequestValidationException.class)
-    public void getInvalidRequest() {
-        GetEventRequest request = GetEventRequest.builder()
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/events/GET_response.json");
+        }
 
-        Streams.wrap(this.events.get(request)).next().get();
-    }
+        @Override
+        protected ListEventsResponse getResponse() {
+            return ListEventsResponse.builder()
+                    .totalResults(3)
+                    .totalPages(1)
+                    .resource(EventResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
+                                    .url("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .build())
+                            .entity(EventEntity.builder()
+                                    .type("name-1034")
+                                    .actor("guid-ddc7f725-c67f-4e68-8118-1ae1687f9fff")
+                                    .actorType("name-1035")
+                                    .actorName("name-1036")
+                                    .actee("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197")
+                                    .acteeType("name-1037")
+                                    .acteeName("name-1038")
+                                    .timestamp("2015-07-27T22:43:23Z")
+                                    .metadatas(Collections.<String, Object>emptyMap())
+                                    .spaceId("1a769af6-8ddb-4508-a35a-cc61c51fdcdf")
+                                    .organizationId("49723c2a-a11e-43f8-971a-b34e9134ce00")
+                                    .build())
+                            .build())
+                    .resource(EventResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("a82493b7-bd16-421b-aef0-d0b5c40869e8")
+                                    .url("/v2/events/a82493b7-bd16-421b-aef0-d0b5c40869e8")
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .build())
+                            .entity(EventEntity.builder()
+                                    .type("name-1042")
+                                    .actor("guid-e68c8d10-dc83-4466-8735-9c4201166af9")
+                                    .actorType("name-1043")
+                                    .actorName("name-1044")
+                                    .actee("guid-d3ecb6be-c8a0-4e3b-9838-b78c58a88b65")
+                                    .acteeType("name-1045")
+                                    .acteeName("name-1046")
+                                    .timestamp("2015-07-27T22:43:23Z")
+                                    .metadatas(Collections.<String, Object>emptyMap())
+                                    .spaceId("dbe6bbdc-0d9c-495c-abbb-0b5eb93c8494")
+                                    .organizationId("52c7fb45-e31b-4271-9f16-8c94df30d8c7")
+                                    .build())
+                            .build())
+                    .resource(EventResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("4a0e6a34-2807-44cd-a5cc-b61890662ade")
+                                    .url("/v2/events/4a0e6a34-2807-44cd-a5cc-b61890662ade")
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .build())
+                            .entity(EventEntity.builder()
+                                    .type("name-1050")
+                                    .actor("guid-69e5e7e7-7723-4af8-a7cb-255d9a90c8db")
+                                    .actorType("name-1051")
+                                    .actorName("name-1052")
+                                    .actee("guid-cc1f17ce-85ab-4cc2-988b-9fca0f3a1d03")
+                                    .acteeType("name-1053")
+                                    .acteeName("name-1054")
+                                    .timestamp("2015-07-27T22:43:23Z")
+                                    .metadatas(Collections.<String, Object>emptyMap())
+                                    .spaceId("38a2f075-fe19-4edc-8787-5571f2af7051")
+                                    .organizationId("9160433e-860d-4251-bd6d-140187a2c5db")
+                                    .build())
+                            .build())
+                    .build();
+        }
 
-    @Test
-    public void list() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
-                .status(OK)
-                .responsePayload("v2/events/GET_response.json"));
+        @Override
+        protected ListEventsRequest getValidRequest() {
+            return ListEventsRequest.builder()
+                    .actee("test-actee")
+                    .page(-1)
+                    .build();
+        }
 
-        ListEventsRequest request = ListEventsRequest.builder()
-                .actee("test-actee")
-                .page(-1)
-                .build();
+        @Override
+        protected Publisher<ListEventsResponse> invoke(ListEventsRequest request) {
+            return this.events.list(request);
+        }
 
-        ListEventsResponse expected = ListEventsResponse.builder()
-                .totalResults(3)
-                .totalPages(1)
-                .resource(EventResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
-                                .url("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
-                                .createdAt("2015-07-27T22:43:23Z")
-                                .build())
-                        .entity(EventEntity.builder()
-                                .type("name-1034")
-                                .actor("guid-ddc7f725-c67f-4e68-8118-1ae1687f9fff")
-                                .actorType("name-1035")
-                                .actorName("name-1036")
-                                .actee("guid-16ac41e9-c30c-45e1-b51c-226fb37e4197")
-                                .acteeType("name-1037")
-                                .acteeName("name-1038")
-                                .timestamp("2015-07-27T22:43:23Z")
-                                .metadatas(Collections.<String, Object>emptyMap())
-                                .spaceId("1a769af6-8ddb-4508-a35a-cc61c51fdcdf")
-                                .organizationId("49723c2a-a11e-43f8-971a-b34e9134ce00")
-                                .build())
-                        .build())
-                .resource(EventResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("a82493b7-bd16-421b-aef0-d0b5c40869e8")
-                                .url("/v2/events/a82493b7-bd16-421b-aef0-d0b5c40869e8")
-                                .createdAt("2015-07-27T22:43:23Z")
-                                .build())
-                        .entity(EventEntity.builder()
-                                .type("name-1042")
-                                .actor("guid-e68c8d10-dc83-4466-8735-9c4201166af9")
-                                .actorType("name-1043")
-                                .actorName("name-1044")
-                                .actee("guid-d3ecb6be-c8a0-4e3b-9838-b78c58a88b65")
-                                .acteeType("name-1045")
-                                .acteeName("name-1046")
-                                .timestamp("2015-07-27T22:43:23Z")
-                                .metadatas(Collections.<String, Object>emptyMap())
-                                .spaceId("dbe6bbdc-0d9c-495c-abbb-0b5eb93c8494")
-                                .organizationId("52c7fb45-e31b-4271-9f16-8c94df30d8c7")
-                                .build())
-                        .build())
-                .resource(EventResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("4a0e6a34-2807-44cd-a5cc-b61890662ade")
-                                .url("/v2/events/4a0e6a34-2807-44cd-a5cc-b61890662ade")
-                                .createdAt("2015-07-27T22:43:23Z")
-                                .build())
-                        .entity(EventEntity.builder()
-                                .type("name-1050")
-                                .actor("guid-69e5e7e7-7723-4af8-a7cb-255d9a90c8db")
-                                .actorType("name-1051")
-                                .actorName("name-1052")
-                                .actee("guid-cc1f17ce-85ab-4cc2-988b-9fca0f3a1d03")
-                                .acteeType("name-1053")
-                                .acteeName("name-1054")
-                                .timestamp("2015-07-27T22:43:23Z")
-                                .metadatas(Collections.<String, Object>emptyMap())
-                                .spaceId("38a2f075-fe19-4edc-8787-5571f2af7051")
-                                .organizationId("9160433e-860d-4251-bd6d-140187a2c5db")
-                                .build())
-                        .build())
-                .build();
-
-        ListEventsResponse actual = Streams.wrap(this.events.list(request)).next().get();
-
-        assertEquals(expected, actual);
-        verify();
-    }
-
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/events?q=actee%20IN%20test-actee&page=-1")
-                .errorResponse());
-
-        ListEventsRequest request = ListEventsRequest.builder()
-                .actee("test-actee")
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.events.list(request)).next().get();
     }
 
 }

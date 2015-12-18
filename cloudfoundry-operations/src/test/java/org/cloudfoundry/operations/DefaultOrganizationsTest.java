@@ -20,58 +20,68 @@ import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
-import org.junit.Test;
+import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Before;
+import org.reactivestreams.Publisher;
 import reactor.Publishers;
-import reactor.rx.Streams;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public final class DefaultOrganizationsTest extends AbstractOperationsTest {
+public final class DefaultOrganizationsTest {
 
-    private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+    public static final class List extends AbstractOperationsApiTest<Organization> {
 
-    @Test
-    public void list() {
-        ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-id-1")
-                                .build())
-                        .entity(OrganizationEntity.builder()
-                                .name("test-name-1")
-                                .build())
-                        .build())
-                .totalPages(2)
-                .build();
-        when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(1).build()))
-                .thenReturn(Publishers.just(page1));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
 
-        ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-id-2")
-                                .build())
-                        .entity(OrganizationEntity.builder()
-                                .name("test-name-2")
-                                .build())
-                        .build())
-                .totalPages(2)
-                .build();
-        when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(2).build()))
-                .thenReturn(Publishers.just(page2));
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
+                    .resource(ListOrganizationsResponse.Resource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("test-id-1")
+                                    .build())
+                            .entity(OrganizationEntity.builder()
+                                    .name("test-name-1")
+                                    .build())
+                            .build())
+                    .totalPages(2)
+                    .build();
+            when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(1).build()))
+                    .thenReturn(Publishers.just(page1));
 
-        List<Organization> expected = Arrays.asList(
-                Organization.builder().id("test-id-1").name("test-name-1").build(),
-                Organization.builder().id("test-id-2").name("test-name-2").build()
-        );
+            ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
+                    .resource(ListOrganizationsResponse.Resource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("test-id-2")
+                                    .build())
+                            .entity(OrganizationEntity.builder()
+                                    .name("test-name-2")
+                                    .build())
+                            .build())
+                    .totalPages(2)
+                    .build();
+            when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(2).build()))
+                    .thenReturn(Publishers.just(page2));
+        }
 
-        List<Organization> actual = Streams.wrap(this.organizations.list()).toList().get();
+        @Override
+        protected void assertions(TestSubscriber<Organization> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(Organization.builder()
+                            .id("test-id-1")
+                            .name("test-name-1")
+                            .build())
+                    .assertEquals(Organization.builder()
+                            .id("test-id-2")
+                            .name("test-name-2")
+                            .build());
+        }
 
-        assertEquals(expected, actual);
+        @Override
+        protected Publisher<Organization> invoke() {
+            return this.organizations.list();
+        }
+
     }
 
 }

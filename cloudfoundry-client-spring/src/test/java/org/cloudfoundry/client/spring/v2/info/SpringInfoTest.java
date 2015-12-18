@@ -16,55 +16,59 @@
 
 package org.cloudfoundry.client.spring.v2.info;
 
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.junit.Test;
-import reactor.rx.Streams;
+import org.reactivestreams.Publisher;
 
-import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringInfoTest extends AbstractRestTest {
+public final class SpringInfoTest {
 
-    private final SpringInfo info = new SpringInfo(this.restTemplate, this.root);
+    public static final class Get extends AbstractApiTest<Void, GetInfoResponse> {
 
-    @Test
-    public void get() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/info")
-                .status(OK)
-                .responsePayload("v2/info/GET_response.json"));
+        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root);
 
-        GetInfoResponse expected = GetInfoResponse.builder()
-                .apiVersion("2.33.0")
-                .appSshEndpoint("ssh.run.pivotal.io:2222")
-                .authorizationEndpoint("https://login.run.pivotal.io")
-                .buildNumber("2222")
-                .description("Cloud Foundry sponsored by Pivotal")
-                .dopplerLoggingEndpoint("wss://doppler.run.pivotal.io:443")
-                .loggingEndpoint("wss://loggregator.run.pivotal.io:4443")
-                .name("vcap")
-                .support("http://support.cloudfoundry.com")
-                .tokenEndpoint("https://uaa.run.pivotal.io")
-                .version(2)
-                .build();
+        @Override
+        protected Void getInvalidRequest() {
+            return null;
+        }
 
-        GetInfoResponse actual = Streams.wrap(this.info.get()).next().get();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/info")
+                    .status(OK)
+                    .responsePayload("v2/info/GET_response.json");
+        }
 
-        assertEquals(expected, actual);
-        verify();
-    }
+        @Override
+        protected GetInfoResponse getResponse() {
+            return GetInfoResponse.builder()
+                    .apiVersion("2.33.0")
+                    .appSshEndpoint("ssh.run.pivotal.io:2222")
+                    .authorizationEndpoint("https://login.run.pivotal.io")
+                    .buildNumber("2222")
+                    .description("Cloud Foundry sponsored by Pivotal")
+                    .dopplerLoggingEndpoint("wss://doppler.run.pivotal.io:443")
+                    .loggingEndpoint("wss://loggregator.run.pivotal.io:4443")
+                    .name("vcap")
+                    .support("http://support.cloudfoundry.com")
+                    .tokenEndpoint("https://uaa.run.pivotal.io")
+                    .version(2)
+                    .build();
+        }
 
-    @Test(expected = CloudFoundryException.class)
-    public void getError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/info")
-                .status(OK)
-                .errorResponse());
+        @Override
+        protected Void getValidRequest() {
+            return null;
+        }
 
-        Streams.wrap(this.info.get()).next().get();
+        @Override
+        protected Publisher<GetInfoResponse> invoke(Void request) {
+            return this.info.get();
+        }
+
     }
 
 }

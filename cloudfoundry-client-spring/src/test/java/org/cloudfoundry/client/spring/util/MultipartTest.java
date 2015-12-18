@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.util;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.fn.Function;
@@ -24,7 +25,6 @@ import reactor.fn.Function;
 import java.io.IOException;
 
 import static org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
-import static org.junit.Assert.assertEquals;
 
 public final class MultipartTest {
 
@@ -32,7 +32,7 @@ public final class MultipartTest {
 
     @Test
     public void test() throws IOException {
-        Long count = Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
+        Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
                 .map(new Function<byte[], Object>() {
 
                     @Override
@@ -46,8 +46,7 @@ public final class MultipartTest {
 
                 })
                 .count()
-                .next().get();
-
-        assertEquals(Long.valueOf(14), count);
+                .subscribe(new TestSubscriber<Long>()
+                        .assertEquals(14L));
     }
 }

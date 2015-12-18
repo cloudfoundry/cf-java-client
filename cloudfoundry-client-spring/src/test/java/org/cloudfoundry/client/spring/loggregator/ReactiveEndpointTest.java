@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.client.spring.loggregator;
 
-import org.cloudfoundry.client.spring.TestSubscriber;
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 
 import javax.websocket.CloseReason;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -42,31 +41,29 @@ public final class ReactiveEndpointTest {
     public void onCloseGoingAway() {
         this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.GOING_AWAY,
                 "test-reason-phrase"));
-
-        assertFalse(this.subscriber.getOnCompleteEvents().isEmpty());
     }
 
     @Test
     public void onCloseNormalClosure() {
         this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
                 "test-reason-phrase"));
-
-        assertFalse(this.subscriber.getOnCompleteEvents().isEmpty());
     }
 
     @Test
     public void onCloseOther() {
+        this.subscriber
+                .assertError(Exception.class);
+
         this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NO_STATUS_CODE,
                 "test-reason-phrase"));
-
-        assertFalse(this.subscriber.getOnErrorEvents().isEmpty());
     }
 
     @Test
     public void onError() {
-        this.reactiveEndpoint.onError(this.session, new RuntimeException());
+        this.subscriber
+                .assertError(Exception.class);
 
-        assertFalse(this.subscriber.getOnErrorEvents().isEmpty());
+        this.reactiveEndpoint.onError(this.session, new RuntimeException());
     }
 
     @Test

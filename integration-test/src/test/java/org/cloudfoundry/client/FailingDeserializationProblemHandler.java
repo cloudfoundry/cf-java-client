@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.client;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static org.junit.Assert.fail;
 
-/**
- * An implementation of {@link DeserializationProblemHandler} that logs the failure
- */
-public final class LoggingDeserializationProblemHandler extends DeserializationProblemHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
 
     @Override
     public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer,
-                                         Object beanOrClass, String propertyName) throws IOException {
-        this.logger.warn("Found unexpected property {} in payload for {}", propertyName,
-                beanOrClass.getClass().getSimpleName());
-        return true;
+                                         Object beanOrClass, String propertyName) {
+
+        fail(String.format("Found unexpected property %s in payload for %s", propertyName,
+                beanOrClass.getClass().getSimpleName()));
+        return false;
     }
 
 }

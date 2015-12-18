@@ -16,75 +16,76 @@
 
 package org.cloudfoundry.client.spring.v2.spacequotadefinitions;
 
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.junit.Test;
-import reactor.rx.Streams;
+import org.reactivestreams.Publisher;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringSpaceQuotaDefinitionsTest extends AbstractRestTest {
+public final class SpringSpaceQuotaDefinitionsTest  {
 
-    private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root);
+    public static final class List
+            extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
 
-    @Test
-    public void list() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/space_quota_definitions?page=-1")
-                .status(OK)
-                .responsePayload("v2/space_quota_definitions/GET_response.json"));
+        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions =
+                new SpringSpaceQuotaDefinitions(this.restTemplate, this.root);
 
-        ListSpaceQuotaDefinitionsRequest request = ListSpaceQuotaDefinitionsRequest.builder()
-                .page(-1)
-                .build();
+        @Override
+        protected ListSpaceQuotaDefinitionsRequest getInvalidRequest() {
+            return null;
+        }
 
-        ListSpaceQuotaDefinitionsResponse expected = ListSpaceQuotaDefinitionsResponse.builder()
-                .totalResults(1)
-                .totalPages(1)
-                .resource(SpaceQuotaDefinitionResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                                .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                                .createdAt("2015-07-27T22:43:32Z")
-                                .build())
-                        .entity(SpaceQuotaDefinitionEntity.builder()
-                                .name("name-2236")
-                                .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                                .nonBasicServicesAllowed(true)
-                                .totalServices(60)
-                                .totalRoutes(1000)
-                                .memoryLimit(20480)
-                                .instanceMemoryLimit(-1)
-                                .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                                .spacesUrl("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
-                                .build())
-                        .build())
-                .build();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/space_quota_definitions?page=-1")
+                    .status(OK)
+                    .responsePayload("v2/space_quota_definitions/GET_response.json");
+        }
 
-        ListSpaceQuotaDefinitionsResponse actual = Streams.wrap(this.spaceQuotaDefinitions.list(request)).next().get();
+        @Override
+        protected ListSpaceQuotaDefinitionsResponse getResponse() {
+            return ListSpaceQuotaDefinitionsResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(SpaceQuotaDefinitionResource.builder()
+                            .metadata(Metadata.builder()
+                                    .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                                    .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                                    .createdAt("2015-07-27T22:43:32Z")
+                                    .build())
+                            .entity(SpaceQuotaDefinitionEntity.builder()
+                                    .name("name-2236")
+                                    .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
+                                    .nonBasicServicesAllowed(true)
+                                    .totalServices(60)
+                                    .totalRoutes(1000)
+                                    .memoryLimit(20480)
+                                    .instanceMemoryLimit(-1)
+                                    .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
+                                    .spacesUrl("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
+                                    .build())
+                            .build())
+                    .build();
+        }
 
-        assertEquals(expected, actual);
-        verify();
-    }
+        @Override
+        protected ListSpaceQuotaDefinitionsRequest getValidRequest() {
+            return ListSpaceQuotaDefinitionsRequest.builder()
+                    .page(-1)
+                    .build();
+        }
 
-    @Test(expected = CloudFoundryException.class)
-    public void listError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/v2/space_quota_definitions?page=-1")
-                .errorResponse());
+        @Override
+        protected Publisher<ListSpaceQuotaDefinitionsResponse> invoke(ListSpaceQuotaDefinitionsRequest request) {
+            return this.spaceQuotaDefinitions.list(request);
+        }
 
-        ListSpaceQuotaDefinitionsRequest request = ListSpaceQuotaDefinitionsRequest.builder()
-                .page(-1)
-                .build();
-
-        Streams.wrap(this.spaceQuotaDefinitions.list(request)).next().get();
     }
 
 }
