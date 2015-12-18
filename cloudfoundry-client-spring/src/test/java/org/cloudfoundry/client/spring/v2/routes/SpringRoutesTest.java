@@ -62,7 +62,7 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .responsePayload("v2/routes/PUT_{id}_apps_{app-id}_response.json"));
 
         AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
-                .appId("test-app-id")
+                .applicationId("test-app-id")
                 .id("test-id")
                 .build();
 
@@ -97,7 +97,7 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .errorResponse());
 
         AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
-                .appId("test-app-id")
+                .applicationId("test-app-id")
                 .id("test-id")
                 .build();
 
