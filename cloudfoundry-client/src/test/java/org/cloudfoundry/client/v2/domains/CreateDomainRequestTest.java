@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateSharedDomainRequestTest {
+public final class CreateDomainRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateSharedDomainRequest.builder()
+        ValidationResult result = CreateDomainRequest.builder()
                 .name("test-name")
                 .owningOrganizationId("test-owning-organization-id")
                 .wildcard(true)
@@ -39,7 +39,7 @@ public final class CreateSharedDomainRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = CreateSharedDomainRequest.builder()
+        ValidationResult result = CreateDomainRequest.builder()
                 .owningOrganizationId("test-owning-organization-id")
                 .wildcard(true)
                 .build()
@@ -51,7 +51,7 @@ public final class CreateSharedDomainRequestTest {
 
     @Test
     public void isValidNoWildcard() {
-        ValidationResult result = CreateSharedDomainRequest.builder()
+        ValidationResult result = CreateDomainRequest.builder()
                 .name("test-name")
                 .owningOrganizationId("test-owning-organization-id")
                 .build()

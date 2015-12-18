@@ -24,10 +24,10 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the deprecated Create a Shared Domain operation
+ * The request payload for the deprecated Create a Domain operation
  */
 @Data
-public final class CreateSharedDomainRequest implements Validatable {
+public final class CreateDomainRequest implements Validatable {
 
     /**
      * The name
@@ -57,7 +57,7 @@ public final class CreateSharedDomainRequest implements Validatable {
     private final Boolean wildcard;
 
     @Builder
-    CreateSharedDomainRequest(String name, String owningOrganizationId, Boolean wildcard) {
+    CreateDomainRequest(String name, String owningOrganizationId, Boolean wildcard) {
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
         this.wildcard = wildcard;

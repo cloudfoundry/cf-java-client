@@ -19,8 +19,8 @@ package org.cloudfoundry.client.spring.v2.domains;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.domains.CreateSharedDomainRequest;
-import org.cloudfoundry.client.v2.domains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
+import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
@@ -50,57 +50,62 @@ public final class SpringDomainsTest extends AbstractRestTest {
     private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
 
     @Test
-    public void createShared() {
+    public void create() {
         mockRequest(new RequestContext()
                 .method(POST).path("v2/domains")
                 .requestPayload("v2/domains/POST_request.json")
                 .status(OK)
                 .responsePayload("v2/domains/POST_response.json"));
 
-        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
-                .name("example.com")
+        CreateDomainRequest request = CreateDomainRequest.builder()
+                .name("exmaple.com")
+                .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                 .wildcard(true)
                 .build();
 
-        CreateSharedDomainResponse expected = CreateSharedDomainResponse.builder()
+        CreateDomainResponse expected = CreateDomainResponse.builder()
                 .metadata(Metadata.builder()
-                        .id("cf2b6b9b-aa02-4ab8-ae20-0d5454dd7e98")
-                        .url("/v2/domains/cf2b6b9b-aa02-4ab8-ae20-0d5454dd7e98")
+                        .id("abb8338f-eaea-4149-85c0-61888bac0737")
+                        .url("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737")
                         .createdAt("2015-07-27T22:43:33Z")
                         .build())
                 .entity(DomainEntity.builder()
-                        .name("example.com")
+                        .name("exmaple.com")
+                        .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+                        .owningOrganizationUrl("/v2/organizations/09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                         .sharedOrganizations(Collections.<String>emptyList())
+                        .spacesUrl("/v2/domains/abb8338f-eaea-4149-85c0-61888bac0737/spaces")
                         .build())
                 .build();
 
-        CreateSharedDomainResponse actual = Streams.wrap(this.domains.createShared(request)).next().get();
+        CreateDomainResponse actual = Streams.wrap(this.domains.create(request)).next().get();
 
         assertEquals(expected, actual);
         verify();
     }
 
     @Test(expected = CloudFoundryException.class)
-    public void createSharedError() {
+    public void createError() {
         mockRequest(new RequestContext()
                 .method(POST).path("v2/domains")
                 .requestPayload("v2/domains/POST_request.json")
                 .errorResponse());
 
-        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
-                .name("example.com")
+        CreateDomainRequest request = CreateDomainRequest.builder()
+                .name("exmaple.com")
+                .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                 .wildcard(true)
                 .build();
 
-        Streams.wrap(this.domains.createShared(request)).next().get();
+        Streams.wrap(this.domains.create(request)).next().get();
     }
 
     @Test(expected = RequestValidationException.class)
-    public void createSharedInvalidRequest() {
-        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
+    public void createInvalidRequest() {
+        CreateDomainRequest request = CreateDomainRequest.builder()
                 .build();
 
-        Streams.wrap(this.domains.createShared(request)).next().get();
+        Streams.wrap(this.domains.create(request)).next().get();
     }
 
     @Test
