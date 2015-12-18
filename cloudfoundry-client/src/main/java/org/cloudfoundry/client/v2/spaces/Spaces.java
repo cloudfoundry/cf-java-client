@@ -130,6 +130,16 @@ public interface Spaces {
     Publisher<ListSpaceDevelopersResponse> listDevelopers(ListSpaceDevelopersRequest request);
 
     /**
+     * Makes the deprecated
+     * <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_domains_for_the_space_%28deprecated%29.html">List
+     * all Domains for the Space</a> request
+     *
+     * @param request the List all Domains for the Space request
+     * @return the response from the List all Domains for the Space request
+     */
+    Publisher<ListSpaceDomainsResponse> listDomains(ListSpaceDomainsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_events_for_the_space.html">List all Events
      * for the Space</a> request
      *

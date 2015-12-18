@@ -41,6 +41,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceEventsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
@@ -70,7 +72,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.fn.Consumer;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * The Spring-based implementation of {@link Spaces}
@@ -236,6 +237,20 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "developers");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<ListSpaceDomainsResponse> listDomains(final ListSpaceDomainsRequest request) {
+        return get(request, ListSpaceDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "domains");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
