@@ -403,7 +403,7 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .status(NO_CONTENT));
 
         RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
-                .appId("test-app-id")
+                .applicationId("test-app-id")
                 .id("test-id")
                 .build();
 
@@ -419,7 +419,7 @@ public final class SpringRoutesTest extends AbstractRestTest {
                 .errorResponse());
 
         RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
-                .appId("test-app-id")
+                .applicationId("test-app-id")
                 .id("test-id")
                 .build();
 

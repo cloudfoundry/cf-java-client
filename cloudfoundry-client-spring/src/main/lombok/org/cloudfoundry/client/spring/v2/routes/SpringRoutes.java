@@ -144,7 +144,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId(), "apps", request.getAppId());
+                builder.pathSegment("v2", "routes", request.getId(), "apps", request.getApplicationId());
             }
 
         });
