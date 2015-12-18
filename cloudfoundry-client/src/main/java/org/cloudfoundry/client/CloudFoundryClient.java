@@ -35,6 +35,11 @@ import org.cloudfoundry.client.v3.packages.Packages;
 public interface CloudFoundryClient {
 
     /**
+     * The currently supported Cloud Controller API version
+     */
+    public static final String SUPPORTED_API_VERSION = "2.33.0";
+
+    /**
      * Main entry point to the Cloud Foundry Applications V2 Client API
      *
      * @return the Cloud Foundry Application V2 Client API
