@@ -34,9 +34,38 @@ public final class DomainEntity {
      */
     private final String name;
 
-    @Builder
-    public DomainEntity(@JsonProperty("name") String name) {
-        this.name = name;
-    }
+    /**
+     * The owning organization id
+     *
+     * @param owningOrganizationId the owning organization id
+     * @return the owning organization id
+     */
+    private final String owningOrganizationId;
 
+    /**
+     * The owning organization url
+     *
+     * @param owningOrganizationUrl the owning organization url
+     * @return the owning organization url
+     */
+    private final String owningOrganizationUrl;
+
+    /**
+     * The spaces url
+     *
+     * @param spacesUrl the spaces url
+     * @return the spaces url
+     */
+    private final String spacesUrl;
+
+    @Builder
+    DomainEntity(@JsonProperty("name") String name,
+                        @JsonProperty("owning_organization_guid") String owningOrganizationId,
+                        @JsonProperty("owning_organization_url") String owningOrganizationUrl,
+                        @JsonProperty("spaces_url") String spacesUrl) {
+        this.name = name;
+        this.owningOrganizationId = owningOrganizationId;
+        this.owningOrganizationUrl = owningOrganizationUrl;
+        this.spacesUrl = spacesUrl;
+    }
 }

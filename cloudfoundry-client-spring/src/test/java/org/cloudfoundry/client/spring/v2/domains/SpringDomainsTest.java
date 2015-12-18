@@ -20,10 +20,13 @@ import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
+import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
+import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
@@ -85,6 +88,84 @@ public final class SpringDomainsTest extends AbstractRestTest {
                 .build();
 
         Streams.wrap(this.domains.get(request)).next().get();
+    }
+
+    @Test
+    public void listDomains() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/domains?page=-1")
+                .status(OK)
+                .responsePayload("v2/domains/GET_response.json"));
+
+        ListDomainsRequest request = ListDomainsRequest.builder()
+                .page(-1)
+                .build();
+
+        ListDomainsResponse expected = ListDomainsResponse.builder()
+                .totalResults(4)
+                .totalPages(1)
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                                .url("/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7")
+                                .createdAt("2015-07-27T22:43:31Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("customer-app-domain1.com")
+                                .build())
+                        .build())
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                                .url("/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4")
+                                .createdAt("2015-07-27T22:43:31Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("customer-app-domain2.com")
+                                .build())
+                        .build())
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                                .url("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da")
+                                .createdAt("2015-07-27T22:43:31Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("vcap.me")
+                                .owningOrganizationId("f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                                .owningOrganizationUrl("/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c")
+                                .spacesUrl("/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces")
+                                .build())
+                        .build())
+                .resource(DomainResource.builder()
+                        .metadata(Metadata.builder()
+                                .id("b37aab98-5882-420a-a91f-65539e36e860")
+                                .url("/v2/domains/b37aab98-5882-420a-a91f-65539e36e860")
+                                .createdAt("2015-07-27T22:43:33Z")
+                                .build())
+                        .entity(DomainEntity.builder()
+                                .name("domain-62.example.com")
+                                .build())
+                        .build())
+                .build();
+
+        ListDomainsResponse actual = Streams.wrap(this.domains.listDomains(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void listDomainsError() {
+        mockRequest(new RequestContext()
+                .method(GET).path("v2/domains?page=-1")
+                .errorResponse());
+
+        ListDomainsRequest request = ListDomainsRequest.builder()
+                .page(-1)
+                .build();
+
+        Streams.wrap(this.domains.listDomains(request)).next().get();
     }
 
     @Test

@@ -1,0 +1,55 @@
+{
+  "total_results": 4,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "c8e670ff-2473-4e21-8047-afc6e0c62ce7",
+        "url": "/v2/domains/c8e670ff-2473-4e21-8047-afc6e0c62ce7",
+        "created_at": "2015-07-27T22:43:31Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain1.com"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4",
+        "url": "/v2/domains/2b63d3fa-52e9-4f12-87d1-a96af5bd3cd4",
+        "created_at": "2015-07-27T22:43:31Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain2.com"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da",
+        "url": "/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da",
+        "created_at": "2015-07-27T22:43:31Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "vcap.me",
+        "owning_organization_guid": "f93d5a41-5d35-4e21-ac32-421dfd545d3c",
+        "owning_organization_url": "/v2/organizations/f93d5a41-5d35-4e21-ac32-421dfd545d3c",
+        "spaces_url": "/v2/domains/2c60a78c-0f6e-4ef8-81db-f3a6cb5e31da/spaces"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "b37aab98-5882-420a-a91f-65539e36e860",
+        "url": "/v2/domains/b37aab98-5882-420a-a91f-65539e36e860",
+        "created_at": "2015-07-27T22:43:33Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "domain-62.example.com"
+      }
+    }
+  ]
+}

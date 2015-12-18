@@ -35,6 +35,16 @@ public interface Domains {
 
     /**
      * Makes the deprecated
+     * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/list_all_domains_%28deprecated%29.html">List
+     * all Domains</a> request
+     *
+     * @param request the List all Domains request
+     * @return the response from the List all Domains request
+     */
+    Publisher<ListDomainsResponse> listDomains(ListDomainsRequest request);
+
+    /**
+     * Makes the deprecated
      * <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/list_all_spaces_for_the_domain_%28deprecated%29.html">List
      * all Spaces for the Domain</a> request
      *
