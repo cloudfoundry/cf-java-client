@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v2.domains;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.domains.CreateSharedDomainRequest;
+import org.cloudfoundry.client.v2.domains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
@@ -33,16 +35,73 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
 import reactor.rx.Streams;
 
+import java.util.Collections;
+
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringDomainsTest extends AbstractRestTest {
 
     private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+
+    @Test
+    public void createShared() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/domains")
+                .requestPayload("v2/domains/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/domains/POST_response.json"));
+
+        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
+                .name("example.com")
+                .wildcard(true)
+                .build();
+
+        CreateSharedDomainResponse expected = CreateSharedDomainResponse.builder()
+                .metadata(Metadata.builder()
+                        .id("cf2b6b9b-aa02-4ab8-ae20-0d5454dd7e98")
+                        .url("/v2/domains/cf2b6b9b-aa02-4ab8-ae20-0d5454dd7e98")
+                        .createdAt("2015-07-27T22:43:33Z")
+                        .build())
+                .entity(DomainEntity.builder()
+                        .name("example.com")
+                        .sharedOrganizations(Collections.<String>emptyList())
+                        .build())
+                .build();
+
+        CreateSharedDomainResponse actual = Streams.wrap(this.domains.createShared(request)).next().get();
+
+        assertEquals(expected, actual);
+        verify();
+    }
+
+    @Test(expected = CloudFoundryException.class)
+    public void createSharedError() {
+        mockRequest(new RequestContext()
+                .method(POST).path("v2/domains")
+                .requestPayload("v2/domains/POST_request.json")
+                .errorResponse());
+
+        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
+                .name("example.com")
+                .wildcard(true)
+                .build();
+
+        Streams.wrap(this.domains.createShared(request)).next().get();
+    }
+
+    @Test(expected = RequestValidationException.class)
+    public void createSharedInvalidRequest() {
+        CreateSharedDomainRequest request = CreateSharedDomainRequest.builder()
+                .build();
+
+        Streams.wrap(this.domains.createShared(request)).next().get();
+    }
 
     @Test
     public void delete() {
