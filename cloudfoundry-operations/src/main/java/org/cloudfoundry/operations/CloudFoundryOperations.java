@@ -36,6 +36,13 @@ public interface CloudFoundryOperations {
     Organizations organizations();
 
     /**
+     * Main entry point to the Cloud Foundry Routes Operations API
+     *
+     * @return the Cloud Foundry Routes Operations API
+     */
+    Routes routes();
+
+    /**
      * Main entry point to the Cloud Foundry Spaces Operations API
      *
      * @return the Cloud Foundry Spaces Operations API
