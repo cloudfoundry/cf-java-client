@@ -30,13 +30,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RemoveRouteApplicationRequest implements Validatable {
 
     /**
-     * The app id
+     * The application id
      *
-     * @param appId the app id
-     * @return the app id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String appId;
+    private final String applicationId;
 
     /**
      * The id
@@ -48,8 +48,8 @@ public final class RemoveRouteApplicationRequest implements Validatable {
     private final String id;
 
     @Builder
-    RemoveRouteApplicationRequest(String appId, String id) {
-        this.appId = appId;
+    RemoveRouteApplicationRequest(String applicationId, String id) {
+        this.applicationId = applicationId;
         this.id = id;
     }
 
@@ -57,8 +57,8 @@ public final class RemoveRouteApplicationRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.appId == null) {
-            builder.message("app id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.id == null) {
