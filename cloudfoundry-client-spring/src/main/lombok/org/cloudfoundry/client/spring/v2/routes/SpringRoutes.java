@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
+import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
@@ -91,6 +92,20 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "routes", request.getId());
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> exists(final RouteExistsRequest request) {
+        return get(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request
+                        .getHost());
                 QueryBuilder.augment(builder, request);
             }
 
