@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRespons
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
@@ -106,7 +108,7 @@ public final class SpringOrganizationsTest {
             return new RequestContext()
                     .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
                     .status(CREATED)
-                    .responsePayload("v2/organizations/auditors/PUT_{id}_response.json");
+                    .responsePayload("v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json");
         }
 
         @Override
@@ -563,6 +565,46 @@ public final class SpringOrganizationsTest {
         @Override
         protected Publisher<GetOrganizationResponse> invoke(GetOrganizationRequest request) {
             return this.organizations.get(request);
+        }
+
+    }
+
+    public static final class GetInstanceUsage
+            extends AbstractApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected GetOrganizationInstanceUsageRequest getInvalidRequest() {
+            return GetOrganizationInstanceUsageRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("v2/organizations/test-id/instance_usage")
+                    .status(OK)
+                    .responsePayload("v2/organizations/GET_{id}_instance_usage_response.json");
+        }
+
+        @Override
+        protected GetOrganizationInstanceUsageResponse getResponse() {
+            return GetOrganizationInstanceUsageResponse.builder()
+                    .instanceUsage(3)
+                    .build();
+        }
+
+        @Override
+        protected GetOrganizationInstanceUsageRequest getValidRequest() throws Exception {
+            return GetOrganizationInstanceUsageRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetOrganizationInstanceUsageResponse> invoke(GetOrganizationInstanceUsageRequest request) {
+            return this.organizations.getInstanceUsage(request);
         }
 
     }
