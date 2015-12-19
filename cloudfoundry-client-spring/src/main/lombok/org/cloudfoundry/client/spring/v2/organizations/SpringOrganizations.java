@@ -33,6 +33,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRespons
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
@@ -194,8 +196,21 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(final GetOrganizationMemoryUsageRequest
-                                                                                request) {
+    public Publisher<GetOrganizationInstanceUsageResponse> getInstanceUsage(
+            final GetOrganizationInstanceUsageRequest request) {
+        return get(request, GetOrganizationInstanceUsageResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "instance_usage");
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(
+            final GetOrganizationMemoryUsageRequest request) {
         return get(request, GetOrganizationMemoryUsageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
