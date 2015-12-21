@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUs
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
@@ -95,8 +97,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorResponse> associateAuditor(final AssociateOrganizationAuditorRequest
-                                                                                        request) {
+    public Publisher<AssociateOrganizationAuditorResponse> associateAuditor(
+            final AssociateOrganizationAuditorRequest request) {
         return put(request, AssociateOrganizationAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -109,8 +111,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(final
-                                                                                                AssociateOrganizationAuditorByUsernameRequest request) {
+    public Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(
+            final AssociateOrganizationAuditorByUsernameRequest request) {
         return put(request, AssociateOrganizationAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -128,11 +130,25 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
-                        .getBillingManagerId());
+                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers",
+                        request.getBillingManagerId());
             }
 
         });
+    }
+
+    @Override
+    public Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(
+            final AssociateOrganizationBillingManagerByUsernameRequest request) {
+        return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class, new
+                Consumer<UriComponentsBuilder>() {
+
+                    @Override
+                    public void accept(UriComponentsBuilder builder) {
+                        builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
+                    }
+
+                });
     }
 
     @Override
