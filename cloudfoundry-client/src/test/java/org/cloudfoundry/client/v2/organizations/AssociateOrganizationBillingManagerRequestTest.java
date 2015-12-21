@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class AssociateBillingManagerRequestTest {
+public final class AssociateOrganizationBillingManagerRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = AssociateBillingManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
                 .billingManagerId("test-billing-manager-id")
                 .id("test-id")
                 .build()
@@ -38,7 +38,7 @@ public final class AssociateBillingManagerRequestTest {
 
     @Test
     public void isValidNoBillingManagerId() {
-        ValidationResult result = AssociateBillingManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
                 .id("test-id")
                 .build()
                 .isValid();
@@ -49,7 +49,7 @@ public final class AssociateBillingManagerRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = AssociateBillingManagerRequest.builder()
+        ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
                 .billingManagerId("test-billing-manager-id")
                 .build()
                 .isValid();

@@ -31,7 +31,18 @@ public interface Organizations {
      * @param request the Associate Auditor request
      * @return the response from the Associate Auditor request
      */
-    Publisher<AssociateAuditorResponse> associateAuditor(AssociateAuditorRequest request);
+    Publisher<AssociateOrganizationAuditorResponse> associateAuditor(AssociateOrganizationAuditorRequest request);
+
+    /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_auditor_with_the_organization_by_username.html">Associate
+     * Auditor with the Organization by Username</a> request
+     *
+     * @param request the Associate Auditor with an Organization by Username request
+     * @return the response from the Associate Auditor with an Organization by Username request
+     */
+    Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername
+    (AssociateOrganizationAuditorByUsernameRequest request);
 
     /**
      * Makes the
@@ -41,7 +52,8 @@ public interface Organizations {
      * @param request the Associate Billing Manager with the Organization request
      * @return the response from the Associate Billing Manager with the Organization request
      */
-    Publisher<AssociateBillingManagerResponse> associateBillingManager(AssociateBillingManagerRequest request);
+    Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager
+    (AssociateOrganizationBillingManagerRequest request);
 
     /**
      * Makes the

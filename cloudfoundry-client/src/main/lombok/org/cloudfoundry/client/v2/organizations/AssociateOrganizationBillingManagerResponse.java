@@ -21,18 +21,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the Associate Auditor operation
+ * The response payload for the Associate Billing Manager with the Organization operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class AssociateAuditorResponse extends OrganizationResource {
+public final class AssociateOrganizationBillingManagerResponse extends OrganizationResource {
 
     @Builder
-    AssociateAuditorResponse(@JsonProperty("entity") OrganizationEntity entity,
-                             @JsonProperty("metadata") Metadata metadata) {
+    AssociateOrganizationBillingManagerResponse(@JsonProperty("entity") OrganizationEntity entity,
+                                                @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

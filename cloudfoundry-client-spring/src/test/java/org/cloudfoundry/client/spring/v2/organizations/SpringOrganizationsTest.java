@@ -17,10 +17,12 @@
 package org.cloudfoundry.client.spring.v2.organizations;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.v2.organizations.AssociateAuditorRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateAuditorResponse;
-import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateBillingManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
@@ -92,14 +94,14 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationsTest {
 
-    public static final class AssociateAuditor
-            extends AbstractApiTest<AssociateAuditorRequest, AssociateAuditorResponse> {
+    public static final class AssociateOrganizationAuditor
+            extends AbstractApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
         @Override
-        protected AssociateAuditorRequest getInvalidRequest() {
-            return AssociateAuditorRequest.builder()
+        protected AssociateOrganizationAuditorRequest getInvalidRequest() {
+            return AssociateOrganizationAuditorRequest.builder()
                     .build();
         }
 
@@ -112,8 +114,8 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected AssociateAuditorResponse getResponse() {
-            return AssociateAuditorResponse.builder()
+        protected AssociateOrganizationAuditorResponse getResponse() {
+            return AssociateOrganizationAuditorResponse.builder()
                     .metadata(Metadata.builder()
                             .id("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
                             .url("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
@@ -141,28 +143,95 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected AssociateAuditorRequest getValidRequest() throws Exception {
-            return AssociateAuditorRequest.builder()
+        protected AssociateOrganizationAuditorRequest getValidRequest() throws Exception {
+            return AssociateOrganizationAuditorRequest.builder()
                     .auditorId("uaa-id-71")
                     .organizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
                     .build();
         }
 
         @Override
-        protected Publisher<AssociateAuditorResponse> invoke(AssociateAuditorRequest request) {
+        protected Publisher<AssociateOrganizationAuditorResponse> invoke(AssociateOrganizationAuditorRequest request) {
             return this.organizations.associateAuditor(request);
         }
 
     }
 
-    public static final class AssociateBillingManager
-            extends AbstractApiTest<AssociateBillingManagerRequest, AssociateBillingManagerResponse> {
+    public static final class AssociateOrganizationAuditorByUsername extends
+            AbstractApiTest<AssociateOrganizationAuditorByUsernameRequest,
+                    AssociateOrganizationAuditorByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
         @Override
-        protected AssociateBillingManagerRequest getInvalidRequest() {
-            return AssociateBillingManagerRequest.builder()
+        protected AssociateOrganizationAuditorByUsernameRequest getInvalidRequest() {
+            return AssociateOrganizationAuditorByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/organizations/test-id/auditors")
+                    .requestPayload("v2/organizations/PUT_{id}_auditors_request.json")
+                    .status(OK)
+                    .responsePayload("v2/organizations/PUT_{id}_auditors_response.json");
+        }
+
+        @Override
+        protected AssociateOrganizationAuditorByUsernameResponse getResponse() {
+            return AssociateOrganizationAuditorByUsernameResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("50dfb04d-cd49-477d-a54c-32e00e180022")
+                            .url("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022")
+                            .createdAt("2015-11-30T23:38:58Z")
+                            .build())
+                    .entity(OrganizationEntity.builder()
+                            .name("name-2476")
+                            .billingEnabled(false)
+                            .quotaDefinitionId("8de0754e-bb1e-4739-be6e-91104bbab281")
+                            .status("active")
+                            .quotaDefinitionUrl("/v2/quota_definitions/8de0754e-bb1e-4739-be6e-91104bbab281")
+                            .spacesUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/spaces")
+                            .domainsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/domains")
+                            .privateDomainsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/private_domains")
+                            .usersUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/users")
+                            .managersUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/managers")
+                            .billingManagersUrl
+                                    ("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/billing_managers")
+                            .auditorsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/auditors")
+                            .applicationEventsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/app_events")
+                            .spaceQuotaDefinitionsUrl
+                                    ("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/space_quota_definitions")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateOrganizationAuditorByUsernameRequest getValidRequest() throws Exception {
+            return AssociateOrganizationAuditorByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("user@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<AssociateOrganizationAuditorByUsernameResponse> invoke
+                (AssociateOrganizationAuditorByUsernameRequest request) {
+            return this.organizations.associateAuditorByUsername(request);
+        }
+
+    }
+
+    public static final class AssociateOrganizationBillingManager
+            extends AbstractApiTest<AssociateOrganizationBillingManagerRequest,
+            AssociateOrganizationBillingManagerResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected AssociateOrganizationBillingManagerRequest getInvalidRequest() {
+            return AssociateOrganizationBillingManagerRequest.builder()
                     .build();
         }
 
@@ -175,8 +244,8 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected AssociateBillingManagerResponse getResponse() {
-            return AssociateBillingManagerResponse.builder()
+        protected AssociateOrganizationBillingManagerResponse getResponse() {
+            return AssociateOrganizationBillingManagerResponse.builder()
                     .entity(OrganizationEntity.builder()
                             .applicationEventsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/app_events")
                             .auditorsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/auditors")
@@ -204,21 +273,22 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected AssociateBillingManagerRequest getValidRequest() throws Exception {
-            return AssociateBillingManagerRequest.builder()
+        protected AssociateOrganizationBillingManagerRequest getValidRequest() throws Exception {
+            return AssociateOrganizationBillingManagerRequest.builder()
                     .billingManagerId("test-billing-manager-id")
                     .id("test-id")
                     .build();
         }
 
         @Override
-        protected Publisher<AssociateBillingManagerResponse> invoke(AssociateBillingManagerRequest request) {
+        protected Publisher<AssociateOrganizationBillingManagerResponse> invoke
+                (AssociateOrganizationBillingManagerRequest request) {
             return this.organizations.associateBillingManager(request);
         }
 
     }
 
-    public static final class AssociateManager
+    public static final class AssociateOrganizationManager
             extends AbstractApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);

@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Associate Auditor operation
  */
 @Data
-public final class AssociateAuditorRequest implements Validatable {
+public final class AssociateOrganizationAuditorRequest implements Validatable {
 
     /**
      * The auditor id
@@ -48,7 +48,7 @@ public final class AssociateAuditorRequest implements Validatable {
     private final String organizationId;
 
     @Builder
-    AssociateAuditorRequest(String auditorId, String organizationId) {
+    AssociateOrganizationAuditorRequest(String auditorId, String organizationId) {
         this.auditorId = auditorId;
         this.organizationId = organizationId;
     }

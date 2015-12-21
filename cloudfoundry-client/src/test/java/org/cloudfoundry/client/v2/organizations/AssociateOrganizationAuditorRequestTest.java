@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class AssociateAuditorRequestTest {
+public final class AssociateOrganizationAuditorRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = AssociateAuditorRequest.builder()
+        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
                 .auditorId("test-auditor-id")
                 .organizationId("test-organization-id")
                 .build()
@@ -38,7 +38,7 @@ public final class AssociateAuditorRequestTest {
 
     @Test
     public void isValidNoAuditorId() {
-        ValidationResult result = AssociateAuditorRequest.builder()
+        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
                 .organizationId("test-organization-id")
                 .build()
                 .isValid();
@@ -49,7 +49,7 @@ public final class AssociateAuditorRequestTest {
 
     @Test
     public void isValidNoOrganizationId() {
-        ValidationResult result = AssociateAuditorRequest.builder()
+        ValidationResult result = AssociateOrganizationAuditorRequest.builder()
                 .auditorId("test-auditor-id")
                 .build()
                 .isValid();
