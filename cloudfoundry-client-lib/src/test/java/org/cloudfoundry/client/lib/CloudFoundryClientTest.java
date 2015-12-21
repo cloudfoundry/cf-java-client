@@ -1265,7 +1265,7 @@ public class CloudFoundryClientTest {
         List<CloudService> expectedServices = Arrays.asList(
                 createMySqlService("mysql-test"),
                 createUserProvidedService("user-provided-test"),
-                createMySqlService("mysql-test2")
+                createMySqlService("mysql-child")
         );
 
         List<CloudService> services = connectedClient.getServices();

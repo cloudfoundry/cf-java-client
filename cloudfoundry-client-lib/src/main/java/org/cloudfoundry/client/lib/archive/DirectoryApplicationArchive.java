@@ -81,10 +81,11 @@ public class DirectoryApplicationArchive implements ApplicationArchive {
 
         public EntryAdapter(File file) {
             this.file = file;
-            this.name = file.getAbsolutePath().substring(directory.getAbsolutePath().length() + 1);
+            String entryName = file.getAbsolutePath().substring(directory.getAbsolutePath().length() + 1);
             if (isDirectory()) {
-                this.name = this.name + File.separatorChar;
+                entryName = entryName + File.separatorChar;
             }
+            this.name = entryName.replace(File.separator, "/");
         }
 
         public InputStream getInputStream() throws IOException {
