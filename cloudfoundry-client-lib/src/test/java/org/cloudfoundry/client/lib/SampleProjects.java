@@ -43,6 +43,11 @@ public class SampleProjects {
 
     private static final String TEST_APP_DIR = "src/test/resources/apps";
 
+    public static File appWithDirectoryStructure(TemporaryFolder temporaryFolder) throws IOException {
+        File appDirectory = new File(TEST_APP_DIR + "/app-with-directory-structure");
+        return copyAppToTempDir(temporaryFolder, appDirectory);
+    }
+
     public static File appWithScmMetaData(TemporaryFolder temporaryFolder) throws IOException {
         File appDirectory = new File(TEST_APP_DIR + "/app-with-scm-metadata");
         File tmpAppDirectory = copyAppToTempDir(temporaryFolder, appDirectory);

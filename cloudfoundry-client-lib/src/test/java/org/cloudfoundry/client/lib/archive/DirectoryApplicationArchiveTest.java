@@ -53,6 +53,19 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
     }
 
     @Test
+    public void archiveShouldPreserveDirectoryStructure() throws IOException {
+        ApplicationArchive archive = new DirectoryApplicationArchive(SampleProjects.appWithDirectoryStructure
+                (temporaryFolder));
+        boolean containsFile = false;
+        for (Entry entry : archive.getEntries()) {
+            if (entry.getName().equals("parent/child/file")) {
+                containsFile = true;
+            }
+        }
+        assertTrue("The archive should contain 'parent/child/file'", containsFile);
+    }
+
+    @Test
     public void shouldNeedFileThatIsADirectory() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("File must reference a directory");
@@ -72,7 +85,7 @@ public class DirectoryApplicationArchiveTest extends AbstractApplicationArchiveT
     }
 
     private void assertContainsAppFiles(ApplicationArchive archive) {
-        final String subProjectPath = "sub-project" + File.separator;
+        final String subProjectPath = "sub-project/";
         int fileCount = 0;
         boolean containsApp = false;
         boolean containsPackage = false;
