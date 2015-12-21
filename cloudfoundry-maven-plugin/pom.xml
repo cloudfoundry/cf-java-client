@@ -67,14 +67,30 @@
 	</profiles>
 
 	<build>
-		<extensions>
-			<extension>
-				<groupId>org.springframework.build.aws</groupId>
-				<artifactId>org.springframework.build.aws.maven</artifactId>
-				<version>3.0.0.RELEASE</version>
-			</extension>
-		</extensions>
 		<plugins>
+			<plugin>
+				<groupId>org.jfrog.buildinfo</groupId>
+				<artifactId>artifactory-maven-plugin</artifactId>
+				<version>2.4.0</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+						<configuration>
+							<publisher>
+								<contextUrl>https://repo.spring.io</contextUrl>
+								<username>{{ARTIFACTORY_USERNAME}}</username>
+								<password>{{ARTIFACTORY_PASSWORD}}</password>
+								<repoKey>{{ARTIFACTORY_REPO_KEY|"libs-milestone-local"}}</repoKey>
+								<snapshotRepoKey>{{ARTIFACTORY_SNAPSHOT_REPO_KEY|"libs-snapshot-local"}}</snapshotRepoKey>
+							</publisher>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -135,14 +151,14 @@
 			<artifactId>maven-artifact-manager</artifactId>
 			<version>2.2.1</version>
 		</dependency>
-		
+
 		<dependency>
 	    	<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
 		</dependency>
 
-		
+
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -203,17 +219,4 @@
 			<email>sfrederick at gopivotal.com</email>
 		</developer>
 	</developers>
-
-	<distributionManagement>
-		<repository>
-			<id>sonatype-ossrh-staging</id>
-			<name>Sonatype OSSRH</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
