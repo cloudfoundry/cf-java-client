@@ -57,6 +57,17 @@ public interface Organizations {
 
     /**
      * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_billing_manager_with_the_organization_by_username.html">Associate
+     * Billing Manager with the Organization by Username</a> request
+     *
+     * @param request the Associate Billing Manager with the Organization by Username request
+     * @return the response from the Associate Billing Manager with the Organization by Username request
+     */
+    Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername
+    (AssociateOrganizationBillingManagerByUsernameRequest request);
+
+    /**
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_manager_with_the_organization.html">Associate
      * Manager with the Organization</a> request
      *
