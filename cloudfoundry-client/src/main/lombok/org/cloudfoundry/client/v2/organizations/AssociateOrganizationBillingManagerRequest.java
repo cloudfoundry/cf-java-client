@@ -17,23 +17,17 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
-import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-
-import java.util.List;
 
 /**
  * The request payload for the Associate Billing Manager with the Organization operation
  */
 @Data
-public final class AssociateBillingManagerRequest implements Validatable {
+public final class AssociateOrganizationBillingManagerRequest implements Validatable {
 
     /**
      * The billing manager id
@@ -54,7 +48,7 @@ public final class AssociateBillingManagerRequest implements Validatable {
     private final String id;
 
     @Builder
-    AssociateBillingManagerRequest(String billingManagerId, String id) {
+    AssociateOrganizationBillingManagerRequest(String billingManagerId, String id) {
         this.billingManagerId = billingManagerId;
         this.id = id;
     }
