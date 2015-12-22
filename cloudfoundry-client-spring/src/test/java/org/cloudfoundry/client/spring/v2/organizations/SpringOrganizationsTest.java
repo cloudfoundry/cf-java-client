@@ -69,6 +69,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
@@ -1725,6 +1726,45 @@ public final class SpringOrganizationsTest {
         @Override
         protected Publisher<Void> invoke(RemoveOrganizationManagerRequest request) {
             return this.organizations.removeManager(request);
+        }
+
+    }
+
+    public static final class RemoveOrganizationManagerByUsername
+            extends AbstractApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveOrganizationManagerByUsernameRequest getInvalidRequest() {
+            return RemoveOrganizationManagerByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/organizations/test-id/managers")
+                    .requestPayload("v2/organizations/DELETE_{id}_managers_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveOrganizationManagerByUsernameRequest getValidRequest() throws Exception {
+            return RemoveOrganizationManagerByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("manage@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveOrganizationManagerByUsernameRequest request) {
+            return this.organizations.removeManagerByUsername(request);
         }
 
     }
