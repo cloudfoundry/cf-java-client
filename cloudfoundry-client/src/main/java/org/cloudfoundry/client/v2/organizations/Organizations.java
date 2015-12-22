@@ -24,7 +24,7 @@ import org.reactivestreams.Publisher;
 public interface Organizations {
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_auditor_with_the_organization.html">Associate
      * Auditor with the Organization</a> request
      *
@@ -34,7 +34,7 @@ public interface Organizations {
     Publisher<AssociateOrganizationAuditorResponse> associateAuditor(AssociateOrganizationAuditorRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_auditor_with_the_organization_by_username.html">Associate
      * Auditor with the Organization by Username</a> request
      *
@@ -45,7 +45,7 @@ public interface Organizations {
     (AssociateOrganizationAuditorByUsernameRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_billing_manager_with_the_organization.html">
      * Associate Billing Manager with the Organization</a> request
      *
@@ -56,7 +56,7 @@ public interface Organizations {
     (AssociateOrganizationBillingManagerRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_billing_manager_with_the_organization_by_username.html">Associate
      * Billing Manager with the Organization by Username</a> request
      *
@@ -67,7 +67,7 @@ public interface Organizations {
     (AssociateOrganizationBillingManagerByUsernameRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_manager_with_the_organization.html">Associate
      * Manager with the Organization</a> request
      *
@@ -77,7 +77,7 @@ public interface Organizations {
     Publisher<AssociateOrganizationManagerResponse> associateManager(AssociateOrganizationManagerRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
      * Private Domain with the Organization</a> request
      *
@@ -88,7 +88,7 @@ public interface Organizations {
             AssociateOrganizationPrivateDomainRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_user_with_the_organization.html">Associate
      * User with the Organization</a> request
      *
@@ -107,7 +107,7 @@ public interface Organizations {
     Publisher<CreateOrganizationResponse> create(CreateOrganizationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/delete_a_particular_organization.html">Delete
      * a Particular Organization</a> request
      *
@@ -117,7 +117,7 @@ public interface Organizations {
     Publisher<Void> delete(DeleteOrganizationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieve_a_particular_organization.html">Retrieve
      * a Particular Organization</a> request
      *
@@ -127,7 +127,7 @@ public interface Organizations {
     Publisher<GetOrganizationResponse> get(GetOrganizationRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/217/organizations/retrieving_organization_instance_usage.html">
      * Retrieving organization instance usage</a> request
      *
@@ -137,7 +137,7 @@ public interface Organizations {
     Publisher<GetOrganizationInstanceUsageResponse> getInstanceUsage(GetOrganizationInstanceUsageRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_organization_memory_usage.html">Retrieving
      * organization memory usage</a> request
      *
@@ -147,7 +147,7 @@ public interface Organizations {
     Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(GetOrganizationMemoryUsageRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieving_the_roles_of_all_users_in_the_organization.html">Retrieving
      * the roles of all Users in the Organization</a> request
      *
@@ -166,7 +166,7 @@ public interface Organizations {
     Publisher<ListOrganizationsResponse> list(ListOrganizationsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_auditors_for_the_organization.html">List
      * all Auditors for the Organization</a> request
      *
@@ -176,7 +176,7 @@ public interface Organizations {
     Publisher<ListOrganizationAuditorsResponse> listAuditors(ListOrganizationAuditorsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_billing_managers_for_the_organization.html">List
      * all Billing Managers for the Organization</a> request
      *
@@ -187,7 +187,7 @@ public interface Organizations {
             ListOrganizationBillingManagersRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_managers_for_the_organization.html">List
      * all Managers for the Organization</a> request
      *
@@ -206,7 +206,7 @@ public interface Organizations {
     Publisher<ListOrganizationPrivateDomainsResponse> listPrivateDomains(ListOrganizationPrivateDomainsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_services_for_the_organization.html">List
      * all Services for the Organization</a> request
      *
@@ -216,7 +216,7 @@ public interface Organizations {
     Publisher<ListOrganizationServicesResponse> listServices(ListOrganizationServicesRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_space_quota_definitions_for_the_organization.html">List
      * all Space Quota Definitions for the Organization</a> request
      *
@@ -227,7 +227,7 @@ public interface Organizations {
             ListOrganizationSpaceQuotaDefinitionsRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_spaces_for_the_organization.html">List
      * all Spaces for the Organization</a> request
      *
@@ -237,7 +237,7 @@ public interface Organizations {
     Publisher<ListOrganizationSpacesResponse> listSpaces(ListOrganizationSpacesRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_users_for_the_organization.html">List
      * all Users for the Organization</a> request
      *
@@ -247,7 +247,7 @@ public interface Organizations {
     Publisher<ListOrganizationUsersResponse> listUsers(ListOrganizationUsersRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/remove_auditor_from_the_organization.html">Remove
      * Auditor from the Organization</a> request
      *
@@ -255,6 +255,16 @@ public interface Organizations {
      * @return the response from the Remove Auditor from the Organization request
      */
     Publisher<Void> removeAuditor(RemoveOrganizationAuditorRequest request);
+
+    /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/disassociate_auditor_with_the_organization_by_username.html">
+     * Disassociate Auditor with the Organization by Username</a> request
+     *
+     * @param request the Remove Auditor with the Organization By Username request
+     * @return the response from the Associate Billing Manager with the Organization request
+     */
+    Publisher<Void> removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest request);
 
     /**
      * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_billing_manager_from_the_organization.html">Remove
@@ -275,7 +285,7 @@ public interface Organizations {
     Publisher<Void> removeManager(RemoveOrganizationManagerRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_private_domain_from_the_organization.html">Remove
      * Private Domain from the Organization</a> request
      *
@@ -285,7 +295,7 @@ public interface Organizations {
     Publisher<Void> removePrivateDomain(RemoveOrganizationPrivateDomainRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_user_from_the_organization.html">Remove
      * User from the Organization</a> request
      *

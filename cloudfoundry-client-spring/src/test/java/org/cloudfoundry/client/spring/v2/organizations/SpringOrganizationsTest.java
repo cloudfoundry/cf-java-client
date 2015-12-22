@@ -62,6 +62,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
@@ -1474,6 +1475,45 @@ public final class SpringOrganizationsTest {
         @Override
         protected Publisher<Void> invoke(RemoveOrganizationAuditorRequest request) {
             return this.organizations.removeAuditor(request);
+        }
+
+    }
+
+    public static final class RemoveAuditorByUsername extends
+            AbstractApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveOrganizationAuditorByUsernameRequest getInvalidRequest() {
+            return RemoveOrganizationAuditorByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/organizations/test-id/auditors")
+                    .requestPayload("v2/organizations/DELETE_{id}_auditors_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveOrganizationAuditorByUsernameRequest getValidRequest() throws Exception {
+            return RemoveOrganizationAuditorByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("auditor@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveOrganizationAuditorByUsernameRequest request) {
+            return this.organizations.removeAuditorByUsername(request);
         }
 
     }
