@@ -21,6 +21,7 @@ import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;

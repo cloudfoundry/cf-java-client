@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring;
 import lombok.Getter;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
+import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -65,7 +66,8 @@ public abstract class AbstractRestTest {
         for (HttpMessageConverter<?> messageConverter : messageConverters) {
             if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
                 ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                        .setSerializationInclusion(NON_NULL);
+                        .setSerializationInclusion(NON_NULL)
+                        .addHandler(new FailingDeserializationProblemHandler());
             }
         }
 

@@ -267,6 +267,8 @@ public final class SpringRoutesTest {
                             .spaceId("b3f94ab9-1520-478b-a6d6-eb467c179ada")
                             .domainUrl("/v2/domains/a284da28-3a0b-4e46-8c2f-a4b28f76a09b")
                             .spaceUrl("/v2/spaces/b3f94ab9-1520-478b-a6d6-eb467c179ada")
+                            .serviceInstanceId("e3db4ea8-ab0c-4c47-adf8-a70a8e990ee4")
+                            .serviceInstanceUrl("/v2/service_instances/e3db4ea8-ab0c-4c47-adf8-a70a8e990ee4")
                             .applicationsUrl("/v2/routes/75c16cfe-9b8a-4faf-bb65-02c713c7956f/apps")
                             .build())
                     .build();
