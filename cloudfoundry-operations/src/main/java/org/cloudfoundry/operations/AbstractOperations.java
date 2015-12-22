@@ -30,6 +30,13 @@ abstract class AbstractOperations {
         this.spaceId = spaceId;
     }
 
+    protected final static void checkRequestValid(Validatable request) {
+        ValidationResult validationResult = request.isValid();
+        if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+            throw new RequestValidationException(validationResult);
+        }
+    }
+
     protected final Stream<String> getTargetedOrganization() {
         if (AbstractOperations.this.organizationId == null) {
             return Streams.fail(new IllegalStateException("No organization targeted"));
@@ -45,6 +52,5 @@ abstract class AbstractOperations {
             return Streams.just(AbstractOperations.this.spaceId);
         }
     }
-
 }
 

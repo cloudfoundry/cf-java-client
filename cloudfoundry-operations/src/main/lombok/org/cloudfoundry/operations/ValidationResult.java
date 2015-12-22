@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client;
+package org.cloudfoundry.operations;
 
 import lombok.Builder;
 import lombok.Data;

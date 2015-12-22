@@ -82,6 +82,7 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
 
     @Override
     public Publisher<SpaceQuota> get(final GetSpaceQuotaRequest request) {
+        checkRequestValid(request);
         return getTargetedOrganization()
                 .flatMap(this.toSpaceQuotaDefinitionStream)
                 .filter(new Predicate<SpaceQuotaDefinitionResource>() {

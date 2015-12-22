@@ -23,7 +23,7 @@ import lombok.Data;
  * The request options for the list routes operation
  */
 @Data
-public final class ListRoutesRequest {
+public final class ListRoutesRequest implements Validatable {
 
     /**
      * A level to indicate which routes to list
@@ -36,6 +36,17 @@ public final class ListRoutesRequest {
     @Builder
     ListRoutesRequest(Level level) {
         this.level = level;
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.level == null) {
+            builder.message("level must be specified");
+        }
+
+        return builder.build();
     }
 
     public enum Level {

@@ -16,37 +16,15 @@
 
 package org.cloudfoundry.operations;
 
-import lombok.Builder;
-import lombok.Data;
-
 /**
- * The request options for the list routes operation
+ * Interface for types that are able to be validated
  */
-@Data
-public final class GetSpaceQuotaRequest implements Validatable {
+public interface Validatable {
 
     /**
-     * The name of the space quota to get
+     * Returns whether an instance is valid
      *
-     * @param name the name
-     * @return the name
+     * @return a result indicating whether an instance is valid, and messages about what is wrong if it is invalid
      */
-    private final String name;
-
-    @Builder
-    GetSpaceQuotaRequest(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.name == null) {
-            builder.message("space quota name must be specified");
-        }
-
-        return builder.build();
-    }
-
+    ValidationResult isValid();
 }

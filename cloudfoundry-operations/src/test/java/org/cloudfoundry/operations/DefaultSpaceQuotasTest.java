@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEnti
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
+import org.junit.Test;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
 
@@ -107,6 +108,38 @@ public final class DefaultSpaceQuotasTest {
         }
 
     }
+
+    public static final class GetInvalid extends AbstractOperationsTest {
+
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
+
+        @Test(expected = IllegalArgumentException.class)
+        public final void getInvalid() {
+            this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+                    .build());
+        }
+
+    }
+
+    public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
+
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
+
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+                    .name("test-name-2")
+                    .build());
+        }
+
+    }
+
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
         private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
@@ -142,25 +175,6 @@ public final class DefaultSpaceQuotasTest {
         protected Publisher<SpaceQuota> invoke() {
             return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
                     .name("test-name-0")
-                    .build());
-        }
-
-    }
-
-    public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
-
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
-
-        @Override
-        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(IllegalStateException.class);
-        }
-
-        @Override
-        protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
-                    .name("test-name-2")
                     .build());
         }
 
