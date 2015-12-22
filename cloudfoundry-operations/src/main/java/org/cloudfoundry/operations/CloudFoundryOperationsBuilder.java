@@ -22,8 +22,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.operations.v2.PageUtils;
+import org.reactivestreams.Publisher;
 import reactor.fn.Function;
-import reactor.rx.Streams;
 
 import java.util.List;
 
@@ -96,35 +97,37 @@ public final class CloudFoundryOperationsBuilder {
             return null;
         }
 
-        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                .name(this.organization)
-                .build();
+        List<String> orgIds = PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationsResponse>>() {
 
-        return Streams.wrap(cloudFoundryClient.organizations().list(request))
-                .map(new Function<ListOrganizationsResponse, List<ListOrganizationsResponse.Resource>>() {
+            @Override
+            public Publisher<ListOrganizationsResponse> apply(Integer integer) {
+                ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                        .name(CloudFoundryOperationsBuilder.this.organization)
+                        .build();
 
-                    @Override
-                    public List<ListOrganizationsResponse.Resource> apply(ListOrganizationsResponse response) {
-                        return response.getResources();
-                    }
+                return CloudFoundryOperationsBuilder.this.cloudFoundryClient.organizations().list(request);
+            }
+        }).map(new Function<ListOrganizationsResponse.Resource, String>() {
 
-                }).map(new Function<List<ListOrganizationsResponse.Resource>, String>() {
+            @Override
+            public String apply(ListOrganizationsResponse.Resource resource) {
 
-                    @Override
-                    public String apply(List<ListOrganizationsResponse.Resource> resources) {
-                        if (resources.isEmpty()) {
-                            throw new IllegalArgumentException(String.format("Organization '%s' does not exist",
-                                    CloudFoundryOperationsBuilder.this.organization));
+                return resource.getMetadata().getId();
+            }
 
-                        }
+        }).toList().get();
 
-                        return resources.get(0).getMetadata().getId();
-                    }
-
-                }).next().get();
+        if (orgIds == null || orgIds.size() == 0) {
+            throw new IllegalArgumentException(String.format("Organization '%s' does not exist",
+                    CloudFoundryOperationsBuilder.this.organization));
+        } else if (orgIds.size() > 1) {
+            throw new UnexpectedResponseException(String.format("Organization '%s' was listed more than once: '%s'",
+                    CloudFoundryOperationsBuilder.this.organization, orgIds.toString()));
+        }
+        return orgIds.get(0);
     }
 
-    private String getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private String getSpaceId(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         if (organizationId == null) {
             return null;
         }
@@ -133,32 +136,34 @@ public final class CloudFoundryOperationsBuilder {
             return null;
         }
 
-        ListSpacesRequest request = ListSpacesRequest.builder()
-                .organizationId(organizationId)
-                .name(this.space)
-                .build();
+        List<String> spaceIds = PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
 
-        return Streams.wrap(cloudFoundryClient.spaces().list(request))
-                .map(new Function<ListSpacesResponse, List<SpaceResource>>() {
+            @Override
+            public Publisher<ListSpacesResponse> apply(Integer integer) {
+                ListSpacesRequest request = ListSpacesRequest.builder()
+                        .organizationId(organizationId)
+                        .name(CloudFoundryOperationsBuilder.this.space)
+                        .build();
 
-                    @Override
-                    public List<SpaceResource> apply(ListSpacesResponse response) {
-                        return response.getResources();
-                    }
+                return cloudFoundryClient.spaces().list(request);
+            }
+        }).map(new Function<SpaceResource, String>() {
 
-                }).map(new Function<List<SpaceResource>, String>() {
+            @Override
+            public String apply(SpaceResource resource) {
 
-                    @Override
-                    public String apply(List<SpaceResource> resources) {
-                        if (resources.isEmpty()) {
-                            throw new IllegalArgumentException(String.format("Space '%s' does not exist",
-                                    CloudFoundryOperationsBuilder.this.space));
-                        }
+                return resource.getMetadata().getId();
+            }
+        }).toList().get();
 
-                        return resources.get(0).getMetadata().getId();
-                    }
-
-                }).next().get();
+        if (spaceIds == null || spaceIds.size() == 0) {
+            throw new IllegalArgumentException(String.format("Space '%s' does not exist",
+                    CloudFoundryOperationsBuilder.this.space));
+        } else if (spaceIds.size() > 1) {
+            throw new UnexpectedResponseException(String.format("Space '%s' was listed more than once: '%s'",
+                    CloudFoundryOperationsBuilder.this.space, spaceIds.toString()));
+        }
+        return spaceIds.get(0);
     }
 
 }
