@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.spring.v2.spacequotadefinitions;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -27,7 +29,64 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringSpaceQuotaDefinitionsTest  {
+public final class SpringSpaceQuotaDefinitionsTest {
+
+    public static final class GetSpaceQuotaDefinition
+            extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
+
+        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this
+                .restTemplate, this.root);
+
+        @Override
+        protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
+            return GetSpaceQuotaDefinitionRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("v2/space_quota_definitions/test-id")
+                    .status(OK)
+                    .responsePayload("v2/space_quota_definitions/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetSpaceQuotaDefinitionResponse getResponse() {
+            return GetSpaceQuotaDefinitionResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
+                            .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
+                            .createdAt("2015-11-30T23:38:46Z")
+                            .build())
+                    .entity(SpaceQuotaDefinitionEntity.builder()
+                            .name("name-1892")
+                            .organizationId("0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                            .nonBasicServicesAllowed(true)
+                            .totalServices(60)
+                            .totalRoutes(1000)
+                            .memoryLimit(20480)
+                            .instanceMemoryLimit(-1)
+                            .applicationInstanceMemoryLimit(-1)
+                            .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                            .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return GetSpaceQuotaDefinitionRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetSpaceQuotaDefinitionResponse> invoke(GetSpaceQuotaDefinitionRequest request) {
+            return this.spacequotadefinitions.get(request);
+        }
+
+    }
 
     public static final class List
             extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
@@ -68,7 +127,8 @@ public final class SpringSpaceQuotaDefinitionsTest  {
                                     .memoryLimit(20480)
                                     .instanceMemoryLimit(-1)
                                     .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                                    .spacesUrl("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
+                                    .spacesUrl
+                                            ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
                                     .build())
                             .build())
                     .build();
