@@ -67,6 +67,105 @@ public final class DefaultSpaceQuotasTest {
                 .build();
     }
 
+    public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
+
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationSpaceQuotaDefinitionsResponse page1 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
+            ListOrganizationSpaceQuotaDefinitionsResponse page2 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
+
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(1)
+                            .build()))
+                    .thenReturn(Publishers.just(page1));
+
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(2)
+                            .build()))
+                    .thenReturn(Publishers.just(page2));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(getSpaceQuota(2));
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+                    .name("test-name-2")
+                    .build());
+        }
+
+    }
+    public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
+
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationSpaceQuotaDefinitionsResponse page1 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
+            ListOrganizationSpaceQuotaDefinitionsResponse page2 =
+                    getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
+
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(1)
+                            .build()))
+                    .thenReturn(Publishers.just(page1));
+
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .id(TEST_ORGANIZATION)
+                            .page(2)
+                            .build()))
+                    .thenReturn(Publishers.just(page2));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            // expect nothing back
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+                    .name("test-name-0")
+                    .build());
+        }
+
+    }
+
+    public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
+
+        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
+
+        @Override
+        protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<SpaceQuota> invoke() {
+            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+                    .name("test-name-2")
+                    .build());
+        }
+
+    }
+
     public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
 
         private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, TEST_ORGANIZATION);
@@ -107,7 +206,7 @@ public final class DefaultSpaceQuotasTest {
 
     }
 
-    public static final class ListNoSpace extends AbstractOperationsApiTest<SpaceQuota> {
+    public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
         private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, null);
 

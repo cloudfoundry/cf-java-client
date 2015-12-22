@@ -16,25 +16,26 @@
 
 package org.cloudfoundry.operations;
 
-import org.reactivestreams.Publisher;
+import lombok.Builder;
+import lombok.Data;
 
 /**
- * Main entry point to the Cloud Foundry Spaces Operations API
+ * The request options for the list routes operation
  */
-public interface SpaceQuotas {
+@Data
+public final class GetSpaceQuotaRequest {
 
     /**
-     * Lists the space quotas
+     * The name of the space quota to get
      *
-     * @return the space quotas
+     * @param name the name
+     * @return the name
      */
-    Publisher<SpaceQuota> list();
+    private final String name;
+
+    @Builder
+    GetSpaceQuotaRequest(String name) {
+        this.name = name;
+    }
     
-    /**
-     * Gets a space quota
-     *
-     * @return the space quota
-     */
-    Publisher<SpaceQuota> get(GetSpaceQuotaRequest request);
-
 }
