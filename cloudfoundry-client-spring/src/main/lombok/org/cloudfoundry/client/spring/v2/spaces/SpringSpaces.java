@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -96,6 +98,19 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final
+                                                                                             AssociateSpaceAuditorByUsernameRequest request) {
+        return put(request, AssociateSpaceAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
             }
 
         });
