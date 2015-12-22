@@ -33,7 +33,7 @@ public interface Spaces {
     Publisher<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/226/spaces/associate_auditor_with_the_space_by_username.html">Associate
      * Auditor with the Space by Username</a> request
      *
@@ -51,6 +51,17 @@ public interface Spaces {
      * @return the response from the Associate Developer request
      */
     Publisher<AssociateSpaceDeveloperResponse> associateDeveloper(AssociateSpaceDeveloperRequest request);
+
+    /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/associate_developer_with_the_space_by_username.html">Associate
+     * Developer with the Space by Username</a> request
+     *
+     * @param request the Associate Developer with the Space by Username request
+     * @return the response from the Associate Developer with the Space by Username request
+     */
+    Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername
+    (AssociateSpaceDeveloperByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/associate_manager_with_the_space.html">Associate
@@ -141,7 +152,7 @@ public interface Spaces {
     Publisher<ListSpaceDevelopersResponse> listDevelopers(ListSpaceDevelopersRequest request);
 
     /**
-     * Makes the deprecated
+     * Makes the deprecated 
      * <a href="http://apidocs.cloudfoundry.org/214/spaces/list_all_domains_for_the_space_%28deprecated%29.html">List
      * all Domains for the Space</a> request
      *
@@ -205,7 +216,7 @@ public interface Spaces {
     Publisher<ListSpaceServicesResponse> listServices(ListSpaceServicesRequest request);
 
     /**
-     * Makes the
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieving_the_roles_of_all_users_in_the_space.html">
      * Retrieving the roles of all Users in the Space</a> request
      *
