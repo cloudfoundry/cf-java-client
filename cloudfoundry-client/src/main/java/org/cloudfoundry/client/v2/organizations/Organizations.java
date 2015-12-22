@@ -41,8 +41,8 @@ public interface Organizations {
      * @param request the Associate Auditor with an Organization by Username request
      * @return the response from the Associate Auditor with an Organization by Username request
      */
-    Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername
-    (AssociateOrganizationAuditorByUsernameRequest request);
+    Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(
+            AssociateOrganizationAuditorByUsernameRequest request);
 
     /**
      * Makes the 
@@ -52,8 +52,8 @@ public interface Organizations {
      * @param request the Associate Billing Manager with the Organization request
      * @return the response from the Associate Billing Manager with the Organization request
      */
-    Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager
-    (AssociateOrganizationBillingManagerRequest request);
+    Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager(
+            AssociateOrganizationBillingManagerRequest request);
 
     /**
      * Makes the 
@@ -63,8 +63,8 @@ public interface Organizations {
      * @param request the Associate Billing Manager with the Organization by Username request
      * @return the response from the Associate Billing Manager with the Organization by Username request
      */
-    Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername
-    (AssociateOrganizationBillingManagerByUsernameRequest request);
+    Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(
+            AssociateOrganizationBillingManagerByUsernameRequest request);
 
     /**
      * Makes the 
@@ -107,6 +107,17 @@ public interface Organizations {
      * @return the response from the Associate User with the Organization request
      */
     Publisher<AssociateOrganizationUserResponse> associateUser(AssociateOrganizationUserRequest request);
+
+    /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_user_with_the_organization_by_username.html">Associate
+     * User with the Organization by Username</a> request
+     *
+     * @param request the Associate User with the Organization by Username request
+     * @return the response from the Associate User with the Organization by Username request
+     */
+    Publisher<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(
+            AssociateOrganizationUserByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/creating_an_organization.html">Creating an

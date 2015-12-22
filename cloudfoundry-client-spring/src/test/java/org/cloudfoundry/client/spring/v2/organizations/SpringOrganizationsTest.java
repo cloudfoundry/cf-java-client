@@ -31,6 +31,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -422,8 +424,8 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationManagerByUsername extends 
-            AbstractApiTest<AssociateOrganizationManagerByUsernameRequest, 
+    public static final class AssociateOrganizationManagerByUsername extends
+            AbstractApiTest<AssociateOrganizationManagerByUsernameRequest,
                     AssociateOrganizationManagerByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
@@ -484,6 +486,134 @@ public final class SpringOrganizationsTest {
         protected Publisher<AssociateOrganizationManagerByUsernameResponse> invoke
                 (AssociateOrganizationManagerByUsernameRequest request) {
             return this.organizations.associateManagerByUsername(request);
+        }
+
+    }
+
+    public static final class AssociateOrganizationUser
+            extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected AssociateOrganizationUserRequest getInvalidRequest() {
+            return AssociateOrganizationUserRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/organizations/test-id/users/test-user-id")
+                    .status(OK)
+                    .responsePayload("v2/organizations/PUT_{id}_users_{user-id}_response.json");
+        }
+
+        @Override
+        protected AssociateOrganizationUserResponse getResponse() {
+            return AssociateOrganizationUserResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("584664d0-e5bb-449b-bfe5-0136c30c4ff8")
+                            .url("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8")
+                            .createdAt("2015-07-27T22:43:11Z")
+                            .build())
+                    .entity(OrganizationEntity.builder()
+                            .name("name-234")
+                            .billingEnabled(false)
+                            .quotaDefinitionId("51a2f10b-9803-4f35-ad69-0350ff4b66d4")
+                            .status("active")
+                            .quotaDefinitionUrl("/v2/quota_definitions/51a2f10b-9803-4f35-ad69-0350ff4b66d4")
+                            .spacesUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/spaces")
+                            .domainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/domains")
+                            .privateDomainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/private_domains")
+                            .usersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/users")
+                            .managersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/managers")
+                            .billingManagersUrl
+                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/billing_managers")
+                            .auditorsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/auditors")
+                            .applicationEventsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/app_events")
+                            .spaceQuotaDefinitionsUrl
+                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/space_quota_definitions")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateOrganizationUserRequest getValidRequest() throws Exception {
+            return AssociateOrganizationUserRequest.builder()
+                    .id("test-id")
+                    .userId("test-user-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<AssociateOrganizationUserResponse> invoke(AssociateOrganizationUserRequest request) {
+            return this.organizations.associateUser(request);
+        }
+
+    }
+
+    public static final class AssociateOrganizationUserByUsername extends
+            AbstractApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected AssociateOrganizationUserByUsernameRequest getInvalidRequest() {
+            return AssociateOrganizationUserByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/organizations/test-id/users")
+                    .requestPayload("v2/organizations/PUT_{id}_users_request.json")
+                    .status(OK)
+                    .responsePayload("v2/organizations/PUT_{id}_users_response.json");
+        }
+
+        @Override
+        protected AssociateOrganizationUserByUsernameResponse getResponse() {
+            return AssociateOrganizationUserByUsernameResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("1a93417a-811a-46c7-85fa-4a0507c53f08")
+                            .url("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08")
+                            .createdAt("2015-11-30T23:38:59Z")
+                            .build())
+                    .entity(OrganizationEntity.builder()
+                            .name("name-2510")
+                            .billingEnabled(false)
+                            .quotaDefinitionId("4df84394-d265-4b78-a679-c31bb2e5379c")
+                            .status("active")
+                            .quotaDefinitionUrl("/v2/quota_definitions/4df84394-d265-4b78-a679-c31bb2e5379c")
+                            .spacesUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/spaces")
+                            .domainsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/domains")
+                            .privateDomainsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/private_domains")
+                            .usersUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/users")
+                            .managersUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/managers")
+                            .billingManagersUrl
+                                    ("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/billing_managers")
+                            .auditorsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/auditors")
+                            .applicationEventsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/app_events")
+                            .spaceQuotaDefinitionsUrl
+                                    ("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/space_quota_definitions")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateOrganizationUserByUsernameRequest getValidRequest() throws Exception {
+            return AssociateOrganizationUserByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("user@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<AssociateOrganizationUserByUsernameResponse> invoke
+                (AssociateOrganizationUserByUsernameRequest request) {
+            return this.organizations.associateUserByUsername(request);
         }
 
     }
@@ -549,69 +679,6 @@ public final class SpringOrganizationsTest {
                 AssociateOrganizationPrivateDomainRequest request) {
 
             return this.organizations.associatePrivateDomain(request);
-        }
-
-    }
-
-    public static final class AssociateUser
-            extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
-
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
-
-        @Override
-        protected AssociateOrganizationUserRequest getInvalidRequest() {
-            return AssociateOrganizationUserRequest.builder()
-                    .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/users/test-user-id")
-                    .status(OK)
-                    .responsePayload("v2/organizations/PUT_{id}_users_{user-id}_response.json");
-        }
-
-        @Override
-        protected AssociateOrganizationUserResponse getResponse() {
-            return AssociateOrganizationUserResponse.builder()
-                    .metadata(Metadata.builder()
-                            .id("584664d0-e5bb-449b-bfe5-0136c30c4ff8")
-                            .url("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8")
-                            .createdAt("2015-07-27T22:43:11Z")
-                            .build())
-                    .entity(OrganizationEntity.builder()
-                            .name("name-234")
-                            .billingEnabled(false)
-                            .quotaDefinitionId("51a2f10b-9803-4f35-ad69-0350ff4b66d4")
-                            .status("active")
-                            .quotaDefinitionUrl("/v2/quota_definitions/51a2f10b-9803-4f35-ad69-0350ff4b66d4")
-                            .spacesUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/spaces")
-                            .domainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/domains")
-                            .privateDomainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/private_domains")
-                            .usersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/users")
-                            .managersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/billing_managers")
-                            .auditorsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/auditors")
-                            .applicationEventsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/space_quota_definitions")
-                            .build())
-                    .build();
-        }
-
-        @Override
-        protected AssociateOrganizationUserRequest getValidRequest() throws Exception {
-            return AssociateOrganizationUserRequest.builder()
-                    .id("test-id")
-                    .userId("test-user-id")
-                    .build();
-        }
-
-        @Override
-        protected Publisher<AssociateOrganizationUserResponse> invoke(AssociateOrganizationUserRequest request) {
-            return this.organizations.associateUser(request);
         }
 
     }
