@@ -71,6 +71,7 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
@@ -1799,6 +1800,45 @@ public final class SpringOrganizationsTest {
         protected Publisher<Void> invoke(RemoveOrganizationUserRequest request) {
             return this.organizations.removeUser(request);
         }
+    }
+
+    public static final class RemoveUserByUsername extends
+            AbstractApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveOrganizationUserByUsernameRequest getInvalidRequest() {
+            return RemoveOrganizationUserByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/organizations/test-id/users")
+                    .requestPayload("v2/organizations/DELETE_{id}_users_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveOrganizationUserByUsernameRequest getValidRequest() throws Exception {
+            return RemoveOrganizationUserByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("user@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveOrganizationUserByUsernameRequest request) {
+            return this.organizations.removeUserByUsername(request);
+        }
+
     }
 
     public static final class Summary extends AbstractApiTest<SummaryOrganizationRequest, SummaryOrganizationResponse> {
