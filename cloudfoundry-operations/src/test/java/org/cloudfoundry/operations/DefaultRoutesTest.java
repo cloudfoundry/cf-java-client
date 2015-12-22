@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
+import org.junit.Test;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
 
@@ -268,6 +269,18 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
             return this.routes.list(request);
         }
+    }
+
+    public static final class ListInvalid extends AbstractOperationsTest {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
+
+        @Test(expected = IllegalArgumentException.class)
+        public final void listInvalid() {
+            this.routes.list(ListRoutesRequest.builder()
+                    .build());
+        }
+
     }
 
 }
