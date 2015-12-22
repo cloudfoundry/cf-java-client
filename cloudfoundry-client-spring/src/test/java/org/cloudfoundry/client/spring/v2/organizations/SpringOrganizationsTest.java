@@ -68,6 +68,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
@@ -1726,6 +1727,45 @@ public final class SpringOrganizationsTest {
         @Override
         protected Publisher<Void> invoke(RemoveOrganizationManagerRequest request) {
             return this.organizations.removeManager(request);
+        }
+
+    }
+
+    public static final class RemoveOrganizationBillingManagerByUsername extends
+            AbstractApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
+            return RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/organizations/test-id/billing_managers")
+                    .requestPayload("v2/organizations/DELETE_{id}_billing_managers_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveOrganizationBillingManagerByUsernameRequest getValidRequest() throws Exception {
+            return RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("billing_manager@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveOrganizationBillingManagerByUsernameRequest request) {
+            return this.organizations.removeBillingManagerByUsername(request);
         }
 
     }

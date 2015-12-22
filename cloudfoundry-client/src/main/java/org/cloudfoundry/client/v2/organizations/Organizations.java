@@ -298,6 +298,16 @@ public interface Organizations {
     Publisher<Void> removeBillingManager(RemoveOrganizationBillingManagerRequest request);
 
     /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/disassociate_billing_manager_with_the_organization_by_username.html">Disassociate
+     * Billing Manager with the Organization by Username</a> request
+     *
+     * @param request the Disassociate Billing Manager with the Organization by Username request
+     * @return the response from the Disassociate Billing Manager with the Organization by Username request
+     */
+    Publisher<Void> removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest request);
+
+    /**
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/remove_manager_from_the_organization.html">Remove
      * Manager from the Organization</a> request
      *

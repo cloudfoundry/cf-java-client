@@ -70,6 +70,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
@@ -456,6 +457,19 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
                         .getBillingManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest
+                                                                  request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
             }
 
         });
