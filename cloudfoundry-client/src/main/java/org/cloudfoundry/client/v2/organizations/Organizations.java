@@ -289,6 +289,7 @@ public interface Organizations {
     Publisher<Void> removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest request);
 
     /**
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_billing_manager_from_the_organization.html">Remove
      * Billing Manager from the Organization</a> request
      *
@@ -308,6 +309,7 @@ public interface Organizations {
     Publisher<Void> removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest request);
 
     /**
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/remove_manager_from_the_organization.html">Remove
      * Manager from the Organization</a> request
      *

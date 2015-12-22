@@ -24,10 +24,56 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.operations.v2.PageUtils;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
+import reactor.fn.Predicate;
 
 final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas {
 
+    private static final Function<SpaceQuotaDefinitionResource, SpaceQuota> toSpaceQuotaFunction = new
+            Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
+                @Override
+                public SpaceQuota apply(SpaceQuotaDefinitionResource spaceQuotaDefinition) {
+
+                    SpaceQuotaDefinitionEntity spaceQuotaDefinitionEntity = spaceQuotaDefinition.getEntity();
+                    return SpaceQuota.builder()
+                            .id(spaceQuotaDefinition.getMetadata().getId())
+                            .instanceMemoryLimit(spaceQuotaDefinitionEntity.getInstanceMemoryLimit())
+                            .name(spaceQuotaDefinitionEntity.getName())
+                            .organizationId(spaceQuotaDefinitionEntity.getOrganizationId())
+                            .paidServicePlans(spaceQuotaDefinitionEntity.getNonBasicServicesAllowed())
+                            .totalMemoryLimit(spaceQuotaDefinitionEntity.getMemoryLimit())
+                            .totalRoutes(spaceQuotaDefinitionEntity.getTotalRoutes())
+                            .totalServiceInstances(spaceQuotaDefinitionEntity.getTotalServices())
+                            .build();
+
+                }
+            };
+
     private final CloudFoundryClient cloudFoundryClient;
+
+    private final Function<String, Publisher<SpaceQuotaDefinitionResource>>
+            toSpaceQuotaDefinitionStream = new Function<String, Publisher<SpaceQuotaDefinitionResource>>() {
+
+        @Override
+        public Publisher<SpaceQuotaDefinitionResource> apply(final String targetedOrganization) {
+            return PageUtils.resourceStream(
+                    new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+
+                        @Override
+                        public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                            ListOrganizationSpaceQuotaDefinitionsRequest request =
+                                    ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                                            .id(targetedOrganization)
+                                            .page(page)
+                                            .build();
+
+                            return DefaultSpaceQuotas.this.cloudFoundryClient.organizations()
+                                    .listSpaceQuotaDefinitions(request);
+                        }
+
+                    });
+        }
+
+    };
 
     DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId) {
         super(organizationId, null);
@@ -35,49 +81,23 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
     }
 
     @Override
+    public Publisher<SpaceQuota> get(final GetSpaceQuotaRequest request) {
+        return getTargetedOrganization()
+                .flatMap(this.toSpaceQuotaDefinitionStream)
+                .filter(new Predicate<SpaceQuotaDefinitionResource>() {
+                    @Override
+                    public boolean test(SpaceQuotaDefinitionResource spaceQuotaDefinition) {
+                        return request.getName().equals(spaceQuotaDefinition.getEntity().getName());
+                    }
+                })
+                .map(toSpaceQuotaFunction);
+    }
+
+    @Override
     public Publisher<SpaceQuota> list() {
         return getTargetedOrganization()
-                .flatMap(new Function<String, Publisher<SpaceQuotaDefinitionResource>>() {
-
-                    @Override
-                    public Publisher<SpaceQuotaDefinitionResource> apply(final String targetedOrganization) {
-                        return PageUtils.resourceStream(
-                                new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
-
-                                    @Override
-                                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                                        ListOrganizationSpaceQuotaDefinitionsRequest request =
-                                                ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                                                        .id(targetedOrganization)
-                                                        .page(page)
-                                                        .build();
-
-                                        return DefaultSpaceQuotas.this.cloudFoundryClient.organizations()
-                                                .listSpaceQuotaDefinitions(request);
-                                    }
-
-                                });
-                    }
-
-                })
-                .map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
-
-                    @Override
-                    public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
-                        SpaceQuotaDefinitionEntity spaceQuotaDefinitionEntity = resource.getEntity();
-                        return SpaceQuota.builder()
-                                .id(resource.getMetadata().getId())
-                                .instanceMemoryLimit(spaceQuotaDefinitionEntity.getInstanceMemoryLimit())
-                                .name(spaceQuotaDefinitionEntity.getName())
-                                .organizationId(spaceQuotaDefinitionEntity.getOrganizationId())
-                                .paidServicePlans(spaceQuotaDefinitionEntity.getNonBasicServicesAllowed())
-                                .totalMemoryLimit(spaceQuotaDefinitionEntity.getMemoryLimit())
-                                .totalRoutes(spaceQuotaDefinitionEntity.getTotalRoutes())
-                                .totalServiceInstances(spaceQuotaDefinitionEntity.getTotalServices())
-                                .build();
-                    }
-
-                });
+                .flatMap(this.toSpaceQuotaDefinitionStream)
+                .map(toSpaceQuotaFunction);
     }
 
 }
