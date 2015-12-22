@@ -40,7 +40,7 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
     private final List<DeserializationProblemHandler> deserializationProblemHandlers = Collections.emptyList();
 
-    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
+    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class, Mockito.RETURNS_SMART_NULLS);
 
     @Test
     public void applicationsV2() {

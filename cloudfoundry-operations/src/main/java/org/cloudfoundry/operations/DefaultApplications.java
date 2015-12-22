@@ -17,11 +17,13 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
+import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
@@ -76,10 +78,10 @@ final class DefaultApplications implements Applications {
             @Override
             public Application apply(SpaceApplicationSummary applicationSummary) {
                 return Application.builder()
-                        .disk(applicationSummary.getDiskQuota())
+                        .diskQuota(applicationSummary.getDiskQuota())
                         .id(applicationSummary.getId())
                         .instances(applicationSummary.getInstances())
-                        .memory(applicationSummary.getMemory())
+                        .memoryLimit(applicationSummary.getMemory())
                         .name(applicationSummary.getName())
                         .requestedState(applicationSummary.getState())
                         .runningInstances(applicationSummary.getRunningInstances())

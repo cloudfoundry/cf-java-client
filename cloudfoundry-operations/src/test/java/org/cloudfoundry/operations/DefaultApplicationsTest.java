@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -43,10 +46,10 @@ public final class DefaultApplicationsTest {
                     .id(TEST_SPACE)
                     .application(SpaceApplicationSummary.builder()
                             .spaceId(TEST_SPACE)
-                            .diskQuota(1024)
+                            .diskQuota(1073741824)
                             .id("test-id-1")
                             .instances(2)
-                            .memory(512)
+                            .memory(536870912)
                             .name("test-name-1")
                             .state("RUNNING")
                             .runningInstances(2)
@@ -54,10 +57,10 @@ public final class DefaultApplicationsTest {
                             .build())
                     .application(SpaceApplicationSummary.builder()
                             .spaceId(TEST_SPACE)
-                            .diskQuota(1024)
+                            .diskQuota(1073741824)
                             .id("test-id-2")
                             .instances(2)
-                            .memory(512)
+                            .memory(536870912)
                             .name("test-name-2")
                             .state("RUNNING")
                             .runningInstances(2)
@@ -72,20 +75,20 @@ public final class DefaultApplicationsTest {
         protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {
             testSubscriber
                     .assertEquals(Application.builder()
-                            .disk(1024)
+                            .diskQuota(1073741824)
                             .id("test-id-1")
                             .instances(2)
-                            .memory(512)
+                            .memoryLimit(536870912)
                             .name("test-name-1")
                             .requestedState("RUNNING")
                             .runningInstances(2)
                             .url("foo.com")
                             .build())
                     .assertEquals(Application.builder()
-                            .disk(1024)
+                            .diskQuota(1073741824)
                             .id("test-id-2")
                             .instances(2)
-                            .memory(512)
+                            .memoryLimit(536870912)
                             .name("test-name-2")
                             .requestedState("RUNNING")
                             .runningInstances(2)

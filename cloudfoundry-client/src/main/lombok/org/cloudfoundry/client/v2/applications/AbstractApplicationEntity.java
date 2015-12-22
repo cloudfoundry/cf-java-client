@@ -80,10 +80,10 @@ public abstract class AbstractApplicationEntity {
     private final Boolean diego;
 
     /**
-     * The disk quota
+     * The disk quota in bytes
      *
-     * @param diskQuota the disk quota
-     * @return the disk quota
+     * @param diskQuota the disk quota in bytes
+     * @return the disk quota in bytes
      */
     private final Integer diskQuota;
 
