@@ -105,7 +105,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final
-                                                                                             AssociateSpaceAuditorByUsernameRequest request) {
+                                                                                         AssociateSpaceAuditorByUsernameRequest request) {
         return put(request, AssociateSpaceAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
