@@ -67,7 +67,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
                             .totalRoutes(1000)
                             .memoryLimit(20480)
                             .instanceMemoryLimit(-1)
-                            .applicationInstanceMemoryLimit(-1)
+                            .applicationInstanceLimit(-1)
                             .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
                             .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
                             .build())
