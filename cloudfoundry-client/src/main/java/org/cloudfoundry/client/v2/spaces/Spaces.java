@@ -264,6 +264,16 @@ public interface Spaces {
     Publisher<Void> removeManager(RemoveSpaceManagerRequest request);
 
     /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/disassociate_manager_with_the_space_by_username.html">Disassociate
+     * Manager with the Space by Username</a> request
+     *
+     * @param request the Disassociate Manager with the Space by Username request
+     * @return the response from the Disassociate Manager with the Space by Username request
+     */
+    Publisher<Void> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_security_group_from_the_space.html">Remove
      * Security Group from the Space</a> request
      *
