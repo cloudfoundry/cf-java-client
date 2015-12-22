@@ -65,6 +65,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
@@ -411,6 +412,18 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
+            }
+
+        });
+    }
+    
+    @Override
+    public Publisher<Void> removeAuditorByUsername(final RemoveSpaceAuditorByUsernameRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
             }
 
         });
