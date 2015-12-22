@@ -33,6 +33,17 @@ public interface Spaces {
     Publisher<AssociateSpaceAuditorResponse> associateAuditor(AssociateSpaceAuditorRequest request);
 
     /**
+     * Makes the
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/associate_auditor_with_the_space_by_username.html">Associate
+     * Auditor with the Space by Username</a> request
+     *
+     * @param request the Associate Auditor with the Space by Username request
+     * @return the response from the Associate Auditor with the Space by Username request
+     */
+    Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername
+    (AssociateSpaceAuditorByUsernameRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/associate_developer_with_the_space.html">Associate
      * Developer with the Space</a> request
      *
