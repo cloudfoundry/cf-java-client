@@ -244,6 +244,16 @@ public interface Spaces {
      * @return the response from the Remove Auditor from the Space request
      */
     Publisher<Void> removeAuditor(RemoveSpaceAuditorRequest request);
+    
+    /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/disassociate_auditor_with_the_space_by_username.html">Disassociate
+     * Auditor with the Space by Username</a> request
+     *
+     * @param request the Disassociate Auditor with the Space by Username request
+     * @return the response from the Disassociate Auditor with the Space by Username request
+     */
+    Publisher<Void> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_developer_from_the_space.html">Remove

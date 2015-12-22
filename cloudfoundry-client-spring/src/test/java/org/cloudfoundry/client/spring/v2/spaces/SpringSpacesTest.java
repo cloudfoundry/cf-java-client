@@ -80,6 +80,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
@@ -1577,6 +1578,45 @@ public final class SpringSpacesTest {
 
     }
 
+    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest,
+            Void> {
+
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveSpaceAuditorByUsernameRequest getInvalidRequest() {
+            return RemoveSpaceAuditorByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/spaces/test-id/auditors")
+                    .requestPayload("v2/spaces/DELETE_{id}_auditors_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveSpaceAuditorByUsernameRequest getValidRequest() throws Exception {
+            return RemoveSpaceAuditorByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("auditor@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveSpaceAuditorByUsernameRequest request) {
+            return this.spaces.removeAuditorByUsername(request);
+        }
+
+    }
+
     public static final class RemoveDeveloper extends AbstractApiTest<RemoveSpaceDeveloperRequest, Void> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
@@ -1613,7 +1653,7 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class RemoveDeveloperByUsername extends 
+    public static final class RemoveDeveloperByUsername extends
             AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
