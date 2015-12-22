@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
@@ -80,7 +82,7 @@ import java.net.URI;
  */
 @ToString(callSuper = true)
 public final class SpringSpaces extends AbstractSpringOperations implements Spaces {
-
+    
     /**
      * Creates an instance
      *
@@ -123,6 +125,19 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "developers", request.getDeveloperId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final 
+                                                                                                 AssociateSpaceDeveloperByUsernameRequest request) {
+        return put(request, AssociateSpaceDeveloperByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "developers");
             }
 
         });
