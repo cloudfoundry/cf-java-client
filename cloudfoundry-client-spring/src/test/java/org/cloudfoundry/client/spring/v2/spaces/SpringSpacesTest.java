@@ -43,6 +43,8 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameReques
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupRequest;
@@ -472,6 +474,69 @@ public final class SpringSpacesTest {
         protected Publisher<AssociateSpaceDeveloperByUsernameResponse> invoke
                 (AssociateSpaceDeveloperByUsernameRequest request) {
             return this.spaces.associateDeveloperByUsername(request);
+        }
+
+    }
+
+    public static final class AssociateSpaceManagerByUsername extends 
+            AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
+
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+
+        @Override
+        protected AssociateSpaceManagerByUsernameRequest getInvalidRequest() {
+            return AssociateSpaceManagerByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/spaces/test-id/managers")
+                    .requestPayload("v2/spaces/PUT_{id}_managers_request.json")
+                    .status(OK)
+                    .responsePayload("v2/spaces/PUT_{id}_managers_response.json");
+        }
+
+        @Override
+        protected AssociateSpaceManagerByUsernameResponse getResponse() {
+            return AssociateSpaceManagerByUsernameResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("4351f97b-3485-4738-821b-5bf77bed44eb")
+                            .url("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb")
+                            .createdAt("2015-11-30T23:38:28Z")
+                            .build())
+                    .entity(SpaceEntity.builder()
+                            .name("name-98")
+                            .organizationId("a488910d-2d69-46a2-bf6e-319248e03705")
+                            .allowSsh(true)
+                            .organizationUrl("/v2/organizations/a488910d-2d69-46a2-bf6e-319248e03705")
+                            .developersUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/developers")
+                            .managersUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/managers")
+                            .auditorsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/auditors")
+                            .applicationsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/apps")
+                            .routesUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/routes")
+                            .domainsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/domains")
+                            .serviceInstancesUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/service_instances")
+                            .applicationEventsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/app_events")
+                            .eventsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/events")
+                            .securityGroupsUrl("/v2/spaces/4351f97b-3485-4738-821b-5bf77bed44eb/security_groups")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateSpaceManagerByUsernameRequest getValidRequest() throws Exception {
+            return AssociateSpaceManagerByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("user@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest 
+                                                                                            request) {
+            return this.spaces.associateManagerByUsername(request);
         }
 
     }

@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameReques
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupRequest;
@@ -82,7 +84,7 @@ import java.net.URI;
  */
 @ToString(callSuper = true)
 public final class SpringSpaces extends AbstractSpringOperations implements Spaces {
-    
+
     /**
      * Creates an instance
      *
@@ -131,8 +133,8 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final 
-                                                                                                 AssociateSpaceDeveloperByUsernameRequest request) {
+    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final
+                                                                                             AssociateSpaceDeveloperByUsernameRequest request) {
         return put(request, AssociateSpaceDeveloperByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -150,6 +152,19 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final 
+                                                                                             AssociateSpaceManagerByUsernameRequest request) {
+        return put(request, AssociateSpaceManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "managers");
             }
 
         });

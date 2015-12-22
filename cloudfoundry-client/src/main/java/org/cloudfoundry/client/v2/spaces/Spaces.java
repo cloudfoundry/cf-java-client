@@ -73,6 +73,17 @@ public interface Spaces {
     Publisher<AssociateSpaceManagerResponse> associateManager(AssociateSpaceManagerRequest request);
 
     /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/associate_manager_with_the_space_by_username.html">Associate
+     * Manager with the Space by Username</a> request
+     *
+     * @param request the Associate Manager with the Space by Username request
+     * @return the response from the Associate Manager with the Space by Username request
+     */
+    Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername
+    (AssociateSpaceManagerByUsernameRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/associate_security_group_with_the_space.html">
      * Associate Security Group with the Space</a> request
      *
