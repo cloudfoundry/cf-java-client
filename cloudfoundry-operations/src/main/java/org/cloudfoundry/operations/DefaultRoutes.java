@@ -50,8 +50,15 @@ final class DefaultRoutes extends AbstractOperations implements Routes {
 
     @Override
     public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        checkRequestValid(listRoutesRequest);
-        return getRouteResources(listRoutesRequest)
+        return checkRequestValid(listRoutesRequest)
+                .flatMap(new Function<ListRoutesRequest, Publisher<RouteResource>>() {
+
+                    @Override
+                    public Publisher<RouteResource> apply(ListRoutesRequest request) {
+                        return getRouteResources(request);
+                    }
+
+                })
                 .flatMap(new Function<RouteResource, Publisher<Route>>() {
 
                     @Override

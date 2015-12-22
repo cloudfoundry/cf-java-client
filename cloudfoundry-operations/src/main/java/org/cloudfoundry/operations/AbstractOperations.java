@@ -30,10 +30,12 @@ abstract class AbstractOperations {
         this.spaceId = spaceId;
     }
 
-    protected final static void checkRequestValid(Validatable request) {
+    protected final <T extends Validatable> Stream<T> checkRequestValid(T request) {
         ValidationResult validationResult = request.isValid();
         if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-            throw new RequestValidationException(validationResult);
+            return Streams.fail(new RequestValidationException(validationResult));
+        } else {
+            return Streams.just(request);
         }
     }
 
