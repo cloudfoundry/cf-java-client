@@ -33,6 +33,13 @@ public interface Routes {
     Mono<Boolean> check(CheckRouteRequest request);
 
     /**
+     * Create a new route
+     *
+     * @return the route
+     */
+    Publisher<Void> create(CreateRouteRequest createRouteRequest);
+
+    /**
      * Lists the routes and the applications bound to those routes
      *
      * @param request the List Routes request

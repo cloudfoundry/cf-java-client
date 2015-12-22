@@ -30,18 +30,18 @@ public final class DefaultApplicationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Application> {
 
-        private final Applications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE));
-
+        private final Applications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+        
         @Before
         public void setUp() throws Exception {
             GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                    .id(TEST_SPACE)
+                    .id(TEST_SPACE_ID)
                     .build();
 
             GetSpaceSummaryResponse response = GetSpaceSummaryResponse.builder()
-                    .id(TEST_SPACE)
+                    .id(TEST_SPACE_ID)
                     .application(SpaceApplicationSummary.builder()
-                            .spaceId(TEST_SPACE)
+                            .spaceId(TEST_SPACE_ID)
                             .diskQuota(1073741824)
                             .id("test-id-1")
                             .instances(2)
@@ -52,7 +52,7 @@ public final class DefaultApplicationsTest {
                             .url("foo.com")
                             .build())
                     .application(SpaceApplicationSummary.builder()
-                            .spaceId(TEST_SPACE)
+                            .spaceId(TEST_SPACE_ID)
                             .diskQuota(1073741824)
                             .id("test-id-2")
                             .instances(2)

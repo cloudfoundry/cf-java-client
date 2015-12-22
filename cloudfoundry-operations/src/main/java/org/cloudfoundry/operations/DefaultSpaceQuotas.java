@@ -31,8 +31,6 @@ import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import java.util.NoSuchElementException;
-
 final class DefaultSpaceQuotas implements SpaceQuotas {
 
     private final CloudFoundryClient cloudFoundryClient;
@@ -55,7 +53,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .single()
                 .map(extractQuotaDefinition())
                 .map(toSpaceQuota())
-                .otherwise(convertException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName())));
+                .otherwise(Exceptions.<SpaceQuota>convert(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName())));
     }
 
     @Override
@@ -71,22 +69,6 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
             @Override
             public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
                 return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
-            }
-
-        };
-    }
-
-    private static Function<Throwable, Mono<SpaceQuota>> convertException(final String message) {
-        return new Function<Throwable, Mono<SpaceQuota>>() {
-
-            @Override
-            public Mono<SpaceQuota> apply(Throwable throwable) {
-                if (throwable instanceof NoSuchElementException) {
-
-                    return Mono.error(new IllegalArgumentException(message, throwable));
-                } else {
-                    return Mono.error(throwable);
-                }
             }
 
         };
