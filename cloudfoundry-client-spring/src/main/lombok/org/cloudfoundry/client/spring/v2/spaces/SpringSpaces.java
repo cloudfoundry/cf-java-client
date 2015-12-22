@@ -67,6 +67,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -158,8 +159,8 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final 
-                                                                                             AssociateSpaceManagerByUsernameRequest request) {
+    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final
+                                                                                         AssociateSpaceManagerByUsernameRequest request) {
         return put(request, AssociateSpaceManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -433,6 +434,18 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<Void> removeManagerByUsername(final RemoveSpaceManagerByUsernameRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "spaces", request.getId(), "managers");
             }
 
         });

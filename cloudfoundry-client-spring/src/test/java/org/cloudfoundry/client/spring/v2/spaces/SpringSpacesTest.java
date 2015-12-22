@@ -82,6 +82,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
@@ -478,7 +479,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSpaceManagerByUsername extends 
+    public static final class AssociateSpaceManagerByUsername extends
             AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
@@ -534,8 +535,8 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest 
-                                                                                            request) {
+        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest
+                                                                                    request) {
             return this.spaces.associateManagerByUsername(request);
         }
 
@@ -1644,6 +1645,45 @@ public final class SpringSpacesTest {
         @Override
         protected Publisher<Void> invoke(RemoveSpaceManagerRequest request) {
             return this.spaces.removeManager(request);
+        }
+
+    }
+
+    public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest,
+            Void> {
+
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveSpaceManagerByUsernameRequest getInvalidRequest() {
+            return RemoveSpaceManagerByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/spaces/test-id/managers")
+                    .requestPayload("v2/spaces/DELETE_{id}_managers_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveSpaceManagerByUsernameRequest getValidRequest() throws Exception {
+            return RemoveSpaceManagerByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("manager@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveSpaceManagerByUsernameRequest request) {
+            return this.spaces.removeManagerByUsername(request);
         }
 
     }
