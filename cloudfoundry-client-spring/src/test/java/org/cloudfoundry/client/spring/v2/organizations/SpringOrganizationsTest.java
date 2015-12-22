@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingMana
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
@@ -416,6 +418,72 @@ public final class SpringOrganizationsTest {
         @Override
         protected Publisher<AssociateOrganizationManagerResponse> invoke(AssociateOrganizationManagerRequest request) {
             return this.organizations.associateManager(request);
+        }
+
+    }
+
+    public static final class AssociateOrganizationManagerByUsername extends 
+            AbstractApiTest<AssociateOrganizationManagerByUsernameRequest, 
+                    AssociateOrganizationManagerByUsernameResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
+
+        @Override
+        protected AssociateOrganizationManagerByUsernameRequest getInvalidRequest() {
+            return AssociateOrganizationManagerByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/organizations/test-id/managers")
+                    .requestPayload("v2/organizations/PUT_{id}_managers_request.json")
+                    .status(OK)
+                    .responsePayload("v2/organizations/PUT_{id}_managers_response.json");
+        }
+
+        @Override
+        protected AssociateOrganizationManagerByUsernameResponse getResponse() {
+            return AssociateOrganizationManagerByUsernameResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("8d2238e2-2fb3-4ede-b188-1fd3a533c4b4")
+                            .url("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4")
+                            .createdAt("2015-11-30T23:38:59Z")
+                            .build())
+                    .entity(OrganizationEntity.builder()
+                            .name("name-2523")
+                            .billingEnabled(false)
+                            .quotaDefinitionId("0e36ae22-a752-4e37-9dbf-0bac5c1b93c1")
+                            .status("active")
+                            .quotaDefinitionUrl("/v2/quota_definitions/0e36ae22-a752-4e37-9dbf-0bac5c1b93c1")
+                            .spacesUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/spaces")
+                            .domainsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/domains")
+                            .privateDomainsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/private_domains")
+                            .usersUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/users")
+                            .managersUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/managers")
+                            .billingManagersUrl
+                                    ("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/billing_managers")
+                            .auditorsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/auditors")
+                            .applicationEventsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/app_events")
+                            .spaceQuotaDefinitionsUrl
+                                    ("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/space_quota_definitions")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateOrganizationManagerByUsernameRequest getValidRequest() throws Exception {
+            return AssociateOrganizationManagerByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("user@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<AssociateOrganizationManagerByUsernameResponse> invoke
+                (AssociateOrganizationManagerByUsernameRequest request) {
+            return this.organizations.associateManagerByUsername(request);
         }
 
     }

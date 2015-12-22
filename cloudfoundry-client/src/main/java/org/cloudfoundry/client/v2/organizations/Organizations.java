@@ -78,6 +78,17 @@ public interface Organizations {
 
     /**
      * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/associate_manager_with_the_organization_by_username.html">Associate
+     * Manager with the Organization by Username</a> request
+     *
+     * @param request the Associate Manager with the Organization by Username request
+     * @return the response from the Associate Manager with the Organization by Username request
+     */
+    Publisher<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(
+            AssociateOrganizationManagerByUsernameRequest request);
+
+    /**
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/214/organizations/associate_private_domain_with_the_organization.html">Associate
      * Private Domain with the Organization</a> request
      *
