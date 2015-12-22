@@ -308,6 +308,16 @@ public interface Organizations {
 
     /**
      * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/organizations/disassociate_manager_with_the_organization_by_username.html">Disassociate
+     * Manager with the Organization by Username</a> request
+     *
+     * @param request the Disassociate Manager with the Organization by Username request
+     * @return the response from the Disassociate Manager with the Organization by Username request
+     */
+    Publisher<Void> removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest request);
+
+    /**
+     * Makes the 
      * <a href="http://apidocs.cloudfoundry.org/223/organizations/remove_private_domain_from_the_organization.html">Remove
      * Private Domain from the Organization</a> request
      *
