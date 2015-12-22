@@ -81,6 +81,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceUserRolesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceAuditorRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceDeveloperRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
@@ -1610,6 +1611,45 @@ public final class SpringSpacesTest {
         protected Publisher<Void> invoke(RemoveSpaceDeveloperRequest request) {
             return this.spaces.removeDeveloper(request);
         }
+    }
+
+    public static final class RemoveDeveloperByUsername extends 
+            AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
+
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+
+        @Override
+        protected RemoveSpaceDeveloperByUsernameRequest getInvalidRequest() {
+            return RemoveSpaceDeveloperByUsernameRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/spaces/test-id/developers")
+                    .requestPayload("v2/spaces/DELETE_{id}_developers_request.json")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveSpaceDeveloperByUsernameRequest getValidRequest() throws Exception {
+            return RemoveSpaceDeveloperByUsernameRequest.builder()
+                    .id("test-id")
+                    .username("developer@example.com")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(RemoveSpaceDeveloperByUsernameRequest request) {
+            return this.spaces.removeDeveloperByUsername(request);
+        }
+
     }
 
     public static final class RemoveManager extends AbstractApiTest<RemoveSpaceManagerRequest, Void> {

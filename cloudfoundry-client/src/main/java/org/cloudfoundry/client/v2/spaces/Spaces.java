@@ -255,6 +255,16 @@ public interface Spaces {
     Publisher<Void> removeDeveloper(RemoveSpaceDeveloperRequest request);
 
     /**
+     * Makes the 
+     * <a href="http://apidocs.cloudfoundry.org/226/spaces/disassociate_developer_with_the_space_by_username.html">Disassociate
+     * Developer with the Space by Username</a> request
+     *
+     * @param request the Disassociate Developer with the Space by Username request
+     * @return the response from the Disassociate Developer with the Space by Username request
+     */
+    Publisher<Void> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/spaces/remove_manager_from_the_space.html">Remove Manager
      * from the Space</a> request
      *
