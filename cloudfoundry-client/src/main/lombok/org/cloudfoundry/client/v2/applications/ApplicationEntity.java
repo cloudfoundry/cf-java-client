@@ -74,6 +74,14 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
     private final String packageUpdatedAt;
 
     /**
+     * The ports
+     *
+     * @param ports the ports
+     * @return the ports
+     */
+    private final String ports;
+
+    /**
      * The routes url
      *
      * @param routesUrl the routes url
@@ -151,6 +159,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("stack_url") String stackUrl,
                       @JsonProperty("staging_failed_description") String stagingFailedDescription,
                       @JsonProperty("staging_failed_reason") String stagingFailedReason,
+                      @JsonProperty("ports") String ports,
                       @JsonProperty("staging_task_id") String stagingTaskId,
                       @JsonProperty("state") String state,
                       @JsonProperty("version") String version) {
@@ -167,6 +176,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
         this.serviceBindingsUrl = serviceBindingsUrl;
         this.spaceUrl = spaceUrl;
         this.stackUrl = stackUrl;
+        this.ports = ports;
         this.stagingTaskId = stagingTaskId;
         this.version = version;
     }

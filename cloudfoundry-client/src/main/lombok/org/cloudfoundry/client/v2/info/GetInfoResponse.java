@@ -37,18 +37,26 @@ public final class GetInfoResponse {
     /**
      * The application SSH endpoint
      *
-     * @param appSshEndpoint the application SSH endpoint
+     * @param applicationSshEndpoint the application SSH endpoint
      * @return the application SSH endpoint
      */
-    private final String appSshEndpoint;
+    private final String applicationSshEndpoint;
 
     /**
      * The application SSH host key fingerprint
      *
-     * @param appSshHostKeyFingerprint the application SSH host key fingerprint
+     * @param applicationSshHostKeyFingerprint the application SSH host key fingerprint
      * @return the application SSH host key fingerprint
      */
-    private final String appSshHostKeyFingerprint;
+    private final String applicationSshHostKeyFingerprint;
+
+    /**
+     * The application SSH OAuth client
+     *
+     * @param applicationSshOAuthClient the application SSH OAuth client
+     * @return the application SSH OAuth client
+     */
+    private final String applicationSshOAuthClient;
 
     /**
      * The authorization endpoint
@@ -115,6 +123,14 @@ public final class GetInfoResponse {
     private final String name;
 
     /**
+     * The routing endpoint
+     *
+     * @param routingEndpoin the routing endpoint
+     * @return the routing endpoint
+     */
+    private final String routingEndpoint;
+
+    /**
      * The support url
      *
      * @param support the support url
@@ -148,8 +164,9 @@ public final class GetInfoResponse {
 
     @Builder
     GetInfoResponse(@JsonProperty("api_version") String apiVersion,
-                    @JsonProperty("app_ssh_endpoint") String appSshEndpoint,
-                    @JsonProperty("app_ssh_host_key_fingerprint") String appSshHostKeyFingerprint,
+                    @JsonProperty("app_ssh_endpoint") String applicationSshEndpoint,
+                    @JsonProperty("app_ssh_host_key_fingerprint") String applicationSshHostKeyFingerprint,
+                    @JsonProperty("app_ssh_oauth_client") String applicationSshOAuthClient,
                     @JsonProperty("authorization_endpoint") String authorizationEndpoint,
                     @JsonProperty("build") String buildNumber,
                     @JsonProperty("description") String description,
@@ -158,13 +175,15 @@ public final class GetInfoResponse {
                     @JsonProperty("min_cli_version") String minCliVersion,
                     @JsonProperty("min_recommended_cli_version") String minRecommendedCliVersion,
                     @JsonProperty("name") String name,
+                    @JsonProperty("routing_endpoint") String routingEndpoint,
                     @JsonProperty("support") String support,
                     @JsonProperty("token_endpoint") String tokenEndpoint,
                     @JsonProperty("user") String user,
                     @JsonProperty("version") Integer version) {
         this.apiVersion = apiVersion;
-        this.appSshEndpoint = appSshEndpoint;
-        this.appSshHostKeyFingerprint = appSshHostKeyFingerprint;
+        this.applicationSshEndpoint = applicationSshEndpoint;
+        this.applicationSshHostKeyFingerprint = applicationSshHostKeyFingerprint;
+        this.applicationSshOAuthClient = applicationSshOAuthClient;
         this.authorizationEndpoint = authorizationEndpoint;
         this.buildNumber = buildNumber;
         this.description = description;
@@ -173,6 +192,7 @@ public final class GetInfoResponse {
         this.minCliVersion = minCliVersion;
         this.minRecommendedCliVersion = minRecommendedCliVersion;
         this.name = name;
+        this.routingEndpoint = routingEndpoint;
         this.support = support;
         this.tokenEndpoint = tokenEndpoint;
         this.user = user;

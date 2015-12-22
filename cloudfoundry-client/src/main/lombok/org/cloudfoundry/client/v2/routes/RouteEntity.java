@@ -75,6 +75,22 @@ public final class RouteEntity {
     private final Integer port;
 
     /**
+     * The service instance id
+     *
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
+     */
+    private final String serviceInstanceId;
+
+    /**
+     * The service instance url
+     *
+     * @param serviceInstanceUrl the service instance url
+     * @return the service instance url
+     */
+    private final String serviceInstanceUrl;
+
+    /**
      * The space id
      *
      * @param spaceId the space id
@@ -97,6 +113,8 @@ public final class RouteEntity {
                 @JsonProperty("host") String host,
                 @JsonProperty("path") String path,
                 @JsonProperty("port") Integer port,
+                @JsonProperty("service_instance_guid") String serviceInstanceId,
+                @JsonProperty("service_instance_url") String serviceInstanceUrl,
                 @JsonProperty("space_guid") String spaceId,
                 @JsonProperty("space_url") String spaceUrl) {
 
@@ -106,6 +124,8 @@ public final class RouteEntity {
         this.host = host;
         this.path = path;
         this.port = port;
+        this.serviceInstanceId = serviceInstanceId;
+        this.serviceInstanceUrl = serviceInstanceUrl;
         this.spaceId = spaceId;
         this.spaceUrl = spaceUrl;
     }

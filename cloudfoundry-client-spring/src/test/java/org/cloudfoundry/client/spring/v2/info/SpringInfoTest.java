@@ -45,17 +45,18 @@ public final class SpringInfoTest {
         @Override
         protected GetInfoResponse getResponse() {
             return GetInfoResponse.builder()
-                    .apiVersion("2.33.0")
-                    .appSshEndpoint("ssh.run.pivotal.io:2222")
-                    .authorizationEndpoint("https://login.run.pivotal.io")
-                    .buildNumber("2222")
-                    .description("Cloud Foundry sponsored by Pivotal")
-                    .dopplerLoggingEndpoint("wss://doppler.run.pivotal.io:443")
-                    .loggingEndpoint("wss://loggregator.run.pivotal.io:4443")
                     .name("vcap")
+                    .buildNumber("2222")
                     .support("http://support.cloudfoundry.com")
-                    .tokenEndpoint("https://uaa.run.pivotal.io")
                     .version(2)
+                    .description("Cloud Foundry sponsored by Pivotal")
+                    .authorizationEndpoint("http://localhost:8080/uaa")
+                    .tokenEndpoint("http://localhost:8080/uaa")
+                    .apiVersion("2.44.0")
+                    .applicationSshEndpoint("ssh.system.domain.example.com:2222")
+                    .applicationSshHostKeyFingerprint("47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0")
+                    .routingEndpoint("http://localhost:3000")
+                    .loggingEndpoint("ws://loggregator.vcap.me:80")
                     .build();
         }
 

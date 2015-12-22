@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client;
+package org.cloudfoundry.utils.test;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 
 import static org.junit.Assert.fail;
 
-final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
+public final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
 
     @Override
     public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer,
