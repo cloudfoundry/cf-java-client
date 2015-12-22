@@ -27,9 +27,17 @@ import lombok.Data;
 public final class SpaceQuotaDefinitionEntity {
 
     /**
+     * The application instance memory limit
+     *
+     * @param applicationInstanceMemoryLimit the application instance memory limit
+     * @return applicationInstanceMemoryLimit
+     */
+    private final Integer applicationInstanceMemoryLimit;
+
+    /**
      * The instance memory limit
      *
-     * @param instanceMemoryLimit the admin boolean
+     * @param instanceMemoryLimit the instance memory limit
      * @return instanceMemoryLimit
      */
     private final Integer instanceMemoryLimit;
@@ -99,7 +107,8 @@ public final class SpaceQuotaDefinitionEntity {
     private final Integer totalServices;
 
     @Builder
-    SpaceQuotaDefinitionEntity(@JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
+    SpaceQuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceMemoryLimit,
+                               @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
                                @JsonProperty("memory_limit") Integer memoryLimit,
                                @JsonProperty("name") String name,
                                @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
@@ -108,6 +117,7 @@ public final class SpaceQuotaDefinitionEntity {
                                @JsonProperty("spaces_url") String spacesUrl,
                                @JsonProperty("total_routes") Integer totalRoutes,
                                @JsonProperty("total_services") Integer totalServices) {
+        this.applicationInstanceMemoryLimit = applicationInstanceMemoryLimit;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;
         this.name = name;

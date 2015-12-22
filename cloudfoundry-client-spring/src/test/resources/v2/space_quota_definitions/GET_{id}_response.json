@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "4b8e7d14-71bd-4abb-b474-183375c75c84",
+    "url": "/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84",
+    "created_at": "2015-11-30T23:38:46Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-1892",
+    "organization_guid": "0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d",
+    "non_basic_services_allowed": true,
+    "total_services": 60,
+    "total_routes": 1000,
+    "memory_limit": 20480,
+    "instance_memory_limit": -1,
+    "app_instance_limit": -1,
+    "organization_url": "/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d",
+    "spaces_url": "/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces"
+  }
+}
