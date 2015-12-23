@@ -38,9 +38,9 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
     private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
 
-    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
-
     private final List<DeserializationProblemHandler> deserializationProblemHandlers = Collections.emptyList();
+
+    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class);
 
     @Test
     public void applicationsV2() {
@@ -142,6 +142,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void serviceInstances() {
         assertNotNull(this.client.serviceInstances());
+    }
+
+    @Test
+    public void sharedDomains() {
+        assertNotNull(this.client.sharedDomains());
     }
 
     @Test
