@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEnti
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -140,6 +141,7 @@ public final class DefaultSpaceQuotasTest {
 
     }
 
+    @Ignore("Waiting on reactor to allow throw on defaultIsEmpty")
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
         private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION));
