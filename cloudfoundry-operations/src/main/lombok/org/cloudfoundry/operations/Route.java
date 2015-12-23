@@ -18,6 +18,7 @@ package org.cloudfoundry.operations;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 
 import java.util.List;
 
@@ -68,7 +69,11 @@ public class Route {
     private final String space;
 
     @Builder
-    private Route(String routeId, List<String> applications, String domain, String host, String space) {
+    private Route(String routeId,
+                  @Singular List<String> applications,
+                  String domain,
+                  String host,
+                  String space) {
         this.routeId = routeId;
         this.applications = applications;
         this.domain = domain;

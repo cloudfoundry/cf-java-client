@@ -17,20 +17,21 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import reactor.rx.Stream;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Applications applications;
 
     private final Organizations organizations;
-    
-    private final SpaceQuotas spaceQuotas;
 
     private final Routes routes;
 
+    private final SpaceQuotas spaceQuotas;
+
     private final Spaces spaces;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, Stream<String> spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
@@ -54,13 +55,13 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     }
 
     @Override
-    public Spaces spaces() {
-        return this.spaces;
+    public SpaceQuotas spaceQuotas() {
+        return this.spaceQuotas;
     }
 
     @Override
-    public SpaceQuotas spaceQuotas() {
-        return this.spaceQuotas;
+    public Spaces spaces() {
+        return this.spaces;
     }
 
 }

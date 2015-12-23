@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
+import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
@@ -35,8 +36,7 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
-
-import java.util.Arrays;
+import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -44,64 +44,62 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListCurrentOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
-            when(this.cloudFoundryClient.routes().list(
-                    org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                            .organizationId("test-organization-id")
-                            .page(1)
-                            .build()))
-                    .thenReturn(Publishers.just(
-                            org.cloudfoundry.client.v2.routes.ListRoutesResponse.builder()
-                                    .resource(RouteResource.builder()
-                                            .entity(RouteEntity.builder()
-                                                    .domainId("domain-id")
-                                                    .host("host")
-                                                    .spaceId("test-space-id")
-                                                    .build())
-                                            .metadata(Resource.Metadata.builder()
-                                                    .id("route-id")
-                                                    .build())
-                                            .build())
-                                    .totalPages(1)
-                                    .build()));
-
-            when(this.cloudFoundryClient.domains().get(
-                    GetDomainRequest.builder()
-                            .id("domain-id")
-                            .build()
-            )).thenReturn(Publishers.just(
-                    GetDomainResponse.builder()
-                            .entity(DomainEntity.builder()
-                                    .name("domain")
+            org.cloudfoundry.client.v2.routes.ListRoutesRequest request1 = org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                    .organizationId("test-organization-id")
+                    .page(1)
+                    .build();
+            ListRoutesResponse response1 = ListRoutesResponse.builder()
+                    .resource(RouteResource.builder()
+                            .entity(RouteEntity.builder()
+                                    .domainId("domain-id")
+                                    .host("host")
+                                    .spaceId("test-space-id")
                                     .build())
-                            .build()));
-
-            when(this.cloudFoundryClient.spaces().get(
-                    GetSpaceRequest.builder()
-                            .id("test-space-id")
-                            .build())).thenReturn(Publishers.just(
-                    GetSpaceResponse.builder()
-                            .entity(SpaceEntity.builder()
-                                    .name("test-space")
+                            .metadata(Resource.Metadata.builder()
+                                    .id("route-id")
                                     .build())
-                            .build()));
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Publishers.just(response1));
 
-            when(this.cloudFoundryClient.routes().listApplications(
-                    ListRouteApplicationsRequest.builder()
-                            .id("route-id")
-                            .page(1)
-                            .build())).thenReturn(Publishers.just(
-                    ListRouteApplicationsResponse.builder()
-                            .resource(ApplicationResource.builder()
-                                    .entity(ApplicationEntity.builder()
-                                            .name("application")
-                                            .build())
+            GetDomainRequest request2 = GetDomainRequest.builder()
+                    .id("domain-id")
+                    .build();
+            GetDomainResponse response2 = GetDomainResponse.builder()
+                    .entity(DomainEntity.builder()
+                            .name("domain")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Publishers.just(response2));
+
+            GetSpaceRequest request3 = GetSpaceRequest.builder()
+                    .id("test-space-id")
+                    .build();
+            GetSpaceResponse response3 = GetSpaceResponse.builder()
+                    .entity(SpaceEntity.builder()
+                            .name("test-space")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Publishers.just(response3));
+
+            ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
+                    .id("route-id")
+                    .page(1)
+                    .build();
+            ListRouteApplicationsResponse response4 = ListRouteApplicationsResponse.builder()
+                    .resource(ApplicationResource.builder()
+                            .entity(ApplicationEntity.builder()
+                                    .name("application")
                                     .build())
-                            .totalPages(1)
-                            .build()));
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Publishers.just(response4));
         }
 
         @Override
@@ -109,7 +107,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
             testSubscriber
                     .assertEquals(Route.builder()
                             .routeId("route-id")
-                            .applications(Arrays.asList("application"))
+                            .application("application")
                             .domain("domain")
                             .host("host")
                             .space("test-space")
@@ -128,7 +126,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
@@ -148,64 +146,62 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListCurrentSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
-            when(this.cloudFoundryClient.spaces().listRoutes(
-                    ListSpaceRoutesRequest.builder()
-                            .id("test-space-id")
-                            .page(1)
-                            .build()))
-                    .thenReturn(Publishers.just(
-                            ListSpaceRoutesResponse.builder()
-                                    .resource(RouteResource.builder()
-                                            .entity(RouteEntity.builder()
-                                                    .domainId("domain-id")
-                                                    .host("host")
-                                                    .spaceId("test-space-id")
-                                                    .build())
-                                            .metadata(Resource.Metadata.builder()
-                                                    .id("route-id")
-                                                    .build())
-                                            .build())
-                                    .totalPages(1)
-                                    .build()));
-
-            when(this.cloudFoundryClient.domains().get(
-                    GetDomainRequest.builder()
-                            .id("domain-id")
-                            .build()
-            )).thenReturn(Publishers.just(
-                    GetDomainResponse.builder()
-                            .entity(DomainEntity.builder()
-                                    .name("domain")
+            ListSpaceRoutesRequest request1 = ListSpaceRoutesRequest.builder()
+                    .id("test-space-id")
+                    .page(1)
+                    .build();
+            ListSpaceRoutesResponse response1 = ListSpaceRoutesResponse.builder()
+                    .resource(RouteResource.builder()
+                            .entity(RouteEntity.builder()
+                                    .domainId("domain-id")
+                                    .host("host")
+                                    .spaceId("test-space-id")
                                     .build())
-                            .build()));
-
-            when(this.cloudFoundryClient.spaces().get(
-                    GetSpaceRequest.builder()
-                            .id("test-space-id")
-                            .build())).thenReturn(Publishers.just(
-                    GetSpaceResponse.builder()
-                            .entity(SpaceEntity.builder()
-                                    .name("test-space")
+                            .metadata(Resource.Metadata.builder()
+                                    .id("route-id")
                                     .build())
-                            .build()));
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Publishers.just(response1));
 
-            when(this.cloudFoundryClient.routes().listApplications(
-                    ListRouteApplicationsRequest.builder()
-                            .id("route-id")
-                            .page(1)
-                            .build())).thenReturn(Publishers.just(
-                    ListRouteApplicationsResponse.builder()
-                            .resource(ApplicationResource.builder()
-                                    .entity(ApplicationEntity.builder()
-                                            .name("application")
-                                            .build())
+            GetDomainRequest request2 = GetDomainRequest.builder()
+                    .id("domain-id")
+                    .build();
+            GetDomainResponse response2 = GetDomainResponse.builder()
+                    .entity(DomainEntity.builder()
+                            .name("domain")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Publishers.just(response2));
+
+            GetSpaceRequest request3 = GetSpaceRequest.builder()
+                    .id("test-space-id")
+                    .build();
+            GetSpaceResponse response3 = GetSpaceResponse.builder()
+                    .entity(SpaceEntity.builder()
+                            .name("test-space")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Publishers.just(response3));
+
+            ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
+                    .id("route-id")
+                    .page(1)
+                    .build();
+            ListRouteApplicationsResponse response4 = ListRouteApplicationsResponse.builder()
+                    .resource(ApplicationResource.builder()
+                            .entity(ApplicationEntity.builder()
+                                    .name("application")
                                     .build())
-                            .totalPages(1)
-                            .build()));
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Publishers.just(response4));
         }
 
         @Override
@@ -213,7 +209,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
             testSubscriber
                     .assertEquals(Route.builder()
                             .routeId("route-id")
-                            .applications(Arrays.asList("application"))
+                            .application("application")
                             .domain("domain")
                             .host("host")
                             .space("test-space")
@@ -232,7 +228,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, null, null);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
@@ -252,7 +248,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, null);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
@@ -272,7 +268,7 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
 
     public static final class ListInvalid extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, TEST_ORGANIZATION, TEST_SPACE);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {

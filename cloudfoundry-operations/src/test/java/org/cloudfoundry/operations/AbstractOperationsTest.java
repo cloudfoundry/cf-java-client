@@ -23,11 +23,15 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.junit.Before;
+import reactor.rx.Stream;
+import reactor.rx.Streams;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
+
+    protected static final Stream<String> MISSING_ID = Streams.fail(new java.lang.IllegalStateException());
 
     protected static final String TEST_ORGANIZATION = "test-organization-id";
 

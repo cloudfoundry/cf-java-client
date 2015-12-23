@@ -20,53 +20,68 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.operations.v2.PageUtils;
+import org.cloudfoundry.operations.v2.Paginated;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
+import reactor.rx.Stream;
 
 final class DefaultSpaces extends AbstractOperations implements Spaces {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    DefaultSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        super(organizationId, null);
+    private final Stream<String> organizationId;
+
+    DefaultSpaces(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.organizationId = organizationId;
     }
 
     @Override
     public Publisher<Space> list() {
-        return getTargetedOrganization()
-                .flatMap(new Function<String, Publisher<SpaceResource>>() {
+        return this.organizationId
+                .flatMap(requestSpaceResources(this.cloudFoundryClient))
+                .map(toSpace());
+    }
 
-                    @Override
-                    public Publisher<SpaceResource> apply(final String targetedOrganization) {
-                        return PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+    private Function<Integer, Publisher<ListSpacesResponse>> requestPage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return new Function<Integer, Publisher<ListSpacesResponse>>() {
 
-                            @Override
-                            public Publisher<ListSpacesResponse> apply(Integer page) {
-                                ListSpacesRequest request = ListSpacesRequest.builder()
-                                        .organizationId(targetedOrganization)
-                                        .page(page)
-                                        .build();
+            @Override
+            public Publisher<ListSpacesResponse> apply(Integer page) {
+                ListSpacesRequest request = ListSpacesRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build();
 
-                                return DefaultSpaces.this.cloudFoundryClient.spaces().list(request);
-                            }
+                return cloudFoundryClient.spaces().list(request);
+            }
 
-                        });
-                    }
+        };
+    }
 
-                })
-                .map(new Function<SpaceResource, Space>() {
+    private Function<String, Publisher<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Publisher<SpaceResource>>() {
 
-                    @Override
-                    public Space apply(SpaceResource resource) {
-                        return Space.builder()
-                                .id(resource.getMetadata().getId())
-                                .name(resource.getEntity().getName())
-                                .build();
-                    }
+            @Override
+            public Publisher<SpaceResource> apply(String organizationId) {
+                return Paginated.requestResources(requestPage(cloudFoundryClient, organizationId));
+            }
 
-                });
+        };
+    }
+
+    private Function<SpaceResource, Space> toSpace() {
+        return new Function<SpaceResource, Space>() {
+
+            @Override
+            public Space apply(SpaceResource resource) {
+                return Space.builder()
+                        .id(resource.getMetadata().getId())
+                        .name(resource.getEntity().getName())
+                        .build();
+            }
+
+        };
     }
 
 }

@@ -19,6 +19,7 @@ package org.cloudfoundry.client;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -44,22 +45,6 @@ public final class ApplicationsV3Test {
     @Autowired
     private volatile String spaceId;
 
-    @Before
-    public void zeroExistingApplications() {
-        ListApplicationsRequest request = ListApplicationsRequest.builder()
-                .organizationId(this.organizationId)
-                .spaceId(this.spaceId)
-                .build();
-
-        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
-                .map(ListApplicationsResponse::getResources)
-                .flatMap(Streams::from)
-                .count()
-                .next().get();
-
-        assertEquals("Unexpected applications exist", 0, size);
-    }
-
     @Test
     public void create() {
         CreateApplicationRequest createRequest = CreateApplicationRequest.builder()
@@ -74,13 +59,28 @@ public final class ApplicationsV3Test {
                 .spaceId(this.spaceId)
                 .build();
 
-        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(listRequest))
+        Streams.wrap(this.cloudFoundryClient.applicationsV3().list(listRequest))
+                .map(ListApplicationsResponse::getResources)
+                .flatMap(Streams::from)
+                .count()
+                .subscribe(new TestSubscriber<>()
+                        .assertEquals(14L));
+    }
+
+    @Before
+    public void zeroExistingApplications() {
+        ListApplicationsRequest request = ListApplicationsRequest.builder()
+                .organizationId(this.organizationId)
+                .spaceId(this.spaceId)
+                .build();
+
+        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
                 .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
                 .next().get();
 
-        assertEquals(1, size);
+        assertEquals("Unexpected applications exist", 0, size);
     }
 
 }

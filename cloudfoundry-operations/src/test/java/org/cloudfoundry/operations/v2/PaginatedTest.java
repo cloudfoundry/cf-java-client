@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public final class PageUtilsTest {
+public final class PaginatedTest {
 
     private final static Publisher<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
         return Streams.just(ListSpacesResponse.builder()
@@ -53,7 +53,7 @@ public final class PageUtilsTest {
 
     @Test
     public final void pageStream() {
-        List<SpaceResource> actual = PageUtils.pageStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+        List<SpaceResource> actual = Paginated.requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
             @Override
             public Publisher<ListSpacesResponse> apply(Integer i) {
                 return testPaginatedResponsePublisher(i, 3);
@@ -75,7 +75,7 @@ public final class PageUtilsTest {
 
     @Test
     public final void resourceStream() {
-        List<SpaceResource> actual = PageUtils.resourceStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+        List<SpaceResource> actual = Paginated.requestResources(new Function<Integer, Publisher<ListSpacesResponse>>() {
             @Override
             public Publisher<ListSpacesResponse> apply(Integer i) {
                 return testPaginatedResponsePublisher(i - 1, 3);
@@ -90,7 +90,7 @@ public final class PageUtilsTest {
 
     @Test(expected = IllegalStateException.class)
     public final void pageStreamNoTotalPages() {
-        PageUtils.pageStream(new Function<Integer, Publisher<ListSpacesResponse>>() {
+        Paginated.requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
             @Override
             public Publisher<ListSpacesResponse> apply(Integer page) {
                 return Streams.just(ListSpacesResponse.builder()

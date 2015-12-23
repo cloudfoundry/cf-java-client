@@ -19,7 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.operations.v2.PageUtils;
+import org.cloudfoundry.operations.v2.Paginated;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 
@@ -28,13 +28,17 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
     private final CloudFoundryClient cloudFoundryClient;
 
     DefaultOrganizations(CloudFoundryClient cloudFoundryClient) {
-        super(null, null);
         this.cloudFoundryClient = cloudFoundryClient;
     }
 
     @Override
     public Publisher<Organization> list() {
-        return PageUtils.resourceStream(new Function<Integer, Publisher<ListOrganizationsResponse>>() {
+        return Paginated.requestResources(requestPage(this.cloudFoundryClient))
+                .map(toOrganization());
+    }
+
+    private Function<Integer, Publisher<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
 
             @Override
             public Publisher<ListOrganizationsResponse> apply(Integer page) {
@@ -42,10 +46,14 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
                         .page(page)
                         .build();
 
-                return DefaultOrganizations.this.cloudFoundryClient.organizations().list(request);
+                return cloudFoundryClient.organizations().list(request);
             }
 
-        }).map(new Function<ListOrganizationsResponse.Resource, Organization>() {
+        };
+    }
+
+    private Function<ListOrganizationsResponse.Resource, Organization> toOrganization() {
+        return new Function<ListOrganizationsResponse.Resource, Organization>() {
 
             @Override
             public Organization apply(ListOrganizationsResponse.Resource resource) {
@@ -55,7 +63,7 @@ final class DefaultOrganizations extends AbstractOperations implements Organizat
                         .build();
             }
 
-        });
+        };
     }
 
 }

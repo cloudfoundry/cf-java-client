@@ -21,16 +21,7 @@ import reactor.rx.Streams;
 
 abstract class AbstractOperations {
 
-    private final String organizationId;
-
-    private final String spaceId;
-
-    protected AbstractOperations(String organizationId, String spaceId) {
-        this.organizationId = organizationId;
-        this.spaceId = spaceId;
-    }
-
-    protected final <T extends Validatable> Stream<T> checkRequestValid(T request) {
+    protected final <T extends Validatable> Stream<T> getValidatedRequest(T request) {
         ValidationResult validationResult = request.isValid();
         if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
             return Streams.fail(new RequestValidationException(validationResult));
@@ -39,20 +30,5 @@ abstract class AbstractOperations {
         }
     }
 
-    protected final Stream<String> getTargetedOrganization() {
-        if (AbstractOperations.this.organizationId == null) {
-            return Streams.fail(new IllegalStateException("No organization targeted"));
-        } else {
-            return Streams.just(this.organizationId);
-        }
-    }
-
-    protected final Stream<String> getTargetedSpace() {
-        if (AbstractOperations.this.spaceId == null) {
-            return Streams.fail(new IllegalStateException("No space targeted"));
-        } else {
-            return Streams.just(AbstractOperations.this.spaceId);
-        }
-    }
 }
 

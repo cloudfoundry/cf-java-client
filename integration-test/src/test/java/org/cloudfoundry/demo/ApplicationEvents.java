@@ -21,7 +21,7 @@ import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.operations.v2.PageUtils;
+import org.cloudfoundry.operations.v2.Paginated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class ApplicationEvents {
         private void run() throws IOException {
             Map<String, String> organizations = new HashMap<>();
 
-            PageUtils.resourceStream(page -> {
+            Paginated.requestResources(page -> {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder().page(page).build();
                 return this.cloudFoundryClient.organizations().list(request);
             })
@@ -110,7 +110,7 @@ public class ApplicationEvents {
             this.logger.info("{} Organizations Found", organizations.size());
 
             try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
-                PageUtils.resourceStream(page -> {
+                Paginated.requestResources(page -> {
                     ListEventsRequest request = ListEventsRequest.builder()
                             .types(EVENT_TYPES)
                             .timestamp("2015-10-01T05:18:38Z")

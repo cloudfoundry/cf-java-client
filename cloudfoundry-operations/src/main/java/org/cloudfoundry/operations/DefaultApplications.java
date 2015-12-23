@@ -22,57 +22,72 @@ import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
+import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 final class DefaultApplications extends AbstractOperations implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    DefaultApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        super(null, spaceId);
+    private final Stream<String> spaceId;
+
+    DefaultApplications(CloudFoundryClient cloudFoundryClient, Stream<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.spaceId = spaceId;
     }
 
     @Override
     public Publisher<Application> list() {
-        return getTargetedSpace()
-                .flatMap(new Function<String, Publisher<GetSpaceSummaryResponse>>() {
+        return this.spaceId
+                .flatMap(requestSpaceSummary(this.cloudFoundryClient))
+                .flatMap(extractApplications())
+                .map(toApplication());
+    }
 
-                    @Override
-                    public Publisher<GetSpaceSummaryResponse> apply(String targetedSpace) {
-                        GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                                .id(targetedSpace)
-                                .build();
+    private Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>> extractApplications() {
+        return new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
 
-                        return DefaultApplications.this.cloudFoundryClient.spaces().getSummary(request);
-                    }
+            @Override
+            public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
+                return Streams.from(getSpaceSummaryResponse.getApplications());
+            }
 
-                })
-                .flatMap(new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
+        };
+    }
 
-                    @Override
-                    public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
-                        return Streams.from(getSpaceSummaryResponse.getApplications());
-                    }
+    private Function<String, Publisher<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Publisher<GetSpaceSummaryResponse>>() {
 
-                })
-                .map(new Function<SpaceApplicationSummary, Application>() {
+            @Override
+            public Publisher<GetSpaceSummaryResponse> apply(String targetedSpace) {
+                GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
+                        .id(targetedSpace)
+                        .build();
 
-                    @Override
-                    public Application apply(SpaceApplicationSummary applicationSummary) {
-                        return Application.builder()
-                                .disk(applicationSummary.getDiskQuota())
-                                .id(applicationSummary.getId())
-                                .instances(applicationSummary.getInstances())
-                                .memory(applicationSummary.getMemory())
-                                .name(applicationSummary.getName())
-                                .requestedState(applicationSummary.getState())
-                                .runningInstances(applicationSummary.getRunningInstances())
-                                .urls(applicationSummary.getUrls())
-                                .build();
-                    }
+                return cloudFoundryClient.spaces().getSummary(request);
+            }
 
-                });
+        };
+    }
+
+    private Function<SpaceApplicationSummary, Application> toApplication() {
+        return new Function<SpaceApplicationSummary, Application>() {
+
+            @Override
+            public Application apply(SpaceApplicationSummary applicationSummary) {
+                return Application.builder()
+                        .disk(applicationSummary.getDiskQuota())
+                        .id(applicationSummary.getId())
+                        .instances(applicationSummary.getInstances())
+                        .memory(applicationSummary.getMemory())
+                        .name(applicationSummary.getName())
+                        .requestedState(applicationSummary.getState())
+                        .runningInstances(applicationSummary.getRunningInstances())
+                        .urls(applicationSummary.getUrls())
+                        .build();
+            }
+
+        };
     }
 
 }

@@ -23,6 +23,7 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
+import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -30,7 +31,7 @@ public final class DefaultApplicationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Application> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, TEST_SPACE);
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Streams.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
@@ -64,23 +65,22 @@ public final class DefaultApplicationsTest {
                             .build())
                     .build();
 
-            when(this.cloudFoundryClient.spaces().getSummary(request))
-                    .thenReturn(Publishers.just(response));
-
+            when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Publishers.just(response));
         }
 
         @Override
         protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {
-            testSubscriber.assertEquals(Application.builder()
-                    .disk(1024)
-                    .id("test-id-1")
-                    .instances(2)
-                    .memory(512)
-                    .name("test-name-1")
-                    .requestedState("RUNNING")
-                    .runningInstances(2)
-                    .url("foo.com")
-                    .build())
+            testSubscriber
+                    .assertEquals(Application.builder()
+                            .disk(1024)
+                            .id("test-id-1")
+                            .instances(2)
+                            .memory(512)
+                            .name("test-name-1")
+                            .requestedState("RUNNING")
+                            .runningInstances(2)
+                            .url("foo.com")
+                            .build())
                     .assertEquals(Application.builder()
                             .disk(1024)
                             .id("test-id-2")
@@ -90,8 +90,7 @@ public final class DefaultApplicationsTest {
                             .requestedState("RUNNING")
                             .runningInstances(2)
                             .url("bar.com")
-                            .build()
-                    );
+                            .build());
         }
 
         @Override
@@ -102,7 +101,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ListNoSpace extends AbstractOperationsApiTest<Application> {
 
-        private DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, null);
+        private DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {

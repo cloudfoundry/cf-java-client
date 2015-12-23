@@ -17,20 +17,19 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
-import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
-import org.cloudfoundry.operations.v2.PageUtils;
+import org.cloudfoundry.operations.ListRoutesRequest.Level;
+import org.cloudfoundry.operations.v2.Paginated;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple3;
@@ -43,150 +42,195 @@ final class DefaultRoutes extends AbstractOperations implements Routes {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    public DefaultRoutes(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId) {
-        super(organizationId, spaceId);
+    private final Stream<String> organizationId;
+
+    private final Stream<String> spaceId;
+
+    public DefaultRoutes(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, Stream<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.organizationId = organizationId;
+        this.spaceId = spaceId;
     }
 
     @Override
     public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        return checkRequestValid(listRoutesRequest)
-                .flatMap(new Function<ListRoutesRequest, Publisher<RouteResource>>() {
-
-                    @Override
-                    public Publisher<RouteResource> apply(ListRoutesRequest request) {
-                        return getRouteResources(request);
-                    }
-
-                })
-                .flatMap(new Function<RouteResource, Publisher<Route>>() {
-
-                    @Override
-                    public Publisher<Route> apply(RouteResource routeResource) {
-                        final RouteEntity routeEntity = routeResource.getEntity();
-                        final Resource.Metadata routeMetadata = routeResource.getMetadata();
-
-                        return Streams.zip(getApplicationNames(routeMetadata), getDomainName(routeEntity),
-                                getSpaceName(routeEntity),
-                                new Function<Tuple3<List<String>, String, String>, Route>() {
-
-                                    @Override
-                                    public Route apply(Tuple3<List<String>, String, String> tuple) {
-                                        return Route.builder()
-                                                .applications(tuple.getT1())
-                                                .domain(tuple.getT2())
-                                                .host(routeEntity.getHost())
-                                                .routeId(routeMetadata.getId())
-                                                .space(tuple.getT3())
-                                                .build();
-                                    }
-                                });
-                    }
-                });
+        return getValidatedRequest(listRoutesRequest)
+                .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
+                .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }
 
-    private Stream<List<String>> getApplicationNames(final Resource.Metadata metadata) {
-        return PageUtils.resourceStream(new Function<Integer, Publisher<ListRouteApplicationsResponse>>() {
-
-            @Override
-            public Publisher<ListRouteApplicationsResponse> apply(Integer page) {
-                return DefaultRoutes.this.cloudFoundryClient.routes().listApplications(
-                        ListRouteApplicationsRequest.builder()
-                                .id(metadata.getId())
-                                .page(page)
-                                .build()
-                );
-            }
-        }).map(new Function<ApplicationResource, String>() {
+    private Function<ApplicationResource, String> extractApplicationName() {
+        return new Function<ApplicationResource, String>() {
 
             @Override
             public String apply(ApplicationResource applicationResource) {
                 return applicationResource.getEntity().getName();
             }
-        }).toList().stream();
+
+        };
     }
 
-    private Stream<String> getDomainName(RouteEntity routeEntity) {
+    private Function<GetDomainResponse, String> extractDomainName() {
+        return new Function<GetDomainResponse, String>() {
+
+            @Override
+            public String apply(GetDomainResponse getDomainResponse) {
+                return getDomainResponse.getEntity().getName();
+            }
+
+        };
+    }
+
+    private Function<GetSpaceResponse, String> extractSpaceName() {
+        return new Function<GetSpaceResponse, String>() {
+
+            @Override
+            public String apply(GetSpaceResponse response) {
+                return response.getEntity().getName();
+            }
+
+        };
+    }
+
+    private Stream<String> getDomainName(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
         GetDomainRequest request = GetDomainRequest.builder()
-                .id(routeEntity.getDomainId())
+                .id(routeResource.getEntity().getDomainId())
                 .build();
 
-        return Streams.wrap(this.cloudFoundryClient.domains().get(request))
-                .map(new Function<GetDomainResponse, String>() {
-
-                    @Override
-                    public String apply(GetDomainResponse getDomainResponse) {
-                        return getDomainResponse.getEntity().getName();
-                    }
-                });
+        return Streams.wrap(cloudFoundryClient.domains().get(request))
+                .map(extractDomainName());
     }
 
-    private Stream<RouteResource> getRouteResources(ListRoutesRequest listRoutesRequest) {
-        return (ListRoutesRequest.Level.Organization == listRoutesRequest.getLevel()) ?
-                getTargetedOrganizationRouteResources() : getTargetedSpaceRouteResources();
-    }
-
-    private Stream<String> getSpaceName(RouteEntity routeEntity) {
+    private Stream<String> getSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
         GetSpaceRequest request = GetSpaceRequest.builder()
-                .id(routeEntity.getSpaceId())
+                .id(routeResource.getEntity().getSpaceId())
                 .build();
 
-        return Streams.wrap(this.cloudFoundryClient.spaces().get(request))
-                .map(new Function<GetSpaceResponse, String>() {
-
-                    @Override
-                    public String apply(GetSpaceResponse getSpaceResponse) {
-                        return getSpaceResponse.getEntity().getName();
-                    }
-                });
+        return Streams.wrap(cloudFoundryClient.spaces().get(request))
+                .map(extractSpaceName());
     }
 
-    private Stream<RouteResource> getTargetedOrganizationRouteResources() {
-        return getTargetedOrganization()
-                .flatMap(new Function<String, Publisher<RouteResource>>() {
-
-                    @Override
-                    public Publisher<RouteResource> apply(final String organizationId) {
-                        return PageUtils.resourceStream(new Function<Integer,
-                                Publisher<ListRoutesResponse>>() {
-
-                            @Override
-                            public Publisher<ListRoutesResponse> apply(Integer page) {
-                                return DefaultRoutes.this.cloudFoundryClient.routes().list(
-                                        org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                                                .organizationId(organizationId)
-                                                .page(page)
-                                                .build());
-                            }
-
-                        });
-                    }
-
-                });
+    private Stream<List<String>> requestApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
+        return Paginated.requestResources(requestApplicationPage(cloudFoundryClient, routeResource))
+                .map(extractApplicationName())
+                .toList()
+                .stream();
     }
 
-    private Stream<RouteResource> getTargetedSpaceRouteResources() {
-        return getTargetedSpace()
-                .flatMap(new Function<String, Publisher<RouteResource>>() {
+    private Function<Integer, Publisher<ListRouteApplicationsResponse>> requestApplicationPage(final CloudFoundryClient cloudFoundryClient, final RouteResource routeResource) {
+        return new Function<Integer, Publisher<ListRouteApplicationsResponse>>() {
 
-                    @Override
-                    public Publisher<RouteResource> apply(final String targetedSpace) {
-                        return PageUtils.resourceStream(new Function<Integer,
-                                Publisher<ListSpaceRoutesResponse>>() {
+            @Override
+            public Publisher<ListRouteApplicationsResponse> apply(Integer page) {
+                ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
+                        .id(routeResource.getMetadata().getId())
+                        .page(page)
+                        .build();
 
-                            @Override
-                            public Publisher<ListSpaceRoutesResponse> apply(Integer page) {
-                                return DefaultRoutes.this.cloudFoundryClient.spaces().listRoutes(
-                                        ListSpaceRoutesRequest.builder()
-                                                .id(targetedSpace)
-                                                .page(page)
-                                                .build());
-                            }
+                return cloudFoundryClient.routes().listApplications(request);
+            }
 
-                        });
-                    }
+        };
+    }
 
-                });
+    private Function<RouteResource, Publisher<Route>> requestAuxiliaryContent(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<RouteResource, Publisher<Route>>() {
+
+            @Override
+            public Publisher<Route> apply(RouteResource routeResource) {
+                return Streams.zip(requestApplicationNames(cloudFoundryClient, routeResource), getDomainName(cloudFoundryClient, routeResource), getSpaceName(cloudFoundryClient, routeResource),
+                        toRoute(routeResource));
+            }
+
+        };
+    }
+
+    private Function<Integer, Publisher<ListRoutesResponse>> requestOrganizationRoutePage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return new Function<Integer, Publisher<ListRoutesResponse>>() {
+
+            @Override
+            public Publisher<ListRoutesResponse> apply(Integer page) {
+                org.cloudfoundry.client.v2.routes.ListRoutesRequest request = org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build();
+
+                return cloudFoundryClient.routes().list(request);
+            }
+
+        };
+    }
+
+    private Function<String, Publisher<RouteResource>> requestOrganizationRoutes(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Publisher<RouteResource>>() {
+
+            @Override
+            public Publisher<RouteResource> apply(String organizationId) {
+                return Paginated.requestResources(requestOrganizationRoutePage(cloudFoundryClient, organizationId));
+            }
+
+        };
+    }
+
+    private Function<ListRoutesRequest, Publisher<RouteResource>> requestRouteResources(final CloudFoundryClient cloudFoundryClient, final Stream<String> organizationId, final Stream<String>
+            spaceId) {
+        return new Function<ListRoutesRequest, Publisher<RouteResource>>() {
+
+            @Override
+            public Publisher<RouteResource> apply(ListRoutesRequest request) {
+                if (Level.Organization == request.getLevel()) {
+                    return organizationId
+                            .flatMap(requestOrganizationRoutes(cloudFoundryClient));
+                } else {
+                    return spaceId
+                            .flatMap(requestSpaceRoutes(cloudFoundryClient));
+                }
+            }
+
+        };
+    }
+
+    private Function<Integer, Publisher<ListSpaceRoutesResponse>> requestSpaceRoutePage(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
+        return new Function<Integer, Publisher<ListSpaceRoutesResponse>>() {
+
+            @Override
+            public Publisher<ListSpaceRoutesResponse> apply(Integer page) {
+                ListSpaceRoutesRequest request = ListSpaceRoutesRequest.builder()
+                        .id(spaceId)
+                        .page(page)
+                        .build();
+
+                return cloudFoundryClient.spaces().listRoutes(request);
+            }
+
+        };
+    }
+
+    private Function<String, Publisher<RouteResource>> requestSpaceRoutes(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Publisher<RouteResource>>() {
+
+            @Override
+            public Publisher<RouteResource> apply(String spaceId) {
+                return Paginated.requestResources(requestSpaceRoutePage(cloudFoundryClient, spaceId));
+            }
+
+        };
+    }
+
+    private Function<Tuple3<List<String>, String, String>, Route> toRoute(final RouteResource routeResource) {
+        return new Function<Tuple3<List<String>, String, String>, Route>() {
+
+            @Override
+            public Route apply(Tuple3<List<String>, String, String> tuple) {
+                return Route.builder()
+                        .applications(tuple.getT1())
+                        .domain(tuple.getT2())
+                        .host(routeResource.getEntity().getHost())
+                        .routeId(routeResource.getMetadata().getId())
+                        .space(tuple.getT3())
+                        .build();
+            }
+        };
     }
 
 }

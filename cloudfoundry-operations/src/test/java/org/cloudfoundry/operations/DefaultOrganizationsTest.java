@@ -35,6 +35,9 @@ public final class DefaultOrganizationsTest {
 
         @Before
         public void setUp() throws Exception {
+            ListOrganizationsRequest request1 = ListOrganizationsRequest.builder()
+                    .page(1)
+                    .build();
             ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
                     .resource(ListOrganizationsResponse.Resource.builder()
                             .metadata(Metadata.builder()
@@ -46,9 +49,11 @@ public final class DefaultOrganizationsTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(1).build()))
-                    .thenReturn(Publishers.just(page1));
+            when(this.cloudFoundryClient.organizations().list(request1)).thenReturn(Publishers.just(page1));
 
+            ListOrganizationsRequest request2 = ListOrganizationsRequest.builder()
+                    .page(2)
+                    .build();
             ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
                     .resource(ListOrganizationsResponse.Resource.builder()
                             .metadata(Metadata.builder()
@@ -60,8 +65,7 @@ public final class DefaultOrganizationsTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.organizations().list(ListOrganizationsRequest.builder().page(2).build()))
-                    .thenReturn(Publishers.just(page2));
+            when(this.cloudFoundryClient.organizations().list(request2)).thenReturn(Publishers.just(page2));
         }
 
         @Override

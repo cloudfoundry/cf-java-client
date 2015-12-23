@@ -22,8 +22,7 @@ import static org.junit.Assert.assertNotNull;
 
 public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(
-            this.cloudFoundryClient, null, null);
+    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
 
     @Test
     public void applications() {
