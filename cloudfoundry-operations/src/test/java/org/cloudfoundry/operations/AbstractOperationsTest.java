@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.junit.Before;
+import org.mockito.Mockito;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
@@ -37,20 +38,20 @@ public abstract class AbstractOperationsTest {
 
     protected static final String TEST_SPACE = "test-space-id";
 
-    protected final ApplicationsV2 applications = mock(ApplicationsV2.class);
+    protected final ApplicationsV2 applications = mock(ApplicationsV2.class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class);
+    protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final Domains domains = mock(Domains.class);
+    protected final Domains domains = mock(Domains.class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final Organizations organizations = mock(Organizations.class);
+    protected final Organizations organizations = mock(Organizations.class, Mockito.RETURNS_SMART_NULLS);
 
     protected final org.cloudfoundry.client.v2.routes.Routes routes = mock(org.cloudfoundry.client.v2.routes.Routes
-            .class);
+            .class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class);
+    protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final Spaces spaces = mock(Spaces.class);
+    protected final Spaces spaces = mock(Spaces.class, Mockito.RETURNS_SMART_NULLS);
 
     @Before
     public final void mockClient() throws Exception {
