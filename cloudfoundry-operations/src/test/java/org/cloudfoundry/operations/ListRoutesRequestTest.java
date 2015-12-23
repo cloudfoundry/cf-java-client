@@ -33,4 +33,13 @@ public final class ListRoutesRequestTest {
         assertEquals(VALID, result.getStatus());
     }
 
+    @Test
+    public void isValidNoLevel() {
+        ValidationResult result = ListRoutesRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
 }
