@@ -266,24 +266,4 @@ public class DefaultRoutesTest extends AbstractOperationsTest {
         }
     }
 
-    public static final class ListInvalid extends AbstractOperationsApiTest<Route> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
-
-        @Override
-        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(RequestValidationException.class);
-        }
-
-        @Override
-        protected Publisher<Route> invoke() {
-            ListRoutesRequest request = ListRoutesRequest.builder()
-                    .build();
-
-            return this.routes.list(request);
-        }
-
-    }
-
 }
