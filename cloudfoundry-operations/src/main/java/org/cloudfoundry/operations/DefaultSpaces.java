@@ -43,7 +43,7 @@ final class DefaultSpaces implements Spaces {
                 .map(toSpace());
     }
 
-    private Function<Integer, Publisher<ListSpacesResponse>> requestPage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+    private static Function<Integer, Publisher<ListSpacesResponse>> requestPage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return new Function<Integer, Publisher<ListSpacesResponse>>() {
 
             @Override
@@ -59,7 +59,7 @@ final class DefaultSpaces implements Spaces {
         };
     }
 
-    private Function<String, Publisher<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<String, Publisher<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
         return new Function<String, Publisher<SpaceResource>>() {
 
             @Override
@@ -70,7 +70,7 @@ final class DefaultSpaces implements Spaces {
         };
     }
 
-    private Function<SpaceResource, Space> toSpace() {
+    private static Function<SpaceResource, Space> toSpace() {
         return new Function<SpaceResource, Space>() {
 
             @Override

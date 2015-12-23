@@ -44,7 +44,7 @@ final class DefaultApplications implements Applications {
                 .map(toApplication());
     }
 
-    private Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>> extractApplications() {
+    private static Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>> extractApplications() {
         return new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
 
             @Override
@@ -55,7 +55,7 @@ final class DefaultApplications implements Applications {
         };
     }
 
-    private Function<String, Publisher<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<String, Publisher<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
         return new Function<String, Publisher<GetSpaceSummaryResponse>>() {
 
             @Override
@@ -70,7 +70,7 @@ final class DefaultApplications implements Applications {
         };
     }
 
-    private Function<SpaceApplicationSummary, Application> toApplication() {
+    private static Function<SpaceApplicationSummary, Application> toApplication() {
         return new Function<SpaceApplicationSummary, Application>() {
 
             @Override

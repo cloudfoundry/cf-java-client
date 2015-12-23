@@ -37,7 +37,7 @@ final class DefaultOrganizations implements Organizations {
                 .map(toOrganization());
     }
 
-    private Function<Integer, Publisher<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Integer, Publisher<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
         return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
 
             @Override
@@ -52,7 +52,7 @@ final class DefaultOrganizations implements Organizations {
         };
     }
 
-    private Function<ListOrganizationsResponse.Resource, Organization> toOrganization() {
+    private static Function<ListOrganizationsResponse.Resource, Organization> toOrganization() {
         return new Function<ListOrganizationsResponse.Resource, Organization>() {
 
             @Override

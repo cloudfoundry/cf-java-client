@@ -60,7 +60,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .map(toSpaceQuota());
     }
 
-    private BiFunction<GetSpaceQuotaRequest, String, Tuple2<GetSpaceQuotaRequest, String>> combineRequestAndOrganizationId() {
+    private static BiFunction<GetSpaceQuotaRequest, String, Tuple2<GetSpaceQuotaRequest, String>> combineRequestAndOrganizationId() {
         return new BiFunction<GetSpaceQuotaRequest, String, Tuple2<GetSpaceQuotaRequest, String>>() {
 
             @Override
@@ -71,7 +71,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
+    private static Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
         return new Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
 
             @Override
@@ -82,7 +82,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> equalRequestAndDefinitionName() {
+    private static Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> equalRequestAndDefinitionName() {
         return new Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
 
             @Override
@@ -93,7 +93,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Function<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, SpaceQuotaDefinitionResource> extractQuotaDefinition() {
+    private static Function<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, SpaceQuotaDefinitionResource> extractQuotaDefinition() {
         return new Function<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, SpaceQuotaDefinitionResource>() {
 
             @Override
@@ -104,7 +104,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Stream<SpaceQuotaDefinitionResource> fromSpaceQuotaDefinitionResourceStream(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+    private static Stream<SpaceQuotaDefinitionResource> fromSpaceQuotaDefinitionResourceStream(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return Paginated.requestResources(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
             @Override
@@ -120,7 +120,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         });
     }
 
-    private Function<String, Publisher<SpaceQuotaDefinitionResource>> requestSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<String, Publisher<SpaceQuotaDefinitionResource>> requestSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient) {
         return new Function<String, Publisher<SpaceQuotaDefinitionResource>>() {
 
             @Override
@@ -131,8 +131,8 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionWithContext(final CloudFoundryClient
-                                                                                                                                                                                 cloudFoundryClient) {
+    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionWithContext(final CloudFoundryClient
+                                                                                                                                                                                        cloudFoundryClient) {
         return new Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>>() {
 
             @Override
@@ -144,7 +144,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private Function<SpaceQuotaDefinitionResource, SpaceQuota> toSpaceQuota() {
+    private static Function<SpaceQuotaDefinitionResource, SpaceQuota> toSpaceQuota() {
         return new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
 
             @Override
