@@ -34,6 +34,7 @@ import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
+import org.cloudfoundry.client.spring.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.client.spring.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplicationsV3;
@@ -46,6 +47,7 @@ import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
@@ -105,6 +107,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final ServiceInstances serviceInstances;
 
+    private final SharedDomains sharedDomains;
+
     private final SpaceQuotaDefinitions spaceQuotaDefinitions;
 
     private final Spaces spaces;
@@ -149,6 +153,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
         this.routes = new SpringRoutes(restOperations, root);
+        this.sharedDomains = new SpringSharedDomains(restOperations, root);
         this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
@@ -166,6 +171,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.organizations = new SpringOrganizations(restOperations, root);
         this.packages = new SpringPackages(restOperations, root);
         this.routes = new SpringRoutes(restOperations, root);
+        this.sharedDomains = new SpringSharedDomains(restOperations, root);
         this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
@@ -285,6 +291,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public ServiceInstances serviceInstances() {
         return this.serviceInstances;
+    }
+
+    @Override
+    public SharedDomains sharedDomains() {
+        return this.sharedDomains;
     }
 
     @Override
