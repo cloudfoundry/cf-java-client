@@ -1,0 +1,68 @@
+{
+  "total_results": 5,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "f01b174d-c750-46b0-9ddf-3aeb2064d796",
+        "url": "/v2/shared_domains/f01b174d-c750-46b0-9ddf-3aeb2064d796",
+        "created_at": "2015-11-30T23:38:35Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain1.com",
+        "router_group_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "3595f6cb-81cf-424e-a546-533877ccccfd",
+        "url": "/v2/shared_domains/3595f6cb-81cf-424e-a546-533877ccccfd",
+        "created_at": "2015-11-30T23:38:35Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain2.com",
+        "router_group_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "d0d28c59-86ee-4415-9269-500976f18e72",
+        "url": "/v2/shared_domains/d0d28c59-86ee-4415-9269-500976f18e72",
+        "created_at": "2015-11-30T23:38:35Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "domain-19.example.com",
+        "router_group_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "b7242cdb-f81a-4469-b897-d5a218470fdf",
+        "url": "/v2/shared_domains/b7242cdb-f81a-4469-b897-d5a218470fdf",
+        "created_at": "2015-11-30T23:38:35Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "domain-20.example.com",
+        "router_group_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "130c193c-c1c6-41c9-98c2-4a0e16a948bf",
+        "url": "/v2/shared_domains/130c193c-c1c6-41c9-98c2-4a0e16a948bf",
+        "created_at": "2015-11-30T23:38:35Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "domain-21.example.com",
+        "router_group_guid": null
+      }
+    }
+  ]
+}
