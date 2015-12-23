@@ -20,15 +20,15 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
 import org.cloudfoundry.client.LoggregatorClient;
-import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
 import org.cloudfoundry.client.loggregator.StreamLogsRequest;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHandler;
 import org.cloudfoundry.client.spring.loggregator.ReactiveEndpoint;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.Validators;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -94,7 +94,10 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
-        return Streams.wrap(cloudFoundryClient.info().get())
+        GetInfoRequest request = GetInfoRequest.builder()
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.info().get(request))
                 .map(new Function<GetInfoResponse, String>() {
 
                     @Override
@@ -156,27 +159,27 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Stream<T> exchange(final Validatable request, final Consumer<Subscriber<T>> exchange) {
-        return Streams.wrap(Publishers.createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
+    private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
+        return Validators.stream(request)
+                .flatMap(new Function<V, Publisher<T>>() {
 
-            @Override
-            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
-                if (n != Long.MAX_VALUE) {
-                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-                }
+                    @Override
+                    public Publisher<T> apply(V request) {
+                        return Publishers.createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
-                if (request != null) {
-                    ValidationResult validationResult = request.isValid();
-                    if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                        subscriber.onError(new RequestValidationException(validationResult));
-                        return;
+                            @Override
+                            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
+                                if (n != Long.MAX_VALUE) {
+                                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
+                                }
+
+                                exchange.accept(subscriber);
+                            }
+
+                        });
                     }
-                }
 
-                exchange.accept(subscriber);
-            }
-
-        }));
+                });
     }
 
     private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {

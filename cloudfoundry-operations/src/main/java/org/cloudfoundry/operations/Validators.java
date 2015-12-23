@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.operations;
 
-import org.reactivestreams.Publisher;
+import reactor.rx.Stream;
+import reactor.rx.Streams;
 
-/**
- * Main entry point to the Cloud Foundry Info Client API
- */
-public interface Info {
+final class Validators {
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
-     *
-     * @param request the Get Info request
-     * @return the response from the Get Info request
-     */
-    Publisher<GetInfoResponse> get(GetInfoRequest request);
+    private Validators() {
+    }
+
+    static <T extends Validatable> Stream<T> stream(T request) {
+        ValidationResult validationResult = request.isValid();
+        if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
+            return Streams.fail(new RequestValidationException(validationResult));
+        } else {
+            return Streams.just(request);
+        }
+    }
 
 }

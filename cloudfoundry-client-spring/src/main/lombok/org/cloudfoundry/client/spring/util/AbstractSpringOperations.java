@@ -17,10 +17,9 @@
 package org.cloudfoundry.client.spring.util;
 
 import lombok.ToString;
-import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -81,33 +80,32 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final <T> Stream<T> exchange(final Validatable request, final Function<ReactiveSession<T>,
-            T> exchange) {
-        return Streams.yield(new Consumer<ReactiveSession<T>>() {
+    protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<ReactiveSession<T>, T> exchange) {
+        return Validators.stream(request)
+                .flatMap(new Function<V, Publisher<T>>() {
 
-            @Override
-            public void accept(ReactiveSession<T> session) {
-                if (request != null) {
-                    ValidationResult validationResult = request.isValid();
-                    if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-                        session.onError(new RequestValidationException(validationResult));
-                        return;
+                    @Override
+                    public Publisher<T> apply(V request) {
+                        return Streams.yield(new Consumer<ReactiveSession<T>>() {
+
+                            @Override
+                            public void accept(ReactiveSession<T> session) {
+                                try {
+                                    T result = exchange.apply(session);
+                                    if (result != null) {
+                                        session.onNext(result);
+                                    }
+
+                                    session.onComplete();
+                                } catch (HttpStatusCodeException e) {
+                                    session.onError(CloudFoundryExceptionBuilder.build(e));
+                                }
+                            }
+
+                        });
                     }
-                }
 
-                try {
-                    T result = exchange.apply(session);
-                    if (result != null) {
-                        session.onNext(result);
-                    }
-
-                    session.onComplete();
-                } catch (HttpStatusCodeException e) {
-                    session.onError(CloudFoundryExceptionBuilder.build(e));
-                }
-            }
-
-        });
+                });
     }
 
     protected final <T> Stream<T> get(Validatable request, final Class<T> responseType,

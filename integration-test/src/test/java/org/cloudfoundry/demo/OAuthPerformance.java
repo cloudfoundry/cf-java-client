@@ -18,6 +18,7 @@ package org.cloudfoundry.demo;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -80,8 +81,8 @@ public class OAuthPerformance {
                             .build());
                 }));
 
-                first.add(time(() -> Streams.wrap(client.get().info().get()).next().get()));
-                subsequent.add(time(() -> Streams.wrap(client.get().info().get()).next().get()));
+                first.add(time(() -> Streams.wrap(client.get().info().get(GetInfoRequest.builder().build())).next().get()));
+                subsequent.add(time(() -> Streams.wrap(client.get().info().get(GetInfoRequest.builder().build())).next().get()));
             }
 
             System.out.printf("Startup:    %f ms %n", startup.stream().collect(Collectors.averagingLong(l -> l)));

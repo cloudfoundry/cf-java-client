@@ -32,7 +32,7 @@ import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
-final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas {
+final class DefaultSpaceQuotas implements SpaceQuotas {
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -46,7 +46,7 @@ final class DefaultSpaceQuotas extends AbstractOperations implements SpaceQuotas
     @Override
     public Publisher<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
         return Streams
-                .zip(getValidatedRequest(getSpaceQuotaRequest), this.organizationId, combineRequestAndOrganizationId())
+                .zip(Validators.stream(getSpaceQuotaRequest), this.organizationId, combineRequestAndOrganizationId())
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
                 .map(extractQuotaDefinition())

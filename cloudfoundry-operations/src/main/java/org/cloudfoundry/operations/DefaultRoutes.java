@@ -38,7 +38,7 @@ import reactor.rx.Streams;
 
 import java.util.List;
 
-final class DefaultRoutes extends AbstractOperations implements Routes {
+final class DefaultRoutes implements Routes {
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -54,7 +54,7 @@ final class DefaultRoutes extends AbstractOperations implements Routes {
 
     @Override
     public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        return getValidatedRequest(listRoutesRequest)
+        return Validators.stream(listRoutesRequest)
                 .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
                 .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }

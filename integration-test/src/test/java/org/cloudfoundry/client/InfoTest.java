@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public final class InfoTest {
 
     @Test
     public void info() {
-        this.cloudFoundryClient.info().get()
+        this.cloudFoundryClient.info().get(GetInfoRequest.builder().build())
                 .subscribe(new TestSubscriber<GetInfoResponse>()
                         .assertThat(response -> assertEquals(SUPPORTED_API_VERSION, response.getApiVersion())));
     }

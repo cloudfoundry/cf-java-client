@@ -25,7 +25,7 @@ import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.rx.Stream;
 
-final class DefaultSpaces extends AbstractOperations implements Spaces {
+final class DefaultSpaces implements Spaces {
 
     private final CloudFoundryClient cloudFoundryClient;
 

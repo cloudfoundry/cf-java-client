@@ -25,7 +25,7 @@ import reactor.fn.Function;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
-final class DefaultApplications extends AbstractOperations implements Applications {
+final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 

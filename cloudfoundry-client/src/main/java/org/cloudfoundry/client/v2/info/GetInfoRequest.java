@@ -16,19 +16,24 @@
 
 package org.cloudfoundry.client.v2.info;
 
-import org.reactivestreams.Publisher;
+import lombok.Builder;
+import lombok.Data;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
- * Main entry point to the Cloud Foundry Info Client API
+ * The request payload for the Get Info operation
  */
-public interface Info {
+@Data
+public final class GetInfoRequest implements Validatable {
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/info/get_info.html">Get Info</a> request
-     *
-     * @param request the Get Info request
-     * @return the response from the Get Info request
-     */
-    Publisher<GetInfoResponse> get(GetInfoRequest request);
+    @Builder
+    GetInfoRequest() {
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        return ValidationResult.builder().build();
+    }
 
 }

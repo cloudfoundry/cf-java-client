@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations;
+package org.cloudfoundry.client.v2.info;
 
-import reactor.rx.Stream;
-import reactor.rx.Streams;
+import org.cloudfoundry.client.ValidationResult;
+import org.junit.Test;
 
-abstract class AbstractOperations {
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.junit.Assert.assertEquals;
 
-    protected final <T extends Validatable> Stream<T> getValidatedRequest(T request) {
-        ValidationResult validationResult = request.isValid();
-        if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-            return Streams.fail(new RequestValidationException(validationResult));
-        } else {
-            return Streams.just(request);
-        }
+public final class GetInfoRequestTest {
+
+    @Test
+    public void isValid() {
+        ValidationResult result = GetInfoRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }
-

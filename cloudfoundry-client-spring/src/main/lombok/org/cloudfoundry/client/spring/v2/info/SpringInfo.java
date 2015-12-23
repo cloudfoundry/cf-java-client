@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v2.info;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
 import org.reactivestreams.Publisher;
@@ -45,8 +46,8 @@ public final class SpringInfo extends AbstractSpringOperations implements Info {
     }
 
     @Override
-    public Publisher<GetInfoResponse> get() {
-        return get(null, GetInfoResponse.class, new Consumer<UriComponentsBuilder>() {
+    public Publisher<GetInfoResponse> get(GetInfoRequest request) {
+        return get(request, GetInfoResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

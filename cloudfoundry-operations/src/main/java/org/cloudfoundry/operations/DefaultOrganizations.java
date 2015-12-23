@@ -23,7 +23,7 @@ import org.cloudfoundry.operations.v2.Paginated;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 
-final class DefaultOrganizations extends AbstractOperations implements Organizations {
+final class DefaultOrganizations implements Organizations {
 
     private final CloudFoundryClient cloudFoundryClient;
 
