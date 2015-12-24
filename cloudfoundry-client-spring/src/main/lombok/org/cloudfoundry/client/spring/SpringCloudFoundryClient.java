@@ -274,10 +274,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
     }
 
-    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(
-            String clientId, String clientSecret, String host, String username, String password,
-            RestOperations bootstrapRestOperations) {
-
+    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(String clientId, String clientSecret, String host, String username, String password, RestOperations
+            bootstrapRestOperations) {
         ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
         details.setClientId(clientId != null ? clientId : "cf");
         details.setClientSecret(clientSecret != null ? clientSecret : "");
@@ -295,8 +293,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                                                           String password,
                                                           RestOperations bootstrapRestOperations,
                                                           List<DeserializationProblemHandler> deserializationProblemHandlers) {
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId,
-                clientSecret, host, username, password, bootstrapRestOperations);
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId, clientSecret, host, username, password, bootstrapRestOperations);
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
