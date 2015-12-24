@@ -34,4 +34,5 @@ public interface SslCertificateTruster {
      * @param timeUnit the time unit of the {@code timeout} argument
      */
     void trust(String host, int port, int timeout, TimeUnit timeUnit) throws GeneralSecurityException, IOException;
+
 }

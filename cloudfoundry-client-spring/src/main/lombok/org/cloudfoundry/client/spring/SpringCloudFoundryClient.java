@@ -114,15 +114,23 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Spaces spaces;
 
     @Builder
-    SpringCloudFoundryClient(@NonNull String host, Boolean skipSslValidation, String clientId, String clientSecret,
-                             @NonNull String username, @NonNull String password,
+    SpringCloudFoundryClient(@NonNull String host,
+                             Boolean skipSslValidation,
+                             String clientId,
+                             String clientSecret,
+                             @NonNull String username,
+                             @NonNull String password,
                              @Singular List<DeserializationProblemHandler> deserializationProblemHandlers) {
-        this(host, skipSslValidation, clientId, clientSecret, username, password, new RestTemplate(),
-                new CertificateCollectingSslCertificateTruster(), deserializationProblemHandlers);
+        this(host, skipSslValidation, clientId, clientSecret, username, password, new RestTemplate(), new CertificateCollectingSslCertificateTruster(), deserializationProblemHandlers);
     }
 
-    SpringCloudFoundryClient(String host, Boolean skipSslValidation, String clientId, String clientSecret,
-                             String username, String password, RestOperations bootstrapRestOperations,
+    SpringCloudFoundryClient(String host,
+                             Boolean skipSslValidation,
+                             String clientId,
+                             String clientSecret,
+                             String username,
+                             String password,
+                             RestOperations bootstrapRestOperations,
                              SslCertificateTruster sslCertificateTruster,
                              List<DeserializationProblemHandler> deserializationProblemHandlers) {
 
@@ -138,8 +146,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             }
         }
 
-        OAuth2RestOperations restOperations = getRestOperations(clientId, clientSecret, host, username, password,
-                bootstrapRestOperations, deserializationProblemHandlers);
+        OAuth2RestOperations restOperations = getRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
         URI root = getRoot(host);
 
         this.restOperations = restOperations;
@@ -175,72 +182,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.serviceInstances = new SpringServiceInstances(restOperations, root);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root);
         this.spaces = new SpringSpaces(restOperations, root);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations) {
-        String infoUri = UriComponentsBuilder.newInstance()
-                .scheme("https").host(host).pathSegment("info")
-                .build().toUriString();
-
-        Map<String, String> results = bootstrapRestOperations.getForObject(infoUri, Map.class);
-
-        return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
-                .pathSegment("oauth", "token")
-                .build().toUriString();
-    }
-
-    private static OAuth2ClientContext getOAuth2ClientContext() {
-        return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
-    }
-
-    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(
-            String clientId, String clientSecret, String host, String username, String password,
-            RestOperations bootstrapRestOperations) {
-
-        ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
-        details.setClientId(clientId != null ? clientId : "cf");
-        details.setClientSecret(clientSecret != null ? clientSecret : "");
-        details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations));
-        details.setUsername(username);
-        details.setPassword(password);
-
-        return details;
-    }
-
-    private static OAuth2RestOperations getRestOperations(
-            String clientId, String clientSecret, String host, String username, String password,
-            RestOperations bootstrapRestOperations,
-            List<DeserializationProblemHandler> deserializationProblemHandlers) {
-
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId,
-                clientSecret, host, username, password, bootstrapRestOperations);
-        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
-
-        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-
-        for (HttpMessageConverter<?> messageConverter : messageConverters) {
-            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
-                LOGGER.debug("Modifying ObjectMapper configuration");
-
-                ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                        .setSerializationInclusion(NON_NULL);
-
-                for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
-                    objectMapper.addHandler(deserializationProblemHandler);
-                }
-            }
-        }
-
-        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
-        messageConverters.add(new FallbackHttpMessageConverter());
-
-        return restTemplate;
-    }
-
-    private static URI getRoot(String host) {
-        return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
     }
 
     @Override
@@ -314,6 +255,74 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     OAuth2RestOperations getRestOperations() {
         return this.restOperations;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations) {
+        String infoUri = UriComponentsBuilder.newInstance()
+                .scheme("https").host(host).pathSegment("info")
+                .build().toUriString();
+
+        Map<String, String> results = bootstrapRestOperations.getForObject(infoUri, Map.class);
+
+        return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
+                .pathSegment("oauth", "token")
+                .build().toUriString();
+    }
+
+    private static OAuth2ClientContext getOAuth2ClientContext() {
+        return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
+    }
+
+    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(
+            String clientId, String clientSecret, String host, String username, String password,
+            RestOperations bootstrapRestOperations) {
+
+        ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
+        details.setClientId(clientId != null ? clientId : "cf");
+        details.setClientSecret(clientSecret != null ? clientSecret : "");
+        details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations));
+        details.setUsername(username);
+        details.setPassword(password);
+
+        return details;
+    }
+
+    private static OAuth2RestOperations getRestOperations(String clientId,
+                                                          String clientSecret,
+                                                          String host,
+                                                          String username,
+                                                          String password,
+                                                          RestOperations bootstrapRestOperations,
+                                                          List<DeserializationProblemHandler> deserializationProblemHandlers) {
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId,
+                clientSecret, host, username, password, bootstrapRestOperations);
+        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
+
+        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
+
+        for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
+                LOGGER.debug("Modifying ObjectMapper configuration");
+
+                ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
+                        .setSerializationInclusion(NON_NULL);
+
+                for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
+                    objectMapper.addHandler(deserializationProblemHandler);
+                }
+            }
+        }
+
+        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
+        messageConverters.add(new FallbackHttpMessageConverter());
+
+        return restTemplate;
+    }
+
+    private static URI getRoot(String host) {
+        return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
     }
 
 }

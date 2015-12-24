@@ -16,66 +16,62 @@
 
 package org.cloudfoundry.client.spring;
 
-import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
-import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.junit.Test;
+import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
 import reactor.rx.Streams;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.WebSocketContainer;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
-public final class SpringLoggregatorClientTest extends AbstractRestTest {
+public final class SpringLoggregatorClientTest {
 
-    private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; " +
-            "boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
+    public static final class Recent extends AbstractApiTest<RecentLogsRequest, Long> {
 
-    private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class);
+        private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
 
-    private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class);
+        private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class);
 
-    private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig,
-            this.webSocketContainer, this.restTemplate, this.root);
+        private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class);
 
-    @Test
-    public void recent() throws Exception {
-        mockRequest(new RequestContext()
-                .method(GET).path("/recent?app=test-id")
-                .status(OK)
-                .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin"));
+        private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root);
 
-        RecentLogsRequest request = RecentLogsRequest.builder()
-                .id("test-id")
-                .build();
+        @Override
+        protected RecentLogsRequest getInvalidRequest() {
+            return RecentLogsRequest.builder()
+                    .build();
+        }
 
-        Long count = Streams.wrap(this.client.recent(request)).count().next().get();
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/recent?app=test-id")
+                    .status(OK)
+                    .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin");
+        }
 
-        assertEquals(Long.valueOf(14), count);
-        verify();
-    }
+        @Override
+        protected Long getResponse() {
+            return 14L;
+        }
 
-    @Test(expected = CloudFoundryException.class)
-    public void recentError() {
-        mockRequest(new RequestContext()
-                .method(GET).path("/recent?app=test-id")
-                .errorResponse());
+        @Override
+        protected RecentLogsRequest getValidRequest() throws Exception {
+            return RecentLogsRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
 
-        RecentLogsRequest request = RecentLogsRequest.builder()
-                .id("test-id")
-                .build();
+        @Override
+        protected Publisher<Long> invoke(RecentLogsRequest request) {
+            return Streams.wrap(this.client.recent(request))
+                    .count();
+        }
 
-        Streams.wrap(this.client.recent(request)).next().get();
-    }
-
-    @Test(expected = RequestValidationException.class)
-    public void recentInvalidRequest() {
-        Streams.wrap(this.client.recent(RecentLogsRequest.builder().build())).next().get();
     }
 
 }

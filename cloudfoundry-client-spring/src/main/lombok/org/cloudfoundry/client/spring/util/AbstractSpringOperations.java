@@ -61,8 +61,7 @@ public abstract class AbstractSpringOperations {
         this.root = root;
     }
 
-    protected final Stream<Void> delete(final Validatable request,
-                                        final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final Stream<Void> delete(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<Void>, Void>() {
 
             @Override
@@ -108,8 +107,7 @@ public abstract class AbstractSpringOperations {
                 });
     }
 
-    protected final <T> Stream<T> get(Validatable request, final Class<T> responseType,
-                                      final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Stream<T> get(Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<T>, T>() {
 
             @Override
@@ -125,9 +123,9 @@ public abstract class AbstractSpringOperations {
         });
     }
 
-    protected final Stream<byte[]> getStream(final Validatable request,
-                                             final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final Stream<byte[]> getStream(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<byte[]>, byte[]>() {
+
             @Override
             public byte[] apply(final ReactiveSession<byte[]> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
@@ -135,8 +133,7 @@ public abstract class AbstractSpringOperations {
                 URI uri = builder.build().toUri();
 
                 AbstractSpringOperations.this.logger.debug("GET {}", uri);
-                return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null,
-                        new ResponseExtractor<byte[]>() {
+                return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
 
                             @Override
                             public byte[] extractData(ClientHttpResponse response) throws IOException {
@@ -155,12 +152,13 @@ public abstract class AbstractSpringOperations {
 
                         });
             }
+
         });
     }
 
-    protected final <T> Stream<T> patch(final Validatable request, final Class<T> responseType,
-                                        final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Stream<T> patch(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<T>, T>() {
+
             @Override
             public T apply(ReactiveSession<T> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
@@ -171,23 +169,22 @@ public abstract class AbstractSpringOperations {
                 return AbstractSpringOperations.this.restOperations.exchange(
                         new RequestEntity<>(request, PATCH, uri), responseType).getBody();
             }
+
         });
     }
 
-    protected final <T> Stream<T> post(final Validatable request, Class<T> responseType,
-                                       Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Stream<T> post(final Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
         return postWithBody(request, new Supplier<Validatable>() {
+
             @Override
             public Validatable get() {
                 return request;
             }
+
         }, responseType, builderCallback);
     }
 
-    protected final <T, B> Stream<T> postWithBody(Validatable request,
-                                                  final Supplier<B> bodySupplier,
-                                                  final Class<T> responseType,
-                                                  final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T, B> Stream<T> postWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<T>, T>() {
 
             @Override
@@ -197,15 +194,13 @@ public abstract class AbstractSpringOperations {
                 URI uri = builder.build().toUri();
 
                 AbstractSpringOperations.this.logger.debug("POST {}", uri);
-                return AbstractSpringOperations.this.restOperations.postForObject(
-                        uri, bodySupplier.get(), responseType);
+                return AbstractSpringOperations.this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
             }
 
         });
     }
 
-    protected final <T> Stream<T> put(final Validatable request, Class<T> responseType,
-                                      Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T> Stream<T> put(final Validatable request, Class<T> responseType, Consumer<UriComponentsBuilder> builderCallback) {
         return putWithBody(request, new Supplier<Validatable>() {
 
             @Override
@@ -216,10 +211,7 @@ public abstract class AbstractSpringOperations {
         }, responseType, builderCallback);
     }
 
-    protected final <T, B> Stream<T> putWithBody(Validatable request,
-                                                 final Supplier<B> bodySupplier,
-                                                 final Class<T> responseType,
-                                                 final Consumer<UriComponentsBuilder> builderCallback) {
+    protected final <T, B> Stream<T> putWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
         return exchange(request, new Function<ReactiveSession<T>, T>() {
 
             @Override
@@ -229,8 +221,7 @@ public abstract class AbstractSpringOperations {
                 URI uri = builder.build().toUri();
 
                 AbstractSpringOperations.this.logger.debug("PUT {}", uri);
-                return AbstractSpringOperations.this.restOperations.exchange(
-                        new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
+                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
             }
 
         });

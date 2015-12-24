@@ -43,8 +43,7 @@ import java.util.concurrent.TimeUnit;
 public final class CertificateCollectingSslCertificateTruster implements SslCertificateTruster {
 
     @Override
-    public void trust(String host, int port, int timeout, TimeUnit timeUnit) throws GeneralSecurityException,
-            IOException {
+    public void trust(String host, int port, int timeout, TimeUnit timeUnit) throws GeneralSecurityException, IOException {
         X509Certificate[] untrusted = getUntrustedCertificate(host, port, timeout, timeUnit);
 
         if (untrusted != null) {
@@ -54,8 +53,7 @@ public final class CertificateCollectingSslCertificateTruster implements SslCert
         HttpsURLConnection.setDefaultHostnameVerifier(new ExplicitHostnameVerifier(host));
     }
 
-    private void appendToTruststore(X509Certificate[] chain) throws KeyStoreException, NoSuchAlgorithmException,
-            IOException, CertificateException {
+    private void appendToTruststore(X509Certificate[] chain) throws KeyStoreException, NoSuchAlgorithmException, IOException, CertificateException {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         trustStore.load(null);
 
@@ -84,8 +82,8 @@ public final class CertificateCollectingSslCertificateTruster implements SslCert
     }
 
     private X509Certificate[] getUntrustedCertificate(String host, int port, int timeout, TimeUnit timeUnit)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException,
-            CertificateException {
+            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException, CertificateException {
+
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(getDefaultTrustManager());
 
         SSLContext sslContext = SSLContext.getInstance("TLS");

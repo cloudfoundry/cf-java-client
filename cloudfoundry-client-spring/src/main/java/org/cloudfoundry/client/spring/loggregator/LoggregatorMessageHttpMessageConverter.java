@@ -30,8 +30,7 @@ import reactor.rx.Stream;
 
 import java.io.IOException;
 
-public final class LoggregatorMessageHttpMessageConverter
-        extends AbstractHttpMessageConverter<Stream<LoggregatorMessage>> {
+public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<Stream<LoggregatorMessage>> {
 
     public LoggregatorMessageHttpMessageConverter() {
         super(MediaType.parseMediaType("multipart/x-protobuf"));
@@ -44,25 +43,10 @@ public final class LoggregatorMessageHttpMessageConverter
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz,
-                                                      HttpInputMessage inputMessage) throws IOException {
-
+    protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
-
         return Multipart.from(inputMessage.getBody(), boundary)
-                .map(new Function<byte[], LoggregatorMessage>() {
-
-                    @Override
-                    public LoggregatorMessage apply(byte[] part) {
-                        try {
-                            LogMessage logMessage = LogMessage.parseFrom(part);
-                            return LoggregatorMessage.from(logMessage);
-                        } catch (InvalidProtocolBufferException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
-                });
+                .map(toLoggregatorMessage());
     }
 
     @Override
@@ -74,4 +58,21 @@ public final class LoggregatorMessageHttpMessageConverter
     protected void writeInternal(Stream<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
         throw new UnsupportedOperationException();
     }
+
+    private static Function<byte[], LoggregatorMessage> toLoggregatorMessage() {
+        return new Function<byte[], LoggregatorMessage>() {
+
+            @Override
+            public LoggregatorMessage apply(byte[] part) {
+                try {
+                    LogMessage logMessage = LogMessage.parseFrom(part);
+                    return LoggregatorMessage.from(logMessage);
+                } catch (InvalidProtocolBufferException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        };
+    }
+
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.loggregator;
 
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -25,17 +26,14 @@ import reactor.rx.Stream;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public final class LoggregatorMessageHttpMessageConverterTest {
 
-    private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; " +
-            "boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
+    private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
 
-    private final LoggregatorMessageHttpMessageConverter messageConverter =
-            new LoggregatorMessageHttpMessageConverter();
+    private final LoggregatorMessageHttpMessageConverter messageConverter = new LoggregatorMessageHttpMessageConverter();
 
     @Test
     public void canWrite() {
@@ -51,15 +49,13 @@ public final class LoggregatorMessageHttpMessageConverterTest {
 
     @Test
     public void readInternal() throws IOException {
-        MockHttpInputMessage inputMessage = new MockHttpInputMessage(
-                new ClassPathResource("loggregator_response.bin").getInputStream());
+        MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
-        Long result = this.messageConverter.readInternal(null, inputMessage)
+        this.messageConverter.readInternal(null, inputMessage)
                 .count()
-                .next().get();
-
-        assertEquals(Long.valueOf(14), result);
+                .subscribe(new TestSubscriber<>()
+                        .assertEquals(14L));
     }
 
     @Test

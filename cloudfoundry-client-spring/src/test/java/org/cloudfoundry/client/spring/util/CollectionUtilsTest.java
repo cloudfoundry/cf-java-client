@@ -27,9 +27,7 @@ public final class CollectionUtilsTest {
 
     @Test
     public void singletonMultiValueMap() {
-        MultiValueMap<String, String> map = CollectionUtils.singletonMultiValueMap("test-key",
-                "test-value-1", "test-value-2");
-
+        MultiValueMap<String, String> map = CollectionUtils.singletonMultiValueMap("test-key", "test-value-1", "test-value-2");
         assertEquals(Arrays.asList("test-value-1", "test-value-2"), map.get("test-key"));
     }
 

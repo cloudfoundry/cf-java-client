@@ -75,7 +75,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         verify();
     }
 
-    protected final Consumer<byte[]> arrayEqualsExpectation(final byte[] expected) {
+    protected static final Consumer<byte[]> arrayEqualsExpectation(final byte[] expected) {
         return new Consumer<byte[]>() {
 
             @Override
@@ -93,28 +93,9 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     }
 
     protected final Publisher<byte[]> getContents(Publisher<byte[]> publisher) {
-        return Streams.wrap(publisher).reduce(new ByteArrayOutputStream(),
-                new BiFunction<ByteArrayOutputStream, byte[], ByteArrayOutputStream>() {
-
-                    @Override
-                    public ByteArrayOutputStream apply(ByteArrayOutputStream out, byte[] bytes) {
-
-                        try {
-                            out.write(bytes);
-                            return out;
-                        } catch (IOException e) {
-                            throw ReactorFatalException.create(e);
-                        }
-                    }
-                })
-                .map(new Function<ByteArrayOutputStream, byte[]>() {
-
-                    @Override
-                    public byte[] apply(ByteArrayOutputStream out) {
-                        return out.toByteArray();
-                    }
-
-                });
+        return Streams.wrap(publisher)
+                .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
+                .map(toByteArray());
     }
 
     protected final byte[] getContents(Resource resource) {
@@ -141,5 +122,32 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     protected abstract REQ getValidRequest() throws Exception;
 
     protected abstract Publisher<RSP> invoke(REQ request);
+
+    private static BiFunction<ByteArrayOutputStream, byte[], ByteArrayOutputStream> collectIntoByteArrayInputStream() {
+        return new BiFunction<ByteArrayOutputStream, byte[], ByteArrayOutputStream>() {
+
+            @Override
+            public ByteArrayOutputStream apply(ByteArrayOutputStream out, byte[] bytes) {
+
+                try {
+                    out.write(bytes);
+                    return out;
+                } catch (IOException e) {
+                    throw ReactorFatalException.create(e);
+                }
+            }
+        };
+    }
+
+    private static Function<ByteArrayOutputStream, byte[]> toByteArray() {
+        return new Function<ByteArrayOutputStream, byte[]>() {
+
+            @Override
+            public byte[] apply(ByteArrayOutputStream out) {
+                return out.toByteArray();
+            }
+
+        };
+    }
 
 }

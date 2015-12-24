@@ -34,19 +34,16 @@ public final class ReactiveEndpointTest {
 
     private final TestSubscriber<String> subscriber = new TestSubscriber<>();
 
-    private final ReactiveEndpoint<String> reactiveEndpoint = new ReactiveEndpoint<>(this.messageHandler,
-            this.subscriber);
+    private final ReactiveEndpoint<String> reactiveEndpoint = new ReactiveEndpoint<>(this.messageHandler, this.subscriber);
 
     @Test
     public void onCloseGoingAway() {
-        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.GOING_AWAY,
-                "test-reason-phrase"));
+        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "test-reason-phrase"));
     }
 
     @Test
     public void onCloseNormalClosure() {
-        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
-                "test-reason-phrase"));
+        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "test-reason-phrase"));
     }
 
     @Test
@@ -54,8 +51,7 @@ public final class ReactiveEndpointTest {
         this.subscriber
                 .assertError(Exception.class);
 
-        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NO_STATUS_CODE,
-                "test-reason-phrase"));
+        this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NO_STATUS_CODE, "test-reason-phrase"));
     }
 
     @Test

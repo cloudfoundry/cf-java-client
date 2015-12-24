@@ -81,40 +81,11 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         this.webSocketContainer = webSocketContainer;
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer,
-                            RestOperations restOperations, URI root) {
+    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root) {
         super(restOperations, root);
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.webSocketContainer = webSocketContainer;
-    }
-
-    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getRestOperations();
-    }
-
-    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
-        GetInfoRequest request = GetInfoRequest.builder()
-                .build();
-
-        return Streams.wrap(cloudFoundryClient.info().get(request))
-                .map(new Function<GetInfoResponse, String>() {
-
-                    @Override
-                    public String apply(GetInfoResponse getInfoResponse) {
-                        return getInfoResponse.getLoggingEndpoint();
-                    }
-
-                })
-                .map(new Function<String, URI>() {
-
-                    @Override
-                    public URI apply(String loggingEndpoint) {
-                        return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
-                    }
-
-                })
-                .next().poll();
     }
 
     @Override
@@ -158,6 +129,34 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         });
     }
 
+    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getRestOperations();
+    }
+
+    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
+        GetInfoRequest request = GetInfoRequest.builder()
+                .build();
+
+        return Streams.wrap(cloudFoundryClient.info().get(request))
+                .map(new Function<GetInfoResponse, String>() {
+
+                    @Override
+                    public String apply(GetInfoResponse getInfoResponse) {
+                        return getInfoResponse.getLoggingEndpoint();
+                    }
+
+                })
+                .map(new Function<String, URI>() {
+
+                    @Override
+                    public URI apply(String loggingEndpoint) {
+                        return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
+                    }
+
+                })
+                .next().poll();
+    }
+
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
         return Validators.stream(request)
@@ -187,12 +186,11 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         return ClientEndpointConfig.Builder.create().configurator(configurator).build();
     }
 
-    private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback,
-                             final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
-
+    private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
         final AtomicReference<Session> session = new AtomicReference<>();
 
         Stream<T> exchange = exchange(request, new Consumer<Subscriber<T>>() {
+
             @Override
             public void accept(Subscriber<T> subscriber) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(SpringLoggregatorClient.this.root);
@@ -210,6 +208,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                     subscriber.onError(e);
                 }
             }
+
         });
 
         return exchange.observeCancel(new Consumer<Void>() {

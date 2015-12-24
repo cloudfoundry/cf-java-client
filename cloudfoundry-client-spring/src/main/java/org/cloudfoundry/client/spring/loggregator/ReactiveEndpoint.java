@@ -47,8 +47,7 @@ public final class ReactiveEndpoint<T> extends Endpoint {
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
-        if (CloseReason.CloseCodes.NORMAL_CLOSURE == closeReason.getCloseCode() ||
-                CloseReason.CloseCodes.GOING_AWAY == closeReason.getCloseCode()) {
+        if (CloseReason.CloseCodes.NORMAL_CLOSURE == closeReason.getCloseCode() || CloseReason.CloseCodes.GOING_AWAY == closeReason.getCloseCode()) {
             this.subscriber.onComplete();
         } else {
             this.subscriber.onError(new LoggregatorException(closeReason.getReasonPhrase()));

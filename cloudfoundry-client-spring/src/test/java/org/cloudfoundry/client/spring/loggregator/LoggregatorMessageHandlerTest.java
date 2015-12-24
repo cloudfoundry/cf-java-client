@@ -68,4 +68,5 @@ public final class LoggregatorMessageHandlerTest {
 
         this.messageHandler.onMessage(new byte[0]);
     }
+
 }
