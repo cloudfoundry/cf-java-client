@@ -29,12 +29,12 @@ import java.util.List;
 public final class Application {
 
     /**
-     * The disk
+     * The disk quota in bytes
      *
-     * @param disk the disk
-     * @return the disk
+     * @param diskQuota the disk quota in bytes
+     * @return the disk quota in bytes
      */
-    private final Integer disk;
+    private final Integer diskQuota;
 
     /**
      * The id
@@ -53,12 +53,12 @@ public final class Application {
     private final Integer instances;
 
     /**
-     * The memory
+     * The memory limit in bytes
      *
-     * @param memory the memory
-     * @return the memory
+     * @param memoryLimit the memory limit in bytes
+     * @return the memory limit in bytes
      */
-    private final Integer memory;
+    private final Integer memoryLimit;
 
     /**
      * The name
@@ -93,19 +93,19 @@ public final class Application {
     private final List<String> urls;
 
     @Builder
-    private Application(Integer disk,
+    private Application(Integer diskQuota,
                         String id,
                         Integer instances,
-                        Integer memory,
+                        Integer memoryLimit,
                         String name,
                         String requestedState,
                         Integer runningInstances,
                         @Singular List<String> urls) {
 
-        this.disk = disk;
+        this.diskQuota = diskQuota;
         this.id = id;
         this.instances = instances;
-        this.memory = memory;
+        this.memoryLimit = memoryLimit;
         this.name = name;
         this.requestedState = requestedState;
         this.runningInstances = runningInstances;

@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.util;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
@@ -35,7 +36,7 @@ public final class CertificateCollectingTrustManagerTest {
 
     private final X509Certificate[] chain = new X509Certificate[0];
 
-    private final X509TrustManager delegate = mock(X509TrustManager.class);
+    private final X509TrustManager delegate = mock(X509TrustManager.class, Mockito.RETURNS_SMART_NULLS);
 
     private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
 
