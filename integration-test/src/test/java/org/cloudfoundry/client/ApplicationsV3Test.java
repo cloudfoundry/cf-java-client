@@ -29,8 +29,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.rx.Streams;
 
-import static org.junit.Assert.assertEquals;
-
 @Ignore("V3 APIs are unstable and prone to breakage")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
@@ -53,13 +51,13 @@ public final class ApplicationsV3Test {
                 .build();
 
         Streams.wrap(this.cloudFoundryClient.applicationsV3().create(createRequest))
-                .next().get();
+                .flatMap(createApplicationResponse -> {
+                    ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
+                            .spaceId(ApplicationsV3Test.this.spaceId)
+                            .build();
 
-        ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
-                .spaceId(this.spaceId)
-                .build();
-
-        Streams.wrap(this.cloudFoundryClient.applicationsV3().list(listRequest))
+                    return ApplicationsV3Test.this.cloudFoundryClient.applicationsV3().list(listRequest);
+                })
                 .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
@@ -74,13 +72,12 @@ public final class ApplicationsV3Test {
                 .spaceId(this.spaceId)
                 .build();
 
-        long size = Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
+        Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
                 .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()
-                .next().get();
-
-        assertEquals("Unexpected applications exist", 0, size);
+                .subscribe(new TestSubscriber<>()
+                        .assertEquals(0));
     }
 
 }

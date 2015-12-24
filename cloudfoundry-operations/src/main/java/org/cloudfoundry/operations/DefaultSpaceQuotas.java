@@ -24,7 +24,6 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEnti
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.reactivestreams.Publisher;
-import reactor.fn.BiFunction;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple;
@@ -46,7 +45,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
     @Override
     public Publisher<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
         return Streams
-                .zip(Validators.stream(getSpaceQuotaRequest), this.organizationId, combineRequestAndOrganizationId())
+                .zip(Validators.stream(getSpaceQuotaRequest), this.organizationId)
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
                 .map(extractQuotaDefinition())
@@ -58,17 +57,6 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         return this.organizationId
                 .flatMap(requestSpaceQuotaDefinition(this.cloudFoundryClient))
                 .map(toSpaceQuota());
-    }
-
-    private static BiFunction<GetSpaceQuotaRequest, String, Tuple2<GetSpaceQuotaRequest, String>> combineRequestAndOrganizationId() {
-        return new BiFunction<GetSpaceQuotaRequest, String, Tuple2<GetSpaceQuotaRequest, String>>() {
-
-            @Override
-            public Tuple2<GetSpaceQuotaRequest, String> apply(GetSpaceQuotaRequest getSpaceQuotaRequest, String organizationId) {
-                return Tuple.of(getSpaceQuotaRequest, organizationId);
-            }
-
-        };
     }
 
     private static Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {

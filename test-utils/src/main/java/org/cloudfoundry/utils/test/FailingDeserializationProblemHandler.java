@@ -26,11 +26,8 @@ import static org.junit.Assert.fail;
 public final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
 
     @Override
-    public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer,
-                                         Object beanOrClass, String propertyName) {
-
-        fail(String.format("Found unexpected property %s in payload for %s", propertyName,
-                beanOrClass.getClass().getSimpleName()));
+    public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) {
+        fail(String.format("Found unexpected property %s in payload for %s", propertyName, beanOrClass.getClass().getSimpleName()));
         return false;
     }
 

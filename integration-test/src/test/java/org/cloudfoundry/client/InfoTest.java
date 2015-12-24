@@ -37,7 +37,10 @@ public final class InfoTest {
 
     @Test
     public void info() {
-        this.cloudFoundryClient.info().get(GetInfoRequest.builder().build())
+        GetInfoRequest request = GetInfoRequest.builder()
+                .build();
+
+        this.cloudFoundryClient.info().get(request)
                 .subscribe(new TestSubscriber<GetInfoResponse>()
                         .assertThat(response -> assertEquals(SUPPORTED_API_VERSION, response.getApiVersion())));
     }
