@@ -121,7 +121,6 @@ public final class ListOrganizationUsersRequest extends PaginatedRequest impleme
                                  @Singular List<String> organizationIds,
                                  @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;

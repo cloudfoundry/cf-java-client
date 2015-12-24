@@ -70,7 +70,6 @@ public final class ListDomainsRequest extends PaginatedRequest implements Valida
                        @Singular List<String> owningOrganizationIds,
                        @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.names = names;
         this.owningOrganizationIds = owningOrganizationIds;
         this.spaceIds = spaceIds;

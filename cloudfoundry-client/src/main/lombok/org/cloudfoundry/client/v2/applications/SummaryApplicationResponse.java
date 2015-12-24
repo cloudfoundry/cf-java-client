@@ -54,9 +54,9 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
     private final Integer runningInstances;
 
     private final List<ServiceInstance> services;
-    
+
     private final String stagingTaskId;
-    
+
     private final String version;
 
     @Builder
@@ -69,8 +69,7 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
                                @JsonProperty("detected_start_command") String detectedStartCommand,
                                @JsonProperty("diego") Boolean diego,
                                @JsonProperty("disk_quota") Integer diskQuota,
-                               @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
-                                       dockerCredentialsJsons,
+                               @JsonProperty("docker_credentials_json") @Singular Map<String, Object> dockerCredentialsJsons,
                                @JsonProperty("docker_image") String dockerImage,
                                @JsonProperty("enable_ssh") Boolean enableSsh,
                                @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
@@ -93,10 +92,8 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
                                @JsonProperty("staging_task_id") String stagingTaskId,
                                @JsonProperty("state") String state,
                                @JsonProperty("version") String version) {
-        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
-                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
-                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
-        
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons, dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances,
+                memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
         this.availableDomains = availableDomains;
         this.detectedBuildpack = detectedBuildpack;
         this.enableSsh = enableSsh;

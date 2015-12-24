@@ -40,7 +40,6 @@ public final class ListSpaceUserRolesResponse extends PaginatedResponse<UserSpac
                                @JsonProperty("resources") @Singular List<UserSpaceRoleResource> resources,
                                @JsonProperty("total_pages") Integer totalPages,
                                @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

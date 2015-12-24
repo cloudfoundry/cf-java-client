@@ -49,7 +49,6 @@ public final class RemoveSpaceSecurityGroupRequest implements Validatable {
 
     @Builder
     RemoveSpaceSecurityGroupRequest(String id, String securityGroupId) {
-
         this.id = id;
         this.securityGroupId = securityGroupId;
     }

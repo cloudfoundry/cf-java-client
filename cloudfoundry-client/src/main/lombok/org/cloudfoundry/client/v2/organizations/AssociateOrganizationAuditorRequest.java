@@ -67,4 +67,5 @@ public final class AssociateOrganizationAuditorRequest implements Validatable {
 
         return builder.build();
     }
+
 }

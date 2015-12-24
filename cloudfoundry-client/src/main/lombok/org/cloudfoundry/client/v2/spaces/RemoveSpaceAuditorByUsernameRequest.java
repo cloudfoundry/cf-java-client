@@ -49,10 +49,7 @@ public final class RemoveSpaceAuditorByUsernameRequest implements Validatable {
     private final String username;
 
     @Builder
-    RemoveSpaceAuditorByUsernameRequest(
-            String id,
-            String username) {
-
+    RemoveSpaceAuditorByUsernameRequest(String id, String username) {
         this.id = id;
         this.username = username;
     }

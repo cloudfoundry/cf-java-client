@@ -20,14 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
-import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-
-import java.util.List;
 
 /**
  * The request payload for the Associate Auditor with the Space by Username operation
@@ -54,10 +49,7 @@ public final class AssociateSpaceAuditorByUsernameRequest implements Validatable
     private final String username;
 
     @Builder
-    AssociateSpaceAuditorByUsernameRequest(
-                      String id, 
-                      String username) {
-        
+    AssociateSpaceAuditorByUsernameRequest(String id, String username) {
         this.id = id;
         this.username = username;
     }

@@ -60,8 +60,7 @@ public final class ListApplicationsResponse extends PaginatedResponse<ListApplic
                  @JsonProperty("name") String name,
                  @JsonProperty("total_desired_instances") Integer totalDesiredInstances,
                  @JsonProperty("updated_at") String updatedAt) {
-            super(buildpack, createdAt, desiredState, environmentVariables, id, links, name, totalDesiredInstances,
-                    updatedAt);
+            super(buildpack, createdAt, desiredState, environmentVariables, id, links, name, totalDesiredInstances, updatedAt);
         }
 
     }

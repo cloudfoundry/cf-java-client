@@ -37,17 +37,16 @@ public final class ApplicationEnvironmentResponse {
     private final Map<String, Object> systemEnvironmentJsons;
 
     @Builder
-    ApplicationEnvironmentResponse(
-            @JsonProperty("application_env_json") @Singular Map<String, Object> applicationEnvironmentJsons,
-            @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
-            @JsonProperty("running_env_json") @Singular Map<String, Object> runningEnvironmentJsons,
-            @JsonProperty("staging_env_json") @Singular Map<String, Object> stagingEnvironmentJsons,
-            @JsonProperty("system_env_json") @Singular Map<String, Object> systemEnvironmentJsons) {
-
+    ApplicationEnvironmentResponse(@JsonProperty("application_env_json") @Singular Map<String, Object> applicationEnvironmentJsons,
+                                   @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
+                                   @JsonProperty("running_env_json") @Singular Map<String, Object> runningEnvironmentJsons,
+                                   @JsonProperty("staging_env_json") @Singular Map<String, Object> stagingEnvironmentJsons,
+                                   @JsonProperty("system_env_json") @Singular Map<String, Object> systemEnvironmentJsons) {
         this.applicationEnvironmentJsons = applicationEnvironmentJsons;
         this.environmentJsons = environmentJsons;
         this.runningEnvironmentJsons = runningEnvironmentJsons;
         this.stagingEnvironmentJsons = stagingEnvironmentJsons;
         this.systemEnvironmentJsons = systemEnvironmentJsons;
     }
+    
 }

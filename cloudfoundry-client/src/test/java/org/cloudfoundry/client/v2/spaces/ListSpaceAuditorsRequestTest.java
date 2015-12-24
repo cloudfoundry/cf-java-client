@@ -43,6 +43,6 @@ public final class ListSpaceAuditorsRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }

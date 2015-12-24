@@ -199,8 +199,7 @@ public interface Events {
     String AUDIT_USER_PROVIDED_SERVICE_INSTANCE_UPDATE = "audit.user_provided_service_instance.update";
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/events/retrieve_a_particular_event.html">Get Event</a>
-     * request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/events/retrieve_a_particular_event.html">Get Event</a> request
      *
      * @param request the Get Event request
      * @return the response from the Get Event request

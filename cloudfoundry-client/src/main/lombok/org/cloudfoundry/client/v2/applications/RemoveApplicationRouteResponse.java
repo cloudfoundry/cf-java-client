@@ -34,7 +34,6 @@ public final class RemoveApplicationRouteResponse extends Resource<ApplicationEn
     @Builder
     RemoveApplicationRouteResponse(@JsonProperty("entity") ApplicationEntity entity,
                                    @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

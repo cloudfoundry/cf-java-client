@@ -49,10 +49,7 @@ public final class RemoveSpaceDeveloperByUsernameRequest implements Validatable 
     private final String username;
 
     @Builder
-    RemoveSpaceDeveloperByUsernameRequest(
-            String id,
-            String username) {
-
+    RemoveSpaceDeveloperByUsernameRequest(String id, String username) {
         this.id = id;
         this.username = username;
     }

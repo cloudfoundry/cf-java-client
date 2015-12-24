@@ -34,7 +34,6 @@ public final class CreateOrganizationResponse extends Resource<OrganizationEntit
     @Builder
     CreateOrganizationResponse(@JsonProperty("entity") OrganizationEntity entity,
                                @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

@@ -40,7 +40,6 @@ public final class GetOrganizationUserRolesResponse extends PaginatedResponse<Us
                                      @JsonProperty("resources") @Singular List<UserOrganizationRoleResource> resources,
                                      @JsonProperty("total_pages") Integer totalPages,
                                      @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

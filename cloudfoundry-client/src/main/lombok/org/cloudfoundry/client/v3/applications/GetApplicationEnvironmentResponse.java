@@ -38,14 +38,10 @@ public final class GetApplicationEnvironmentResponse {
     private final Map<String, Object> stagingEnvironmentVariables;
 
     @Builder
-    GetApplicationEnvironmentResponse(@JsonProperty("application_env_json") @Singular Map<String, Object>
-                                              applicationEnvironmentVariables,
-                                      @JsonProperty("environment_variables") @Singular Map<String, Object>
-                                              environmentVariables,
-                                      @JsonProperty("running_env_json") @Singular Map<String, Object>
-                                              runningEnvironmentVariables,
-                                      @JsonProperty("staging_env_json") @Singular Map<String, Object>
-                                              stagingEnvironmentVariables) {
+    GetApplicationEnvironmentResponse(@JsonProperty("application_env_json") @Singular Map<String, Object> applicationEnvironmentVariables,
+                                      @JsonProperty("environment_variables") @Singular Map<String, Object> environmentVariables,
+                                      @JsonProperty("running_env_json") @Singular Map<String, Object> runningEnvironmentVariables,
+                                      @JsonProperty("staging_env_json") @Singular Map<String, Object> stagingEnvironmentVariables) {
         this.applicationEnvironmentVariables = applicationEnvironmentVariables;
         this.environmentVariables = environmentVariables;
         this.runningEnvironmentVariables = runningEnvironmentVariables;

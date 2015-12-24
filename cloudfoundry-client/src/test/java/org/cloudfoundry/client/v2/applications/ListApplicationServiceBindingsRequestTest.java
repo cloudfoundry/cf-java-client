@@ -44,5 +44,5 @@ public final class ListApplicationServiceBindingsRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
     }
-    
+
 }

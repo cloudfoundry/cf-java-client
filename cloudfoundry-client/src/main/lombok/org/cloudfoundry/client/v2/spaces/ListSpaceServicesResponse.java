@@ -41,7 +41,6 @@ public final class ListSpaceServicesResponse extends PaginatedResponse<ServiceRe
                               @JsonProperty("resources") @Singular List<ServiceResource> resources,
                               @JsonProperty("total_pages") Integer totalPages,
                               @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

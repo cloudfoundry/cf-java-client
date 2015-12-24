@@ -47,8 +47,13 @@ public final class LoggregatorMessage {
     private final Date timestamp;
 
     @Builder
-    LoggregatorMessage(String applicationId, @Singular List<String> drainUrls, String message, MessageType messageType,
-                       String sourceId, String sourceName, Date timestamp) {
+    LoggregatorMessage(String applicationId,
+                       @Singular List<String> drainUrls,
+                       String message,
+                       MessageType messageType,
+                       String sourceId,
+                       String sourceName,
+                       Date timestamp) {
         this.applicationId = applicationId;
         this.drainUrls = drainUrls;
         this.message = message;

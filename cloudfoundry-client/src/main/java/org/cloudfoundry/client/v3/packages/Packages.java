@@ -24,8 +24,7 @@ import org.reactivestreams.Publisher;
 public interface Packages {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/copy_a_package.html">Copy
-     * Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/copy_a_package.html">Copy Package</a> request
      *
      * @param request the Copy Package request
      * @return the response from the Copy Package request
@@ -33,8 +32,7 @@ public interface Packages {
     Publisher<CopyPackageResponse> copy(CopyPackageRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/create_a_package.html">Create
-     * Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/create_a_package.html">Create Package</a> request
      *
      * @param request the Create Package request
      * @return the response from the Create Package request
@@ -42,8 +40,7 @@ public interface Packages {
     Publisher<CreatePackageResponse> create(CreatePackageRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/delete_a_package.html">Delete
-     * Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/delete_a_package.html">Delete Package</a> request
      *
      * @param request the Delete Package request
      * @return the response from the Delete Package request
@@ -51,9 +48,7 @@ public interface Packages {
     Publisher<Void> delete(DeletePackageRequest request);
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/download_the_bits_for_a_package.html">Download
-     * the bits for a package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/download_the_bits_for_a_package.html">Download the bits for a package</a> request
      *
      * @param request the Download Package request
      * @return the response from the Download Package request
@@ -61,8 +56,7 @@ public interface Packages {
     Publisher<byte[]> download(DownloadPackageRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/get_a_package.html">Get
-     * Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/get_a_package.html">Get Package</a> request
      *
      * @param request the Get Package request
      * @return the response from the Get Package request
@@ -70,8 +64,7 @@ public interface Packages {
     Publisher<GetPackageResponse> get(GetPackageRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/list_all_packages.html">List
-     * Packages</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/list_all_packages.html">List Packages</a> request
      *
      * @param request the List Packages request
      * @return the response from the List Packages request
@@ -79,8 +72,7 @@ public interface Packages {
     Publisher<ListPackagesResponse> list(ListPackagesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage
-     * Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage Package</a> request
      *
      * @param request the Stage Package request
      * @return the response from the StagePackage request
@@ -88,9 +80,7 @@ public interface Packages {
     Publisher<StagePackageResponse> stage(StagePackageRequest request);
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html">
-     * Upload Package</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html"> Upload Package</a> request
      *
      * @param request the Upload Package request
      * @return the response from the Upload Package request

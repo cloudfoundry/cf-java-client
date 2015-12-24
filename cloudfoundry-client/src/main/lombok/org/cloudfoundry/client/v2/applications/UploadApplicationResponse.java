@@ -36,4 +36,5 @@ public final class UploadApplicationResponse extends Resource<JobEntity> {
                               @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

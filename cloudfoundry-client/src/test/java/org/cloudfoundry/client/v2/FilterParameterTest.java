@@ -37,4 +37,5 @@ public final class FilterParameterTest {
         assertEquals("<", LESS_THAN.toString());
         assertEquals("<=", LESS_THAN_OR_EQUAL_TO.toString());
     }
+
 }

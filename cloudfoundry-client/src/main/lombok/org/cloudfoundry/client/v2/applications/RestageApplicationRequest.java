@@ -53,4 +53,5 @@ public final class RestageApplicationRequest implements Validatable {
 
         return builder.build();
     }
+
 }

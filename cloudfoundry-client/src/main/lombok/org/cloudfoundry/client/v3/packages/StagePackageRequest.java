@@ -33,21 +33,57 @@ import java.util.Map;
 @Data
 public final class StagePackageRequest implements Validatable {
 
+    /**
+     * The buildpack
+     *
+     * @param buildpack the buildpack
+     * @return the buildpack
+     */
     @Getter(onMethod = @__(@JsonProperty("buildpack")))
     private final String buildpack;
 
+    /**
+     * The disk limit
+     *
+     * @param diskLimit the disk limit
+     * @return the disk limit
+     */
     @Getter(onMethod = @__(@JsonProperty("disk_limit")))
     private final Integer diskLimit;
 
+    /**
+     * The environment variables
+     *
+     * @param environmentVariables the environment variables
+     * @return the environment variables
+     */
     @Getter(onMethod = @__(@JsonProperty("environment_variables")))
     private final Map<String, Object> environmentVariables;
 
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String id;
 
+    /**
+     * The memory limit
+     *
+     * @param memoryLimit the memoty limit
+     * @return the memory limit
+     */
     @Getter(onMethod = @__(@JsonProperty("memory_limit")))
     private final Integer memoryLimit;
 
+    /**
+     * The stack
+     *
+     * @param stack the stack
+     * @return the stack
+     */
     @Getter(onMethod = @__(@JsonProperty("stack")))
     private final String stack;
 

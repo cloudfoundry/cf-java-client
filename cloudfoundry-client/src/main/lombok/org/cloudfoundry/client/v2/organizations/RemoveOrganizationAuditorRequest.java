@@ -48,10 +48,7 @@ public final class RemoveOrganizationAuditorRequest implements Validatable {
     private final String id;
 
     @Builder
-    RemoveOrganizationAuditorRequest(
-            String auditorId,
-            String id) {
-
+    RemoveOrganizationAuditorRequest(String auditorId, String id) {
         this.auditorId = auditorId;
         this.id = id;
     }

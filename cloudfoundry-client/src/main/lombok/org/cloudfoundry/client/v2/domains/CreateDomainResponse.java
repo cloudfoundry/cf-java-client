@@ -34,7 +34,6 @@ public final class CreateDomainResponse extends Resource<DomainEntity> {
     @Builder
     CreateDomainResponse(@JsonProperty("entity") DomainEntity entity,
                          @JsonProperty("metadata") Metadata metadata) {
-
         super(entity, metadata);
     }
 

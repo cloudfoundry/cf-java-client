@@ -163,10 +163,8 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("staging_task_id") String stagingTaskId,
                       @JsonProperty("state") String state,
                       @JsonProperty("version") String version) {
-        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
-                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
-                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
-
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons, dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances,
+                memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
         this.detectedBuildpack = detectedBuildpack;
         this.enableSsh = enableSsh;
         this.eventsUrl = eventsUrl;

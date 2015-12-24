@@ -56,7 +56,6 @@ public final class ApplicationStatisticsResponse extends HashMap<String, Applica
         @Builder
         InstanceStats(@JsonProperty("state") String state,
                       @JsonProperty("stats") Statistics statistics) {
-
             this.state = state;
             this.statistics = statistics;
         }
@@ -92,7 +91,6 @@ public final class ApplicationStatisticsResponse extends HashMap<String, Applica
                        @JsonProperty("uptime") Long uptime,
                        @JsonProperty("uris") @Singular("uri") List<String> uris,
                        @JsonProperty("usage") Usage usage) {
-
                 this.diskQuota = diskQuota;
                 this.fdsQuota = fdsQuota;
                 this.host = host;
@@ -126,6 +124,9 @@ public final class ApplicationStatisticsResponse extends HashMap<String, Applica
                     this.time = time;
                 }
             }
+
         }
+
     }
+
 }

@@ -41,9 +41,7 @@ public final class ListApplicationServiceBindingsResponse extends PaginatedRespo
                                            @JsonProperty("resources") @Singular List<ServiceBindingResource> resources,
                                            @JsonProperty("total_pages") Integer totalPages,
                                            @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
-
 
 }

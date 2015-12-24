@@ -31,8 +31,7 @@ public final class ListSpaceApplicationsRequestTest {
 
     @Test
     public void isValidNoId() {
-        assertEquals(ValidationResult.Status.INVALID,
-                ListSpaceApplicationsRequest.builder().build().isValid().getStatus());
+        assertEquals(ValidationResult.Status.INVALID, ListSpaceApplicationsRequest.builder().build().isValid().getStatus());
     }
 
 }

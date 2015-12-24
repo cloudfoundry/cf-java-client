@@ -61,7 +61,6 @@ public final class ListSpaceSecurityGroupsRequest extends PaginatedRequest imple
                                    String id,
                                    @Singular List<String> names) {
         super(orderDirection, page, resultsPerPage);
-
         this.id = id;
         this.names = names;
     }

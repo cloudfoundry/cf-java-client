@@ -36,4 +36,5 @@ public final class JobEntity {
         this.id = id;
         this.status = status;
     }
+
 }

@@ -45,7 +45,7 @@ public final class AssociateSpaceAuditorByUsernameRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
 
     @Test
     public void isValidNoUsername() {
@@ -56,6 +56,6 @@ public final class AssociateSpaceAuditorByUsernameRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("username must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }

@@ -111,7 +111,6 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
                              @Singular List<String> managedSpaceIds,
                              @Singular List<String> organizationIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;

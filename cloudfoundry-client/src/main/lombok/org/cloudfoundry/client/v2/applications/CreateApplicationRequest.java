@@ -100,8 +100,7 @@ public final class CreateApplicationRequest implements Validatable {
     private final String dockerImage;
 
     /**
-     * Key/value pairs of all the environment variables to run in your app. Does not include any system or service
-     * variables.
+     * Key/value pairs of all the environment variables to run in your app. Does not include any system or service variables.
      *
      * @return the environment variables to run in your app
      */
@@ -125,8 +124,7 @@ public final class CreateApplicationRequest implements Validatable {
     private final String healthCheckType;
 
     /**
-     * The number of instances of the app to run. To ensure optimal availability, ensure there are at least 2
-     * instances.
+     * The number of instances of the app to run. To ensure optimal availability, ensure there are at least 2 instances.
      *
      * @return the number of instances to run
      */

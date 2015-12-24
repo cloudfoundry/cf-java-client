@@ -91,7 +91,6 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
                              @Singular List<String> providers,
                              @Singular List<String> serviceBrokerIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.actives = actives;
         this.id = id;
         this.labels = labels;

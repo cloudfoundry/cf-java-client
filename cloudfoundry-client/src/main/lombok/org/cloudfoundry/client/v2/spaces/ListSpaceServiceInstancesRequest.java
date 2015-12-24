@@ -123,7 +123,6 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
                                      @Singular List<String> serviceKeyIds,
                                      @Singular List<String> servicePlanIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.gatewayNames = gatewayNames;
         this.id = id;
         this.names = names;

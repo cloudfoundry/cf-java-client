@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -51,7 +50,6 @@ public final class DeleteOrganizationRequest implements Validatable {
 
     @Builder
     DeleteOrganizationRequest(Boolean async, String id) {
-
         this.async = async;
         this.id = id;
     }

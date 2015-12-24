@@ -34,7 +34,6 @@ public final class RemoveApplicationServiceBindingResponse extends Resource<Appl
     @Builder
     RemoveApplicationServiceBindingResponse(@JsonProperty("entity") ApplicationEntity entity,
                                             @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

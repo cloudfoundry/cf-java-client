@@ -91,7 +91,6 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
                            @Singular List<String> organizationIds,
                            @Singular List<String> paths) {
         super(orderDirection, page, resultsPerPage);
-
         this.domainIds = domainIds;
         this.id = id;
         this.hosts = hosts;

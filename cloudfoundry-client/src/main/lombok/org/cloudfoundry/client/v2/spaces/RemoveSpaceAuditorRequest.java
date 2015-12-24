@@ -49,7 +49,6 @@ public final class RemoveSpaceAuditorRequest implements Validatable {
 
     @Builder
     RemoveSpaceAuditorRequest(String auditorId, String id) {
-
         this.auditorId = auditorId;
         this.id = id;
     }

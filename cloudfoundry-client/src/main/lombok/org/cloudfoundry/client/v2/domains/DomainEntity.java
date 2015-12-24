@@ -80,4 +80,5 @@ public final class DomainEntity {
         this.sharedOrganizations = sharedOrganizations;
         this.spacesUrl = spacesUrl;
     }
+
 }

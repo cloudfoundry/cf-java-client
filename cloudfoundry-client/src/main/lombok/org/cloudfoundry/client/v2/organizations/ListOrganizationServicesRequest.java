@@ -91,7 +91,6 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
                                     @Singular List<String> providers,
                                     @Singular List<String> serviceBrokerIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.actives = actives;
         this.id = id;
         this.labels = labels;

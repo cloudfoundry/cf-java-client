@@ -81,7 +81,6 @@ public final class ListSpaceDomainsRequest extends PaginatedRequest implements V
                             @Singular List<String> owningOrganizationIds,
                             @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
-
         this.id = id;
         this.names = names;
         this.owningOrganizationIds = owningOrganizationIds;

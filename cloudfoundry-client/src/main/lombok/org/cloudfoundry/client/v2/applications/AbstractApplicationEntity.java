@@ -207,11 +207,9 @@ public abstract class AbstractApplicationEntity {
                                         @JsonProperty("detected_start_command") String detectedStartCommand,
                                         @JsonProperty("diego") Boolean diego,
                                         @JsonProperty("disk_quota") Integer diskQuota,
-                                        @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
-                                                dockerCredentialsJsons,
+                                        @JsonProperty("docker_credentials_json") @Singular Map<String, Object> dockerCredentialsJsons,
                                         @JsonProperty("docker_image") String dockerImage,
-                                        @JsonProperty("environment_json") @Singular Map<String, Object>
-                                                environmentJsons,
+                                        @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
                                         @JsonProperty("health_check_timeout") Integer healthCheckTimeout,
                                         @JsonProperty("health_check_type") String healthCheckType,
                                         @JsonProperty("instances") Integer instances,

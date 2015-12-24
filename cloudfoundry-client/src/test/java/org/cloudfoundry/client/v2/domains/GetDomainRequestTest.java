@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2.domains;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;

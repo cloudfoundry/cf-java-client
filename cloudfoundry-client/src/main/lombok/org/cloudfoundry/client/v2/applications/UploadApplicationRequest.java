@@ -93,7 +93,7 @@ public final class UploadApplicationRequest implements Validatable {
             builder.message("id must be specified");
         }
 
-        for(Resource resource : this.resources) {
+        for (Resource resource : this.resources) {
             builder.messages(resource.isValid().getMessages());
         }
 
@@ -141,4 +141,5 @@ public final class UploadApplicationRequest implements Validatable {
             return builder.build();
         }
     }
+
 }

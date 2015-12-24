@@ -42,4 +42,5 @@ public final class ListApplicationsRequestTest {
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
     }
+
 }

@@ -24,7 +24,7 @@ import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateApplicationRequestTest {
-    
+
     @Test
     public void isValid() {
         ValidationResult result = CreateApplicationRequest.builder()

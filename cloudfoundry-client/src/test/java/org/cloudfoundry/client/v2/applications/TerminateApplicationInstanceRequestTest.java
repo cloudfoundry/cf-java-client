@@ -57,5 +57,5 @@ public final class TerminateApplicationInstanceRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("index must be specified", result.getMessages().get(0));
     }
-    
+
 }

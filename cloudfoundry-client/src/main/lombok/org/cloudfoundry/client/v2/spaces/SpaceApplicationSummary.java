@@ -141,8 +141,7 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("detected_start_command") String detectedStartCommand,
                             @JsonProperty("diego") Boolean diego,
                             @JsonProperty("disk_quota") Integer diskQuota,
-                            @JsonProperty("docker_credentials_json") @Singular Map<String, Object>
-                                    dockerCredentialsJsons,
+                            @JsonProperty("docker_credentials_json") @Singular Map<String, Object> dockerCredentialsJsons,
                             @JsonProperty("docker_image") String dockerImage,
                             @JsonProperty("enable_ssh") Boolean enableSsh,
                             @JsonProperty("environment_json") @Singular Map<String, Object> environmentJsons,
@@ -167,9 +166,8 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("service_count") Integer serviceCount,
                             @JsonProperty("service_names") @Singular List<String> serviceNames,
                             @JsonProperty("urls") @Singular List<String> urls) {
-        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons,
-                dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances, memory, name,
-                production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+        super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons, dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances,
+                memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
         this.detectedBuildpack = detectedBuildpack;
         this.enableSsh = enableSsh;
         this.id = id;

@@ -49,9 +49,7 @@ public final class RemoveOrganizationAuditorByUsernameRequest implements Validat
     private final String username;
 
     @Builder
-    RemoveOrganizationAuditorByUsernameRequest(
-            String id,
-            String username) {
+    RemoveOrganizationAuditorByUsernameRequest(String id, String username) {
         this.id = id;
         this.username = username;
     }

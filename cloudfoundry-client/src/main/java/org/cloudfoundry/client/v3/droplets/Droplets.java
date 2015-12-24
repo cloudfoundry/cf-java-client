@@ -24,8 +24,7 @@ import org.reactivestreams.Publisher;
 public interface Droplets {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/delete_a_droplet.html">Delete
-     * Droplet</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/delete_a_droplet.html">Delete Droplet</a> request
      *
      * @param request the Delete Droplet request
      * @return the response from the Delete Droplet request
@@ -33,8 +32,7 @@ public interface Droplets {
     Publisher<Void> delete(DeleteDropletRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/get_a_droplet.html">Get
-     * Droplet</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/get_a_droplet.html">Get Droplet</a> request
      *
      * @param request the Get Droplet request
      * @return the response from the Get Droplet request
@@ -42,8 +40,7 @@ public interface Droplets {
     Publisher<GetDropletResponse> get(GetDropletRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_%28experimental%29/list_all_droplets.html">List
-     * Droplets</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_%28experimental%29/list_all_droplets.html">List Droplets</a> request
      *
      * @param request the List Droplets request
      * @return the response from the List Droplets request

@@ -34,7 +34,6 @@ public final class AssociateOrganizationUserResponse extends Resource<Organizati
     @Builder
     AssociateOrganizationUserResponse(@JsonProperty("entity") OrganizationEntity entity,
                                       @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

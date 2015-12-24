@@ -45,7 +45,7 @@ public final class RemoveApplicationServiceBindingRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
-    }        
+    }
 
     @Test
     public void isValidNoServiceBindingId() {
@@ -56,6 +56,6 @@ public final class RemoveApplicationServiceBindingRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service binding id must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }

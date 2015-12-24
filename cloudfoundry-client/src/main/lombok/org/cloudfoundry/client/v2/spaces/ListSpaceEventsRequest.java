@@ -81,7 +81,6 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
                            @Singular List<String> timestamps,
                            @Singular List<String> types) {
         super(orderDirection, page, resultsPerPage);
-
         this.actees = actees;
         this.id = id;
         this.timestamps = timestamps;

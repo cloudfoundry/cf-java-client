@@ -44,8 +44,7 @@ public final class ListSpaceUserRolesRequest extends PaginatedRequest implements
     private final String id;
 
     @Builder
-    ListSpaceUserRolesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                              String id) {
+    ListSpaceUserRolesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, String id) {
         super(orderDirection, page, resultsPerPage);
         this.id = id;
     }

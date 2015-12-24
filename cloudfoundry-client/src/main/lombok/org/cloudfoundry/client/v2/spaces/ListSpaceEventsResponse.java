@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.events.EventResource;
 
@@ -42,7 +41,6 @@ public final class ListSpaceEventsResponse extends PaginatedResponse<EventResour
                             @JsonProperty("resources") @Singular List<EventResource> resources,
                             @JsonProperty("total_pages") Integer totalPages,
                             @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

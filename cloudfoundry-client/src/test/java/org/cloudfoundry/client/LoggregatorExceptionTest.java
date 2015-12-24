@@ -33,4 +33,5 @@ public final class LoggregatorExceptionTest {
         String message = "test-message";
         assertEquals(message, new LoggregatorException(message).getMessage());
     }
+
 }

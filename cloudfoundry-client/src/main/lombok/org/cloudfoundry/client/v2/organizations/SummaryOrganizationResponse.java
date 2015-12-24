@@ -63,11 +63,10 @@ public final class SummaryOrganizationResponse {
 
 
     @Builder
-    SummaryOrganizationResponse(
-            @JsonProperty("guid") String id,
-            @JsonProperty("name") String name,
-            @JsonProperty("spaces") @Singular List<OrganizationSpaceSummary> spaces,
-            @JsonProperty("status") String status) {
+    SummaryOrganizationResponse(@JsonProperty("guid") String id,
+                                @JsonProperty("name") String name,
+                                @JsonProperty("spaces") @Singular List<OrganizationSpaceSummary> spaces,
+                                @JsonProperty("status") String status) {
         this.id = id;
         this.name = name;
         this.spaces = spaces;

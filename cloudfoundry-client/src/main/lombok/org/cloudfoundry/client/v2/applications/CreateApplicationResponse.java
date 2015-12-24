@@ -36,4 +36,5 @@ public final class CreateApplicationResponse extends Resource<ApplicationEntity>
                               @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

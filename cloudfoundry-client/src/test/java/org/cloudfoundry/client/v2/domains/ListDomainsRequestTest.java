@@ -32,5 +32,5 @@ public final class ListDomainsRequestTest {
 
         assertEquals(VALID, result.getStatus());
     }
-    
+
 }

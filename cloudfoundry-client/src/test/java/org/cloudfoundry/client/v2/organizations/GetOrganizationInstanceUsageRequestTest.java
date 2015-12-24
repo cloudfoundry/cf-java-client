@@ -44,4 +44,5 @@ public final class GetOrganizationInstanceUsageRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
     }
+
 }

@@ -41,7 +41,6 @@ public final class ListOrganizationPrivateDomainsResponse extends PaginatedRespo
                                            @JsonProperty("resources") @Singular List<PrivateDomainResource> resources,
                                            @JsonProperty("total_pages") Integer totalPages,
                                            @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

@@ -36,4 +36,5 @@ public final class UserOrganizationRoleResource extends Resource<UserOrganizatio
                                  @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

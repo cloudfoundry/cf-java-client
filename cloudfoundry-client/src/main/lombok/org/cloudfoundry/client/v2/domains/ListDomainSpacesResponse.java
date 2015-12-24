@@ -41,7 +41,6 @@ public final class ListDomainSpacesResponse extends PaginatedResponse<SpaceResou
                              @JsonProperty("resources") @Singular List<SpaceResource> resources,
                              @JsonProperty("total_pages") Integer totalPages,
                              @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
