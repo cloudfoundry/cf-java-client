@@ -46,8 +46,7 @@ public abstract class AbstractOperationsTest {
 
     protected final Organizations organizations = mock(Organizations.class, Mockito.RETURNS_SMART_NULLS);
 
-    protected final org.cloudfoundry.client.v2.routes.Routes routes = mock(org.cloudfoundry.client.v2.routes.Routes
-            .class, Mockito.RETURNS_SMART_NULLS);
+    protected final org.cloudfoundry.client.v2.routes.Routes routes = mock(org.cloudfoundry.client.v2.routes.Routes.class, Mockito.RETURNS_SMART_NULLS);
 
     protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class, Mockito.RETURNS_SMART_NULLS);
 

@@ -50,4 +50,5 @@ public final class FallbackHttpMessageConverterTest {
 
         assertEquals(0, outputMessage.getBodyAsBytes().length);
     }
+
 }

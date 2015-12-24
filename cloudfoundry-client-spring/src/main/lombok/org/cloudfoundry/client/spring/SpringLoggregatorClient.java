@@ -202,8 +202,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
                 try {
                     SpringLoggregatorClient.this.logger.debug("WS {}", uri);
-                    session.set(SpringLoggregatorClient.this.webSocketContainer.connectToServer(endpoint,
-                            SpringLoggregatorClient.this.clientEndpointConfig, uri));
+                    session.set(SpringLoggregatorClient.this.webSocketContainer.connectToServer(endpoint, SpringLoggregatorClient.this.clientEndpointConfig, uri));
                 } catch (DeploymentException | IOException e) {
                     subscriber.onError(e);
                 }

@@ -23,9 +23,8 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 
 /**
- * An implementation of {@link HttpMessageConverter} that can be used as a fallback for all types that do not have a
- * converter.  It does this by always supporting conversion, not supporting deserialization (reading) and writing
- * nothing during serialization.
+ * An implementation of {@link HttpMessageConverter} that can be used as a fallback for all types that do not have a converter.  It does this by always supporting conversion, not supporting
+ * deserialization (reading) and writing nothing during serialization.
  */
 public final class FallbackHttpMessageConverter extends AbstractHttpMessageConverter<Object> {
 

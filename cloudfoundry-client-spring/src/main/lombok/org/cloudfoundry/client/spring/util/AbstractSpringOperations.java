@@ -71,8 +71,7 @@ public abstract class AbstractSpringOperations {
                 URI uri = builder.build().toUri();
 
                 AbstractSpringOperations.this.logger.debug("DELETE {}", uri);
-                AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri),
-                        Void.class);
+                AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class);
                 return null;
             }
 
@@ -135,22 +134,22 @@ public abstract class AbstractSpringOperations {
                 AbstractSpringOperations.this.logger.debug("GET {}", uri);
                 return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
 
-                            @Override
-                            public byte[] extractData(ClientHttpResponse response) throws IOException {
-                                try (InputStream in = response.getBody()) {
-                                    int len;
-                                    byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
+                    @Override
+                    public byte[] extractData(ClientHttpResponse response) throws IOException {
+                        try (InputStream in = response.getBody()) {
+                            int len;
+                            byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
 
-                                    ReactiveSession.Emission emission = ReactiveSession.Emission.OK;
-                                    while (emission.isOk() && (len = in.read(buffer)) != -1) {
-                                        emission = session.emit(Arrays.copyOf(buffer, len));
-                                    }
-
-                                    return null;
-                                }
+                            ReactiveSession.Emission emission = ReactiveSession.Emission.OK;
+                            while (emission.isOk() && (len = in.read(buffer)) != -1) {
+                                emission = session.emit(Arrays.copyOf(buffer, len));
                             }
 
-                        });
+                            return null;
+                        }
+                    }
+
+                });
             }
 
         });
@@ -166,8 +165,7 @@ public abstract class AbstractSpringOperations {
                 URI uri = builder.build().toUri();
 
                 AbstractSpringOperations.this.logger.debug("PATCH {}", uri);
-                return AbstractSpringOperations.this.restOperations.exchange(
-                        new RequestEntity<>(request, PATCH, uri), responseType).getBody();
+                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
             }
 
         });

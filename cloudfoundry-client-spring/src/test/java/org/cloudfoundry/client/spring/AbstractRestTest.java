@@ -52,8 +52,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(),
-            new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
+    protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
     protected final URI root = UriComponentsBuilder.newInstance()
             .scheme("https").host("api.run.pivotal.io")
