@@ -16,27 +16,23 @@
 
 package org.cloudfoundry.operations;
 
-import org.reactivestreams.Publisher;
-import reactor.Mono;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-/**
- * Main entry point to the Cloud Foundry Applications Operations API
- */
-public interface Applications {
+final class Dates {
 
-    /**
-     * Gets information for a specific application
-     *
-     * @param request the get application request
-     * @return the application
-     */
-    Mono<ApplicationDetail> get(GetApplicationRequest request);
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
-    /**
-     * Lists the applications
-     *
-     * @return the applications
-     */
-    Publisher<ApplicationSummary> list();
+    private static final Object MONITOR = new Object();
+
+    private Dates() {
+    }
+
+    static Date parse(String s) throws ParseException {
+        synchronized (MONITOR) {
+            return ISO8601.parse(s);
+        }
+    }
 
 }
