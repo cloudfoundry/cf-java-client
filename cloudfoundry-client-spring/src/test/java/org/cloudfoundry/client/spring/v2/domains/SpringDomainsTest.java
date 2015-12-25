@@ -297,12 +297,10 @@ public final class SpringDomainsTest {
                                     .applicationsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/apps")
                                     .routesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/routes")
                                     .domainsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/domains")
-                                    .serviceInstancesUrl
-                                            ("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
+                                    .serviceInstancesUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/service_instances")
                                     .applicationEventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/app_events")
                                     .eventsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/events")
-                                    .securityGroupsUrl
-                                            ("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
+                                    .securityGroupsUrl("/v2/spaces/d1686ef7-59dc-4ada-8900-85e89d749046/security_groups")
                                     .build())
                             .build())
                     .build();

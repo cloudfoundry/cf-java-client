@@ -64,8 +64,7 @@ public final class SpringPackagesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package" +
-                            "-id")
+                    .method(POST).path("/v3/apps/test-application-id/packages?source_package_guid=test-source-package-id")
                     .status(OK)
                     .responsePayload("v3/apps/POST_{id}_packages_response.json");
         }

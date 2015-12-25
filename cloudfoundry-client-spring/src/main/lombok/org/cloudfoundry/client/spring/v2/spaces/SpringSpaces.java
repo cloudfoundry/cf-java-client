@@ -111,8 +111,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final
-                                                                                         AssociateSpaceAuditorByUsernameRequest request) {
+    public Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final AssociateSpaceAuditorByUsernameRequest request) {
         return put(request, AssociateSpaceAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -136,8 +135,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final
-                                                                                             AssociateSpaceDeveloperByUsernameRequest request) {
+    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final AssociateSpaceDeveloperByUsernameRequest request) {
         return put(request, AssociateSpaceDeveloperByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -161,8 +159,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final
-                                                                                         AssociateSpaceManagerByUsernameRequest request) {
+    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final AssociateSpaceManagerByUsernameRequest request) {
         return put(request, AssociateSpaceManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -174,9 +171,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(
-            final AssociateSpaceSecurityGroupRequest request) {
-
+    public Publisher<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(final AssociateSpaceSecurityGroupRequest request) {
         return put(request, AssociateSpaceSecurityGroupResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -363,9 +358,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(
-            final ListSpaceServiceInstancesRequest request) {
-
+    public Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(final ListSpaceServiceInstancesRequest request) {
         return get(request, ListSpaceServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -416,7 +409,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
         });
     }
-    
+
     @Override
     public Publisher<Void> removeAuditorByUsername(final RemoveSpaceAuditorByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {

@@ -71,8 +71,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationsV3Test {
 
-    public static final class AssignDroplet
-            extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
+    public static final class AssignDroplet extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -364,8 +363,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetEnvironment
-            extends AbstractApiTest<GetApplicationEnvironmentRequest, GetApplicationEnvironmentResponse> {
+    public static final class GetEnvironment extends AbstractApiTest<GetApplicationEnvironmentRequest, GetApplicationEnvironmentResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -418,8 +416,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class GetProcess
-            extends AbstractApiTest<GetApplicationProcessRequest, GetApplicationProcessResponse> {
+    public static final class GetProcess extends AbstractApiTest<GetApplicationProcessRequest, GetApplicationProcessResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -595,8 +592,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListDroplets
-            extends AbstractApiTest<ListApplicationDropletsRequest, ListApplicationDropletsResponse> {
+    public static final class ListDroplets extends AbstractApiTest<ListApplicationDropletsRequest, ListApplicationDropletsResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -609,8 +605,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1" +
-                            "&per_page=2")
+                    .method(GET).path("/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_droplets_response.json");
         }
@@ -697,8 +692,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListPackages
-            extends AbstractApiTest<ListApplicationPackagesRequest, ListApplicationPackagesResponse> {
+    public static final class ListPackages extends AbstractApiTest<ListApplicationPackagesRequest, ListApplicationPackagesResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -722,12 +716,10 @@ public final class SpringApplicationsV3Test {
                     .pagination(Pagination.builder()
                             .totalResults(1)
                             .first(Link.builder()
-                                    .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1" +
-                                            "&per_page=50")
+                                    .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
                                     .build())
                             .last(Link.builder()
-                                    .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1" +
-                                            "&per_page=50")
+                                    .href("/v3/apps/guid-e6ee32d9-013f-4184-84c4-f6528c3ce7e8/packages?page=1&per_page=50")
                                     .build())
                             .build())
                     .resource(Resource.builder()
@@ -775,8 +767,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListProcesses
-            extends AbstractApiTest<ListApplicationProcessesRequest, ListApplicationProcessesResponse> {
+    public static final class ListProcesses extends AbstractApiTest<ListApplicationProcessesRequest, ListApplicationProcessesResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -800,12 +791,10 @@ public final class SpringApplicationsV3Test {
                     .pagination(Pagination.builder()
                             .totalResults(1)
                             .first(Link.builder()
-                                    .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1" +
-                                            "&per_page=50")
+                                    .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50")
                                     .build())
                             .last(Link.builder()
-                                    .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1" +
-                                            "&per_page=50")
+                                    .href("/v3/apps/guid-ad6388b3-c798-4ee7-8bab-6714864eb389/processes?page=1&per_page=50")
                                     .build())
                             .build())
                     .resource(ListApplicationProcessesResponse.Resource.builder()
@@ -848,8 +837,7 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListRoutes
-            extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
+    public static final class ListRoutes extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
 
@@ -873,12 +861,10 @@ public final class SpringApplicationsV3Test {
                     .pagination(Pagination.builder()
                             .totalResults(2)
                             .first(Link.builder()
-                                    .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page" +
-                                            "=50")
+                                    .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
                                     .build())
                             .last(Link.builder()
-                                    .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page" +
-                                            "=50")
+                                    .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
                                     .build())
                             .build())
                     .resource(ListApplicationRoutesResponse.Resource.builder()

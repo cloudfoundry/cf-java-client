@@ -31,11 +31,9 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSpaceQuotaDefinitionsTest {
 
-    public static final class GetSpaceQuotaDefinition
-            extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
+    public static final class GetSpaceQuotaDefinition extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
 
-        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this
-                .restTemplate, this.root);
+        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root);
 
         @Override
         protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
@@ -88,11 +86,9 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
     }
 
-    public static final class List
-            extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
+    public static final class List extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
 
-        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions =
-                new SpringSpaceQuotaDefinitions(this.restTemplate, this.root);
+        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root);
 
         @Override
         protected ListSpaceQuotaDefinitionsRequest getInvalidRequest() {

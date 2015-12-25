@@ -45,7 +45,7 @@ public final class FilterBuilder {
         Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
         Arrays.sort(methods, MethodNameComparator.INSTANCE);
 
-        for(Method method: methods) {
+        for (Method method : methods) {
             FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
             if (filterParameter == null) {
                 continue;

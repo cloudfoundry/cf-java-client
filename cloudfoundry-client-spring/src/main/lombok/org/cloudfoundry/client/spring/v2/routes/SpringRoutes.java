@@ -60,8 +60,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<AssociateRouteApplicationResponse> associateApplication(
-            final AssociateRouteApplicationRequest request) {
+    public Publisher<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest request) {
         return put(request, AssociateRouteApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -104,8 +103,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host",
-                        request.getHost());
+                builder.pathSegment("v2", "routes", "reserved", "domain", request.getDomainId(), "host", request.getHost());
                 QueryBuilder.augment(builder, request);
             }
 

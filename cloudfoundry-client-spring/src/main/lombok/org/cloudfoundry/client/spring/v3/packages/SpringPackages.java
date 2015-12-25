@@ -100,13 +100,14 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Publisher<byte[]> download(final DownloadPackageRequest request) {
-        return getStream(request,
-                new Consumer<UriComponentsBuilder>() {
-                    @Override
-                    public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v3", "packages", request.getId(), "download");
-                    }
-                });
+        return getStream(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "packages", request.getId(), "download");
+            }
+
+        });
     }
 
     @Override
@@ -151,8 +152,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public MultiValueMap<String, FileSystemResource> get() {
-                return CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile
-                        ()));
+                return CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile()));
             }
 
         }, UploadPackageResponse.class, new Consumer<UriComponentsBuilder>() {

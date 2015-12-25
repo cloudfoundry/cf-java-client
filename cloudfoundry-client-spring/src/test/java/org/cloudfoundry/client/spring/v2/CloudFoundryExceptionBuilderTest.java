@@ -46,9 +46,8 @@ public final class CloudFoundryExceptionBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void buildInvalidPayload() {
-        HttpStatusCodeException cause = new HttpClientErrorException(UNPROCESSABLE_ENTITY,
-                UNPROCESSABLE_ENTITY.getReasonPhrase(), "{".getBytes(Charset.defaultCharset()),
-                Charset.defaultCharset());
+        HttpStatusCodeException cause = new HttpClientErrorException(UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY.getReasonPhrase(), "{".getBytes(Charset.defaultCharset()), Charset.defaultCharset());
         CloudFoundryExceptionBuilder.build(cause);
     }
+
 }

@@ -49,8 +49,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringRoutesTest {
 
-    public static final class AssociateApplication
-            extends AbstractApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
+    public static final class AssociateApplication extends AbstractApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
 
         private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
 
@@ -343,8 +342,7 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class ListApplications
-            extends AbstractApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
+    public static final class ListApplications extends AbstractApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
 
         private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
 
@@ -395,8 +393,7 @@ public final class SpringRoutesTest {
                                     .spaceUrl("/v2/spaces/55f1c5ea-12a5-4128-8f20-606af2a3bce1")
                                     .stackUrl("/v2/stacks/0ef84d2a-4fdd-43ba-afbc-074a5e19ea66")
                                     .eventsUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/events")
-                                    .serviceBindingsUrl
-                                            ("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/service_bindings")
+                                    .serviceBindingsUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/service_bindings")
                                     .routesUrl("/v2/apps/f1243da8-e613-490a-8a0e-21ef1bcce952/routes")
                                     .build())
                             .build())

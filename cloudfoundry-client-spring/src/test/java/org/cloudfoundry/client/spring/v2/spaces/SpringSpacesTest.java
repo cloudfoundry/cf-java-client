@@ -111,8 +111,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSpacesTest {
 
-    public static final class AssociateAuditor
-            extends AbstractApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
+    public static final class AssociateAuditor extends AbstractApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -172,8 +171,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateAuditorByUsername extends
-            AbstractApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
+    public static final class AssociateAuditorByUsername extends AbstractApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -228,15 +226,13 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceAuditorByUsernameResponse> invoke(AssociateSpaceAuditorByUsernameRequest
-                                                                                    request) {
+        protected Publisher<AssociateSpaceAuditorByUsernameResponse> invoke(AssociateSpaceAuditorByUsernameRequest request) {
             return this.spaces.associateAuditorByUsername(request);
         }
 
     }
 
-    public static final class AssociateDeveloper
-            extends AbstractApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
+    public static final class AssociateDeveloper extends AbstractApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -296,8 +292,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateManager
-            extends AbstractApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
+    public static final class AssociateManager extends AbstractApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -357,8 +352,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSecurityGroup
-            extends AbstractApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
+    public static final class AssociateSecurityGroup extends AbstractApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -418,8 +412,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class AssociateSpaceDeveloperByUsername extends
-            AbstractApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
+    public static final class AssociateSpaceDeveloperByUsername extends AbstractApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -474,15 +467,13 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceDeveloperByUsernameResponse> invoke
-                (AssociateSpaceDeveloperByUsernameRequest request) {
+        protected Publisher<AssociateSpaceDeveloperByUsernameResponse> invoke(AssociateSpaceDeveloperByUsernameRequest request) {
             return this.spaces.associateDeveloperByUsername(request);
         }
 
     }
 
-    public static final class AssociateSpaceManagerByUsername extends
-            AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
+    public static final class AssociateSpaceManagerByUsername extends AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -537,8 +528,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest
-                                                                                    request) {
+        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest request) {
             return this.spaces.associateManagerByUsername(request);
         }
 
@@ -825,12 +815,10 @@ public final class SpringSpacesTest {
                                     .applicationsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/apps")
                                     .routesUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/routes")
                                     .domainsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/domains")
-                                    .serviceInstancesUrl
-                                            ("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances")
+                                    .serviceInstancesUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/service_instances")
                                     .applicationEventsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/app_events")
                                     .eventsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/events")
-                                    .securityGroupsUrl
-                                            ("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups")
+                                    .securityGroupsUrl("/v2/spaces/b4293b09-8316-472c-a29a-6468a3adff59/security_groups")
                                     .build())
                             .build())
                     .build();
@@ -851,8 +839,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListApplications
-            extends AbstractApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
+    public static final class ListApplications extends AbstractApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -902,8 +889,7 @@ public final class SpringSpacesTest {
                                     .spaceUrl("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f")
                                     .stackUrl("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47")
                                     .eventsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events")
-                                    .serviceBindingsUrl
-                                            ("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings")
+                                    .serviceBindingsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/service_bindings")
                                     .routesUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/routes")
                                     .build())
                             .build())
@@ -926,8 +912,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListAuditors
-            extends AbstractApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
+    public static final class ListAuditors extends AbstractApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -987,8 +972,7 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class ListDevelopers
-            extends AbstractApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
+    public static final class ListDevelopers extends AbstractApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1174,8 +1158,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListManagers
-            extends AbstractApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
+    public static final class ListManagers extends AbstractApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1293,8 +1276,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListSecurityGroups
-            extends AbstractApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
+    public static final class ListSecurityGroups extends AbstractApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1353,8 +1335,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListServiceInstances
-            extends AbstractApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
+    public static final class ListServiceInstances extends AbstractApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1416,8 +1397,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListServices
-            extends AbstractApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
+    public static final class ListServices extends AbstractApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1475,8 +1455,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class ListUserRoles
-            extends AbstractApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
+    public static final class ListUserRoles extends AbstractApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1578,8 +1557,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest,
-            Void> {
+    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest, Void> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1653,8 +1631,7 @@ public final class SpringSpacesTest {
         }
     }
 
-    public static final class RemoveDeveloperByUsername extends
-            AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
+    public static final class RemoveDeveloperByUsername extends AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 
@@ -1729,8 +1706,7 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest,
-            Void> {
+    public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest, Void> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
 

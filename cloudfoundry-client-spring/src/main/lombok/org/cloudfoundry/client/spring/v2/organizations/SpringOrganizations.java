@@ -105,8 +105,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorResponse> associateAuditor(
-            final AssociateOrganizationAuditorRequest request) {
+    public Publisher<AssociateOrganizationAuditorResponse> associateAuditor(final AssociateOrganizationAuditorRequest request) {
         return put(request, AssociateOrganizationAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -119,8 +118,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(
-            final AssociateOrganizationAuditorByUsernameRequest request) {
+    public Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(final AssociateOrganizationAuditorByUsernameRequest request) {
         return put(request, AssociateOrganizationAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -132,8 +130,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager(
-            final AssociateOrganizationBillingManagerRequest request) {
+    public Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager(final AssociateOrganizationBillingManagerRequest request) {
         return put(request, AssociateOrganizationBillingManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -146,22 +143,19 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(
-            final AssociateOrganizationBillingManagerByUsernameRequest request) {
-        return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class, new
-                Consumer<UriComponentsBuilder>() {
+    public Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(final AssociateOrganizationBillingManagerByUsernameRequest request) {
+        return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
-                    @Override
-                    public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
-                    }
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
+            }
 
-                });
+        });
     }
 
     @Override
-    public Publisher<AssociateOrganizationManagerResponse> associateManager(
-            final AssociateOrganizationManagerRequest request) {
+    public Publisher<AssociateOrganizationManagerResponse> associateManager(final AssociateOrganizationManagerRequest request) {
         return put(request, AssociateOrganizationManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -173,8 +167,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(
-            final AssociateOrganizationManagerByUsernameRequest request) {
+    public Publisher<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(final AssociateOrganizationManagerByUsernameRequest request) {
         return put(request, AssociateOrganizationManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -186,8 +179,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(
-            final AssociateOrganizationPrivateDomainRequest request) {
+    public Publisher<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(final AssociateOrganizationPrivateDomainRequest request) {
         return put(request, AssociateOrganizationPrivateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -212,8 +204,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(
-            final AssociateOrganizationUserByUsernameRequest request) {
+    public Publisher<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(final AssociateOrganizationUserByUsernameRequest request) {
         return put(request, AssociateOrganizationUserByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -262,8 +253,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationInstanceUsageResponse> getInstanceUsage(
-            final GetOrganizationInstanceUsageRequest request) {
+    public Publisher<GetOrganizationInstanceUsageResponse> getInstanceUsage(final GetOrganizationInstanceUsageRequest request) {
         return get(request, GetOrganizationInstanceUsageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -275,8 +265,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(
-            final GetOrganizationMemoryUsageRequest request) {
+    public Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(final GetOrganizationMemoryUsageRequest request) {
         return get(request, GetOrganizationMemoryUsageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -303,12 +292,14 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     @Override
     public Publisher<ListOrganizationsResponse> list(final ListOrganizationsRequest request) {
         return get(request, ListOrganizationsResponse.class, new Consumer<UriComponentsBuilder>() {
+
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
+
         });
     }
 
@@ -327,8 +318,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(
-            final ListOrganizationBillingManagersRequest request) {
+    public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(final ListOrganizationBillingManagersRequest request) {
         return get(request, ListOrganizationBillingManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -356,8 +346,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationPrivateDomainsResponse> listPrivateDomains(
-            final ListOrganizationPrivateDomainsRequest request) {
+    public Publisher<ListOrganizationPrivateDomainsResponse> listPrivateDomains(final ListOrganizationPrivateDomainsRequest request) {
         return get(request, ListOrganizationPrivateDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -385,8 +374,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(
-            final ListOrganizationSpaceQuotaDefinitionsRequest request) {
+    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(final ListOrganizationSpaceQuotaDefinitionsRequest request) {
         return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -463,8 +451,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest
-                                                                  request) {
+    public Publisher<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override

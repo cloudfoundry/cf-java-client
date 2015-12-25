@@ -104,8 +104,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringOrganizationsTest {
 
-    public static final class AssociateOrganizationAuditor
-            extends AbstractApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
+    public static final class AssociateOrganizationAuditor extends AbstractApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -142,12 +141,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/private_domains")
                             .usersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/users")
                             .managersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/billing_managers")
+                            .billingManagersUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/billing_managers")
                             .auditorsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors")
                             .applicationEventsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -167,9 +164,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationAuditorByUsername extends
-            AbstractApiTest<AssociateOrganizationAuditorByUsernameRequest,
-                    AssociateOrganizationAuditorByUsernameResponse> {
+    public static final class AssociateOrganizationAuditorByUsername extends AbstractApiTest<AssociateOrganizationAuditorByUsernameRequest, AssociateOrganizationAuditorByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -207,12 +202,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/private_domains")
                             .usersUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/users")
                             .managersUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/billing_managers")
+                            .billingManagersUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/billing_managers")
                             .auditorsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/auditors")
                             .applicationEventsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/50dfb04d-cd49-477d-a54c-32e00e180022/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -226,16 +219,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationAuditorByUsernameResponse> invoke
-                (AssociateOrganizationAuditorByUsernameRequest request) {
+        protected Publisher<AssociateOrganizationAuditorByUsernameResponse> invoke(AssociateOrganizationAuditorByUsernameRequest request) {
             return this.organizations.associateAuditorByUsername(request);
         }
 
     }
 
-    public static final class AssociateOrganizationBillingManager
-            extends AbstractApiTest<AssociateOrganizationBillingManagerRequest,
-            AssociateOrganizationBillingManagerResponse> {
+    public static final class AssociateOrganizationBillingManager extends AbstractApiTest<AssociateOrganizationBillingManagerRequest, AssociateOrganizationBillingManagerResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -260,16 +250,14 @@ public final class SpringOrganizationsTest {
                             .applicationEventsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/app_events")
                             .auditorsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/auditors")
                             .billingEnabled(false)
-                            .billingManagersUrl
-                                    ("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/billing_managers")
+                            .billingManagersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/billing_managers")
                             .domainsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/domains")
                             .managersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/managers")
                             .name("name-200")
                             .privateDomainsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/private_domains")
                             .quotaDefinitionId("ab51f0d8-1920-4bfc-9401-cd0e978e8c5e")
                             .quotaDefinitionUrl("/v2/quota_definitions/ab51f0d8-1920-4bfc-9401-cd0e978e8c5e")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/space_quota_definitions")
                             .spacesUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/spaces")
                             .status("active")
                             .usersUrl("/v2/organizations/39ab104d-79f9-4bac-82e0-35b826a236b8/users")
@@ -291,16 +279,14 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationBillingManagerResponse> invoke
-                (AssociateOrganizationBillingManagerRequest request) {
+        protected Publisher<AssociateOrganizationBillingManagerResponse> invoke(AssociateOrganizationBillingManagerRequest request) {
             return this.organizations.associateBillingManager(request);
         }
 
     }
 
-    public static final class AssociateOrganizationBillingManagerByUsername extends
-            AbstractApiTest<AssociateOrganizationBillingManagerByUsernameRequest,
-                    AssociateOrganizationBillingManagerByUsernameResponse> {
+    public static final class AssociateOrganizationBillingManagerByUsername
+            extends AbstractApiTest<AssociateOrganizationBillingManagerByUsernameRequest, AssociateOrganizationBillingManagerByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -338,12 +324,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/private_domains")
                             .usersUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/users")
                             .managersUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/billing_managers")
+                            .billingManagersUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/billing_managers")
                             .auditorsUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/auditors")
                             .applicationEventsUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/c8d4f13c-8880-4859-8e03-fc690efd8f48/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -357,15 +341,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationBillingManagerByUsernameResponse> invoke
-                (AssociateOrganizationBillingManagerByUsernameRequest request) {
+        protected Publisher<AssociateOrganizationBillingManagerByUsernameResponse> invoke(AssociateOrganizationBillingManagerByUsernameRequest request) {
             return this.organizations.associateBillingManagerByUsername(request);
         }
 
     }
 
-    public static final class AssociateOrganizationManager
-            extends AbstractApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
+    public static final class AssociateOrganizationManager extends AbstractApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -402,12 +384,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/private_domains")
                             .usersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/users")
                             .managersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/billing_managers")
+                            .billingManagersUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/billing_managers")
                             .auditorsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/auditors")
                             .applicationEventsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/cc7c5224-f973-4358-a95a-dd72decbb20f/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -427,9 +407,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationManagerByUsername extends
-            AbstractApiTest<AssociateOrganizationManagerByUsernameRequest,
-                    AssociateOrganizationManagerByUsernameResponse> {
+    public static final class AssociateOrganizationManagerByUsername extends AbstractApiTest<AssociateOrganizationManagerByUsernameRequest, AssociateOrganizationManagerByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -467,12 +445,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/private_domains")
                             .usersUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/users")
                             .managersUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/billing_managers")
+                            .billingManagersUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/billing_managers")
                             .auditorsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/auditors")
                             .applicationEventsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/8d2238e2-2fb3-4ede-b188-1fd3a533c4b4/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -486,15 +462,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationManagerByUsernameResponse> invoke
-                (AssociateOrganizationManagerByUsernameRequest request) {
+        protected Publisher<AssociateOrganizationManagerByUsernameResponse> invoke(AssociateOrganizationManagerByUsernameRequest request) {
             return this.organizations.associateManagerByUsername(request);
         }
 
     }
 
-    public static final class AssociateOrganizationUser
-            extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
+    public static final class AssociateOrganizationUser extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -531,12 +505,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/private_domains")
                             .usersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/users")
                             .managersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/billing_managers")
+                            .billingManagersUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/billing_managers")
                             .auditorsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/auditors")
                             .applicationEventsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/584664d0-e5bb-449b-bfe5-0136c30c4ff8/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -556,8 +528,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class AssociateOrganizationUserByUsername extends
-            AbstractApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
+    public static final class AssociateOrganizationUserByUsername extends AbstractApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -595,12 +566,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/private_domains")
                             .usersUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/users")
                             .managersUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/billing_managers")
+                            .billingManagersUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/billing_managers")
                             .auditorsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/auditors")
                             .applicationEventsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/1a93417a-811a-46c7-85fa-4a0507c53f08/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -614,15 +583,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationUserByUsernameResponse> invoke
-                (AssociateOrganizationUserByUsernameRequest request) {
+        protected Publisher<AssociateOrganizationUserByUsernameResponse> invoke(AssociateOrganizationUserByUsernameRequest request) {
             return this.organizations.associateUserByUsername(request);
         }
 
     }
 
-    public static final class AssociatePrivateDomain extends
-            AbstractApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
+    public static final class AssociatePrivateDomain extends AbstractApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -654,12 +621,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/private_domains")
                             .usersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/users")
                             .managersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/billing_managers")
+                            .billingManagersUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/billing_managers")
                             .auditorsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/auditors")
                             .applicationEventsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/676f9ff8-8c35-49ed-8ebf-fdf3db34cde7/space_quota_definitions")
                             .build())
                     .metadata(Metadata.builder()
                             .createdAt("2015-07-27T22:43:10Z")
@@ -678,9 +643,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationPrivateDomainResponse> invoke(
-                AssociateOrganizationPrivateDomainRequest request) {
-
+        protected Publisher<AssociateOrganizationPrivateDomainResponse> invoke(AssociateOrganizationPrivateDomainRequest request) {
             return this.organizations.associatePrivateDomain(request);
         }
 
@@ -724,12 +687,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/private_domains")
                             .usersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/users")
                             .managersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/billing_managers")
+                            .billingManagersUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/billing_managers")
                             .auditorsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/auditors")
                             .applicationEventsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/137bfc86-5a2f-4759-9c0c-59ef614cd0be/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -822,12 +783,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/private_domains")
                             .usersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/users")
                             .managersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/billing_managers")
+                            .billingManagersUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/billing_managers")
                             .auditorsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/auditors")
                             .applicationEventsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/027616f3-66c4-412c-8214-7e43db2d587b/space_quota_definitions")
                             .build())
                     .build();
         }
@@ -846,8 +805,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetInstanceUsage
-            extends AbstractApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
+    public static final class GetInstanceUsage extends AbstractApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -886,8 +844,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetMemoryUsage
-            extends AbstractApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
+    public static final class GetMemoryUsage extends AbstractApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -926,8 +883,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class GetUserRoles
-            extends AbstractApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
+    public static final class GetUserRoles extends AbstractApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -950,9 +906,7 @@ public final class SpringOrganizationsTest {
             return GetOrganizationUserRolesResponse.builder()
                     .totalResults(2)
                     .totalPages(2)
-                    .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc" +
-                            "&page" +
-                            "=2&results-per-page=1")
+                    .nextUrl("/v2/organizations/6fd1790e-0785-41ec-aff0-99915ce000c1/user_roles?order-direction=asc&page=2&results-per-page=1")
                     .resource(UserOrganizationRoleResource.builder()
                             .metadata(Metadata.builder()
                                     .id("uaa-id-92")
@@ -1031,17 +985,13 @@ public final class SpringOrganizationsTest {
                                     .quotaDefinitionUrl("/v2/quota_definitions/9b56a1ec-4981-4a1e-9348-0d78eeca842c")
                                     .spacesUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/spaces")
                                     .domainsUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/domains")
-                                    .privateDomainsUrl
-                                            ("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/private_domains")
+                                    .privateDomainsUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/private_domains")
                                     .usersUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/users")
                                     .managersUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/managers")
-                                    .billingManagersUrl
-                                            ("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/billing_managers")
+                                    .billingManagersUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/billing_managers")
                                     .auditorsUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/auditors")
-                                    .applicationEventsUrl
-                                            ("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/app_events")
-                                    .spaceQuotaDefinitionsUrl
-                                            ("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/space_quota_definitions")
+                                    .applicationEventsUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/app_events")
+                                    .spaceQuotaDefinitionsUrl("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a/space_quota_definitions")
                                     .build())
                             .build())
                     .build();
@@ -1062,8 +1012,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListAuditors
-            extends AbstractApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
+    public static final class ListAuditors extends AbstractApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1180,15 +1129,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationBillingManagersResponse> invoke(ListOrganizationBillingManagersRequest
-                                                                                    request) {
+        protected Publisher<ListOrganizationBillingManagersResponse> invoke(ListOrganizationBillingManagersRequest request) {
             return this.organizations.listBillingManagers(request);
         }
 
     }
 
-    public static final class ListManagers
-            extends AbstractApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
+    public static final class ListManagers extends AbstractApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1244,8 +1191,7 @@ public final class SpringOrganizationsTest {
                                     .spacesUrl("/v2/users/uaa-id-100/spaces")
                                     .organizationsUrl("/v2/users/uaa-id-100/organizations")
                                     .managedOrganizationsUrl("/v2/users/uaa-id-100/managed_organizations")
-                                    .billingManagedOrganizationsUrl
-                                            ("/v2/users/uaa-id-100/billing_managed_organizations")
+                                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-100/billing_managed_organizations")
                                     .auditedOrganizationsUrl("/v2/users/uaa-id-100/audited_organizations")
                                     .managedSpacesUrl("/v2/users/uaa-id-100/managed_spaces")
                                     .auditedSpacesUrl("/v2/users/uaa-id-100/audited_spaces")
@@ -1269,8 +1215,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListPrivateDomains
-            extends AbstractApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
+    public static final class ListPrivateDomains extends AbstractApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1319,15 +1264,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationPrivateDomainsResponse> invoke(ListOrganizationPrivateDomainsRequest
-                                                                                   request) {
+        protected Publisher<ListOrganizationPrivateDomainsResponse> invoke(ListOrganizationPrivateDomainsRequest request) {
             return this.organizations.listPrivateDomains(request);
         }
 
     }
 
-    public static final class ListServices
-            extends AbstractApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
+    public static final class ListServices extends AbstractApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1385,9 +1328,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListSpaceQuotaDefinitions
-            extends AbstractApiTest<ListOrganizationSpaceQuotaDefinitionsRequest,
-            ListOrganizationSpaceQuotaDefinitionsResponse> {
+    public static final class ListSpaceQuotaDefinitions extends AbstractApiTest<ListOrganizationSpaceQuotaDefinitionsRequest, ListOrganizationSpaceQuotaDefinitionsResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1423,8 +1364,7 @@ public final class SpringOrganizationsTest {
                                     .nonBasicServicesAllowed(true)
                                     .organizationId("a163840f-5bd5-48a0-8736-1d837bda1353")
                                     .organizationUrl("/v2/organizations/a163840f-5bd5-48a0-8736-1d837bda1353")
-                                    .spacesUrl
-                                            ("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9/spaces")
+                                    .spacesUrl("/v2/space_quota_definitions/d0bf6c52-a880-4c8f-b7d9-d9302a2ac6c9/spaces")
                                     .totalRoutes(1000)
                                     .totalServices(60)
                                     .build())
@@ -1441,16 +1381,13 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> invoke(
-                ListOrganizationSpaceQuotaDefinitionsRequest request) {
-
+        protected Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> invoke(ListOrganizationSpaceQuotaDefinitionsRequest request) {
             return this.organizations.listSpaceQuotaDefinitions(request);
         }
 
     }
 
-    public static final class ListSpaces
-            extends AbstractApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
+    public static final class ListSpaces extends AbstractApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1491,12 +1428,10 @@ public final class SpringOrganizationsTest {
                                     .applicationsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/apps")
                                     .routesUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/routes")
                                     .domainsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/domains")
-                                    .serviceInstancesUrl
-                                            ("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/service_instances")
+                                    .serviceInstancesUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/service_instances")
                                     .applicationEventsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/app_events")
                                     .eventsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/events")
-                                    .securityGroupsUrl
-                                            ("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/security_groups")
+                                    .securityGroupsUrl("/v2/spaces/9f6ce6e0-e3db-42ae-9572-bbc38f4f541b/security_groups")
                                     .build())
                             .build())
                     .build();
@@ -1517,8 +1452,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class ListUsers
-            extends AbstractApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
+    public static final class ListUsers extends AbstractApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1555,8 +1489,7 @@ public final class SpringOrganizationsTest {
                                     .spacesUrl("/v2/users/uaa-id-111/spaces")
                                     .organizationsUrl("/v2/users/uaa-id-111/organizations")
                                     .managedOrganizationsUrl("/v2/users/uaa-id-111/managed_organizations")
-                                    .billingManagedOrganizationsUrl
-                                            ("/v2/users/uaa-id-111/billing_managed_organizations")
+                                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-111/billing_managed_organizations")
                                     .auditedOrganizationsUrl("/v2/users/uaa-id-111/audited_organizations")
                                     .managedSpacesUrl("/v2/users/uaa-id-111/managed_spaces")
                                     .auditedSpacesUrl("/v2/users/uaa-id-111/audited_spaces")
@@ -1617,8 +1550,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveAuditorByUsername extends
-            AbstractApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
+    public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1656,8 +1588,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveBillingManager
-            extends AbstractApiTest<RemoveOrganizationBillingManagerRequest, Void> {
+    public static final class RemoveBillingManager extends AbstractApiTest<RemoveOrganizationBillingManagerRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1731,8 +1662,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveOrganizationBillingManagerByUsername extends
-            AbstractApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
+    public static final class RemoveOrganizationBillingManagerByUsername extends AbstractApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1770,8 +1700,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemoveOrganizationManagerByUsername
-            extends AbstractApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
+    public static final class RemoveOrganizationManagerByUsername extends AbstractApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1809,8 +1738,7 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class RemovePrivateDomain
-            extends AbstractApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
+    public static final class RemovePrivateDomain extends AbstractApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -1882,8 +1810,7 @@ public final class SpringOrganizationsTest {
         }
     }
 
-    public static final class RemoveUserByUsername extends
-            AbstractApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
+    public static final class RemoveUserByUsername extends AbstractApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root);
 
@@ -2009,12 +1936,10 @@ public final class SpringOrganizationsTest {
                             .privateDomainsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/private_domains")
                             .usersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/users")
                             .managersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/managers")
-                            .billingManagersUrl
-                                    ("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/billing_managers")
+                            .billingManagersUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/billing_managers")
                             .auditorsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/auditors")
                             .applicationEventsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/app_events")
-                            .spaceQuotaDefinitionsUrl
-                                    ("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/space_quota_definitions")
+                            .spaceQuotaDefinitionsUrl("/v2/organizations/31a539be-dbfd-4db6-aec1-6565ebe975ed/space_quota_definitions")
                             .build())
                     .build();
         }

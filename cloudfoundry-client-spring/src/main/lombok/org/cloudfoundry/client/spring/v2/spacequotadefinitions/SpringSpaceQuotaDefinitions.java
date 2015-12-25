@@ -59,7 +59,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
 
         });
     }
-    
+
     @Override
     public Publisher<ListSpaceQuotaDefinitionsResponse> list(final ListSpaceQuotaDefinitionsRequest request) {
         return get(request, ListSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
