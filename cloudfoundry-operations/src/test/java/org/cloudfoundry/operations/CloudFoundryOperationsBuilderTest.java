@@ -24,7 +24,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.junit.Ignore;
 import org.junit.Test;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -47,7 +46,6 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
     }
 
-    @Ignore("Waiting on rector to allow throw on defaultIsEmpty")
     @Test(expected = IllegalArgumentException.class)
     public void buildWithInvalidOrganization() {
         ListOrganizationsRequest request = ListOrganizationsRequest.builder()
@@ -67,7 +65,6 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
     }
 
-    @Ignore("Waiting on rector to allow throw on defaultIsEmpty")
     @Test(expected = IllegalArgumentException.class)
     public void buildWithInvalidSpace() {
         ListOrganizationsRequest orgRequest = ListOrganizationsRequest.builder()

@@ -48,6 +48,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .zip(Validators.stream(getSpaceQuotaRequest), this.organizationId)
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
+                .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
                 .map(extractQuotaDefinition())
                 .map(toSpaceQuota());
     }

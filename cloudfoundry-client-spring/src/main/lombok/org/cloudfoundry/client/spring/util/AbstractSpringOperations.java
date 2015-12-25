@@ -50,7 +50,7 @@ public abstract class AbstractSpringOperations {
 
     private static final int BYTE_ARRAY_BUFFER_LENGTH = 8192;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client-spring");
 
     protected final RestOperations restOperations;
 

@@ -20,6 +20,8 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTest {
 
     @Test
@@ -28,7 +30,7 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
         assertions(testSubscriber);
 
         invoke().subscribe(testSubscriber);
-        testSubscriber.verify();
+        testSubscriber.verify(1, SECONDS);
     }
 
     protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;

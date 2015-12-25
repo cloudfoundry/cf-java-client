@@ -114,11 +114,6 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         verifyExpectations();
     }
 
-    public void verify() throws InterruptedException {
-        this.latch.await();
-        verifyExpectations();
-    }
-
     private void verifyExpectations() {
         if (!this.expectations.isEmpty()) {
             fail(String.format("Unexpected completion. %d expectations not met.", this.expectations.size()));

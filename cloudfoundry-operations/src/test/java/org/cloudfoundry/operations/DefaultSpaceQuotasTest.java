@@ -23,7 +23,6 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEnti
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.reactivestreams.Publisher;
 import reactor.Publishers;
 import reactor.rx.Streams;
@@ -96,9 +95,11 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-2")
-                    .build());
+                    .build();
+
+            return this.spaceQuotas.get(request);
         }
 
     }
@@ -134,14 +135,16 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-2")
-                    .build());
+                    .build();
+
+            return this.spaceQuotas.get(request);
         }
 
     }
 
-    @Ignore("Waiting on reactor to allow throw on defaultIsEmpty")
+
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
         private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION));
@@ -166,14 +169,17 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
-            // expect nothing back
+            testSubscriber
+                    .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder()
+            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-0")
-                    .build());
+                    .build();
+
+            return this.spaceQuotas.get(request);
         }
 
     }

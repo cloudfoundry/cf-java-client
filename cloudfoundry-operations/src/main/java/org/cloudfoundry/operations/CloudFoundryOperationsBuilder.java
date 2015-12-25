@@ -93,19 +93,18 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private Function<Resource<?>, String> extractId() {
+    private static Function<Resource<?>, String> extractId() {
         return new Function<Resource<?>, String>() {
 
             @Override
             public String apply(Resource<?> resource) {
-
                 return resource.getMetadata().getId();
             }
 
         };
     }
 
-    private <T extends Resource<?>> BiFunction<T, T, T> failIfMoreThanOne(final String message) {
+    private static <T extends Resource<?>> BiFunction<T, T, T> failIfMoreThanOne(final String message) {
         return new BiFunction<T, T, T>() {
 
             @Override
@@ -116,48 +115,46 @@ public final class CloudFoundryOperationsBuilder {
         };
     }
 
-    private Stream<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Stream<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         if (organization == null) {
             return Streams.fail(new IllegalStateException("No organization targeted"));
         }
 
-        Stream<String> organizationId = Paginated.requestResources(requestOrganizationPage(cloudFoundryClient))
-                .reduce(this.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
-// TODO: Some sort of supplier
-// .defaultIfEmpty(Streams.<ListOrganizationsResponse.Resource>fail(
-// new IllegalArgumentException(String.format("Organization '%s' does not exist", CloudFoundryOperationsBuilder.this.organization))))
+        Stream<String> organizationId = Paginated.requestResources(requestOrganizationPage(cloudFoundryClient, organization))
+                .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
+                .switchIfEmpty(Streams.<ListOrganizationsResponse.Resource, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Organization %s does not exist", organization))))
                 .map(extractId())
+                .take(1)
                 .cache(1);
 
-        organizationId.toBlockingQueue().poll();
+        organizationId.next().poll();
         return organizationId;
     }
 
-    private Stream<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, String space) {
+    private static Stream<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, String space) {
         if (space == null) {
             return Streams.fail(new IllegalStateException("No space targeted"));
         }
 
         Stream<String> spaceId = organizationId
-                .flatMap(requestResources(cloudFoundryClient))
-                .reduce(this.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
-// TODO: Some sort of supplier
-// .defaultIfEmpty(Streams.<ListOrganizationsResponse.Resource>fail(
-// new IllegalArgumentException(String.format("Organization '%s' does not exist", CloudFoundryOperationsBuilder.this.organization))))
+                .flatMap(requestResources(cloudFoundryClient, space))
+                .reduce(CloudFoundryOperationsBuilder.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
+                .switchIfEmpty(Streams.<SpaceResource, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Space %s does not exist", space))))
                 .map(extractId())
+                .take(1)
                 .cache(1);
 
-        spaceId.toBlockingQueue().poll();
+        spaceId.next().poll();
         return spaceId;
     }
 
-    private Function<Integer, Publisher<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Integer, Publisher<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
         return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
 
             @Override
             public Publisher<ListOrganizationsResponse> apply(Integer page) {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                        .name(CloudFoundryOperationsBuilder.this.organization)
+                        .name(organization)
                         .page(page)
                         .build();
 
@@ -166,25 +163,25 @@ public final class CloudFoundryOperationsBuilder {
         };
     }
 
-    private Function<String, Publisher<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<String, Publisher<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
         return new Function<String, Publisher<SpaceResource>>() {
 
             @Override
             public Publisher<SpaceResource> apply(String organizationId) {
-                return Paginated.requestResources(requestSpacePage(organizationId, cloudFoundryClient));
+                return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
             }
 
         };
     }
 
-    private Function<Integer, Publisher<ListSpacesResponse>> requestSpacePage(final String organizationId, final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Integer, Publisher<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
         return new Function<Integer, Publisher<ListSpacesResponse>>() {
 
             @Override
             public Publisher<ListSpacesResponse> apply(Integer page) {
                 ListSpacesRequest request = ListSpacesRequest.builder()
                         .organizationId(organizationId)
-                        .name(CloudFoundryOperationsBuilder.this.space)
+                        .name(space)
                         .page(page)
                         .build();
 
