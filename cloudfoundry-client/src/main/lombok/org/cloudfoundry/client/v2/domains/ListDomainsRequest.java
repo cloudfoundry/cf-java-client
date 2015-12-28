@@ -55,24 +55,13 @@ public final class ListDomainsRequest extends PaginatedRequest implements Valida
     @Getter(onMethod = @__(@FilterParameter("owning_organization_guid")))
     private final List<String> owningOrganizationIds;
 
-    /**
-     * The space ids
-     *
-     * @param spaceIds the space ids
-     * @return the space ids
-     */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
-    private final List<String> spaceIds;
-
     @Builder
     ListDomainsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                        @Singular List<String> names,
-                       @Singular List<String> owningOrganizationIds,
-                       @Singular List<String> spaceIds) {
+                       @Singular List<String> owningOrganizationIds) {
         super(orderDirection, page, resultsPerPage);
         this.names = names;
         this.owningOrganizationIds = owningOrganizationIds;
-        this.spaceIds = spaceIds;
     }
 
     @Override

@@ -53,6 +53,14 @@ public final class DomainEntity {
     private final String owningOrganizationUrl;
 
     /**
+     * The router group id
+     *
+     * @param routerGroupId the router group id
+     * @return the router group id
+     */
+    private final String routerGroupId;
+
+    /**
      * The shared organizations
      *
      * @param sharedOrganizations the shared organizations
@@ -72,11 +80,13 @@ public final class DomainEntity {
     DomainEntity(@JsonProperty("name") String name,
                  @JsonProperty("owning_organization_guid") String owningOrganizationId,
                  @JsonProperty("owning_organization_url") String owningOrganizationUrl,
+                 @JsonProperty("router_group_guid") String routerGroupId,
                  @JsonProperty("shared_organizations") List<String> sharedOrganizations,
                  @JsonProperty("spaces_url") String spacesUrl) {
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
         this.owningOrganizationUrl = owningOrganizationUrl;
+        this.routerGroupId = routerGroupId;
         this.sharedOrganizations = sharedOrganizations;
         this.spacesUrl = spacesUrl;
     }

@@ -19,9 +19,13 @@ package org.cloudfoundry.client;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.operations.UnexpectedResponseException;
+import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -66,27 +70,51 @@ public class ClientConfiguration {
 
     @Bean
     String organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
-        ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                .name(organization)
-                .build();
+        return Paginated
+                .requestResources(page -> {
+                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                            .name(organization)
+                            .page(page)
+                            .build();
 
-        return Streams.wrap(cloudFoundryClient.organizations().list(request))
-                .flatMap(response -> Streams.from(response.getResources()))
-                .map(resource -> resource.getMetadata().getId())
-                .next().get();
+                    return cloudFoundryClient.organizations().list(request);
+                })
+                .reduce((resource, resource2) -> failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
+                .switchIfEmpty(failIfLessThanOne(String.format("Organization %s does not exist", organization)))
+                .map(this::extractId)
+                .take(1)
+                .next().poll();
     }
 
     @Bean
     String spaceId(CloudFoundryClient cloudFoundryClient, String organizationId, @Value("${test.space}") String space) {
-        ListSpacesRequest request = ListSpacesRequest.builder()
-                .organizationId(organizationId)
-                .name(space)
-                .build();
+        return Paginated
+                .requestResources(page -> {
+                    ListSpacesRequest request = ListSpacesRequest.builder()
+                            .organizationId(organizationId)
+                            .name(space)
+                            .page(page)
+                            .build();
 
-        return Streams.wrap(cloudFoundryClient.spaces().list(request))
-                .flatMap(response -> Streams.from(response.getResources()))
-                .map(resource -> resource.getMetadata().getId())
-                .next().get();
+                    return cloudFoundryClient.spaces().list(request);
+                })
+                .reduce((resource, resource2) -> failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
+                .switchIfEmpty(failIfLessThanOne(String.format("Space %s does not exist", space)))
+                .map(this::extractId)
+                .take(1)
+                .next().poll();
+    }
+
+    private static <T extends Resource<?>> T failIfMoreThanOne(String message) {
+        throw new UnexpectedResponseException(message);
+    }
+
+    private String extractId(Resource<?> resource) {
+        return resource.getMetadata().getId();
+    }
+
+    private <T extends Resource<?>> Publisher<T> failIfLessThanOne(String message) {
+        return Streams.fail(new IllegalArgumentException(message));
     }
 
 }

@@ -22,6 +22,11 @@ package org.cloudfoundry.operations;
 public interface CloudFoundryOperations {
 
     /**
+     * The currently supported Cloud Foundry CLI version
+     */
+    String SUPPORTED_CLI_VERSION = "6.14.1";
+
+    /**
      * Main entry point to the Cloud Foundry Applications Operations API
      *
      * @return the Cloud Foundry Applications Operations API

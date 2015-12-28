@@ -54,18 +54,7 @@ public final class Paginated {
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> requestResources(final Function<Integer, Publisher<U>> pagePublisher) {
         return requestPages(pagePublisher)
-                .flatMap(Paginated.<R, U>extractResources());
-    }
-
-    private static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Publisher<R>> extractResources() {
-        return new Function<U, Publisher<R>>() {
-
-            @Override
-            public Publisher<R> apply(U pageResponse) {
-                return Streams.from(pageResponse.getResources());
-            }
-
-        };
+                .flatMap(Resources.<R, U>extractResources());
     }
 
     private static <U extends PaginatedResponse<?>> Function<U, Publisher<? extends U>> requestAdditionalPages(final Function<Integer, Publisher<U>> pagePublisher) {

@@ -104,6 +104,10 @@ public final class CloudFoundryOperationsBuilder {
         };
     }
 
+    private static <T extends Resource<?>> Stream<T> failIfLessThanOne(String message) {
+        return Streams.fail(new IllegalArgumentException(message));
+    }
+
     private static <T extends Resource<?>> BiFunction<T, T, T> failIfMoreThanOne(final String message) {
         return new BiFunction<T, T, T>() {
 
@@ -122,7 +126,7 @@ public final class CloudFoundryOperationsBuilder {
 
         Stream<String> organizationId = Paginated.requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                 .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
-                .switchIfEmpty(Streams.<ListOrganizationsResponse.Resource, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Organization %s does not exist", organization))))
+                .switchIfEmpty(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
                 .map(extractId())
                 .take(1)
                 .cache(1);
@@ -139,7 +143,7 @@ public final class CloudFoundryOperationsBuilder {
         Stream<String> spaceId = organizationId
                 .flatMap(requestResources(cloudFoundryClient, space))
                 .reduce(CloudFoundryOperationsBuilder.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
-                .switchIfEmpty(Streams.<SpaceResource, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Space %s does not exist", space))))
+                .switchIfEmpty(CloudFoundryOperationsBuilder.<SpaceResource>failIfLessThanOne(String.format("Space %s does not exist", space)))
                 .map(extractId())
                 .take(1)
                 .cache(1);

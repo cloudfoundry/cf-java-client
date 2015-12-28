@@ -32,8 +32,7 @@ import org.springframework.context.annotation.Lazy;
 public class OperationsConfiguration {
 
     @Bean
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                                  @Value("${test.organization}") String organization) {
+    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
         return new CloudFoundryOperationsBuilder()
                 .cloudFoundryClient(cloudFoundryClient)
                 .target(organization)
