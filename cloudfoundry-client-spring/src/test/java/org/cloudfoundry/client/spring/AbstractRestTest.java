@@ -124,19 +124,19 @@ public abstract class AbstractRestTest {
 
         private final List<RequestMatcher> requestMatchers = new ArrayList<>();
 
-        private volatile boolean anyRequestPayload;
+        private boolean anyRequestPayload;
 
-        private volatile MediaType contentType = APPLICATION_JSON;
+        private MediaType contentType = APPLICATION_JSON;
 
-        private volatile HttpMethod method;
+        private HttpMethod method;
 
-        private volatile String path;
+        private String path;
 
-        private volatile Resource requestPayload;
+        private Resource requestPayload;
 
-        private volatile Resource responsePayload;
+        private Resource responsePayload;
 
-        private volatile HttpStatus status;
+        private HttpStatus status;
 
         public RequestContext anyRequestPayload() {
             this.anyRequestPayload = true;

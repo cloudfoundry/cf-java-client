@@ -27,9 +27,9 @@ final class CertificateCollectingTrustManager implements X509TrustManager {
 
     private final Object monitor = new Object();
 
-    private volatile X509Certificate[] collected;
+    private X509Certificate[] collected;
 
-    private volatile Boolean trusted = Boolean.FALSE;
+    private Boolean trusted = Boolean.FALSE;
 
     CertificateCollectingTrustManager(X509TrustManager delegate) {
         this.delegate = delegate;

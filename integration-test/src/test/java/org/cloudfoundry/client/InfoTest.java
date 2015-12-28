@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public final class InfoTest {
 
     @Autowired
-    private volatile CloudFoundryClient cloudFoundryClient;
+    private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void info() {

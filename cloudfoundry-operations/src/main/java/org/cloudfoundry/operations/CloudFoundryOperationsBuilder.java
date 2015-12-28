@@ -35,11 +35,11 @@ import reactor.rx.Streams;
  */
 public final class CloudFoundryOperationsBuilder {
 
-    private volatile CloudFoundryClient cloudFoundryClient;
+    private CloudFoundryClient cloudFoundryClient;
 
-    private volatile String organization;
+    private String organization;
 
-    private volatile String space;
+    private String space;
 
     /**
      * Builds a new instance of the default implementation of the {@link CloudFoundryOperations} using the information provided.

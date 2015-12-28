@@ -35,13 +35,13 @@ import reactor.rx.Streams;
 public final class ApplicationsV3Test {
 
     @Autowired
-    private volatile CloudFoundryClient cloudFoundryClient;
+    private CloudFoundryClient cloudFoundryClient;
 
     @Autowired
-    private volatile String organizationId;
+    private String organizationId;
 
     @Autowired
-    private volatile String spaceId;
+    private String spaceId;
 
     @Test
     public void create() {

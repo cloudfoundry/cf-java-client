@@ -29,7 +29,7 @@ import reactor.rx.Streams;
 public final class SpacesTest {
 
     @Autowired
-    private volatile CloudFoundryOperations cloudFoundryOperations;
+    private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void list() {
