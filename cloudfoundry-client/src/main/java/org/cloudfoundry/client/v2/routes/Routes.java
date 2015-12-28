@@ -24,8 +24,7 @@ import org.reactivestreams.Publisher;
 public interface Routes {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/associate_app_with_the_route.html">Associate
-     * Application with the Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/associate_app_with_the_route.html">Associate Application with the Route</a> request
      *
      * @param request the Associate an Application with the Route request
      * @return the response from the Associate an Application with the Route request
@@ -33,8 +32,7 @@ public interface Routes {
     Publisher<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/creating_a_route.html">Creating a Route</a>
-     * request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/creating_a_route.html">Creating a Route</a> request
      *
      * @param request the Creating a Route request
      * @return the response from the Creating a Route request
@@ -42,8 +40,7 @@ public interface Routes {
     Publisher<CreateRouteResponse> create(CreateRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/delete_a_particular_route.html">Delete a Particular
-     * Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/delete_a_particular_route.html">Delete a Particular Route</a> request
      *
      * @param request the Delete a Particular Route request
      * @return the response from the Delete a Particular Route request
@@ -51,8 +48,7 @@ public interface Routes {
     Publisher<Void> delete(DeleteRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/check_a_route_exists.html">Check a Route exists</a>
-     * request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/check_a_route_exists.html">Check a Route exists</a> request
      *
      * @param request the Check a Route exists request
      * @return the response from the Check a Route exists request
@@ -60,8 +56,7 @@ public interface Routes {
     Publisher<Void> exists(RouteExistsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/retrieve_a_particular_route.html">Retrieve a
-     * Particular Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/retrieve_a_particular_route.html">Retrieve a Particular Route</a> request
      *
      * @param request the Retrieve a Particular Route request
      * @return the response from the Retrieve a Particular Route request
@@ -77,8 +72,7 @@ public interface Routes {
     Publisher<ListRoutesResponse> list(ListRoutesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/list_all_apps_for_the_route.html">List all
-     * Applications for the Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/list_all_apps_for_the_route.html">List all Applications for the Route</a> request
      *
      * @param request the List all Applications for the Route request
      * @return the response from the List all Applications for the Route request
@@ -86,8 +80,7 @@ public interface Routes {
     Publisher<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/remove_app_from_the_route.html">Remove Application
-     * from the Route</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/remove_app_from_the_route.html">Remove Application from the Route</a> request
      *
      * @param request the Remove Application from the Route request
      * @return the response from the Remove Application from the Route request

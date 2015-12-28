@@ -45,7 +45,7 @@ public final class RouteExistsRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain id must be specified", result.getMessages().get(0));
-    }        
+    }
 
     @Test
     public void isValidNoHost() {
@@ -56,6 +56,6 @@ public final class RouteExistsRequestTest {
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("host must be specified", result.getMessages().get(0));
-    }        
+    }
 
 }

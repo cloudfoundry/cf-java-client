@@ -34,7 +34,6 @@ public final class GetRouteResponse extends Resource<RouteEntity> {
     @Builder
     GetRouteResponse(@JsonProperty("entity") RouteEntity entity,
                      @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

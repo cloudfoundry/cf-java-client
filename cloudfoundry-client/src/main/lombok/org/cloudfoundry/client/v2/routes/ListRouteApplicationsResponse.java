@@ -41,7 +41,6 @@ public final class ListRouteApplicationsResponse extends PaginatedResponse<Appli
                                   @JsonProperty("resources") @Singular List<ApplicationResource> resources,
                                   @JsonProperty("total_pages") Integer totalPages,
                                   @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

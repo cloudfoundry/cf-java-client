@@ -117,7 +117,6 @@ public final class RouteEntity {
                 @JsonProperty("service_instance_url") String serviceInstanceUrl,
                 @JsonProperty("space_guid") String spaceId,
                 @JsonProperty("space_url") String spaceUrl) {
-
         this.applicationsUrl = applicationsUrl;
         this.domainId = domainId;
         this.domainUrl = domainUrl;
@@ -129,4 +128,5 @@ public final class RouteEntity {
         this.spaceId = spaceId;
         this.spaceUrl = spaceUrl;
     }
+
 }

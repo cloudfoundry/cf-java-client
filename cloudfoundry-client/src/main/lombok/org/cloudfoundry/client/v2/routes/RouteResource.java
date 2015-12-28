@@ -36,4 +36,5 @@ public final class RouteResource extends Resource<RouteEntity> {
                   @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

@@ -34,7 +34,6 @@ public final class AssociateRouteApplicationResponse extends Resource<RouteEntit
     @Builder
     AssociateRouteApplicationResponse(@JsonProperty("entity") RouteEntity entity,
                                       @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 
