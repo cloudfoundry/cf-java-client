@@ -90,7 +90,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<ListDomainsResponse> listDomains(final ListDomainsRequest request) {
+    public Publisher<ListDomainsResponse> list(final ListDomainsRequest request) {
         return get(request, ListDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

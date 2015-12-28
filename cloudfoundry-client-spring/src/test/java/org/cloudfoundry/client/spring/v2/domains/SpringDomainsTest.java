@@ -253,7 +253,7 @@ public final class SpringDomainsTest {
 
         @Override
         protected Publisher<ListDomainsResponse> invoke(ListDomainsRequest request) {
-            return this.domains.listDomains(request);
+            return this.domains.list(request);
         }
     }
 
