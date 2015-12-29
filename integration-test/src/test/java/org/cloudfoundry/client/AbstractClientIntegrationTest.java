@@ -56,54 +56,57 @@ public abstract class AbstractClientIntegrationTest {
     public final void cleanup() throws Exception {
         Paginated
                 .requestResources(page -> {
-                    ListApplicationsRequest listApplicationsRequest = ListApplicationsRequest.builder()
+                    ListApplicationsRequest request = ListApplicationsRequest.builder()
                             .page(page)
                             .build();
 
-                    return this.cloudFoundryClient.applicationsV2().list(listApplicationsRequest);
+                    return this.cloudFoundryClient.applicationsV2().list(request);
                 })
-                .flatMap(resource -> {
-                    DeleteApplicationRequest deleteApplicationRequest = DeleteApplicationRequest.builder()
-                            .id(Resources.getId(resource))
+                .flatMap(response -> {
+                    DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                            .id(Resources.getId(response))
                             .build();
 
-                    return this.cloudFoundryClient.applicationsV2().delete(deleteApplicationRequest);
+                    return this.cloudFoundryClient.applicationsV2().delete(request);
                 })
                 .subscribe(new TestSubscriber<>());
 
 
         Paginated
                 .requestResources(page -> {
-                    ListRoutesRequest listRoutesRequest = ListRoutesRequest.builder()
+                    ListRoutesRequest request = ListRoutesRequest.builder()
                             .page(page)
                             .build();
 
-                    return this.cloudFoundryClient.routes().list(listRoutesRequest);
+                    return this.cloudFoundryClient.routes().list(request);
                 })
-                .flatMap(resource -> {
-                    DeleteRouteRequest deleteRouteRequest = DeleteRouteRequest.builder()
-                            .id(Resources.getId(resource))
+                .flatMap(response -> {
+                    DeleteRouteRequest request = DeleteRouteRequest.builder()
+                            .id(Resources.getId(response))
                             .build();
 
-                    return this.cloudFoundryClient.routes().delete(deleteRouteRequest);
+                    return this.cloudFoundryClient.routes().delete(request);
                 })
                 .subscribe(new TestSubscriber<>());
 
         Paginated
                 .requestResources(page -> {
-                    ListDomainsRequest listDomainsRequest = ListDomainsRequest.builder()
+                    ListDomainsRequest request = ListDomainsRequest.builder()
                             .page(page)
                             .build();
 
-                    return this.cloudFoundryClient.domains().list(listDomainsRequest);
+                    return this.cloudFoundryClient.domains().list(request);
                 })
-                .filter(resource -> !Resources.getEntity(resource).getName().equals("local.micropcf.io"))
-                .flatMap(resource -> {
-                    DeleteDomainRequest deleteDomainRequest = DeleteDomainRequest.builder()
-                            .id(Resources.getId(resource))
+                .filter(response -> {
+                    String name = Resources.getEntity(response).getName();
+                    return !name.equals("local.micropcf.io") && !name.endsWith(".xip.io");
+                })
+                .flatMap(response -> {
+                    DeleteDomainRequest request = DeleteDomainRequest.builder()
+                            .id(Resources.getId(response))
                             .build();
 
-                    return this.cloudFoundryClient.domains().delete(deleteDomainRequest);
+                    return this.cloudFoundryClient.domains().delete(request);
                 })
                 .subscribe(new TestSubscriber<>());
     }
