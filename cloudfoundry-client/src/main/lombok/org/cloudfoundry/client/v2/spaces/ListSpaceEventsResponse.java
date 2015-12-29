@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 
 import java.util.List;
@@ -33,15 +34,31 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceEventsResponse extends PaginatedResponse<EventResource> {
+public final class ListSpaceEventsResponse extends PaginatedResponse<ListSpaceEventsResponse.Resource> {
 
     @Builder
     ListSpaceEventsResponse(@JsonProperty("next_url") String nextUrl,
                             @JsonProperty("prev_url") String previousUrl,
-                            @JsonProperty("resources") @Singular List<EventResource> resources,
+                            @JsonProperty("resources") @Singular List<ListSpaceEventsResponse.Resource> resources,
                             @JsonProperty("total_pages") Integer totalPages,
                             @JsonProperty("total_results") Integer totalResults) {
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
+    }
+
+    /**
+     * The entity response payload for the List Space Events operation
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static final class Resource extends EventResource {
+
+        @Builder
+        Resource(@JsonProperty("entity") EventEntity entity,
+                 @JsonProperty("metadata") Metadata metadata) {
+            super(entity, metadata);
+        }
+
     }
 
 }

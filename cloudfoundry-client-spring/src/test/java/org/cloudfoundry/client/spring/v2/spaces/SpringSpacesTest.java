@@ -25,7 +25,6 @@ import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -1116,7 +1115,7 @@ public final class SpringSpacesTest {
             return ListSpaceEventsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
-                    .resource(EventResource.builder()
+                    .resource(ListSpaceEventsResponse.Resource.builder()
                             .metadata(Metadata.builder()
                                     .id("cbb42f10-2737-4522-95dc-3ada35056fa8")
                                     .url("/v2/events/cbb42f10-2737-4522-95dc-3ada35056fa8")
