@@ -35,7 +35,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 import reactor.rx.Stream;
@@ -44,9 +43,6 @@ import reactor.rx.Streams;
 import static org.junit.Assert.assertEquals;
 
 public final class RoutesTest extends AbstractClientIntegrationTest {
-
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
 
     private Stream<String> domainId;
 

@@ -275,13 +275,6 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
         assertEquals(organizationId, entity.getOwningOrganizationId());
     }
 
-    private void assertTupleEquality(Tuple2<String, String> tuple) {
-        String expected = tuple.t1;
-        String actual = tuple.t2;
-
-        assertEquals(expected, actual);
-    }
-
     private Stream<CreateDomainResponse> createDomain(String organizationId) {
         CreateDomainRequest request = CreateDomainRequest.builder()
                 .name("test.domain.name")

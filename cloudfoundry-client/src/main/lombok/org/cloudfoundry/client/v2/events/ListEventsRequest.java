@@ -54,6 +54,7 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
      * @param timestamps the timestamps
      * @return the timestamps
      */
+    @Getter(onMethod = @__(@FilterParameter(name = "timestamp", operation = GREATER_THAN_OR_EQUAL_TO)))
     private final List<String> timestamps;
 
     /**
@@ -74,18 +75,6 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
         this.actees = actees;
         this.timestamps = timestamps;
         this.types = types;
-    }
-
-    /**
-     * The timestamps
-     *
-     * @return the timestamps
-     */
-    @FilterParameter(name = "timestamp", operation = GREATER_THAN_OR_EQUAL_TO)
-    public List<String> getTimestamps() {
-        // This method exists because annotations with arguments break Lombok.
-        // https://github.com/rzwitserloot/lombok/issues/735
-        return this.timestamps;
     }
 
     @Override

@@ -31,7 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
@@ -103,6 +106,13 @@ public abstract class AbstractClientIntegrationTest {
                     return this.cloudFoundryClient.domains().delete(deleteDomainRequest);
                 })
                 .subscribe(new TestSubscriber<>());
+    }
+
+    protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
+        T expected = tuple.t1;
+        T actual = tuple.t2;
+
+        assertEquals(expected, actual);
     }
 
 }
