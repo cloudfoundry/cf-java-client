@@ -33,7 +33,8 @@ public final class OrganizationsTest {
 
     @Test
     public void list() {
-        Streams.wrap(this.cloudFoundryOperations.organizations().list())
+        Streams
+                .wrap(this.cloudFoundryOperations.organizations().list())
                 .count()
                 .subscribe(new TestSubscriber<Long>()
                         .assertEquals(1L));

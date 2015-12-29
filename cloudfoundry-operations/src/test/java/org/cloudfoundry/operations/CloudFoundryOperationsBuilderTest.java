@@ -186,8 +186,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Streams.just(spaceResponse,
-                spaceResponse));
+        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Streams.just(spaceResponse, spaceResponse));
 
         this.builder
                 .cloudFoundryClient(this.cloudFoundryClient)

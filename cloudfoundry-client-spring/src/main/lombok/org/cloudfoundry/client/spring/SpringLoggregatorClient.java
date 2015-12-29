@@ -137,7 +137,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         GetInfoRequest request = GetInfoRequest.builder()
                 .build();
 
-        return Streams.wrap(cloudFoundryClient.info().get(request))
+        return Streams
+                .wrap(cloudFoundryClient.info().get(request))
                 .map(new Function<GetInfoResponse, String>() {
 
                     @Override
@@ -159,7 +160,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
-        return Validators.stream(request)
+        return Validators
+                .stream(request)
                 .flatMap(new Function<V, Publisher<T>>() {
 
                     @Override

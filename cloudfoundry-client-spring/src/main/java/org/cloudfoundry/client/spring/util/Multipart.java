@@ -38,37 +38,38 @@ public final class Multipart {
     private static final String DASHES = "--";
 
     public static Stream<byte[]> from(final InputStream inputStream, final String boundary) {
-        return Streams.create(new Consumer<SubscriberWithContext<byte[], Void>>() {
+        return Streams
+                .create(new Consumer<SubscriberWithContext<byte[], Void>>() {
 
-            @Override
-            public void accept(SubscriberWithContext<byte[], Void> subscriber) {
-                try {
-                    byte[] part = getPart(inputStream, boundary);
+                    @Override
+                    public void accept(SubscriberWithContext<byte[], Void> subscriber) {
+                        try {
+                            byte[] part = getPart(inputStream, boundary);
 
-                    if (part == null) {
-                        subscriber.onComplete();
-                    } else {
-                        subscriber.onNext(part);
+                            if (part == null) {
+                                subscriber.onComplete();
+                            } else {
+                                subscriber.onNext(part);
+                            }
+                        } catch (IOException e) {
+                            subscriber.onError(e);
+                        }
                     }
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-            }
 
-        }, new Function<Subscriber<? super byte[]>, Void>() {
+                }, new Function<Subscriber<? super byte[]>, Void>() {
 
-            @Override
-            public Void apply(Subscriber<? super byte[]> subscriber) {
-                try {
-                    primeStream(inputStream, boundary);
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
+                    @Override
+                    public Void apply(Subscriber<? super byte[]> subscriber) {
+                        try {
+                            primeStream(inputStream, boundary);
+                        } catch (IOException e) {
+                            subscriber.onError(e);
+                        }
 
-                return null;
-            }
+                        return null;
+                    }
 
-        });
+                });
     }
 
     private static void discardHeader(InputStream in) throws IOException {

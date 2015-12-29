@@ -34,7 +34,7 @@ public final class SpringLoggregatorClientTest {
     public static final class Recent extends AbstractApiTest<RecentLogsRequest, Long> {
 
         private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
-        
+
         private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class, Mockito.RETURNS_SMART_NULLS);
 
         private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, Mockito.RETURNS_SMART_NULLS);
@@ -69,7 +69,8 @@ public final class SpringLoggregatorClientTest {
 
         @Override
         protected Publisher<Long> invoke(RecentLogsRequest request) {
-            return Streams.wrap(this.client.recent(request))
+            return Streams
+                    .wrap(this.client.recent(request))
                     .count();
         }
 

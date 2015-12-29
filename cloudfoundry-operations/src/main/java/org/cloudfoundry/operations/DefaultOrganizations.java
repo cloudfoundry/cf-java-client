@@ -33,7 +33,8 @@ final class DefaultOrganizations implements Organizations {
 
     @Override
     public Publisher<Organization> list() {
-        return Paginated.requestResources(requestPage(this.cloudFoundryClient))
+        return Paginated
+                .requestResources(requestPage(this.cloudFoundryClient))
                 .map(toOrganization());
     }
 

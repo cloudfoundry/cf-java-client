@@ -54,7 +54,8 @@ final class DefaultRoutes implements Routes {
 
     @Override
     public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        return Validators.stream(listRoutesRequest)
+        return Validators
+                .stream(listRoutesRequest)
                 .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
                 .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }
@@ -97,7 +98,8 @@ final class DefaultRoutes implements Routes {
                 .id(routeResource.getEntity().getDomainId())
                 .build();
 
-        return Streams.wrap(cloudFoundryClient.domains().get(request))
+        return Streams
+                .wrap(cloudFoundryClient.domains().get(request))
                 .map(extractDomainName());
     }
 
@@ -106,12 +108,14 @@ final class DefaultRoutes implements Routes {
                 .id(routeResource.getEntity().getSpaceId())
                 .build();
 
-        return Streams.wrap(cloudFoundryClient.spaces().get(request))
+        return Streams
+                .wrap(cloudFoundryClient.spaces().get(request))
                 .map(extractSpaceName());
     }
 
     private static Stream<List<String>> requestApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
-        return Paginated.requestResources(requestApplicationPage(cloudFoundryClient, routeResource))
+        return Paginated
+                .requestResources(requestApplicationPage(cloudFoundryClient, routeResource))
                 .map(extractApplicationName())
                 .toList()
                 .stream();
@@ -138,8 +142,9 @@ final class DefaultRoutes implements Routes {
 
             @Override
             public Publisher<Route> apply(RouteResource routeResource) {
-                return Streams.zip(requestApplicationNames(cloudFoundryClient, routeResource), getDomainName(cloudFoundryClient, routeResource), getSpaceName(cloudFoundryClient, routeResource),
-                        toRoute(routeResource));
+                return Streams
+                        .zip(requestApplicationNames(cloudFoundryClient, routeResource), getDomainName(cloudFoundryClient, routeResource), getSpaceName(cloudFoundryClient, routeResource),
+                                toRoute(routeResource));
             }
 
         };

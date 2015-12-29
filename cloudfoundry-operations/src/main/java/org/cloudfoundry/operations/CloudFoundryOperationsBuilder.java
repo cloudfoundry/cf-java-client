@@ -124,7 +124,8 @@ public final class CloudFoundryOperationsBuilder {
             return Streams.fail(new IllegalStateException("No organization targeted"));
         }
 
-        Stream<String> organizationId = Paginated.requestResources(requestOrganizationPage(cloudFoundryClient, organization))
+        Stream<String> organizationId = Paginated
+                .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                 .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
                 .switchIfEmpty(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
                 .map(extractId())

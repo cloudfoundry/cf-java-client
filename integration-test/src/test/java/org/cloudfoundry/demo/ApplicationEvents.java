@@ -95,10 +95,11 @@ public class ApplicationEvents {
         private void run() throws IOException {
             Map<String, String> organizations = new HashMap<>();
 
-            Paginated.requestResources(page -> {
-                ListOrganizationsRequest request = ListOrganizationsRequest.builder().page(page).build();
-                return this.cloudFoundryClient.organizations().list(request);
-            })
+            Paginated
+                    .requestResources(page -> {
+                        ListOrganizationsRequest request = ListOrganizationsRequest.builder().page(page).build();
+                        return this.cloudFoundryClient.organizations().list(request);
+                    })
                     .filter(r -> r.getEntity().getName().startsWith("s1-scs-demo-"))
                     .consume(r -> {
                                 String key = r.getMetadata().getId();
@@ -110,16 +111,17 @@ public class ApplicationEvents {
             this.logger.info("{} Organizations Found", organizations.size());
 
             try (Writer writer = new FileWriter("/Users/bhale/Desktop/scs-usage.csv", true)) {
-                Paginated.requestResources(page -> {
-                    ListEventsRequest request = ListEventsRequest.builder()
-                            .types(EVENT_TYPES)
-                            .timestamp("2015-10-01T05:18:38Z")
-                            .page(page)
-                            .resultsPerPage(100)
-                            .build();
+                Paginated
+                        .requestResources(page -> {
+                            ListEventsRequest request = ListEventsRequest.builder()
+                                    .types(EVENT_TYPES)
+                                    .timestamp("2015-10-01T05:18:38Z")
+                                    .page(page)
+                                    .resultsPerPage(100)
+                                    .build();
 
-                    return this.cloudFoundryClient.events().list(request);
-                })
+                            return this.cloudFoundryClient.events().list(request);
+                        })
                         .filter(r -> organizations.keySet().contains(r.getEntity().getOrganizationId()))
                         .map(r -> {
                             EventEntity entity = r.getEntity();

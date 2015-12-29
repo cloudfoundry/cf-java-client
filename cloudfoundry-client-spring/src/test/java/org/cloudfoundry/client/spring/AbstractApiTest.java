@@ -93,7 +93,8 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
     }
 
     protected final Publisher<byte[]> getContents(Publisher<byte[]> publisher) {
-        return Streams.wrap(publisher)
+        return Streams
+                .wrap(publisher)
                 .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
                 .map(toByteArray());
     }

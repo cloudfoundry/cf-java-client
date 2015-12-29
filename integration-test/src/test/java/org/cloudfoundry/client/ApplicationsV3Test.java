@@ -50,7 +50,8 @@ public final class ApplicationsV3Test {
                 .name("test-name")
                 .build();
 
-        Streams.wrap(this.cloudFoundryClient.applicationsV3().create(createRequest))
+        Streams
+                .wrap(this.cloudFoundryClient.applicationsV3().create(createRequest))
                 .flatMap(createApplicationResponse -> {
                     ListApplicationsRequest listRequest = ListApplicationsRequest.builder()
                             .spaceId(ApplicationsV3Test.this.spaceId)
@@ -72,7 +73,8 @@ public final class ApplicationsV3Test {
                 .spaceId(this.spaceId)
                 .build();
 
-        Streams.wrap(this.cloudFoundryClient.applicationsV3().list(request))
+        Streams
+                .wrap(this.cloudFoundryClient.applicationsV3().list(request))
                 .map(ListApplicationsResponse::getResources)
                 .flatMap(Streams::from)
                 .count()

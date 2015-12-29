@@ -39,7 +39,8 @@ public final class Paginated {
      * @return a stream of <code>U</code> objects.
      */
     public static <U extends PaginatedResponse<?>> Stream<U> requestPages(final Function<Integer, Publisher<U>> pagePublisher) {
-        return Streams.wrap(pagePublisher.apply(1))
+        return Streams
+                .wrap(pagePublisher.apply(1))
                 .take(1)
                 .flatMap(requestAdditionalPages(pagePublisher));
     }
@@ -67,7 +68,8 @@ public final class Paginated {
                     throw new IllegalStateException(String.format("Page response (class %s) has no total pages set", response.getClass().getCanonicalName()));
                 }
 
-                return Streams.range(2, totalPages - 1)
+                return Streams
+                        .range(2, totalPages - 1)
                         .flatMap(requestPage(pagePublisher))
                         .startWith(response);
             }

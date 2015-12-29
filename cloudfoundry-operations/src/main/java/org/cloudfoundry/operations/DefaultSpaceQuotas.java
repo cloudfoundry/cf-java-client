@@ -95,19 +95,20 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
     }
 
     private static Stream<SpaceQuotaDefinitionResource> fromSpaceQuotaDefinitionResourceStream(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
-        return Paginated.requestResources(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+        return Paginated
+                .requestResources(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
-            @Override
-            public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                        .id(organizationId)
-                        .page(page)
-                        .build();
+                    @Override
+                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                        ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                                .id(organizationId)
+                                .page(page)
+                                .build();
 
-                return cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request);
-            }
+                        return cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request);
+                    }
 
-        });
+                });
     }
 
     private static Function<String, Publisher<SpaceQuotaDefinitionResource>> requestSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient) {

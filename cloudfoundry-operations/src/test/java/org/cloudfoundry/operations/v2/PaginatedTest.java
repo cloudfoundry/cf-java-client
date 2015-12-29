@@ -24,79 +24,91 @@ import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.rx.Streams;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public final class PaginatedTest {
 
-    private final static Publisher<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
-        return Streams.just(ListSpacesResponse.builder()
-                .totalPages(totalNumber)
-                .resource(testSpaceResource(i))
-                .build()
-        );
-    }
-
-    private final static SpaceResource testSpaceResource(int i) {
-        return SpaceResource.builder()
-                .metadata(SpaceResource.Metadata.builder()
-                        .id("test-id-" + i)
-                        .build()
-                )
-                .entity(SpaceEntity.builder()
-                        .name("name-" + i)
-                        .build()
-                )
-                .build();
-    }
-
     @Test
-    public final void pageStream() {
-        List<SpaceResource> actual = Paginated.requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
-            @Override
-            public Publisher<ListSpacesResponse> apply(Integer i) {
-                return testPaginatedResponsePublisher(i, 3);
-            }
-        })
+    public void pageStream() {
+        List<SpaceResource> expected = Arrays.asList(testSpaceResource(1), testSpaceResource(2), testSpaceResource(3));
+
+        List<SpaceResource> actual = Paginated
+                .requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
+
+                    @Override
+                    public Publisher<ListSpacesResponse> apply(Integer i) {
+                        return testPaginatedResponsePublisher(i, 3);
+                    }
+
+                })
                 .flatMap(new Function<ListSpacesResponse, Publisher<? extends SpaceResource>>() {
+
                     @Override
                     public Publisher<? extends SpaceResource> apply(ListSpacesResponse response) {
                         return Streams.from(response.getResources());
                     }
+
                 })
-                .toList().get();
-
-        List<SpaceResource> expected = Streams.just(testSpaceResource(1), testSpaceResource(2), testSpaceResource(3))
-                .toList().get();
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public final void resourceStream() {
-        List<SpaceResource> actual = Paginated.requestResources(new Function<Integer, Publisher<ListSpacesResponse>>() {
-            @Override
-            public Publisher<ListSpacesResponse> apply(Integer i) {
-                return testPaginatedResponsePublisher(i - 1, 3);
-            }
-        }).toList().get();
-
-        List<SpaceResource> expected = Streams.just(testSpaceResource(0), testSpaceResource(1), testSpaceResource(2))
                 .toList().get();
 
         assertEquals(expected, actual);
     }
 
     @Test(expected = IllegalStateException.class)
-    public final void pageStreamNoTotalPages() {
-        Paginated.requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
-            @Override
-            public Publisher<ListSpacesResponse> apply(Integer page) {
-                return Streams.just(ListSpacesResponse.builder()
-                        .resource(testSpaceResource(0))
-                        .build());
-            }
-        }).toList().get();
+    public void pageStreamNoTotalPages() {
+        Paginated
+                .requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
+
+                    @Override
+                    public Publisher<ListSpacesResponse> apply(Integer page) {
+                        ListSpacesResponse response = ListSpacesResponse.builder()
+                                .resource(testSpaceResource(0))
+                                .build();
+
+                        return Streams.just(response);
+                    }
+
+                }).toList().get();
     }
+
+    @Test
+    public void resourceStream() {
+        List<SpaceResource> expected = Arrays.asList(testSpaceResource(0), testSpaceResource(1), testSpaceResource(2));
+
+        List<SpaceResource> actual = Paginated
+                .requestResources(new Function<Integer, Publisher<ListSpacesResponse>>() {
+
+                    @Override
+                    public Publisher<ListSpacesResponse> apply(Integer i) {
+                        return testPaginatedResponsePublisher(i - 1, 3);
+                    }
+
+                }).toList().get();
+
+        assertEquals(expected, actual);
+    }
+
+    private static Publisher<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
+        ListSpacesResponse response = ListSpacesResponse.builder()
+                .totalPages(totalNumber)
+                .resource(testSpaceResource(i))
+                .build();
+
+        return Streams.just(response);
+    }
+
+    private static SpaceResource testSpaceResource(int i) {
+        return SpaceResource.builder()
+                .metadata(SpaceResource.Metadata.builder()
+                        .id("test-id-" + i)
+                        .build())
+                .entity(SpaceEntity.builder()
+                        .name("name-" + i)
+                        .build())
+                .build();
+    }
+
 }

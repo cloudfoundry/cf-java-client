@@ -33,7 +33,8 @@ public final class SpacesTest {
 
     @Test
     public void list() {
-        Streams.wrap(this.cloudFoundryOperations.spaces().list())
+        Streams
+                .wrap(this.cloudFoundryOperations.spaces().list())
                 .count()
                 .subscribe(new TestSubscriber<Long>()
                         .assertEquals(1L));

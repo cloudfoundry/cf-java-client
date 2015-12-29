@@ -66,7 +66,8 @@ public class DeleteServices {
                     .spaceId("371e051f-8521-42bc-acef-ac11cc896323")
                     .build();
 
-            Streams.wrap(this.cloudFoundryClient.serviceInstances().list(request))
+            Streams
+                    .wrap(this.cloudFoundryClient.serviceInstances().list(request))
                     .flatMap(r -> Streams.from(r.getResources()))
                     .count()
                     .consume(System.out::println);
