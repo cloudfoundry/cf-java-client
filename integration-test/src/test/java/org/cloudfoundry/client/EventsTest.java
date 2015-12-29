@@ -72,18 +72,6 @@ public final class EventsTest extends AbstractClientIntegrationTest {
                 })
                 .subscribe(new TestSubscriber<Tuple2<EventResource, EventResource>>()
                         .assertThat(this::assertTupleEquality));
-
-
-        ListEventsRequest listEventsRequest = ListEventsRequest.builder()
-                .actee("fc77e7f1-48b1-42f8-b0ff-ceb1a0dc52a9")
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.events().list(listEventsRequest))
-                .flatMap(Resources::getResources)
-                .count()
-                .subscribe(new TestSubscriber<Long>()
-                        .assertThat(count -> assertTrue(count > 0)));
     }
 
     @Test
