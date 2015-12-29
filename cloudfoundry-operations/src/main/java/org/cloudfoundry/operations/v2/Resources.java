@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
+import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 public final class Resources {
@@ -44,18 +45,18 @@ public final class Resources {
     }
 
     /**
-     * Generate the stream of resources accumulated from a series of responses.
+     * Returns a function to extract the resources from a response
      *
-     * @param <R> the type of resource in the list on each {@link PaginatedResponse}.
-     * @param <U> the type of {@link PaginatedResponse}.
-     * @return a stream of <code>R</code> objects.
+     * @param <R> the resource type
+     * @param <U> the response type
+     * @return the function to extract the resources from the response
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Publisher<R>> extractResources() {
         return new Function<U, Publisher<R>>() {
 
             @Override
             public Publisher<R> apply(U pageResponse) {
-                return Streams.from(pageResponse.getResources());
+                return getResources(pageResponse);
             }
 
         };
@@ -80,6 +81,18 @@ public final class Resources {
      */
     public static String getId(Resource<?> resource) {
         return resource.getMetadata().getId();
+    }
+
+    /**
+     * Return a stream of resources from a response
+     *
+     * @param response the response
+     * @param <R>      the resource type
+     * @param <U>      the response type
+     * @return a stream of resources from the response
+     */
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> getResources(U response) {
+        return Streams.from(response.getResources());
     }
 
 }

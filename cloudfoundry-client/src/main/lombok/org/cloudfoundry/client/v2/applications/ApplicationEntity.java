@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,7 +80,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
      * @param ports the ports
      * @return the ports
      */
-    private final String ports;
+    private final List<Integer> ports;
 
     /**
      * The routes url
@@ -159,7 +160,7 @@ public final class ApplicationEntity extends AbstractApplicationEntity {
                       @JsonProperty("stack_url") String stackUrl,
                       @JsonProperty("staging_failed_description") String stagingFailedDescription,
                       @JsonProperty("staging_failed_reason") String stagingFailedReason,
-                      @JsonProperty("ports") String ports,
+                      @JsonProperty("ports") @Singular List<Integer> ports,
                       @JsonProperty("staging_task_id") String stagingTaskId,
                       @JsonProperty("state") String state,
                       @JsonProperty("version") String version) {

@@ -26,6 +26,7 @@ import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
+import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
@@ -58,6 +59,17 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         return this.organizationId
                 .flatMap(requestSpaceQuotaDefinition(this.cloudFoundryClient))
                 .map(toSpaceQuota());
+    }
+
+    private static Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
+        return new Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
+
+            @Override
+            public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
+                return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
+            }
+
+        };
     }
 
     private static Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> equalRequestAndDefinitionName() {
@@ -119,10 +131,10 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
             @Override
             public Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-                GetSpaceQuotaRequest request = tuple.t1;
                 String organizationId = tuple.t2;
 
-                return Streams.zip(Streams.just(request), fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId));
+                return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId)
+                        .map(combineRequestWithDefinition(tuple));
             }
 
         };

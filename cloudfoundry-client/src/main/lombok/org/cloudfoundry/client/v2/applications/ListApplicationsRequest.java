@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
 
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
+
 /**
  * The request payload for the List all Apps operation
  */
@@ -38,13 +40,13 @@ import java.util.List;
 public final class ListApplicationsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The diego flags
+     * The diego flag
      *
-     * @param diegos the diego flags
-     * @return the diego flags
+     * @param diego the diego flag
+     * @return the diego flag
      */
-    @Getter(onMethod = @__(@FilterParameter("diego")))
-    private final List<Boolean> diegos;
+    @Getter(onMethod = @__(@FilterParameter(value = "diego", operation = IS)))
+    private final Boolean diego;
 
     /**
      * The names
@@ -84,14 +86,14 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
 
     @Builder
     ListApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                            @Singular List<Boolean> diegos,
+                            Boolean diego,
                             @Singular List<String> names,
                             @Singular List<String> organizationIds,
                             @Singular List<String> spaceIds,
                             @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
 
-        this.diegos = diegos;
+        this.diego = diego;
         this.names = names;
         this.organizationIds = organizationIds;
         this.spaceIds = spaceIds;

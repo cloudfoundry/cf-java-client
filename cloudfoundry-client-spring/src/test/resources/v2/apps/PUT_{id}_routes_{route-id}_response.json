@@ -39,6 +39,7 @@
     "stack_url": "/v2/stacks/46576b60-3d3e-42a6-bdb3-171bc2dedfc4",
     "events_url": "/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/events",
     "service_bindings_url": "/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/service_bindings",
-    "routes_url": "/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/routes"
+    "routes_url": "/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/routes",
+    "ports": []
   }
 }

@@ -40,6 +40,7 @@
     "stack_url": "/v2/stacks/d449ecea-669f-448a-a9e7-ec84d51e2fdb",
     "events_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/events",
     "service_bindings_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/service_bindings",
-    "routes_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/routes"
+    "routes_url": "/v2/apps/78d1a119-2ded-405f-8675-421d8dade602/routes",
+    "ports": []
   }
 }

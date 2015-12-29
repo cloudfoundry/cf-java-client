@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
 
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
+
 /**
  * The request payload for the List all Routes operation
  */
@@ -61,8 +63,8 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
-    private final List<String> organizationIds;
+    @Getter(onMethod = @__(@FilterParameter(value = "organization_guid", operation = IS)))
+    private final String organizationId;
 
     /**
      * The paths
@@ -77,13 +79,13 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
     ListRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                       @Singular List<String> domainIds,
                       @Singular List<String> hosts,
-                      @Singular List<String> organizationIds,
+                      String organizationId,
                       @Singular List<String> paths) {
         super(orderDirection, page, resultsPerPage);
 
         this.domainIds = domainIds;
         this.hosts = hosts;
-        this.organizationIds = organizationIds;
+        this.organizationId = organizationId;
         this.paths = paths;
     }
 

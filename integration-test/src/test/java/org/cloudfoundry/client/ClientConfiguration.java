@@ -27,7 +27,6 @@ import org.cloudfoundry.operations.UnexpectedResponseException;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -114,7 +113,7 @@ public class ClientConfiguration {
     }
 
 
-    private <T extends Resource<?>> Publisher<T> failIfLessThanOne(String message) {
+    private <T extends Resource<?>> Stream<T> failIfLessThanOne(String message) {
         return Streams.fail(new IllegalArgumentException(message));
     }
 

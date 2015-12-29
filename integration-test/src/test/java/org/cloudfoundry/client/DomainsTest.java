@@ -17,136 +17,83 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
-import org.cloudfoundry.client.v2.domains.GetDomainResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
-import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
-import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
+import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ClientConfiguration.class)
-public final class DomainsTest {
-
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
-
-    @Autowired
-    private String organizationId;
-
-    @Autowired
-    private String spaceId;
-
-    @Value("${test.space}")
-    private String spaceName;
+public final class DomainsTest extends AbstractClientIntegrationTest {
 
     @Test
     public void create() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        this.cloudFoundryClient.domains().create(createDomainRequest)
-                .subscribe(new TestSubscriber<CreateDomainResponse>()
-                        .assertThat(response -> {
-                            DomainEntity entity = response.getEntity();
-
-                            assertEquals("test.domain.name", entity.getName());
-                            assertEquals(this.organizationId, entity.getOwningOrganizationId());
-                        }));
+        this.organizationId
+                .flatMap(organizationId -> Streams.zip(this.organizationId, createDomainEntity(organizationId)))
+                .subscribe(new TestSubscriber<Tuple2<String, DomainEntity>>()
+                        .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
     @Test
     public void delete() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    DeleteDomainRequest deleteDomainRequest = DeleteDomainRequest.builder()
-                            .id(response.getMetadata().getId())
+        this.organizationId
+                .flatMap(this::createDomainId)
+                .flatMap(domainId -> {
+                    DeleteDomainRequest request = DeleteDomainRequest.builder()
+                            .id(domainId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().delete(deleteDomainRequest);
+                    return this.cloudFoundryClient.domains().delete(request);
                 })
                 .subscribe(new TestSubscriber<>());
     }
 
     @Test
     public void get() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    GetDomainRequest getDomainRequest = GetDomainRequest.builder()
-                            .id(response.getMetadata().getId())
+        this.organizationId
+                .flatMap(this::createDomainId)
+                .flatMap(domainId -> {
+                    GetDomainRequest request = GetDomainRequest.builder()
+                            .id(domainId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().get(getDomainRequest);
-                })
-                .subscribe(new TestSubscriber<GetDomainResponse>()
-                        .assertThat(response -> {
-                            DomainEntity entity = response.getEntity();
+                    Stream<DomainEntity> domainEntity = Streams
+                            .wrap(this.cloudFoundryClient.domains().get(request))
+                            .map(Resources::getEntity);
 
-                            assertEquals("test.domain.name", entity.getName());
-                            assertEquals(this.organizationId, entity.getOwningOrganizationId());
-                        }));
+
+                    return Streams.zip(this.organizationId, domainEntity);
+                })
+                .subscribe(new TestSubscriber<Tuple2<String, DomainEntity>>()
+                        .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
     @Test
     public void list() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
+        this.organizationId
+                .flatMap(this::createDomain)
                 .flatMap(response -> {
-                    ListDomainsRequest listDomainsRequest = ListDomainsRequest.builder()
+                    ListDomainsRequest request = ListDomainsRequest.builder()
                             .build();
 
-                    return this.cloudFoundryClient.domains().list(listDomainsRequest);
+                    return Streams
+                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .flatMap(Resources::getResources);
                 })
-                .flatMap(Resources.extractResources())
                 .count()
                 .subscribe(new TestSubscriber<>()
                         .assertEquals(2L));
@@ -154,69 +101,78 @@ public final class DomainsTest {
 
     @Test
     public void listDomainSpaces() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    ListDomainSpacesRequest listDomainSpacesRequest = ListDomainSpacesRequest.builder()
-                            .id(response.getMetadata().getId())
+        this.organizationId
+                .flatMap(this::createDomainId)
+                .flatMap(domainId -> {
+                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
+                            .id(domainId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().listSpaces(listDomainSpacesRequest);
+                    Stream<String> actual = Streams
+                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .flatMap(Resources::getResources)
+                            .map(Resources::getId);
+
+                    return Streams.zip(this.spaceId, actual);
                 })
-                .flatMap(Resources.extractResources())
-                .map(resource -> resource.getMetadata().getId())
-                .subscribe(new TestSubscriber<>()
-                        .assertEquals(this.spaceId));
+                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                        .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listDomainSpacesFilterByApplicationId() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
-                .name("test-application-name")
-                .spaceId(this.spaceId)
-                .build();
-
-        Streams
-                .zip(this.cloudFoundryClient.domains().create(createDomainRequest), this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
+        this.organizationId
+                .flatMap(organizationId -> Streams.zip(this.spaceId, createDomainId(organizationId)))
                 .flatMap(tuple -> {
+                    String spaceId = tuple.t1;
+                    String domainId = tuple.t2;
+
+                    CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
+                            .name("test-application-name")
+                            .spaceId(spaceId)
+                            .build();
+
+                    Stream<String> applicationId = Streams
+                            .wrap(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
+                            .map(Resources::getId);
+
                     CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
-                            .domainId(tuple.getT1().getMetadata().getId())
-                            .spaceId(this.spaceId)
+                            .domainId(domainId)
+                            .spaceId(spaceId)
                             .build();
 
-                    return Streams
+                    Stream<String> routeId = Streams
                             .wrap(this.cloudFoundryClient.routes().create(createRouteRequest))
-                            .map(response -> Tuple.of(tuple.getT1(), tuple.getT2(), response));
+                            .map(Resources::getId);
+
+                    return Streams.zip(Streams.just(domainId), applicationId, routeId, t -> t);
                 })
                 .flatMap(tuple -> {
-                    AssociateRouteApplicationRequest associateRouteApplicationRequest = AssociateRouteApplicationRequest.builder()
-                            .id(tuple.getT3().getMetadata().getId())
-                            .applicationId(tuple.getT2().getMetadata().getId())
+                    String domainId = tuple.t1;
+                    String applicationId = tuple.t2;
+                    String routeId = tuple.t3;
+
+                    AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
+                            .id(routeId)
+                            .applicationId(applicationId)
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().associateApplication(associateRouteApplicationRequest))
-                            .map(response -> Tuple.of(tuple.getT1(), tuple.getT2()));
+                            .wrap(this.cloudFoundryClient.routes().associateApplication(request))
+                            .map(response -> Tuple.of(domainId, applicationId));
                 })
-                .flatMap((Tuple2<CreateDomainResponse, CreateApplicationResponse> tuple) -> {
-                    ListDomainSpacesRequest listDomainSpacesRequest = ListDomainSpacesRequest.builder()
-                            .applicationId(tuple.getT2().getMetadata().getId())
-                            .id(tuple.getT1().getMetadata().getId())
+                .flatMap((Tuple2<String, String> tuple) -> {
+                    String domainId = tuple.t1;
+                    String applicationId = tuple.t2;
+
+                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
+                            .applicationId(applicationId)
+                            .id(domainId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().listSpaces(listDomainSpacesRequest);
+                    return Streams
+                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .flatMap(Resources::getResources);
                 })
                 .count()
                 .subscribe(new TestSubscriber<>()
@@ -231,69 +187,62 @@ public final class DomainsTest {
 
     @Test
     public void listDomainSpacesFilterByName() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    ListDomainSpacesRequest listDomainSpacesRequest = ListDomainSpacesRequest.builder()
-                            .id(response.getMetadata().getId())
+        this.organizationId
+                .flatMap(this::createDomainId)
+                .flatMap(domainId -> {
+                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
+                            .id(domainId)
                             .name("test.domain.name")
                             .build();
 
-                    return this.cloudFoundryClient.domains().listSpaces(listDomainSpacesRequest);
+                    Stream<String> actual = Streams
+                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .flatMap(Resources::getResources)
+                            .map(Resources::getId);
+
+                    return Streams.zip(this.spaceId, actual);
                 })
-                .flatMap(Resources.extractResources())
-                .subscribe(new TestSubscriber<>()
-                        .assertEquals(this.spaceId));
+                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                        .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
+        this.organizationId
+                .flatMap(organizationId -> Streams.zip(this.organizationId, createDomainId(organizationId)))
+                .flatMap(tuple -> {
+                    String organizationId = tuple.t1;
+                    String domainId = tuple.t2;
 
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    ListDomainSpacesRequest listDomainSpacesRequest = ListDomainSpacesRequest.builder()
-                            .id(response.getMetadata().getId())
-                            .organizationId(this.organizationId)
+                    ListDomainSpacesRequest response = ListDomainSpacesRequest.builder()
+                            .id(domainId)
+                            .organizationId(organizationId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().listSpaces(listDomainSpacesRequest);
+                    Stream<String> actual = Streams
+                            .wrap(this.cloudFoundryClient.domains().listSpaces(response))
+                            .flatMap(Resources::getResources)
+                            .map(Resources::getId);
+
+                    return Streams.zip(this.organizationId, actual);
                 })
-                .flatMap(Resources.extractResources())
-                .map(resource -> resource.getMetadata().getId())
-                .subscribe(new TestSubscriber<>()
-                        .assertEquals(this.spaceId));
+                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                        .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listFilterByName() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
+        this.organizationId
+                .flatMap(this::createDomain)
                 .flatMap(response -> {
-                    ListDomainsRequest listDomainsRequest = ListDomainsRequest.builder()
+                    ListDomainsRequest request = ListDomainsRequest.builder()
                             .name("test.domain.name")
                             .build();
 
-                    return this.cloudFoundryClient.domains().list(listDomainsRequest);
+                    return Streams
+                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .flatMap(Resources::getResources);
                 })
-                .flatMap(Resources.extractResources())
                 .count()
                 .subscribe(new TestSubscriber<>()
                         .assertEquals(1L));
@@ -301,81 +250,56 @@ public final class DomainsTest {
 
     @Test
     public void listFilterByOwningOrganizationId() {
-        CreateDomainRequest createDomainRequest = CreateDomainRequest.builder()
-                .name("test.domain.name")
-                .owningOrganizationId(this.organizationId)
-                .wildcard(true)
-                .build();
-
-        Streams
-                .wrap(this.cloudFoundryClient.domains().create(createDomainRequest))
-                .flatMap(response -> {
-                    ListDomainsRequest listDomainsRequest = ListDomainsRequest.builder()
-                            .owningOrganizationId(this.organizationId)
+        this.organizationId
+                .flatMap(organizationId -> createDomain(organizationId)
+                        .flatMap(response -> this.organizationId))
+                .flatMap(organizationId -> {
+                    ListDomainsRequest request = ListDomainsRequest.builder()
+                            .owningOrganizationId(organizationId)
                             .build();
 
-                    return this.cloudFoundryClient.domains().list(listDomainsRequest);
+                    return Streams
+                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .flatMap(Resources::getResources);
                 })
-                .flatMap(Resources.extractResources())
                 .count()
                 .subscribe(new TestSubscriber<>()
                         .assertEquals(1L));
     }
 
-    @After
-    public void tearDown() throws Exception {
-        Paginated
-                .requestResources(page -> {
-                    ListApplicationsRequest listApplicationsRequest = ListApplicationsRequest.builder()
-                            .page(page)
-                            .build();
+    private void assertDomainNameAndOrganizationId(Tuple2<String, DomainEntity> tuple) {
+        String organizationId = tuple.t1;
+        DomainEntity entity = tuple.t2;
 
-                    return this.cloudFoundryClient.applicationsV2().list(listApplicationsRequest);
-                })
-                .flatMap(resource -> {
-                    DeleteApplicationRequest deleteApplicationRequest = DeleteApplicationRequest.builder()
-                            .id(resource.getMetadata().getId())
-                            .build();
+        assertEquals("test.domain.name", entity.getName());
+        assertEquals(organizationId, entity.getOwningOrganizationId());
+    }
 
-                    return this.cloudFoundryClient.applicationsV2().delete(deleteApplicationRequest);
-                })
-                .subscribe(new TestSubscriber<>());
+    private void assertTupleEquality(Tuple2<String, String> tuple) {
+        String expected = tuple.t1;
+        String actual = tuple.t2;
 
+        assertEquals(expected, actual);
+    }
 
-        Paginated
-                .requestResources(page -> {
-                    ListRoutesRequest listRoutesRequest = ListRoutesRequest.builder()
-                            .page(page)
-                            .build();
+    private Stream<CreateDomainResponse> createDomain(String organizationId) {
+        CreateDomainRequest request = CreateDomainRequest.builder()
+                .name("test.domain.name")
+                .owningOrganizationId(organizationId)
+                .wildcard(true)
+                .build();
 
-                    return this.cloudFoundryClient.routes().list(listRoutesRequest);
-                })
-                .flatMap(resource -> {
-                    DeleteRouteRequest deleteRouteRequest = DeleteRouteRequest.builder()
-                            .id(resource.getMetadata().getId())
-                            .build();
+        return Streams.wrap(this.cloudFoundryClient.domains().create(request));
+    }
 
-                    return this.cloudFoundryClient.routes().delete(deleteRouteRequest);
-                })
-                .subscribe(new TestSubscriber<>());
+    private Stream<DomainEntity> createDomainEntity(String organizationId) {
+        return createDomain(organizationId)
+                .map(Resources::getEntity);
+    }
 
-        Paginated
-                .requestResources(page -> {
-                    ListDomainsRequest listDomainsRequest = ListDomainsRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().list(listDomainsRequest);
-                })
-                .filter(resource -> !resource.getEntity().getName().equals("local.micropcf.io"))
-                .flatMap(resource -> {
-                    DeleteDomainRequest deleteDomainRequest = DeleteDomainRequest.builder()
-                            .id(resource.getMetadata().getId())
-                            .build();
-
-                    return this.cloudFoundryClient.domains().delete(deleteDomainRequest);
-                })
-                .subscribe(new TestSubscriber<>());
+    private Stream<String> createDomainId(String organizationId) {
+        return createDomain(organizationId)
+                .map(response -> response.getMetadata().getId());
     }
 
 }
