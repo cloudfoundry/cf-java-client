@@ -48,7 +48,8 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .zip(Validators.stream(getSpaceQuotaRequest), this.organizationId)
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
-                .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
+                .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(
+                        new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
                 .map(extractQuotaDefinition())
                 .map(toSpaceQuota());
     }
@@ -65,7 +66,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
             @Override
             public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
-                return Tuple.of(tuple.getT1(), spaceQuotaDefinitionResource);
+                return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
             }
 
         };
@@ -76,7 +77,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
             @Override
             public boolean test(Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> tuple) {
-                return tuple.getT1().getName().equals(tuple.getT2().getEntity().getName());
+                return tuple.t1.getName().equals(tuple.t2.getEntity().getName());
             }
 
         };
@@ -87,7 +88,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
             @Override
             public SpaceQuotaDefinitionResource apply(Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> tuple) {
-                return tuple.getT2();
+                return tuple.t2;
             }
 
         };
@@ -120,13 +121,13 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionWithContext(final CloudFoundryClient
-                                                                                                                                                                                        cloudFoundryClient) {
+    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionWithContext(
+            final CloudFoundryClient cloudFoundryClient) {
         return new Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>>() {
 
             @Override
             public Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-                return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, tuple.getT2())
+                return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, tuple.t2)
                         .map(combineRequestWithDefinition(tuple));
             }
 

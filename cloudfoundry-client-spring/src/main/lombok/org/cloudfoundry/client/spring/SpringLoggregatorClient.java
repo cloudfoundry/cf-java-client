@@ -164,18 +164,19 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
                     @Override
                     public Publisher<T> apply(V request) {
-                        return Publishers.createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
+                        return Publishers
+                                .createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
-                            @Override
-                            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
-                                if (n != Long.MAX_VALUE) {
-                                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-                                }
+                                    @Override
+                                    public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
+                                        if (n != Long.MAX_VALUE) {
+                                            subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
+                                        }
 
-                                exchange.accept(subscriber);
-                            }
+                                        exchange.accept(subscriber);
+                                    }
 
-                        });
+                                });
                     }
 
                 });

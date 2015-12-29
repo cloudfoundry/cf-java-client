@@ -223,11 +223,11 @@ final class DefaultRoutes implements Routes {
             @Override
             public Route apply(Tuple3<List<String>, String, String> tuple) {
                 return Route.builder()
-                        .applications(tuple.getT1())
-                        .domain(tuple.getT2())
+                        .applications(tuple.t1)
+                        .domain(tuple.t2)
                         .host(routeResource.getEntity().getHost())
                         .routeId(routeResource.getMetadata().getId())
-                        .space(tuple.getT3())
+                        .space(tuple.t3)
                         .build();
             }
         };
