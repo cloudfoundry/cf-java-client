@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 
@@ -59,8 +60,8 @@ final class DefaultOrganizations implements Organizations {
             @Override
             public Organization apply(ListOrganizationsResponse.Resource resource) {
                 return Organization.builder()
-                        .id(resource.getMetadata().getId())
-                        .name(resource.getEntity().getName())
+                        .id(Resources.getId(resource))
+                        .name(Resources.getEntity(resource).getName())
                         .build();
             }
 

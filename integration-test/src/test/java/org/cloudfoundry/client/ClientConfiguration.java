@@ -21,9 +21,11 @@ import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.operations.UnexpectedResponseException;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 import java.util.List;
@@ -69,7 +72,7 @@ public class ClientConfiguration {
     }
 
     @Bean
-    String organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
+    Stream<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
         return Paginated
                 .requestResources(page -> {
                     ListOrganizationsRequest request = ListOrganizationsRequest.builder()
@@ -80,38 +83,36 @@ public class ClientConfiguration {
                     return cloudFoundryClient.organizations().list(request);
                 })
                 .reduce((resource, resource2) -> failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
-                .switchIfEmpty(failIfLessThanOne(String.format("Organization %s does not exist", organization)))
-                .map(this::extractId)
+                .switchIfEmpty(this.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
+                .map(Resources::getId)
                 .take(1)
-                .next().poll();
+                .cache(1);
     }
 
     @Bean
-    String spaceId(CloudFoundryClient cloudFoundryClient, String organizationId, @Value("${test.space}") String space) {
-        return Paginated
-                .requestResources(page -> {
-                    ListSpacesRequest request = ListSpacesRequest.builder()
-                            .organizationId(organizationId)
-                            .name(space)
-                            .page(page)
-                            .build();
+    Stream<String> spaceId(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, @Value("${test.space}") String space) {
+        return organizationId
+                .flatMap(orgId -> Paginated
+                        .requestResources(page -> {
+                            ListSpacesRequest request = ListSpacesRequest.builder()
+                                    .organizationId(orgId)
+                                    .name(space)
+                                    .page(page)
+                                    .build();
 
-                    return cloudFoundryClient.spaces().list(request);
-                })
+                            return cloudFoundryClient.spaces().list(request);
+                        }))
                 .reduce((resource, resource2) -> failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
                 .switchIfEmpty(failIfLessThanOne(String.format("Space %s does not exist", space)))
-                .map(this::extractId)
+                .map(Resources::getId)
                 .take(1)
-                .next().poll();
+                .cache(1);
     }
 
     private static <T extends Resource<?>> T failIfMoreThanOne(String message) {
         throw new UnexpectedResponseException(message);
     }
 
-    private String extractId(Resource<?> resource) {
-        return resource.getMetadata().getId();
-    }
 
     private <T extends Resource<?>> Publisher<T> failIfLessThanOne(String message) {
         return Streams.fail(new IllegalArgumentException(message));

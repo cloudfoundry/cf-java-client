@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.operations.ListRoutesRequest.Level;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple3;
@@ -54,8 +55,7 @@ final class DefaultRoutes implements Routes {
 
     @Override
     public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        return Validators
-                .stream(listRoutesRequest)
+        return Validators.stream(listRoutesRequest)
                 .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
                 .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }
@@ -64,8 +64,8 @@ final class DefaultRoutes implements Routes {
         return new Function<ApplicationResource, String>() {
 
             @Override
-            public String apply(ApplicationResource applicationResource) {
-                return applicationResource.getEntity().getName();
+            public String apply(ApplicationResource resource) {
+                return Resources.getEntity(resource).getName();
             }
 
         };
@@ -75,8 +75,8 @@ final class DefaultRoutes implements Routes {
         return new Function<GetDomainResponse, String>() {
 
             @Override
-            public String apply(GetDomainResponse getDomainResponse) {
-                return getDomainResponse.getEntity().getName();
+            public String apply(GetDomainResponse response) {
+                return Resources.getEntity(response).getName();
             }
 
         };
@@ -87,15 +87,15 @@ final class DefaultRoutes implements Routes {
 
             @Override
             public String apply(GetSpaceResponse response) {
-                return response.getEntity().getName();
+                return Resources.getEntity(response).getName();
             }
 
         };
     }
 
-    private static Stream<String> getDomainName(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
+    private static Stream<String> getDomainName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
         GetDomainRequest request = GetDomainRequest.builder()
-                .id(routeResource.getEntity().getDomainId())
+                .id(Resources.getEntity(resource).getDomainId())
                 .build();
 
         return Streams
@@ -103,9 +103,9 @@ final class DefaultRoutes implements Routes {
                 .map(extractDomainName());
     }
 
-    private static Stream<String> getSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
+    private static Stream<String> getSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
         GetSpaceRequest request = GetSpaceRequest.builder()
-                .id(routeResource.getEntity().getSpaceId())
+                .id(Resources.getEntity(resource).getSpaceId())
                 .build();
 
         return Streams
@@ -121,13 +121,13 @@ final class DefaultRoutes implements Routes {
                 .stream();
     }
 
-    private static Function<Integer, Publisher<ListRouteApplicationsResponse>> requestApplicationPage(final CloudFoundryClient cloudFoundryClient, final RouteResource routeResource) {
+    private static Function<Integer, Publisher<ListRouteApplicationsResponse>> requestApplicationPage(final CloudFoundryClient cloudFoundryClient, final RouteResource resource) {
         return new Function<Integer, Publisher<ListRouteApplicationsResponse>>() {
 
             @Override
             public Publisher<ListRouteApplicationsResponse> apply(Integer page) {
                 ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                        .id(routeResource.getMetadata().getId())
+                        .id(Resources.getId(resource))
                         .page(page)
                         .build();
 
@@ -222,17 +222,21 @@ final class DefaultRoutes implements Routes {
         };
     }
 
-    private static Function<Tuple3<List<String>, String, String>, Route> toRoute(final RouteResource routeResource) {
+    private static Function<Tuple3<List<String>, String, String>, Route> toRoute(final RouteResource resource) {
         return new Function<Tuple3<List<String>, String, String>, Route>() {
 
             @Override
             public Route apply(Tuple3<List<String>, String, String> tuple) {
+                List<String> applications = tuple.t1;
+                String domainId = tuple.t2;
+                String spaceId = tuple.t3;
+
                 return Route.builder()
-                        .applications(tuple.t1)
-                        .domain(tuple.t2)
-                        .host(routeResource.getEntity().getHost())
-                        .routeId(routeResource.getMetadata().getId())
-                        .space(tuple.t3)
+                        .applications(applications)
+                        .domain(domainId)
+                        .host(Resources.getEntity(resource).getHost())
+                        .routeId(Resources.getId(resource))
+                        .space(spaceId)
                         .build();
             }
         };

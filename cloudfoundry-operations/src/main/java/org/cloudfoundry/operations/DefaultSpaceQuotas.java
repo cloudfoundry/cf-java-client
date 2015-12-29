@@ -17,16 +17,15 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
-import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
@@ -61,23 +60,15 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .map(toSpaceQuota());
     }
 
-    private static Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-        return new Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
-
-            @Override
-            public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
-                return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
-            }
-
-        };
-    }
-
     private static Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> equalRequestAndDefinitionName() {
         return new Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
 
             @Override
             public boolean test(Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> tuple) {
-                return tuple.t1.getName().equals(tuple.t2.getEntity().getName());
+                GetSpaceQuotaRequest request = tuple.t1;
+                SpaceQuotaDefinitionResource resource = tuple.t2;
+
+                return request.getName().equals(Resources.getEntity(resource).getName());
             }
 
         };
@@ -128,8 +119,10 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
             @Override
             public Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-                return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, tuple.t2)
-                        .map(combineRequestWithDefinition(tuple));
+                GetSpaceQuotaRequest request = tuple.t1;
+                String organizationId = tuple.t2;
+
+                return Streams.zip(Streams.just(request), fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId));
             }
 
         };
@@ -139,12 +132,11 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
         return new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
 
             @Override
-            public SpaceQuota apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
-                SpaceQuotaDefinitionEntity entity = spaceQuotaDefinitionResource.getEntity();
-                Resource.Metadata metadata = spaceQuotaDefinitionResource.getMetadata();
+            public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
+                SpaceQuotaDefinitionEntity entity = Resources.getEntity(resource);
 
                 return SpaceQuota.builder()
-                        .id(metadata.getId())
+                        .id(Resources.getId(resource))
                         .instanceMemoryLimit(entity.getInstanceMemoryLimit())
                         .name(entity.getName())
                         .organizationId(entity.getOrganizationId())

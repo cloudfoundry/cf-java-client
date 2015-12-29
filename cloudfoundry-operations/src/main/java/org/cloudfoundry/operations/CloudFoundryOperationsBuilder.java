@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.BiFunction;
 import reactor.fn.Function;
@@ -93,16 +94,7 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private static Function<Resource<?>, String> extractId() {
-        return new Function<Resource<?>, String>() {
 
-            @Override
-            public String apply(Resource<?> resource) {
-                return resource.getMetadata().getId();
-            }
-
-        };
-    }
 
     private static <T extends Resource<?>> Stream<T> failIfLessThanOne(String message) {
         return Streams.fail(new IllegalArgumentException(message));
@@ -128,7 +120,7 @@ public final class CloudFoundryOperationsBuilder {
                 .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                 .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
                 .switchIfEmpty(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
-                .map(extractId())
+                .map(Resources.extractId())
                 .take(1)
                 .cache(1);
 
@@ -145,7 +137,7 @@ public final class CloudFoundryOperationsBuilder {
                 .flatMap(requestResources(cloudFoundryClient, space))
                 .reduce(CloudFoundryOperationsBuilder.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
                 .switchIfEmpty(CloudFoundryOperationsBuilder.<SpaceResource>failIfLessThanOne(String.format("Space %s does not exist", space)))
-                .map(extractId())
+                .map(Resources.extractId())
                 .take(1)
                 .cache(1);
 

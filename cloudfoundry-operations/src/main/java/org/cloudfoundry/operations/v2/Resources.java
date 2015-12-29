@@ -28,10 +28,26 @@ public final class Resources {
     }
 
     /**
+     * Returns a function to extract the id of a resource
+     *
+     * @return the function to extract the id of a resource
+     */
+    public static Function<Resource<?>, String> extractId() {
+        return new Function<Resource<?>, String>() {
+
+            @Override
+            public String apply(Resource<?> resource) {
+                return getId(resource);
+            }
+
+        };
+    }
+
+    /**
      * Generate the stream of resources accumulated from a series of responses.
      *
-     * @param <R>           the type of resource in the list on each {@link PaginatedResponse}.
-     * @param <U>           the type of {@link PaginatedResponse}.
+     * @param <R> the type of resource in the list on each {@link PaginatedResponse}.
+     * @param <U> the type of {@link PaginatedResponse}.
      * @return a stream of <code>R</code> objects.
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Publisher<R>> extractResources() {
@@ -43,6 +59,27 @@ public final class Resources {
             }
 
         };
+    }
+
+    /**
+     * Return the entity of a resource
+     *
+     * @param resource the resource
+     * @param <T>      the type of the resource's entity
+     * @return the resource's entity
+     */
+    public static <T> T getEntity(Resource<T> resource) {
+        return resource.getEntity();
+    }
+
+    /**
+     * Returns the id of a resource
+     *
+     * @param resource the resource
+     * @return the id of the resource
+     */
+    public static String getId(Resource<?> resource) {
+        return resource.getMetadata().getId();
     }
 
 }

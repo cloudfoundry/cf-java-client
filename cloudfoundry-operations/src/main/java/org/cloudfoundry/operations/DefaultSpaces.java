@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.rx.Stream;
@@ -76,8 +77,8 @@ final class DefaultSpaces implements Spaces {
             @Override
             public Space apply(SpaceResource resource) {
                 return Space.builder()
-                        .id(resource.getMetadata().getId())
-                        .name(resource.getEntity().getName())
+                        .id(Resources.getId(resource))
+                        .name(Resources.getEntity(resource).getName())
                         .build();
             }
 
