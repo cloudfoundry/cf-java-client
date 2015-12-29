@@ -6,5 +6,5 @@ source connection/domain
 export TEST_HOST=api.$DOMAIN
 
 pushd cf-java-client
-  ./mvnw -P integration-test package
+  ./mvnw -P integration-test test
 popd

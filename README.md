@@ -1,147 +1,233 @@
+# Cloud Foundry Java Client
+The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components which expose different levels of abstraction depending on need.
 
+* `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect a Cloud Foundry instance on its own.
+* `cloudfoundry-client-spring` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Spring Framework [`RestTemplate`][t].
+* `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-cli` and therefore has a single implementation.
+* `cloudfoundry-maven-plugin` / `cloudfoundry-gradle-plugin` – Build plugins for [Maven][m] and [Gradle][g].  These projects build on `cloudfoundry-operations` and therefore have single implementations.
 
+Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
 
-cf-java-client
-================
-
-The cf-java-client repo contains a Java client library and tools for Cloud Foundry. Three major components are included
-in this repo.
-
-# Components
-
-## cloudfoundry-client-lib
-
-The cloudfoundry-client-lib is a Java library that provides a Java language binding for the Cloud Foundry Cloud Controller REST API.
-The library can be used by Java, Groovy, and Scala apps to interact with a Cloud Foundry service on behalf of a user.
-
-[Read more](http://docs.cloudfoundry.org/buildpacks/java/java-client.html)
-
-## cloudfoundry-maven-plugin
-
-The Cloud Foundry Maven plugin is a plugin for the [Maven build tool](http://maven.apache.org/) that allows you to
-deploy and manage applications with Maven goals.
-
-[Read more](./cloudfoundry-maven-plugin)
-
-## cloudfoundry-gradle-plugin
-
-The Cloud Foundry Gradle plugin is a plugin for the [Gradle build tool](http://www.gradle.org/) that allows you to
-deploy and manage applications with Gradle tasks.
-
-[Read more](./cloudfoundry-gradle-plugin)
-
-# Building
-
-## Prerequisites
-
-### Apache Maven
-
-The `cloudfoundry-client-lib` and `cloudfoundry-maven-plugin` components are built with [Apache Maven](http://maven.apache.org/).
-
-### Gradle
-
-The `cloudfoundry-gradle-plugin` component is built with [Gradle](http://www.gradle.org/).
-
-### Protocol Buffer compiler
-
-The `cloudfoundry-client-lib` uses Protocol Buffers to get logs from the Cloud Foundry [loggregator](https://github.com/cloudfoundry/loggregator)
-component. A `protoc` Protocol Buffer compiler is required at build time to compile message specifications. `protoc` version
-2.6.1 is required.
-
-On Linux with `apt`, run the [install-protoc-apt.sh](./bin/install-protoc-apt.sh) script in this repository to compile `protoc` from source.
-
-On OSX, run the [install-protoc-osx.sh](./bin/install-protoc-osx.sh) script to install `protoc`. Alternatively you can install `protobuf` using [homebrew](http://brew.sh/) if homebrew supports the appropriate version.
-
-On Windows, download the `protoc` binary zip file from the [releases page](https://github.com/google/protobuf/releases),
-unzip it, and put `protoc.exe` in the path.
-
-After installing, run this command and check the output to make sure it is similar to the following:
-
-```
-$ protoc --version
-libprotoc 2.6.1
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.cloudfoundry</groupId>
+        <artifactId>cloudfoundry-client-spring</artifactId>
+        <version>${cf-java-client.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.cloudfoundry</groupId>
+        <artifactId>cloudfoundry-operations</artifactId>
+        <version>${cf-java-client.version}</version>
+    </dependency>
+    ...
+</dependencies>
 ```
 
-## Compiling and Packaging
+The artifacts can be found in the Spring release and snapshot repositories:
 
-To build `cloudfoundry-client-lib` and `cloudfoundry-maven-plugin`, run the following command from the project root directory:
-
-```
-$ mvn clean install
-```
-
-To build `cloudfoundry-gradle-plugin`, run the following command from the `cloudfoundry-gradle-plugin` sub-directory after
-building `cloudfoundry-client-lib`:
-
-```
-$ gradle clean install
+```xml
+<repositories>
+    <repository>
+        <id>spring-releases</id>
+        <name>Spring Releases</name>
+        <url>http://repo.spring.io/release</url>
+    </repository>
+    ...
+</repositories>
 ```
 
-## Running Integration Tests
-
-`cloudfoundry-client-lib` has an extensive set of integration tests which run against a Cloud Foundry service. To execute the
-integration tests, run the following command from the project root directory:
-
-```
-$ mvn -P integration-test clean install -Dccng.target=<endpoint> -Dccng.email=<username> -Dccng.passwd=<password> -Dccng.org=<organization> -Dccng.space=<space>
-```
-
-Following is a complete list of the `-D` parameters that can be passed to the integration test:
-
-| Parameter        | Description                                                     | Required/Optional |
-| ---------        | -----------                                                     | ----------------- |
-| ccng.target      | target Cloud Foundry endpoint (e.g. https://api.run.pivotal.io) | required |
-| ccng.email       | Cloud Foundry username                                          | required |
-| ccng.passwd      | Cloud Foundry password                                          | required |
-| ccng.org         | Cloud Foundry organization to run tests against                 | required |
-| ccng.space       | Cloud Foundry space to run tests against                        | required |
-| ccng.ssl         | trust self-signed certificates from target endpoint             | optional, default is `false` |
-| vcap.mysql.label | label of a MySQL service that can be created                    | optional, default is `cleardb` |
-| vcap.mysql.plan  | plan of a MySQL service that can be created                     | optional, default is `spark` |
-| http.proxyHost   | host name of an HTTP proxy                                      | optional |
-| http.proxyPort   | port of an HTTP proxy                                           | optional |
-
-**Important**
-
-Integration tests should be run against an empty Cloud Foundry space. The integration tests are destructive,
-and will delete any apps, services, routes, and domains existing in the target space.
-
-# Cloud Foundry Resources
-
-_Cloud Foundry Open Source Platform as a Service_
-
-## Learn
-
-Our documentation, currently a work in progress, is available here: [http://docs.cloudfoundry.org/buildpacks/java/java-client.html](http://docs.cloudfoundry.org/buildpacks/java/java-client.html)
-
-## Ask Questions
-
-Questions about the Cloud Foundry Open Source Project can be directed to our Mailing Lists.
-
-* Cloud Foundry Developers:
-[cf-dev](https://lists.cloudfoundry.org/pipermail/cf-dev)
-* BOSH:
-[cf-bosh](https://lists.cloudfoundry.org/pipermail/cf-bosh)
-
-## File a bug
-
-Bugs can be filed using Github Issues within the various repositories of the [Cloud Foundry](http://github.com/cloudfoundry) components, including for [this project](https://github.com/cloudfoundry/cf-java-client/issues)
-
-## OSS Contributions
-
-The Cloud Foundry team uses GitHub and accepts contributions via [pull request](https://help.github.com/articles/using-pull-requests)
-
-Follow these steps to make a contribution to any of our open source repositories:
-
-1. Complete our CLA Agreement for [individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf) or [corporations](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf)
-2. Set your name and email
-
-```
-$ git config --global user.name "Firstname Lastname"
-$ git config --global user.email "your_email@youremail.com"
+```xml
+<repositories>
+    <repository>
+        <id>spring-snapshots</id>
+        <name>Spring Snapshots</name>
+        <url>http://repo.spring.io/snapshot</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    ...
+</repositories>
 ```
 
-3. Fork the repo
-4. Make your changes on a topic branch, commit, and push to github and open a pull request.
+For Gradle, the dependencies would be defined like this:
 
-Once your commits are approved by Concourse CI and reviewed by the core team, they will be merged.
+```groovy
+dependencies {
+    compile "org.cloudfoundry:cloudfoundry-client-spring:$cfJavaClientVersion"
+    compile "org.cloudfoundry:cloudfoundry-operations:$cfJavaClientVersion"
+    ...
+}
+```
+
+The artifacts can be found in the Spring release and snapshot repositories:
+
+```groovy
+repositories {
+    maven { url "http://repo.spring.io/release" }
+    ...
+}
+```
+
+```groovy
+repositories {
+    maven { url "http://repo.spring.io/snapshot" }
+    ...
+}
+```
+
+## Usage
+Both the `cloudfoundry-operations` and `cloudfoundry-client` projects follow a ["Reactive"][r] design pattern and expose their responses with [Reactive Streams][s] `Publisher`s.  The choice to expose Reactive Streams `Publisher`s gives the project interoperability with the various reactive framework implementations such as [Project Reactor][p] and [RxJava][x].  In the examples that follow, Project Reactor is used, but all reactive frameworks work similarly.
+
+### `CloudFoundryClient` and `CloudFoundryOperations` Builders
+
+The lowest-level building block of the API is a `CloudFoundryClient`.  This is only an interface and the default implementation of this is the `SpringCloudFoundryClient`.  To instantiate one, you configure it with a builder:
+
+```java
+SpringCloudFoundryClient.builder()
+    .host("api.run.pivotal.io")
+    .username("example-username")
+    .password("example-password")
+    .build();
+```
+
+In Spring-based applications, you'll want to encapsulate this in a bean definition:
+
+```java
+@Bean
+CloudFoundryClient cloudFoundryClient(@Value("${cf.host}") String host,
+                                      @Value("${cf.username}") String username,
+                                      @Value("${cf.password}") String password) {
+    return SpringCloudFoundryClient.builder()
+            .host(host)
+            .username(username)
+            .password(password)
+            .build();
+}
+```
+
+The `CloudFoundryClient` provides direct access to the raw REST APIs.  This level of abstraction provides the most detailed and powerful access to the Cloud Foundry instance, but also requires users to perform quite a lot of orchestration on their own.  Most users will instead want to work at the `CloudFoundryOperations` layer.  Once again this is only an interface and the default implementation of this is the `DefaultCloudFoundryOperations`.  To instantiate one, you configure it with a builder:
+
+```java
+new CloudFoundryOperationsBuilder()
+    .cloudFoundryClient(cloudFoundryClient)
+    .target("example-organization", "example-space")
+    .build();
+```
+
+In Spring-based applications, you'll want to encapsulate this in a bean definition as well:
+
+```java
+@Bean
+CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+                                              @Value("${cf.organization}") String organization,
+                                              @Value("${cf.space}") String space) {
+    return new CloudFoundryOperationsBuilder()
+            .cloudFoundryClient(cloudFoundryClient)
+            .target(organization, space)
+            .build();
+}
+```
+
+### `CloudFoundryOperations` APIs
+
+Once you've got a reference to the `CloudFoundryOperations`, it's time to start making calls to the Cloud Foundry instance.  One of the simplest possible operations is list all of the organizations the user is a member of.  The following example does three things:
+
+1. Requests a list of all organizations
+1. Extracts the name of each organization
+1. Prints the name of the each organization to `System.out`
+
+```java
+Streams
+    .wrap(this.cloudFoundryOperations.organizations().list())
+    .map(Organization::getName)
+    .consume(System.out::println);
+```
+
+To relate the example to the description above the following happens:
+
+1. `Streams.wrap(...)` – Wraps the Reactive Streams `Publisher` (an interoperability type) in the Reactor-native `Stream` type
+1. `.map(...)` – Maps an input type to an output type.  This example uses a method a reference and the equivalent lambda would look like `organization -> organization.getName()`.
+1. `consume...` – The terminal operation that consumes each item in the stream.  Again, this example uses a method reference and the the equivalent lambda would look like `name -> System.out.println(name)`.
+
+### `CloudFoundryClient` APIs
+
+As mentioned earlier, the `cloudfoundry-operations` implementation builds upon the `cloudfoundry-client` API.  That implementation takes advantage of the same reactive style in the lower-level API.  The implementation of the `Organizations.list()` method (which was demonstrated above) looks like the following (roughly):
+
+```java
+ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+    .page(1)
+    .build();
+
+Streams
+    .wrap(cloudFoundryClient.organizations().list(request))
+    .flatMap(response -> Streams.from(response.getResources))
+    .map(resource -> {
+        return Organization.builder()
+            .id(resource.getMetadata().getId())
+            .name(resource.getEntity().getName())
+            .build();
+    });
+```
+
+The above example is more complicated:
+
+1.  `Streams.wrap(...)` – Wraps the Reactive Streams `Publisher` in the Reactor-native `Stream` type
+1.  `.flatMap(...)` – substitutes the original stream with a stream of the `Resource`s returned by the requested page
+1. `.map(...)` – Maps the `Resource` to an `Organization` type
+
+### Maven Plugin
+
+TODO: Document once implemented
+
+### Gradle Plugin
+
+TODO: Document once implemented
+
+## Development
+The project depends on Java 8 but is built to be Java 7 compatible.  To build from source and install to your local Maven cache, run the following:
+
+```shell
+$ ./mvnw clean install
+```
+
+To run the the integration tests, run the following:
+
+```shell
+$ ./mvnw -Pintegration-test clean test
+```
+
+**IMPORTANT**
+Integration tests should be run against an empty Cloud Foundry instance. The integration tests are destructive, nearly everything on an instance given the chance.
+
+The integration tests require a running instance of Cloud Foundry to test against.  We recommend using [MicroPCF][i] to start a local instance to test with.  To configure the integration tests with the appropriate connection information use the following environment variables:
+
+Name | Description
+---- | -----------
+`TEST_HOST` | The host of Cloud Foundry instance.  Typically something like `api.local.micropcf.io`.
+`TEST_ORGANIZATION` | The default organization to use for testing
+`TEST_PASSWORD` | The test user's password
+`TEST_SKIPSSLVALIDATION` | Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Typically `true` when connecting to a MicroPCF instance.
+`TEST_SPACE` | The default space to use for testing
+`TEST_USERNAME` | The test user's username
+
+## Contributing
+[Pull requests][u] and [Issues][e] are welcome.
+
+## License
+This project is released under version 2.0 of the [Apache License][l].
+
+[a]: https://apidocs.cloudfoundry.org/226/
+[c]: https://github.com/cloudfoundry/cli
+[e]: https://github.com/cloudfoundry/cf-java-client/issues
+[g]: https://gradle.org
+[i]: https://github.com/pivotal-cf/micropcf
+[l]: https://www.apache.org/licenses/LICENSE-2.0
+[m]: https://maven.apache.org
+[p]: https://projectreactor.io
+[r]: http://reactivex.io
+[s]: https://www.reactive-streams.org
+[t]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html
+[u]: https://help.github.com/articles/using-pull-requests
+[x]: https://github.com/ReactiveX/RxJava
