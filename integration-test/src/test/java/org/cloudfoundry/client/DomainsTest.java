@@ -43,8 +43,9 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
     @Test
     public void create() {
         this.organizationId
-                .flatMap(organizationId -> Streams.zip(this.organizationId, createDomainEntity(organizationId)))
-                .subscribe(new TestSubscriber<Tuple2<String, DomainEntity>>()
+                .flatMap(this::createDomainEntity)
+                .zipWith(this.organizationId)
+                .subscribe(new TestSubscriber<Tuple2<DomainEntity, String>>()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
@@ -71,14 +72,12 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .id(domainId)
                             .build();
 
-                    Stream<DomainEntity> domainEntity = Streams
+                    return Streams
                             .wrap(this.cloudFoundryClient.domains().get(request))
                             .map(Resources::getEntity);
-
-
-                    return Streams.zip(this.organizationId, domainEntity);
                 })
-                .subscribe(new TestSubscriber<Tuple2<String, DomainEntity>>()
+                .zipWith(this.organizationId)
+                .subscribe(new TestSubscriber<Tuple2<DomainEntity, String>>()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
@@ -108,13 +107,12 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .id(domainId)
                             .build();
 
-                    Stream<String> actual = Streams
+                    return Streams
                             .wrap(this.cloudFoundryClient.domains().listSpaces(request))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
-
-                    return Streams.zip(this.spaceId, actual);
                 })
+                .zipWith(this.spaceId)
                 .subscribe(new TestSubscriber<Tuple2<String, String>>()
                         .assertThat(this::assertTupleEquality));
     }
@@ -122,10 +120,11 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
     @Test
     public void listDomainSpacesFilterByApplicationId() {
         this.organizationId
-                .flatMap(organizationId -> Streams.zip(this.spaceId, createDomainId(organizationId)))
+                .flatMap(this::createDomainId)
+                .zipWith(this.spaceId)
                 .flatMap(tuple -> {
-                    String spaceId = tuple.t1;
-                    String domainId = tuple.t2;
+                    String domainId = tuple.t1;
+                    String spaceId = tuple.t2;
 
                     CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
                             .name("test-application-name")
@@ -145,7 +144,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .wrap(this.cloudFoundryClient.routes().create(createRouteRequest))
                             .map(Resources::getId);
 
-                    return Streams.zip(Streams.just(domainId), applicationId, routeId, t -> t);
+                    return Streams.zip(Streams.just(domainId), applicationId, routeId);
                 })
                 .flatMap(tuple -> {
                     String domainId = tuple.t1;
@@ -195,13 +194,12 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .name("test.domain.name")
                             .build();
 
-                    Stream<String> actual = Streams
+                    return Streams
                             .wrap(this.cloudFoundryClient.domains().listSpaces(request))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
-
-                    return Streams.zip(this.spaceId, actual);
                 })
+                .zipWith(this.spaceId)
                 .subscribe(new TestSubscriber<Tuple2<String, String>>()
                         .assertThat(this::assertTupleEquality));
     }
@@ -209,23 +207,23 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
         this.organizationId
-                .flatMap(organizationId -> Streams.zip(this.organizationId, createDomainId(organizationId)))
+                .flatMap(this::createDomainId)
+                .zipWith(this.organizationId)
                 .flatMap(tuple -> {
-                    String organizationId = tuple.t1;
-                    String domainId = tuple.t2;
+                    String domainId = tuple.t1;
+                    String organizationId = tuple.t2;
 
                     ListDomainSpacesRequest response = ListDomainSpacesRequest.builder()
                             .id(domainId)
                             .organizationId(organizationId)
                             .build();
 
-                    Stream<String> actual = Streams
+                    return Streams
                             .wrap(this.cloudFoundryClient.domains().listSpaces(response))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
-
-                    return Streams.zip(this.organizationId, actual);
                 })
+                .zipWith(this.spaceId)
                 .subscribe(new TestSubscriber<Tuple2<String, String>>()
                         .assertThat(this::assertTupleEquality));
     }
@@ -267,9 +265,9 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                         .assertEquals(1L));
     }
 
-    private void assertDomainNameAndOrganizationId(Tuple2<String, DomainEntity> tuple) {
-        String organizationId = tuple.t1;
-        DomainEntity entity = tuple.t2;
+    private void assertDomainNameAndOrganizationId(Tuple2<DomainEntity, String> tuple) {
+        DomainEntity entity = tuple.t1;
+        String organizationId = tuple.t2;
 
         assertEquals("test.domain.name", entity.getName());
         assertEquals(organizationId, entity.getOwningOrganizationId());

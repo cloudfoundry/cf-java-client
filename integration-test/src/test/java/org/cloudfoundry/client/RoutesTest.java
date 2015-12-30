@@ -83,7 +83,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .wrap(this.cloudFoundryClient.routes().create(request))
                             .map(Resources::getEntity);
 
-                    return Streams.zip(this.domainId, this.spaceId, entity, t -> t);
+                    return Streams.zip(this.domainId, this.spaceId, entity);
                 })
                 .subscribe(new TestSubscriber<Tuple3<String, String, RouteEntity>>()
                         .assertThat(this::assertDomainIdAndSpaceId));
@@ -218,7 +218,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .wrap(this.cloudFoundryClient.routes().get(request))
                             .map(Resources::getEntity);
 
-                    return Streams.zip(this.domainId, this.spaceId, entity, t -> t);
+                    return Streams.zip(this.domainId, this.spaceId, entity);
                 })
                 .subscribe(new TestSubscriber<Tuple3<String, String, RouteEntity>>()
                         .assertThat(this::assertDomainIdAndSpaceId));
@@ -319,10 +319,11 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
         Streams
                 .zip(this.domainId, this.spaceId)
                 .flatMap(this::createApplicationAndRoute)
-                .flatMap(tuple1 -> Streams.zip(this.organizationId, associateApplicationWithRoute(tuple1)))
+                .flatMap(this::associateApplicationWithRoute)
+                .zipWith(this.organizationId)
                 .flatMap(tuple -> {
-                    String organizationId = tuple.t1;
-                    String routeId = tuple.t2;
+                    String routeId = tuple.t1;
+                    String organizationId = tuple.t2;
 
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
@@ -343,10 +344,11 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
         Streams
                 .zip(this.domainId, this.spaceId)
                 .flatMap(this::createApplicationAndRoute)
-                .flatMap(tuple1 -> Streams.zip(this.spaceId, associateApplicationWithRoute(tuple1)))
+                .flatMap(this::associateApplicationWithRoute)
+                .zipWith(this.spaceId)
                 .flatMap(tuple -> {
-                    String spaceId = tuple.t1;
-                    String routeId = tuple.t2;
+                    String routeId = tuple.t1;
+                    String spaceId = tuple.t2;
 
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
