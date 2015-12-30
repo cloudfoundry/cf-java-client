@@ -24,7 +24,7 @@ import reactor.fn.Supplier;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public final class Optional<T> {
+final class Optional<T> {
 
     private static final Optional<?> EMPTY = new Optional<>();
 
@@ -36,20 +36,6 @@ public final class Optional<T> {
 
     private Optional(T value) {
         this.value = Objects.requireNonNull(value);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> empty() {
-        return (Optional<T>) EMPTY;
-    }
-
-    public static <T> Optional<T> of(T value) {
-        return new Optional<>(value);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> ofNullable(T value) {
-        return value == null ? (Optional<T>) empty() : of(value);
     }
 
     @Override
@@ -66,8 +52,32 @@ public final class Optional<T> {
         return Objects.equals(this.value, other.value);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
+    }
+
+    @Override
+    public String toString() {
+        return this.value != null ? String.format("Optional[%s]", this.value) : "Optional.empty";
+    }
+
     @SuppressWarnings("unchecked")
-    public Optional<T> filter(Predicate<? super T> predicate) {
+    static <T> Optional<T> empty() {
+        return (Optional<T>) EMPTY;
+    }
+
+    static <T> Optional<T> of(T value) {
+        return new Optional<>(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> Optional<T> ofNullable(T value) {
+        return value == null ? (Optional<T>) empty() : of(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    Optional<T> filter(Predicate<? super T> predicate) {
         Objects.requireNonNull(predicate);
 
         if (!isPresent())
@@ -76,7 +86,7 @@ public final class Optional<T> {
             return predicate.test(this.value) ? this : (Optional<T>) empty();
     }
 
-    public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
+    <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
         Objects.requireNonNull(mapper);
 
         if (!isPresent())
@@ -86,28 +96,23 @@ public final class Optional<T> {
         }
     }
 
-    public T get() {
+    T get() {
         if (this.value == null) {
             throw new NoSuchElementException("No value present");
         }
         return this.value;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(this.value);
-    }
-
-    public void ifPresent(Consumer<? super T> consumer) {
+    void ifPresent(Consumer<? super T> consumer) {
         if (this.value != null)
             consumer.accept(this.value);
     }
 
-    public boolean isPresent() {
+    boolean isPresent() {
         return this.value != null;
     }
 
-    public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
+    <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
 
         if (!isPresent())
@@ -117,25 +122,20 @@ public final class Optional<T> {
         }
     }
 
-    public T orElse(T other) {
+    T orElse(T other) {
         return this.value != null ? this.value : other;
     }
 
-    public T orElseGet(Supplier<? extends T> other) {
+    T orElseGet(Supplier<? extends T> other) {
         return this.value != null ? this.value : other.get();
     }
 
-    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+    <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
         if (this.value != null) {
             return this.value;
         } else {
             throw exceptionSupplier.get();
         }
-    }
-
-    @Override
-    public String toString() {
-        return this.value != null ? String.format("Optional[%s]", this.value) : "Optional.empty";
     }
 
 }
