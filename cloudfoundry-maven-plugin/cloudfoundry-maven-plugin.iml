@@ -16,8 +16,8 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.6.3" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor:reactor-stream:2.1.0.BUILD-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.1.0.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-stream:2.5.0.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:2.5.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-logging-juli:8.0.28" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:8.0.28" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.28" level="project" />
