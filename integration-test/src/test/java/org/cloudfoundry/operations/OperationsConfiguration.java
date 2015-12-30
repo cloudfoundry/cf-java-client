@@ -23,19 +23,19 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 
 @Configuration
 @EnableAutoConfiguration
 @Import(ClientConfiguration.class)
-@Lazy
 public class OperationsConfiguration {
 
     @Bean
-    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) {
+    CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+                                                  @Value("${test.organization}") String organization,
+                                                  @Value("${test.space}") String space) {
         return new CloudFoundryOperationsBuilder()
                 .cloudFoundryClient(cloudFoundryClient)
-                .target(organization)
+                .target(organization, space)
                 .build();
     }
 

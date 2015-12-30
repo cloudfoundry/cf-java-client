@@ -39,7 +39,6 @@ import java.util.List;
 
 @Configuration
 @EnableAutoConfiguration
-@Lazy
 public class ClientConfiguration {
 
     @Bean
