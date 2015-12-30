@@ -22,12 +22,13 @@ import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class GetSpaceQuotaRequestTest {
+public final class CheckRouteRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetSpaceQuotaRequest.builder()
-                .name("test-name")
+        ValidationResult result = CheckRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-host")
                 .build()
                 .isValid();
 
@@ -35,13 +36,25 @@ public final class GetSpaceQuotaRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = GetSpaceQuotaRequest.builder()
+    public void isValidNoDomain() {
+        ValidationResult result = CheckRouteRequest.builder()
+                .host("test-host")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("space quota name must be specified", result.getMessages().get(0));
+        assertEquals("domain must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoHost() {
+        ValidationResult result = CheckRouteRequest.builder()
+                .domain("test-domain")
+                .build()
+                .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("host must be specified", result.getMessages().get(0));
     }
 
 }

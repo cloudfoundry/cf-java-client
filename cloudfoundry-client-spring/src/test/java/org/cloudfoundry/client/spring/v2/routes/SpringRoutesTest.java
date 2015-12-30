@@ -195,7 +195,7 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Exists extends AbstractApiTest<RouteExistsRequest, Void> {
+    public static final class Exists extends AbstractApiTest<RouteExistsRequest, Boolean> {
 
         private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
 
@@ -213,8 +213,8 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected Boolean getResponse() {
+            return true;
         }
 
         @Override
@@ -227,7 +227,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RouteExistsRequest request) {
+        protected Publisher<Boolean> invoke(RouteExistsRequest request) {
             return this.routes.exists(request);
         }
     }

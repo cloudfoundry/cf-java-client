@@ -22,11 +22,18 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
@@ -40,7 +47,220 @@ import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
-public class DefaultRoutesTest extends AbstractOperationsTest {
+public class DefaultRoutesTest {
+
+    public static final class CheckRouteInvalidDomain extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationPrivateDomainsRequest request1 = ListOrganizationPrivateDomainsRequest.builder()
+                    .id(TEST_ORGANIZATION)
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
+                    .totalPages(1)
+                    .build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+
+            ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListSharedDomainsResponse response2 = ListSharedDomainsResponse.builder()
+                    .totalPages(1)
+                    .build();
+            when(this.sharedDomains.list(request2)).thenReturn(Publishers.just(response2));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(false);
+        }
+
+        @Override
+        protected Publisher<Boolean> invoke() {
+            CheckRouteRequest request = CheckRouteRequest.builder()
+                    .domain("test-domain")
+                    .host("test-host")
+                    .build();
+
+            return this.routes.check(request);
+        }
+
+    }
+
+    public static final class CheckRouteInvalidHost extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationPrivateDomainsRequest request1 = ListOrganizationPrivateDomainsRequest.builder()
+                    .id(TEST_ORGANIZATION)
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
+                    .resource(PrivateDomainResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .id("test-domain-id")
+                                    .build())
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+
+            RouteExistsRequest request2 = RouteExistsRequest.builder()
+                    .domainId("test-domain-id")
+                    .host("test-host")
+                    .build();
+            when(super.routes.exists(request2)).thenReturn(Publishers.just(false));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(false);
+        }
+
+        @Override
+        protected Publisher<Boolean> invoke() {
+            CheckRouteRequest request = CheckRouteRequest.builder()
+                    .domain("test-domain")
+                    .host("test-host")
+                    .build();
+
+            return this.routes.check(request);
+        }
+
+    }
+
+    public static final class CheckRouteNoOrganization extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Boolean> invoke() {
+            CheckRouteRequest request = CheckRouteRequest.builder()
+                    .domain("test-domain")
+                    .host("test-host")
+                    .build();
+
+            return this.routes.check(request);
+        }
+
+    }
+
+    public static final class CheckRoutePrivateDomain extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationPrivateDomainsRequest request1 = ListOrganizationPrivateDomainsRequest.builder()
+                    .id(TEST_ORGANIZATION)
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
+                    .resource(PrivateDomainResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .id("test-domain-id")
+                                    .build())
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+
+            RouteExistsRequest request2 = RouteExistsRequest.builder()
+                    .domainId("test-domain-id")
+                    .host("test-host")
+                    .build();
+            when(super.routes.exists(request2)).thenReturn(Publishers.just(true));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(true);
+        }
+
+        @Override
+        protected Publisher<Boolean> invoke() {
+            CheckRouteRequest request = CheckRouteRequest.builder()
+                    .domain("test-domain")
+                    .host("test-host")
+                    .build();
+
+            return this.routes.check(request);
+        }
+
+    }
+
+    public static final class CheckRouteSharedDomain extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationPrivateDomainsRequest request1 = ListOrganizationPrivateDomainsRequest.builder()
+                    .id(TEST_ORGANIZATION)
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
+                    .totalPages(1)
+                    .build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+
+            ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
+                    .name("test-domain")
+                    .page(1)
+                    .build();
+            ListSharedDomainsResponse response2 = ListSharedDomainsResponse.builder()
+                    .resource(SharedDomainResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .id("test-domain-id")
+                                    .build())
+                            .build())
+                    .totalPages(1)
+                    .build();
+            when(this.sharedDomains.list(request2)).thenReturn(Publishers.just(response2));
+
+            RouteExistsRequest request3 = RouteExistsRequest.builder()
+                    .domainId("test-domain-id")
+                    .host("test-host")
+                    .build();
+            when(super.routes.exists(request3)).thenReturn(Publishers.just(true));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(true);
+        }
+
+        @Override
+        protected Publisher<Boolean> invoke() {
+            CheckRouteRequest request = CheckRouteRequest.builder()
+                    .domain("test-domain")
+                    .host("test-host")
+                    .build();
+
+            return this.routes.check(request);
+        }
+
+    }
 
     public static final class ListCurrentOrganization extends AbstractOperationsApiTest<Route> {
 

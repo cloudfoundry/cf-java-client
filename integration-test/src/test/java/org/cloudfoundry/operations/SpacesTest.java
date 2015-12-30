@@ -18,18 +18,9 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.rx.Streams;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = OperationsConfiguration.class)
-public final class SpacesTest {
-
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+public final class SpacesTest extends AbstractOperationsIntegrationTest {
 
     @Test
     public void list() {

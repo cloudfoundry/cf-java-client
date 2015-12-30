@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client;
 
-import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
@@ -160,7 +159,8 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return this.cloudFoundryClient.routes().exists(request);
                 })
-                .subscribe(new TestSubscriber<>());
+                .subscribe(new TestSubscriber<>()
+                        .assertEquals(true));
     }
 
     @Test
@@ -190,7 +190,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                     return this.cloudFoundryClient.routes().exists(request);
                 })
                 .subscribe(new TestSubscriber<>()
-                        .assertError(CloudFoundryException.class));
+                        .assertEquals(false));
     }
 
     @Test

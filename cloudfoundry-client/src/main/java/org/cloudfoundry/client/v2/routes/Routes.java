@@ -53,7 +53,7 @@ public interface Routes {
      * @param request the Check a Route exists request
      * @return the response from the Check a Route exists request
      */
-    Publisher<Void> exists(RouteExistsRequest request);
+    Publisher<Boolean> exists(RouteExistsRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/retrieve_a_particular_route.html">Retrieve a Particular Route</a> request
