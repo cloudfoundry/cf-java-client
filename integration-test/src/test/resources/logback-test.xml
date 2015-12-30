@@ -33,7 +33,9 @@
         <appender-ref ref="STREAM" />
     </logger>
 
-    <logger name="cloudfoundry-client-spring" level="INFO"/>
+    <logger name="cloudfoundry-client-spring" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+
+    <logger name="test" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

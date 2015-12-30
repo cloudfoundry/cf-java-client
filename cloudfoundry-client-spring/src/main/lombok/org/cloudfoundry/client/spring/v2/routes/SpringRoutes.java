@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -39,7 +40,10 @@ import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Publishers;
 import reactor.fn.Consumer;
+import reactor.fn.Function;
+import reactor.rx.Streams;
 
 import java.net.URI;
 
@@ -48,6 +52,8 @@ import java.net.URI;
  */
 @ToString(callSuper = true)
 public final class SpringRoutes extends AbstractSpringOperations implements Routes {
+
+    private static final int CF_NOT_FOUND = 10000;
 
     /**
      * Creates an instance
@@ -98,8 +104,8 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<Void> exists(final RouteExistsRequest request) {
-        return get(request, Void.class, new Consumer<UriComponentsBuilder>() {
+    public Publisher<Boolean> exists(final RouteExistsRequest request) {
+        return get(request, Boolean.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -107,7 +113,20 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
                 QueryBuilder.augment(builder, request);
             }
 
-        });
+        })
+                .defaultIfEmpty(true)
+                .onErrorResumeNext(new Function<Throwable, Publisher<Boolean>>() {
+
+                    @Override
+                    public Publisher<Boolean> apply(Throwable throwable) {
+                        if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
+                            return Publishers.just(false);
+                        } else {
+                            return Streams.fail(throwable);
+                        }
+                    }
+
+                });
     }
 
     @Override

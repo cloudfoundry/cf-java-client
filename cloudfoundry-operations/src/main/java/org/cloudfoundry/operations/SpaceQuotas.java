@@ -24,17 +24,18 @@ import org.reactivestreams.Publisher;
 public interface SpaceQuotas {
 
     /**
+     * Gets a space quota
+     *
+     * @param request the Get Space Quota request
+     * @return the space quota
+     */
+    Publisher<SpaceQuota> get(GetSpaceQuotaRequest request);
+
+    /**
      * Lists the space quotas
      *
      * @return the space quotas
      */
     Publisher<SpaceQuota> list();
-    
-    /**
-     * Gets a space quota
-     *
-     * @return the space quota
-     */
-    Publisher<SpaceQuota> get(GetSpaceQuotaRequest request);
 
 }

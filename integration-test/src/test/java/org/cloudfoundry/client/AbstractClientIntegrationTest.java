@@ -27,6 +27,8 @@ import org.cloudfoundry.operations.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -39,6 +41,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ClientConfiguration.class)
 public abstract class AbstractClientIntegrationTest {
+
+    private final Logger logger = LoggerFactory.getLogger("test");
 
     @Autowired
     protected CloudFoundryClient cloudFoundryClient;
@@ -54,6 +58,8 @@ public abstract class AbstractClientIntegrationTest {
 
     @After
     public final void cleanup() throws Exception {
+        this.logger.info(">> CLEANUP << ");
+
         Paginated
                 .requestResources(page -> {
                     ListApplicationsRequest request = ListApplicationsRequest.builder()

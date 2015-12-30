@@ -17,13 +17,19 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
@@ -32,7 +38,9 @@ import org.cloudfoundry.operations.ListRoutesRequest.Level;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
+import reactor.Publishers;
 import reactor.fn.Function;
+import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
@@ -54,8 +62,17 @@ final class DefaultRoutes implements Routes {
     }
 
     @Override
-    public Publisher<Route> list(ListRoutesRequest listRoutesRequest) {
-        return Validators.stream(listRoutesRequest)
+    public Publisher<Boolean> check(CheckRouteRequest request) {
+        return Validators.stream(request)
+                .zipWith(this.organizationId)
+                .flatMap(requestDomainId(this.cloudFoundryClient))
+                .flatMap(requestCheckRoute(this.cloudFoundryClient))
+                .defaultIfEmpty(false);
+    }
+
+    @Override
+    public Publisher<Route> list(ListRoutesRequest request) {
+        return Validators.stream(request)
                 .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
                 .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }
@@ -150,6 +167,42 @@ final class DefaultRoutes implements Routes {
         };
     }
 
+    private static Function<Tuple2<String, CheckRouteRequest>, Publisher<Boolean>> requestCheckRoute(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<Tuple2<String, CheckRouteRequest>, Publisher<Boolean>>() {
+
+            @Override
+            public Publisher<Boolean> apply(Tuple2<String, CheckRouteRequest> tuple) {
+                String domainId = tuple.t1;
+                CheckRouteRequest checkRouteRequest = tuple.t2;
+
+                RouteExistsRequest request = RouteExistsRequest.builder()
+                        .domainId(domainId)
+                        .host(checkRouteRequest.getHost())
+                        .build();
+
+                return cloudFoundryClient.routes().exists(request);
+            }
+
+        };
+    }
+
+    private static Function<Tuple2<CheckRouteRequest, String>, Publisher<Tuple2<String, CheckRouteRequest>>> requestDomainId(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<Tuple2<CheckRouteRequest, String>, Publisher<Tuple2<String, CheckRouteRequest>>>() {
+
+            @Override
+            public Publisher<Tuple2<String, CheckRouteRequest>> apply(Tuple2<CheckRouteRequest, String> tuple) {
+                CheckRouteRequest request = tuple.t1;
+                String organizationId = tuple.t2;
+
+                return requestPrivateDomains(cloudFoundryClient, request.getDomain(), organizationId)
+                        .switchIfEmpty(requestSharedDomains(cloudFoundryClient, request.getDomain()))
+                        .map(Resources.extractId())
+                        .zipWith(Publishers.just(request));
+            }
+
+        };
+    }
+
     private static Function<Integer, Publisher<ListRoutesResponse>> requestOrganizationRoutePage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return new Function<Integer, Publisher<ListRoutesResponse>>() {
 
@@ -177,6 +230,29 @@ final class DefaultRoutes implements Routes {
         };
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T extends Resource<?>> Stream<T> requestPrivateDomains(final CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return (Stream<T>) Paginated.requestResources(requestPrivateDomainsPage(cloudFoundryClient, organizationId, domain));
+    }
+
+    private static Function<Integer, Publisher<ListOrganizationPrivateDomainsResponse>> requestPrivateDomainsPage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final
+    String domain) {
+        return new Function<Integer, Publisher<ListOrganizationPrivateDomainsResponse>>() {
+
+            @Override
+            public Publisher<ListOrganizationPrivateDomainsResponse> apply(Integer page) {
+                ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
+                        .id(organizationId)
+                        .name(domain)
+                        .page(page)
+                        .build();
+
+                return cloudFoundryClient.organizations().listPrivateDomains(request);
+            }
+
+        };
+    }
+
     private static Function<ListRoutesRequest, Publisher<RouteResource>> requestRouteResources(final CloudFoundryClient cloudFoundryClient, final Stream<String> organizationId,
                                                                                                final Stream<String> spaceId) {
         return new Function<ListRoutesRequest, Publisher<RouteResource>>() {
@@ -190,6 +266,27 @@ final class DefaultRoutes implements Routes {
                     return spaceId
                             .flatMap(requestSpaceRoutes(cloudFoundryClient));
                 }
+            }
+
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Resource<?>> Stream<T> requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
+        return (Stream<T>) Paginated.requestResources(requestSharedDomainsPage(cloudFoundryClient, domain));
+    }
+
+    private static Function<Integer, Publisher<ListSharedDomainsResponse>> requestSharedDomainsPage(final CloudFoundryClient cloudFoundryClient, final String domain) {
+        return new Function<Integer, Publisher<ListSharedDomainsResponse>>() {
+
+            @Override
+            public Publisher<ListSharedDomainsResponse> apply(Integer page) {
+                ListSharedDomainsRequest request = ListSharedDomainsRequest.builder()
+                        .name(domain)
+                        .page(page)
+                        .build();
+
+                return cloudFoundryClient.sharedDomains().list(request);
             }
 
         };

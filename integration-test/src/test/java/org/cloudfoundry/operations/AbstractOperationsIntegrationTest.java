@@ -16,27 +16,14 @@
 
 package org.cloudfoundry.operations;
 
-import org.reactivestreams.Publisher;
+import org.cloudfoundry.client.AbstractClientIntegrationTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 
-/**
- * Main entry point to the Cloud Foundry Routes Operations API
- */
-public interface Routes {
+@SpringApplicationConfiguration(classes = OperationsConfiguration.class)
+public abstract class AbstractOperationsIntegrationTest extends AbstractClientIntegrationTest {
 
-    /**
-     * Checks whether a route exists
-     *
-     * @param request the Check Route request
-     * @return whether the route exists
-     */
-    Publisher<Boolean> check(CheckRouteRequest request);
-
-    /**
-     * Lists the routes and the applications bound to those routes
-     *
-     * @param request the List Routes request
-     * @return the routes and the applications bound to those routes
-     */
-    Publisher<Route> list(ListRoutesRequest request);
+    @Autowired
+    protected CloudFoundryOperations cloudFoundryOperations;
 
 }

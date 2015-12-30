@@ -28,6 +28,7 @@
       <env name="TEST_SKIPSSLVALIDATION" value="true" />
       <env name="TEST_SPACE" value="integration-test" />
       <env name="TEST_USERNAME" value="admin" />
+      <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
     </envs>
     <patterns />
     <method />
