@@ -50,6 +50,7 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 .filter(equalRequestAndDefinitionName())
                 .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(
                         new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
+                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
                 .map(extractQuotaDefinition())
                 .map(toSpaceQuota());
     }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
@@ -37,7 +38,7 @@ import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
-public final class DomainsTest extends AbstractClientIntegrationTest {
+public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
@@ -30,7 +31,7 @@ import reactor.rx.Streams;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public final class EventsTest extends AbstractClientIntegrationTest {
+public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {

@@ -16,10 +16,11 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.AbstractIntegrationTest;
 import org.junit.Test;
 import reactor.rx.Streams;
 
-public final class SpacesTest extends AbstractOperationsIntegrationTest {
+public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {

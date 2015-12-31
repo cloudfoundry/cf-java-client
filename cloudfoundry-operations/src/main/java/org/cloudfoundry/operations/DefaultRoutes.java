@@ -67,7 +67,8 @@ final class DefaultRoutes implements Routes {
                 .zipWith(this.organizationId)
                 .flatMap(requestDomainId(this.cloudFoundryClient))
                 .flatMap(requestCheckRoute(this.cloudFoundryClient))
-                .defaultIfEmpty(false);
+                .defaultIfEmpty(false)
+                .take(1);  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
     }
 
     @Override

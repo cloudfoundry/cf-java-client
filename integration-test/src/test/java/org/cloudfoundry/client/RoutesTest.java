@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
@@ -40,7 +41,7 @@ import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
-public final class RoutesTest extends AbstractClientIntegrationTest {
+public final class RoutesTest extends AbstractIntegrationTest {
 
     private Stream<String> domainId;
 

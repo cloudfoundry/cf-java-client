@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client;
+package org.cloudfoundry;
 
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
+import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
-import org.cloudfoundry.utils.test.BlockingSubscriber;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -36,13 +37,14 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
+import reactor.rx.Streams;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ClientConfiguration.class)
-public abstract class AbstractClientIntegrationTest {
+@SpringApplicationConfiguration(classes = IntegrationTestConfiguration.class)
+public abstract class AbstractIntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger("test");
 
@@ -50,6 +52,9 @@ public abstract class AbstractClientIntegrationTest {
 
     @Autowired
     protected CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
+    protected CloudFoundryOperations cloudFoundryOperations;
 
     @Autowired
     protected Stream<String> organizationId;
@@ -61,11 +66,13 @@ public abstract class AbstractClientIntegrationTest {
     protected String spaceName;
 
     @After
-    public final void cleanup() throws Exception {
-        this.logger.info(">> CLEANUP << ");
-        cleanupApplications(this.cloudFoundryClient).await(5, SECONDS);
-        cleanupRoutes(this.cloudFoundryClient).await(5, SECONDS);
-        cleanupDomains(this.cloudFoundryClient).await(5, SECONDS);
+    public final void cleanup() throws Exception { // TODO: Link together instead of doing await()
+        this.logger.info(">> CLEANUP <<");
+        Streams.await(cleanupApplications(this.cloudFoundryClient), 5, SECONDS);
+        Streams.await(cleanupRoutes(this.cloudFoundryClient), 5, SECONDS);
+        Streams.await(cleanupDomains(this.cloudFoundryClient), 5, SECONDS);
+        this.logger.info("<< CLEANUP >>");
+
     }
 
     @After
@@ -85,10 +92,8 @@ public abstract class AbstractClientIntegrationTest {
         return (TestSubscriber<T>) this.testSubscriber;
     }
 
-    private static BlockingSubscriber<Void> cleanupApplications(CloudFoundryClient cloudFoundryClient) {
-        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
-
-        Paginated
+    private static Stream<Void> cleanupApplications(CloudFoundryClient cloudFoundryClient) {
+        return Paginated
                 .requestResources(page -> {
                     ListApplicationsRequest request = ListApplicationsRequest.builder()
                             .page(page)
@@ -102,16 +107,11 @@ public abstract class AbstractClientIntegrationTest {
                             .build();
 
                     return cloudFoundryClient.applicationsV2().delete(request);
-                })
-                .subscribe(subscriber);
-
-        return subscriber;
+                });
     }
 
-    private static BlockingSubscriber<Void> cleanupDomains(CloudFoundryClient cloudFoundryClient) {
-        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
-
-        Paginated
+    private static Stream<Void> cleanupDomains(CloudFoundryClient cloudFoundryClient) {
+        return Paginated
                 .requestResources(page -> {
                     ListDomainsRequest request = ListDomainsRequest.builder()
                             .page(page)
@@ -129,16 +129,11 @@ public abstract class AbstractClientIntegrationTest {
                             .build();
 
                     return cloudFoundryClient.domains().delete(request);
-                })
-                .subscribe(subscriber);
-
-        return subscriber;
+                });
     }
 
-    private static BlockingSubscriber<Void> cleanupRoutes(CloudFoundryClient cloudFoundryClient) {
-        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
-
-        Paginated
+    private static Stream<Void> cleanupRoutes(CloudFoundryClient cloudFoundryClient) {
+        return Paginated
                 .requestResources(page -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .page(page)
@@ -152,10 +147,7 @@ public abstract class AbstractClientIntegrationTest {
                             .build();
 
                     return cloudFoundryClient.routes().delete(request);
-                })
-                .subscribe(subscriber);
-
-        return subscriber;
+                });
     }
 
 }

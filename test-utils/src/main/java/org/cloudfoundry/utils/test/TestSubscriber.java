@@ -17,27 +17,29 @@
 package org.cloudfoundry.utils.test;
 
 import org.junit.Assert;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.error.Exceptions;
 import reactor.fn.Consumer;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 
-public final class TestSubscriber<T> extends BlockingSubscriber<T> {
+public final class TestSubscriber<T>  implements Subscriber<T> {
 
     private final Queue<T> actuals = new LinkedList<T>();
 
     private final Queue<Consumer<T>> expectations = new LinkedList<>();
 
+    private final CountDownLatch latch = new CountDownLatch(1);
+
     private volatile Throwable errorActual;
 
     private Consumer<? super Throwable> errorExpectation;
-
-    public TestSubscriber() { // TODO: Remove
-    }
 
     public TestSubscriber<T> assertEquals(final T expected) {
         assertThat(new Consumer<T>() {
@@ -72,18 +74,32 @@ public final class TestSubscriber<T> extends BlockingSubscriber<T> {
     }
 
     @Override
-    public void doOnError(Throwable t) {
-        Exceptions.throwIfFatal(t);
-        this.errorActual = t;
+    public void onComplete() {
+        this.latch.countDown();
     }
 
     @Override
-    public void doOnNext(T t) {
+    public void onError(Throwable t) {
+        Exceptions.throwIfFatal(t);
+        this.errorActual = t;
+        this.latch.countDown();
+    }
+
+    @Override
+    public void onNext(T t) {
         this.actuals.add(t);
     }
 
+    @Override
+    public void onSubscribe(Subscription s) {
+        s.request(Long.MAX_VALUE);
+    }
+
     public void verify(long timeout, TimeUnit unit) throws InterruptedException {
-        await(timeout, unit);
+        if (!this.latch.await(timeout, unit)) {
+            throw new IllegalStateException("Subscriber timed out");
+        }
+
         verifyError();
         verifyItems();
     }
