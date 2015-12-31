@@ -24,6 +24,7 @@ import reactor.fn.Function;
 
 import java.io.IOException;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
 
 public final class MultipartTest {
@@ -31,12 +32,16 @@ public final class MultipartTest {
     private static final String BOUNDARY = "90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c";
 
     @Test
-    public void test() throws IOException {
+    public void test() throws IOException, InterruptedException {
+        TestSubscriber<Long> testSubscriber = new TestSubscriber<>();
+
         Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
                 .map(toLogMessage())
                 .count()
-                .subscribe(new TestSubscriber<Long>()
+                .subscribe(testSubscriber
                         .assertEquals(14L));
+
+        testSubscriber.verify(1, SECONDS);
     }
 
     private Function<byte[], Object> toLogMessage() {

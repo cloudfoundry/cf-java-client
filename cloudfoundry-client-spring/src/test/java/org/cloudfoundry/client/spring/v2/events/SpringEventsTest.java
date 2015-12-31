@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring.v2.events;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -35,7 +34,7 @@ public final class SpringEventsTest {
 
     public static final class Get extends AbstractApiTest<GetEventRequest, GetEventResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root);
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetEventRequest getInvalidRequest() {
@@ -91,7 +90,7 @@ public final class SpringEventsTest {
 
     public static final class List extends AbstractApiTest<ListEventsRequest, ListEventsResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root);
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListEventsRequest getInvalidRequest() {

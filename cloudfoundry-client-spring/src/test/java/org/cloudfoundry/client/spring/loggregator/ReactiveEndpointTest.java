@@ -23,6 +23,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -32,9 +33,9 @@ public final class ReactiveEndpointTest {
 
     private final Session session = mock(Session.class);
 
-    private final TestSubscriber<String> subscriber = new TestSubscriber<>();
+    private final TestSubscriber<String> testSubscriber = new TestSubscriber<>();
 
-    private final ReactiveEndpoint<String> reactiveEndpoint = new ReactiveEndpoint<>(this.messageHandler, this.subscriber);
+    private final ReactiveEndpoint<String> reactiveEndpoint = new ReactiveEndpoint<>(this.messageHandler, this.testSubscriber);
 
     @Test
     public void onCloseGoingAway() {
@@ -47,19 +48,21 @@ public final class ReactiveEndpointTest {
     }
 
     @Test
-    public void onCloseOther() {
-        this.subscriber
-                .assertError(Exception.class);
-
+    public void onCloseOther() throws InterruptedException {
         this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NO_STATUS_CODE, "test-reason-phrase"));
+
+        this.testSubscriber
+                .assertError(Exception.class)
+                .verify(1, SECONDS);
     }
 
     @Test
-    public void onError() {
-        this.subscriber
-                .assertError(Exception.class);
-
+    public void onError() throws InterruptedException {
         this.reactiveEndpoint.onError(this.session, new RuntimeException());
+
+        this.testSubscriber
+                .assertError(Exception.class)
+                .verify(1, SECONDS);
     }
 
     @Test

@@ -1,11 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="integration-test" type="JUnit" factoryName="JUnit" singleton="true">
-    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-      <pattern>
-        <option name="PATTERN" value="org.cloudfoundry.operations.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-    </extension>
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="jacoco" />
     <module name="integration-test" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />

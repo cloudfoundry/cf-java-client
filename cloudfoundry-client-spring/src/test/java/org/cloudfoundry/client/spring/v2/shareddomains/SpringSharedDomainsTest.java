@@ -31,7 +31,7 @@ public final class SpringSharedDomainsTest {
 
     public static final class ListSharedDomains extends AbstractApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
 
-        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root);
+        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSharedDomainsRequest getInvalidRequest() {

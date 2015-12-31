@@ -67,6 +67,10 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Processors;
+import reactor.core.processor.BaseProcessor;
+import reactor.core.processor.ProcessorGroup;
+import reactor.fn.Consumer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -100,6 +104,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Organizations organizations;
 
     private final Packages packages;
+
+    private final ProcessorGroup<?> processorGroup;
 
     private final OAuth2RestOperations restOperations;
 
@@ -146,42 +152,43 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
             }
         }
 
-        OAuth2RestOperations restOperations = getRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
         URI root = getRoot(host);
 
-        this.restOperations = restOperations;
+        this.processorGroup = createProcessorGroup();
+        this.restOperations = createRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
 
-        this.applicationsV2 = new SpringApplicationsV2(restOperations, root);
-        this.applicationsV3 = new SpringApplicationsV3(restOperations, root);
-        this.domains = new SpringDomains(restOperations, root);
-        this.droplets = new SpringDroplets(restOperations, root);
-        this.events = new SpringEvents(restOperations, root);
-        this.info = new SpringInfo(restOperations, root);
-        this.organizations = new SpringOrganizations(restOperations, root);
-        this.packages = new SpringPackages(restOperations, root);
-        this.routes = new SpringRoutes(restOperations, root);
-        this.sharedDomains = new SpringSharedDomains(restOperations, root);
-        this.serviceInstances = new SpringServiceInstances(restOperations, root);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root);
-        this.spaces = new SpringSpaces(restOperations, root);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.processorGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.processorGroup);
+        this.domains = new SpringDomains(this.restOperations, root, this.processorGroup);
+        this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
+        this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
+        this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
+        this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
+        this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
+        this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
     }
 
-    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root) {
+    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+        this.processorGroup = processorGroup;
         this.restOperations = restOperations;
 
-        this.applicationsV2 = new SpringApplicationsV2(restOperations, root);
-        this.applicationsV3 = new SpringApplicationsV3(restOperations, root);
-        this.domains = new SpringDomains(restOperations, root);
-        this.droplets = new SpringDroplets(restOperations, root);
-        this.events = new SpringEvents(restOperations, root);
-        this.info = new SpringInfo(restOperations, root);
-        this.organizations = new SpringOrganizations(restOperations, root);
-        this.packages = new SpringPackages(restOperations, root);
-        this.routes = new SpringRoutes(restOperations, root);
-        this.sharedDomains = new SpringSharedDomains(restOperations, root);
-        this.serviceInstances = new SpringServiceInstances(restOperations, root);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root);
-        this.spaces = new SpringSpaces(restOperations, root);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.processorGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.processorGroup);
+        this.domains = new SpringDomains(this.restOperations, root, this.processorGroup);
+        this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
+        this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
+        this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
+        this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
+        this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
+        this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
     }
 
     @Override
@@ -253,8 +260,54 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations.getAccessToken().getValue();
     }
 
+    ProcessorGroup<?> getProcessorGroup() {
+        return this.processorGroup;
+    }
+
     OAuth2RestOperations getRestOperations() {
         return this.restOperations;
+    }
+
+    private static ProcessorGroup<?> createProcessorGroup() {
+        return Processors.ioGroup("cloudfoundry-client-spring", BaseProcessor.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
+    }
+
+    private static Consumer<Throwable> uncaughtExceptionHandler() {
+        return new Consumer<Throwable>() {
+
+            @Override
+            public void accept(Throwable throwable) {
+                LOGGER.error(throwable.getMessage());
+            }
+
+        };
+    }
+
+    private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,
+                                                             List<DeserializationProblemHandler> deserializationProblemHandlers) {
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId, clientSecret, host, username, password, bootstrapRestOperations);
+        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
+
+        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
+
+        for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
+                LOGGER.debug("Modifying ObjectMapper configuration");
+
+                ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
+                        .setSerializationInclusion(NON_NULL);
+
+                for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
+                    objectMapper.addHandler(deserializationProblemHandler);
+                }
+            }
+        }
+
+        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
+        messageConverters.add(new FallbackHttpMessageConverter());
+
+        return restTemplate;
     }
 
     @SuppressWarnings("unchecked")
@@ -284,38 +337,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         details.setPassword(password);
 
         return details;
-    }
-
-    private static OAuth2RestOperations getRestOperations(String clientId,
-                                                          String clientSecret,
-                                                          String host,
-                                                          String username,
-                                                          String password,
-                                                          RestOperations bootstrapRestOperations,
-                                                          List<DeserializationProblemHandler> deserializationProblemHandlers) {
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId, clientSecret, host, username, password, bootstrapRestOperations);
-        OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
-
-        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-        List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-
-        for (HttpMessageConverter<?> messageConverter : messageConverters) {
-            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
-                LOGGER.debug("Modifying ObjectMapper configuration");
-
-                ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                        .setSerializationInclusion(NON_NULL);
-
-                for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
-                    objectMapper.addHandler(deserializationProblemHandler);
-                }
-            }
-        }
-
-        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
-        messageConverters.add(new FallbackHttpMessageConverter());
-
-        return restTemplate;
     }
 
     private static URI getRoot(String host) {

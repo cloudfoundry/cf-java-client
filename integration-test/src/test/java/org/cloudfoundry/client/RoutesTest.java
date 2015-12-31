@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client;
 
+import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
@@ -29,7 +30,6 @@ import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.operations.v2.Resources;
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -41,7 +41,7 @@ import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
-public final class RoutesTest extends AbstractClientIntegrationTest {
+public final class RoutesTest extends AbstractIntegrationTest {
 
     private Stream<String> domainId;
 
@@ -61,7 +61,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -84,7 +84,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return Streams.zip(this.domainId, this.spaceId, entity);
                 })
-                .subscribe(new TestSubscriber<Tuple3<String, String, RouteEntity>>()
+                .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                         .assertThat(this::assertDomainIdAndSpaceId));
     }
 
@@ -130,7 +130,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return this.cloudFoundryClient.routes().delete(request);
                 })
-                .subscribe(new TestSubscriber<>());
+                .subscribe(testSubscriber());
     }
 
     @Test
@@ -159,7 +159,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return this.cloudFoundryClient.routes().exists(request);
                 })
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(true));
     }
 
@@ -189,7 +189,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return this.cloudFoundryClient.routes().exists(request);
                 })
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(false));
     }
 
@@ -220,7 +220,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
 
                     return Streams.zip(this.domainId, this.spaceId, entity);
                 })
-                .subscribe(new TestSubscriber<Tuple3<String, String, RouteEntity>>()
+                .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                         .assertThat(this::assertDomainIdAndSpaceId));
     }
 
@@ -248,7 +248,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -268,7 +268,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -289,7 +289,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -310,7 +310,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -335,7 +335,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -360,7 +360,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -397,7 +397,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -427,7 +427,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -458,7 +458,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -488,7 +488,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -522,7 +522,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(0L));
     }
 
@@ -553,7 +553,7 @@ public final class RoutesTest extends AbstractClientIntegrationTest {
                             .wrap(this.cloudFoundryClient.routes().update(request))
                             .map(Resources::getEntity);
                 })
-                .subscribe(new TestSubscriber<RouteEntity>()
+                .subscribe(this.<RouteEntity>testSubscriber()
                         .assertThat(entity -> assertEquals("test-host", entity.getHost())));
     }
 

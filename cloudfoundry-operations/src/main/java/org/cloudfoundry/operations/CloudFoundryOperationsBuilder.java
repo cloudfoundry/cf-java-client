@@ -94,8 +94,6 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-
-
     private static <T extends Resource<?>> Stream<T> failIfLessThanOne(String message) {
         return Streams.fail(new IllegalArgumentException(message));
     }
@@ -120,8 +118,8 @@ public final class CloudFoundryOperationsBuilder {
                 .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                 .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
                 .switchIfEmpty(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
+                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
                 .map(Resources.extractId())
-                .take(1)
                 .cache(1);
 
         organizationId.next().poll();
@@ -137,8 +135,8 @@ public final class CloudFoundryOperationsBuilder {
                 .flatMap(requestResources(cloudFoundryClient, space))
                 .reduce(CloudFoundryOperationsBuilder.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
                 .switchIfEmpty(CloudFoundryOperationsBuilder.<SpaceResource>failIfLessThanOne(String.format("Space %s does not exist", space)))
+                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
                 .map(Resources.extractId())
-                .take(1)
                 .cache(1);
 
         spaceId.next().poll();

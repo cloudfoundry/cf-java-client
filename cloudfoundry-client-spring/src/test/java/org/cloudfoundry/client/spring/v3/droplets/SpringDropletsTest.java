@@ -40,7 +40,7 @@ public final class SpringDropletsTest {
 
     public static final class Delete extends AbstractApiTest<DeleteDropletRequest, Void> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteDropletRequest getInvalidRequest() {
@@ -76,7 +76,7 @@ public final class SpringDropletsTest {
 
     public static final class Get extends AbstractApiTest<GetDropletRequest, GetDropletResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
 
 
         @Override
@@ -150,7 +150,7 @@ public final class SpringDropletsTest {
 
     public static final class List extends AbstractApiTest<ListDropletsRequest, ListDropletsResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListDropletsRequest getInvalidRequest() {

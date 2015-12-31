@@ -45,7 +45,7 @@ public final class SpringDomainsTest {
 
     public static final class Create extends AbstractApiTest<CreateDomainRequest, CreateDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreateDomainRequest getInvalidRequest() {
@@ -97,7 +97,7 @@ public final class SpringDomainsTest {
 
     public static final class Delete extends AbstractApiTest<DeleteDomainRequest, Void> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteDomainRequest getInvalidRequest() {
@@ -132,7 +132,7 @@ public final class SpringDomainsTest {
 
     public static final class Get extends AbstractApiTest<GetDomainRequest, GetDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetDomainRequest getInvalidRequest() {
@@ -178,7 +178,7 @@ public final class SpringDomainsTest {
 
     public static final class ListDomains extends AbstractApiTest<ListDomainsRequest, ListDomainsResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListDomainsRequest getInvalidRequest() {
@@ -259,7 +259,7 @@ public final class SpringDomainsTest {
 
     public static final class ListSpaces extends AbstractApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListDomainSpacesRequest getInvalidRequest() {

@@ -29,6 +29,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.processor.ProcessorGroup;
 import reactor.core.subscription.ReactiveSession;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -56,9 +57,12 @@ public abstract class AbstractSpringOperations {
 
     protected final URI root;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root) {
+    private final ProcessorGroup<?> processorGroup;
+
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
         this.restOperations = restOperations;
         this.root = root;
+        this.processorGroup = processorGroup;
     }
 
     protected final Stream<Void> delete(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
@@ -105,7 +109,8 @@ public abstract class AbstractSpringOperations {
                                 });
                     }
 
-                });
+                })
+                .publishOn(this.processorGroup);
     }
 
     protected final <T> Stream<T> get(Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {

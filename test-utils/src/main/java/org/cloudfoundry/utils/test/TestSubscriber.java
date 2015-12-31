@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.error.Exceptions;
-import reactor.core.error.ReactorFatalException;
 import reactor.fn.Consumer;
 
 import java.util.LinkedList;
@@ -30,11 +29,15 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 
-public final class TestSubscriber<T> implements Subscriber<T> {
+public final class TestSubscriber<T>  implements Subscriber<T> {
+
+    private final Queue<T> actuals = new LinkedList<T>();
 
     private final Queue<Consumer<T>> expectations = new LinkedList<>();
 
     private final CountDownLatch latch = new CountDownLatch(1);
+
+    private volatile Throwable errorActual;
 
     private Consumer<? super Throwable> errorExpectation;
 
@@ -78,30 +81,13 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     @Override
     public void onError(Throwable t) {
         Exceptions.throwIfFatal(t);
-
-        if (t instanceof AssertionError) {
-            throw ReactorFatalException.create(t);
-        }
-
-        if (this.errorExpectation == null) {
-            fail(String.format("Unexpected error %s", t));
-        }
-
-        this.errorExpectation.accept(t);
-        this.errorExpectation = null;
-
+        this.errorActual = t;
         this.latch.countDown();
     }
 
     @Override
     public void onNext(T t) {
-        Consumer<T> expectation = this.expectations.poll();
-
-        if (expectation == null) {
-            fail(String.format("Unexpected item %s", t));
-        }
-
-        expectation.accept(t);
+        this.actuals.add(t);
     }
 
     @Override
@@ -110,17 +96,42 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     }
 
     public void verify(long timeout, TimeUnit unit) throws InterruptedException {
-        this.latch.await(timeout, unit);
-        verifyExpectations();
+        if (!this.latch.await(timeout, unit)) {
+            throw new IllegalStateException("Subscriber timed out");
+        }
+
+        verifyError();
+        verifyItems();
     }
 
-    private void verifyExpectations() {
-        if (!this.expectations.isEmpty()) {
-            fail(String.format("Unexpected completion. %d expectations not met.", this.expectations.size()));
+    private void verifyError() {
+        if (this.errorActual != null) {
+            if (this.errorExpectation == null) {
+                fail(String.format("Unexpected error %s", this.errorActual));
+            }
+
+            this.errorExpectation.accept(this.errorActual);
+            this.errorExpectation = null;
         }
 
         if (this.errorExpectation != null) {
             fail("Unexpected completion. Error expectation not met.");
+        }
+    }
+
+    private void verifyItems() {
+        for (T actual : this.actuals) {
+            Consumer<T> expectation = this.expectations.poll();
+
+            if (expectation == null) {
+                fail(String.format("Unexpected item %s", actual));
+            }
+
+            expectation.accept(actual);
+        }
+
+        if (!this.expectations.isEmpty()) {
+            fail(String.format("Unexpected completion. %d expectations not met.", this.expectations.size()));
         }
     }
 

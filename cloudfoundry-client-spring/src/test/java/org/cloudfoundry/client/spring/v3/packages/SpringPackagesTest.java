@@ -53,7 +53,7 @@ public final class SpringPackagesTest {
 
     public static final class Copy extends AbstractApiTest<CopyPackageRequest, CopyPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CopyPackageRequest getInvalidRequest() {
@@ -106,7 +106,7 @@ public final class SpringPackagesTest {
 
     public static final class Create extends AbstractApiTest<CreatePackageRequest, CreatePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreatePackageRequest getInvalidRequest() {
@@ -161,7 +161,7 @@ public final class SpringPackagesTest {
 
     public static final class Delete extends AbstractApiTest<DeletePackageRequest, Void> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeletePackageRequest getInvalidRequest() {
@@ -197,7 +197,7 @@ public final class SpringPackagesTest {
 
     public static final class Download extends AbstractApiTest<DownloadPackageRequest, byte[]> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
@@ -240,7 +240,7 @@ public final class SpringPackagesTest {
 
     public static final class Get extends AbstractApiTest<GetPackageRequest, GetPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetPackageRequest getInvalidRequest() {
@@ -303,7 +303,7 @@ public final class SpringPackagesTest {
 
     public static final class List extends AbstractApiTest<ListPackagesRequest, ListPackagesResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListPackagesRequest getInvalidRequest() {
@@ -396,7 +396,7 @@ public final class SpringPackagesTest {
 
     public static final class Stage extends AbstractApiTest<StagePackageRequest, StagePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
 
         @Override
@@ -460,7 +460,7 @@ public final class SpringPackagesTest {
 
     public static final class Upload extends AbstractApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UploadPackageRequest getInvalidRequest() {

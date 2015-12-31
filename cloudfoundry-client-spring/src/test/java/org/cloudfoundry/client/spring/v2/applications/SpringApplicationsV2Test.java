@@ -89,7 +89,7 @@ public final class SpringApplicationsV2Test {
     public static final class AssociateRoute
             extends AbstractApiTest<AssociateApplicationRouteRequest, AssociateApplicationRouteResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateApplicationRouteRequest getInvalidRequest() {
@@ -158,7 +158,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Copy extends AbstractApiTest<CopyApplicationRequest, CopyApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CopyApplicationRequest getInvalidRequest() {
@@ -206,7 +206,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Create extends AbstractApiTest<CreateApplicationRequest, CreateApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreateApplicationRequest getInvalidRequest() {
@@ -277,7 +277,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Delete extends AbstractApiTest<DeleteApplicationRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteApplicationRequest getInvalidRequest() {
@@ -313,7 +313,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Download extends AbstractApiTest<DownloadApplicationRequest, byte[]> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
@@ -356,7 +356,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class DownloadDroplet extends AbstractApiTest<DownloadDropletRequest, byte[]> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
@@ -399,7 +399,7 @@ public final class SpringApplicationsV2Test {
     public static final class Environment
             extends AbstractApiTest<ApplicationEnvironmentRequest, ApplicationEnvironmentResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ApplicationEnvironmentRequest getInvalidRequest() {
@@ -458,7 +458,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Get extends AbstractApiTest<GetApplicationRequest, GetApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetApplicationRequest getInvalidRequest() {
@@ -527,7 +527,7 @@ public final class SpringApplicationsV2Test {
     public static final class Instances
             extends AbstractApiTest<ApplicationInstancesRequest, ApplicationInstancesResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ApplicationInstancesRequest getInvalidRequest() {
@@ -569,7 +569,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class List extends AbstractApiTest<ListApplicationsRequest, ListApplicationsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
 
         @Override
@@ -710,7 +710,7 @@ public final class SpringApplicationsV2Test {
     public static final class ListRoutes
             extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationRoutesRequest getInvalidRequest() {
@@ -768,7 +768,7 @@ public final class SpringApplicationsV2Test {
     public static final class ListServiceBindings
             extends AbstractApiTest<ListApplicationServiceBindingsRequest, ListApplicationServiceBindingsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationServiceBindingsRequest getInvalidRequest() {
@@ -818,8 +818,7 @@ public final class SpringApplicationsV2Test {
         }
 
         @Override
-        protected Publisher<ListApplicationServiceBindingsResponse> invoke(ListApplicationServiceBindingsRequest
-                                                                                   request) {
+        protected Publisher<ListApplicationServiceBindingsResponse> invoke(ListApplicationServiceBindingsRequest request) {
             return this.applications.listServiceBindings(request);
         }
 
@@ -827,7 +826,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class RemoveRoute extends AbstractApiTest<RemoveApplicationRouteRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveApplicationRouteRequest getInvalidRequest() {
@@ -865,7 +864,7 @@ public final class SpringApplicationsV2Test {
     public static final class RemoveServiceBinding
             extends AbstractApiTest<RemoveApplicationServiceBindingRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveApplicationServiceBindingRequest getInvalidRequest() {
@@ -901,7 +900,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Restage extends AbstractApiTest<RestageApplicationRequest, RestageApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RestageApplicationRequest getInvalidRequest() {
@@ -965,7 +964,7 @@ public final class SpringApplicationsV2Test {
     public static final class Statistics
             extends AbstractApiTest<ApplicationStatisticsRequest, ApplicationStatisticsResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ApplicationStatisticsRequest getInvalidRequest() {
@@ -1022,7 +1021,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Summary extends AbstractApiTest<SummaryApplicationRequest, SummaryApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected SummaryApplicationRequest getInvalidRequest() {
@@ -1113,7 +1112,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class TerminateInstance extends AbstractApiTest<TerminateApplicationInstanceRequest, Void> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
 
         @Override
@@ -1151,7 +1150,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Update extends AbstractApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UpdateApplicationRequest getInvalidRequest() {
@@ -1221,7 +1220,7 @@ public final class SpringApplicationsV2Test {
 
     public static final class Upload extends AbstractApiTest<UploadApplicationRequest, UploadApplicationResponse> {
 
-        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root);
+        private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UploadApplicationRequest getInvalidRequest() {
