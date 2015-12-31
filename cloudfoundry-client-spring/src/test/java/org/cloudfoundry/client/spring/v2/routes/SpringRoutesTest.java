@@ -51,7 +51,7 @@ public final class SpringRoutesTest {
 
     public static final class AssociateApplication extends AbstractApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateRouteApplicationRequest getInvalidRequest() {
@@ -105,7 +105,7 @@ public final class SpringRoutesTest {
 
     public static final class Create extends AbstractApiTest<CreateRouteRequest, CreateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreateRouteRequest getInvalidRequest() {
@@ -161,7 +161,7 @@ public final class SpringRoutesTest {
 
     public static final class Delete extends AbstractApiTest<DeleteRouteRequest, Void> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteRouteRequest getInvalidRequest() {
@@ -197,7 +197,7 @@ public final class SpringRoutesTest {
 
     public static final class Exists extends AbstractApiTest<RouteExistsRequest, Boolean> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RouteExistsRequest getInvalidRequest() {
@@ -234,7 +234,7 @@ public final class SpringRoutesTest {
 
     public static final class Get extends AbstractApiTest<GetRouteRequest, GetRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetRouteRequest getInvalidRequest() {
@@ -289,7 +289,7 @@ public final class SpringRoutesTest {
 
     public static final class List extends AbstractApiTest<ListRoutesRequest, ListRoutesResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListRoutesRequest getInvalidRequest() {
@@ -344,7 +344,7 @@ public final class SpringRoutesTest {
 
     public static final class ListApplications extends AbstractApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListRouteApplicationsRequest getInvalidRequest() {
@@ -417,7 +417,7 @@ public final class SpringRoutesTest {
 
     public static final class RemoveApplication extends AbstractApiTest<RemoveRouteApplicationRequest, Void> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveRouteApplicationRequest getInvalidRequest() {
@@ -454,7 +454,7 @@ public final class SpringRoutesTest {
 
     public static final class Update extends AbstractApiTest<UpdateRouteRequest, UpdateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UpdateRouteRequest getInvalidRequest() {

@@ -20,6 +20,7 @@ import lombok.Getter;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
+import org.junit.After;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -37,6 +38,8 @@ import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Processors;
+import reactor.core.processor.ProcessorGroup;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -51,6 +54,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public abstract class AbstractRestTest {
+
+    protected final ProcessorGroup<?> processorGroup = Processors.ioGroup();
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
@@ -72,6 +77,11 @@ public abstract class AbstractRestTest {
 
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
+    }
+
+    @After
+    public final void shutdownProcessorGroup() throws Exception {
+        this.processorGroup.shutdown();
     }
 
     protected final void mockRequest(RequestContext requestContext) {

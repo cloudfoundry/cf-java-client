@@ -73,7 +73,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class AssignDroplet extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssignApplicationDropletRequest getInvalidRequest() {
@@ -146,7 +146,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Create extends AbstractApiTest<CreateApplicationRequest, CreateApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreateApplicationRequest getInvalidRequest() {
@@ -219,7 +219,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Delete extends AbstractApiTest<DeleteApplicationRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteApplicationRequest getInvalidRequest() {
@@ -255,7 +255,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class DeleteProcess extends AbstractApiTest<DeleteApplicationInstanceRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteApplicationInstanceRequest getInvalidRequest() {
@@ -293,7 +293,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Get extends AbstractApiTest<GetApplicationRequest, GetApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetApplicationRequest getInvalidRequest() {
@@ -365,7 +365,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class GetEnvironment extends AbstractApiTest<GetApplicationEnvironmentRequest, GetApplicationEnvironmentResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetApplicationEnvironmentRequest getInvalidRequest() {
@@ -418,7 +418,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class GetProcess extends AbstractApiTest<GetApplicationProcessRequest, GetApplicationProcessResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetApplicationProcessRequest getInvalidRequest() {
@@ -477,7 +477,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class List extends AbstractApiTest<ListApplicationsRequest, ListApplicationsResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationsRequest getInvalidRequest() {
@@ -594,7 +594,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class ListDroplets extends AbstractApiTest<ListApplicationDropletsRequest, ListApplicationDropletsResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationDropletsRequest getInvalidRequest() {
@@ -694,7 +694,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class ListPackages extends AbstractApiTest<ListApplicationPackagesRequest, ListApplicationPackagesResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationPackagesRequest getInvalidRequest() {
@@ -769,7 +769,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class ListProcesses extends AbstractApiTest<ListApplicationProcessesRequest, ListApplicationProcessesResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationProcessesRequest getInvalidRequest() {
@@ -839,7 +839,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class ListRoutes extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListApplicationRoutesRequest getInvalidRequest() {
@@ -910,7 +910,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class MapRoute extends AbstractApiTest<MapApplicationRouteRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected MapApplicationRouteRequest getInvalidRequest() {
@@ -948,7 +948,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Scale extends AbstractApiTest<ScaleApplicationRequest, ScaleApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ScaleApplicationRequest getInvalidRequest() {
@@ -1011,7 +1011,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Start extends AbstractApiTest<StartApplicationRequest, StartApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected StartApplicationRequest getInvalidRequest() {
@@ -1082,7 +1082,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Stop extends AbstractApiTest<StopApplicationRequest, StopApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected StopApplicationRequest getInvalidRequest() {
@@ -1153,7 +1153,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class UnmapRoute extends AbstractApiTest<UnmapApplicationRouteRequest, Void> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UnmapApplicationRouteRequest getInvalidRequest() {
@@ -1191,7 +1191,7 @@ public final class SpringApplicationsV3Test {
 
     public static final class Update extends AbstractApiTest<UpdateApplicationRequest, UpdateApplicationResponse> {
 
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root);
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UpdateApplicationRequest getInvalidRequest() {

@@ -36,7 +36,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
-    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root);
+    private final SpringCloudFoundryClient client = new SpringCloudFoundryClient(this.restTemplate, this.root, this.processorGroup);
 
     private final List<DeserializationProblemHandler> deserializationProblemHandlers = Collections.emptyList();
 

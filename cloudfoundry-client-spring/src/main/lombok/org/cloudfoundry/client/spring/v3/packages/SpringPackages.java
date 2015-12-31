@@ -40,6 +40,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
 
@@ -56,9 +57,10 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
      *
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param processorGroup The group to use when making requests
      */
-    public SpringPackages(RestOperations restOperations, URI root) {
-        super(restOperations, root);
+    public SpringPackages(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+        super(restOperations, root, processorGroup);
     }
 
     @Override

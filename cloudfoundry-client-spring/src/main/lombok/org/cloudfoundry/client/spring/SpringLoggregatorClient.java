@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Publishers;
+import reactor.core.processor.ProcessorGroup;
 import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.BiConsumer;
 import reactor.fn.Consumer;
@@ -74,15 +75,15 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
-        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient));
+        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient), getProcessorGroup(cloudFoundryClient));
 
         this.clientEndpointConfig = getClientEndpointConfig(cloudFoundryClient);
         this.root = UriComponentsBuilder.fromUri(super.root).scheme("wss").build().toUri();
         this.webSocketContainer = webSocketContainer;
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root) {
-        super(restOperations, root);
+    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+        super(restOperations, root, processorGroup);
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.webSocketContainer = webSocketContainer;
@@ -127,6 +128,10 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
             }
 
         });
+    }
+
+    private static ProcessorGroup<?> getProcessorGroup(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getProcessorGroup();
     }
 
     private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {

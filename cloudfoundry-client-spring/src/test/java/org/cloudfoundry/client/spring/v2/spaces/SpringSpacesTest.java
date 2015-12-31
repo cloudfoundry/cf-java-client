@@ -112,7 +112,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateAuditor extends AbstractApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceAuditorRequest getInvalidRequest() {
@@ -172,7 +172,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateAuditorByUsername extends AbstractApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceAuditorByUsernameRequest getInvalidRequest() {
@@ -233,7 +233,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateDeveloper extends AbstractApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceDeveloperRequest getInvalidRequest() {
@@ -293,7 +293,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateManager extends AbstractApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceManagerRequest getInvalidRequest() {
@@ -353,7 +353,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSecurityGroup extends AbstractApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceSecurityGroupRequest getInvalidRequest() {
@@ -413,7 +413,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSpaceDeveloperByUsername extends AbstractApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceDeveloperByUsernameRequest getInvalidRequest() {
@@ -474,7 +474,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSpaceManagerByUsername extends AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected AssociateSpaceManagerByUsernameRequest getInvalidRequest() {
@@ -535,7 +535,7 @@ public final class SpringSpacesTest {
 
     public static final class Create extends AbstractApiTest<CreateSpaceRequest, CreateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected CreateSpaceRequest getInvalidRequest() {
@@ -596,7 +596,7 @@ public final class SpringSpacesTest {
 
     public static final class Delete extends AbstractApiTest<DeleteSpaceRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected DeleteSpaceRequest getInvalidRequest() {
@@ -633,7 +633,7 @@ public final class SpringSpacesTest {
 
     public static final class Get extends AbstractApiTest<GetSpaceRequest, GetSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetSpaceRequest getInvalidRequest() {
@@ -692,7 +692,7 @@ public final class SpringSpacesTest {
 
     public static final class GetSummary extends AbstractApiTest<GetSpaceSummaryRequest, GetSpaceSummaryResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetSpaceSummaryRequest getInvalidRequest() {
@@ -777,7 +777,7 @@ public final class SpringSpacesTest {
 
     public static final class List extends AbstractApiTest<ListSpacesRequest, ListSpacesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpacesRequest getInvalidRequest() {
@@ -840,7 +840,7 @@ public final class SpringSpacesTest {
 
     public static final class ListApplications extends AbstractApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceApplicationsRequest getInvalidRequest() {
@@ -913,7 +913,7 @@ public final class SpringSpacesTest {
 
     public static final class ListAuditors extends AbstractApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceAuditorsRequest getInvalidRequest() {
@@ -973,7 +973,7 @@ public final class SpringSpacesTest {
 
     public static final class ListDevelopers extends AbstractApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceDevelopersRequest getInvalidRequest() {
@@ -1034,7 +1034,7 @@ public final class SpringSpacesTest {
 
     public static final class ListDomains extends AbstractApiTest<ListSpaceDomainsRequest, ListSpaceDomainsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceDomainsRequest getInvalidRequest() {
@@ -1094,7 +1094,7 @@ public final class SpringSpacesTest {
 
     public static final class ListEvents extends AbstractApiTest<ListSpaceEventsRequest, ListSpaceEventsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceEventsRequest getInvalidRequest() {
@@ -1159,7 +1159,7 @@ public final class SpringSpacesTest {
 
     public static final class ListManagers extends AbstractApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceManagersRequest getInvalidRequest() {
@@ -1220,7 +1220,7 @@ public final class SpringSpacesTest {
 
     public static final class ListRoutes extends AbstractApiTest<ListSpaceRoutesRequest, ListSpaceRoutesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceRoutesRequest getInvalidRequest() {
@@ -1277,7 +1277,7 @@ public final class SpringSpacesTest {
 
     public static final class ListSecurityGroups extends AbstractApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceSecurityGroupsRequest getInvalidRequest() {
@@ -1336,7 +1336,7 @@ public final class SpringSpacesTest {
 
     public static final class ListServiceInstances extends AbstractApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceServiceInstancesRequest getInvalidRequest() {
@@ -1398,7 +1398,7 @@ public final class SpringSpacesTest {
 
     public static final class ListServices extends AbstractApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceServicesRequest getInvalidRequest() {
@@ -1456,7 +1456,7 @@ public final class SpringSpacesTest {
 
     public static final class ListUserRoles extends AbstractApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListSpaceUserRolesRequest getInvalidRequest() {
@@ -1521,7 +1521,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveAuditor extends AbstractApiTest<RemoveSpaceAuditorRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceAuditorRequest getInvalidRequest() {
@@ -1558,7 +1558,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceAuditorByUsernameRequest getInvalidRequest() {
@@ -1596,7 +1596,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveDeveloper extends AbstractApiTest<RemoveSpaceDeveloperRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceDeveloperRequest getInvalidRequest() {
@@ -1632,7 +1632,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveDeveloperByUsername extends AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceDeveloperByUsernameRequest getInvalidRequest() {
@@ -1670,7 +1670,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveManager extends AbstractApiTest<RemoveSpaceManagerRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceManagerRequest getInvalidRequest() {
@@ -1707,7 +1707,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceManagerByUsernameRequest getInvalidRequest() {
@@ -1745,7 +1745,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveSecurityGroup extends AbstractApiTest<RemoveSpaceSecurityGroupRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RemoveSpaceSecurityGroupRequest getInvalidRequest() {
@@ -1782,7 +1782,7 @@ public final class SpringSpacesTest {
 
     public static final class Update extends AbstractApiTest<UpdateSpaceRequest, UpdateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UpdateSpaceRequest getInvalidRequest() {

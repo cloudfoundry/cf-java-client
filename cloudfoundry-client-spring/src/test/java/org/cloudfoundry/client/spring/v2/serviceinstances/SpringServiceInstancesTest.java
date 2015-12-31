@@ -31,7 +31,7 @@ public final class SpringServiceInstancesTest {
 
     public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root);
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListServiceInstancesRequest getInvalidRequest() {

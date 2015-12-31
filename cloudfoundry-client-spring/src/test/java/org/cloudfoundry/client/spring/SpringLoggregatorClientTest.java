@@ -39,7 +39,7 @@ public final class SpringLoggregatorClientTest {
 
         private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, Mockito.RETURNS_SMART_NULLS);
 
-        private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root);
+        private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected RecentLogsRequest getInvalidRequest() {

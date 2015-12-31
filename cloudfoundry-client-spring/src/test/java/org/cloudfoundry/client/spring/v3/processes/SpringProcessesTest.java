@@ -42,7 +42,7 @@ public final class SpringProcessesTest {
 
     public static final class DeleteInstance extends AbstractApiTest<DeleteProcessInstanceRequest, Void> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
 
 
         @Override
@@ -80,7 +80,7 @@ public final class SpringProcessesTest {
 
     public static final class Get extends AbstractApiTest<GetProcessRequest, GetProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetProcessRequest getInvalidRequest() {
@@ -138,7 +138,7 @@ public final class SpringProcessesTest {
 
     public static final class List extends AbstractApiTest<ListProcessesRequest, ListProcessesResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ListProcessesRequest getInvalidRequest() {
@@ -234,7 +234,7 @@ public final class SpringProcessesTest {
 
     public static final class Scale extends AbstractApiTest<ScaleProcessRequest, ScaleProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected ScaleProcessRequest getInvalidRequest() {
@@ -295,7 +295,7 @@ public final class SpringProcessesTest {
 
     public static final class Update extends AbstractApiTest<UpdateProcessRequest, UpdateProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected UpdateProcessRequest getInvalidRequest() {

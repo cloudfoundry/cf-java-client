@@ -28,7 +28,7 @@ public final class SpringInfoTest {
 
     public static final class Get extends AbstractApiTest<GetInfoRequest, GetInfoResponse> {
 
-        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root);
+        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetInfoRequest getInvalidRequest() {
