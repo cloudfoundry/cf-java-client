@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import reactor.rx.Streams;
 
@@ -27,7 +26,7 @@ public final class OrganizationsTest extends AbstractOperationsIntegrationTest {
         Streams
                 .wrap(this.cloudFoundryOperations.organizations().list())
                 .count()
-                .subscribe(new TestSubscriber<Long>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 

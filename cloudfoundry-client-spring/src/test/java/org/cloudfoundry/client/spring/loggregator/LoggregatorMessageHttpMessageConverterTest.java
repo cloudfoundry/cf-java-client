@@ -26,6 +26,7 @@ import reactor.rx.Stream;
 import java.io.IOException;
 import java.util.Map;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -48,14 +49,18 @@ public final class LoggregatorMessageHttpMessageConverterTest {
     }
 
     @Test
-    public void readInternal() throws IOException {
+    public void readInternal() throws IOException, InterruptedException {
         MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
+        TestSubscriber<Long> testSubscriber = new TestSubscriber<>();
+
         this.messageConverter.readInternal(null, inputMessage)
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber
                         .assertEquals(14L));
+
+        testSubscriber.verify(1, SECONDS);
     }
 
     @Test

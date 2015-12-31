@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
+import org.cloudfoundry.utils.test.BlockingSubscriber;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,6 +45,8 @@ import static org.junit.Assert.assertEquals;
 public abstract class AbstractClientIntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger("test");
+
+    private final TestSubscriber<?> testSubscriber = new TestSubscriber<>();
 
     @Autowired
     protected CloudFoundryClient cloudFoundryClient;
@@ -59,6 +63,30 @@ public abstract class AbstractClientIntegrationTest {
     @After
     public final void cleanup() throws Exception {
         this.logger.info(">> CLEANUP << ");
+        cleanupApplications(this.cloudFoundryClient).await(5, SECONDS);
+        cleanupRoutes(this.cloudFoundryClient).await(5, SECONDS);
+        cleanupDomains(this.cloudFoundryClient).await(5, SECONDS);
+    }
+
+    @After
+    public final void verify() throws InterruptedException {
+        this.testSubscriber.verify(5, SECONDS);
+    }
+
+    protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
+        T actual = tuple.t1;
+        T expected = tuple.t2;
+
+        assertEquals(expected, actual);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> TestSubscriber<T> testSubscriber() {
+        return (TestSubscriber<T>) this.testSubscriber;
+    }
+
+    private static BlockingSubscriber<Void> cleanupApplications(CloudFoundryClient cloudFoundryClient) {
+        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
 
         Paginated
                 .requestResources(page -> {
@@ -66,34 +94,22 @@ public abstract class AbstractClientIntegrationTest {
                             .page(page)
                             .build();
 
-                    return this.cloudFoundryClient.applicationsV2().list(request);
+                    return cloudFoundryClient.applicationsV2().list(request);
                 })
                 .flatMap(response -> {
                     DeleteApplicationRequest request = DeleteApplicationRequest.builder()
                             .id(Resources.getId(response))
                             .build();
 
-                    return this.cloudFoundryClient.applicationsV2().delete(request);
+                    return cloudFoundryClient.applicationsV2().delete(request);
                 })
-                .subscribe(new TestSubscriber<>());
+                .subscribe(subscriber);
 
+        return subscriber;
+    }
 
-        Paginated
-                .requestResources(page -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request);
-                })
-                .flatMap(response -> {
-                    DeleteRouteRequest request = DeleteRouteRequest.builder()
-                            .id(Resources.getId(response))
-                            .build();
-
-                    return this.cloudFoundryClient.routes().delete(request);
-                })
-                .subscribe(new TestSubscriber<>());
+    private static BlockingSubscriber<Void> cleanupDomains(CloudFoundryClient cloudFoundryClient) {
+        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
 
         Paginated
                 .requestResources(page -> {
@@ -101,7 +117,7 @@ public abstract class AbstractClientIntegrationTest {
                             .page(page)
                             .build();
 
-                    return this.cloudFoundryClient.domains().list(request);
+                    return cloudFoundryClient.domains().list(request);
                 })
                 .filter(response -> {
                     String name = Resources.getEntity(response).getName();
@@ -112,16 +128,34 @@ public abstract class AbstractClientIntegrationTest {
                             .id(Resources.getId(response))
                             .build();
 
-                    return this.cloudFoundryClient.domains().delete(request);
+                    return cloudFoundryClient.domains().delete(request);
                 })
-                .subscribe(new TestSubscriber<>());
+                .subscribe(subscriber);
+
+        return subscriber;
     }
 
-    protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
-        T actual = tuple.t1;
-        T expected = tuple.t2;
+    private static BlockingSubscriber<Void> cleanupRoutes(CloudFoundryClient cloudFoundryClient) {
+        BlockingSubscriber<Void> subscriber = new BlockingSubscriber<>();
 
-        assertEquals(expected, actual);
+        Paginated
+                .requestResources(page -> {
+                    ListRoutesRequest request = ListRoutesRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return cloudFoundryClient.routes().list(request);
+                })
+                .flatMap(response -> {
+                    DeleteRouteRequest request = DeleteRouteRequest.builder()
+                            .id(Resources.getId(response))
+                            .build();
+
+                    return cloudFoundryClient.routes().delete(request);
+                })
+                .subscribe(subscriber);
+
+        return subscriber;
     }
 
 }

@@ -27,7 +27,6 @@ import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.operations.v2.Resources;
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
         this.organizationId
                 .flatMap(this::createDomainEntity)
                 .zipWith(this.organizationId)
-                .subscribe(new TestSubscriber<Tuple2<DomainEntity, String>>()
+                .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
@@ -60,7 +59,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
 
                     return this.cloudFoundryClient.domains().delete(request);
                 })
-                .subscribe(new TestSubscriber<>());
+                .subscribe(testSubscriber());
     }
 
     @Test
@@ -77,7 +76,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .map(Resources::getEntity);
                 })
                 .zipWith(this.organizationId)
-                .subscribe(new TestSubscriber<Tuple2<DomainEntity, String>>()
+                .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
 
@@ -94,7 +93,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(2L));
     }
 
@@ -113,7 +112,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .map(Resources::getId);
                 })
                 .zipWith(this.spaceId)
-                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
@@ -174,7 +173,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -191,7 +190,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .id(domainId)
-                            .name("test.domain.name")
+                            .name(this.spaceName)
                             .build();
 
                     return Streams
@@ -200,7 +199,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .map(Resources::getId);
                 })
                 .zipWith(this.spaceId)
-                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
@@ -224,7 +223,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .map(Resources::getId);
                 })
                 .zipWith(this.spaceId)
-                .subscribe(new TestSubscriber<Tuple2<String, String>>()
+                .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
@@ -242,7 +241,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 
@@ -261,7 +260,7 @@ public final class DomainsTest extends AbstractClientIntegrationTest {
                             .flatMap(Resources::getResources);
                 })
                 .count()
-                .subscribe(new TestSubscriber<>()
+                .subscribe(testSubscriber()
                         .assertEquals(1L));
     }
 

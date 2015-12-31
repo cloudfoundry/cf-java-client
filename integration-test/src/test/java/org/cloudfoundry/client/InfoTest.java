@@ -18,7 +18,6 @@ package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -37,7 +36,7 @@ public final class InfoTest extends AbstractClientIntegrationTest {
                 .build();
 
         this.cloudFoundryClient.info().get(request)
-                .subscribe(new TestSubscriber<GetInfoResponse>()
+                .subscribe(this.<GetInfoResponse>testSubscriber()
                         .assertThat(response -> assertEquals(SUPPORTED_API_VERSION, response.getApiVersion())));
     }
 

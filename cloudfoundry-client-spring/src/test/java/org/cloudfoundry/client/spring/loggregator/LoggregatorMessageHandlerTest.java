@@ -25,16 +25,17 @@ import org.junit.Test;
 import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.client.loggregator.LoggregatorMessage.MessageType.ERR;
 
 public final class LoggregatorMessageHandlerTest {
 
-    private final TestSubscriber<LoggregatorMessage> subscriber = new TestSubscriber<>();
+    private final TestSubscriber<LoggregatorMessage> testSubscriber = new TestSubscriber<>();
 
-    private final LoggregatorMessageHandler messageHandler = new LoggregatorMessageHandler(this.subscriber);
+    private final LoggregatorMessageHandler messageHandler = new LoggregatorMessageHandler(this.testSubscriber);
 
     @Test
-    public void onMessage() {
+    public void onMessage() throws InterruptedException {
         Date timestamp = new Date();
 
         LoggregatorProtocolBuffers.LogMessage logMessage = LoggregatorProtocolBuffers.LogMessage.newBuilder()
@@ -47,7 +48,10 @@ public final class LoggregatorMessageHandlerTest {
                 .setTimestamp(MILLISECONDS.toNanos(timestamp.getTime()))
                 .build();
 
-        this.subscriber
+        this.messageHandler.onMessage(logMessage.toByteArray());
+
+        this.testSubscriber.onComplete();
+        this.testSubscriber
                 .assertEquals(LoggregatorMessage.builder()
                         .applicationId("test-app-id")
                         .drainUrl("test-drain-url")
@@ -56,17 +60,17 @@ public final class LoggregatorMessageHandlerTest {
                         .sourceId("test-source-id")
                         .sourceName("test-source-name")
                         .timestamp(timestamp)
-                        .build());
-
-        this.messageHandler.onMessage(logMessage.toByteArray());
+                        .build())
+                .verify(1, SECONDS);
     }
 
     @Test
-    public void onMessageError() {
-        this.subscriber
-                .assertError(Exception.class);
-
+    public void onMessageError() throws InterruptedException {
         this.messageHandler.onMessage(new byte[0]);
+
+        this.testSubscriber
+                .assertError(Exception.class)
+                .verify(1, SECONDS);
     }
 
 }

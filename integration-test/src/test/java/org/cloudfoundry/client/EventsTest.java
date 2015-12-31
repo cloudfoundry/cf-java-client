@@ -22,12 +22,12 @@ import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.operations.v2.Resources;
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public final class EventsTest extends AbstractClientIntegrationTest {
@@ -42,17 +42,22 @@ public final class EventsTest extends AbstractClientIntegrationTest {
 
                     Stream<GetEventResponse> actual = Streams.wrap(this.cloudFoundryClient.events().get(request));
 
-                    return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
+                    return Streams.zip(Streams.just(resource), actual);
                 })
-                .subscribe(new TestSubscriber<Tuple2<EventResource, EventResource>>()
-                        .assertThat(this::assertTupleEquality));
+                .subscribe(this.<Tuple2<ListEventsResponse.Resource, GetEventResponse>>testSubscriber()
+                        .assertThat(tuple -> {
+                            ListEventsResponse.Resource expected = tuple.t1;
+                            GetEventResponse actual = tuple.t2;
+
+                            assertEquals(Resources.getId(expected), Resources.getId(actual));
+                        }));
     }
 
     @Test
     public void list() {
         listEvents()
                 .count()
-                .subscribe(new TestSubscriber<Long>()
+                .subscribe(this.<Long>testSubscriber()
                         .assertThat(count -> assertTrue(count > 0)));
     }
 
@@ -70,7 +75,7 @@ public final class EventsTest extends AbstractClientIntegrationTest {
 
                     return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
                 })
-                .subscribe(new TestSubscriber<Tuple2<EventResource, EventResource>>()
+                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
@@ -88,7 +93,7 @@ public final class EventsTest extends AbstractClientIntegrationTest {
 
                     return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
                 })
-                .subscribe(new TestSubscriber<Tuple2<EventResource, EventResource>>()
+                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
@@ -106,7 +111,7 @@ public final class EventsTest extends AbstractClientIntegrationTest {
 
                     return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
                 })
-                .subscribe(new TestSubscriber<Tuple2<EventResource, EventResource>>()
+                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
