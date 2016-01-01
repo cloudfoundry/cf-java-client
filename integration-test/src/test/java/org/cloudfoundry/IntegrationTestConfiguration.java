@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import reactor.core.error.Exceptions;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
@@ -68,6 +69,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn({"organizationId", "spaceId"})
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
                                                   @Value("${test.organization}") String organization,
                                                   @Value("${test.space}") String space) {
