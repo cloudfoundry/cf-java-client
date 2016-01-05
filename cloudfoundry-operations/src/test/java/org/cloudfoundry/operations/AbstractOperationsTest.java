@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v2.routes.Routes;
 import org.junit.Before;
 import reactor.rx.Stream;
 import reactor.rx.Streams;
@@ -47,7 +48,7 @@ public abstract class AbstractOperationsTest {
 
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
 
-    protected final org.cloudfoundry.client.v2.routes.Routes routes = mock(org.cloudfoundry.client.v2.routes.Routes.class, RETURNS_SMART_NULLS);
+    protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
 
     protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
 

@@ -47,7 +47,7 @@ import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
-public class DefaultRoutesTest {
+public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidDomain extends AbstractOperationsApiTest<Boolean> {
 
@@ -118,7 +118,7 @@ public class DefaultRoutesTest {
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(super.routes.exists(request2)).thenReturn(Publishers.just(false));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Publishers.just(false));
         }
 
         @Override
@@ -186,7 +186,7 @@ public class DefaultRoutesTest {
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(super.routes.exists(request2)).thenReturn(Publishers.just(true));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Publishers.just(true));
         }
 
         @Override
@@ -241,7 +241,7 @@ public class DefaultRoutesTest {
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(super.routes.exists(request3)).thenReturn(Publishers.just(true));
+            when(this.cloudFoundryClient.routes().exists(request3)).thenReturn(Publishers.just(true));
         }
 
         @Override
