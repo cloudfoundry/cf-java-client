@@ -20,8 +20,11 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
@@ -62,4 +65,15 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
         });
     }
 
+    @Override
+    public Publisher<GetServiceInstanceResponse> get(final GetServiceInstanceRequest request) {
+        return get(request, GetServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances", request.getId());
+            }
+
+        });
+    }
 }
