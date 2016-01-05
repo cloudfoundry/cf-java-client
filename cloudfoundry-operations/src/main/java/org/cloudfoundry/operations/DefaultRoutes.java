@@ -63,7 +63,8 @@ final class DefaultRoutes implements Routes {
 
     @Override
     public Publisher<Boolean> check(CheckRouteRequest request) {
-        return Validators.stream(request)
+        return Validators
+                .stream(request)
                 .zipWith(this.organizationId)
                 .flatMap(requestDomainId(this.cloudFoundryClient))
                 .flatMap(requestCheckRoute(this.cloudFoundryClient))
@@ -73,7 +74,8 @@ final class DefaultRoutes implements Routes {
 
     @Override
     public Publisher<Route> list(ListRoutesRequest request) {
-        return Validators.stream(request)
+        return Validators
+                .stream(request)
                 .flatMap(requestRouteResources(this.cloudFoundryClient, this.organizationId, this.spaceId))
                 .flatMap(requestAuxiliaryContent(this.cloudFoundryClient));
     }

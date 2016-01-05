@@ -44,7 +44,8 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
     @Override
     public Publisher<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
-        return Validators.stream(getSpaceQuotaRequest)
+        return Validators
+                .stream(getSpaceQuotaRequest)
                 .zipWith(this.organizationId)
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
