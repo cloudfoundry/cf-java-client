@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.job;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.cloudfoundry.client.v2.Resource;
 
 /**
- * Job entity in response payload for the Upload Bits operation.
+ * The response payload for the Get Job operation
  */
 @Data
-public final class JobEntity {
-
-    private final String id;
-
-    private final String status;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class GetJobResponse extends Resource<JobEntity> {
 
     @Builder
-    JobEntity(@JsonProperty("guid") String id,
-              @JsonProperty("status") String status) {
-        this.id = id;
-        this.status = status;
+    GetJobResponse(@JsonProperty("entity") JobEntity entity,
+                   @JsonProperty("metadata") Metadata metadata) {
+        super(entity, metadata);
     }
 
 }

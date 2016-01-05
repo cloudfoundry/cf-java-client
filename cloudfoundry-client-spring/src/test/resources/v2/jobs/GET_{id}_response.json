@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "guid": "e86ffe00-a243-48f7-be05-8f1f41bee864",
+    "created_at": "2015-11-30T23:38:44Z",
+    "url": "/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864"
+  },
+  "entity": {
+    "guid": "e86ffe00-a243-48f7-be05-8f1f41bee864",
+    "status": "failed",
+    "error": "Use of entity>error is deprecated in favor of entity>error_details.",
+    "error_details": {
+      "error_code": "UnknownError",
+      "description": "An unknown error occurred.",
+      "code": 10001
+    }
+  }
+}

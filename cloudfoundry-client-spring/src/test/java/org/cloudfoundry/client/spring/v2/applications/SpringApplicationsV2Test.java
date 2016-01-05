@@ -39,7 +39,7 @@ import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DownloadDropletRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v2.applications.JobEntity;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;

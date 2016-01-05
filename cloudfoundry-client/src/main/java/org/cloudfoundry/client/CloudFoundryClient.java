@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -81,6 +82,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Info Client API
      */
     Info info();
+
+    /**
+     * Main entry point to the Cloud Foundry Job Client API
+     *
+     * @return the Cloud Foundry Job Client API
+     */
+    Jobs jobs();
 
     /**
      * Main entry point to the Cloud Foundry Organizations Client API

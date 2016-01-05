@@ -29,6 +29,7 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.http.HttpMethod.GET;
@@ -40,7 +41,7 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
 
     private final List<DeserializationProblemHandler> deserializationProblemHandlers = Collections.emptyList();
 
-    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class, Mockito.RETURNS_SMART_NULLS);
+    private final SslCertificateTruster sslCertificateTruster = mock(SslCertificateTruster.class, RETURNS_SMART_NULLS);
 
     @Test
     public void applicationsV2() {
@@ -119,6 +120,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void info() {
         assertNotNull(this.client.info());
+    }
+
+    @Test
+    public void jobs() {
+        assertNotNull(this.client.jobs());
     }
 
     @Test
