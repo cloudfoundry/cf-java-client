@@ -25,6 +25,7 @@ import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class GetServiceInstanceRequestTest {
+
     @Test
     public void isValid() {
         ValidationResult result = GetServiceInstanceRequest.builder()
@@ -44,4 +45,5 @@ public final class GetServiceInstanceRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("id must be specified", result.getMessages().get(0));
     }
+
 }

@@ -54,4 +54,5 @@ public final class GetServiceInstanceRequest implements Validatable {
 
         return builder.build();
     }
+
 }
