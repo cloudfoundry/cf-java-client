@@ -21,6 +21,7 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
@@ -65,8 +66,8 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
     }
 
     @Override
-    public Publisher<ServiceInstanceResource> get(final GetServiceInstanceRequest request) {
-        return get(request, ServiceInstanceResource.class, new Consumer<UriComponentsBuilder>() {
+    public Publisher<GetServiceInstanceResponse> get(final GetServiceInstanceRequest request) {
+        return get(request, GetServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

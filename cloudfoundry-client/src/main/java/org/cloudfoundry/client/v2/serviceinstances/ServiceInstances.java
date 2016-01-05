@@ -38,5 +38,5 @@ public interface ServiceInstances {
      * @param request the Get Service Instance request
      * @return the response from the Get Service Instance request
      */
-    Publisher<ServiceInstanceResource> get(GetServiceInstanceRequest request);
+    Publisher<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
 }

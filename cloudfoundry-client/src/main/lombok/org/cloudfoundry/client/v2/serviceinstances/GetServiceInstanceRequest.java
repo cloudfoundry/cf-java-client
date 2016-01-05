@@ -28,7 +28,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Get Service Instance operation
  */
 @Data
-public class GetServiceInstanceRequest implements Validatable {
+public final class GetServiceInstanceRequest implements Validatable {
 
     /**
      * The id

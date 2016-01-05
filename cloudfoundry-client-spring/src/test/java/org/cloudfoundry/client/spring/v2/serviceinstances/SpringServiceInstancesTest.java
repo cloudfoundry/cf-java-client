@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
@@ -104,10 +105,10 @@ public final class SpringServiceInstancesTest {
     }
 
 
-    public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, ServiceInstanceResource> {
+    public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
 
         private final SpringServiceInstances serviceInstances =
-                new SpringServiceInstances(this.restTemplate, this.root);
+                new SpringServiceInstances(this.restTemplate, this.root, this.processorGroup);
 
         @Override
         protected GetServiceInstanceRequest getInvalidRequest() {
@@ -124,8 +125,8 @@ public final class SpringServiceInstancesTest {
         }
 
         @Override
-        protected ServiceInstanceResource getResponse() {
-            return ServiceInstanceResource.builder()
+        protected GetServiceInstanceResponse getResponse() {
+            return GetServiceInstanceResponse.builder()
                     .metadata(Metadata.builder()
                             .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
                             .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
@@ -164,7 +165,7 @@ public final class SpringServiceInstancesTest {
         }
 
         @Override
-        protected Publisher<ServiceInstanceResource> invoke(GetServiceInstanceRequest request) {
+        protected Publisher<GetServiceInstanceResponse> invoke(GetServiceInstanceRequest request) {
             return this.serviceInstances.get(request);
         }
 
