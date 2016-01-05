@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,22 @@
 
 package org.cloudfoundry.operations;
 
-import org.reactivestreams.Publisher;
+import reactor.fn.Function;
 
-/**
- * Main entry point to the Cloud Foundry Spaces Operations API
- */
-public interface Spaces {
+final class Optionals {
 
-    /**
-     * Gets space information
-     *
-     * @param getSpaceRequest details of space information required
-     * @return the space information
-     */
-    Publisher<SpaceDetail> get(GetSpaceRequest getSpaceRequest);
+    private Optionals() {
+    }
 
-    /**
-     * Lists the spaces
-     *
-     * @return the spaces
-     */
-    Publisher<SpaceSummary> list();
+    static <T> Function<T, Optional<T>> toOptional() {
+        return new Function<T, Optional<T>>() {
+
+            @Override
+            public Optional<T> apply(T value) {
+                return Optional.of(value);
+            }
+
+        };
+    }
 
 }
