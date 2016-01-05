@@ -31,6 +31,7 @@ import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
+import org.cloudfoundry.client.spring.v2.job.SpringJobs;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
@@ -44,6 +45,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -100,6 +102,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Events events;
 
     private final Info info;
+
+    private final Jobs jobs;
 
     private final Organizations organizations;
 
@@ -163,6 +167,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
         this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
         this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
+        this.jobs = new SpringJobs(this.restOperations, root, this.processorGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
         this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
@@ -182,6 +187,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
         this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
         this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
+        this.jobs = new SpringJobs(this.restOperations, root, this.processorGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
         this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
@@ -219,6 +225,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Info info() {
         return this.info;
+    }
+
+    @Override
+    public Jobs jobs() {
+        return this.jobs;
     }
 
     @Override
@@ -270,17 +281,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static ProcessorGroup<?> createProcessorGroup() {
         return Processors.ioGroup("cloudfoundry-client-spring", BaseProcessor.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
-    }
-
-    private static Consumer<Throwable> uncaughtExceptionHandler() {
-        return new Consumer<Throwable>() {
-
-            @Override
-            public void accept(Throwable throwable) {
-                LOGGER.error(throwable.getMessage());
-            }
-
-        };
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,
@@ -341,6 +341,17 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static URI getRoot(String host) {
         return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
+    }
+
+    private static Consumer<Throwable> uncaughtExceptionHandler() {
+        return new Consumer<Throwable>() {
+
+            @Override
+            public void accept(Throwable throwable) {
+                LOGGER.error(throwable.getMessage());
+            }
+
+        };
     }
 
 }
