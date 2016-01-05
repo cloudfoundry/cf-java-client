@@ -38,7 +38,7 @@ public final class ListProcessesResponse extends PaginatedResponse<ListProcesses
 
     @Builder
     ListProcessesResponse(@JsonProperty("pagination") Pagination pagination,
-                          @JsonProperty("resources") @Singular List<Resource> resources) {
+                          @JsonProperty("resources") @Singular List<ListProcessesResponse.Resource> resources) {
         super(pagination, resources);
     }
 
@@ -64,4 +64,5 @@ public final class ListProcessesResponse extends PaginatedResponse<ListProcesses
         }
 
     }
+
 }

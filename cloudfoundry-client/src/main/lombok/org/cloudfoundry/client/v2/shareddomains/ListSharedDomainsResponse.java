@@ -40,7 +40,6 @@ public final class ListSharedDomainsResponse extends PaginatedResponse<SharedDom
                               @JsonProperty("resources") @Singular List<SharedDomainResource> resources,
                               @JsonProperty("total_pages") Integer totalPages,
                               @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

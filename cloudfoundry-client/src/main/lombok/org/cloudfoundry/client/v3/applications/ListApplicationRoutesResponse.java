@@ -38,7 +38,7 @@ public final class ListApplicationRoutesResponse extends PaginatedResponse<ListA
 
     @Builder
     ListApplicationRoutesResponse(@JsonProperty("pagination") Pagination pagination,
-                                  @JsonProperty("resources") @Singular List<Resource> resources) {
+                                  @JsonProperty("resources") @Singular List<ListApplicationRoutesResponse.Resource> resources) {
         super(pagination, resources);
     }
 

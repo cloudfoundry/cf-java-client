@@ -36,4 +36,5 @@ public final class ServiceInstanceResource extends Resource<ServiceInstanceEntit
                             @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

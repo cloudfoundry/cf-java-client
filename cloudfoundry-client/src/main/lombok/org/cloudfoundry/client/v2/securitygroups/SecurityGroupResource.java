@@ -36,4 +36,5 @@ public final class SecurityGroupResource extends Resource<SecurityGroupEntity> {
                           @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

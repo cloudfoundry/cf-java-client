@@ -33,7 +33,7 @@ public final class CreateRouteResponse extends Resource<RouteEntity> {
 
     @Builder
     CreateRouteResponse(@JsonProperty("entity") RouteEntity entity,
-                        @JsonProperty("metadata") Resource.Metadata metadata) {
+                        @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -116,8 +117,8 @@ public final class CloudFoundryOperationsBuilder {
 
         Stream<String> organizationId = Paginated
                 .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
-                .reduce(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
-                .switchIfEmpty(CloudFoundryOperationsBuilder.<ListOrganizationsResponse.Resource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
+                .reduce(CloudFoundryOperationsBuilder.<OrganizationResource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
+                .switchIfEmpty(CloudFoundryOperationsBuilder.<OrganizationResource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
                 .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
                 .map(Resources.extractId())
                 .cache(1);

@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
@@ -73,7 +74,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
@@ -112,7 +113,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListOrganizationsResponse response = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id-1")
                                 .build())
@@ -120,7 +121,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                                 .name("test-name")
                                 .build())
                         .build())
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id-2")
                                 .build())
@@ -147,7 +148,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
@@ -202,7 +203,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListOrganizationsResponse response = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())
@@ -229,7 +230,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .build();
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
-                .resource(ListOrganizationsResponse.Resource.builder()
+                .resource(OrganizationResource.builder()
                         .metadata(Metadata.builder()
                                 .id("test-organization-id")
                                 .build())

@@ -32,31 +32,15 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListEventsResponse extends PaginatedResponse<ListEventsResponse.Resource> {
+public final class ListEventsResponse extends PaginatedResponse<EventResource> {
 
     @Builder
     ListEventsResponse(@JsonProperty("next_url") String nextUrl,
                        @JsonProperty("prev_url") String previousUrl,
-                       @JsonProperty("resources") @Singular List<ListEventsResponse.Resource> resources,
+                       @JsonProperty("resources") @Singular List<EventResource> resources,
                        @JsonProperty("total_pages") Integer totalPages,
                        @JsonProperty("total_results") Integer totalResults) {
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
-    }
-
-    /**
-     * The entity response payload for the List Events operation
-     */
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static final class Resource extends EventResource {
-
-        @Builder
-        Resource(@JsonProperty("entity") EventEntity entity,
-                 @JsonProperty("metadata") Metadata metadata) {
-            super(entity, metadata);
-        }
-
     }
 
 }

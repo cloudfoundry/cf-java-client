@@ -19,13 +19,13 @@ package org.cloudfoundry.operations;
 /**
  * An exception indicating an unexpected response has been returned from Cloud Foundry
  */
-public class UnexpectedResponseException extends RuntimeException {
+public final class UnexpectedResponseException extends RuntimeException {
 
     private static final long serialVersionUID = 4252724548345624556L;
 
     /**
      * Creates a new instance
-     * 
+     *
      * @param message an explanation of the problem
      */
     public UnexpectedResponseException(String message) {

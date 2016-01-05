@@ -32,8 +32,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListSpaceQuotaDefinitionsResponse
-        extends PaginatedResponse<SpaceQuotaDefinitionResource> {
+public final class ListSpaceQuotaDefinitionsResponse extends PaginatedResponse<SpaceQuotaDefinitionResource> {
 
     @Builder
     ListSpaceQuotaDefinitionsResponse(@JsonProperty("next_url") String nextUrl,
@@ -41,7 +40,7 @@ public final class ListSpaceQuotaDefinitionsResponse
                                       @JsonProperty("resources") @Singular List<SpaceQuotaDefinitionResource> resources,
                                       @JsonProperty("total_pages") Integer totalPages,
                                       @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
+
 }

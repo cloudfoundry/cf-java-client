@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
@@ -54,11 +55,11 @@ final class DefaultOrganizations implements Organizations {
         };
     }
 
-    private static Function<ListOrganizationsResponse.Resource, Organization> toOrganization() {
-        return new Function<ListOrganizationsResponse.Resource, Organization>() {
+    private static Function<OrganizationResource, Organization> toOrganization() {
+        return new Function<OrganizationResource, Organization>() {
 
             @Override
-            public Organization apply(ListOrganizationsResponse.Resource resource) {
+            public Organization apply(OrganizationResource resource) {
                 return Organization.builder()
                         .id(Resources.getId(resource))
                         .name(Resources.getEntity(resource).getName())

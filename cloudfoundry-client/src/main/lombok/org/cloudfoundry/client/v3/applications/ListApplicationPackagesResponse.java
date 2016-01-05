@@ -40,7 +40,7 @@ public final class ListApplicationPackagesResponse extends PaginatedResponse<Lis
 
     @Builder
     ListApplicationPackagesResponse(@JsonProperty("pagination") Pagination pagination,
-                                    @JsonProperty("resources") @Singular List<Resource> resources) {
+                                    @JsonProperty("resources") @Singular List<ListApplicationPackagesResponse.Resource> resources) {
         super(pagination, resources);
     }
 
@@ -66,4 +66,5 @@ public final class ListApplicationPackagesResponse extends PaginatedResponse<Lis
         }
 
     }
+
 }

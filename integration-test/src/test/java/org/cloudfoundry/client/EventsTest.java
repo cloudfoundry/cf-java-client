@@ -21,7 +21,6 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.operations.v2.Resources;
 import org.junit.Test;
 import reactor.fn.tuple.Tuple2;
@@ -45,9 +44,9 @@ public final class EventsTest extends AbstractIntegrationTest {
 
                     return Streams.zip(Streams.just(resource), actual);
                 })
-                .subscribe(this.<Tuple2<ListEventsResponse.Resource, GetEventResponse>>testSubscriber()
+                .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
                         .assertThat(tuple -> {
-                            ListEventsResponse.Resource expected = tuple.t1;
+                            EventResource expected = tuple.t1;
                             GetEventResponse actual = tuple.t2;
 
                             assertEquals(Resources.getId(expected), Resources.getId(actual));
@@ -70,11 +69,11 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .actee(Resources.getEntity(resource).getActee())
                             .build();
 
-                    Stream<ListEventsResponse.Resource> actual = Streams
+                    Stream<EventResource> actual = Streams
                             .wrap(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
-                    return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
+                    return Streams.zip(Streams.just(resource), actual);
                 })
                 .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -88,11 +87,11 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .timestamp(Resources.getEntity(resource).getTimestamp())
                             .build();
 
-                    Stream<ListEventsResponse.Resource> actual = Streams
+                    Stream<EventResource> actual = Streams
                             .wrap(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
-                    return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
+                    return Streams.zip(Streams.just(resource), actual);
                 })
                 .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -106,22 +105,22 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .type(Resources.getEntity(resource).getType())
                             .build();
 
-                    Stream<ListEventsResponse.Resource> actual = Streams
+                    Stream<EventResource> actual = Streams
                             .wrap(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
-                    return Streams.<EventResource, EventResource>zip(Streams.just(resource), actual);
+                    return Streams.zip(Streams.just(resource), actual);
                 })
                 .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
 
-    private Stream<ListEventsResponse.Resource> getFirstEvent() {
+    private Stream<EventResource> getFirstEvent() {
         return listEvents()
                 .take(1);
     }
 
-    private Stream<ListEventsResponse.Resource> listEvents() {
+    private Stream<EventResource> listEvents() {
         ListEventsRequest request = ListEventsRequest.builder()
                 .build();
 

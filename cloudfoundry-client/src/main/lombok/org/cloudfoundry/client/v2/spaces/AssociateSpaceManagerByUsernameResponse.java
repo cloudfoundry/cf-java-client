@@ -33,8 +33,7 @@ public final class AssociateSpaceManagerByUsernameResponse extends Resource<Spac
 
     @Builder
     AssociateSpaceManagerByUsernameResponse(@JsonProperty("entity") SpaceEntity entity,
-                                            @JsonProperty("metadata") Resource.Metadata metadata) {
-
+                                            @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

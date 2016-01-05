@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,10 +29,11 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public abstract class EventResource extends Resource<EventEntity> {
+public final class EventResource extends Resource<EventEntity> {
 
-    protected EventResource(@JsonProperty("entity") EventEntity entity,
-                            @JsonProperty("metadata") Metadata metadata) {
+    @Builder
+    EventResource(@JsonProperty("entity") EventEntity entity,
+                  @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

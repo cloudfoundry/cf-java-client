@@ -18,6 +18,7 @@ package org.cloudfoundry.client.spring.v2.events;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.events.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -110,7 +111,7 @@ public final class SpringEventsTest {
             return ListEventsResponse.builder()
                     .totalResults(3)
                     .totalPages(1)
-                    .resource(ListEventsResponse.Resource.builder()
+                    .resource(EventResource.builder()
                             .metadata(Metadata.builder()
                                     .id("2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
                                     .url("/v2/events/2cc565c7-18e7-4fff-8fb0-52525f09ee6b")
@@ -130,7 +131,7 @@ public final class SpringEventsTest {
                                     .organizationId("49723c2a-a11e-43f8-971a-b34e9134ce00")
                                     .build())
                             .build())
-                    .resource(ListEventsResponse.Resource.builder()
+                    .resource(EventResource.builder()
                             .metadata(Metadata.builder()
                                     .id("a82493b7-bd16-421b-aef0-d0b5c40869e8")
                                     .url("/v2/events/a82493b7-bd16-421b-aef0-d0b5c40869e8")
@@ -150,7 +151,7 @@ public final class SpringEventsTest {
                                     .organizationId("52c7fb45-e31b-4271-9f16-8c94df30d8c7")
                                     .build())
                             .build())
-                    .resource(ListEventsResponse.Resource.builder()
+                    .resource(EventResource.builder()
                             .metadata(Metadata.builder()
                                     .id("4a0e6a34-2807-44cd-a5cc-b61890662ade")
                                     .url("/v2/events/4a0e6a34-2807-44cd-a5cc-b61890662ade")

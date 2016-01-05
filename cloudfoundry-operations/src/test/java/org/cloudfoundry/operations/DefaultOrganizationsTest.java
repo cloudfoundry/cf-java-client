@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -39,7 +40,7 @@ public final class DefaultOrganizationsTest {
                     .page(1)
                     .build();
             ListOrganizationsResponse page1 = ListOrganizationsResponse.builder()
-                    .resource(ListOrganizationsResponse.Resource.builder()
+                    .resource(OrganizationResource.builder()
                             .metadata(Metadata.builder()
                                     .id("test-id-1")
                                     .build())
@@ -55,7 +56,7 @@ public final class DefaultOrganizationsTest {
                     .page(2)
                     .build();
             ListOrganizationsResponse page2 = ListOrganizationsResponse.builder()
-                    .resource(ListOrganizationsResponse.Resource.builder()
+                    .resource(OrganizationResource.builder()
                             .metadata(Metadata.builder()
                                     .id("test-id-2")
                                     .build())

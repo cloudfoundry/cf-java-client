@@ -44,5 +44,4 @@ public final class ListApplicationRoutesResponse extends PaginatedResponse<Route
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
-
 }

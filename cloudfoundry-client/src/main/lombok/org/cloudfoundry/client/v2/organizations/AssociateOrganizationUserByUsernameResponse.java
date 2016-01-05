@@ -33,7 +33,7 @@ public final class AssociateOrganizationUserByUsernameResponse extends Resource<
 
     @Builder
     AssociateOrganizationUserByUsernameResponse(@JsonProperty("entity") OrganizationEntity entity,
-                                                @JsonProperty("metadata") Resource.Metadata metadata) {
+                                                @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

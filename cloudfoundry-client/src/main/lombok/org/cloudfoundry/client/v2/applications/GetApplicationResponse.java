@@ -33,7 +33,7 @@ public final class GetApplicationResponse extends Resource<ApplicationEntity> {
 
     @Builder
     GetApplicationResponse(@JsonProperty("entity") ApplicationEntity entity,
-                           @JsonProperty("metadata") Resource.Metadata metadata) {
+                           @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

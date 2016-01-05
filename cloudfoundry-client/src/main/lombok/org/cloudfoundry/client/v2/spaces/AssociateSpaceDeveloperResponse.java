@@ -36,4 +36,5 @@ public final class AssociateSpaceDeveloperResponse extends Resource<SpaceEntity>
                                     @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

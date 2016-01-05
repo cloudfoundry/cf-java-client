@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,10 +29,11 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public abstract class OrganizationResource extends Resource<OrganizationEntity> {
+public final class OrganizationResource extends Resource<OrganizationEntity> {
 
-    protected OrganizationResource(@JsonProperty("entity") OrganizationEntity entity,
-                                   @JsonProperty("metadata") Metadata metadata) {
+    @Builder
+    OrganizationResource(@JsonProperty("entity") OrganizationEntity entity,
+                         @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

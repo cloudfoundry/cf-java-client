@@ -40,7 +40,6 @@ public final class ListServiceInstancesResponse extends PaginatedResponse<Servic
                                  @JsonProperty("resources") @Singular List<ServiceInstanceResource> resources,
                                  @JsonProperty("total_pages") Integer totalPages,
                                  @JsonProperty("total_results") Integer totalResults) {
-
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 

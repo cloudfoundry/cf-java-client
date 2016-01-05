@@ -35,12 +35,11 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListApplicationProcessesResponse
-        extends PaginatedResponse<ListApplicationProcessesResponse.Resource> {
+public final class ListApplicationProcessesResponse extends PaginatedResponse<ListApplicationProcessesResponse.Resource> {
 
     @Builder
     ListApplicationProcessesResponse(@JsonProperty("pagination") Pagination pagination,
-                                     @JsonProperty("resources") @Singular List<Resource> resources) {
+                                     @JsonProperty("resources") @Singular List<ListApplicationProcessesResponse.Resource> resources) {
         super(pagination, resources);
     }
 
@@ -66,4 +65,5 @@ public final class ListApplicationProcessesResponse
         }
 
     }
+
 }

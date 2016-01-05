@@ -36,4 +36,5 @@ public final class ServiceBindingResource extends Resource<ServiceBindingEntity>
                            @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

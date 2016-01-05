@@ -33,8 +33,7 @@ public final class GetSpaceQuotaDefinitionResponse extends Resource<SpaceQuotaDe
 
     @Builder
     GetSpaceQuotaDefinitionResponse(@JsonProperty("entity") SpaceQuotaDefinitionEntity entity,
-                                    @JsonProperty("metadata") Resource.Metadata metadata) {
-
+                                    @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

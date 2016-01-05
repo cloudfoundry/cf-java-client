@@ -34,7 +34,6 @@ public final class AssociateSpaceDeveloperByUsernameResponse extends Resource<Sp
     @Builder
     AssociateSpaceDeveloperByUsernameResponse(@JsonProperty("entity") SpaceEntity entity,
                                               @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

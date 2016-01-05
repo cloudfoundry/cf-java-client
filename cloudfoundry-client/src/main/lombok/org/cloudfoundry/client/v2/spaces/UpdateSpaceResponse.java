@@ -34,7 +34,6 @@ public final class UpdateSpaceResponse extends Resource<SpaceEntity> {
     @Builder
     UpdateSpaceResponse(@JsonProperty("entity") SpaceEntity entity,
                         @JsonProperty("metadata") Resource.Metadata metadata) {
-
         super(entity, metadata);
     }
 

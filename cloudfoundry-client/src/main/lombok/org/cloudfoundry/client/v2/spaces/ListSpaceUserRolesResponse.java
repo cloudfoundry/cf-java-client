@@ -43,5 +43,4 @@ public final class ListSpaceUserRolesResponse extends PaginatedResponse<UserSpac
         super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
-
 }

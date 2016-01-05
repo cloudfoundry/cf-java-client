@@ -36,4 +36,5 @@ public final class UserSpaceRoleResource extends Resource<UserSpaceRoleEntity> {
                           @JsonProperty("metadata") Resource.Metadata metadata) {
         super(entity, metadata);
     }
+
 }

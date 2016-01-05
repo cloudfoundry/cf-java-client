@@ -65,6 +65,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.OrganizationSpaceSummary;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
@@ -971,7 +972,7 @@ public final class SpringOrganizationsTest {
             return ListOrganizationsResponse.builder()
                     .totalResults(1)
                     .totalPages(1)
-                    .resource(ListOrganizationsResponse.Resource.builder()
+                    .resource(OrganizationResource.builder()
                             .metadata(Metadata.builder()
                                     .id("deb3c359-2261-45ba-b34f-ee7487acd71a")
                                     .url("/v2/organizations/deb3c359-2261-45ba-b34f-ee7487acd71a")

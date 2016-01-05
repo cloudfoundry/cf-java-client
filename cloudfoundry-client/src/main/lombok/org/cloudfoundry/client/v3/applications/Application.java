@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v3.Link;
 import java.util.Map;
 
 @Data
-abstract class Application {
+public abstract class Application {
 
     private final String buildpack;
 

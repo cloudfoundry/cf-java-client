@@ -38,4 +38,3 @@ public final class UserResource extends Resource<UserEntity> {
     }
 
 }
-
