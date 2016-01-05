@@ -227,8 +227,7 @@ final class DefaultSpaces implements Spaces {
     }
 
     private static Function<Integer, Publisher<ListSpaceApplicationsResponse>> requestSpaceApplicationPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return new Function<Integer,
-                Publisher<ListSpaceApplicationsResponse>>() {
+        return new Function<Integer, Publisher<ListSpaceApplicationsResponse>>() {
 
             @Override
             public Publisher<ListSpaceApplicationsResponse> apply(Integer page) {
