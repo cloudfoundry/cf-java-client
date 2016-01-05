@@ -24,8 +24,15 @@ import org.reactivestreams.Publisher;
 public interface ServiceInstances {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/list_all_service_instances.html">List
-     * Service Instances</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/retrieve_a_particular_service_instance.html">Retrieve a Particular Service Instance</a> request
+     *
+     * @param request the Get Service Instance request
+     * @return the response from the Get Service Instance request
+     */
+    Publisher<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/list_all_service_instances.html">List Service Instances</a> request
      *
      * @param request the List Service Instances request
      * @return the response from the List Service Instances request

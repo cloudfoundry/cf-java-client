@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "guid": "24ec15f9-f6c7-434a-8893-51baab8408d8",
+    "url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8",
+    "created_at": "2015-07-27T22:43:08Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-133",
+    "credentials": {
+      "creds-key-72": "creds-val-72"
+    },
+    "service_plan_guid": "2b53255a-8b40-4671-803d-21d3f5d4183a",
+    "space_guid": "83b3e705-49fd-4c40-8adf-f5e34f622a19",
+    "gateway_data": null,
+    "dashboard_url": null,
+    "type": "managed_service_instance",
+    "last_operation": {
+      "type": "create",
+      "state": "succeeded",
+      "description": "service broker-provided description",
+      "updated_at": "2015-07-27T22:43:08Z",
+      "created_at": "2015-07-27T22:43:08Z"
+    },
+    "tags": [
+      "accounting",
+      "mongodb"
+    ],
+    "space_url": "/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19",
+    "service_plan_url": "/v2/service_plans/2b53255a-8b40-4671-803d-21d3f5d4183a",
+    "service_bindings_url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings",
+    "service_keys_url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys"
+  }
+}

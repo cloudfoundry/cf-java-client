@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.spring.v2.serviceinstances;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
@@ -28,6 +30,71 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceInstancesTest {
+
+    public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, this.processorGroup);
+
+        @Override
+        protected GetServiceInstanceRequest getInvalidRequest() {
+            return GetServiceInstanceRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_instances/test-id")
+                    .status(OK)
+                    .responsePayload("v2/service_instances/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServiceInstanceResponse getResponse() {
+            return GetServiceInstanceResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("24ec15f9-f6c7-434a-8893-51baab8408d8")
+                            .url("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8")
+                            .createdAt("2015-07-27T22:43:08Z")
+                            .build())
+                    .entity(ServiceInstanceEntity.builder()
+                            .name("name-133")
+                            .credential("creds-key-72", "creds-val-72")
+                            .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
+                            .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
+                            .type("managed_service_instance")
+                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                                    .type("create")
+                                    .state("succeeded")
+                                    .description("service broker-provided description")
+                                    .updatedAt("2015-07-27T22:43:08Z")
+                                    .createdAt("2015-07-27T22:43:08Z")
+                                    .build())
+                            .tag("accounting")
+                            .tag("mongodb")
+                            .spaceUrl("/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19")
+                            .servicePlanUrl("/v2/service_plans/2b53255a-8b40-4671-803d-21d3f5d4183a")
+                            .serviceBindingsUrl
+                                    ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings")
+                            .serviceKeysUrl
+                                    ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetServiceInstanceRequest getValidRequest() throws Exception {
+            return GetServiceInstanceRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetServiceInstanceResponse> invoke(GetServiceInstanceRequest request) {
+            return this.serviceInstances.get(request);
+        }
+
+    }
 
     public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
