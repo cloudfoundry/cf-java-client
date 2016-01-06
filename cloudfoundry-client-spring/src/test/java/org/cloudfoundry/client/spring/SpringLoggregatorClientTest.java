@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
 import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
-import reactor.rx.Streams;
+import reactor.rx.Stream;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.WebSocketContainer;
@@ -39,7 +39,7 @@ public final class SpringLoggregatorClientTest {
 
         private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, RETURNS_SMART_NULLS);
 
-        private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root, this.processorGroup);
+        private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RecentLogsRequest getInvalidRequest() {
@@ -69,7 +69,7 @@ public final class SpringLoggregatorClientTest {
 
         @Override
         protected Publisher<Long> invoke(RecentLogsRequest request) {
-            return Streams
+            return Stream
                     .from(this.client.recent(request))
                     .count();
         }

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.domains;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Domains Client API
@@ -31,7 +31,7 @@ public interface Domains {
      * @param request the Create a Domain request
      * @return the response from the Create a Domain request
      */
-    Publisher<CreateDomainResponse> create(CreateDomainRequest request);
+    Mono<CreateDomainResponse> create(CreateDomainRequest request);
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/delete_a_particular_domain_%28deprecated%29.html">Delete a Particular Domain</a> request
@@ -39,7 +39,7 @@ public interface Domains {
      * @param request the Delete a Particular Domain request
      * @return the response from the Delete a Particular Domain request
      */
-    Publisher<Void> delete(DeleteDomainRequest request);
+    Mono<Void> delete(DeleteDomainRequest request);
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/214/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">Get Domain</a> request
@@ -47,7 +47,7 @@ public interface Domains {
      * @param request The Get Domain request
      * @return the response from the Get Domain request
      */
-    Publisher<GetDomainResponse> get(GetDomainRequest request);
+    Mono<GetDomainResponse> get(GetDomainRequest request);
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/list_all_domains_%28deprecated%29.html">List all Domains</a> request
@@ -55,7 +55,7 @@ public interface Domains {
      * @param request the List all Domains request
      * @return the response from the List all Domains request
      */
-    Publisher<ListDomainsResponse> list(ListDomainsRequest request);
+    Mono<ListDomainsResponse> list(ListDomainsRequest request);
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/214/domains_%28deprecated%29/list_all_spaces_for_the_domain_%28deprecated%29.html">List all Spaces for the Domain</a> request
@@ -63,6 +63,6 @@ public interface Domains {
      * @param request the List all Spaces for the Domain request
      * @return the response from the List all Spaces for the Domain request
      */
-    Publisher<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request);
+    Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request);
 
 }

@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.v2.info;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
@@ -28,7 +28,7 @@ public final class SpringInfoTest {
 
     public static final class Get extends AbstractApiTest<GetInfoRequest, GetInfoResponse> {
 
-        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root, this.processorGroup);
+        private final SpringInfo info = new SpringInfo(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetInfoRequest getInvalidRequest() {
@@ -68,7 +68,7 @@ public final class SpringInfoTest {
         }
 
         @Override
-        protected Publisher<GetInfoResponse> invoke(GetInfoRequest request) {
+        protected Mono<GetInfoResponse> invoke(GetInfoRequest request) {
             return this.info.get(request);
         }
 

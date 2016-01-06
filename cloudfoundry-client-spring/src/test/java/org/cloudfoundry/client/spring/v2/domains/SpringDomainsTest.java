@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import java.util.Collections;
 
@@ -45,7 +45,7 @@ public final class SpringDomainsTest {
 
     public static final class Create extends AbstractApiTest<CreateDomainRequest, CreateDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreateDomainRequest getInvalidRequest() {
@@ -90,14 +90,14 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Publisher<CreateDomainResponse> invoke(CreateDomainRequest request) {
+        protected Mono<CreateDomainResponse> invoke(CreateDomainRequest request) {
             return this.domains.create(request);
         }
     }
 
     public static final class Delete extends AbstractApiTest<DeleteDomainRequest, Void> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteDomainRequest getInvalidRequest() {
@@ -125,14 +125,14 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteDomainRequest request) {
+        protected Mono<Void> invoke(DeleteDomainRequest request) {
             return this.domains.delete(request);
         }
     }
 
     public static final class Get extends AbstractApiTest<GetDomainRequest, GetDomainResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetDomainRequest getInvalidRequest() {
@@ -170,7 +170,7 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Publisher<GetDomainResponse> invoke(GetDomainRequest request) {
+        protected Mono<GetDomainResponse> invoke(GetDomainRequest request) {
             return this.domains.get(request);
         }
 
@@ -178,7 +178,7 @@ public final class SpringDomainsTest {
 
     public static final class ListDomains extends AbstractApiTest<ListDomainsRequest, ListDomainsResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListDomainsRequest getInvalidRequest() {
@@ -252,14 +252,14 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Publisher<ListDomainsResponse> invoke(ListDomainsRequest request) {
+        protected Mono<ListDomainsResponse> invoke(ListDomainsRequest request) {
             return this.domains.list(request);
         }
     }
 
     public static final class ListSpaces extends AbstractApiTest<ListDomainSpacesRequest, ListDomainSpacesResponse> {
 
-        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListDomainSpacesRequest getInvalidRequest() {
@@ -315,7 +315,7 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Publisher<ListDomainSpacesResponse> invoke(ListDomainSpacesRequest request) {
+        protected Mono<ListDomainSpacesResponse> invoke(ListDomainSpacesRequest request) {
             return this.domains.listSpaces(request);
         }
 

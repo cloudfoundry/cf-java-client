@@ -92,7 +92,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -107,7 +107,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationAuditor extends AbstractApiTest<AssociateOrganizationAuditorRequest, AssociateOrganizationAuditorResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationAuditorRequest getInvalidRequest() {
@@ -159,7 +159,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationAuditorResponse> invoke(AssociateOrganizationAuditorRequest request) {
+        protected Mono<AssociateOrganizationAuditorResponse> invoke(AssociateOrganizationAuditorRequest request) {
             return this.organizations.associateAuditor(request);
         }
 
@@ -167,7 +167,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationAuditorByUsername extends AbstractApiTest<AssociateOrganizationAuditorByUsernameRequest, AssociateOrganizationAuditorByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationAuditorByUsernameRequest getInvalidRequest() {
@@ -220,7 +220,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationAuditorByUsernameResponse> invoke(AssociateOrganizationAuditorByUsernameRequest request) {
+        protected Mono<AssociateOrganizationAuditorByUsernameResponse> invoke(AssociateOrganizationAuditorByUsernameRequest request) {
             return this.organizations.associateAuditorByUsername(request);
         }
 
@@ -228,7 +228,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationBillingManager extends AbstractApiTest<AssociateOrganizationBillingManagerRequest, AssociateOrganizationBillingManagerResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationBillingManagerRequest getInvalidRequest() {
@@ -280,7 +280,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationBillingManagerResponse> invoke(AssociateOrganizationBillingManagerRequest request) {
+        protected Mono<AssociateOrganizationBillingManagerResponse> invoke(AssociateOrganizationBillingManagerRequest request) {
             return this.organizations.associateBillingManager(request);
         }
 
@@ -289,7 +289,7 @@ public final class SpringOrganizationsTest {
     public static final class AssociateOrganizationBillingManagerByUsername
             extends AbstractApiTest<AssociateOrganizationBillingManagerByUsernameRequest, AssociateOrganizationBillingManagerByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
@@ -342,7 +342,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationBillingManagerByUsernameResponse> invoke(AssociateOrganizationBillingManagerByUsernameRequest request) {
+        protected Mono<AssociateOrganizationBillingManagerByUsernameResponse> invoke(AssociateOrganizationBillingManagerByUsernameRequest request) {
             return this.organizations.associateBillingManagerByUsername(request);
         }
 
@@ -350,7 +350,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationManager extends AbstractApiTest<AssociateOrganizationManagerRequest, AssociateOrganizationManagerResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationManagerRequest getInvalidRequest() {
@@ -402,7 +402,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationManagerResponse> invoke(AssociateOrganizationManagerRequest request) {
+        protected Mono<AssociateOrganizationManagerResponse> invoke(AssociateOrganizationManagerRequest request) {
             return this.organizations.associateManager(request);
         }
 
@@ -410,7 +410,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationManagerByUsername extends AbstractApiTest<AssociateOrganizationManagerByUsernameRequest, AssociateOrganizationManagerByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationManagerByUsernameRequest getInvalidRequest() {
@@ -463,7 +463,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationManagerByUsernameResponse> invoke(AssociateOrganizationManagerByUsernameRequest request) {
+        protected Mono<AssociateOrganizationManagerByUsernameResponse> invoke(AssociateOrganizationManagerByUsernameRequest request) {
             return this.organizations.associateManagerByUsername(request);
         }
 
@@ -471,7 +471,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationUser extends AbstractApiTest<AssociateOrganizationUserRequest, AssociateOrganizationUserResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationUserRequest getInvalidRequest() {
@@ -523,7 +523,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationUserResponse> invoke(AssociateOrganizationUserRequest request) {
+        protected Mono<AssociateOrganizationUserResponse> invoke(AssociateOrganizationUserRequest request) {
             return this.organizations.associateUser(request);
         }
 
@@ -531,7 +531,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociateOrganizationUserByUsername extends AbstractApiTest<AssociateOrganizationUserByUsernameRequest, AssociateOrganizationUserByUsernameResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationUserByUsernameRequest getInvalidRequest() {
@@ -584,7 +584,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationUserByUsernameResponse> invoke(AssociateOrganizationUserByUsernameRequest request) {
+        protected Mono<AssociateOrganizationUserByUsernameResponse> invoke(AssociateOrganizationUserByUsernameRequest request) {
             return this.organizations.associateUserByUsername(request);
         }
 
@@ -592,7 +592,7 @@ public final class SpringOrganizationsTest {
 
     public static final class AssociatePrivateDomain extends AbstractApiTest<AssociateOrganizationPrivateDomainRequest, AssociateOrganizationPrivateDomainResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateOrganizationPrivateDomainRequest getInvalidRequest() {
@@ -644,7 +644,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<AssociateOrganizationPrivateDomainResponse> invoke(AssociateOrganizationPrivateDomainRequest request) {
+        protected Mono<AssociateOrganizationPrivateDomainResponse> invoke(AssociateOrganizationPrivateDomainRequest request) {
             return this.organizations.associatePrivateDomain(request);
         }
 
@@ -652,7 +652,7 @@ public final class SpringOrganizationsTest {
 
     public static final class Create extends AbstractApiTest<CreateOrganizationRequest, CreateOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreateOrganizationRequest getInvalidRequest() {
@@ -705,7 +705,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<CreateOrganizationResponse> invoke(CreateOrganizationRequest request) {
+        protected Mono<CreateOrganizationResponse> invoke(CreateOrganizationRequest request) {
             return this.organizations.create(request);
         }
 
@@ -713,7 +713,7 @@ public final class SpringOrganizationsTest {
 
     public static final class Delete extends AbstractApiTest<DeleteOrganizationRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteOrganizationRequest getInvalidRequest() {
@@ -742,14 +742,14 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteOrganizationRequest request) {
+        protected Mono<Void> invoke(DeleteOrganizationRequest request) {
             return this.organizations.delete(request);
         }
     }
 
     public static final class Get extends AbstractApiTest<GetOrganizationRequest, GetOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetOrganizationRequest getInvalidRequest() {
@@ -800,7 +800,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<GetOrganizationResponse> invoke(GetOrganizationRequest request) {
+        protected Mono<GetOrganizationResponse> invoke(GetOrganizationRequest request) {
             return this.organizations.get(request);
         }
 
@@ -808,7 +808,7 @@ public final class SpringOrganizationsTest {
 
     public static final class GetInstanceUsage extends AbstractApiTest<GetOrganizationInstanceUsageRequest, GetOrganizationInstanceUsageResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetOrganizationInstanceUsageRequest getInvalidRequest() {
@@ -839,7 +839,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<GetOrganizationInstanceUsageResponse> invoke(GetOrganizationInstanceUsageRequest request) {
+        protected Mono<GetOrganizationInstanceUsageResponse> invoke(GetOrganizationInstanceUsageRequest request) {
             return this.organizations.getInstanceUsage(request);
         }
 
@@ -847,7 +847,7 @@ public final class SpringOrganizationsTest {
 
     public static final class GetMemoryUsage extends AbstractApiTest<GetOrganizationMemoryUsageRequest, GetOrganizationMemoryUsageResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetOrganizationMemoryUsageRequest getInvalidRequest() {
@@ -878,7 +878,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<GetOrganizationMemoryUsageResponse> invoke(GetOrganizationMemoryUsageRequest request) {
+        protected Mono<GetOrganizationMemoryUsageResponse> invoke(GetOrganizationMemoryUsageRequest request) {
             return this.organizations.getMemoryUsage(request);
         }
 
@@ -886,7 +886,7 @@ public final class SpringOrganizationsTest {
 
     public static final class GetUserRoles extends AbstractApiTest<GetOrganizationUserRolesRequest, GetOrganizationUserRolesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetOrganizationUserRolesRequest getInvalidRequest() {
@@ -944,7 +944,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<GetOrganizationUserRolesResponse> invoke(GetOrganizationUserRolesRequest request) {
+        protected Mono<GetOrganizationUserRolesResponse> invoke(GetOrganizationUserRolesRequest request) {
             return this.organizations.getUserRoles(request);
         }
 
@@ -952,7 +952,7 @@ public final class SpringOrganizationsTest {
 
     public static final class List extends AbstractApiTest<ListOrganizationsRequest, ListOrganizationsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationsRequest getInvalidRequest() {
@@ -1007,7 +1007,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationsResponse> invoke(ListOrganizationsRequest request) {
+        protected Mono<ListOrganizationsResponse> invoke(ListOrganizationsRequest request) {
             return this.organizations.list(request);
         }
 
@@ -1015,7 +1015,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListAuditors extends AbstractApiTest<ListOrganizationAuditorsRequest, ListOrganizationAuditorsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationAuditorsRequest getInvalidRequest() {
@@ -1068,7 +1068,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationAuditorsResponse> invoke(ListOrganizationAuditorsRequest request) {
+        protected Mono<ListOrganizationAuditorsResponse> invoke(ListOrganizationAuditorsRequest request) {
             return this.organizations.listAuditors(request);
         }
 
@@ -1077,7 +1077,7 @@ public final class SpringOrganizationsTest {
     public static final class ListBillingManagers
             extends AbstractApiTest<ListOrganizationBillingManagersRequest, ListOrganizationBillingManagersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationBillingManagersRequest getInvalidRequest() {
@@ -1130,7 +1130,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationBillingManagersResponse> invoke(ListOrganizationBillingManagersRequest request) {
+        protected Mono<ListOrganizationBillingManagersResponse> invoke(ListOrganizationBillingManagersRequest request) {
             return this.organizations.listBillingManagers(request);
         }
 
@@ -1138,7 +1138,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListManagers extends AbstractApiTest<ListOrganizationManagersRequest, ListOrganizationManagersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationManagersRequest getInvalidRequest() {
@@ -1210,7 +1210,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationManagersResponse> invoke(ListOrganizationManagersRequest request) {
+        protected Mono<ListOrganizationManagersResponse> invoke(ListOrganizationManagersRequest request) {
             return this.organizations.listManagers(request);
         }
 
@@ -1218,7 +1218,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListPrivateDomains extends AbstractApiTest<ListOrganizationPrivateDomainsRequest, ListOrganizationPrivateDomainsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationPrivateDomainsRequest getInvalidRequest() {
@@ -1265,7 +1265,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationPrivateDomainsResponse> invoke(ListOrganizationPrivateDomainsRequest request) {
+        protected Mono<ListOrganizationPrivateDomainsResponse> invoke(ListOrganizationPrivateDomainsRequest request) {
             return this.organizations.listPrivateDomains(request);
         }
 
@@ -1273,7 +1273,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListServices extends AbstractApiTest<ListOrganizationServicesRequest, ListOrganizationServicesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationServicesRequest getInvalidRequest() {
@@ -1323,7 +1323,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationServicesResponse> invoke(ListOrganizationServicesRequest request) {
+        protected Mono<ListOrganizationServicesResponse> invoke(ListOrganizationServicesRequest request) {
             return this.organizations.listServices(request);
         }
 
@@ -1331,7 +1331,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListSpaceQuotaDefinitions extends AbstractApiTest<ListOrganizationSpaceQuotaDefinitionsRequest, ListOrganizationSpaceQuotaDefinitionsResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationSpaceQuotaDefinitionsRequest getInvalidRequest() {
@@ -1382,7 +1382,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> invoke(ListOrganizationSpaceQuotaDefinitionsRequest request) {
+        protected Mono<ListOrganizationSpaceQuotaDefinitionsResponse> invoke(ListOrganizationSpaceQuotaDefinitionsRequest request) {
             return this.organizations.listSpaceQuotaDefinitions(request);
         }
 
@@ -1390,7 +1390,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListSpaces extends AbstractApiTest<ListOrganizationSpacesRequest, ListOrganizationSpacesResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationSpacesRequest getInvalidRequest() {
@@ -1447,7 +1447,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationSpacesResponse> invoke(ListOrganizationSpacesRequest request) {
+        protected Mono<ListOrganizationSpacesResponse> invoke(ListOrganizationSpacesRequest request) {
             return this.organizations.listSpaces(request);
         }
 
@@ -1455,7 +1455,7 @@ public final class SpringOrganizationsTest {
 
     public static final class ListUsers extends AbstractApiTest<ListOrganizationUsersRequest, ListOrganizationUsersResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListOrganizationUsersRequest getInvalidRequest() {
@@ -1508,7 +1508,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<ListOrganizationUsersResponse> invoke(ListOrganizationUsersRequest request) {
+        protected Mono<ListOrganizationUsersResponse> invoke(ListOrganizationUsersRequest request) {
             return this.organizations.listUsers(request);
         }
 
@@ -1516,7 +1516,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveAuditor extends AbstractApiTest<RemoveOrganizationAuditorRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationAuditorRequest getInvalidRequest() {
@@ -1545,7 +1545,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationAuditorRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationAuditorRequest request) {
             return this.organizations.removeAuditor(request);
         }
 
@@ -1553,7 +1553,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveOrganizationAuditorByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationAuditorByUsernameRequest getInvalidRequest() {
@@ -1583,7 +1583,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationAuditorByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationAuditorByUsernameRequest request) {
             return this.organizations.removeAuditorByUsername(request);
         }
 
@@ -1591,7 +1591,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveBillingManager extends AbstractApiTest<RemoveOrganizationBillingManagerRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationBillingManagerRequest getInvalidRequest() {
@@ -1620,7 +1620,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationBillingManagerRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationBillingManagerRequest request) {
             return this.organizations.removeBillingManager(request);
         }
 
@@ -1628,7 +1628,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveManager extends AbstractApiTest<RemoveOrganizationManagerRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationManagerRequest getInvalidRequest() {
@@ -1657,7 +1657,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationManagerRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationManagerRequest request) {
             return this.organizations.removeManager(request);
         }
 
@@ -1665,7 +1665,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveOrganizationBillingManagerByUsername extends AbstractApiTest<RemoveOrganizationBillingManagerByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationBillingManagerByUsernameRequest getInvalidRequest() {
@@ -1695,7 +1695,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationBillingManagerByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationBillingManagerByUsernameRequest request) {
             return this.organizations.removeBillingManagerByUsername(request);
         }
 
@@ -1703,7 +1703,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemoveOrganizationManagerByUsername extends AbstractApiTest<RemoveOrganizationManagerByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationManagerByUsernameRequest getInvalidRequest() {
@@ -1733,7 +1733,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationManagerByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationManagerByUsernameRequest request) {
             return this.organizations.removeManagerByUsername(request);
         }
 
@@ -1741,7 +1741,7 @@ public final class SpringOrganizationsTest {
 
     public static final class RemovePrivateDomain extends AbstractApiTest<RemoveOrganizationPrivateDomainRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationPrivateDomainRequest getInvalidRequest() {
@@ -1770,14 +1770,14 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationPrivateDomainRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationPrivateDomainRequest request) {
             return this.organizations.removePrivateDomain(request);
         }
     }
 
     public static final class RemoveUser extends AbstractApiTest<RemoveOrganizationUserRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationUserRequest getInvalidRequest() {
@@ -1806,14 +1806,14 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationUserRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationUserRequest request) {
             return this.organizations.removeUser(request);
         }
     }
 
     public static final class RemoveUserByUsername extends AbstractApiTest<RemoveOrganizationUserByUsernameRequest, Void> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveOrganizationUserByUsernameRequest getInvalidRequest() {
@@ -1843,7 +1843,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveOrganizationUserByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveOrganizationUserByUsernameRequest request) {
             return this.organizations.removeUserByUsername(request);
         }
 
@@ -1851,7 +1851,7 @@ public final class SpringOrganizationsTest {
 
     public static final class Summary extends AbstractApiTest<SummaryOrganizationRequest, SummaryOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected SummaryOrganizationRequest getInvalidRequest() {
@@ -1892,7 +1892,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<SummaryOrganizationResponse> invoke(SummaryOrganizationRequest request) {
+        protected Mono<SummaryOrganizationResponse> invoke(SummaryOrganizationRequest request) {
             return this.organizations.summary(request);
         }
 
@@ -1900,7 +1900,7 @@ public final class SpringOrganizationsTest {
 
     public static final class Update extends AbstractApiTest<UpdateOrganizationRequest, UpdateOrganizationResponse> {
 
-        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, this.processorGroup);
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UpdateOrganizationRequest getInvalidRequest() {
@@ -1955,7 +1955,7 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Publisher<UpdateOrganizationResponse> invoke(UpdateOrganizationRequest request) {
+        protected Mono<UpdateOrganizationResponse> invoke(UpdateOrganizationRequest request) {
             return this.organizations.update(request);
         }
 

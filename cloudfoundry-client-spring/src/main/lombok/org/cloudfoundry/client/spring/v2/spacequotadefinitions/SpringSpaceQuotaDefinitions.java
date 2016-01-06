@@ -25,9 +25,9 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinition
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -51,7 +51,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
     }
 
     @Override
-    public Publisher<GetSpaceQuotaDefinitionResponse> get(final GetSpaceQuotaDefinitionRequest request) {
+    public Mono<GetSpaceQuotaDefinitionResponse> get(final GetSpaceQuotaDefinitionRequest request) {
         return get(request, GetSpaceQuotaDefinitionResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -63,7 +63,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
     }
 
     @Override
-    public Publisher<ListSpaceQuotaDefinitionsResponse> list(final ListSpaceQuotaDefinitionsRequest request) {
+    public Mono<ListSpaceQuotaDefinitionsResponse> list(final ListSpaceQuotaDefinitionsRequest request) {
         return get(request, ListSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

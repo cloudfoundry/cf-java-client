@@ -31,10 +31,10 @@ import org.cloudfoundry.operations.v2.Resources;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import reactor.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,8 +43,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void create() {
         this.organizationId
-                .flatMap(this::createDomainEntity)
-                .zipWith(this.organizationId)
+                .then(this::createDomainEntity)
+                .and(this.organizationId)
                 .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
@@ -52,8 +52,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void delete() {
         this.organizationId
-                .flatMap(this::createDomainId)
-                .flatMap(domainId -> {
+                .then(this::createDomainId)
+                .then(domainId -> {
                     DeleteDomainRequest request = DeleteDomainRequest.builder()
                             .id(domainId)
                             .build();
@@ -66,17 +66,16 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void get() {
         this.organizationId
-                .flatMap(this::createDomainId)
-                .flatMap(domainId -> {
+                .then(this::createDomainId)
+                .then(domainId -> {
                     GetDomainRequest request = GetDomainRequest.builder()
                             .id(domainId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().get(request))
+                    return this.cloudFoundryClient.domains().get(request)
                             .map(Resources::getEntity);
                 })
-                .zipWith(this.organizationId)
+                .and(this.organizationId)
                 .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                         .assertThat(this::assertDomainNameAndOrganizationId));
     }
@@ -84,15 +83,15 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         this.organizationId
-                .flatMap(this::createDomain)
+                .then(this::createDomain)
                 .flatMap(response -> {
                     ListDomainsRequest request = ListDomainsRequest.builder()
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().list(request))
+                    return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
+                .as(Stream::from)
                 .count()
                 .subscribe(testSubscriber()
                         .assertEquals(2L));
@@ -101,17 +100,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpaces() {
         this.organizationId
-                .flatMap(this::createDomainId)
+                .then(this::createDomainId)
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .id(domainId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().listSpaces(request))
+                    return this.cloudFoundryClient.domains().listSpaces(request)
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
+                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -120,9 +119,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByApplicationId() {
         this.organizationId
-                .flatMap(this::createDomainId)
-                .zipWith(this.spaceId)
-                .flatMap(tuple -> {
+                .then(this::createDomainId)
+                .and(this.spaceId)
+                .then(tuple -> {
                     String domainId = tuple.t1;
                     String spaceId = tuple.t2;
 
@@ -131,8 +130,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    Stream<String> applicationId = Streams
-                            .from(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
+                    Mono<String> applicationId = this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
                             .map(Resources::getId);
 
                     CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
@@ -140,13 +138,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    Stream<String> routeId = Streams
-                            .from(this.cloudFoundryClient.routes().create(createRouteRequest))
+                    Mono<String> routeId = this.cloudFoundryClient.routes().create(createRouteRequest)
                             .map(Resources::getId);
 
-                    return Streams.zip(Streams.just(domainId), applicationId, routeId);
+                    return Mono.when(Mono.just(domainId), applicationId, routeId);
                 })
-                .flatMap(tuple -> {
+                .then(tuple -> {
                     String domainId = tuple.t1;
                     String applicationId = tuple.t2;
                     String routeId = tuple.t3;
@@ -156,8 +153,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .applicationId(applicationId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.routes().associateApplication(request))
+                    return this.cloudFoundryClient.routes().associateApplication(request)
                             .map(response -> Tuple.of(domainId, applicationId));
                 })
                 .flatMap((Tuple2<String, String> tuple) -> {
@@ -169,10 +165,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .id(domainId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().listSpaces(request))
+                    return this.cloudFoundryClient.domains().listSpaces(request)
                             .flatMap(Resources::getResources);
                 })
+                .as(Stream::from)
                 .count()
                 .subscribe(testSubscriber()
                         .assertEquals(1L));
@@ -187,18 +183,18 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByName() {
         this.organizationId
-                .flatMap(this::createDomainId)
+                .then(this::createDomainId)
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .id(domainId)
                             .name(this.spaceName)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().listSpaces(request))
+                    return this.cloudFoundryClient.domains().listSpaces(request)
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
+                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -207,8 +203,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
         this.organizationId
-                .flatMap(this::createDomainId)
-                .zipWith(this.organizationId)
+                .then(this::createDomainId)
+                .and(this.organizationId)
                 .flatMap(tuple -> {
                     String domainId = tuple.t1;
                     String organizationId = tuple.t2;
@@ -218,11 +214,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .organizationId(organizationId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().listSpaces(response))
+                    return this.cloudFoundryClient.domains().listSpaces(response)
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
+                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -231,16 +227,16 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByName() {
         this.organizationId
-                .flatMap(this::createDomain)
+                .then(this::createDomain)
                 .flatMap(response -> {
                     ListDomainsRequest request = ListDomainsRequest.builder()
                             .name("test.domain.name")
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().list(request))
+                    return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
+                .as(Stream::from)
                 .count()
                 .subscribe(testSubscriber()
                         .assertEquals(1L));
@@ -249,17 +245,17 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByOwningOrganizationId() {
         this.organizationId
-                .flatMap(organizationId -> createDomain(organizationId)
-                        .flatMap(response -> this.organizationId))
+                .then(organizationId -> createDomain(organizationId)
+                        .then(response -> this.organizationId))
                 .flatMap(organizationId -> {
                     ListDomainsRequest request = ListDomainsRequest.builder()
                             .owningOrganizationId(organizationId)
                             .build();
 
-                    return Streams
-                            .from(this.cloudFoundryClient.domains().list(request))
+                    return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
+                .as(Stream::from)
                 .count()
                 .subscribe(testSubscriber()
                         .assertEquals(1L));
@@ -273,23 +269,22 @@ public final class DomainsTest extends AbstractIntegrationTest {
         assertEquals(organizationId, entity.getOwningOrganizationId());
     }
 
-    private Stream<CreateDomainResponse> createDomain(String organizationId) {
+    private Mono<CreateDomainResponse> createDomain(String organizationId) {
         CreateDomainRequest request = CreateDomainRequest.builder()
                 .name("test.domain.name")
                 .owningOrganizationId(organizationId)
                 .wildcard(true)
                 .build();
 
-        return Streams
-                .from(this.cloudFoundryClient.domains().create(request));
+        return this.cloudFoundryClient.domains().create(request);
     }
 
-    private Stream<DomainEntity> createDomainEntity(String organizationId) {
+    private Mono<DomainEntity> createDomainEntity(String organizationId) {
         return createDomain(organizationId)
                 .map(Resources::getEntity);
     }
 
-    private Stream<String> createDomainId(String organizationId) {
+    private Mono<String> createDomainId(String organizationId) {
         return createDomain(organizationId)
                 .map(response -> response.getMetadata().getId());
     }

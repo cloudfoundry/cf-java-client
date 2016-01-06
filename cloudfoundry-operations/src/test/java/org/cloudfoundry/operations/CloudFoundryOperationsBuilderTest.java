@@ -26,7 +26,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
-import reactor.rx.Streams;
+import reactor.Mono;
 
 import static org.mockito.Mockito.when;
 
@@ -57,7 +57,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Streams.just(response));
+        when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Mono.just(response));
 
         this.builder
                 .cloudFoundryClient(this.cloudFoundryClient)
@@ -84,7 +84,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Streams.just(orgResponse));
+        when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Mono.just(orgResponse));
 
         ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
                 .organizationId("test-organization-id")
@@ -96,7 +96,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Streams.just(spaceResponse));
+        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Mono.just(spaceResponse));
 
         this.builder
                 .cloudFoundryClient(this.cloudFoundryClient)
@@ -123,7 +123,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Streams.just(response));
+        when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Mono.just(response));
 
         this.builder
                 .cloudFoundryClient(this.cloudFoundryClient)
@@ -150,7 +150,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Streams.just(orgResponse));
+        when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Mono.just(orgResponse));
 
         ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
                 .organizationId("test-organization-id")
@@ -170,7 +170,7 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
                 .totalPages(1)
                 .build();
 
-        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Streams.just(spaceResponse));
+        when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Mono.just(spaceResponse));
 
         this.builder
                 .cloudFoundryClient(this.cloudFoundryClient)

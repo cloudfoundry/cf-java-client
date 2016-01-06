@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Spaces Operations API
@@ -29,7 +30,7 @@ public interface Spaces {
      * @param getSpaceRequest details of space information required
      * @return the space information
      */
-    Publisher<SpaceDetail> get(GetSpaceRequest getSpaceRequest);
+    Mono<SpaceDetail> get(GetSpaceRequest getSpaceRequest);
 
     /**
      * Lists the spaces

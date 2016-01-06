@@ -41,8 +41,8 @@ import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.BiConsumer;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
+import reactor.rx.Promise;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -99,11 +99,10 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
             }
 
         })
-                .take(1)
-                .flatMap(new Function<Stream, Publisher<? extends LoggregatorMessage>>() {
+                .flatMap(new Function<Stream, Stream<LoggregatorMessage>>() {
 
                     @Override
-                    public Publisher<? extends LoggregatorMessage> apply(Stream stream) {
+                    public Stream<LoggregatorMessage> apply(Stream stream) {
                         return stream;
                     }
 
@@ -141,8 +140,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         GetInfoRequest request = GetInfoRequest.builder()
                 .build();
 
-        return Streams
-                .from(cloudFoundryClient.info().get(request))
+        return cloudFoundryClient.info().get(request)
                 .map(new Function<GetInfoResponse, String>() {
 
                     @Override
@@ -159,20 +157,21 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                     }
 
                 })
-                .promise()
-                .poll();
+                .to(Promise.<URI>prepare())
+                .get();
 
     }
 
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
-        return Validators
-                .stream(request)
-                .flatMap(new Function<V, Publisher<T>>() {
+        return Stream
+                .from(Validators
+                        .validate(request))
+                .flatMap(new Function<V, Stream<T>>() {
 
                     @Override
-                    public Publisher<T> apply(V request) {
-                        return Streams
+                    public Stream<T> apply(V request) {
+                        return Stream
                                 .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
                                     @Override
@@ -198,7 +197,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
         final AtomicReference<Session> session = new AtomicReference<>();
 
-        Stream<T> exchange = exchange(request, new Consumer<Subscriber<T>>() {
+        return exchange(request, new Consumer<Subscriber<T>>() {
 
             @Override
             public void accept(Subscriber<T> subscriber) {
@@ -217,9 +216,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                 }
             }
 
-        });
-
-        return exchange.doOnCancel(new Runnable() {
+        }).doOnCancel(new Runnable() {
 
             @Override
             public void run() {

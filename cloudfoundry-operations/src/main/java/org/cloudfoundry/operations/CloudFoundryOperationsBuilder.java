@@ -24,11 +24,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
-import org.reactivestreams.Publisher;
 import reactor.Mono;
 import reactor.fn.Function;
 import reactor.rx.Promise;
-import reactor.rx.Streams;
+import reactor.rx.Stream;
 
 import java.util.NoSuchElementException;
 
@@ -126,14 +125,14 @@ public final class CloudFoundryOperationsBuilder {
         return organizationId;
     }
 
-    private static Mono<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Publisher<String> organizationId, String space) {
+    private static Mono<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {
         if (space == null) {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
 
-        Mono<String> spaceId = Streams
-                .from(organizationId)
-                .flatMap(requestResources(cloudFoundryClient, space))
+        Mono<String> spaceId = Stream
+                .from(organizationId
+                        .flatMap(requestResources(cloudFoundryClient, space)))
                 .single()
                 .map(Resources.extractId())
                 .otherwise(CloudFoundryOperationsBuilder.<String>convertException(String.format("Space %s does not exist", space)))
@@ -143,11 +142,11 @@ public final class CloudFoundryOperationsBuilder {
         return spaceId;
     }
 
-    private static Function<Integer, Publisher<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
-        return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
+    private static Function<Integer, Mono<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
+        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
 
             @Override
-            public Publisher<ListOrganizationsResponse> apply(Integer page) {
+            public Mono<ListOrganizationsResponse> apply(Integer page) {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder()
                         .name(organization)
                         .page(page)
@@ -158,22 +157,22 @@ public final class CloudFoundryOperationsBuilder {
         };
     }
 
-    private static Function<String, Publisher<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
-        return new Function<String, Publisher<SpaceResource>>() {
+    private static Function<String, Stream<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
+        return new Function<String, Stream<SpaceResource>>() {
 
             @Override
-            public Publisher<SpaceResource> apply(String organizationId) {
+            public Stream<SpaceResource> apply(String organizationId) {
                 return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
             }
 
         };
     }
 
-    private static Function<Integer, Publisher<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
-        return new Function<Integer, Publisher<ListSpacesResponse>>() {
+    private static Function<Integer, Mono<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+        return new Function<Integer, Mono<ListSpacesResponse>>() {
 
             @Override
-            public Publisher<ListSpacesResponse> apply(Integer page) {
+            public Mono<ListSpacesResponse> apply(Integer page) {
                 ListSpacesRequest request = ListSpacesRequest.builder()
                         .organizationId(organizationId)
                         .name(space)

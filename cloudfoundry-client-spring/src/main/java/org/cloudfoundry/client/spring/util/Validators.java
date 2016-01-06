@@ -19,20 +19,19 @@ package org.cloudfoundry.client.spring.util;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import reactor.rx.Stream;
-import reactor.rx.Streams;
+import reactor.Mono;
 
 public final class Validators {
 
     private Validators() {
     }
 
-    public static <T extends Validatable> Stream<T> stream(T request) {
+    public static <T extends Validatable> Mono<T> validate(T request) {
         ValidationResult validationResult = request.isValid();
         if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-            return Streams.fail(new RequestValidationException(validationResult));
+            return Mono.error(new RequestValidationException(validationResult));
         } else {
-            return Streams.just(request);
+            return Mono.just(request);
         }
     }
 

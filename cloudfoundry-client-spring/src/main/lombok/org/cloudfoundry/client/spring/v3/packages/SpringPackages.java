@@ -40,6 +40,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
@@ -64,7 +65,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<CopyPackageResponse> copy(final CopyPackageRequest request) {
+    public Mono<CopyPackageResponse> copy(final CopyPackageRequest request) {
         return post(request, CopyPackageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -77,7 +78,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<CreatePackageResponse> create(final CreatePackageRequest request) {
+    public Mono<CreatePackageResponse> create(final CreatePackageRequest request) {
         return post(request, CreatePackageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -89,7 +90,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<Void> delete(final DeletePackageRequest request) {
+    public Mono<Void> delete(final DeletePackageRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -113,7 +114,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<GetPackageResponse> get(final GetPackageRequest request) {
+    public Mono<GetPackageResponse> get(final GetPackageRequest request) {
         return get(request, GetPackageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -125,7 +126,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<ListPackagesResponse> list(final ListPackagesRequest request) {
+    public Mono<ListPackagesResponse> list(final ListPackagesRequest request) {
         return get(request, ListPackagesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -137,7 +138,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<StagePackageResponse> stage(final StagePackageRequest request) {
+    public Mono<StagePackageResponse> stage(final StagePackageRequest request) {
         return post(request, StagePackageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -149,7 +150,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
     }
 
     @Override
-    public Publisher<UploadPackageResponse> upload(final UploadPackageRequest request) {
+    public Mono<UploadPackageResponse> upload(final UploadPackageRequest request) {
         return postWithBody(request, new Supplier<MultiValueMap<String, FileSystemResource>>() {
 
             @Override

@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.packages;
 
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Packages Client API
@@ -29,7 +30,7 @@ public interface Packages {
      * @param request the Copy Package request
      * @return the response from the Copy Package request
      */
-    Publisher<CopyPackageResponse> copy(CopyPackageRequest request);
+    Mono<CopyPackageResponse> copy(CopyPackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/create_a_package.html">Create Package</a> request
@@ -37,7 +38,7 @@ public interface Packages {
      * @param request the Create Package request
      * @return the response from the Create Package request
      */
-    Publisher<CreatePackageResponse> create(CreatePackageRequest request);
+    Mono<CreatePackageResponse> create(CreatePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/delete_a_package.html">Delete Package</a> request
@@ -45,7 +46,7 @@ public interface Packages {
      * @param request the Delete Package request
      * @return the response from the Delete Package request
      */
-    Publisher<Void> delete(DeletePackageRequest request);
+    Mono<Void> delete(DeletePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/download_the_bits_for_a_package.html">Download the bits for a package</a> request
@@ -61,7 +62,7 @@ public interface Packages {
      * @param request the Get Package request
      * @return the response from the Get Package request
      */
-    Publisher<GetPackageResponse> get(GetPackageRequest request);
+    Mono<GetPackageResponse> get(GetPackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_%28experimental%29/list_all_packages.html">List Packages</a> request
@@ -69,7 +70,7 @@ public interface Packages {
      * @param request the List Packages request
      * @return the response from the List Packages request
      */
-    Publisher<ListPackagesResponse> list(ListPackagesRequest request);
+    Mono<ListPackagesResponse> list(ListPackagesRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/packages_(experimental)/stage_a_package.html">Stage Package</a> request
@@ -77,7 +78,7 @@ public interface Packages {
      * @param request the Stage Package request
      * @return the response from the StagePackage request
      */
-    Publisher<StagePackageResponse> stage(StagePackageRequest request);
+    Mono<StagePackageResponse> stage(StagePackageRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/packages_(experimental)/upload_bits_for_a_package_of_type_bits.html"> Upload Package</a> request
@@ -85,6 +86,6 @@ public interface Packages {
      * @param request the Upload Package request
      * @return the response from the Upload Package request
      */
-    Publisher<UploadPackageResponse> upload(UploadPackageRequest request);
+    Mono<UploadPackageResponse> upload(UploadPackageRequest request);
 
 }

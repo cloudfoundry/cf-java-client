@@ -53,9 +53,9 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -79,7 +79,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<AssignApplicationDropletResponse> assignDroplet(final AssignApplicationDropletRequest request) {
+    public Mono<AssignApplicationDropletResponse> assignDroplet(final AssignApplicationDropletRequest request) {
         return put(request, AssignApplicationDropletResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -91,7 +91,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
+    public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return post(request, CreateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -103,7 +103,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteApplicationRequest request) {
+    public Mono<Void> delete(final DeleteApplicationRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -115,7 +115,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> deleteInstance(final DeleteApplicationInstanceRequest request) {
+    public Mono<Void> deleteInstance(final DeleteApplicationInstanceRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -128,7 +128,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<GetApplicationResponse> get(final GetApplicationRequest request) {
+    public Mono<GetApplicationResponse> get(final GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -140,7 +140,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<GetApplicationEnvironmentResponse> getEnvironment(final GetApplicationEnvironmentRequest request) {
+    public Mono<GetApplicationEnvironmentResponse> getEnvironment(final GetApplicationEnvironmentRequest request) {
         return get(request, GetApplicationEnvironmentResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -152,7 +152,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<GetApplicationProcessResponse> getProcess(final GetApplicationProcessRequest request) {
+    public Mono<GetApplicationProcessResponse> getProcess(final GetApplicationProcessRequest request) {
         return get(request, GetApplicationProcessResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -164,7 +164,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationsResponse> list(final ListApplicationsRequest request) {
+    public Mono<ListApplicationsResponse> list(final ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -178,7 +178,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationDropletsResponse> listDroplets(final ListApplicationDropletsRequest request) {
+    public Mono<ListApplicationDropletsResponse> listDroplets(final ListApplicationDropletsRequest request) {
         return get(request, ListApplicationDropletsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -192,7 +192,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationPackagesResponse> listPackages(final ListApplicationPackagesRequest request) {
+    public Mono<ListApplicationPackagesResponse> listPackages(final ListApplicationPackagesRequest request) {
         return get(request, ListApplicationPackagesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -204,7 +204,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationProcessesResponse> listProcesses(final ListApplicationProcessesRequest request) {
+    public Mono<ListApplicationProcessesResponse> listProcesses(final ListApplicationProcessesRequest request) {
         return get(request, ListApplicationProcessesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -216,7 +216,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
+    public Mono<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
         return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -228,7 +228,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> mapRoute(final MapApplicationRouteRequest request) {
+    public Mono<Void> mapRoute(final MapApplicationRouteRequest request) {
         return put(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -240,7 +240,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ScaleApplicationResponse> scale(final ScaleApplicationRequest request) {
+    public Mono<ScaleApplicationResponse> scale(final ScaleApplicationRequest request) {
         return put(request, ScaleApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -252,7 +252,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<StartApplicationResponse> start(final StartApplicationRequest request) {
+    public Mono<StartApplicationResponse> start(final StartApplicationRequest request) {
         return put(request, StartApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -264,7 +264,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<StopApplicationResponse> stop(final StopApplicationRequest request) {
+    public Mono<StopApplicationResponse> stop(final StopApplicationRequest request) {
         return put(request, StopApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -276,7 +276,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> unmapRoute(final UnmapApplicationRouteRequest request) {
+    public Mono<Void> unmapRoute(final UnmapApplicationRouteRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -288,7 +288,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
+    public Mono<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
         return patch(request, UpdateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

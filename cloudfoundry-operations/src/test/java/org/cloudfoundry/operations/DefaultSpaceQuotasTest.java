@@ -25,7 +25,6 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
-import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -77,14 +76,14 @@ public final class DefaultSpaceQuotasTest {
                     .page(1)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Streams.just(page1));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
 
             ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .id(TEST_ORGANIZATION)
                     .page(2)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Streams.just(page2));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
         }
 
         @Override
@@ -94,7 +93,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected Publisher<SpaceQuota> invoke() {
+        protected Mono<SpaceQuota> invoke() {
             GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-2")
                     .build();
@@ -115,7 +114,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected Publisher<SpaceQuota> invoke() {
+        protected Mono<SpaceQuota> invoke() {
             GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .build();
 
@@ -134,7 +133,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected Publisher<SpaceQuota> invoke() {
+        protected Mono<SpaceQuota> invoke() {
             GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-2")
                     .build();
@@ -157,14 +156,14 @@ public final class DefaultSpaceQuotasTest {
                     .build();
 
             ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Streams.just(page1));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
 
             ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .id(TEST_ORGANIZATION)
                     .page(2)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Streams.just(page2));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
         }
 
         @Override
@@ -174,7 +173,7 @@ public final class DefaultSpaceQuotasTest {
         }
 
         @Override
-        protected Publisher<SpaceQuota> invoke() {
+        protected Mono<SpaceQuota> invoke() {
             GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
                     .name("test-name-0")
                     .build();
@@ -195,14 +194,14 @@ public final class DefaultSpaceQuotasTest {
                     .page(1)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Streams.just(page1));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
 
             ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                     .id(TEST_ORGANIZATION)
                     .page(2)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Streams.just(page2));
+            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
         }
 
         @Override

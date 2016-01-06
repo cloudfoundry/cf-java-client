@@ -16,20 +16,19 @@
 
 package org.cloudfoundry.operations;
 
-import reactor.rx.Stream;
-import reactor.rx.Streams;
+import reactor.Mono;
 
 final class Validators {
 
     private Validators() {
     }
 
-    static <T extends Validatable> Stream<T> stream(T request) {
+    static <T extends Validatable> Mono<T> validate(T request) {
         ValidationResult validationResult = request.isValid();
         if (validationResult.getStatus() == ValidationResult.Status.INVALID) {
-            return Streams.fail(new RequestValidationException(validationResult));
+            return Mono.error(new RequestValidationException(validationResult));
         } else {
-            return Streams.just(request);
+            return Mono.just(request);
         }
     }
 

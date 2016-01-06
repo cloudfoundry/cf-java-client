@@ -75,9 +75,9 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -101,7 +101,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceAuditorResponse> associateAuditor(final AssociateSpaceAuditorRequest request) {
+    public Mono<AssociateSpaceAuditorResponse> associateAuditor(final AssociateSpaceAuditorRequest request) {
         return put(request, AssociateSpaceAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -113,7 +113,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final AssociateSpaceAuditorByUsernameRequest request) {
+    public Mono<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(final AssociateSpaceAuditorByUsernameRequest request) {
         return put(request, AssociateSpaceAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -125,7 +125,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceDeveloperResponse> associateDeveloper(final AssociateSpaceDeveloperRequest request) {
+    public Mono<AssociateSpaceDeveloperResponse> associateDeveloper(final AssociateSpaceDeveloperRequest request) {
         return put(request, AssociateSpaceDeveloperResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -137,7 +137,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final AssociateSpaceDeveloperByUsernameRequest request) {
+    public Mono<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(final AssociateSpaceDeveloperByUsernameRequest request) {
         return put(request, AssociateSpaceDeveloperByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -149,7 +149,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceManagerResponse> associateManager(final AssociateSpaceManagerRequest request) {
+    public Mono<AssociateSpaceManagerResponse> associateManager(final AssociateSpaceManagerRequest request) {
         return put(request, AssociateSpaceManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -161,7 +161,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final AssociateSpaceManagerByUsernameRequest request) {
+    public Mono<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(final AssociateSpaceManagerByUsernameRequest request) {
         return put(request, AssociateSpaceManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -173,7 +173,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(final AssociateSpaceSecurityGroupRequest request) {
+    public Mono<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(final AssociateSpaceSecurityGroupRequest request) {
         return put(request, AssociateSpaceSecurityGroupResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -185,7 +185,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<CreateSpaceResponse> create(final CreateSpaceRequest request) {
+    public Mono<CreateSpaceResponse> create(final CreateSpaceRequest request) {
         return post(request, CreateSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -197,7 +197,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteSpaceRequest request) {
+    public Mono<Void> delete(final DeleteSpaceRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -210,7 +210,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<GetSpaceResponse> get(final GetSpaceRequest request) {
+    public Mono<GetSpaceResponse> get(final GetSpaceRequest request) {
         return get(request, GetSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -222,7 +222,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<GetSpaceSummaryResponse> getSummary(final GetSpaceSummaryRequest request) {
+    public Mono<GetSpaceSummaryResponse> getSummary(final GetSpaceSummaryRequest request) {
         return get(request, GetSpaceSummaryResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -234,7 +234,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpacesResponse> list(final ListSpacesRequest request) {
+    public Mono<ListSpacesResponse> list(final ListSpacesRequest request) {
         return get(request, ListSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -248,7 +248,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceApplicationsResponse> listApplications(final ListSpaceApplicationsRequest request) {
+    public Mono<ListSpaceApplicationsResponse> listApplications(final ListSpaceApplicationsRequest request) {
         return get(request, ListSpaceApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -262,7 +262,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceAuditorsResponse> listAuditors(final ListSpaceAuditorsRequest request) {
+    public Mono<ListSpaceAuditorsResponse> listAuditors(final ListSpaceAuditorsRequest request) {
         return get(request, ListSpaceAuditorsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -276,7 +276,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceDevelopersResponse> listDevelopers(final ListSpaceDevelopersRequest request) {
+    public Mono<ListSpaceDevelopersResponse> listDevelopers(final ListSpaceDevelopersRequest request) {
         return get(request, ListSpaceDevelopersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -290,7 +290,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceDomainsResponse> listDomains(final ListSpaceDomainsRequest request) {
+    public Mono<ListSpaceDomainsResponse> listDomains(final ListSpaceDomainsRequest request) {
         return get(request, ListSpaceDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -304,7 +304,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceEventsResponse> listEvents(final ListSpaceEventsRequest request) {
+    public Mono<ListSpaceEventsResponse> listEvents(final ListSpaceEventsRequest request) {
         return get(request, ListSpaceEventsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -318,7 +318,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceManagersResponse> listManagers(final ListSpaceManagersRequest request) {
+    public Mono<ListSpaceManagersResponse> listManagers(final ListSpaceManagersRequest request) {
         return get(request, ListSpaceManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -332,7 +332,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceRoutesResponse> listRoutes(final ListSpaceRoutesRequest request) {
+    public Mono<ListSpaceRoutesResponse> listRoutes(final ListSpaceRoutesRequest request) {
         return get(request, ListSpaceRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -346,7 +346,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceSecurityGroupsResponse> listSecurityGroups(final ListSpaceSecurityGroupsRequest request) {
+    public Mono<ListSpaceSecurityGroupsResponse> listSecurityGroups(final ListSpaceSecurityGroupsRequest request) {
         return get(request, ListSpaceSecurityGroupsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -360,7 +360,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceServiceInstancesResponse> listServiceInstances(final ListSpaceServiceInstancesRequest request) {
+    public Mono<ListSpaceServiceInstancesResponse> listServiceInstances(final ListSpaceServiceInstancesRequest request) {
         return get(request, ListSpaceServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -374,7 +374,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceServicesResponse> listServices(final ListSpaceServicesRequest request) {
+    public Mono<ListSpaceServicesResponse> listServices(final ListSpaceServicesRequest request) {
         return get(request, ListSpaceServicesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -388,7 +388,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<ListSpaceUserRolesResponse> listUserRoles(final ListSpaceUserRolesRequest request) {
+    public Mono<ListSpaceUserRolesResponse> listUserRoles(final ListSpaceUserRolesRequest request) {
         return get(request, ListSpaceUserRolesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -401,7 +401,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeAuditor(final RemoveSpaceAuditorRequest request) {
+    public Mono<Void> removeAuditor(final RemoveSpaceAuditorRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -413,7 +413,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeAuditorByUsername(final RemoveSpaceAuditorByUsernameRequest request) {
+    public Mono<Void> removeAuditorByUsername(final RemoveSpaceAuditorByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -425,7 +425,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeDeveloper(final RemoveSpaceDeveloperRequest request) {
+    public Mono<Void> removeDeveloper(final RemoveSpaceDeveloperRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -437,7 +437,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeDeveloperByUsername(final RemoveSpaceDeveloperByUsernameRequest request) {
+    public Mono<Void> removeDeveloperByUsername(final RemoveSpaceDeveloperByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -449,7 +449,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeManager(final RemoveSpaceManagerRequest request) {
+    public Mono<Void> removeManager(final RemoveSpaceManagerRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -461,7 +461,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeManagerByUsername(final RemoveSpaceManagerByUsernameRequest request) {
+    public Mono<Void> removeManagerByUsername(final RemoveSpaceManagerByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -473,7 +473,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<Void> removeSecurityGroup(final RemoveSpaceSecurityGroupRequest request) {
+    public Mono<Void> removeSecurityGroup(final RemoveSpaceSecurityGroupRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -485,7 +485,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Publisher<UpdateSpaceResponse> update(final UpdateSpaceRequest request) {
+    public Mono<UpdateSpaceResponse> update(final UpdateSpaceRequest request) {
         return put(request, UpdateSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

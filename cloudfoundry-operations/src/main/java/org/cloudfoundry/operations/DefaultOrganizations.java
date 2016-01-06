@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
 
 final class DefaultOrganizations implements Organizations {
@@ -40,11 +41,11 @@ final class DefaultOrganizations implements Organizations {
                 .map(toOrganization());
     }
 
-    private static Function<Integer, Publisher<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
+    private static Function<Integer, Mono<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
 
             @Override
-            public Publisher<ListOrganizationsResponse> apply(Integer page) {
+            public Mono<ListOrganizationsResponse> apply(Integer page) {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder()
                         .page(page)
                         .build();

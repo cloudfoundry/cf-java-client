@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import java.util.Collections;
 
@@ -40,7 +40,7 @@ public final class SpringDropletsTest {
 
     public static final class Delete extends AbstractApiTest<DeleteDropletRequest, Void> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteDropletRequest getInvalidRequest() {
@@ -68,7 +68,7 @@ public final class SpringDropletsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteDropletRequest request) {
+        protected Mono<Void> invoke(DeleteDropletRequest request) {
             return this.droplets.delete(request);
         }
 
@@ -76,7 +76,7 @@ public final class SpringDropletsTest {
 
     public static final class Get extends AbstractApiTest<GetDropletRequest, GetDropletResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
 
 
         @Override
@@ -142,7 +142,7 @@ public final class SpringDropletsTest {
         }
 
         @Override
-        protected Publisher<GetDropletResponse> invoke(GetDropletRequest request) {
+        protected Mono<GetDropletResponse> invoke(GetDropletRequest request) {
             return this.droplets.get(request);
         }
 
@@ -150,7 +150,7 @@ public final class SpringDropletsTest {
 
     public static final class List extends AbstractApiTest<ListDropletsRequest, ListDropletsResponse> {
 
-        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, this.processorGroup);
+        private final SpringDroplets droplets = new SpringDroplets(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListDropletsRequest getInvalidRequest() {
@@ -234,7 +234,7 @@ public final class SpringDropletsTest {
         }
 
         @Override
-        protected Publisher<ListDropletsResponse> invoke(ListDropletsRequest request) {
+        protected Mono<ListDropletsResponse> invoke(ListDropletsRequest request) {
             return this.droplets.list(request);
         }
 

@@ -23,7 +23,6 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
-import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -65,7 +64,7 @@ public final class DefaultApplicationsTest {
                             .build())
                     .build();
 
-            when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Streams.just(response));
+            when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Mono.just(response));
         }
 
         @Override

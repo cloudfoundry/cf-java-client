@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.job;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Job Client API
@@ -29,6 +29,6 @@ public interface Jobs {
      * @param request the Get Job request
      * @return the response from the Get Job request
      */
-    Publisher<GetJobResponse> get(GetJobRequest request);
+    Mono<GetJobResponse> get(GetJobRequest request);
 
 }

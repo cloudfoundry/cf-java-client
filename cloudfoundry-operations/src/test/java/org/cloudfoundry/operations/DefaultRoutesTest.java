@@ -43,7 +43,6 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
-import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -63,7 +62,7 @@ public final class DefaultRoutesTest {
             ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
             ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
                     .name("test-domain")
@@ -72,7 +71,7 @@ public final class DefaultRoutesTest {
             ListSharedDomainsResponse response2 = ListSharedDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.sharedDomains.list(request2)).thenReturn(Streams.just(response2));
+            when(this.sharedDomains.list(request2)).thenReturn(Mono.just(response2));
         }
 
         @Override
@@ -82,7 +81,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke() {
+        protected Mono<Boolean> invoke() {
             CheckRouteRequest request = CheckRouteRequest.builder()
                     .domain("test-domain")
                     .host("test-host")
@@ -112,13 +111,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
             RouteExistsRequest request2 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Streams.just(false));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Mono.just(false));
         }
 
         @Override
@@ -128,7 +127,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke() {
+        protected Mono<Boolean> invoke() {
             CheckRouteRequest request = CheckRouteRequest.builder()
                     .domain("test-domain")
                     .host("test-host")
@@ -150,7 +149,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke() {
+        protected Mono<Boolean> invoke() {
             CheckRouteRequest request = CheckRouteRequest.builder()
                     .domain("test-domain")
                     .host("test-host")
@@ -180,13 +179,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
             RouteExistsRequest request2 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Streams.just(true));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Mono.just(true));
         }
 
         @Override
@@ -196,7 +195,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke() {
+        protected Mono<Boolean> invoke() {
             CheckRouteRequest request = CheckRouteRequest.builder()
                     .domain("test-domain")
                     .host("test-host")
@@ -221,7 +220,7 @@ public final class DefaultRoutesTest {
             ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
             ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
                     .name("test-domain")
@@ -235,13 +234,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.sharedDomains.list(request2)).thenReturn(Streams.just(response2));
+            when(this.sharedDomains.list(request2)).thenReturn(Mono.just(response2));
 
             RouteExistsRequest request3 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request3)).thenReturn(Streams.just(true));
+            when(this.cloudFoundryClient.routes().exists(request3)).thenReturn(Mono.just(true));
         }
 
         @Override
@@ -251,7 +250,7 @@ public final class DefaultRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke() {
+        protected Mono<Boolean> invoke() {
             CheckRouteRequest request = CheckRouteRequest.builder()
                     .domain("test-domain")
                     .host("test-host")
@@ -285,7 +284,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Streams.just(response1));
+            when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Mono.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
                     .id("domain-id")
@@ -295,7 +294,7 @@ public final class DefaultRoutesTest {
                             .name("domain")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Streams.just(response2));
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
                     .id("test-space-id")
@@ -305,7 +304,7 @@ public final class DefaultRoutesTest {
                             .name("test-space")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Streams.just(response3));
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 
             ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
                     .id("route-id")
@@ -319,7 +318,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Streams.just(response4));
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Mono.just(response4));
         }
 
         @Override
@@ -387,7 +386,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Streams.just(response1));
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
                     .id("domain-id")
@@ -397,7 +396,7 @@ public final class DefaultRoutesTest {
                             .name("domain")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Streams.just(response2));
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
                     .id("test-space-id")
@@ -407,7 +406,7 @@ public final class DefaultRoutesTest {
                             .name("test-space")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Streams.just(response3));
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 
             ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
                     .id("route-id")
@@ -421,7 +420,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Streams.just(response4));
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Mono.just(response4));
         }
 
         @Override

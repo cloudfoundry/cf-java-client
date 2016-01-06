@@ -37,7 +37,7 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -51,7 +51,7 @@ public final class SpringRoutesTest {
 
     public static final class AssociateApplication extends AbstractApiTest<AssociateRouteApplicationRequest, AssociateRouteApplicationResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateRouteApplicationRequest getInvalidRequest() {
@@ -97,7 +97,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<AssociateRouteApplicationResponse> invoke(AssociateRouteApplicationRequest request) {
+        protected Mono<AssociateRouteApplicationResponse> invoke(AssociateRouteApplicationRequest request) {
             return this.routes.associateApplication(request);
         }
 
@@ -105,7 +105,7 @@ public final class SpringRoutesTest {
 
     public static final class Create extends AbstractApiTest<CreateRouteRequest, CreateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreateRouteRequest getInvalidRequest() {
@@ -153,7 +153,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<CreateRouteResponse> invoke(CreateRouteRequest request) {
+        protected Mono<CreateRouteResponse> invoke(CreateRouteRequest request) {
             return this.routes.create(request);
         }
 
@@ -161,7 +161,7 @@ public final class SpringRoutesTest {
 
     public static final class Delete extends AbstractApiTest<DeleteRouteRequest, Void> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteRouteRequest getInvalidRequest() {
@@ -189,7 +189,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteRouteRequest request) {
+        protected Mono<Void> invoke(DeleteRouteRequest request) {
             return this.routes.delete(request);
         }
 
@@ -197,7 +197,7 @@ public final class SpringRoutesTest {
 
     public static final class Exists extends AbstractApiTest<RouteExistsRequest, Boolean> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RouteExistsRequest getInvalidRequest() {
@@ -227,14 +227,14 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<Boolean> invoke(RouteExistsRequest request) {
+        protected Mono<Boolean> invoke(RouteExistsRequest request) {
             return this.routes.exists(request);
         }
     }
 
     public static final class Get extends AbstractApiTest<GetRouteRequest, GetRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetRouteRequest getInvalidRequest() {
@@ -281,7 +281,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<GetRouteResponse> invoke(GetRouteRequest request) {
+        protected Mono<GetRouteResponse> invoke(GetRouteRequest request) {
             return this.routes.get(request);
         }
 
@@ -289,7 +289,7 @@ public final class SpringRoutesTest {
 
     public static final class List extends AbstractApiTest<ListRoutesRequest, ListRoutesResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListRoutesRequest getInvalidRequest() {
@@ -336,7 +336,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<ListRoutesResponse> invoke(ListRoutesRequest request) {
+        protected Mono<ListRoutesResponse> invoke(ListRoutesRequest request) {
             return this.routes.list(request);
         }
 
@@ -344,7 +344,7 @@ public final class SpringRoutesTest {
 
     public static final class ListApplications extends AbstractApiTest<ListRouteApplicationsRequest, ListRouteApplicationsResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListRouteApplicationsRequest getInvalidRequest() {
@@ -409,7 +409,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<ListRouteApplicationsResponse> invoke(ListRouteApplicationsRequest request) {
+        protected Mono<ListRouteApplicationsResponse> invoke(ListRouteApplicationsRequest request) {
             return this.routes.listApplications(request);
         }
 
@@ -417,7 +417,7 @@ public final class SpringRoutesTest {
 
     public static final class RemoveApplication extends AbstractApiTest<RemoveRouteApplicationRequest, Void> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveRouteApplicationRequest getInvalidRequest() {
@@ -446,7 +446,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveRouteApplicationRequest request) {
+        protected Mono<Void> invoke(RemoveRouteApplicationRequest request) {
             return this.routes.removeApplication(request);
         }
 
@@ -454,7 +454,7 @@ public final class SpringRoutesTest {
 
     public static final class Update extends AbstractApiTest<UpdateRouteRequest, UpdateRouteResponse> {
 
-        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, this.processorGroup);
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UpdateRouteRequest getInvalidRequest() {
@@ -502,7 +502,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Publisher<UpdateRouteResponse> invoke(UpdateRouteRequest request) {
+        protected Mono<UpdateRouteResponse> invoke(UpdateRouteRequest request) {
             return this.routes.update(request);
         }
 

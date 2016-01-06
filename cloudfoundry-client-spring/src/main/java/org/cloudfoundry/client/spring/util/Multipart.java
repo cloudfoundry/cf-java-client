@@ -21,7 +21,6 @@ import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,7 +37,7 @@ public final class Multipart {
     private static final String DASHES = "--";
 
     public static Stream<byte[]> from(final InputStream inputStream, final String boundary) {
-        return Streams
+        return Stream
                 .create(new Consumer<SubscriberWithContext<byte[], Void>>() {
 
                     @Override

@@ -50,7 +50,6 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
-import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
 
@@ -74,7 +73,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Streams.just(response1));
+        when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Mono.just(response1));
 
         ListSpaceApplicationsRequest request2 = ListSpaceApplicationsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -91,7 +90,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Streams.just(response2));
+        when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Mono.just(response2));
 
         ListSpaceDomainsRequest request3 = ListSpaceDomainsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -108,7 +107,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Streams.just(response3));
+        when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Mono.just(response3));
 
         GetOrganizationRequest request4 = GetOrganizationRequest.builder()
                 .id(AbstractOperationsTest.TEST_ORGANIZATION)
@@ -121,7 +120,7 @@ public final class DefaultSpacesTest {
                         .name("test-organization-name")
                         .build())
                 .build();
-        when(cloudFoundryClient.organizations().get(request4)).thenReturn(Streams.just(response4));
+        when(cloudFoundryClient.organizations().get(request4)).thenReturn(Mono.just(response4));
 
         ListSpaceSecurityGroupsRequest request5 = ListSpaceSecurityGroupsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -138,7 +137,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Streams.just(response5));
+        when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Mono.just(response5));
 
         ListSpaceServicesRequest request6 = ListSpaceServicesRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -155,7 +154,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listServices(request6)).thenReturn(Streams.just(response6));
+        when(cloudFoundryClient.spaces().listServices(request6)).thenReturn(Mono.just(response6));
     }
 
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
@@ -210,7 +209,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected Publisher<SpaceDetail> invoke() {
+        protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
                     .name("test-space-name")
                     .securityGroupRules(true)
@@ -232,7 +231,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected Publisher<SpaceDetail> invoke() {
+        protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
                     .name("test-space-name")
                     .securityGroupRules(true)
@@ -268,7 +267,7 @@ public final class DefaultSpacesTest {
         }
 
         @Override
-        protected Publisher<SpaceDetail> invoke() {
+        protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
                     .name("test-space-name")
                     .securityGroupRules(false)
@@ -300,7 +299,7 @@ public final class DefaultSpacesTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.spaces().list(request1)).thenReturn(Streams.just(page1));
+            when(this.cloudFoundryClient.spaces().list(request1)).thenReturn(Mono.just(page1));
 
             ListSpacesResponse page2 = ListSpacesResponse.builder()
                     .resource(SpaceResource.builder()
@@ -317,7 +316,7 @@ public final class DefaultSpacesTest {
                     .organizationId("test-organization-id")
                     .page(2)
                     .build();
-            when(this.cloudFoundryClient.spaces().list(request2)).thenReturn(Streams.just(page2));
+            when(this.cloudFoundryClient.spaces().list(request2)).thenReturn(Mono.just(page2));
         }
 
         @Override

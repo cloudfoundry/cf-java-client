@@ -24,9 +24,9 @@ import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -50,7 +50,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteDropletRequest request) {
+    public Mono<Void> delete(final DeleteDropletRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -62,7 +62,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Publisher<GetDropletResponse> get(final GetDropletRequest request) {
+    public Mono<GetDropletResponse> get(final GetDropletRequest request) {
         return get(request, GetDropletResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -74,7 +74,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
     }
 
     @Override
-    public Publisher<ListDropletsResponse> list(ListDropletsRequest request) {
+    public Mono<ListDropletsResponse> list(ListDropletsRequest request) {
         return get(request, ListDropletsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

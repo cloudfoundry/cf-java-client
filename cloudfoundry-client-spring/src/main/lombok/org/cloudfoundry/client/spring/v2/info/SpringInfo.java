@@ -22,9 +22,9 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -48,7 +48,7 @@ public final class SpringInfo extends AbstractSpringOperations implements Info {
     }
 
     @Override
-    public Publisher<GetInfoResponse> get(GetInfoRequest request) {
+    public Mono<GetInfoResponse> get(GetInfoRequest request) {
         return get(request, GetInfoResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

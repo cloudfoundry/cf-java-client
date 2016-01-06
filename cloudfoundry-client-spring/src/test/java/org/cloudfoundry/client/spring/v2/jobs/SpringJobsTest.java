@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.job.GetJobRequest;
 import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
@@ -30,7 +30,7 @@ public final class SpringJobsTest {
 
     public static final class Get extends AbstractApiTest<GetJobRequest, GetJobResponse> {
 
-        private final SpringJobs jobs = new SpringJobs(this.restTemplate, this.root, this.processorGroup);
+        private final SpringJobs jobs = new SpringJobs(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetJobRequest getInvalidRequest() {
@@ -75,7 +75,7 @@ public final class SpringJobsTest {
         }
 
         @Override
-        protected Publisher<GetJobResponse> invoke(GetJobRequest request) {
+        protected Mono<GetJobResponse> invoke(GetJobRequest request) {
             return this.jobs.get(request);
         }
 

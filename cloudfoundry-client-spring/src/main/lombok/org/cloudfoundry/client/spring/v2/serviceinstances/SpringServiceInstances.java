@@ -25,9 +25,9 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -51,7 +51,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
     }
 
     @Override
-    public Publisher<GetServiceInstanceResponse> get(final GetServiceInstanceRequest request) {
+    public Mono<GetServiceInstanceResponse> get(final GetServiceInstanceRequest request) {
         return get(request, GetServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -63,7 +63,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
     }
 
     @Override
-    public Publisher<ListServiceInstancesResponse> list(final ListServiceInstancesRequest request) {
+    public Mono<ListServiceInstancesResponse> list(final ListServiceInstancesRequest request) {
         return get(request, ListServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
