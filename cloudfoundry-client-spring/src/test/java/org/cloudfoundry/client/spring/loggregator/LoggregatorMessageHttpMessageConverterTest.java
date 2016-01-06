@@ -60,7 +60,7 @@ public final class LoggregatorMessageHttpMessageConverterTest {
                 .subscribe(testSubscriber
                         .assertEquals(14L));
 
-        testSubscriber.verify(1, SECONDS);
+        testSubscriber.verify(5, SECONDS);
     }
 
     @Test

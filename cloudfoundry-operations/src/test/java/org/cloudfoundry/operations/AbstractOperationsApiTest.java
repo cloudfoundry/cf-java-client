@@ -30,7 +30,7 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
         assertions(testSubscriber);
 
         invoke().subscribe(testSubscriber);
-        testSubscriber.verify(1, SECONDS);
+        testSubscriber.verify(5, SECONDS);
     }
 
     protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;

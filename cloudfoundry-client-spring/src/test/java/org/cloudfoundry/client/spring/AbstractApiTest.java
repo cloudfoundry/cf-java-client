@@ -45,7 +45,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         this.testSubscriber.assertError(CloudFoundryException.class);
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(1, SECONDS);
+        this.testSubscriber.verify(5, SECONDS);
         verify();
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         this.testSubscriber.assertError(RequestValidationException.class);
         invoke(request).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(1, SECONDS);
+        this.testSubscriber.verify(5, SECONDS);
         verify();
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         mockRequest(getRequestContext());
         invoke(getValidRequest()).subscribe(this.testSubscriber);
 
-        this.testSubscriber.verify(1, SECONDS);
+        this.testSubscriber.verify(5, SECONDS);
         verify();
     }
 

@@ -62,7 +62,7 @@ public final class ReactiveEndpointTest {
 
         this.testSubscriber
                 .assertError(Exception.class)
-                .verify(1, SECONDS);
+                .verify(5, SECONDS);
     }
 
     @Test

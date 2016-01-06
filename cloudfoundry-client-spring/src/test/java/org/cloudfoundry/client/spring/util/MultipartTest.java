@@ -41,7 +41,7 @@ public final class MultipartTest {
                 .subscribe(testSubscriber
                         .assertEquals(14L));
 
-        testSubscriber.verify(1, SECONDS);
+        testSubscriber.verify(5, SECONDS);
     }
 
     private Function<byte[], Object> toLogMessage() {

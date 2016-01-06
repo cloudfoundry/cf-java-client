@@ -61,7 +61,7 @@ public final class LoggregatorMessageHandlerTest {
                         .sourceName("test-source-name")
                         .timestamp(timestamp)
                         .build())
-                .verify(1, SECONDS);
+                .verify(5, SECONDS);
     }
 
     @Test
@@ -70,7 +70,7 @@ public final class LoggregatorMessageHandlerTest {
 
         this.testSubscriber
                 .assertError(Exception.class)
-                .verify(1, SECONDS);
+                .verify(5, SECONDS);
     }
 
 }
