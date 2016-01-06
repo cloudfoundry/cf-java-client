@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v2.spacequotadefinitions;
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
@@ -48,6 +50,18 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
      */
     public SpringSpaceQuotaDefinitions(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
         super(restOperations, root, processorGroup);
+    }
+
+    @Override
+    public Publisher<AssociateSpaceQuotaDefinitionResponse> associateSpace(final AssociateSpaceQuotaDefinitionRequest request) {
+        return put(request, AssociateSpaceQuotaDefinitionResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "space_quota_definitions", request.getId(), "spaces", request.getSpaceId());
+            }
+
+        });
     }
 
     @Override

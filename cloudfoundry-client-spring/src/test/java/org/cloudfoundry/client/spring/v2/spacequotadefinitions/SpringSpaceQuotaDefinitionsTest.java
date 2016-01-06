@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.spring.v2.spacequotadefinitions;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.spacequotadefinitions.AssociateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
@@ -27,9 +29,61 @@ import org.reactivestreams.Publisher;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSpaceQuotaDefinitionsTest {
+
+    public static final class AssociateSpace extends AbstractApiTest<AssociateSpaceQuotaDefinitionRequest, AssociateSpaceQuotaDefinitionResponse> {
+
+        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, this.processorGroup);
+
+        @Override
+        protected AssociateSpaceQuotaDefinitionRequest getInvalidRequest() {
+            return AssociateSpaceQuotaDefinitionRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("/v2/space_quota_definitions/test-id/spaces/test-space-id")
+                    .status(OK)
+                    .responsePayload("v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
+        }
+
+        @Override
+        protected AssociateSpaceQuotaDefinitionResponse getResponse() {
+            return AssociateSpaceQuotaDefinitionResponse.builder()
+                    .metadata(Metadata.builder()
+                            .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                            .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                            .createdAt("2015-11-30T23:38:46Z")
+                            .build())
+                    .entity(SpaceQuotaDefinitionEntity.builder()
+                            .name("name-1887")
+                            .organizationId("e188543a-cb71-4786-8703-9addbebc5bbf")
+                            .nonBasicServicesAllowed(true)
+                            .totalServices(60)
+                            .totalRoutes(1000)
+                            .memoryLimit(20480)
+                            .instanceMemoryLimit(-1)
+                            .applicationInstanceLimit(-1)
+                            .organizationUrl("/v2/organizations/e188543a-cb71-4786-8703-9addbebc5bbf")
+                            .spacesUrl("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa/spaces")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected AssociateSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return AssociateSpaceQuotaDefinitionRequest.builder().id("test-id").spaceId("test-space-id").build();
+        }
+
+        @Override
+        protected Publisher<AssociateSpaceQuotaDefinitionResponse> invoke(AssociateSpaceQuotaDefinitionRequest request) {
+            return this.spaceQuotaDefinitions.associateSpace(request);
+        }
+    }
 
     public static final class GetSpaceQuotaDefinition extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
 
@@ -143,5 +197,6 @@ public final class SpringSpaceQuotaDefinitionsTest {
         }
 
     }
+
 
 }
