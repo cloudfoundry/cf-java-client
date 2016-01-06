@@ -31,7 +31,7 @@ import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
-import org.cloudfoundry.client.spring.v2.job.SpringJobs;
+import org.cloudfoundry.client.spring.v2.jobs.SpringJobs;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
