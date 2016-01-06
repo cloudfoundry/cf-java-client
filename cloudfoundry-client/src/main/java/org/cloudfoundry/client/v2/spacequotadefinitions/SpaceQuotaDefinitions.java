@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.reactivestreams.Publisher;
 public interface SpaceQuotaDefinitions {
 
     /**
-     * Makes the 
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/226/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve
      * a Particular Space Quota Definition</a> request
      *
@@ -32,9 +32,9 @@ public interface SpaceQuotaDefinitions {
      * @return the response from the Retrieve a Particular Space Quota Definition request
      */
     Publisher<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
-    
+
     /**
-     * Makes the 
+     * Makes the
      * <a href="http://apidocs.cloudfoundry.org/214/space_quota_definitions/list_all_space_quota_definitions.html">List
      * all Space Quota Definitions</a> request
      *
