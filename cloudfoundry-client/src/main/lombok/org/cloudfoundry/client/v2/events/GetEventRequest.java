@@ -16,8 +16,10 @@
 
 package org.cloudfoundry.client.v2.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -33,6 +35,7 @@ public final class GetEventRequest implements Validatable {
      * @param id the id
      * @return the id
      */
+    @Getter(onMethod = @__(@JsonIgnore))
     private final String id;
 
     @Builder
