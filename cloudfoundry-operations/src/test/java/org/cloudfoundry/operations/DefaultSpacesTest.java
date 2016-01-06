@@ -49,7 +49,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
@@ -74,7 +74,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Publishers.just(response1));
+        when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Streams.just(response1));
 
         ListSpaceApplicationsRequest request2 = ListSpaceApplicationsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -91,7 +91,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Publishers.just(response2));
+        when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Streams.just(response2));
 
         ListSpaceDomainsRequest request3 = ListSpaceDomainsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -108,7 +108,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Publishers.just(response3));
+        when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Streams.just(response3));
 
         GetOrganizationRequest request4 = GetOrganizationRequest.builder()
                 .id(AbstractOperationsTest.TEST_ORGANIZATION)
@@ -121,7 +121,7 @@ public final class DefaultSpacesTest {
                         .name("test-organization-name")
                         .build())
                 .build();
-        when(cloudFoundryClient.organizations().get(request4)).thenReturn(Publishers.just(response4));
+        when(cloudFoundryClient.organizations().get(request4)).thenReturn(Streams.just(response4));
 
         ListSpaceSecurityGroupsRequest request5 = ListSpaceSecurityGroupsRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -138,7 +138,7 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Publishers.just(response5));
+        when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Streams.just(response5));
 
         ListSpaceServicesRequest request6 = ListSpaceServicesRequest.builder()
                 .id(AbstractOperationsTest.TEST_SPACE)
@@ -155,12 +155,12 @@ public final class DefaultSpacesTest {
                         .build())
                 .totalPages(1)
                 .build();
-        when(cloudFoundryClient.spaces().listServices(request6)).thenReturn(Publishers.just(response6));
+        when(cloudFoundryClient.spaces().listServices(request6)).thenReturn(Streams.just(response6));
     }
 
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION));
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
 
         @Before
         public void setUp() throws Exception {
@@ -182,7 +182,7 @@ public final class DefaultSpacesTest {
                             .totalServices(444)
                             .build())
                     .build();
-            when(this.cloudFoundryClient.spaceQuotaDefinitions().get(request)).thenReturn(Publishers.just(response));
+            when(this.cloudFoundryClient.spaceQuotaDefinitions().get(request)).thenReturn(Mono.just(response));
         }
 
         @Override
@@ -245,7 +245,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoSpaceQuota extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION));
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
 
         @Before
         public void setUp() throws Exception {
@@ -281,7 +281,7 @@ public final class DefaultSpacesTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION));
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
 
         @Before
         public void setUp() throws Exception {
@@ -300,7 +300,7 @@ public final class DefaultSpacesTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.spaces().list(request1)).thenReturn(Publishers.just(page1));
+            when(this.cloudFoundryClient.spaces().list(request1)).thenReturn(Streams.just(page1));
 
             ListSpacesResponse page2 = ListSpacesResponse.builder()
                     .resource(SpaceResource.builder()
@@ -317,7 +317,7 @@ public final class DefaultSpacesTest {
                     .organizationId("test-organization-id")
                     .page(2)
                     .build();
-            when(this.cloudFoundryClient.spaces().list(request2)).thenReturn(Publishers.just(page2));
+            when(this.cloudFoundryClient.spaces().list(request2)).thenReturn(Streams.just(page2));
         }
 
         @Override

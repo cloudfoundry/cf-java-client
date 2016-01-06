@@ -100,13 +100,13 @@ public class IntegrationTestConfiguration {
                 .build();
 
         Stream<String> organizationId = Streams
-                .wrap(cloudFoundryClient.organizations().create(request))
+                .from(cloudFoundryClient.organizations().create(request))
                 .map(Resources::getId)
-                .observeStart(s -> this.logger.info(">> ORGANIZATION <<"))
-                .observeComplete(v -> this.logger.info("<< ORGANIZATION >>"))
+                .doOnSubscribe(s -> this.logger.info(">> ORGANIZATION <<"))
+                .doOnComplete(() -> this.logger.info("<< ORGANIZATION >>"))
                 .cache(1);
 
-        organizationId.next().poll();
+        organizationId.next().get();
         return organizationId;
     }
 
@@ -122,11 +122,11 @@ public class IntegrationTestConfiguration {
                     return cloudFoundryClient.spaces().create(request);
                 })
                 .map(Resources::getId)
-                .observeStart(s -> this.logger.info(">> SPACE <<"))
-                .observeComplete(v -> this.logger.info("<< SPACE >>"))
+                .doOnSubscribe(s -> this.logger.info(">> SPACE <<"))
+                .doOnComplete(() -> this.logger.info("<< SPACE >>"))
                 .cache(1);
 
-        spaceId.next().poll();
+        spaceId.next().get();
         return spaceId;
     }
 

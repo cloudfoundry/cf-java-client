@@ -42,7 +42,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple6;
@@ -55,9 +55,9 @@ final class DefaultSpaces implements Spaces {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> organizationId;
+    private final Mono<String> organizationId;
 
-    DefaultSpaces(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId) {
+    DefaultSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
     }
@@ -150,20 +150,18 @@ final class DefaultSpaces implements Spaces {
         };
     }
 
-    private static Stream<List<String>> requestApplicationNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
+    private static Mono<List<String>> requestApplicationNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
         return Paginated
                 .requestResources(requestSpaceApplicationPage(cloudFoundryClient, spaceResource))
                 .map(extractApplicationName())
-                .toList()
-                .stream();
+                .toList();
     }
 
-    private static Stream<List<String>> requestDomainNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
+    private static Mono<List<String>> requestDomainNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
         return Paginated
                 .requestResources(requestSpaceDomainPage(cloudFoundryClient, spaceResource))
                 .map(extractDomainName())
-                .toList()
-                .stream();
+                .toList();
     }
 
     private static Stream<String> requestOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
@@ -172,7 +170,7 @@ final class DefaultSpaces implements Spaces {
                 .build();
 
         return Streams
-                .wrap(cloudFoundryClient.organizations().get(request))
+                .from(cloudFoundryClient.organizations().get(request))
                 .map(extractOrganizationName());
     }
 
@@ -210,20 +208,18 @@ final class DefaultSpaces implements Spaces {
         };
     }
 
-    private static Stream<List<String>> requestSecurityGroups(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
+    private static Mono<List<String>> requestSecurityGroups(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
         return Paginated
                 .requestResources(requestSpaceSecurityGroupsPage(cloudFoundryClient, spaceResource))
                 .map(extractSecurityGroupName())
-                .toList()
-                .stream();
+                .toList();
     }
 
-    private static Stream<List<String>> requestServiceNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
+    private static Mono<List<String>> requestServiceNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
         return Paginated
                 .requestResources(requestSpaceServicesPage(cloudFoundryClient, spaceResource))
                 .map(extractServiceName())
-                .toList()
-                .stream();
+                .toList();
     }
 
     private static Function<Integer, Publisher<ListSpaceApplicationsResponse>> requestSpaceApplicationPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
@@ -268,7 +264,7 @@ final class DefaultSpaces implements Spaces {
                 .build();
 
         return Streams
-                .wrap(cloudFoundryClient.spaceQuotaDefinitions().get(request))
+                .from(cloudFoundryClient.spaceQuotaDefinitions().get(request))
                 .map(toSpaceQuotaDefinition())
                 .map(Optionals.<SpaceQuota>toOptional());
     }
@@ -294,7 +290,7 @@ final class DefaultSpaces implements Spaces {
 
                 return Paginated
                         .requestResources(requestOrganizationSpacePage(cloudFoundryClient, organizationId, request))
-                        .zipWith(Publishers.just(request));
+                        .zipWith(Streams.just(request));
             }
 
         };

@@ -19,14 +19,14 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
+import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
+import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
-import org.cloudfoundry.client.v2.routes.Routes;
 import org.junit.Before;
-import reactor.rx.Stream;
-import reactor.rx.Streams;
+import reactor.Mono;
 
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
 
-    protected static final Stream<String> MISSING_ID = Streams.fail(new java.lang.IllegalStateException());
+    protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException());
 
     protected static final String TEST_ORGANIZATION = "test-organization-id";
 
@@ -45,6 +45,8 @@ public abstract class AbstractOperationsTest {
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
 
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
+
+    protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
 
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
 
@@ -57,9 +59,10 @@ public abstract class AbstractOperationsTest {
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
     @Before
-    public final void mockClient() throws Exception {
+    public final void mockClient() {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
+        when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);

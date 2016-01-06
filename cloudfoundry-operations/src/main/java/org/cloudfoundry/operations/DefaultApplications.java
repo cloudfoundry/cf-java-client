@@ -17,23 +17,21 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
-import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
 import reactor.rx.Streams;
 
 final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> spaceId;
+    private final Mono<String> spaceId;
 
-    DefaultApplications(CloudFoundryClient cloudFoundryClient, Stream<String> spaceId) {
+    DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.spaceId = spaceId;
     }
@@ -51,7 +49,7 @@ final class DefaultApplications implements Applications {
 
             @Override
             public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
-                return Streams.from(getSpaceSummaryResponse.getApplications());
+                return Streams.fromIterable(getSpaceSummaryResponse.getApplications());
             }
 
         };

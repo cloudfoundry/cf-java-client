@@ -73,7 +73,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().get(request))
+                            .from(this.cloudFoundryClient.domains().get(request))
                             .map(Resources::getEntity);
                 })
                 .zipWith(this.organizationId)
@@ -90,7 +90,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .from(this.cloudFoundryClient.domains().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -108,7 +108,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .from(this.cloudFoundryClient.domains().listSpaces(request))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
@@ -132,7 +132,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<String> applicationId = Streams
-                            .wrap(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
+                            .from(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
                             .map(Resources::getId);
 
                     CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
@@ -141,7 +141,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<String> routeId = Streams
-                            .wrap(this.cloudFoundryClient.routes().create(createRouteRequest))
+                            .from(this.cloudFoundryClient.routes().create(createRouteRequest))
                             .map(Resources::getId);
 
                     return Streams.zip(Streams.just(domainId), applicationId, routeId);
@@ -157,7 +157,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().associateApplication(request))
+                            .from(this.cloudFoundryClient.routes().associateApplication(request))
                             .map(response -> Tuple.of(domainId, applicationId));
                 })
                 .flatMap((Tuple2<String, String> tuple) -> {
@@ -170,7 +170,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .from(this.cloudFoundryClient.domains().listSpaces(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -195,7 +195,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().listSpaces(request))
+                            .from(this.cloudFoundryClient.domains().listSpaces(request))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
@@ -219,7 +219,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().listSpaces(response))
+                            .from(this.cloudFoundryClient.domains().listSpaces(response))
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
@@ -238,7 +238,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .from(this.cloudFoundryClient.domains().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -257,7 +257,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.domains().list(request))
+                            .from(this.cloudFoundryClient.domains().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -280,7 +280,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .wildcard(true)
                 .build();
 
-        return Streams.wrap(this.cloudFoundryClient.domains().create(request));
+        return Streams
+                .from(this.cloudFoundryClient.domains().create(request));
     }
 
     private Stream<DomainEntity> createDomainEntity(String organizationId) {

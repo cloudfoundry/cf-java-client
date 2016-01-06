@@ -22,6 +22,7 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
+import reactor.Mono;
 import reactor.core.error.ReactorFatalException;
 import reactor.fn.BiFunction;
 import reactor.fn.Consumer;
@@ -92,9 +93,9 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
         }
     }
 
-    protected final Publisher<byte[]> getContents(Publisher<byte[]> publisher) {
+    protected final Mono<byte[]> getContents(Publisher<byte[]> publisher) {
         return Streams
-                .wrap(publisher)
+                .from(publisher)
                 .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
                 .map(toByteArray());
     }

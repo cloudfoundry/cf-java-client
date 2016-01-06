@@ -40,7 +40,8 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .id(Resources.getId(resource))
                             .build();
 
-                    Stream<GetEventResponse> actual = Streams.wrap(this.cloudFoundryClient.events().get(request));
+                    Stream<GetEventResponse> actual = Streams
+                            .from(this.cloudFoundryClient.events().get(request));
 
                     return Streams.zip(Streams.just(resource), actual);
                 })
@@ -70,7 +71,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<EventResource> actual = Streams
-                            .wrap(this.cloudFoundryClient.events().list(request))
+                            .from(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
                     return Streams.zip(Streams.just(resource), actual);
@@ -88,7 +89,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<EventResource> actual = Streams
-                            .wrap(this.cloudFoundryClient.events().list(request))
+                            .from(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
                     return Streams.zip(Streams.just(resource), actual);
@@ -106,7 +107,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<EventResource> actual = Streams
-                            .wrap(this.cloudFoundryClient.events().list(request))
+                            .from(this.cloudFoundryClient.events().list(request))
                             .flatMap(Resources::getResources);
 
                     return Streams.zip(Streams.just(resource), actual);
@@ -125,7 +126,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                 .build();
 
         return Streams
-                .wrap(this.cloudFoundryClient.events().list(request))
+                .from(this.cloudFoundryClient.events().list(request))
                 .flatMap(Resources::getResources);
     }
 

@@ -38,8 +38,9 @@ import org.cloudfoundry.operations.ListRoutesRequest.Level;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.fn.Function;
+import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 import reactor.rx.Stream;
@@ -51,11 +52,11 @@ final class DefaultRoutes implements Routes {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> organizationId;
+    private final Mono<String> organizationId;
 
-    private final Stream<String> spaceId;
+    private final Mono<String> spaceId;
 
-    public DefaultRoutes(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, Stream<String> spaceId) {
+    public DefaultRoutes(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
         this.spaceId = spaceId;
@@ -68,8 +69,14 @@ final class DefaultRoutes implements Routes {
                 .zipWith(this.organizationId)
                 .flatMap(requestDomainId(this.cloudFoundryClient))
                 .flatMap(requestCheckRoute(this.cloudFoundryClient))
-                .defaultIfEmpty(false)
-                .take(1);  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
+                .singleOrDefault(new Supplier<Boolean>() {  // TODO: Waiting on Mono.or()
+
+                    @Override
+                    public Boolean get() {
+                        return false;
+                    }
+
+                });
     }
 
     @Override
@@ -119,7 +126,7 @@ final class DefaultRoutes implements Routes {
                 .build();
 
         return Streams
-                .wrap(cloudFoundryClient.domains().get(request))
+                .from(cloudFoundryClient.domains().get(request))
                 .map(extractDomainName());
     }
 
@@ -129,16 +136,15 @@ final class DefaultRoutes implements Routes {
                 .build();
 
         return Streams
-                .wrap(cloudFoundryClient.spaces().get(request))
+                .from(cloudFoundryClient.spaces().get(request))
                 .map(extractSpaceName());
     }
 
-    private static Stream<List<String>> requestApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
+    private static Mono<List<String>> requestApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
         return Paginated
                 .requestResources(requestApplicationPage(cloudFoundryClient, routeResource))
                 .map(extractApplicationName())
-                .toList()
-                .stream();
+                .toList();
     }
 
     private static Function<Integer, Publisher<ListRouteApplicationsResponse>> requestApplicationPage(final CloudFoundryClient cloudFoundryClient, final RouteResource resource) {
@@ -200,7 +206,7 @@ final class DefaultRoutes implements Routes {
                 return requestPrivateDomains(cloudFoundryClient, request.getDomain(), organizationId)
                         .switchIfEmpty(requestSharedDomains(cloudFoundryClient, request.getDomain()))
                         .map(Resources.extractId())
-                        .zipWith(Publishers.just(request));
+                        .zipWith(Streams.just(request));
             }
 
         };
@@ -256,8 +262,8 @@ final class DefaultRoutes implements Routes {
         };
     }
 
-    private static Function<ListRoutesRequest, Publisher<RouteResource>> requestRouteResources(final CloudFoundryClient cloudFoundryClient, final Stream<String> organizationId,
-                                                                                               final Stream<String> spaceId) {
+    private static Function<ListRoutesRequest, Publisher<RouteResource>> requestRouteResources(final CloudFoundryClient cloudFoundryClient, final Mono<String> organizationId,
+                                                                                               final Mono<String> spaceId) {
         return new Function<ListRoutesRequest, Publisher<RouteResource>>() {
 
             @Override

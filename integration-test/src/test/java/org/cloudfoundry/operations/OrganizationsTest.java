@@ -25,7 +25,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         Streams
-                .wrap(this.cloudFoundryOperations.organizations().list())
+                .from(this.cloudFoundryOperations.organizations().list())
                 .count()
                 .subscribe(testSubscriber()
                         .assertEquals(1L));

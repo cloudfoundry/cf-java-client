@@ -42,7 +42,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -63,7 +63,7 @@ public final class DefaultRoutesTest {
             ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
 
             ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
                     .name("test-domain")
@@ -72,7 +72,7 @@ public final class DefaultRoutesTest {
             ListSharedDomainsResponse response2 = ListSharedDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.sharedDomains.list(request2)).thenReturn(Publishers.just(response2));
+            when(this.sharedDomains.list(request2)).thenReturn(Streams.just(response2));
         }
 
         @Override
@@ -95,7 +95,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteInvalidHost extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -112,13 +112,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
 
             RouteExistsRequest request2 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Publishers.just(false));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Streams.just(false));
         }
 
         @Override
@@ -163,7 +163,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRoutePrivateDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -180,13 +180,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
 
             RouteExistsRequest request2 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Publishers.just(true));
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Streams.just(true));
         }
 
         @Override
@@ -209,7 +209,7 @@ public final class DefaultRoutesTest {
 
     public static final class CheckRouteSharedDomain extends AbstractOperationsApiTest<Boolean> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Before
         public void setUp() throws Exception {
@@ -221,7 +221,7 @@ public final class DefaultRoutesTest {
             ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
                     .totalPages(1)
                     .build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Publishers.just(response1));
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Streams.just(response1));
 
             ListSharedDomainsRequest request2 = ListSharedDomainsRequest.builder()
                     .name("test-domain")
@@ -235,13 +235,13 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.sharedDomains.list(request2)).thenReturn(Publishers.just(response2));
+            when(this.sharedDomains.list(request2)).thenReturn(Streams.just(response2));
 
             RouteExistsRequest request3 = RouteExistsRequest.builder()
                     .domainId("test-domain-id")
                     .host("test-host")
                     .build();
-            when(this.cloudFoundryClient.routes().exists(request3)).thenReturn(Publishers.just(true));
+            when(this.cloudFoundryClient.routes().exists(request3)).thenReturn(Streams.just(true));
         }
 
         @Override
@@ -264,7 +264,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentOrganization extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), Mono.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
@@ -285,7 +285,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Publishers.just(response1));
+            when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Streams.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
                     .id("domain-id")
@@ -295,7 +295,7 @@ public final class DefaultRoutesTest {
                             .name("domain")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Publishers.just(response2));
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Streams.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
                     .id("test-space-id")
@@ -305,7 +305,7 @@ public final class DefaultRoutesTest {
                             .name("test-space")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Publishers.just(response3));
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Streams.just(response3));
 
             ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
                     .id("route-id")
@@ -319,7 +319,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Publishers.just(response4));
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Streams.just(response4));
         }
 
         @Override
@@ -366,7 +366,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), Streams.just(TEST_SPACE));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), Mono.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
@@ -387,7 +387,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Publishers.just(response1));
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Streams.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
                     .id("domain-id")
@@ -397,7 +397,7 @@ public final class DefaultRoutesTest {
                             .name("domain")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Publishers.just(response2));
+            when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Streams.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
                     .id("test-space-id")
@@ -407,7 +407,7 @@ public final class DefaultRoutesTest {
                             .name("test-space")
                             .build())
                     .build();
-            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Publishers.just(response3));
+            when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Streams.just(response3));
 
             ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
                     .id("route-id")
@@ -421,7 +421,7 @@ public final class DefaultRoutesTest {
                             .build())
                     .totalPages(1)
                     .build();
-            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Publishers.just(response4));
+            when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Streams.just(response4));
         }
 
         @Override
@@ -468,7 +468,7 @@ public final class DefaultRoutesTest {
 
     public static final class ListCurrentSpaceNoSpace extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Streams.just(TEST_ORGANIZATION), MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION), MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {

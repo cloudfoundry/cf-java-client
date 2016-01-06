@@ -40,7 +40,6 @@ import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Publishers;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -117,12 +116,12 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
         })
                 .defaultIfEmpty(true)
-                .onErrorResumeNext(new Function<Throwable, Publisher<Boolean>>() {
+                .onErrorResumeWith(new Function<Throwable, Publisher<Boolean>>() {
 
                     @Override
                     public Publisher<Boolean> apply(Throwable throwable) {
                         if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
-                            return Publishers.just(false);
+                            return Streams.just(false);
                         } else {
                             return Streams.fail(throwable);
                         }

@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring;
 
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
-import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
 import reactor.rx.Streams;
@@ -25,6 +24,7 @@ import reactor.rx.Streams;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.WebSocketContainer;
 
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
@@ -35,9 +35,9 @@ public final class SpringLoggregatorClientTest {
 
         private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
 
-        private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class, Mockito.RETURNS_SMART_NULLS);
+        private final ClientEndpointConfig clientEndpointConfig = mock(ClientEndpointConfig.class, RETURNS_SMART_NULLS);
 
-        private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, Mockito.RETURNS_SMART_NULLS);
+        private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, RETURNS_SMART_NULLS);
 
         private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root, this.processorGroup);
 
@@ -70,7 +70,7 @@ public final class SpringLoggregatorClientTest {
         @Override
         protected Publisher<Long> invoke(RecentLogsRequest request) {
             return Streams
-                    .wrap(this.client.recent(request))
+                    .from(this.client.recent(request))
                     .count();
         }
 

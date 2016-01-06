@@ -48,7 +48,7 @@ public final class PaginatedTest {
 
                     @Override
                     public Publisher<? extends SpaceResource> apply(ListSpacesResponse response) {
-                        return Streams.from(response.getResources());
+                        return Streams.fromIterable(response.getResources());
                     }
 
                 })

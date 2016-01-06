@@ -92,7 +92,7 @@ public final class Resources {
      * @return a stream of resources from the response
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> getResources(U response) {
-        return Streams.from(response.getResources());
+        return Streams.fromIterable(response.getResources());
     }
 
 }

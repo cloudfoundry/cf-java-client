@@ -16,16 +16,13 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.rx.Streams;
 
 import static org.mockito.Mockito.when;
@@ -34,7 +31,7 @@ public final class DefaultApplicationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Application> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Streams.just(TEST_SPACE));
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
@@ -68,7 +65,7 @@ public final class DefaultApplicationsTest {
                             .build())
                     .build();
 
-            when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Publishers.just(response));
+            when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Streams.just(response));
         }
 
         @Override

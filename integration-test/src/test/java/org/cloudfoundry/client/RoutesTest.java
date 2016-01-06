@@ -57,7 +57,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -79,7 +79,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<RouteEntity> entity = Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .map(Resources::getEntity);
 
                     return Streams.zip(this.domainId, this.spaceId, entity);
@@ -120,7 +120,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .map(Resources::getId);
                 })
                 .flatMap(routeId -> {
@@ -148,7 +148,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .flatMap(response -> this.domainId);
                 })
                 .flatMap(domainId -> {
@@ -178,7 +178,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .flatMap(response -> this.domainId);
                 })
                 .flatMap(domainId -> {
@@ -206,7 +206,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    return Streams.wrap(this.cloudFoundryClient.routes().create(request))
+                    return Streams.from(this.cloudFoundryClient.routes().create(request))
                             .map(Resources::getId);
                 })
                 .flatMap(routeId -> {
@@ -215,7 +215,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     Stream<RouteEntity> entity = Streams
-                            .wrap(this.cloudFoundryClient.routes().get(request))
+                            .from(this.cloudFoundryClient.routes().get(request))
                             .map(Resources::getEntity);
 
                     return Streams.zip(this.domainId, this.spaceId, entity);
@@ -244,7 +244,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().list(request))
+                            .from(this.cloudFoundryClient.routes().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -264,7 +264,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -285,7 +285,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -306,7 +306,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -331,7 +331,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -356,7 +356,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -384,7 +384,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .flatMap(response -> this.domainId);
                 })
                 .flatMap(domainId -> {
@@ -393,7 +393,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().list(request))
+                            .from(this.cloudFoundryClient.routes().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -423,7 +423,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().list(request))
+                            .from(this.cloudFoundryClient.routes().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -445,7 +445,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().create(request))
+                            .from(this.cloudFoundryClient.routes().create(request))
                             .flatMap(response -> this.organizationId);
                 })
                 .flatMap(organizationId -> {
@@ -454,7 +454,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().list(request))
+                            .from(this.cloudFoundryClient.routes().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -484,7 +484,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().list(request))
+                            .from(this.cloudFoundryClient.routes().list(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -509,7 +509,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().removeApplication(request))
+                            .from(this.cloudFoundryClient.routes().removeApplication(request))
                             .map(response -> routeId);
                 })
                 .flatMap(routeId -> {
@@ -518,7 +518,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().listApplications(request))
+                            .from(this.cloudFoundryClient.routes().listApplications(request))
                             .flatMap(Resources::getResources);
                 })
                 .count()
@@ -539,7 +539,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    return Streams.wrap(this.cloudFoundryClient.routes().create(request))
+                    return Streams.from(this.cloudFoundryClient.routes().create(request))
                             .map(Resources::getId);
                 })
                 .flatMap(routeId -> {
@@ -550,7 +550,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
 
                     return Streams
-                            .wrap(this.cloudFoundryClient.routes().update(request))
+                            .from(this.cloudFoundryClient.routes().update(request))
                             .map(Resources::getEntity);
                 })
                 .subscribe(this.<RouteEntity>testSubscriber()
@@ -576,7 +576,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build();
 
         return Streams
-                .wrap(this.cloudFoundryClient.routes().associateApplication(request))
+                .from(this.cloudFoundryClient.routes().associateApplication(request))
                 .map(response -> routeId);
     }
 
@@ -591,7 +591,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build();
 
         Stream<String> applicationId = Streams
-                .wrap(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
+                .from(this.cloudFoundryClient.applicationsV2().create(createApplicationRequest))
                 .map(response -> response.getMetadata().getId());
 
         CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
@@ -600,7 +600,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build();
 
         Stream<String> routeId = Streams
-                .wrap(this.cloudFoundryClient.routes().create(createRouteRequest))
+                .from(this.cloudFoundryClient.routes().create(createRouteRequest))
                 .map(resource -> resource.getMetadata().getId());
 
         return Streams.zip(applicationId, routeId);

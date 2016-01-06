@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import reactor.rx.Stream;
+import reactor.Mono;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
@@ -31,7 +31,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Spaces spaces;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, Stream<String> spaceId) {
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);

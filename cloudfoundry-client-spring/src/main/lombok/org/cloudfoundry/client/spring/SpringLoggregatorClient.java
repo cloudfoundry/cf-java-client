@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Publishers;
 import reactor.core.processor.ProcessorGroup;
 import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.BiConsumer;
@@ -143,7 +142,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                 .build();
 
         return Streams
-                .wrap(cloudFoundryClient.info().get(request))
+                .from(cloudFoundryClient.info().get(request))
                 .map(new Function<GetInfoResponse, String>() {
 
                     @Override
@@ -160,7 +159,9 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                     }
 
                 })
-                .next().poll();
+                .promise()
+                .poll();
+
     }
 
     @SuppressWarnings("unchecked")
@@ -171,8 +172,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
                     @Override
                     public Publisher<T> apply(V request) {
-                        return Publishers
-                                .createWithDemand(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
+                        return Streams
+                                .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
                                     @Override
                                     public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
@@ -218,10 +219,10 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
         });
 
-        return exchange.observeCancel(new Consumer<Void>() {
+        return exchange.doOnCancel(new Runnable() {
 
             @Override
-            public void accept(Void v) {
+            public void run() {
                 if (session.get() != null) {
                     try {
                         session.get().close();

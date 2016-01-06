@@ -40,7 +40,7 @@ public final class Paginated {
      */
     public static <U extends PaginatedResponse<?>> Stream<U> requestPages(final Function<Integer, Publisher<U>> pagePublisher) {
         return Streams
-                .wrap(pagePublisher.apply(1))
+                .from(pagePublisher.apply(1))
                 .take(1)
                 .flatMap(requestAdditionalPages(pagePublisher));
     }

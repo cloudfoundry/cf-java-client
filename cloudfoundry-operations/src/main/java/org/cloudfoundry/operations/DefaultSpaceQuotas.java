@@ -24,36 +24,38 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
+
+import java.util.NoSuchElementException;
 
 final class DefaultSpaceQuotas implements SpaceQuotas {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> organizationId;
+    private final Mono<String> organizationId;
 
-    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId) {
+    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
     }
 
     @Override
-    public Publisher<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
+    public Publisher<SpaceQuota> get(final GetSpaceQuotaRequest getSpaceQuotaRequest) {
+
         return Validators
                 .stream(getSpaceQuotaRequest)
                 .zipWith(this.organizationId)
                 .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
                 .filter(equalRequestAndDefinitionName())
-                .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(
-                        new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
-                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
+                .single()
                 .map(extractQuotaDefinition())
-                .map(toSpaceQuota());
+                .map(toSpaceQuota())
+                .otherwise(convertException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName())));
     }
 
     @Override
@@ -69,6 +71,22 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
             @Override
             public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
                 return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
+            }
+
+        };
+    }
+
+    private static Function<Throwable, Mono<SpaceQuota>> convertException(final String message) {
+        return new Function<Throwable, Mono<SpaceQuota>>() {
+
+            @Override
+            public Mono<SpaceQuota> apply(Throwable throwable) {
+                if (throwable instanceof NoSuchElementException) {
+
+                    return Mono.error(new IllegalArgumentException(message, throwable));
+                } else {
+                    return Mono.error(throwable);
+                }
             }
 
         };
