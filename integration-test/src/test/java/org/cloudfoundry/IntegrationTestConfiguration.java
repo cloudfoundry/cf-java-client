@@ -44,8 +44,6 @@ import reactor.rx.Stream;
 
 import java.util.List;
 
-import static java.util.concurrent.TimeUnit.DAYS;
-
 @Configuration
 @EnableAutoConfiguration
 public class IntegrationTestConfiguration {

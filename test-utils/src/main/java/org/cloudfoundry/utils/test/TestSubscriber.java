@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
 
-public final class TestSubscriber<T>  implements Subscriber<T> {
+public final class TestSubscriber<T> implements Subscriber<T> {
 
     private final Queue<T> actuals = new LinkedList<T>();
 

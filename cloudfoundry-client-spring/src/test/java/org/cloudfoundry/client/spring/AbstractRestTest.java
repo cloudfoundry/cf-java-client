@@ -59,17 +59,6 @@ public abstract class AbstractRestTest {
     protected static final ProcessorGroup<?> PROCESSOR_GROUP = Processors.ioGroup("cloudfoundry-client-spring", ReactiveState.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE,
             uncaughtExceptionHandler(), null, false);
 
-    private static Consumer<Throwable> uncaughtExceptionHandler() {
-        return new Consumer<Throwable>() {
-
-            @Override
-            public void accept(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-
-        };
-    }
-
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
     protected final URI root = UriComponentsBuilder.newInstance()
@@ -135,6 +124,17 @@ public abstract class AbstractRestTest {
 
     protected final void verify() {
         this.mockServer.verify();
+    }
+
+    private static Consumer<Throwable> uncaughtExceptionHandler() {
+        return new Consumer<Throwable>() {
+
+            @Override
+            public void accept(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+
+        };
     }
 
     @Getter
