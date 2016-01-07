@@ -24,9 +24,15 @@ import org.reactivestreams.Publisher;
 public interface SpaceQuotaDefinitions {
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/226/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve
-     * a Particular Space Quota Definition</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/space_quota_definitions/associate_space_with_the_space_quota_definition.html">Associate a Space with a Space Quota Definition</a> request
+     *
+     * @param request the Associate a Space with a Space Quota Definition request
+     * @return the response from the Associate a Space with a Space Quota Definition request
+     */
+    Publisher<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/226/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve a Particular Space Quota Definition</a> request
      *
      * @param request the Retrieve a Particular Space Quota Definition request
      * @return the response from the Retrieve a Particular Space Quota Definition request
@@ -34,9 +40,7 @@ public interface SpaceQuotaDefinitions {
     Publisher<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the
-     * <a href="http://apidocs.cloudfoundry.org/214/space_quota_definitions/list_all_space_quota_definitions.html">List
-     * all Space Quota Definitions</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/space_quota_definitions/list_all_space_quota_definitions.html">List all Space Quota Definitions</a> request
      *
      * @param request the List Space Quota Definitions request
      * @return the response from the List Space Quota Definitions request
