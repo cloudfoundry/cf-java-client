@@ -91,7 +91,7 @@ public abstract class AbstractIntegrationTest {
     protected String userName;
 
     @Autowired
-    private Predicate<DomainResource> domainsPredicate;
+    protected Predicate<DomainResource> domainsPredicate;
 
     @Before
     public final void cleanup() throws Exception {

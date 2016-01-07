@@ -45,4 +45,16 @@ public final class Dates {
         }
     }
 
+    /**
+     * Formats a {@link Date} into a String in {@code ISO8601} format
+     *
+     * @param d the date to format
+     * @return the formatted date
+     */
+    public static String format(Date d) {
+        synchronized (MONITOR) {
+            return ISO8601.format(d);
+        }
+    }
+
 }
