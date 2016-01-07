@@ -2,7 +2,7 @@
 
 set -e
 
-source connection/domain
+DOMAIN=$(cat connection/domain)
 export TEST_HOST=api.$DOMAIN
 
 pushd cf-java-client
