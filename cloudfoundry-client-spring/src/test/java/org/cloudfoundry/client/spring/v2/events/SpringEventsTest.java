@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import java.util.Collections;
 
@@ -35,7 +35,7 @@ public final class SpringEventsTest {
 
     public static final class Get extends AbstractApiTest<GetEventRequest, GetEventResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, this.processorGroup);
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetEventRequest getInvalidRequest() {
@@ -83,7 +83,7 @@ public final class SpringEventsTest {
         }
 
         @Override
-        protected Publisher<GetEventResponse> invoke(GetEventRequest request) {
+        protected Mono<GetEventResponse> invoke(GetEventRequest request) {
             return this.events.get(request);
         }
 
@@ -91,7 +91,7 @@ public final class SpringEventsTest {
 
     public static final class List extends AbstractApiTest<ListEventsRequest, ListEventsResponse> {
 
-        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, this.processorGroup);
+        private final SpringEvents events = new SpringEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListEventsRequest getInvalidRequest() {
@@ -183,7 +183,7 @@ public final class SpringEventsTest {
         }
 
         @Override
-        protected Publisher<ListEventsResponse> invoke(ListEventsRequest request) {
+        protected Mono<ListEventsResponse> invoke(ListEventsRequest request) {
             return this.events.list(request);
         }
 

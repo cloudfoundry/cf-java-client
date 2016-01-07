@@ -29,9 +29,9 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -55,7 +55,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<Void> deleteInstance(final DeleteProcessInstanceRequest request) {
+    public Mono<Void> deleteInstance(final DeleteProcessInstanceRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -67,7 +67,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<GetProcessResponse> get(final GetProcessRequest request) {
+    public Mono<GetProcessResponse> get(final GetProcessRequest request) {
         return get(request, GetProcessResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -79,7 +79,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<ListProcessesResponse> list(final ListProcessesRequest request) {
+    public Mono<ListProcessesResponse> list(final ListProcessesRequest request) {
         return get(request, ListProcessesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -91,7 +91,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
         });
     }
 
-    public Publisher<ScaleProcessResponse> scale(final ScaleProcessRequest request) {
+    public Mono<ScaleProcessResponse> scale(final ScaleProcessRequest request) {
         return put(request, ScaleProcessResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -103,7 +103,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<UpdateProcessResponse> update(final UpdateProcessRequest request) {
+    public Mono<UpdateProcessResponse> update(final UpdateProcessRequest request) {
         return patch(request, UpdateProcessResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

@@ -61,6 +61,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
@@ -85,7 +86,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<AssociateApplicationRouteResponse> associateRoute(final AssociateApplicationRouteRequest request) {
+    public Mono<AssociateApplicationRouteResponse> associateRoute(final AssociateApplicationRouteRequest request) {
         return put(request, AssociateApplicationRouteResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -97,7 +98,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<CopyApplicationResponse> copy(final CopyApplicationRequest request) {
+    public Mono<CopyApplicationResponse> copy(final CopyApplicationRequest request) {
         return post(request, CopyApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -109,7 +110,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<CreateApplicationResponse> create(CreateApplicationRequest request) {
+    public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return post(request, CreateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -121,7 +122,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteApplicationRequest request) {
+    public Mono<Void> delete(final DeleteApplicationRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -155,7 +156,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ApplicationEnvironmentResponse> environment(final ApplicationEnvironmentRequest request) {
+    public Mono<ApplicationEnvironmentResponse> environment(final ApplicationEnvironmentRequest request) {
         return get(request, ApplicationEnvironmentResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -167,7 +168,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<GetApplicationResponse> get(final GetApplicationRequest request) {
+    public Mono<GetApplicationResponse> get(final GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -179,7 +180,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ApplicationInstancesResponse> instances(final ApplicationInstancesRequest request) {
+    public Mono<ApplicationInstancesResponse> instances(final ApplicationInstancesRequest request) {
         return get(request, ApplicationInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -191,7 +192,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationsResponse> list(final ListApplicationsRequest request) {
+    public Mono<ListApplicationsResponse> list(final ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -205,7 +206,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
+    public Mono<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
         return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -219,9 +220,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ListApplicationServiceBindingsResponse> listServiceBindings(
-            final ListApplicationServiceBindingsRequest request) {
-
+    public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(final ListApplicationServiceBindingsRequest request) {
         return get(request, ListApplicationServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -235,7 +234,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> removeRoute(final RemoveApplicationRouteRequest request) {
+    public Mono<Void> removeRoute(final RemoveApplicationRouteRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -247,7 +246,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> removeServiceBinding(final RemoveApplicationServiceBindingRequest request) {
+    public Mono<Void> removeServiceBinding(final RemoveApplicationServiceBindingRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -259,7 +258,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<RestageApplicationResponse> restage(final RestageApplicationRequest request) {
+    public Mono<RestageApplicationResponse> restage(final RestageApplicationRequest request) {
         return post(request, RestageApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -271,7 +270,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<ApplicationStatisticsResponse> statistics(final ApplicationStatisticsRequest request) {
+    public Mono<ApplicationStatisticsResponse> statistics(final ApplicationStatisticsRequest request) {
         return get(request, ApplicationStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -283,7 +282,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<SummaryApplicationResponse> summary(final SummaryApplicationRequest request) {
+    public Mono<SummaryApplicationResponse> summary(final SummaryApplicationRequest request) {
         return get(request, SummaryApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -295,7 +294,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
+    public Mono<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -307,7 +306,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
+    public Mono<UpdateApplicationResponse> update(final UpdateApplicationRequest request) {
         return put(request, UpdateApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -319,7 +318,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Publisher<UploadApplicationResponse> upload(final UploadApplicationRequest request) {
+    public Mono<UploadApplicationResponse> upload(final UploadApplicationRequest request) {
         return putWithBody(request, new Supplier<MultiValueMap<String, Object>>() {
 
                     @Override

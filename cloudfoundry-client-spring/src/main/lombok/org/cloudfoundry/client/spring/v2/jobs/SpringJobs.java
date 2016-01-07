@@ -21,9 +21,9 @@ import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.job.GetJobRequest;
 import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.Jobs;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -47,7 +47,7 @@ public final class SpringJobs extends AbstractSpringOperations implements Jobs {
     }
 
     @Override
-    public Publisher<GetJobResponse> get(final GetJobRequest request) {
+    public Mono<GetJobResponse> get(final GetJobRequest request) {
         return get(request, GetJobResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

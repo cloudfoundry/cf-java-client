@@ -81,9 +81,9 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -107,7 +107,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorResponse> associateAuditor(final AssociateOrganizationAuditorRequest request) {
+    public Mono<AssociateOrganizationAuditorResponse> associateAuditor(final AssociateOrganizationAuditorRequest request) {
         return put(request, AssociateOrganizationAuditorResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -120,7 +120,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(final AssociateOrganizationAuditorByUsernameRequest request) {
+    public Mono<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(final AssociateOrganizationAuditorByUsernameRequest request) {
         return put(request, AssociateOrganizationAuditorByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -132,7 +132,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationBillingManagerResponse> associateBillingManager(final AssociateOrganizationBillingManagerRequest request) {
+    public Mono<AssociateOrganizationBillingManagerResponse> associateBillingManager(final AssociateOrganizationBillingManagerRequest request) {
         return put(request, AssociateOrganizationBillingManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -145,7 +145,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(final AssociateOrganizationBillingManagerByUsernameRequest request) {
+    public Mono<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(final AssociateOrganizationBillingManagerByUsernameRequest request) {
         return put(request, AssociateOrganizationBillingManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -157,7 +157,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationManagerResponse> associateManager(final AssociateOrganizationManagerRequest request) {
+    public Mono<AssociateOrganizationManagerResponse> associateManager(final AssociateOrganizationManagerRequest request) {
         return put(request, AssociateOrganizationManagerResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -169,7 +169,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(final AssociateOrganizationManagerByUsernameRequest request) {
+    public Mono<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(final AssociateOrganizationManagerByUsernameRequest request) {
         return put(request, AssociateOrganizationManagerByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -181,7 +181,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(final AssociateOrganizationPrivateDomainRequest request) {
+    public Mono<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(final AssociateOrganizationPrivateDomainRequest request) {
         return put(request, AssociateOrganizationPrivateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -194,7 +194,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationUserResponse> associateUser(final AssociateOrganizationUserRequest request) {
+    public Mono<AssociateOrganizationUserResponse> associateUser(final AssociateOrganizationUserRequest request) {
         return put(request, AssociateOrganizationUserResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -206,7 +206,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(final AssociateOrganizationUserByUsernameRequest request) {
+    public Mono<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(final AssociateOrganizationUserByUsernameRequest request) {
         return put(request, AssociateOrganizationUserByUsernameResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -218,7 +218,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<CreateOrganizationResponse> create(final CreateOrganizationRequest request) {
+    public Mono<CreateOrganizationResponse> create(final CreateOrganizationRequest request) {
         return post(request, CreateOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -230,7 +230,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteOrganizationRequest request) {
+    public Mono<Void> delete(final DeleteOrganizationRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -243,7 +243,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationResponse> get(final GetOrganizationRequest request) {
+    public Mono<GetOrganizationResponse> get(final GetOrganizationRequest request) {
         return get(request, GetOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -255,7 +255,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationInstanceUsageResponse> getInstanceUsage(final GetOrganizationInstanceUsageRequest request) {
+    public Mono<GetOrganizationInstanceUsageResponse> getInstanceUsage(final GetOrganizationInstanceUsageRequest request) {
         return get(request, GetOrganizationInstanceUsageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -267,7 +267,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationMemoryUsageResponse> getMemoryUsage(final GetOrganizationMemoryUsageRequest request) {
+    public Mono<GetOrganizationMemoryUsageResponse> getMemoryUsage(final GetOrganizationMemoryUsageRequest request) {
         return get(request, GetOrganizationMemoryUsageResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -279,7 +279,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<GetOrganizationUserRolesResponse> getUserRoles(final GetOrganizationUserRolesRequest request) {
+    public Mono<GetOrganizationUserRolesResponse> getUserRoles(final GetOrganizationUserRolesRequest request) {
         return get(request, GetOrganizationUserRolesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -292,7 +292,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationsResponse> list(final ListOrganizationsRequest request) {
+    public Mono<ListOrganizationsResponse> list(final ListOrganizationsRequest request) {
         return get(request, ListOrganizationsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -306,7 +306,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationAuditorsResponse> listAuditors(final ListOrganizationAuditorsRequest request) {
+    public Mono<ListOrganizationAuditorsResponse> listAuditors(final ListOrganizationAuditorsRequest request) {
         return get(request, ListOrganizationAuditorsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -320,7 +320,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationBillingManagersResponse> listBillingManagers(final ListOrganizationBillingManagersRequest request) {
+    public Mono<ListOrganizationBillingManagersResponse> listBillingManagers(final ListOrganizationBillingManagersRequest request) {
         return get(request, ListOrganizationBillingManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -334,7 +334,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationManagersResponse> listManagers(final ListOrganizationManagersRequest request) {
+    public Mono<ListOrganizationManagersResponse> listManagers(final ListOrganizationManagersRequest request) {
         return get(request, ListOrganizationManagersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -348,7 +348,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationPrivateDomainsResponse> listPrivateDomains(final ListOrganizationPrivateDomainsRequest request) {
+    public Mono<ListOrganizationPrivateDomainsResponse> listPrivateDomains(final ListOrganizationPrivateDomainsRequest request) {
         return get(request, ListOrganizationPrivateDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -362,7 +362,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationServicesResponse> listServices(final ListOrganizationServicesRequest request) {
+    public Mono<ListOrganizationServicesResponse> listServices(final ListOrganizationServicesRequest request) {
         return get(request, ListOrganizationServicesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -376,7 +376,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(final ListOrganizationSpaceQuotaDefinitionsRequest request) {
+    public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(final ListOrganizationSpaceQuotaDefinitionsRequest request) {
         return get(request, ListOrganizationSpaceQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -389,7 +389,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationSpacesResponse> listSpaces(final ListOrganizationSpacesRequest request) {
+    public Mono<ListOrganizationSpacesResponse> listSpaces(final ListOrganizationSpacesRequest request) {
         return get(request, ListOrganizationSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -403,7 +403,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListOrganizationUsersResponse> listUsers(final ListOrganizationUsersRequest request) {
+    public Mono<ListOrganizationUsersResponse> listUsers(final ListOrganizationUsersRequest request) {
         return get(request, ListOrganizationUsersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -417,7 +417,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeAuditor(final RemoveOrganizationAuditorRequest request) {
+    public Mono<Void> removeAuditor(final RemoveOrganizationAuditorRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -429,7 +429,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeAuditorByUsername(final RemoveOrganizationAuditorByUsernameRequest request) {
+    public Mono<Void> removeAuditorByUsername(final RemoveOrganizationAuditorByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -440,7 +440,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeBillingManager(final RemoveOrganizationBillingManagerRequest request) {
+    public Mono<Void> removeBillingManager(final RemoveOrganizationBillingManagerRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -453,7 +453,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest request) {
+    public Mono<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -465,7 +465,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeManager(final RemoveOrganizationManagerRequest request) {
+    public Mono<Void> removeManager(final RemoveOrganizationManagerRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -477,7 +477,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeManagerByUsername(final RemoveOrganizationManagerByUsernameRequest request) {
+    public Mono<Void> removeManagerByUsername(final RemoveOrganizationManagerByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -489,7 +489,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removePrivateDomain(final RemoveOrganizationPrivateDomainRequest request) {
+    public Mono<Void> removePrivateDomain(final RemoveOrganizationPrivateDomainRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -502,7 +502,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeUser(final RemoveOrganizationUserRequest request) {
+    public Mono<Void> removeUser(final RemoveOrganizationUserRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -514,7 +514,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<Void> removeUserByUsername(final RemoveOrganizationUserByUsernameRequest request) {
+    public Mono<Void> removeUserByUsername(final RemoveOrganizationUserByUsernameRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -526,7 +526,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<SummaryOrganizationResponse> summary(final SummaryOrganizationRequest request) {
+    public Mono<SummaryOrganizationResponse> summary(final SummaryOrganizationRequest request) {
         return get(request, SummaryOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -538,7 +538,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<UpdateOrganizationResponse> update(final UpdateOrganizationRequest request) {
+    public Mono<UpdateOrganizationResponse> update(final UpdateOrganizationRequest request) {
         return put(request, UpdateOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

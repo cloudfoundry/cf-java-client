@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Space Quota Definitions Client API
@@ -31,7 +31,7 @@ public interface SpaceQuotaDefinitions {
      * @param request the Retrieve a Particular Space Quota Definition request
      * @return the response from the Retrieve a Particular Space Quota Definition request
      */
-    Publisher<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
+    Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
 
     /**
      * Makes the
@@ -41,7 +41,7 @@ public interface SpaceQuotaDefinitions {
      * @param request the List Space Quota Definitions request
      * @return the response from the List Space Quota Definitions request
      */
-    Publisher<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request);
+    Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request);
 
 
 }

@@ -18,10 +18,8 @@ package org.cloudfoundry.operations.v2;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
-import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 public final class Resources {
 
@@ -51,11 +49,11 @@ public final class Resources {
      * @param <U> the response type
      * @return the function to extract the resources from the response
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Publisher<R>> extractResources() {
-        return new Function<U, Publisher<R>>() {
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Function<U, Stream<R>> extractResources() {
+        return new Function<U, Stream<R>>() {
 
             @Override
-            public Publisher<R> apply(U pageResponse) {
+            public Stream<R> apply(U pageResponse) {
                 return getResources(pageResponse);
             }
 
@@ -92,7 +90,7 @@ public final class Resources {
      * @return a stream of resources from the response
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> getResources(U response) {
-        return Streams.from(response.getResources());
+        return Stream.fromIterable(response.getResources());
     }
 
 }

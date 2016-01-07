@@ -24,42 +24,44 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
+
+import java.util.NoSuchElementException;
 
 final class DefaultSpaceQuotas implements SpaceQuotas {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> organizationId;
+    private final Mono<String> organizationId;
 
-    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId) {
+    DefaultSpaceQuotas(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
     }
 
     @Override
-    public Publisher<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
-        return Validators
-                .stream(getSpaceQuotaRequest)
-                .zipWith(this.organizationId)
-                .flatMap(requestSpaceQuotaDefinitionWithContext(this.cloudFoundryClient))
+    public Mono<SpaceQuota> get(final GetSpaceQuotaRequest getSpaceQuotaRequest) {
+        return Stream
+                .from(Validators
+                        .validate(getSpaceQuotaRequest)
+                        .and(this.organizationId)
+                        .flatMap(requestSpaceQuotaDefinitionsWithContext(this.cloudFoundryClient)))
                 .filter(equalRequestAndDefinitionName())
-                .switchIfEmpty(Streams.<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, IllegalArgumentException>fail(
-                        new IllegalArgumentException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName()))))
-                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
+                .single()
                 .map(extractQuotaDefinition())
-                .map(toSpaceQuota());
+                .map(toSpaceQuota())
+                .otherwise(convertException(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName())));
     }
 
     @Override
     public Publisher<SpaceQuota> list() {
         return this.organizationId
-                .flatMap(requestSpaceQuotaDefinition(this.cloudFoundryClient))
+                .flatMap(requestSpaceQuotaDefinitions(this.cloudFoundryClient))
                 .map(toSpaceQuota());
     }
 
@@ -69,6 +71,22 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
             @Override
             public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
                 return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
+            }
+
+        };
+    }
+
+    private static Function<Throwable, Mono<SpaceQuota>> convertException(final String message) {
+        return new Function<Throwable, Mono<SpaceQuota>>() {
+
+            @Override
+            public Mono<SpaceQuota> apply(Throwable throwable) {
+                if (throwable instanceof NoSuchElementException) {
+
+                    return Mono.error(new IllegalArgumentException(message, throwable));
+                } else {
+                    return Mono.error(throwable);
+                }
             }
 
         };
@@ -101,10 +119,10 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
 
     private static Stream<SpaceQuotaDefinitionResource> fromSpaceQuotaDefinitionResourceStream(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return Paginated
-                .requestResources(new Function<Integer, Publisher<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+                .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
                     @Override
-                    public Publisher<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+                    public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
                         ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                                 .id(organizationId)
                                 .page(page)
@@ -116,23 +134,23 @@ final class DefaultSpaceQuotas implements SpaceQuotas {
                 });
     }
 
-    private static Function<String, Publisher<SpaceQuotaDefinitionResource>> requestSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<String, Publisher<SpaceQuotaDefinitionResource>>() {
+    private static Function<String, Stream<SpaceQuotaDefinitionResource>> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Stream<SpaceQuotaDefinitionResource>>() {
 
             @Override
-            public Publisher<SpaceQuotaDefinitionResource> apply(String organizationId) {
+            public Stream<SpaceQuotaDefinitionResource> apply(String organizationId) {
                 return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId);
             }
 
         };
     }
 
-    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionWithContext(
+    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionsWithContext(
             final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<GetSpaceQuotaRequest, String>, Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>>() {
+        return new Function<Tuple2<GetSpaceQuotaRequest, String>, Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>>() {
 
             @Override
-            public Publisher<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
+            public Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
                 String organizationId = tuple.t2;
 
                 return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId)

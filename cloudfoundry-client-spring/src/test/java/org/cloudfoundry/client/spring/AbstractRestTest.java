@@ -20,7 +20,6 @@ import lombok.Getter;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
-import org.junit.After;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -40,6 +39,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Processors;
 import reactor.core.processor.ProcessorGroup;
+import reactor.core.support.ReactiveState;
+import reactor.fn.Consumer;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -55,7 +56,19 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected final ProcessorGroup<?> processorGroup = Processors.ioGroup();
+    protected static final ProcessorGroup<?> PROCESSOR_GROUP = Processors.ioGroup("cloudfoundry-client-spring", ReactiveState.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE,
+            uncaughtExceptionHandler(), null, false);
+
+    private static Consumer<Throwable> uncaughtExceptionHandler() {
+        return new Consumer<Throwable>() {
+
+            @Override
+            public void accept(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+
+        };
+    }
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
@@ -77,11 +90,6 @@ public abstract class AbstractRestTest {
 
         messageConverters.add(new LoggregatorMessageHttpMessageConverter());
         messageConverters.add(new FallbackHttpMessageConverter());
-    }
-
-    @After
-    public final void shutdownProcessorGroup() throws Exception {
-        this.processorGroup.shutdown();
     }
 
     protected final void mockRequest(RequestContext requestContext) {

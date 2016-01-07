@@ -37,14 +37,12 @@ import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Publishers;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
-import reactor.rx.Streams;
 
 import java.net.URI;
 
@@ -68,7 +66,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest request) {
+    public Mono<AssociateRouteApplicationResponse> associateApplication(final AssociateRouteApplicationRequest request) {
         return put(request, AssociateRouteApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -80,7 +78,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<CreateRouteResponse> create(final CreateRouteRequest request) {
+    public Mono<CreateRouteResponse> create(final CreateRouteRequest request) {
         return post(request, CreateRouteResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -93,7 +91,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteRouteRequest request) {
+    public Mono<Void> delete(final DeleteRouteRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -106,7 +104,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<Boolean> exists(final RouteExistsRequest request) {
+    public Mono<Boolean> exists(final RouteExistsRequest request) {
         return get(request, Boolean.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -116,15 +114,16 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
             }
 
         })
+
                 .defaultIfEmpty(true)
-                .onErrorResumeNext(new Function<Throwable, Publisher<Boolean>>() {
+                .otherwise(new Function<Throwable, Mono<? extends Boolean>>() {
 
                     @Override
-                    public Publisher<Boolean> apply(Throwable throwable) {
+                    public Mono<? extends Boolean> apply(Throwable throwable) {
                         if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
-                            return Publishers.just(false);
+                            return Mono.just(false);
                         } else {
-                            return Streams.fail(throwable);
+                            return Mono.error(throwable);
                         }
                     }
 
@@ -132,7 +131,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<GetRouteResponse> get(final GetRouteRequest request) {
+    public Mono<GetRouteResponse> get(final GetRouteRequest request) {
         return get(request, GetRouteResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -144,7 +143,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<ListRoutesResponse> list(final ListRoutesRequest request) {
+    public Mono<ListRoutesResponse> list(final ListRoutesRequest request) {
         return get(request, ListRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -158,7 +157,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<ListRouteApplicationsResponse> listApplications(final ListRouteApplicationsRequest request) {
+    public Mono<ListRouteApplicationsResponse> listApplications(final ListRouteApplicationsRequest request) {
         return get(request, ListRouteApplicationsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -172,7 +171,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<Void> removeApplication(final RemoveRouteApplicationRequest request) {
+    public Mono<Void> removeApplication(final RemoveRouteApplicationRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -184,7 +183,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Publisher<UpdateRouteResponse> update(final UpdateRouteRequest request) {
+    public Mono<UpdateRouteResponse> update(final UpdateRouteRequest request) {
         return put(request, UpdateRouteResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

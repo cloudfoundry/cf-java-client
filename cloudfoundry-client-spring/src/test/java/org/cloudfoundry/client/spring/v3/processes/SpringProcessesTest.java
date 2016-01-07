@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.processes.ListProcessesResponse.Resource;
@@ -42,7 +42,7 @@ public final class SpringProcessesTest {
 
     public static final class DeleteInstance extends AbstractApiTest<DeleteProcessInstanceRequest, Void> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
 
         @Override
@@ -72,7 +72,7 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteProcessInstanceRequest request) {
+        protected Mono<Void> invoke(DeleteProcessInstanceRequest request) {
             return this.processes.deleteInstance(request);
         }
 
@@ -80,7 +80,7 @@ public final class SpringProcessesTest {
 
     public static final class Get extends AbstractApiTest<GetProcessRequest, GetProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetProcessRequest getInvalidRequest() {
@@ -130,7 +130,7 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<GetProcessResponse> invoke(GetProcessRequest request) {
+        protected Mono<GetProcessResponse> invoke(GetProcessRequest request) {
             return this.processes.get(request);
         }
 
@@ -138,7 +138,7 @@ public final class SpringProcessesTest {
 
     public static final class List extends AbstractApiTest<ListProcessesRequest, ListProcessesResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListProcessesRequest getInvalidRequest() {
@@ -226,7 +226,7 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<ListProcessesResponse> invoke(ListProcessesRequest request) {
+        protected Mono<ListProcessesResponse> invoke(ListProcessesRequest request) {
             return this.processes.list(request);
         }
 
@@ -234,7 +234,7 @@ public final class SpringProcessesTest {
 
     public static final class Scale extends AbstractApiTest<ScaleProcessRequest, ScaleProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ScaleProcessRequest getInvalidRequest() {
@@ -288,14 +288,14 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<ScaleProcessResponse> invoke(ScaleProcessRequest request) {
+        protected Mono<ScaleProcessResponse> invoke(ScaleProcessRequest request) {
             return this.processes.scale(request);
         }
     }
 
     public static final class Update extends AbstractApiTest<UpdateProcessRequest, UpdateProcessResponse> {
 
-        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, this.processorGroup);
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UpdateProcessRequest getInvalidRequest() {
@@ -348,7 +348,7 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<UpdateProcessResponse> invoke(UpdateProcessRequest request) {
+        protected Mono<UpdateProcessResponse> invoke(UpdateProcessRequest request) {
             return this.processes.update(request);
         }
     }

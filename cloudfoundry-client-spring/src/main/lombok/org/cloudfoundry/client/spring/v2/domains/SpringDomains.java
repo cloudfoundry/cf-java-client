@@ -30,9 +30,9 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -56,7 +56,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<CreateDomainResponse> create(final CreateDomainRequest request) {
+    public Mono<CreateDomainResponse> create(final CreateDomainRequest request) {
         return post(request, CreateDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -68,7 +68,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<Void> delete(final DeleteDomainRequest request) {
+    public Mono<Void> delete(final DeleteDomainRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -80,7 +80,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<GetDomainResponse> get(final GetDomainRequest request) {
+    public Mono<GetDomainResponse> get(final GetDomainRequest request) {
         return get(request, GetDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -92,7 +92,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<ListDomainsResponse> list(final ListDomainsRequest request) {
+    public Mono<ListDomainsResponse> list(final ListDomainsRequest request) {
         return get(request, ListDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -106,7 +106,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Publisher<ListDomainSpacesResponse> listSpaces(final ListDomainSpacesRequest request) {
+    public Mono<ListDomainSpacesResponse> listSpaces(final ListDomainSpacesRequest request) {
         return get(request, ListDomainSpacesResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

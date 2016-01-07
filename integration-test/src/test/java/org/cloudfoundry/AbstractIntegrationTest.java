@@ -35,9 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reactor.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
@@ -57,22 +57,23 @@ public abstract class AbstractIntegrationTest {
     protected CloudFoundryOperations cloudFoundryOperations;
 
     @Autowired
-    protected Stream<String> organizationId;
+    protected Mono<String> organizationId;
 
     @Autowired
-    protected Stream<String> spaceId;
+    protected Mono<String> spaceId;
 
     @Value("${test.space}")
     protected String spaceName;
 
     @After
-    public final void cleanup() throws Exception { // TODO: Link together instead of doing await()
-        this.logger.info(">> CLEANUP <<");
-        Streams.await(cleanupApplications(this.cloudFoundryClient), 5, SECONDS);
-        Streams.await(cleanupRoutes(this.cloudFoundryClient), 5, SECONDS);
-        Streams.await(cleanupDomains(this.cloudFoundryClient), 5, SECONDS);
-        this.logger.info("<< CLEANUP >>");
-
+    public final void cleanup() throws Exception {
+        cleanupApplications(this.cloudFoundryClient)
+                .after(() -> cleanupRoutes(this.cloudFoundryClient))
+                .after(() -> cleanupDomains(this.cloudFoundryClient))
+                .doOnSubscribe(s -> this.logger.info(">> CLEANUP <<"))
+                .doOnComplete(() -> this.logger.info("<< CLEANUP >>"))
+                .after()
+                .get();
     }
 
     @After

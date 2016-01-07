@@ -17,23 +17,21 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
-import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
-    private final Stream<String> spaceId;
+    private final Mono<String> spaceId;
 
-    DefaultApplications(CloudFoundryClient cloudFoundryClient, Stream<String> spaceId) {
+    DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.spaceId = spaceId;
     }
@@ -41,27 +39,27 @@ final class DefaultApplications implements Applications {
     @Override
     public Publisher<Application> list() {
         return this.spaceId
-                .flatMap(requestSpaceSummary(this.cloudFoundryClient))
+                .then(requestSpaceSummary(this.cloudFoundryClient))
                 .flatMap(extractApplications())
                 .map(toApplication());
     }
 
-    private static Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>> extractApplications() {
-        return new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
+    private static Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>> extractApplications() {
+        return new Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>>() {
 
             @Override
-            public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
-                return Streams.from(getSpaceSummaryResponse.getApplications());
+            public Stream<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
+                return Stream.fromIterable(getSpaceSummaryResponse.getApplications());
             }
 
         };
     }
 
-    private static Function<String, Publisher<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<String, Publisher<GetSpaceSummaryResponse>>() {
+    private static Function<String, Mono<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<GetSpaceSummaryResponse>>() {
 
             @Override
-            public Publisher<GetSpaceSummaryResponse> apply(String targetedSpace) {
+            public Mono<GetSpaceSummaryResponse> apply(String targetedSpace) {
                 GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
                         .id(targetedSpace)
                         .build();

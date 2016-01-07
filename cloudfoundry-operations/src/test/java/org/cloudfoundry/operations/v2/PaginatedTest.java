@@ -20,9 +20,9 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 import reactor.fn.Function;
-import reactor.rx.Streams;
+import reactor.rx.Stream;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,19 +36,19 @@ public final class PaginatedTest {
         List<SpaceResource> expected = Arrays.asList(testSpaceResource(1), testSpaceResource(2), testSpaceResource(3));
 
         List<SpaceResource> actual = Paginated
-                .requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
+                .requestPages(new Function<Integer, Mono<ListSpacesResponse>>() {
 
                     @Override
-                    public Publisher<ListSpacesResponse> apply(Integer i) {
+                    public Mono<ListSpacesResponse> apply(Integer i) {
                         return testPaginatedResponsePublisher(i, 3);
                     }
 
                 })
-                .flatMap(new Function<ListSpacesResponse, Publisher<? extends SpaceResource>>() {
+                .flatMap(new Function<ListSpacesResponse, Stream<? extends SpaceResource>>() {
 
                     @Override
-                    public Publisher<? extends SpaceResource> apply(ListSpacesResponse response) {
-                        return Streams.from(response.getResources());
+                    public Stream<SpaceResource> apply(ListSpacesResponse response) {
+                        return Stream.fromIterable(response.getResources());
                     }
 
                 })
@@ -60,15 +60,15 @@ public final class PaginatedTest {
     @Test(expected = IllegalStateException.class)
     public void pageStreamNoTotalPages() {
         Paginated
-                .requestPages(new Function<Integer, Publisher<ListSpacesResponse>>() {
+                .requestPages(new Function<Integer, Mono<ListSpacesResponse>>() {
 
                     @Override
-                    public Publisher<ListSpacesResponse> apply(Integer page) {
+                    public Mono<ListSpacesResponse> apply(Integer page) {
                         ListSpacesResponse response = ListSpacesResponse.builder()
                                 .resource(testSpaceResource(0))
                                 .build();
 
-                        return Streams.just(response);
+                        return Mono.just(response);
                     }
 
                 }).toList().get();
@@ -79,10 +79,10 @@ public final class PaginatedTest {
         List<SpaceResource> expected = Arrays.asList(testSpaceResource(0), testSpaceResource(1), testSpaceResource(2));
 
         List<SpaceResource> actual = Paginated
-                .requestResources(new Function<Integer, Publisher<ListSpacesResponse>>() {
+                .requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
 
                     @Override
-                    public Publisher<ListSpacesResponse> apply(Integer i) {
+                    public Mono<ListSpacesResponse> apply(Integer i) {
                         return testPaginatedResponsePublisher(i - 1, 3);
                     }
 
@@ -91,13 +91,13 @@ public final class PaginatedTest {
         assertEquals(expected, actual);
     }
 
-    private static Publisher<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
+    private static Mono<ListSpacesResponse> testPaginatedResponsePublisher(int i, int totalNumber) {
         ListSpacesResponse response = ListSpacesResponse.builder()
                 .totalPages(totalNumber)
                 .resource(testSpaceResource(i))
                 .build();
 
-        return Streams.just(response);
+        return Mono.just(response);
     }
 
     private static SpaceResource testSpaceResource(int i) {

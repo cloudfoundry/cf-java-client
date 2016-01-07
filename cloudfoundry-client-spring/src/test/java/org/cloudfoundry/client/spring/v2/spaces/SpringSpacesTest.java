@@ -96,7 +96,7 @@ import org.cloudfoundry.client.v2.spaces.UserSpaceRoleEntity;
 import org.cloudfoundry.client.v2.spaces.UserSpaceRoleResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.Plan;
@@ -113,7 +113,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateAuditor extends AbstractApiTest<AssociateSpaceAuditorRequest, AssociateSpaceAuditorResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceAuditorRequest getInvalidRequest() {
@@ -165,7 +165,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceAuditorResponse> invoke(AssociateSpaceAuditorRequest request) {
+        protected Mono<AssociateSpaceAuditorResponse> invoke(AssociateSpaceAuditorRequest request) {
             return this.spaces.associateAuditor(request);
         }
 
@@ -173,7 +173,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateAuditorByUsername extends AbstractApiTest<AssociateSpaceAuditorByUsernameRequest, AssociateSpaceAuditorByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceAuditorByUsernameRequest getInvalidRequest() {
@@ -226,7 +226,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceAuditorByUsernameResponse> invoke(AssociateSpaceAuditorByUsernameRequest request) {
+        protected Mono<AssociateSpaceAuditorByUsernameResponse> invoke(AssociateSpaceAuditorByUsernameRequest request) {
             return this.spaces.associateAuditorByUsername(request);
         }
 
@@ -234,7 +234,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateDeveloper extends AbstractApiTest<AssociateSpaceDeveloperRequest, AssociateSpaceDeveloperResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceDeveloperRequest getInvalidRequest() {
@@ -286,7 +286,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceDeveloperResponse> invoke(AssociateSpaceDeveloperRequest request) {
+        protected Mono<AssociateSpaceDeveloperResponse> invoke(AssociateSpaceDeveloperRequest request) {
             return this.spaces.associateDeveloper(request);
         }
 
@@ -294,7 +294,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateManager extends AbstractApiTest<AssociateSpaceManagerRequest, AssociateSpaceManagerResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceManagerRequest getInvalidRequest() {
@@ -346,7 +346,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceManagerResponse> invoke(AssociateSpaceManagerRequest request) {
+        protected Mono<AssociateSpaceManagerResponse> invoke(AssociateSpaceManagerRequest request) {
             return this.spaces.associateManager(request);
         }
 
@@ -354,7 +354,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSecurityGroup extends AbstractApiTest<AssociateSpaceSecurityGroupRequest, AssociateSpaceSecurityGroupResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceSecurityGroupRequest getInvalidRequest() {
@@ -406,7 +406,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceSecurityGroupResponse> invoke(AssociateSpaceSecurityGroupRequest request) {
+        protected Mono<AssociateSpaceSecurityGroupResponse> invoke(AssociateSpaceSecurityGroupRequest request) {
             return this.spaces.associateSecurityGroup(request);
         }
 
@@ -414,7 +414,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSpaceDeveloperByUsername extends AbstractApiTest<AssociateSpaceDeveloperByUsernameRequest, AssociateSpaceDeveloperByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceDeveloperByUsernameRequest getInvalidRequest() {
@@ -467,7 +467,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceDeveloperByUsernameResponse> invoke(AssociateSpaceDeveloperByUsernameRequest request) {
+        protected Mono<AssociateSpaceDeveloperByUsernameResponse> invoke(AssociateSpaceDeveloperByUsernameRequest request) {
             return this.spaces.associateDeveloperByUsername(request);
         }
 
@@ -475,7 +475,7 @@ public final class SpringSpacesTest {
 
     public static final class AssociateSpaceManagerByUsername extends AbstractApiTest<AssociateSpaceManagerByUsernameRequest, AssociateSpaceManagerByUsernameResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected AssociateSpaceManagerByUsernameRequest getInvalidRequest() {
@@ -528,7 +528,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest request) {
+        protected Mono<AssociateSpaceManagerByUsernameResponse> invoke(AssociateSpaceManagerByUsernameRequest request) {
             return this.spaces.associateManagerByUsername(request);
         }
 
@@ -536,7 +536,7 @@ public final class SpringSpacesTest {
 
     public static final class Create extends AbstractApiTest<CreateSpaceRequest, CreateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreateSpaceRequest getInvalidRequest() {
@@ -589,7 +589,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<CreateSpaceResponse> invoke(CreateSpaceRequest request) {
+        protected Mono<CreateSpaceResponse> invoke(CreateSpaceRequest request) {
             return this.spaces.create(request);
         }
 
@@ -597,7 +597,7 @@ public final class SpringSpacesTest {
 
     public static final class Delete extends AbstractApiTest<DeleteSpaceRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeleteSpaceRequest getInvalidRequest() {
@@ -626,7 +626,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteSpaceRequest request) {
+        protected Mono<Void> invoke(DeleteSpaceRequest request) {
             return this.spaces.delete(request);
         }
 
@@ -634,7 +634,7 @@ public final class SpringSpacesTest {
 
     public static final class Get extends AbstractApiTest<GetSpaceRequest, GetSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetSpaceRequest getInvalidRequest() {
@@ -685,7 +685,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<GetSpaceResponse> invoke(GetSpaceRequest request) {
+        protected Mono<GetSpaceResponse> invoke(GetSpaceRequest request) {
             return this.spaces.get(request);
         }
 
@@ -693,7 +693,7 @@ public final class SpringSpacesTest {
 
     public static final class GetSummary extends AbstractApiTest<GetSpaceSummaryRequest, GetSpaceSummaryResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetSpaceSummaryRequest getInvalidRequest() {
@@ -770,7 +770,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<GetSpaceSummaryResponse> invoke(GetSpaceSummaryRequest request) {
+        protected Mono<GetSpaceSummaryResponse> invoke(GetSpaceSummaryRequest request) {
             return this.spaces.getSummary(request);
         }
 
@@ -778,7 +778,7 @@ public final class SpringSpacesTest {
 
     public static final class List extends AbstractApiTest<ListSpacesRequest, ListSpacesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpacesRequest getInvalidRequest() {
@@ -833,7 +833,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpacesResponse> invoke(ListSpacesRequest request) {
+        protected Mono<ListSpacesResponse> invoke(ListSpacesRequest request) {
             return this.spaces.list(request);
         }
 
@@ -841,7 +841,7 @@ public final class SpringSpacesTest {
 
     public static final class ListApplications extends AbstractApiTest<ListSpaceApplicationsRequest, ListSpaceApplicationsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceApplicationsRequest getInvalidRequest() {
@@ -906,7 +906,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceApplicationsResponse> invoke(ListSpaceApplicationsRequest request) {
+        protected Mono<ListSpaceApplicationsResponse> invoke(ListSpaceApplicationsRequest request) {
             return this.spaces.listApplications(request);
         }
 
@@ -914,7 +914,7 @@ public final class SpringSpacesTest {
 
     public static final class ListAuditors extends AbstractApiTest<ListSpaceAuditorsRequest, ListSpaceAuditorsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceAuditorsRequest getInvalidRequest() {
@@ -967,14 +967,14 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceAuditorsResponse> invoke(ListSpaceAuditorsRequest request) {
+        protected Mono<ListSpaceAuditorsResponse> invoke(ListSpaceAuditorsRequest request) {
             return this.spaces.listAuditors(request);
         }
     }
 
     public static final class ListDevelopers extends AbstractApiTest<ListSpaceDevelopersRequest, ListSpaceDevelopersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceDevelopersRequest getInvalidRequest() {
@@ -1027,7 +1027,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceDevelopersResponse> invoke(ListSpaceDevelopersRequest request) {
+        protected Mono<ListSpaceDevelopersResponse> invoke(ListSpaceDevelopersRequest request) {
             return this.spaces.listDevelopers(request);
         }
 
@@ -1035,7 +1035,7 @@ public final class SpringSpacesTest {
 
     public static final class ListDomains extends AbstractApiTest<ListSpaceDomainsRequest, ListSpaceDomainsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceDomainsRequest getInvalidRequest() {
@@ -1088,14 +1088,14 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceDomainsResponse> invoke(ListSpaceDomainsRequest request) {
+        protected Mono<ListSpaceDomainsResponse> invoke(ListSpaceDomainsRequest request) {
             return this.spaces.listDomains(request);
         }
     }
 
     public static final class ListEvents extends AbstractApiTest<ListSpaceEventsRequest, ListSpaceEventsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceEventsRequest getInvalidRequest() {
@@ -1152,7 +1152,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceEventsResponse> invoke(ListSpaceEventsRequest request) {
+        protected Mono<ListSpaceEventsResponse> invoke(ListSpaceEventsRequest request) {
             return this.spaces.listEvents(request);
         }
 
@@ -1160,7 +1160,7 @@ public final class SpringSpacesTest {
 
     public static final class ListManagers extends AbstractApiTest<ListSpaceManagersRequest, ListSpaceManagersResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceManagersRequest getInvalidRequest() {
@@ -1213,7 +1213,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceManagersResponse> invoke(ListSpaceManagersRequest request) {
+        protected Mono<ListSpaceManagersResponse> invoke(ListSpaceManagersRequest request) {
             return this.spaces.listManagers(request);
         }
 
@@ -1221,7 +1221,7 @@ public final class SpringSpacesTest {
 
     public static final class ListRoutes extends AbstractApiTest<ListSpaceRoutesRequest, ListSpaceRoutesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceRoutesRequest getInvalidRequest() {
@@ -1270,7 +1270,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceRoutesResponse> invoke(ListSpaceRoutesRequest request) {
+        protected Mono<ListSpaceRoutesResponse> invoke(ListSpaceRoutesRequest request) {
             return this.spaces.listRoutes(request);
         }
 
@@ -1278,7 +1278,7 @@ public final class SpringSpacesTest {
 
     public static final class ListSecurityGroups extends AbstractApiTest<ListSpaceSecurityGroupsRequest, ListSpaceSecurityGroupsResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceSecurityGroupsRequest getInvalidRequest() {
@@ -1329,7 +1329,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceSecurityGroupsResponse> invoke(ListSpaceSecurityGroupsRequest request) {
+        protected Mono<ListSpaceSecurityGroupsResponse> invoke(ListSpaceSecurityGroupsRequest request) {
             return this.spaces.listSecurityGroups(request);
         }
 
@@ -1337,7 +1337,7 @@ public final class SpringSpacesTest {
 
     public static final class ListServiceInstances extends AbstractApiTest<ListSpaceServiceInstancesRequest, ListSpaceServiceInstancesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceServiceInstancesRequest getInvalidRequest() {
@@ -1391,7 +1391,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceServiceInstancesResponse> invoke(ListSpaceServiceInstancesRequest request) {
+        protected Mono<ListSpaceServiceInstancesResponse> invoke(ListSpaceServiceInstancesRequest request) {
             return this.spaces.listServiceInstances(request);
         }
 
@@ -1399,7 +1399,7 @@ public final class SpringSpacesTest {
 
     public static final class ListServices extends AbstractApiTest<ListSpaceServicesRequest, ListSpaceServicesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceServicesRequest getInvalidRequest() {
@@ -1449,7 +1449,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceServicesResponse> invoke(ListSpaceServicesRequest request) {
+        protected Mono<ListSpaceServicesResponse> invoke(ListSpaceServicesRequest request) {
             return this.spaces.listServices(request);
         }
 
@@ -1457,7 +1457,7 @@ public final class SpringSpacesTest {
 
     public static final class ListUserRoles extends AbstractApiTest<ListSpaceUserRolesRequest, ListSpaceUserRolesResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceUserRolesRequest getInvalidRequest() {
@@ -1514,7 +1514,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<ListSpaceUserRolesResponse> invoke(ListSpaceUserRolesRequest request) {
+        protected Mono<ListSpaceUserRolesResponse> invoke(ListSpaceUserRolesRequest request) {
             return this.spaces.listUserRoles(request);
         }
 
@@ -1522,7 +1522,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveAuditor extends AbstractApiTest<RemoveSpaceAuditorRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceAuditorRequest getInvalidRequest() {
@@ -1551,7 +1551,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceAuditorRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceAuditorRequest request) {
             return this.spaces.removeAuditor(request);
         }
 
@@ -1559,7 +1559,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveAuditorByUsername extends AbstractApiTest<RemoveSpaceAuditorByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceAuditorByUsernameRequest getInvalidRequest() {
@@ -1589,7 +1589,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceAuditorByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceAuditorByUsernameRequest request) {
             return this.spaces.removeAuditorByUsername(request);
         }
 
@@ -1597,7 +1597,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveDeveloper extends AbstractApiTest<RemoveSpaceDeveloperRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceDeveloperRequest getInvalidRequest() {
@@ -1626,14 +1626,14 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceDeveloperRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceDeveloperRequest request) {
             return this.spaces.removeDeveloper(request);
         }
     }
 
     public static final class RemoveDeveloperByUsername extends AbstractApiTest<RemoveSpaceDeveloperByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceDeveloperByUsernameRequest getInvalidRequest() {
@@ -1663,7 +1663,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceDeveloperByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceDeveloperByUsernameRequest request) {
             return this.spaces.removeDeveloperByUsername(request);
         }
 
@@ -1671,7 +1671,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveManager extends AbstractApiTest<RemoveSpaceManagerRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceManagerRequest getInvalidRequest() {
@@ -1700,7 +1700,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceManagerRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceManagerRequest request) {
             return this.spaces.removeManager(request);
         }
 
@@ -1708,7 +1708,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveManagerByUsername extends AbstractApiTest<RemoveSpaceManagerByUsernameRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceManagerByUsernameRequest getInvalidRequest() {
@@ -1738,7 +1738,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceManagerByUsernameRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceManagerByUsernameRequest request) {
             return this.spaces.removeManagerByUsername(request);
         }
 
@@ -1746,7 +1746,7 @@ public final class SpringSpacesTest {
 
     public static final class RemoveSecurityGroup extends AbstractApiTest<RemoveSpaceSecurityGroupRequest, Void> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected RemoveSpaceSecurityGroupRequest getInvalidRequest() {
@@ -1775,7 +1775,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(RemoveSpaceSecurityGroupRequest request) {
+        protected Mono<Void> invoke(RemoveSpaceSecurityGroupRequest request) {
             return this.spaces.removeSecurityGroup(request);
         }
 
@@ -1783,7 +1783,7 @@ public final class SpringSpacesTest {
 
     public static final class Update extends AbstractApiTest<UpdateSpaceRequest, UpdateSpaceResponse> {
 
-        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UpdateSpaceRequest getInvalidRequest() {
@@ -1837,7 +1837,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Publisher<UpdateSpaceResponse> invoke(UpdateSpaceRequest request) {
+        protected Mono<UpdateSpaceResponse> invoke(UpdateSpaceRequest request) {
             return this.spaces.update(request);
         }
 

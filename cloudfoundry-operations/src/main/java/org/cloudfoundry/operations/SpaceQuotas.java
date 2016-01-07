@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Spaces Operations API
@@ -29,7 +30,7 @@ public interface SpaceQuotas {
      * @param request the Get Space Quota request
      * @return the space quota
      */
-    Publisher<SpaceQuota> get(GetSpaceQuotaRequest request);
+    Mono<SpaceQuota> get(GetSpaceQuotaRequest request);
 
     /**
      * Lists the space quotas

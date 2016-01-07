@@ -25,9 +25,9 @@ import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -51,7 +51,7 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
     }
 
     @Override
-    public Publisher<GetEventResponse> get(final GetEventRequest request) {
+    public Mono<GetEventResponse> get(final GetEventRequest request) {
         return get(request, GetEventResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -63,7 +63,7 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
     }
 
     @Override
-    public Publisher<ListEventsResponse> list(final ListEventsRequest request) {
+    public Mono<ListEventsResponse> list(final ListEventsRequest request) {
         return get(request, ListEventsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

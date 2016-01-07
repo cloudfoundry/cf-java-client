@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
@@ -31,7 +31,7 @@ public final class SpringSharedDomainsTest {
 
     public static final class ListSharedDomains extends AbstractApiTest<ListSharedDomainsRequest, ListSharedDomainsResponse> {
 
-        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSharedDomains sharedDomains = new SpringSharedDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSharedDomainsRequest getInvalidRequest() {
@@ -112,7 +112,7 @@ public final class SpringSharedDomainsTest {
         }
 
         @Override
-        protected Publisher<ListSharedDomainsResponse> invoke(ListSharedDomainsRequest request) {
+        protected Mono<ListSharedDomainsResponse> invoke(ListSharedDomainsRequest request) {
             return this.sharedDomains.list(request);
         }
 

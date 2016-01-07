@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Routes Operations API
@@ -29,7 +30,7 @@ public interface Routes {
      * @param request the Check Route request
      * @return whether the route exists
      */
-    Publisher<Boolean> check(CheckRouteRequest request);
+    Mono<Boolean> check(CheckRouteRequest request);
 
     /**
      * Lists the routes and the applications bound to those routes

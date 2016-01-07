@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinition
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
@@ -33,7 +33,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
     public static final class GetSpaceQuotaDefinition extends AbstractApiTest<GetSpaceQuotaDefinitionRequest, GetSpaceQuotaDefinitionResponse> {
 
-        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaceQuotaDefinitions spacequotadefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
@@ -80,7 +80,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         }
 
         @Override
-        protected Publisher<GetSpaceQuotaDefinitionResponse> invoke(GetSpaceQuotaDefinitionRequest request) {
+        protected Mono<GetSpaceQuotaDefinitionResponse> invoke(GetSpaceQuotaDefinitionRequest request) {
             return this.spacequotadefinitions.get(request);
         }
 
@@ -88,7 +88,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
     public static final class List extends AbstractApiTest<ListSpaceQuotaDefinitionsRequest, ListSpaceQuotaDefinitionsResponse> {
 
-        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, this.processorGroup);
+        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListSpaceQuotaDefinitionsRequest getInvalidRequest() {
@@ -138,7 +138,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         }
 
         @Override
-        protected Publisher<ListSpaceQuotaDefinitionsResponse> invoke(ListSpaceQuotaDefinitionsRequest request) {
+        protected Mono<ListSpaceQuotaDefinitionsResponse> invoke(ListSpaceQuotaDefinitionsRequest request) {
             return this.spaceQuotaDefinitions.list(request);
         }
 

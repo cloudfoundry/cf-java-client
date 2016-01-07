@@ -23,9 +23,9 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.Mono;
 import reactor.core.processor.ProcessorGroup;
 import reactor.fn.Consumer;
 
@@ -49,7 +49,7 @@ public final class SpringSharedDomains extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Publisher<ListSharedDomainsResponse> list(final ListSharedDomainsRequest request) {
+    public Mono<ListSharedDomainsResponse> list(final ListSharedDomainsRequest request) {
         return get(request, ListSharedDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

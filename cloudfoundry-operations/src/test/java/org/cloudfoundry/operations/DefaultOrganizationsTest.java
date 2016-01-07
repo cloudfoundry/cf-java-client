@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Publishers;
+import reactor.Mono;
 
 import static org.mockito.Mockito.when;
 
@@ -50,7 +50,7 @@ public final class DefaultOrganizationsTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.organizations().list(request1)).thenReturn(Publishers.just(page1));
+            when(this.cloudFoundryClient.organizations().list(request1)).thenReturn(Mono.just(page1));
 
             ListOrganizationsRequest request2 = ListOrganizationsRequest.builder()
                     .page(2)
@@ -66,7 +66,7 @@ public final class DefaultOrganizationsTest {
                             .build())
                     .totalPages(2)
                     .build();
-            when(this.cloudFoundryClient.organizations().list(request2)).thenReturn(Publishers.just(page2));
+            when(this.cloudFoundryClient.organizations().list(request2)).thenReturn(Mono.just(page2));
         }
 
         @Override

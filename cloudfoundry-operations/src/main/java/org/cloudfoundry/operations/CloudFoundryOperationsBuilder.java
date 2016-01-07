@@ -17,20 +17,19 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.v2.Paginated;
 import org.cloudfoundry.operations.v2.Resources;
-import org.reactivestreams.Publisher;
-import reactor.fn.BiFunction;
+import reactor.Mono;
 import reactor.fn.Function;
+import reactor.rx.Promise;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
+
+import java.util.NoSuchElementException;
 
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
@@ -54,8 +53,8 @@ public final class CloudFoundryOperationsBuilder {
             throw new IllegalArgumentException("CloudFoundryClient must be set");
         }
 
-        Stream<String> organizationId = getOrganizationId(this.cloudFoundryClient, this.organization);
-        Stream<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
+        Mono<String> organizationId = getOrganizationId(this.cloudFoundryClient, this.organization);
+        Mono<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
 
         return new DefaultCloudFoundryOperations(this.cloudFoundryClient, organizationId, spaceId);
     }
@@ -95,60 +94,59 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private static <T extends Resource<?>> Stream<T> failIfLessThanOne(String message) {
-        return Streams.fail(new IllegalArgumentException(message));
-    }
-
-    private static <T extends Resource<?>> BiFunction<T, T, T> failIfMoreThanOne(final String message) {
-        return new BiFunction<T, T, T>() {
+    private static <T> Function<Throwable, Mono<T>> convertException(final String message) {
+        return new Function<Throwable, Mono<T>>() {
 
             @Override
-            public T apply(T resource1, T resource2) {
-                throw new UnexpectedResponseException(message);
+            public Mono<T> apply(Throwable throwable) {
+                if (throwable instanceof NoSuchElementException) {
+                    return Mono.error(new IllegalArgumentException(message, throwable));
+                } else {
+                    return Mono.error(throwable);
+                }
             }
 
         };
     }
 
-    private static Stream<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         if (organization == null) {
-            return Streams.fail(new IllegalStateException("No organization targeted"));
+            return Mono.error(new IllegalStateException("No organization targeted"));
         }
 
-        Stream<String> organizationId = Paginated
+        Mono<String> organizationId = Paginated
                 .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
-                .reduce(CloudFoundryOperationsBuilder.<OrganizationResource>failIfMoreThanOne(String.format("Organization %s was listed more than once", organization)))
-                .switchIfEmpty(CloudFoundryOperationsBuilder.<OrganizationResource>failIfLessThanOne(String.format("Organization %s does not exist", organization)))
-                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
+                .single()
                 .map(Resources.extractId())
-                .cache(1);
+                .otherwise(CloudFoundryOperationsBuilder.<String>convertException(String.format("Organization %s does not exist", organization)))
+                .to(Promise.<String>prepare());
 
-        organizationId.next().poll();
+        organizationId.get();
         return organizationId;
     }
 
-    private static Stream<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, String space) {
+    private static Mono<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {
         if (space == null) {
-            return Streams.fail(new IllegalStateException("No space targeted"));
+            return Mono.error(new IllegalStateException("No space targeted"));
         }
 
-        Stream<String> spaceId = organizationId
-                .flatMap(requestResources(cloudFoundryClient, space))
-                .reduce(CloudFoundryOperationsBuilder.<SpaceResource>failIfMoreThanOne(String.format("Space %s was listed more than once", space)))
-                .switchIfEmpty(CloudFoundryOperationsBuilder.<SpaceResource>failIfLessThanOne(String.format("Space %s does not exist", space)))
-                .take(1)  // TODO: Remove after switchIfEmpty() propagates onComplete() in a non-empty case
+        Mono<String> spaceId = Stream
+                .from(organizationId
+                        .flatMap(requestResources(cloudFoundryClient, space)))
+                .single()
                 .map(Resources.extractId())
-                .cache(1);
+                .otherwise(CloudFoundryOperationsBuilder.<String>convertException(String.format("Space %s does not exist", space)))
+                .to(Promise.<String>prepare());
 
-        spaceId.next().poll();
+        spaceId.get();
         return spaceId;
     }
 
-    private static Function<Integer, Publisher<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
-        return new Function<Integer, Publisher<ListOrganizationsResponse>>() {
+    private static Function<Integer, Mono<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
+        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
 
             @Override
-            public Publisher<ListOrganizationsResponse> apply(Integer page) {
+            public Mono<ListOrganizationsResponse> apply(Integer page) {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder()
                         .name(organization)
                         .page(page)
@@ -159,22 +157,22 @@ public final class CloudFoundryOperationsBuilder {
         };
     }
 
-    private static Function<String, Publisher<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
-        return new Function<String, Publisher<SpaceResource>>() {
+    private static Function<String, Stream<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
+        return new Function<String, Stream<SpaceResource>>() {
 
             @Override
-            public Publisher<SpaceResource> apply(String organizationId) {
+            public Stream<SpaceResource> apply(String organizationId) {
                 return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
             }
 
         };
     }
 
-    private static Function<Integer, Publisher<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
-        return new Function<Integer, Publisher<ListSpacesResponse>>() {
+    private static Function<Integer, Mono<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+        return new Function<Integer, Mono<ListSpacesResponse>>() {
 
             @Override
-            public Publisher<ListSpacesResponse> apply(Integer page) {
+            public Mono<ListSpacesResponse> apply(Integer page) {
                 ListSpacesRequest request = ListSpacesRequest.builder()
                         .organizationId(organizationId)
                         .name(space)

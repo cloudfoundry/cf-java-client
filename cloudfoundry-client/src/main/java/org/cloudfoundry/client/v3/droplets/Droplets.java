@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Droplets Client API
@@ -29,7 +29,7 @@ public interface Droplets {
      * @param request the Delete Droplet request
      * @return the response from the Delete Droplet request
      */
-    Publisher<Void> delete(DeleteDropletRequest request);
+    Mono<Void> delete(DeleteDropletRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_(experimental)/get_a_droplet.html">Get Droplet</a> request
@@ -37,7 +37,7 @@ public interface Droplets {
      * @param request the Get Droplet request
      * @return the response from the Get Droplet request
      */
-    Publisher<GetDropletResponse> get(GetDropletRequest request);
+    Mono<GetDropletResponse> get(GetDropletRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/droplets_%28experimental%29/list_all_droplets.html">List Droplets</a> request
@@ -45,6 +45,6 @@ public interface Droplets {
      * @param request the List Droplets request
      * @return the response from the List Droplets request
      */
-    Publisher<ListDropletsResponse> list(ListDropletsRequest request);
+    Mono<ListDropletsResponse> list(ListDropletsRequest request);
 
 }

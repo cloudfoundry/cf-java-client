@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Processes Client API
@@ -29,7 +29,7 @@ public interface Processes {
      * @param request the Terminate Process Instance request
      * @return the response from the Terminate Process Instance request
      */
-    Publisher<Void> deleteInstance(DeleteProcessInstanceRequest request);
+    Mono<Void> deleteInstance(DeleteProcessInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/get_a_process.html">Get Process</a> request
@@ -37,7 +37,7 @@ public interface Processes {
      * @param request the Get Process request
      * @return the response from the Get Process request
      */
-    Publisher<GetProcessResponse> get(GetProcessRequest request);
+    Mono<GetProcessResponse> get(GetProcessRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/list_all_processes.html">List Process</a> request
@@ -45,7 +45,7 @@ public interface Processes {
      * @param request the List Processes request
      * @return the response from the List Processes request
      */
-    Publisher<ListProcessesResponse> list(ListProcessesRequest request);
+    Mono<ListProcessesResponse> list(ListProcessesRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/scaling_a_process.html">Scale Application</a> request
@@ -53,7 +53,7 @@ public interface Processes {
      * @param request the Scale Process request
      * @return the response from the Scale Process request
      */
-    Publisher<ScaleProcessResponse> scale(ScaleProcessRequest request);
+    Mono<ScaleProcessResponse> scale(ScaleProcessRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/updating_a_process.html">Update Process</a> request
@@ -61,6 +61,6 @@ public interface Processes {
      * @param request the Update Process request
      * @return the response from the Update Process request
      */
-    Publisher<UpdateProcessResponse> update(UpdateProcessRequest request);
+    Mono<UpdateProcessResponse> update(UpdateProcessRequest request);
 
 }

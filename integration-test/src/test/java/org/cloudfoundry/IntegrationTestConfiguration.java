@@ -38,13 +38,13 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import reactor.core.error.Exceptions;
+import reactor.Mono;
+import reactor.rx.Promise;
 import reactor.rx.Stream;
-import reactor.rx.Streams;
 
 import java.util.List;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.DAYS;
 
 @Configuration
 @EnableAutoConfiguration
@@ -92,28 +92,29 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Stream<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) throws InterruptedException {
-        Streams.await(deleteOrganizations(cloudFoundryClient), 5, SECONDS); // TODO: Link together instead of doing await()
+    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) throws InterruptedException {
+        Mono<String> organizationId = deleteOrganizations(cloudFoundryClient)
+                .after(() -> {
+                    CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                            .name(organization)
+                            .build();
 
-        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
-                .name(organization)
-                .build();
-
-        Stream<String> organizationId = Streams
-                .wrap(cloudFoundryClient.organizations().create(request))
+                    return cloudFoundryClient.organizations().create(request);
+                })
+                .single()
                 .map(Resources::getId)
-                .observeStart(s -> this.logger.info(">> ORGANIZATION <<"))
-                .observeComplete(v -> this.logger.info("<< ORGANIZATION >>"))
-                .cache(1);
+                .doOnSubscribe(s -> this.logger.info(">> ORGANIZATION <<"))
+                .doOnTerminate((v, t) -> this.logger.info("<< ORGANIZATION >>"))
+                .to(Promise.prepare());
 
-        organizationId.next().poll();
+        organizationId.get();
         return organizationId;
     }
 
     @Bean
-    Stream<String> spaceId(CloudFoundryClient cloudFoundryClient, Stream<String> organizationId, @Value("${test.space}") String space) throws InterruptedException {
-        Stream<String> spaceId = organizationId
-                .flatMap(orgId -> {
+    Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, @Value("${test.space}") String space) throws InterruptedException {
+        Mono<String> spaceId = organizationId
+                .then(orgId -> {
                     CreateSpaceRequest request = CreateSpaceRequest.builder()
                             .name(space)
                             .organizationId(orgId)
@@ -122,11 +123,11 @@ public class IntegrationTestConfiguration {
                     return cloudFoundryClient.spaces().create(request);
                 })
                 .map(Resources::getId)
-                .observeStart(s -> this.logger.info(">> SPACE <<"))
-                .observeComplete(v -> this.logger.info("<< SPACE >>"))
-                .cache(1);
+                .doOnSubscribe(s -> this.logger.info(">> SPACE <<"))
+                .doOnTerminate((v, t) -> this.logger.info("<< SPACE >>"))
+                .to(Promise.prepare());
 
-        spaceId.next().poll();
+        spaceId.get();
         return spaceId;
     }
 
@@ -140,14 +141,9 @@ public class IntegrationTestConfiguration {
                     return cloudFoundryClient.organizations().list(request);
                 })
                 .map(Resources::getId)
+                .flatMap(organizationId -> deleteSpaces(cloudFoundryClient, organizationId)
+                        .after(() -> Mono.just(organizationId)))
                 .flatMap(organizationId -> {
-                    try {
-                        Streams.await(deleteSpaces(cloudFoundryClient, organizationId), 5, SECONDS); // TODO: Link together instead of doing await()
-                    } catch (InterruptedException e) {
-                        Exceptions.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-
                     DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
                             .id(organizationId)
                             .build();

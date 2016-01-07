@@ -35,8 +35,8 @@ import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.utils.test.TestSubscriber;
-import org.reactivestreams.Publisher;
 import org.springframework.core.io.ClassPathResource;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
@@ -53,7 +53,7 @@ public final class SpringPackagesTest {
 
     public static final class Copy extends AbstractApiTest<CopyPackageRequest, CopyPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CopyPackageRequest getInvalidRequest() {
@@ -98,7 +98,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<CopyPackageResponse> invoke(CopyPackageRequest request) {
+        protected Mono<CopyPackageResponse> invoke(CopyPackageRequest request) {
             return this.packages.copy(request);
         }
 
@@ -106,7 +106,7 @@ public final class SpringPackagesTest {
 
     public static final class Create extends AbstractApiTest<CreatePackageRequest, CreatePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected CreatePackageRequest getInvalidRequest() {
@@ -153,7 +153,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<CreatePackageResponse> invoke(CreatePackageRequest request) {
+        protected Mono<CreatePackageResponse> invoke(CreatePackageRequest request) {
             return this.packages.create(request);
         }
 
@@ -161,7 +161,7 @@ public final class SpringPackagesTest {
 
     public static final class Delete extends AbstractApiTest<DeletePackageRequest, Void> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected DeletePackageRequest getInvalidRequest() {
@@ -189,7 +189,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeletePackageRequest request) {
+        protected Mono<Void> invoke(DeletePackageRequest request) {
             return this.packages.delete(request);
         }
 
@@ -197,7 +197,7 @@ public final class SpringPackagesTest {
 
     public static final class Download extends AbstractApiTest<DownloadPackageRequest, byte[]> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected void assertions(TestSubscriber<byte[]> testSubscriber, final byte[] expected) {
@@ -232,7 +232,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<byte[]> invoke(DownloadPackageRequest request) {
+        protected Mono<byte[]> invoke(DownloadPackageRequest request) {
             return getContents(this.packages.download(request));
         }
 
@@ -240,7 +240,7 @@ public final class SpringPackagesTest {
 
     public static final class Get extends AbstractApiTest<GetPackageRequest, GetPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetPackageRequest getInvalidRequest() {
@@ -295,7 +295,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<GetPackageResponse> invoke(GetPackageRequest request) {
+        protected Mono<GetPackageResponse> invoke(GetPackageRequest request) {
             return this.packages.get(request);
         }
 
@@ -303,7 +303,7 @@ public final class SpringPackagesTest {
 
     public static final class List extends AbstractApiTest<ListPackagesRequest, ListPackagesResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListPackagesRequest getInvalidRequest() {
@@ -388,7 +388,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<ListPackagesResponse> invoke(ListPackagesRequest request) {
+        protected Mono<ListPackagesResponse> invoke(ListPackagesRequest request) {
             return this.packages.list(request);
         }
 
@@ -396,7 +396,7 @@ public final class SpringPackagesTest {
 
     public static final class Stage extends AbstractApiTest<StagePackageRequest, StagePackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
 
         @Override
@@ -453,14 +453,14 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<StagePackageResponse> invoke(StagePackageRequest request) {
+        protected Mono<StagePackageResponse> invoke(StagePackageRequest request) {
             return this.packages.stage(request);
         }
     }
 
     public static final class Upload extends AbstractApiTest<UploadPackageRequest, UploadPackageResponse> {
 
-        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, this.processorGroup);
+        private final SpringPackages packages = new SpringPackages(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected UploadPackageRequest getInvalidRequest() {
@@ -520,7 +520,7 @@ public final class SpringPackagesTest {
         }
 
         @Override
-        protected Publisher<UploadPackageResponse> invoke(UploadPackageRequest request) {
+        protected Mono<UploadPackageResponse> invoke(UploadPackageRequest request) {
             return this.packages.upload(request);
         }
 

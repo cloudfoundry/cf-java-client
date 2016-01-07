@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Shared Domains Client API
@@ -29,6 +29,6 @@ public interface SharedDomains {
      * @param request the List all Shared Domains request
      * @return the response from the List all Shared Domains request
      */
-    Publisher<ListSharedDomainsResponse> list(ListSharedDomainsRequest request);
+    Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request);
 
 }

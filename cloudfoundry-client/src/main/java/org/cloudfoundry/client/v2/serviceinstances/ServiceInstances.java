@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Service Instances Client API
@@ -29,7 +29,7 @@ public interface ServiceInstances {
      * @param request the Get Service Instance request
      * @return the response from the Get Service Instance request
      */
-    Publisher<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
+    Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/list_all_service_instances.html">List Service Instances</a> request
@@ -37,6 +37,6 @@ public interface ServiceInstances {
      * @param request the List Service Instances request
      * @return the response from the List Service Instances request
      */
-    Publisher<ListServiceInstancesResponse> list(ListServiceInstancesRequest request);
+    Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request);
 
 }

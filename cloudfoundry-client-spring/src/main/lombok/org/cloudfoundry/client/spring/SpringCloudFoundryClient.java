@@ -70,8 +70,8 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Processors;
-import reactor.core.processor.BaseProcessor;
 import reactor.core.processor.ProcessorGroup;
+import reactor.core.support.ReactiveState;
 import reactor.fn.Consumer;
 
 import java.io.IOException;
@@ -280,7 +280,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     private static ProcessorGroup<?> createProcessorGroup() {
-        return Processors.ioGroup("cloudfoundry-client-spring", BaseProcessor.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
+        return Processors.ioGroup("cloudfoundry-client-spring", ReactiveState.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,

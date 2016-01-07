@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.info;
 
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Info Client API
@@ -29,6 +29,6 @@ public interface Info {
      * @param request the Get Info request
      * @return the response from the Get Info request
      */
-    Publisher<GetInfoResponse> get(GetInfoRequest request);
+    Mono<GetInfoResponse> get(GetInfoRequest request);
 
 }

@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
-import org.reactivestreams.Publisher;
+import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
@@ -33,7 +33,7 @@ public final class SpringServiceInstancesTest {
 
     public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, this.processorGroup);
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected GetServiceInstanceRequest getInvalidRequest() {
@@ -90,7 +90,7 @@ public final class SpringServiceInstancesTest {
         }
 
         @Override
-        protected Publisher<GetServiceInstanceResponse> invoke(GetServiceInstanceRequest request) {
+        protected Mono<GetServiceInstanceResponse> invoke(GetServiceInstanceRequest request) {
             return this.serviceInstances.get(request);
         }
 
@@ -98,7 +98,7 @@ public final class SpringServiceInstancesTest {
 
     public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
-        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, this.processorGroup);
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
         protected ListServiceInstancesRequest getInvalidRequest() {
@@ -159,7 +159,7 @@ public final class SpringServiceInstancesTest {
         }
 
         @Override
-        protected Publisher<ListServiceInstancesResponse> invoke(ListServiceInstancesRequest request) {
+        protected Mono<ListServiceInstancesResponse> invoke(ListServiceInstancesRequest request) {
             return this.serviceInstances.list(request);
         }
 
