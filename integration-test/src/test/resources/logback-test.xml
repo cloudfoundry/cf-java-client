@@ -35,7 +35,7 @@
 
     <logger name="cloudfoundry-client-spring" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
 
-    <logger name="test" level="INFO"/>
+    <logger name="test" level="${TEST_LOGGING_LEVEL:-INFO}"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

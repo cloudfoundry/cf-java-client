@@ -70,8 +70,8 @@ public abstract class AbstractIntegrationTest {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
                 .after(() -> cleanupDomains(this.cloudFoundryClient))
-                .doOnSubscribe(s -> this.logger.info(">> CLEANUP <<"))
-                .doOnComplete(() -> this.logger.info("<< CLEANUP >>"))
+                .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
+                .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
                 .after()
                 .get();
     }

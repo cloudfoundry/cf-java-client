@@ -101,8 +101,8 @@ public class IntegrationTestConfiguration {
                 })
                 .single()
                 .map(Resources::getId)
-                .doOnSubscribe(s -> this.logger.info(">> ORGANIZATION <<"))
-                .doOnTerminate((v, t) -> this.logger.info("<< ORGANIZATION >>"))
+                .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
+                .doOnTerminate((v, t) -> this.logger.debug("<< ORGANIZATION >>"))
                 .to(Promise.prepare());
 
         organizationId.get();
@@ -121,8 +121,8 @@ public class IntegrationTestConfiguration {
                     return cloudFoundryClient.spaces().create(request);
                 })
                 .map(Resources::getId)
-                .doOnSubscribe(s -> this.logger.info(">> SPACE <<"))
-                .doOnTerminate((v, t) -> this.logger.info("<< SPACE >>"))
+                .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
+                .doOnTerminate((v, t) -> this.logger.debug("<< SPACE >>"))
                 .to(Promise.prepare());
 
         spaceId.get();
