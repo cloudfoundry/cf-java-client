@@ -1,0 +1,7 @@
+{
+  "service_instance_guid": "650d0eb7-3b83-414a-82a0-d503d1c8eb5f",
+  "app_guid": "26ddc1de-3eeb-424b-82f3-f7f30a38b610",
+  "parameters": {
+    "the_service_broker": "wants this object"
+  }
+}
