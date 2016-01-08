@@ -21,6 +21,7 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
@@ -28,9 +29,11 @@ import reactor.Mono;
 
 import java.util.Collections;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceBindingsTest {
@@ -86,7 +89,45 @@ public final class SpringServiceBindingsTest {
         protected Mono<CreateServiceBindingResponse> invoke(CreateServiceBindingRequest request) {
             return this.serviceBindings.create(request);
         }
+
     }
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceBindingRequest, Void> {
+
+        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceBindingRequest getInvalidRequest() {
+            return DeleteServiceBindingRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/service_bindings/test-id")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceBindingRequest getValidRequest() {
+            return DeleteServiceBindingRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteServiceBindingRequest request) {
+            return this.serviceBindings.delete(request);
+        }
+
+    }
+
 
     public static final class Get extends AbstractApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
 
