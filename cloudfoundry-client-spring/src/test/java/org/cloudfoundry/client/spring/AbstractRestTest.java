@@ -86,7 +86,7 @@ public abstract class AbstractRestTest {
         Assert.notNull(method, "method must be set");
 
         Assert.notNull(requestContext.getPath(), "path must be set");
-        String uri = UriComponentsBuilder.fromUri(this.root).path(requestContext.getPath()).build(false).toString();
+        String uri = UriComponentsBuilder.fromUri(this.root).path(requestContext.getPath()).build().toString();
 
         ResponseActions responseActions = this.mockServer
                 .expect(method(method))

@@ -71,7 +71,7 @@ public abstract class AbstractSpringOperations {
             public Void apply(ReactiveSession<Void> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("DELETE {}", uri);
                 AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class);
@@ -121,7 +121,7 @@ public abstract class AbstractSpringOperations {
             public T apply(ReactiveSession<T> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("GET {}", uri);
                 return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
@@ -138,7 +138,7 @@ public abstract class AbstractSpringOperations {
             public byte[] apply(final ReactiveSession<byte[]> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("GET {}", uri);
                 return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
@@ -171,7 +171,7 @@ public abstract class AbstractSpringOperations {
             public T apply(ReactiveSession<T> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("PATCH {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
@@ -199,7 +199,7 @@ public abstract class AbstractSpringOperations {
             public T apply(ReactiveSession<T> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("POST {}", uri);
                 return AbstractSpringOperations.this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
@@ -227,7 +227,7 @@ public abstract class AbstractSpringOperations {
             public T apply(ReactiveSession<T> session) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
+                URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("PUT {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
