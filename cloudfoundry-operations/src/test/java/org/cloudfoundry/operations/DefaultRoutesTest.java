@@ -336,7 +336,7 @@ public final class DefaultRoutesTest {
         @Override
         protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.Organization)
+                    .level(ListRoutesRequest.Level.ORGANIZATION)
                     .build();
 
             return this.routes.list(request);
@@ -356,7 +356,7 @@ public final class DefaultRoutesTest {
         @Override
         protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.Space)
+                    .level(ListRoutesRequest.Level.SPACE)
                     .build();
 
             return this.routes.list(request);
@@ -438,7 +438,7 @@ public final class DefaultRoutesTest {
         @Override
         protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.Space)
+                    .level(ListRoutesRequest.Level.SPACE)
                     .build();
 
             return this.routes.list(request);
@@ -458,7 +458,7 @@ public final class DefaultRoutesTest {
         @Override
         protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.Space)
+                    .level(ListRoutesRequest.Level.SPACE)
                     .build();
 
             return this.routes.list(request);
@@ -478,7 +478,7 @@ public final class DefaultRoutesTest {
         @Override
         protected Publisher<Route> invoke() {
             ListRoutesRequest request = ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.Space)
+                    .level(ListRoutesRequest.Level.SPACE)
                     .build();
 
             return this.routes.list(request);

@@ -261,7 +261,7 @@ final class DefaultRoutes implements Routes {
 
             @Override
             public Flux<RouteResource> apply(ListRoutesRequest request) {
-                if (Level.Organization == request.getLevel()) {
+                if (Level.ORGANIZATION == request.getLevel()) {
                     return organizationId
                             .flatMap(requestOrganizationRoutes(cloudFoundryClient));
                 } else {

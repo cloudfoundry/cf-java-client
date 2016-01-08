@@ -44,15 +44,17 @@ public final class ListRoutesRequest implements Validatable {
     }
 
     public enum Level {
+
         /**
          * List routes for all the spaces in the current organisation
          */
-        Organization,
+        ORGANIZATION,
 
         /**
          * List routes for the current space in the current organisation
          */
-        Space
+        SPACE
+
     }
 
 }
