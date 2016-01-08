@@ -89,6 +89,7 @@ public final class SpringServiceBindingsTest {
         protected Mono<CreateServiceBindingResponse> invoke(CreateServiceBindingRequest request) {
             return this.serviceBindings.create(request);
         }
+
     }
 
     public static final class Delete extends AbstractApiTest<DeleteServiceBindingRequest, Void> {
