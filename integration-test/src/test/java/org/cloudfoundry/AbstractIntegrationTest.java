@@ -78,7 +78,7 @@ public abstract class AbstractIntegrationTest {
 
     @After
     public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(5, SECONDS);
+        this.testSubscriber.verify(10, SECONDS);
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
