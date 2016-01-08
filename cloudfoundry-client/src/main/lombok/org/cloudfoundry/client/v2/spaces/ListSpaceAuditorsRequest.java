@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param auditedOrganizationIds the audited organization ids
      * @return the audited organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("audited_organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("audited_organization_guid")))
     private final List<String> auditedOrganizationIds;
 
     /**
@@ -53,7 +53,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param auditedSpaceIds the audited space ids
      * @return the audited space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("audited_space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("audited_space_guid")))
     private final List<String> auditedSpaceIds;
 
     /**
@@ -62,7 +62,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param billingManagedOrganizationIds the billing managed organization ids
      * @return the billing managed organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("billing_managed_organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("billing_managed_organization_guid")))
     private final List<String> billingManagedOrganizationIds;
 
     /**
@@ -80,7 +80,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param managedOrganizationIds the managed organization ids
      * @return the managed organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("managed_organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("managed_organization_guid")))
     private final List<String> managedOrganizationIds;
 
     /**
@@ -89,7 +89,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param managedSpaceIds the managed space ids
      * @return the managed space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("managed_space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("managed_space_guid")))
     private final List<String> managedSpaceIds;
 
     /**
@@ -98,7 +98,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
     /**
@@ -107,7 +107,7 @@ public final class ListSpaceAuditorsRequest extends PaginatedRequest implements 
      * @param spaceIds the space ids
      * @return the space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
     private final List<String> spaceIds;
 
     @Builder

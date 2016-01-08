@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @param domainIds the domain ids
      * @return the domain ids
      */
-    @Getter(onMethod = @__(@FilterParameter("domain_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("domain_guid")))
     private final List<String> domainIds;
 
     /**
@@ -53,7 +53,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @param hosts the hosts
      * @return the hosts
      */
-    @Getter(onMethod = @__(@FilterParameter("host")))
+    @Getter(onMethod = @__(@InFilterParameter("host")))
     private final List<String> hosts;
 
     /**
@@ -71,7 +71,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
     /**
@@ -80,7 +80,7 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
      * @param paths the paths
      * @return the paths
      */
-    @Getter(onMethod = @__(@FilterParameter("path")))
+    @Getter(onMethod = @__(@InFilterParameter("path")))
     private final List<String> paths;
 
     @Builder

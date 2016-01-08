@@ -24,12 +24,11 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
-
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
 
 /**
  * The request payload for the List all Routes operation
@@ -45,7 +44,7 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param domainIds the domain ids
      * @return the domain ids
      */
-    @Getter(onMethod = @__(@FilterParameter("domain_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("domain_guid")))
     private final List<String> domainIds;
 
     /**
@@ -54,7 +53,7 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param hosts the hosts
      * @return the hosts
      */
-    @Getter(onMethod = @__(@FilterParameter("host")))
+    @Getter(onMethod = @__(@InFilterParameter("host")))
     private final List<String> hosts;
 
     /**
@@ -63,7 +62,7 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter(value = "organization_guid", operation = IS)))
+    @Getter(onMethod = @__(@IsFilterParameter("organization_guid")))
     private final String organizationId;
 
     /**
@@ -72,7 +71,7 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param paths the paths
      * @return the paths
      */
-    @Getter(onMethod = @__(@FilterParameter("path")))
+    @Getter(onMethod = @__(@InFilterParameter("path")))
     private final List<String> paths;
 
     @Builder

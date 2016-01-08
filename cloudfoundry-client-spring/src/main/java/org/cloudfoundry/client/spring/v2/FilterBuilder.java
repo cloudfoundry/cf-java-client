@@ -23,6 +23,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,27 +47,23 @@ public final class FilterBuilder {
         Arrays.sort(methods, MethodNameComparator.INSTANCE);
 
         for (Method method : methods) {
-            FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
-            if (filterParameter == null) {
-                continue;
-            }
+            for (Annotation annotation : AnnotationUtils.getAnnotations(method)) {
+                if (AnnotationUtils.isAnnotationMetaPresent(annotation.getClass(), FilterParameter.class)) {
+                    Object value = getValue(method, instance);
 
-            Object value = getValue(method, instance);
+                    if (value != null) {
+                        FilterParameter filterParameter = AnnotationUtils.getAnnotation(annotation, FilterParameter.class);
 
-            if (value != null) {
-                builder.queryParam("q", getFilter(filterParameter) + filterParameter.operation() + value);
+                        Object name = AnnotationUtils.getValue(annotation);
+                        String operation = filterParameter.operator();
+
+                        builder.queryParam("q", String.format("%s%s%s", name, operation, value));
+                    }
+
+                    break;
+                }
             }
         }
-    }
-
-    private static String getFilter(FilterParameter filterParameter) {
-        String name = filterParameter.value();
-
-        if (!StringUtils.hasText(name)) {
-            name = filterParameter.name();
-        }
-
-        return name;
     }
 
     @SuppressWarnings("unchecked")

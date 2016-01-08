@@ -26,7 +26,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param gatewayNames the gateway names
      * @return the gateway names
      */
-    @Getter(onMethod = @__(@FilterParameter("gateway_name")))
+    @Getter(onMethod = @__(@InFilterParameter("gateway_name")))
     private final List<String> gatewayNames;
 
     /**
@@ -63,7 +63,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param names the names
      * @return the names
      */
-    @Getter(onMethod = @__(@FilterParameter("name")))
+    @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
     /**
@@ -72,7 +72,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
     /**
@@ -90,7 +90,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param serviceBindingIds the service binding ids
      * @return the service binding ids
      */
-    @Getter(onMethod = @__(@FilterParameter("service_binding_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("service_binding_guid")))
     private final List<String> serviceBindingIds;
 
     /**
@@ -99,7 +99,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param serviceKeyIds the service key ids
      * @return the service key ids
      */
-    @Getter(onMethod = @__(@FilterParameter("service_key_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("service_key_guid")))
     private final List<String> serviceKeyIds;
 
     /**
@@ -108,7 +108,7 @@ public final class ListSpaceServiceInstancesRequest extends PaginatedRequest imp
      * @param servicePlanIds the service plan ids
      * @return the service plan ids
      */
-    @Getter(onMethod = @__(@FilterParameter("service_plan_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("service_plan_guid")))
     private final List<String> servicePlanIds;
 
 
