@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @param actees the actees
      * @return the actees
      */
-    @Getter(onMethod = @__(@FilterParameter("actee")))
+    @Getter(onMethod = @__(@InFilterParameter("actee")))
     private final List<String> actees;
 
     /**
@@ -62,7 +62,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @param timestamps the timestamps
      * @return the timestamps
      */
-    @Getter(onMethod = @__(@FilterParameter("timestamp")))
+    @Getter(onMethod = @__(@InFilterParameter("timestamp")))
     private final List<String> timestamps;
 
     /**
@@ -71,7 +71,7 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
      * @param types the types
      * @return the types
      */
-    @Getter(onMethod = @__(@FilterParameter("type")))
+    @Getter(onMethod = @__(@InFilterParameter("type")))
     private final List<String> types;
 
     @Builder

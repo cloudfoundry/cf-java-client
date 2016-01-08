@@ -16,7 +16,12 @@
 
 package org.cloudfoundry.client.spring.v2;
 
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.GreaterThanFilterParameter;
+import org.cloudfoundry.client.v2.GreaterThanOrEqualToFilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.IsFilterParameter;
+import org.cloudfoundry.client.v2.LessThanFilterParameter;
+import org.cloudfoundry.client.v2.LessThanOrEqualToFilterParameter;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,12 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.GREATER_THAN;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.GREATER_THAN_OR_EQUAL_TO;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.LESS_THAN;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.LESS_THAN_OR_EQUAL_TO;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -56,42 +55,42 @@ public final class FilterBuilderTest {
 
     private static abstract class StubFilterParams {
 
-        @FilterParameter(name = "test-empty")
+        @InFilterParameter("test-empty")
         final List<String> getEmpty() {
             return Collections.emptyList();
         }
 
-        @FilterParameter(name = "test-greater-than", operation = GREATER_THAN)
+        @GreaterThanFilterParameter("test-greater-than")
         final String getGreaterThan() {
             return "test-value-1";
         }
 
-        @FilterParameter(name = "test-greater-than-or-equal-to", operation = GREATER_THAN_OR_EQUAL_TO)
+        @GreaterThanOrEqualToFilterParameter("test-greater-than-or-equal-to")
         final String getGreaterThanOrEqualTo() {
             return "test-value-2";
         }
 
-        @FilterParameter(name = "test-in", operation = IN)
+        @InFilterParameter("test-in")
         final List<String> getIn() {
             return Arrays.asList("test-value-3", "test-value-4");
         }
 
-        @FilterParameter(name = "test-is", operation = IS)
+        @IsFilterParameter("test-is")
         final String getIs() {
             return "test-value-5";
         }
 
-        @FilterParameter(name = "test-less-than", operation = LESS_THAN)
+        @LessThanFilterParameter("test-less-than")
         final String getLessThan() {
             return "test-value-6";
         }
 
-        @FilterParameter(name = "test-less-than-or-equal-to", operation = LESS_THAN_OR_EQUAL_TO)
+        @LessThanOrEqualToFilterParameter("test-less-than-or-equal-to")
         final String getLessThanOrEqualTo() {
             return "test-value-7";
         }
 
-        @FilterParameter(name = "test-null")
+        @InFilterParameter("test-null")
         final String getNull() {
             return null;
         }
@@ -100,7 +99,7 @@ public final class FilterBuilderTest {
 
     private static final class StubFilterParamsSubClass extends StubFilterParams {
 
-        @FilterParameter("test-default")
+        @InFilterParameter("test-default")
         List<String> getDefault() {
             return Arrays.asList("test-value-8", "test-value-9");
         }

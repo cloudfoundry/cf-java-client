@@ -24,12 +24,11 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.GreaterThanOrEqualToFilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
-
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.GREATER_THAN_OR_EQUAL_TO;
 
 /**
  * The request payload for the List Events operation
@@ -45,7 +44,7 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
      * @param actees the actees
      * @return the actees
      */
-    @Getter(onMethod = @__(@FilterParameter("actee")))
+    @Getter(onMethod = @__(@InFilterParameter("actee")))
     private final List<String> actees;
 
     /**
@@ -54,7 +53,7 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
      * @param timestamps the timestamps
      * @return the timestamps
      */
-    @Getter(onMethod = @__(@FilterParameter(name = "timestamp", operation = GREATER_THAN_OR_EQUAL_TO)))
+    @Getter(onMethod = @__(@GreaterThanOrEqualToFilterParameter("timestamp")))
     private final List<String> timestamps;
 
     /**
@@ -63,7 +62,7 @@ public final class ListEventsRequest extends PaginatedRequest implements Validat
      * @param types the types
      * @return the types
      */
-    @Getter(onMethod = @__(@FilterParameter("type")))
+    @Getter(onMethod = @__(@InFilterParameter("type")))
     private final List<String> types;
 
     @Builder

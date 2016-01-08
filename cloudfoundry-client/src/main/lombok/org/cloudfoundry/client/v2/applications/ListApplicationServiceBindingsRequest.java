@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public final class ListApplicationServiceBindingsRequest extends PaginatedReques
      * @param serviceInstanceIds the ids of the service instances to filter on
      * @return the ids of the service instances to filter on
      */
-    @Getter(onMethod = @__(@FilterParameter("service_instance_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("service_instance_guid")))
     private final List<String> serviceInstanceIds;
 
     @Builder

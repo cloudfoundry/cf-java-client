@@ -16,28 +16,21 @@
 
 package org.cloudfoundry.client.v2;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * An annotation indicating that a method represents a Cloud Foundry V2 filter parameter
- */
-@Target(ElementType.ANNOTATION_TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@JsonIgnore
-@JacksonAnnotationsInside
-public @interface FilterParameter {
+@FilterParameter(operator = " IN ")
+public @interface InFilterParameter {
 
     /**
-     * The filter's operator
+     * The filter's name
      *
-     * @return the filter's operator
+     * @return the filter's name
      */
-    String operator();
+    String value();
 
 }

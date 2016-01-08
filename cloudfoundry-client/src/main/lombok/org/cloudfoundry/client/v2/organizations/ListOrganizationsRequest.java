@@ -24,7 +24,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param auditorIds the auditor ids
      * @return the auditor ids
      */
-    @Getter(onMethod = @__(@FilterParameter("auditor_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("auditor_guid")))
     private final List<String> auditorIds;
 
     /**
@@ -52,7 +52,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param billingManagerIds the billing manager ids
      * @return the billing manager ids
      */
-    @Getter(onMethod = @__(@FilterParameter("billing_manager_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("billing_manager_guid")))
     private final List<String> billingManagerIds;
 
     /**
@@ -61,7 +61,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param managerIds the manager ids
      * @return the manager ids
      */
-    @Getter(onMethod = @__(@FilterParameter("manager_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("manager_guid")))
     private final List<String> managerIds;
 
     /**
@@ -70,7 +70,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param names the names
      * @return the names
      */
-    @Getter(onMethod = @__(@FilterParameter("name")))
+    @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
     /**
@@ -79,7 +79,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param spaceIds the space ids
      * @return the space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
     private final List<String> spaceIds;
 
     /**
@@ -88,7 +88,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param statuses the statuses
      * @return the statuses
      */
-    @Getter(onMethod = @__(@FilterParameter("status")))
+    @Getter(onMethod = @__(@InFilterParameter("status")))
     private final List<String> statuses;
 
     /**
@@ -97,7 +97,7 @@ public final class ListOrganizationsRequest extends PaginatedRequest implements 
      * @param userIds the user ids
      * @return the user ids
      */
-    @Getter(onMethod = @__(@FilterParameter("user_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("user_guid")))
     private final List<String> userIds;
 
     @Builder

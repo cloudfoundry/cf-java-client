@@ -24,12 +24,11 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
-
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
 
 /**
  * The request payload for the List all Apps operation
@@ -45,7 +44,7 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
      * @param diego the diego flag
      * @return the diego flag
      */
-    @Getter(onMethod = @__(@FilterParameter(value = "diego", operation = IS)))
+    @Getter(onMethod = @__(@IsFilterParameter("diego")))
     private final Boolean diego;
 
     /**
@@ -54,7 +53,7 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
      * @param names the names
      * @return the names
      */
-    @Getter(onMethod = @__(@FilterParameter("name")))
+    @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
     /**
@@ -63,7 +62,7 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
     /**
@@ -72,7 +71,7 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
      * @param spaceIds the space ids
      * @return the space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
     private final List<String> spaceIds;
 
     /**
@@ -81,7 +80,7 @@ public final class ListApplicationsRequest extends PaginatedRequest implements V
      * @param stackIds the stack ids
      * @return the stack ids
      */
-    @Getter(onMethod = @__(@FilterParameter("stack_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("stack_guid")))
     private final List<String> stackIds;
 
     @Builder

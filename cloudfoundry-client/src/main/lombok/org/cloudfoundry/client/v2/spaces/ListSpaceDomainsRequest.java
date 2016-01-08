@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public final class ListSpaceDomainsRequest extends PaginatedRequest implements V
      * @param names the names
      * @return the names
      */
-    @Getter(onMethod = @__(@FilterParameter("name")))
+    @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
     /**
@@ -62,7 +62,7 @@ public final class ListSpaceDomainsRequest extends PaginatedRequest implements V
      * @param owningOrganizationIds the owning organization ids
      * @return the owning organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("owning_organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("owning_organization_guid")))
     private final List<String> owningOrganizationIds;
 
     /**
@@ -71,7 +71,7 @@ public final class ListSpaceDomainsRequest extends PaginatedRequest implements V
      * @param spaceIds the space ids
      * @return the space ids
      */
-    @Getter(onMethod = @__(@FilterParameter("space_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
     private final List<String> spaceIds;
 
     @Builder

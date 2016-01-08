@@ -24,7 +24,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public final class ListSpacesRequest extends PaginatedRequest implements Validat
      * @param applicationIds the application ids
      * @return the application ids
      */
-    @Getter(onMethod = @__(@FilterParameter("app_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("app_guid")))
     private final List<String> applicationIds;
 
     /**
@@ -52,7 +52,7 @@ public final class ListSpacesRequest extends PaginatedRequest implements Validat
      * @param developerIds the developer ids
      * @return the developer ids
      */
-    @Getter(onMethod = @__(@FilterParameter("developer_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("developer_guid")))
     private final List<String> developerIds;
 
     /**
@@ -61,7 +61,7 @@ public final class ListSpacesRequest extends PaginatedRequest implements Validat
      * @param names the names
      * @return the names
      */
-    @Getter(onMethod = @__(@FilterParameter("name")))
+    @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
     /**
@@ -70,7 +70,7 @@ public final class ListSpacesRequest extends PaginatedRequest implements Validat
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@FilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
     @Builder

@@ -25,7 +25,7 @@ import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      * @param actives the actives
      * @return the actives
      */
-    @Getter(onMethod = @__(@FilterParameter("active")))
+    @Getter(onMethod = @__(@InFilterParameter("active")))
     private final List<Boolean> actives;
 
     /**
@@ -62,7 +62,7 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      * @param labels the labels
      * @return the labels
      */
-    @Getter(onMethod = @__(@FilterParameter("label")))
+    @Getter(onMethod = @__(@InFilterParameter("label")))
     private final List<String> labels;
 
     /**
@@ -71,7 +71,7 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      * @param providers the providers
      * @return the providers
      */
-    @Getter(onMethod = @__(@FilterParameter("provider")))
+    @Getter(onMethod = @__(@InFilterParameter("provider")))
     private final List<String> providers;
 
     /**
@@ -80,7 +80,7 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      * @param serviceBrokerIds the service broker ids
      * @return the service broker ids
      */
-    @Getter(onMethod = @__(@FilterParameter("service_broker_guid")))
+    @Getter(onMethod = @__(@InFilterParameter("service_broker_guid")))
     private final List<String> serviceBrokerIds;
 
     @Builder
