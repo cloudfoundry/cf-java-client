@@ -23,14 +23,17 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionR
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringSpaceQuotaDefinitionsTest {
@@ -195,6 +198,43 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected Mono<ListSpaceQuotaDefinitionsResponse> invoke(ListSpaceQuotaDefinitionsRequest request) {
             return this.spaceQuotaDefinitions.list(request);
+        }
+
+    }
+
+    public static final class RemoveSpace extends AbstractApiTest<RemoveSpaceQuotaDefinitionRequest, Void> {
+
+        private final SpringSpaceQuotaDefinitions spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected RemoveSpaceQuotaDefinitionRequest getInvalidRequest() {
+            return RemoveSpaceQuotaDefinitionRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/space_quota_definitions/test-id/spaces/test-space-id")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected RemoveSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
+            return RemoveSpaceQuotaDefinitionRequest.builder()
+                    .id("test-id")
+                    .spaceId("test-space-id")
+                    .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(RemoveSpaceQuotaDefinitionRequest request) {
+            return this.spaceQuotaDefinitions.removeSpace(request);
         }
 
     }
