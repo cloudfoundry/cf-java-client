@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionR
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.spacequotadefinitions.RemoveSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.springframework.web.client.RestOperations;
@@ -84,6 +85,18 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "space_quota_definitions");
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<Void> removeSpace(final RemoveSpaceQuotaDefinitionRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "space_quota_definitions", request.getId(), "spaces", request.getSpaceId());
             }
 
         });
