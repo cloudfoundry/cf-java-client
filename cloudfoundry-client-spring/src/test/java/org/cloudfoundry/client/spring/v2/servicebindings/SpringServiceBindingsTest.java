@@ -21,13 +21,17 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import reactor.Mono;
 
 import java.util.Collections;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceBindingsTest {
 
@@ -82,6 +86,58 @@ public final class SpringServiceBindingsTest {
         protected Mono<CreateServiceBindingResponse> invoke(CreateServiceBindingRequest request) {
             return this.serviceBindings.create(request);
         }
+    }
+
+    public static final class Get extends AbstractApiTest<GetServiceBindingRequest, GetServiceBindingResponse> {
+
+        private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServiceBindingRequest getInvalidRequest() {
+            return GetServiceBindingRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_bindings/test-id")
+                    .status(OK)
+                    .responsePayload("v2/service_bindings/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServiceBindingResponse getResponse() {
+            return GetServiceBindingResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-11-03T00:53:50Z")
+                            .id("925d8848-4808-47cf-a3e8-049aa0163328")
+                            .updatedAt("2015-11-04T12:54:50Z")
+                            .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
+                            .build())
+                    .entity(ServiceBindingEntity.builder()
+                            .applicationId("56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
+                            .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                            .credential("creds-key-108", "creds-val-108")
+                            .gatewayName("")
+                            .applicationUrl("/v2/apps/56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
+                            .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetServiceBindingRequest getValidRequest() throws Exception {
+            return GetServiceBindingRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Mono<GetServiceBindingResponse> invoke(GetServiceBindingRequest request) {
+            return this.serviceBindings.get(request);
+        }
+
     }
 
 }
