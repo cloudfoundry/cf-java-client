@@ -16,13 +16,14 @@
 
 package org.cloudfoundry.client;
 
+import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class InfoTest extends AbstractIntegrationTest {
 
@@ -33,7 +34,12 @@ public final class InfoTest extends AbstractIntegrationTest {
 
         this.cloudFoundryClient.info().get(request)
                 .subscribe(this.<GetInfoResponse>testSubscriber()
-                        .assertThat(response -> assertEquals(SUPPORTED_API_VERSION, response.getApiVersion())));
+                        .assertThat(response -> {
+                            Version expected = Version.valueOf(SUPPORTED_API_VERSION);
+                            Version actual = Version.valueOf(response.getApiVersion());
+
+                            assertTrue(expected.greaterThanOrEqualTo(actual));
+                        }));
     }
 
 }

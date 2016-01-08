@@ -46,11 +46,22 @@
     </modules>
 
     <properties>
+        <java-semver.version>0.9.0</java-semver.version>
         <lombok.version>1.16.6</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>2.6.1</protobuf.version>
         <reactor.version>2.5.0.BUILD-SNAPSHOT</reactor.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.zafarkhaja</groupId>
+                <artifactId>java-semver</artifactId>
+                <version>${java-semver.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
