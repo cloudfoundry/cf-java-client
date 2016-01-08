@@ -208,7 +208,8 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getInvalidRequest() {
-            return RemoveSpaceQuotaDefinitionRequest.builder().build();
+            return RemoveSpaceQuotaDefinitionRequest.builder()
+                    .build();
         }
 
         @Override
@@ -225,13 +226,17 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
-            return RemoveSpaceQuotaDefinitionRequest.builder().id("test-id").spaceId("test-space-id").build();
+            return RemoveSpaceQuotaDefinitionRequest.builder()
+                    .id("test-id")
+                    .spaceId("test-space-id")
+                    .build();
         }
 
         @Override
         protected Mono<Void> invoke(RemoveSpaceQuotaDefinitionRequest request) {
             return this.spaceQuotaDefinitions.removeSpace(request);
         }
+
     }
 
 }

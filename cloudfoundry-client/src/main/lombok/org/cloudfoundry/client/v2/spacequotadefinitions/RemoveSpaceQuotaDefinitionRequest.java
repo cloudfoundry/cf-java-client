@@ -48,9 +48,9 @@ public class RemoveSpaceQuotaDefinitionRequest implements Validatable {
     private final String spaceId;
 
     @Builder
-    RemoveSpaceQuotaDefinitionRequest(String spaceId, String id) {
-        this.spaceId = spaceId;
+    RemoveSpaceQuotaDefinitionRequest(String id, String spaceId) {
         this.id = id;
+        this.spaceId = spaceId;
     }
 
     @Override

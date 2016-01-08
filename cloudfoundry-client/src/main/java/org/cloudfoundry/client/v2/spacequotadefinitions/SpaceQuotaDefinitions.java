@@ -55,5 +55,4 @@ public interface SpaceQuotaDefinitions {
      */
     Mono<Void> removeSpace(RemoveSpaceQuotaDefinitionRequest request);
 
-
 }
