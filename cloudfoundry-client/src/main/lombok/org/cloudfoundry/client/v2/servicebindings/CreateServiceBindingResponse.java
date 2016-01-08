@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceinstances;
+package org.cloudfoundry.client.v2.servicebindings;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -24,17 +25,17 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * Service Binding in responses
+ * The response payload for the the Create Service Binding from an Application operation.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceBindingResource extends Resource<ServiceBindingEntity> {
+public final class CreateServiceBindingResponse extends Resource<ServiceBindingEntity> {
+
 
     @Builder
-    ServiceBindingResource(@JsonProperty("entity") ServiceBindingEntity entity,
-                           @JsonProperty("metadata") Metadata metadata) {
+    CreateServiceBindingResponse(@JsonProperty("entity") ServiceBindingEntity entity,
+                                 @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
-
 }

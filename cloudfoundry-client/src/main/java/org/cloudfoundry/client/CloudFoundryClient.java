@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.routes.Routes;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
@@ -110,6 +111,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Packages Client API
      */
     Routes routes();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Bindings Client API
+     *
+     * @return the Cloud Foundry Service Bindings Client API
+     */
+    ServiceBindings serviceBindings();
 
     /**
      * Main entry point to the Cloud Foundry Service Instances Client API

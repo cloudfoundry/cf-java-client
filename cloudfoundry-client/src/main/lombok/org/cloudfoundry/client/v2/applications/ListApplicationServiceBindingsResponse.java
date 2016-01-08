@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.PaginatedResponse;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceBindingResource;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 
 import java.util.List;
 
