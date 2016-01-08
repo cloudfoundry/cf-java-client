@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceinstances;
+package org.cloudfoundry.client.v2.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
