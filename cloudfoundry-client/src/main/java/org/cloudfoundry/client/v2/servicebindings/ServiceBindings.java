@@ -32,6 +32,14 @@ public interface ServiceBindings {
     Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_bindings/delete_a_particular_service_binding.html">Delete the Service Binding</a> request
+     *
+     * @param request the Delete Service Binding request
+     * @return the response from the Delete Service Binding request
+     */
+    Mono<Void> delete(DeleteServiceBindingRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/service_bindings/retrieve_a_particular_service_binding.html">Retrieve a Particular Service Binding</a> request
      *
      * @param request the Get Application request
