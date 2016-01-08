@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,6 +57,16 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
                 builder.pathSegment("v2", "service_bindings");
             }
 
+        });
+    }
+
+    @Override
+    public Mono<GetServiceBindingResponse> get(final GetServiceBindingRequest request) {
+        return get(request, GetServiceBindingResponse.class, new Consumer<UriComponentsBuilder>() {
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_bindings", request.getId());
+            }
         });
     }
 
