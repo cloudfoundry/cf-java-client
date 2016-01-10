@@ -32,7 +32,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Organization> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final Organizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {

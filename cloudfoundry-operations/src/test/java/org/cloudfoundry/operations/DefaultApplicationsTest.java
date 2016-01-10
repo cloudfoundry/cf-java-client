@@ -30,7 +30,7 @@ public final class DefaultApplicationsTest {
 
     public static final class List extends AbstractOperationsApiTest<Application> {
 
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE));
+        private final Applications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE));
 
         @Before
         public void setUp() throws Exception {
@@ -100,7 +100,7 @@ public final class DefaultApplicationsTest {
 
     public static final class ListNoSpace extends AbstractOperationsApiTest<Application> {
 
-        private DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
+        private Applications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<Application> testSubscriber) throws Exception {
