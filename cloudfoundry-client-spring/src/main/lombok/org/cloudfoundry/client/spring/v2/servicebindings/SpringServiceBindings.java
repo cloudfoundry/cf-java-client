@@ -18,11 +18,15 @@ package org.cloudfoundry.client.spring.v2.servicebindings;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
+import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -80,6 +84,20 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_bindings", request.getId());
             }
+        });
+    }
+
+    @Override
+    public Mono<ListServiceBindingsResponse> list(final ListServiceBindingsRequest request) {
+        return get(request, ListServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_bindings");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 

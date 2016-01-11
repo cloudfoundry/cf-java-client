@@ -47,4 +47,12 @@ public interface ServiceBindings {
      */
     Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_bindings/list_all_service_bindings.html">List all Service Bindings</a> request
+     *
+     * @param request the List Service Bindings request
+     * @return the response from the List Service Bindings request
+     */
+    Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request);
+
 }
