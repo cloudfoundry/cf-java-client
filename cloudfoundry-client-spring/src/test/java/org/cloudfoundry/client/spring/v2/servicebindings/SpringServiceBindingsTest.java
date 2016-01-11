@@ -184,11 +184,9 @@ public final class SpringServiceBindingsTest {
 
     }
 
-
     public static final class List extends AbstractApiTest<ListServiceBindingsRequest, ListServiceBindingsResponse> {
 
         private final SpringServiceBindings serviceBindings = new SpringServiceBindings(this.restTemplate, this.root, PROCESSOR_GROUP);
-
 
         @Override
         protected ListServiceBindingsRequest getInvalidRequest() {
@@ -271,4 +269,5 @@ public final class SpringServiceBindingsTest {
         }
 
     }
+
 }

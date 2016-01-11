@@ -100,4 +100,5 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
 
         });
     }
+
 }
