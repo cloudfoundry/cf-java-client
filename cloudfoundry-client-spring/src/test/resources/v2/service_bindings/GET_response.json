@@ -1,0 +1,74 @@
+{
+  "total_results": 3,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d",
+        "url": "/v2/service_bindings/d6d87c3d-a38f-4b31-9bbe-2432d2faaa1d",
+        "created_at": "2015-07-27T22:43:06Z",
+        "updated_at": null
+      },
+      "entity": {
+        "app_guid": "dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_guid": "bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2",
+        "credentials": {
+          "creds-key-3": "creds-val-3"
+        },
+        "binding_options": {
+        },
+        "gateway_data": null,
+        "gateway_name": "",
+        "syslog_drain_url": null,
+        "app_url": "/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_url": "/v2/service_instances/bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "925d8848-4808-47cf-a3e8-049aa0163328",
+        "url": "/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328",
+        "created_at": "2015-11-03T00:53:50Z",
+        "updated_at": "2015-11-04T12:54:50Z"
+      },
+      "entity": {
+        "app_guid": "dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_guid": "f99b3d23-55f9-48b5-add3-d7ab08b2ff0c",
+        "credentials": {
+          "creds-key-108": "creds-val-108"
+        },
+        "binding_options": {
+        },
+        "gateway_data": null,
+        "gateway_name": "",
+        "syslog_drain_url": null,
+        "app_url": "/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_url": "/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "42eda707-fe4d-4eed-9b39-7cb5e665c226",
+        "url": "/v2/service_bindings/42eda707-fe4d-4eed-9b39-7cb5e665c226",
+        "created_at": "2015-07-27T22:43:20Z",
+        "updated_at": null
+      },
+      "entity": {
+        "app_guid": "dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_guid": "650d0eb7-3b83-414a-82a0-d503d1c8eb5f",
+        "credentials": {
+          "creds-key-356": "creds-val-356"
+        },
+        "binding_options": {
+        },
+        "gateway_data": null,
+        "gateway_name": "",
+        "syslog_drain_url": null,
+        "app_url": "/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e",
+        "service_instance_url": "/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f"
+      }
+    }
+  ]
+}
