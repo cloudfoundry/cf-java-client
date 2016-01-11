@@ -24,6 +24,7 @@
       <env name="TEST_SPACE" value="integration-test" />
       <env name="TEST_USERNAME" value="admin" />
       <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
+      <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
     </envs>
     <patterns />
     <method />
