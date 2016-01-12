@@ -17,8 +17,13 @@
 package org.cloudfoundry.client.spring.v2.serviceinstances;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
@@ -161,6 +166,65 @@ public final class SpringServiceInstancesTest {
         @Override
         protected Mono<ListServiceInstancesResponse> invoke(ListServiceInstancesRequest request) {
             return this.serviceInstances.list(request);
+        }
+
+    }
+
+    public static final class ListServiceBindings
+            extends AbstractApiTest<ListServiceInstanceServiceBindingsRequest, ListServiceInstanceServiceBindingsResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceInstanceServiceBindingsRequest getInvalidRequest() {
+            return ListServiceInstanceServiceBindingsRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET)
+                    .path("v2/service_instances/test-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/service_instances/GET_{id}_service_bindings_response.json");
+        }
+
+        @Override
+        protected ListServiceInstanceServiceBindingsResponse getResponse() {
+            return ListServiceInstanceServiceBindingsResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(ServiceBindingResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:09Z")
+                                    .id("05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
+                                    .url("/v2/service_bindings/05f3ec3c-8d97-4bd8-bf86-e44cc835a154")
+                                    .build())
+                            .entity(ServiceBindingEntity.builder()
+                                    .applicationId("8a50163b-a39d-4f44-aece-dc5a956da848")
+                                    .serviceInstanceId("a5a0567e-edbf-4da9-ae90-dce24af308a1")
+                                    .credential("creds-key-85", "creds-val-85")
+                                    .gatewayName("")
+                                    .applicationUrl("/v2/apps/8a50163b-a39d-4f44-aece-dc5a956da848")
+                                    .serviceInstanceUrl("/v2/service_instances/a5a0567e-edbf-4da9-ae90-dce24af308a1")
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected ListServiceInstanceServiceBindingsRequest getValidRequest() throws Exception {
+            return ListServiceInstanceServiceBindingsRequest.builder()
+                    .id("test-id")
+                    .applicationId("test-application-id")
+                    .page(-1)
+                    .build();
+        }
+
+        @Override
+        protected Mono<ListServiceInstanceServiceBindingsResponse> invoke(ListServiceInstanceServiceBindingsRequest request) {
+            return this.serviceInstances.listServiceBindings(request);
         }
 
     }
