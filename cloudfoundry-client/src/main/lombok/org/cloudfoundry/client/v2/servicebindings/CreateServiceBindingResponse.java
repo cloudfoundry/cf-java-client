@@ -25,7 +25,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The response payload for the the Create Service Binding from an Application operation.
+ * The response payload for the the Create Service Binding request.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
