@@ -36,9 +36,13 @@ public abstract class AbstractOperationsTest {
 
     protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException());
 
-    protected static final String TEST_ORGANIZATION = "test-organization-id";
+    protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
 
-    protected static final String TEST_SPACE = "test-space-id";
+    protected static final String TEST_ORGANIZATION_NAME = "test-organization-name";
+
+    protected static final String TEST_SPACE_ID = "test-space-id";
+
+    protected static final String TEST_SPACE_NAME = "test-space-name";
 
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 

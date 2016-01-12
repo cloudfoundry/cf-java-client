@@ -51,24 +51,27 @@ import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
 
+import static org.cloudfoundry.operations.AbstractOperationsTest.TEST_ORGANIZATION_ID;
+import static org.cloudfoundry.operations.AbstractOperationsTest.TEST_SPACE_ID;
+import static org.cloudfoundry.operations.AbstractOperationsTest.TEST_SPACE_NAME;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
 
     private static void setupExpectations(CloudFoundryClient cloudFoundryClient) {
         ListOrganizationSpacesRequest request1 = ListOrganizationSpacesRequest.builder()
-                .organizationId(AbstractOperationsTest.TEST_ORGANIZATION)
-                .name("test-space-name")
+                .organizationId(TEST_ORGANIZATION_ID)
+                .name(TEST_SPACE_NAME)
                 .page(1)
                 .build();
         ListOrganizationSpacesResponse response1 = ListOrganizationSpacesResponse.builder()
                 .resource(SpaceResource.builder()
                         .metadata(Metadata.builder()
-                                .id(AbstractOperationsTest.TEST_SPACE)
+                                .id(TEST_SPACE_ID)
                                 .build())
                         .entity(SpaceEntity.builder()
-                                .name("test-space-name")
-                                .organizationId(AbstractOperationsTest.TEST_ORGANIZATION)
+                                .name(TEST_SPACE_NAME)
+                                .organizationId(TEST_ORGANIZATION_ID)
                                 .build())
                         .build())
                 .totalPages(1)
@@ -76,7 +79,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Mono.just(response1));
 
         ListSpaceApplicationsRequest request2 = ListSpaceApplicationsRequest.builder()
-                .id(AbstractOperationsTest.TEST_SPACE)
+                .id(TEST_SPACE_ID)
                 .page(1)
                 .build();
         ListSpaceApplicationsResponse response2 = ListSpaceApplicationsResponse.builder()
@@ -93,7 +96,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Mono.just(response2));
 
         ListSpaceDomainsRequest request3 = ListSpaceDomainsRequest.builder()
-                .id(AbstractOperationsTest.TEST_SPACE)
+                .id(TEST_SPACE_ID)
                 .page(1)
                 .build();
         ListSpaceDomainsResponse response3 = ListSpaceDomainsResponse.builder()
@@ -110,11 +113,11 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Mono.just(response3));
 
         GetOrganizationRequest request4 = GetOrganizationRequest.builder()
-                .id(AbstractOperationsTest.TEST_ORGANIZATION)
+                .id(TEST_ORGANIZATION_ID)
                 .build();
         GetOrganizationResponse response4 = GetOrganizationResponse.builder()
                 .metadata(Metadata.builder()
-                        .id(AbstractOperationsTest.TEST_ORGANIZATION)
+                        .id(TEST_ORGANIZATION_ID)
                         .build())
                 .entity(OrganizationEntity.builder()
                         .name("test-organization-name")
@@ -123,7 +126,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.organizations().get(request4)).thenReturn(Mono.just(response4));
 
         ListSpaceSecurityGroupsRequest request5 = ListSpaceSecurityGroupsRequest.builder()
-                .id(AbstractOperationsTest.TEST_SPACE)
+                .id(TEST_SPACE_ID)
                 .page(1)
                 .build();
         ListSpaceSecurityGroupsResponse response5 = ListSpaceSecurityGroupsResponse.builder()
@@ -140,7 +143,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Mono.just(response5));
 
         ListSpaceServicesRequest request6 = ListSpaceServicesRequest.builder()
-                .id(AbstractOperationsTest.TEST_SPACE)
+                .id(TEST_SPACE_ID)
                 .page(1)
                 .build();
         ListSpaceServicesResponse response6 = ListSpaceServicesResponse.builder()
@@ -159,7 +162,7 @@ public final class DefaultSpacesTest {
 
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
+        private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -174,7 +177,7 @@ public final class DefaultSpacesTest {
                     .entity(SpaceQuotaDefinitionEntity.builder()
                             .instanceMemoryLimit(111)
                             .name("test-quota-name")
-                            .organizationId(TEST_ORGANIZATION)
+                            .organizationId(TEST_ORGANIZATION_ID)
                             .nonBasicServicesAllowed(true)
                             .memoryLimit(222)
                             .totalRoutes(333)
@@ -190,8 +193,8 @@ public final class DefaultSpacesTest {
                     .assertEquals(SpaceDetail.builder()
                             .application("test-application-name")
                             .domain("test-domain-name")
-                            .id(TEST_SPACE)
-                            .name("test-space-name")
+                            .id(TEST_SPACE_ID)
+                            .name(TEST_SPACE_NAME)
                             .organization("test-organization-name")
                             .securityGroup("test-security-group-name")
                             .service("test-service-name")
@@ -199,7 +202,7 @@ public final class DefaultSpacesTest {
                                     .id("test-quota-id")
                                     .instanceMemoryLimit(111)
                                     .name("test-quota-name")
-                                    .organizationId(TEST_ORGANIZATION)
+                                    .organizationId(TEST_ORGANIZATION_ID)
                                     .paidServicePlans(true)
                                     .totalMemoryLimit(222)
                                     .totalRoutes(333)
@@ -211,7 +214,7 @@ public final class DefaultSpacesTest {
         @Override
         protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
-                    .name("test-space-name")
+                    .name(TEST_SPACE_NAME)
                     .securityGroupRules(true)
                     .build();
 
@@ -233,7 +236,7 @@ public final class DefaultSpacesTest {
         @Override
         protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
-                    .name("test-space-name")
+                    .name(TEST_SPACE_NAME)
                     .securityGroupRules(true)
                     .build();
 
@@ -244,7 +247,7 @@ public final class DefaultSpacesTest {
 
     public static final class GetNoSpaceQuota extends AbstractOperationsApiTest<SpaceDetail> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
+        private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -257,8 +260,8 @@ public final class DefaultSpacesTest {
                     .assertEquals(SpaceDetail.builder()
                             .application("test-application-name")
                             .domain("test-domain-name")
-                            .id(TEST_SPACE)
-                            .name("test-space-name")
+                            .id(TEST_SPACE_ID)
+                            .name(TEST_SPACE_NAME)
                             .organization("test-organization-name")
                             .securityGroup("test-security-group-name")
                             .service("test-service-name")
@@ -269,7 +272,7 @@ public final class DefaultSpacesTest {
         @Override
         protected Mono<SpaceDetail> invoke() {
             GetSpaceRequest request = GetSpaceRequest.builder()
-                    .name("test-space-name")
+                    .name(TEST_SPACE_NAME)
                     .securityGroupRules(false)
                     .build();
 
@@ -280,7 +283,7 @@ public final class DefaultSpacesTest {
 
     public static final class List extends AbstractOperationsApiTest<SpaceSummary> {
 
-        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION));
+        private final Spaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {

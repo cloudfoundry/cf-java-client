@@ -29,8 +29,6 @@ import reactor.fn.Function;
 import reactor.rx.Promise;
 import reactor.rx.Stream;
 
-import java.util.NoSuchElementException;
-
 /**
  * A builder API for creating the default implementation of the {@link CloudFoundryOperations}
  */
@@ -94,21 +92,6 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private static <T> Function<Throwable, Mono<T>> convertException(final String message) {
-        return new Function<Throwable, Mono<T>>() {
-
-            @Override
-            public Mono<T> apply(Throwable throwable) {
-                if (throwable instanceof NoSuchElementException) {
-                    return Mono.error(new IllegalArgumentException(message, throwable));
-                } else {
-                    return Mono.error(throwable);
-                }
-            }
-
-        };
-    }
-
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         if (organization == null) {
             return Mono.error(new IllegalStateException("No organization targeted"));
@@ -118,7 +101,7 @@ public final class CloudFoundryOperationsBuilder {
                 .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                 .single()
                 .map(Resources.extractId())
-                .otherwise(CloudFoundryOperationsBuilder.<String>convertException(String.format("Organization %s does not exist", organization)))
+                .otherwise(Exceptions.<String>convert(String.format("Organization %s does not exist", organization)))
                 .to(Promise.<String>prepare());
 
         organizationId.get();
@@ -135,7 +118,7 @@ public final class CloudFoundryOperationsBuilder {
                         .flatMap(requestResources(cloudFoundryClient, space)))
                 .single()
                 .map(Resources.extractId())
-                .otherwise(CloudFoundryOperationsBuilder.<String>convertException(String.format("Space %s does not exist", space)))
+                .otherwise(Exceptions.<String>convert(String.format("Space %s does not exist", space)))
                 .to(Promise.<String>prepare());
 
         spaceId.get();
