@@ -22,6 +22,8 @@ import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -75,4 +77,19 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
         });
     }
+
+    @Override
+    public Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(final ListServiceInstanceServiceBindingsRequest request) {
+        return get(request, ListServiceInstanceServiceBindingsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances", request.getId(), "service_bindings");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
 }
