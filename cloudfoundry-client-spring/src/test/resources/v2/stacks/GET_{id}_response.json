@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "guid": "fe4999cf-a207-4d40-bb03-f4bbf697edac",
+    "url": "/v2/stacks/fe4999cf-a207-4d40-bb03-f4bbf697edac",
+    "created_at": "2015-12-22T18:27:59Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "cflinuxfs2",
+    "description": "cflinuxfs2"
+  }
+}
