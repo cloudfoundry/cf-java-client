@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
@@ -53,14 +54,14 @@ public final class CreateServiceBindingRequest implements Validatable {
     /**
      * The service instance id
      *
-     * @param serviceInstanceId the service instance applicationId
+     * @param serviceInstanceId the service instance id
      * @return the service instance id
      */
     @Getter(onMethod = @__(@JsonProperty("service_instance_guid")))
     private final String serviceInstanceId;
 
     @Builder
-    CreateServiceBindingRequest(String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
+    CreateServiceBindingRequest(String applicationId, String serviceInstanceId, @Singular Map<String, Object> parameters) {
         this.applicationId = applicationId;
         this.serviceInstanceId = serviceInstanceId;
         this.parameters = parameters;
