@@ -62,11 +62,11 @@ final class DefaultSpaces implements Spaces {
     }
 
     @Override
-    public Mono<SpaceDetail> get(GetSpaceRequest getSpaceRequest) {
+    public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return Validators
-                .validate(getSpaceRequest)
+                .validate(request)
                 .and(this.organizationId)
-                .then(requestSpaceResourcesWithContext(this.cloudFoundryClient))
+                .then(requestSpaceResourceWithContext(this.cloudFoundryClient))
                 .then(getAuxiliaryContent(this.cloudFoundryClient));
     }
 
@@ -267,18 +267,7 @@ final class DefaultSpaces implements Spaces {
                 .map(Optionals.<SpaceQuota>toOptional());
     }
 
-    private static Function<String, Stream<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<String, Stream<SpaceResource>>() {
-
-            @Override
-            public Stream<SpaceResource> apply(String organizationId) {
-                return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId));
-            }
-
-        };
-    }
-
-    private static Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>> requestSpaceResourcesWithContext(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>> requestSpaceResourceWithContext(final CloudFoundryClient cloudFoundryClient) {
         return new Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
 
             @Override
@@ -290,6 +279,17 @@ final class DefaultSpaces implements Spaces {
                         .requestResources(requestOrganizationSpacePage(cloudFoundryClient, organizationId, request))
                         .single()
                         .and(Mono.just(request));
+            }
+
+        };
+    }
+
+    private static Function<String, Stream<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Stream<SpaceResource>>() {
+
+            @Override
+            public Stream<SpaceResource> apply(String organizationId) {
+                return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId));
             }
 
         };
