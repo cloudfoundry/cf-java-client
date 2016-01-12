@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
@@ -143,8 +144,15 @@ public interface CloudFoundryClient {
     /**
      * Main entry point to the Cloud Foundry Spaces Client API
      *
-     * @return the Cloud Foundry Space Client API
+     * @return the Cloud Foundry Spaces Client API
      */
     Spaces spaces();
+
+    /**
+     * Main entry point to the Cloud Foundry Stacks Client API
+     *
+     * @return the Cloud Foundrty Stacks Client API
+     */
+    Stacks stacks();
 
 }
