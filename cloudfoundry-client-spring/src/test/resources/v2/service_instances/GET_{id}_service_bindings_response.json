@@ -1,0 +1,31 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "05f3ec3c-8d97-4bd8-bf86-e44cc835a154",
+        "url": "/v2/service_bindings/05f3ec3c-8d97-4bd8-bf86-e44cc835a154",
+        "created_at": "2015-07-27T22:43:09Z",
+        "updated_at": null
+      },
+      "entity": {
+        "app_guid": "8a50163b-a39d-4f44-aece-dc5a956da848",
+        "service_instance_guid": "a5a0567e-edbf-4da9-ae90-dce24af308a1",
+        "credentials": {
+          "creds-key-85": "creds-val-85"
+        },
+        "binding_options": {
+
+        },
+        "gateway_data": null,
+        "gateway_name": "",
+        "syslog_drain_url": null,
+        "app_url": "/v2/apps/8a50163b-a39d-4f44-aece-dc5a956da848",
+        "service_instance_url": "/v2/service_instances/a5a0567e-edbf-4da9-ae90-dce24af308a1"
+      }
+    }
+  ]
+}
