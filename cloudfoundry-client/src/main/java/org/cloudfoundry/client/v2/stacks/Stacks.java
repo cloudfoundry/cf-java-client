@@ -21,7 +21,7 @@ import reactor.Mono;
 public interface Stacks {
 
     /**
-     * Makes the <a href="">Get Stack</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/227/stacks/retrieve_a_particular_stack.html">Get Stack</a> request
      *
      * @param request the Get Stack request
      * @return the response from the Get Stack Request
