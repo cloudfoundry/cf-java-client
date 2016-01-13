@@ -24,6 +24,14 @@ import reactor.Mono;
 public interface ServiceInstances {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/creating_a_service_instance.html">Create Service Instance</a> request
+     *
+     * @param request the Create Service Instance request
+     * @return the response from the Create Service Instance request
+     */
+    Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/retrieve_a_particular_service_instance.html">Retrieve a Particular Service Instance</a> request
      *
      * @param request the Get Service Instance request
