@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v2.users.Users;
 import org.junit.Before;
 import reactor.Mono;
 
@@ -62,6 +63,8 @@ public abstract class AbstractOperationsTest {
 
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
+    protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
+
     @Before
     public final void mockClient() {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
@@ -72,6 +75,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
+        when(this.cloudFoundryClient.users()).thenReturn(this.users);
     }
 
 }
