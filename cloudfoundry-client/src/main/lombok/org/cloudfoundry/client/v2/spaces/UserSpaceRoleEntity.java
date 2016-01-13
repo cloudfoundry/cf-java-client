@@ -56,10 +56,10 @@ public final class UserSpaceRoleEntity extends AbstractUserEntity {
                         @JsonProperty("space_roles") @Singular List<String> spaceRoles,
                         @JsonProperty("spaces_url") String spacesUrl,
                         @JsonProperty("username") String username) {
-
-        super(active, admin, auditedOrganizationsUrl, auditedSpacesUrl, billingManagedOrganizationsUrl, defaultSpaceId, defaultSpaceUrl, managedOrganizationsUrl, managedSpacesUrl, organizationsUrl, spacesUrl,
-                username);
+        super(active, admin, auditedOrganizationsUrl, auditedSpacesUrl, billingManagedOrganizationsUrl, defaultSpaceId, defaultSpaceUrl, managedOrganizationsUrl, managedSpacesUrl, organizationsUrl,
+                spacesUrl, username);
 
         this.spaceRoles = spaceRoles;
     }
+
 }

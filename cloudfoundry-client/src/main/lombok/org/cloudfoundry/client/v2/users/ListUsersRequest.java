@@ -122,9 +122,7 @@ public final class ListUsersRequest extends PaginatedRequest implements Validata
 
     @Override
     public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        return builder.build();
+        return ValidationResult.builder().build();
     }
 
 }
