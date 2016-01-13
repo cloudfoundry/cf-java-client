@@ -93,7 +93,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected CreateServiceInstanceRequest getValidRequest() throws Exception {
             return CreateServiceInstanceRequest.builder()
-                    .acceptIncomplete(true)
+                    .acceptsIncomplete(true)
                     .name("my-service-instance")
                     .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
                     .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")

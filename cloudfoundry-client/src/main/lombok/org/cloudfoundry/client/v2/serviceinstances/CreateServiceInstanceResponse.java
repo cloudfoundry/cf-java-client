@@ -38,4 +38,5 @@ public final class CreateServiceInstanceResponse extends Resource<ServiceInstanc
                                   @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
+
 }

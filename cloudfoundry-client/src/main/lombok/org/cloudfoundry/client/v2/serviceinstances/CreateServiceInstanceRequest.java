@@ -39,11 +39,11 @@ public final class CreateServiceInstanceRequest implements Validatable {
     /**
      * The accept incomplete flag
      *
-     * @param acceptIncomplete Set to `true` if the client allows asynchronous provisioning. The cloud controller may respond before the service is ready for use.
+     * @param acceptsIncomplete Set to `true` if the client allows asynchronous provisioning. The cloud controller may respond before the service is ready for use.
      * @return the accept incomplete flag
      */
     @Getter(onMethod = @__(@QueryParameter("accepts_incomplete")))
-    private final boolean acceptIncomplete;
+    private final boolean acceptsIncomplete;
 
     /**
      * The name
@@ -90,18 +90,18 @@ public final class CreateServiceInstanceRequest implements Validatable {
 
 
     @Builder
-    CreateServiceInstanceRequest(String name,
+    CreateServiceInstanceRequest(boolean acceptsIncomplete,
+                                 String name,
+                                 @Singular Map<String, Object> parameters,
                                  String servicePlanId,
                                  String spaceId,
-                                 @Singular Map<String, Object> parameters,
-                                 @Singular List<String> tags,
-                                 boolean acceptIncomplete) {
+                                 @Singular List<String> tags) {
+        this.acceptsIncomplete = acceptsIncomplete;
         this.name = name;
+        this.parameters = parameters;
         this.servicePlanId = servicePlanId;
         this.spaceId = spaceId;
-        this.parameters = parameters;
         this.tags = tags;
-        this.acceptIncomplete = acceptIncomplete;
     }
 
     @Override
