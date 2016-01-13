@@ -66,12 +66,20 @@ public abstract class AbstractUserEntity {
     private final String billingManagedOrganizationsUrl;
 
     /**
-     * The Default Space Id
+     * The default space id
      *
-     * @param defaultSpaceId default Space Id
-     * @return default Space Id
+     * @param defaultSpaceId default space id
+     * @return default space id
      */
     private final String defaultSpaceId;
+
+    /**
+     * The default space url
+     *
+     * @param defaultSpaceId default space url
+     * @return default space url
+     */
+    private final String defaultSpaceUrl;
 
     /**
      * The managed organizations url
@@ -119,6 +127,7 @@ public abstract class AbstractUserEntity {
                               @JsonProperty("audited_spaces_url") String auditedSpacesUrl,
                               @JsonProperty("billing_managed_organizations_url") String billingManagedOrganizationsUrl,
                               @JsonProperty("default_space_guid") String defaultSpaceId,
+                              @JsonProperty("default_space_url") String defaultSpaceUrl,
                               @JsonProperty("managed_organizations_url") String managedOrganizationsUrl,
                               @JsonProperty("managed_spaces_url") String managedSpacesUrl,
                               @JsonProperty("organizations_url") String organizationsUrl,
@@ -130,6 +139,7 @@ public abstract class AbstractUserEntity {
         this.auditedSpacesUrl = auditedSpacesUrl;
         this.billingManagedOrganizationsUrl = billingManagedOrganizationsUrl;
         this.defaultSpaceId = defaultSpaceId;
+        this.defaultSpaceUrl = defaultSpaceUrl;
         this.managedOrganizationsUrl = managedOrganizationsUrl;
         this.managedSpacesUrl = managedSpacesUrl;
         this.organizationsUrl = organizationsUrl;

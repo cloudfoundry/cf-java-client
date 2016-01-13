@@ -40,6 +40,7 @@ import org.cloudfoundry.client.spring.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.client.spring.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
 import org.cloudfoundry.client.spring.v2.stacks.SpringStacks;
+import org.cloudfoundry.client.spring.v2.users.SpringUsers;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
 import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
@@ -56,6 +57,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
@@ -131,6 +133,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Stacks stacks;
 
+    private final Users users;
+
     @Builder
     SpringCloudFoundryClient(@NonNull String host,
                              Boolean skipSslValidation,
@@ -185,6 +189,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
         this.stacks = new SpringStacks(this.restOperations, root, this.processorGroup);
+        this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
     }
 
     SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
@@ -208,6 +213,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
         this.stacks = new SpringStacks(this.restOperations, root, this.processorGroup);
+        this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
     }
 
     @Override
@@ -288,6 +294,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Stacks stacks() {
         return this.stacks;
+    }
+
+    @Override
+    public Users users() {
+        return this.users;
     }
 
     String getAccessToken() {
