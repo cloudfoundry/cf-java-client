@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
@@ -32,9 +34,81 @@ import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceInstancesTest {
+
+    public static final class Create extends AbstractApiTest<CreateServiceInstanceRequest, CreateServiceInstanceResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected CreateServiceInstanceRequest getInvalidRequest() {
+            return CreateServiceInstanceRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(POST).path("v2/service_instances?accepts_incomplete=true")
+                    .requestPayload("v2/service_instances/POST_{id}_create_service_instance_request.json")
+                    .status(CREATED)
+                    .responsePayload("v2/service_instances/POST_{id}_create_service_binding_response.json");
+        }
+
+        @Override
+        protected CreateServiceInstanceResponse getResponse() {
+            return CreateServiceInstanceResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-07-27T22:43:08Z")
+                            .id("8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a")
+                            .url("/v2/service_instances/8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a")
+                            .build())
+                    .entity(ServiceInstanceEntity.builder()
+                            .name("my-service-instance")
+                            .credential("creds-key-356", "creds-val-356")
+                            .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
+                            .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
+                            .type("managed_service_instance")
+                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                                    .createdAt("2015-07-27T22:43:08Z")
+                                    .updatedAt("2015-07-27T22:43:08Z")
+                                    .description("")
+                                    .state("in progress")
+                                    .type("create")
+                                    .build())
+                            .tag("accounting")
+                            .tag("mongodb")
+                            .spaceUrl("/v2/spaces/86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
+                            .servicePlanUrl("/v2/service_plans/2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
+                            .serviceBindingsUrl("/v2/service_instances/8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a/service_bindings")
+                            .serviceKeysUrl("/v2/service_instances/8b2b3c5e-c1ba-41d0-ac87-08c776cfc25a/service_keys")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected CreateServiceInstanceRequest getValidRequest() throws Exception {
+            return CreateServiceInstanceRequest.builder()
+                    .acceptIncomplete(true)
+                    .name("my-service-instance")
+                    .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
+                    .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
+                    .parameter("the_service_broker", "wants this object")
+                    .tag("accounting")
+                    .tag("mongodb")
+                    .build();
+        }
+
+        @Override
+        protected Mono<CreateServiceInstanceResponse> invoke(CreateServiceInstanceRequest request) {
+            return this.serviceInstances.create(request);
+        }
+
+    }
 
     public static final class Get extends AbstractApiTest<GetServiceInstanceRequest, GetServiceInstanceResponse> {
 
