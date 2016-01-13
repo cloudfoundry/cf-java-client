@@ -32,6 +32,14 @@ public interface ServiceInstances {
     Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/218/service_instances/delete_a_service_instance.html">Delete the Service Instance</a> request
+     *
+     * @param request the Delete Service Instance request
+     * @return the response from the Delete Service Instance request
+     */
+    Mono<Void> delete(DeleteServiceInstanceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/retrieve_a_particular_service_instance.html">Retrieve a Particular Service Instance</a> request
      *
      * @param request the Get Service Instance request

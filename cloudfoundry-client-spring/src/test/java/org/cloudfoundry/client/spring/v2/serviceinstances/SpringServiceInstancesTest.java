@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
@@ -33,9 +34,11 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceInstancesTest {
@@ -106,6 +109,44 @@ public final class SpringServiceInstancesTest {
         @Override
         protected Mono<CreateServiceInstanceResponse> invoke(CreateServiceInstanceRequest request) {
             return this.serviceInstances.create(request);
+        }
+
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceInstanceRequest, Void> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceInstanceRequest getInvalidRequest() {
+            return DeleteServiceInstanceRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/service_instances/test-id?accepts_incomplete=true&purge=true")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceInstanceRequest getValidRequest() {
+            return DeleteServiceInstanceRequest.builder()
+                    .id("test-id")
+                    .acceptsIncomplete(true)
+                    .purge(true)
+                    .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteServiceInstanceRequest request) {
+            return this.serviceInstances.delete(request);
         }
 
     }
