@@ -1,0 +1,50 @@
+{
+  "total_results": 2,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "uaa-id-133",
+        "url": "/v2/users/uaa-id-133",
+        "created_at": "2015-12-22T18:28:01Z",
+        "updated_at": null
+      },
+      "entity": {
+        "admin": false,
+        "active": false,
+        "default_space_guid": "55b306f6-b956-4c85-a7dc-64358121d39e",
+        "username": "user@example.com",
+        "default_space_url": "/v2/spaces/55b306f6-b956-4c85-a7dc-64358121d39e",
+        "spaces_url": "/v2/users/uaa-id-133/spaces",
+        "organizations_url": "/v2/users/uaa-id-133/organizations",
+        "managed_organizations_url": "/v2/users/uaa-id-133/managed_organizations",
+        "billing_managed_organizations_url": "/v2/users/uaa-id-133/billing_managed_organizations",
+        "audited_organizations_url": "/v2/users/uaa-id-133/audited_organizations",
+        "managed_spaces_url": "/v2/users/uaa-id-133/managed_spaces",
+        "audited_spaces_url": "/v2/users/uaa-id-133/audited_spaces"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "uaa-id-134",
+        "url": "/v2/users/uaa-id-134",
+        "created_at": "2015-12-22T18:28:01Z",
+        "updated_at": null
+      },
+      "entity": {
+        "admin": false,
+        "active": true,
+        "default_space_guid": null,
+        "spaces_url": "/v2/users/uaa-id-134/spaces",
+        "organizations_url": "/v2/users/uaa-id-134/organizations",
+        "managed_organizations_url": "/v2/users/uaa-id-134/managed_organizations",
+        "billing_managed_organizations_url": "/v2/users/uaa-id-134/billing_managed_organizations",
+        "audited_organizations_url": "/v2/users/uaa-id-134/audited_organizations",
+        "managed_spaces_url": "/v2/users/uaa-id-134/managed_spaces",
+        "audited_spaces_url": "/v2/users/uaa-id-134/audited_spaces"
+      }
+    }
+  ]
+}

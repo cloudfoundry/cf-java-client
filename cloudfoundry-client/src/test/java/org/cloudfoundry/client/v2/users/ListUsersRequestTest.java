@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,21 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import reactor.Mono;
+import org.cloudfoundry.client.ValidationResult;
+import org.junit.Test;
 
-public interface Users {
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.junit.Assert.assertEquals;
 
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/227/users/list_all_users.html">List all Users</a> request
-     *
-     * @param request the List all Users request
-     * @return the response from the List all Users request
-     */
-    Mono<ListUsersResponse> listUsers(ListUsersRequest request);
+public final class ListUsersRequestTest {
+
+    @Test
+    public void isValid() {
+        ValidationResult result = ListUsersRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
 }
