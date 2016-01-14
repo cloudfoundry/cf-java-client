@@ -25,6 +25,7 @@ import org.reactivestreams.Publisher;
 import reactor.Mono;
 
 import static org.cloudfoundry.operations.v2.TestObjects.fill;
+import static org.cloudfoundry.operations.v2.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpaceQuotasTest {
@@ -35,10 +36,10 @@ public final class DefaultSpaceQuotasTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationSpaceQuotaDefinitionsRequest request = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            ListOrganizationSpaceQuotaDefinitionsRequest request = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse response = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+            ListOrganizationSpaceQuotaDefinitionsResponse response = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition-").build())
                     .build();
             when(this.cloudFoundryClient.organizations()
@@ -100,10 +101,10 @@ public final class DefaultSpaceQuotasTest {
         @Before
         public void setUp() throws Exception {
             when(this.cloudFoundryClient.organizations()
-                    .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+                    .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                             .id(TEST_ORGANIZATION_ID)
                             .build()))
-                    .thenReturn(Mono.just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder()).build()));
+                    .thenReturn(Mono.just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder()).build()));
         }
 
         @Override
@@ -125,18 +126,18 @@ public final class DefaultSpaceQuotasTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationSpaceQuotaDefinitionsRequest request1 = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            ListOrganizationSpaceQuotaDefinitionsRequest request1 = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse response1 = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+            ListOrganizationSpaceQuotaDefinitionsResponse response1 = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition1-").build())
                     .totalPages(2)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsRequest request2 = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+            ListOrganizationSpaceQuotaDefinitionsRequest request2 = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .page(2)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse response2 = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+            ListOrganizationSpaceQuotaDefinitionsResponse response2 = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition2-").build())
                     .totalPages(2)
                     .build();

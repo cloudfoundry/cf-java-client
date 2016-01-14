@@ -44,34 +44,35 @@ import org.reactivestreams.Publisher;
 import reactor.Mono;
 
 import static org.cloudfoundry.operations.v2.TestObjects.fill;
+import static org.cloudfoundry.operations.v2.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
 
     private static void setupExpectations(CloudFoundryClient cloudFoundryClient, String testOrgId, String testSpaceName, String testSpaceId) {
-        ListOrganizationSpacesRequest request1 = fill(ListOrganizationSpacesRequest.builder())
+        ListOrganizationSpacesRequest request1 = fillPage(ListOrganizationSpacesRequest.builder())
                 .name(testSpaceName)
                 .id(null)
                 .organizationId(testOrgId)
                 .build();
-        ListOrganizationSpacesResponse response1 = fill(ListOrganizationSpacesResponse.builder())
+        ListOrganizationSpacesResponse response1 = fillPage(ListOrganizationSpacesResponse.builder())
                 .resource(fill(SpaceResource.builder(), "space-").build())
                 .build();
         when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Mono.just(response1));
 
-        ListSpaceApplicationsRequest request2 = fill(ListSpaceApplicationsRequest.builder(), "spaceApplications-")
+        ListSpaceApplicationsRequest request2 = fillPage(ListSpaceApplicationsRequest.builder(), "spaceApplications-")
                 .id(testSpaceId)
                 .diego(null)
                 .build();
-        ListSpaceApplicationsResponse response2 = fill(ListSpaceApplicationsResponse.builder())
+        ListSpaceApplicationsResponse response2 = fillPage(ListSpaceApplicationsResponse.builder())
                 .resource(fill(ApplicationResource.builder(), "spaceApplication-").build())
                 .build();
         when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Mono.just(response2));
 
-        ListSpaceDomainsRequest request3 = fill(ListSpaceDomainsRequest.builder())
+        ListSpaceDomainsRequest request3 = fillPage(ListSpaceDomainsRequest.builder())
                 .id(testSpaceId)
                 .build();
-        ListSpaceDomainsResponse response3 = fill(ListSpaceDomainsResponse.builder())
+        ListSpaceDomainsResponse response3 = fillPage(ListSpaceDomainsResponse.builder())
                 .resource(fill(DomainResource.builder(), "spaceDomain-").build())
                 .build();
         when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Mono.just(response3));
@@ -82,18 +83,18 @@ public final class DefaultSpacesTest {
         GetOrganizationResponse response4 = fill(GetOrganizationResponse.builder(), "organization-").build();
         when(cloudFoundryClient.organizations().get(request4)).thenReturn(Mono.just(response4));
 
-        ListSpaceSecurityGroupsRequest request5 = fill(ListSpaceSecurityGroupsRequest.builder())
+        ListSpaceSecurityGroupsRequest request5 = fillPage(ListSpaceSecurityGroupsRequest.builder())
                 .id(testSpaceId)
                 .build();
-        ListSpaceSecurityGroupsResponse response5 = fill(ListSpaceSecurityGroupsResponse.builder())
+        ListSpaceSecurityGroupsResponse response5 = fillPage(ListSpaceSecurityGroupsResponse.builder())
                 .resource(fill(SecurityGroupResource.builder(), "securityGroup-").build())
                 .build();
         when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Mono.just(response5));
 
-        ListSpaceServicesRequest request6 = fill(ListSpaceServicesRequest.builder())
+        ListSpaceServicesRequest request6 = fillPage(ListSpaceServicesRequest.builder())
                 .id(testSpaceId)
                 .build();
-        ListSpaceServicesResponse response6 = fill(ListSpaceServicesResponse.builder())
+        ListSpaceServicesResponse response6 = fillPage(ListSpaceServicesResponse.builder())
                 .resource(fill(ServiceResource.builder(), "service-").build())
                 .build();
         when(cloudFoundryClient.spaces().listServices(request6)).thenReturn(Mono.just(response6));
@@ -201,7 +202,7 @@ public final class DefaultSpacesTest {
                     .page(1)
                     .organizationId(TEST_ORGANIZATION_ID)
                     .build();
-            ListSpacesResponse response1 = fill(ListSpacesResponse.builder(), "1")
+            ListSpacesResponse response1 = fillPage(ListSpacesResponse.builder(), "1")
                     .resource(fill(SpaceResource.builder(), "space1-").build())
                     .totalPages(2)
                     .build();
@@ -211,7 +212,7 @@ public final class DefaultSpacesTest {
                     .organizationId(TEST_ORGANIZATION_ID)
                     .page(2)
                     .build();
-            ListSpacesResponse response2 = fill(ListSpacesResponse.builder())
+            ListSpacesResponse response2 = fillPage(ListSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space2-").build())
                     .totalPages(2)
                     .build();
