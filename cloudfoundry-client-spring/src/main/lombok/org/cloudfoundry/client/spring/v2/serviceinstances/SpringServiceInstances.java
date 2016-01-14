@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBin
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.Mono;
@@ -120,4 +122,16 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
         });
     }
 
+    @Override
+    public Mono<UpdateServiceInstanceResponse> update(final UpdateServiceInstanceRequest request) {
+        return put(request, UpdateServiceInstanceResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances", request.getId());
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
 }
