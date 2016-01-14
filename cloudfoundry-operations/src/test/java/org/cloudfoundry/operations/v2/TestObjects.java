@@ -32,24 +32,37 @@ import static org.junit.Assert.fail;
 /**
  * {@code TestObjects} provides a utility which calls setters of an object of {@code *Builder} type and returns the resulting builder object.
  *
- * <p>The exported static methods are {@link #fill &LT;T>fill(T,String)} and {@link #fill &LT;T>fill(T)}. The {@code T} argument is a builder object, and the {@code String} is a <i>modifier</i> which
- * is used to augment the {@code String} values set. {@code fill(b)} is equivalent to {@code fill(b,"")}.</p>
+ * <p>The exported static methods are {@link #fill &LT;T>fill(T,String)} and {@link #fillPage &LT;T>fillPage(T,String)}. The {@code T} argument is a builder object, and the {@code String} is a
+ * <i>modifier</i> which is used to augment the {@code String} values set. {@code fill(b)} is equivalent to {@code fill(b,"")} and {@code fillPage(b)} is equivalent to {@code fillPage(b,"")}.</p>
  *
- * <p>{@code TestObjects} is designed to populate builder objects with test values. Object setters are called with standard values based upon the parameter type. Setters which are collections or
- * belong to {@link lombok.Singular} versions of collections are ignored.</p>
+ * <p>{@code TestObjects} is designed to populate builder objects with test values. Object setters are called with standard values based upon the parameter type and the name of the setter method.
+ * Setters which take collections or {@link lombok.Singular} generated setters are ignored.</p>
  *
- * <ul> <li>{@link String} types are set to {@code "test-"+modifier+settername}, where {@code modifier} is supplied on the call {@code fill(b,modifier)}.</li>
+ * <ul>
+ *
+ * <li>{@link String} types are set to {@code "test-"+modifier+settername}, where {@code modifier} is supplied on the call {@code fill(b,modifier)} or {@code fillPage(b,modifier)}.</li>
  *
  * <li>{@link Boolean} types are set to {@code true}.</li>
  *
- * <li>{@link Integer} types are set to 1.</li>
+ * <li>{@link Integer} or {@link Long} types are set to {@code 1}.</li>
  *
- * <li>Types with names ending in {@code Entity} or {@code Metadata}<sup>1</sup> are recursively filled, with the same {@code modifier}, if their builder types can be found.</li> </ul>
+ * <li>{@link Float} or {@link Double} types are set to {@code 1.0}.</li>
  *
- * <p>Paginated builder objects<sup>1</sup> (subclassing {@link PaginatedRequest} or {@link PaginatedResponse}) are treated specially, to set page request fields consistently with the operations
- * implementations: their setters {@code resultsPerPage} and {@code orderDirection} are ignored.</p>
+ * <li>Types with names ending in {@code Entity} or {@code Metadata}<sup>1</sup> are recursively filled, using {@link #fill fill(builder-of-type, modifier)}, if their builder types can be found.</li>
  *
- * <p><sup>1</sup>These special cases make the {@code TestObjects} class specific to v2 CloudFoundry REST api interfaces. </p>
+ * </ul>
+ *
+ * <h1>Paginated Types</h1>
+ *
+ * <p>Paginated builder objects<sup>1</sup> (built type subclassing {@link PaginatedRequest} or {@link PaginatedResponse}) can only be filled with {@link #fillPage} (which will call {@link
+ * org.junit.Assert#fail Assert.fail()} if the builder does <i>not</i> build a paginated type). The setters are treated specially, to set page request fields consistently with the operations
+ * implementations. In particular the setters {@code resultsPerPage} and {@code orderDirection} are <i>not set</i>.</p>
+ *
+ * <p>{@link #fill} will call {@link org.junit.Assert#fail Assert.fail()} if the builder object builds an object of paginated type.</p>
+ *
+ * <p>If {@link #fillPage} or {@link #fill} recurses (on Entity or Metadata types), it is assumed that these are <i>not</i> paginated.</p>
+ *
+ * <p><sup>1</sup>These special cases make the {@code TestObjects} class specific to v2 CloudFoundry REST api interfaces.</p>
  */
 public abstract class TestObjects {
 
@@ -57,7 +70,7 @@ public abstract class TestObjects {
     }
 
     /**
-     * Fill the builder "fields" by calling their setters with default values.
+     * Fill the builder "fields" by calling their setters with default values. Fails if this builds a paginated type.
      *
      * @param builder an object of type T which is a builder type
      * @param <T>     the type of the builder object
@@ -68,9 +81,9 @@ public abstract class TestObjects {
     }
 
     /**
-     * Fill the builder "fields" by calling their setters with default values.
+     * Fill the builder "fields" by calling their setters with default values. Fails if this builds a paginated type.
      *
-     * @param builder  an object of type T which is a builder type
+     * @param builder  an object of type T which is a builder of a type which is <i>not</i> paginated
      * @param modifier a modifier for {@code String} types which are set
      * @param <T>      the type of the builder object
      * @return builder with setter fields "filled in"
@@ -79,20 +92,42 @@ public abstract class TestObjects {
         Class<?> builderClass = builder.getClass();
         Class<?> builtType = getBuiltType(builderClass, true);
 
-        boolean isPaginated = isPaginatedType(builtType);
-
-        for (Method m : builderClass.getDeclaredMethods()) {
-            if (isPublic(m.getModifiers())) {
-                Class<?>[] parmTypes = m.getParameterTypes();
-                Class<?> returnType = m.getReturnType();
-                if (parmTypes.length == 1 && returnType == builderClass) { // single-value, chainable, setter
-                    Object parmValue = buildTestValue(m, parmTypes[0], modifier, isPaginated, hasGetterFor(m.getName(), builtType));
-                    if (parmValue != null) {
-                        builder = invokeSetter(builder, m, parmValue);
-                    }
-                }
-            }
+        if (isPaginatedType(builtType)) {
+            fail("Builder argument " + builder + " builds a paginated type.  Use fillPage instead.");
         }
+
+        callSetters(builder, modifier, builderClass, builtType, false);
+        return builder;
+    }
+
+    /**
+     * Fill the builder "fields" by calling their setters with default values.
+     *
+     * @param builder an object of type T which is a builder type
+     * @param <T>     the type of the builder object
+     * @return builder with setter fields "filled in"
+     */
+    public static <T> T fillPage(T builder) {
+        return fillPage(builder, "");
+    }
+
+    /**
+     * Fill the builder "fields" by calling their setters with default values. Fails if this builds a type which is <i>not</i> paginated.
+     *
+     * @param builder  an object of type T which is a builder of a paginated type
+     * @param modifier a modifier for {@code String} types which are set
+     * @param <T>      the type of the builder object
+     * @return builder with setter fields "filled in"
+     */
+    public static <T> T fillPage(T builder, String modifier) {
+        Class<?> builderClass = builder.getClass();
+        Class<?> builtType = getBuiltType(builderClass, true);
+
+        if (!isPaginatedType(builtType)) {
+            fail("Builder argument " + builder + " does not build a paginated type.  Use fill instead.");
+        }
+
+        callSetters(builder, modifier, builderClass, builtType, true);
         return builder;
     }
 
@@ -125,6 +160,9 @@ public abstract class TestObjects {
 
         if (clazz == Boolean.class) return (O) Boolean.valueOf(true);
         if (clazz == Integer.class) return (O) Integer.valueOf(1);
+        if (clazz == Long.class) return (O) Long.valueOf(1l);
+        if (clazz == Float.class) return (O) Float.valueOf(1.0f);
+        if (clazz == Double.class) return (O) Double.valueOf(1.0d);
         if (clazz == String.class) return (O) String.valueOf("test-" + modifier + m.getName());
         if (clazz == Map.class) return (O) Collections.emptyMap();
         if (clazz == List.class) return (O) Collections.emptyList();
@@ -133,6 +171,21 @@ public abstract class TestObjects {
         }
 
         return null;
+    }
+
+    private static <T> void callSetters(T builder, String modifier, Class<?> builderClass, Class<?> builtType, boolean isPaginated) {
+        for (Method m : builderClass.getDeclaredMethods()) {
+            if (isPublic(m.getModifiers())) {
+                Class<?>[] parmTypes = m.getParameterTypes();
+                Class<?> returnType = m.getReturnType();
+                if (parmTypes.length == 1 && returnType == builderClass) { // single-value, chainable, setter
+                    Object parmValue = buildTestValue(m, parmTypes[0], modifier, isPaginated, hasGetterFor(m.getName(), builtType));
+                    if (parmValue != null) {
+                        invokeSetter(builder, m, parmValue);
+                    }
+                }
+            }
+        }
     }
 
     private static Class<?> getBuiltType(Class<?> builderClass, boolean failIfNotBuilder) {

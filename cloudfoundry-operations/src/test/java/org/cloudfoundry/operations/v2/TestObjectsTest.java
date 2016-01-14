@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.applications.ListApplicationsResponse;
 import org.junit.Test;
 
 import static org.cloudfoundry.operations.v2.TestObjects.fill;
+import static org.cloudfoundry.operations.v2.TestObjects.fillPage;
 import static org.junit.Assert.assertEquals;
 
 public final class TestObjectsTest {
@@ -96,10 +97,20 @@ public final class TestObjectsTest {
         assertEquals(expected, actual);
     }
 
+    @Test(expected = AssertionError.class)
+    public void fillOfPaginated() {
+        fill(ListApplicationsResponse.builder());
+    }
+
+    @Test(expected = AssertionError.class)
+    public void fillPageOfNonPaginated() {
+        fillPage(ApplicationEntity.builder());
+    }
+
     @Test
     public void fillRequestPage() {
 
-        ListApplicationsRequest actual = fill(ListApplicationsRequest.builder()).build();
+        ListApplicationsRequest actual = fillPage(ListApplicationsRequest.builder()).build();
         ListApplicationsRequest expected = ListApplicationsRequest.builder()
                 .page(1)
                 .diego(true)
@@ -123,7 +134,7 @@ public final class TestObjectsTest {
     @Test
     public void fillResponsePage() {
 
-        ListApplicationsResponse actual = fill(ListApplicationsResponse.builder()).build();
+        ListApplicationsResponse actual = fillPage(ListApplicationsResponse.builder()).build();
         ListApplicationsResponse expected = ListApplicationsResponse.builder()
                 .nextUrl("test-nextUrl")
                 .previousUrl("test-previousUrl")

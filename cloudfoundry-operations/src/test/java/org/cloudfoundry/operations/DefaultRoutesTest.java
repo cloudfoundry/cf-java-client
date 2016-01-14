@@ -41,6 +41,7 @@ import org.reactivestreams.Publisher;
 import reactor.Mono;
 
 import static org.cloudfoundry.operations.v2.TestObjects.fill;
+import static org.cloudfoundry.operations.v2.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {
@@ -51,14 +52,14 @@ public final class DefaultRoutesTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationPrivateDomainsRequest request1 = fill(ListOrganizationPrivateDomainsRequest.builder())
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .name("test-invalid-domain")
                     .build();
-            ListOrganizationPrivateDomainsResponse response1 = fill(ListOrganizationPrivateDomainsResponse.builder()).build();
+            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
             when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
-            ListSharedDomainsRequest request2 = fill(ListSharedDomainsRequest.builder())
+            ListSharedDomainsRequest request2 = fillPage(ListSharedDomainsRequest.builder())
                     .name("test-invalid-domain")
                     .build();
 
@@ -87,11 +88,11 @@ public final class DefaultRoutesTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationPrivateDomainsRequest request1 = fill(ListOrganizationPrivateDomainsRequest.builder())
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
-            ListOrganizationPrivateDomainsResponse response1 = fill(ListOrganizationPrivateDomainsResponse.builder())
+            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder())
                     .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
                     .build();
             when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
@@ -141,11 +142,11 @@ public final class DefaultRoutesTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationPrivateDomainsRequest request1 = fill(ListOrganizationPrivateDomainsRequest.builder())
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
-            ListOrganizationPrivateDomainsResponse response1 = fill(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
+            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
                     .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
                     .build();
             when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
@@ -176,7 +177,7 @@ public final class DefaultRoutesTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationPrivateDomainsRequest request1 = fill(ListOrganizationPrivateDomainsRequest.builder())
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
@@ -185,10 +186,10 @@ public final class DefaultRoutesTest {
                     .build();
             when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
 
-            ListSharedDomainsRequest request2 = fill(ListSharedDomainsRequest.builder())
+            ListSharedDomainsRequest request2 = fillPage(ListSharedDomainsRequest.builder())
                     .name("test-domain")
                     .build();
-            ListSharedDomainsResponse response2 = fill(ListSharedDomainsResponse.builder(), "sharedDomains-")
+            ListSharedDomainsResponse response2 = fillPage(ListSharedDomainsResponse.builder(), "sharedDomains-")
                     .resource(fill(SharedDomainResource.builder(), "sharedDomain-").build())
                     .build();
             when(this.sharedDomains.list(request2)).thenReturn(Mono.just(response2));
@@ -223,7 +224,7 @@ public final class DefaultRoutesTest {
                     .organizationId(TEST_ORGANIZATION_ID)
                     .page(1)
                     .build();
-            ListRoutesResponse response1 = fill(ListRoutesResponse.builder())
+            ListRoutesResponse response1 = fillPage(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-").build())
                     .build();
             when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Mono.just(response1));
@@ -243,10 +244,10 @@ public final class DefaultRoutesTest {
                     .build();
             when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 
-            ListRouteApplicationsRequest request4 = fill(ListRouteApplicationsRequest.builder(), "route-")
+            ListRouteApplicationsRequest request4 = fillPage(ListRouteApplicationsRequest.builder(), "route-")
                     .diego(null)
                     .build();
-            ListRouteApplicationsResponse response4 = fill(ListRouteApplicationsResponse.builder())
+            ListRouteApplicationsResponse response4 = fillPage(ListRouteApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-").build())
                     .build();
             when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Mono.just(response4));
@@ -300,10 +301,10 @@ public final class DefaultRoutesTest {
 
         @Before
         public void setUp() throws Exception {
-            ListSpaceRoutesRequest request1 = fill(ListSpaceRoutesRequest.builder(), "space-")
+            ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder(), "space-")
                     .id(TEST_SPACE_ID)
                     .build();
-            ListSpaceRoutesResponse response1 = fill(ListSpaceRoutesResponse.builder(), "spaceRoute-")
+            ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder(), "spaceRoute-")
                     .resource(fill(RouteResource.builder(), "route-").build())
                     .build();
             when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
@@ -324,7 +325,7 @@ public final class DefaultRoutesTest {
                     .id("test-route-id")
                     .page(1)
                     .build();
-            ListRouteApplicationsResponse response4 = fill(ListRouteApplicationsResponse.builder())
+            ListRouteApplicationsResponse response4 = fillPage(ListRouteApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "routeApplication-").build())
                     .build();
             when(this.cloudFoundryClient.routes().listApplications(request4)).thenReturn(Mono.just(response4));
