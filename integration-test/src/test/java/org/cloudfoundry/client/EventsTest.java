@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.operations.v2.Resources;
+import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple2;

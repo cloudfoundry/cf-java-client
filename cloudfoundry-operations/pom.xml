@@ -85,6 +85,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <sourceFileExcludes>
+                        <exclude>**\/Default*.java</exclude>
+                    </sourceFileExcludes>
+                    <excludePackageNames>org.cloudfoundry.operations.util</excludePackageNames>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

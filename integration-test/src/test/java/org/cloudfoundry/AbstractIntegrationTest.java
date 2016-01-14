@@ -24,11 +24,10 @@ import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.v2.Paginated;
-import org.cloudfoundry.operations.v2.Resources;
+import org.cloudfoundry.operations.util.v2.Paginated;
+import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +65,7 @@ public abstract class AbstractIntegrationTest {
     @Value("${test.space}")
     protected String spaceName;
 
-    @Before
+    @After
     public final void cleanup() throws Exception {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
