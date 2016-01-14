@@ -31,12 +31,15 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import reactor.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -340,6 +343,71 @@ public final class SpringServiceInstancesTest {
         @Override
         protected Mono<ListServiceInstanceServiceBindingsResponse> invoke(ListServiceInstanceServiceBindingsRequest request) {
             return this.serviceInstances.listServiceBindings(request);
+        }
+
+    }
+
+    public static final class Update extends AbstractApiTest<UpdateServiceInstanceRequest, UpdateServiceInstanceResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateServiceInstanceRequest getInvalidRequest() {
+            return UpdateServiceInstanceRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41?accepts_incomplete=true")
+                    .requestPayload("v2/service_instances/PUT_{id}_update_service_instance_request.json")
+                    .status(CREATED)
+                    .responsePayload("v2/service_instances/PUT_{id}_update_service_instance_response.json");
+        }
+
+        @Override
+        protected UpdateServiceInstanceResponse getResponse() {
+            return UpdateServiceInstanceResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-07-27T22:43:08Z")
+                            .id("2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
+                            .url("/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
+                            .build())
+                    .entity(ServiceInstanceEntity.builder()
+                            .name("name-139")
+                            .credential("creds-key-75", "creds-val-75")
+                            .servicePlanId("b07ff29a-78b8-486f-87a8-3f695368b83d")
+                            .spaceId("04219ffa-a817-459f-bbd7-c161bdca541b")
+                            .type("managed_service_instance")
+                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                                    .createdAt("2015-07-27T22:43:08Z")
+                                    .updatedAt("2015-07-27T22:43:08Z")
+                                    .description("")
+                                    .state("in progress")
+                                    .type("update")
+                                    .build())
+                            .spaceUrl("/v2/spaces/04219ffa-a817-459f-bbd7-c161bdca541b")
+                            .servicePlanUrl("/v2/service_plans/b07ff29a-78b8-486f-87a8-3f695368b83d")
+                            .serviceBindingsUrl("/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41/service_bindings")
+                            .serviceKeysUrl("/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41/service_keys")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected UpdateServiceInstanceRequest getValidRequest() throws Exception {
+            return UpdateServiceInstanceRequest.builder()
+                    .acceptsIncomplete(true)
+                    .id("2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
+                    .servicePlanId("5b5e984f-bbf6-477b-9d3a-b6d5df941b50")
+                    .parameter("the_service_broker", "wants this object")
+                    .build();
+        }
+
+        @Override
+        protected Mono<UpdateServiceInstanceResponse> invoke(UpdateServiceInstanceRequest request) {
+            return this.serviceInstances.update(request);
         }
 
     }
