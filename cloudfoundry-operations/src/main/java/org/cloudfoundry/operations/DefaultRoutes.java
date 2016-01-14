@@ -226,10 +226,8 @@ final class DefaultRoutes implements Routes {
                 CheckRouteRequest request = tuple.t1;
                 String organizationId = tuple.t2;
 
-                return Stream
-                        .from(requestPrivateDomain(cloudFoundryClient, request.getDomain(), organizationId))
-                        .switchIfEmpty(requestSharedDomain(cloudFoundryClient, request.getDomain())) // TODO: Mono.switchIfEmpty() please
-                        .singleOrEmpty()
+                return requestPrivateDomain(cloudFoundryClient, request.getDomain(), organizationId)
+                        .otherwiseIfEmpty(requestSharedDomain(cloudFoundryClient, request.getDomain()))
                         .map(Resources.extractId())
                         .and(Mono.just(request));
             }
@@ -246,10 +244,8 @@ final class DefaultRoutes implements Routes {
                 String organizationId = tuple.t2;
                 CreateRouteRequest request = tuple.t3;
 
-                Mono<String> domainId = Stream
-                        .from(requestPrivateDomain(cloudFoundryClient, request.getDomain(), organizationId))
-                        .switchIfEmpty(requestSharedDomain(cloudFoundryClient, request.getDomain())) // TODO: Mono.switchIfEmpty() please
-                        .single()
+                Mono<String> domainId = requestPrivateDomain(cloudFoundryClient, request.getDomain(), organizationId)
+                        .otherwiseIfEmpty(requestSharedDomain(cloudFoundryClient, request.getDomain()))
                         .map(Resources.extractId())
                         .otherwise(Exceptions.<String>convert(String.format("Domain %s does not exist", request.getDomain())));
 
