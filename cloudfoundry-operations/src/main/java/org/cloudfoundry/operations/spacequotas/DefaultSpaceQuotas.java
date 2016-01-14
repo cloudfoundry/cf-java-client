@@ -57,7 +57,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
                 .single()
                 .map(extractQuotaDefinition())
                 .map(toSpaceQuota())
-                .otherwise(Exceptions.<SpaceQuota>convert(String.format("Space Quota %s does not exist", getSpaceQuotaRequest.getName())));
+                .otherwise(Exceptions.<SpaceQuota>convert("Space Quota %s does not exist", getSpaceQuotaRequest.getName()));
     }
 
     @Override

@@ -34,16 +34,20 @@ public final class Exceptions {
      *
      * <ul> <li>{@link NoSuchElementException} to {@link IllegalArgumentException}</li> </ul>
      *
-     * @param message the message to add to the converted exception
-     * @param <T>     the type of the {@link Mono} being converted
+     * @param format A <a href="../util/Formatter.html#syntax">format string</a>
+     * @param args   Arguments referenced by the format specifiers in the format string.  If there are more arguments than format specifiers, the extra arguments are ignored.  The number of arguments
+     *               is variable and may be zero.  The maximum number of arguments is limited by the maximum dimension of a Java array as defined by <cite>The Java&trade; Virtual Machine
+     *               Specification</cite>. The behaviour on a {@code null} argument depends on the <a href="../util/Formatter.html#syntax">conversion</a>.
+     * @param <T>    the type of the {@link Mono} being converted
      * @return a function that converts errors
      */
-    public static <T> Function<Throwable, Mono<T>> convert(final String message) {
+    public static <T> Function<Throwable, Mono<T>> convert(final String format, final Object... args) {
         return new Function<Throwable, Mono<T>>() {
 
             @Override
             public Mono<T> apply(Throwable throwable) {
                 if (throwable instanceof NoSuchElementException) {
+                    String message = String.format(format, args);
                     return Mono.error(new IllegalArgumentException(message, throwable));
                 } else {
                     return Mono.error(throwable);

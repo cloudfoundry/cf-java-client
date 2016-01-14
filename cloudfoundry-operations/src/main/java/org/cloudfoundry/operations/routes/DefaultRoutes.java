@@ -449,7 +449,7 @@ public final class DefaultRoutes implements Routes {
                 .requestResources(requestSpacesPage(cloudFoundryClient, organizationId, space))
                 .map(Resources.extractId())
                 .single()
-                .otherwise(Exceptions.<String>convert(String.format("Space %s does not exist", space)));
+                .otherwise(Exceptions.<String>convert("Space %s does not exist", space));
     }
 
     private static Mono<String> requestSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
