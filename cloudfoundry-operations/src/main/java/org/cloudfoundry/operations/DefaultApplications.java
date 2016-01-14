@@ -82,11 +82,11 @@ final class DefaultApplications implements Applications {
         return s == null ? "" : s;
     }
 
-    private static Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>> extractApplications() {
-        return new Function<GetSpaceSummaryResponse, Publisher<SpaceApplicationSummary>>() {
+    private static Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>> extractApplications() {
+        return new Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>>() {
 
             @Override
-            public Publisher<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
+            public Stream<SpaceApplicationSummary> apply(GetSpaceSummaryResponse getSpaceSummaryResponse) {
                 return Stream.fromIterable(getSpaceSummaryResponse.getApplications());
             }
 

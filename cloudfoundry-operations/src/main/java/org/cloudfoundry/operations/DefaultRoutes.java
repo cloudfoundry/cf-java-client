@@ -247,7 +247,7 @@ final class DefaultRoutes implements Routes {
                 Mono<String> domainId = requestPrivateDomain(cloudFoundryClient, request.getDomain(), organizationId)
                         .otherwiseIfEmpty(requestSharedDomain(cloudFoundryClient, request.getDomain()))
                         .map(Resources.extractId())
-                        .otherwise(Exceptions.<String>convert(String.format("Domain %s does not exist", request.getDomain())));
+                        .otherwiseIfEmpty(Mono.<String>error(new IllegalArgumentException(String.format("Domain %s does not exist", request.getDomain()))));
 
                 return Mono.when(domainId, Mono.just(spaceId), Mono.just(request));
             }
