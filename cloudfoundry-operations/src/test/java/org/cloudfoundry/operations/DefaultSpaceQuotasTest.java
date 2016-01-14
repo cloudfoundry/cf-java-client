@@ -16,96 +16,52 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
-import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
 
+import static org.cloudfoundry.operations.v2.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpaceQuotasTest {
 
-    private static ListOrganizationSpaceQuotaDefinitionsResponse getListOrganizationSpaceQuotaDefinitionsResponse(int page, int numPages) {
-        return ListOrganizationSpaceQuotaDefinitionsResponse.builder()
-                .resource(getSpaceQuotaDefinitionResource(page))
-                .totalPages(numPages)
-                .build();
-    }
-
-    private static SpaceQuota getSpaceQuota(int index) {
-        return SpaceQuota.builder()
-                .id("test-id-" + index)
-                .instanceMemoryLimit(1024)
-                .paidServicePlans(true)
-                .totalMemoryLimit(2048)
-                .totalRoutes(10)
-                .name("test-name-" + index)
-                .organizationId("test-org-id-" + index)
-                .build();
-    }
-
-    private static SpaceQuotaDefinitionResource getSpaceQuotaDefinitionResource(int resourceIndex) {
-        return SpaceQuotaDefinitionResource.builder()
-                .metadata(Metadata.builder()
-                        .id("test-id-" + resourceIndex)
-                        .build())
-                .entity(SpaceQuotaDefinitionEntity.builder()
-                        .instanceMemoryLimit(1024)
-                        .memoryLimit(2048)
-                        .name("test-name-" + resourceIndex)
-                        .nonBasicServicesAllowed(true)
-                        .organizationId("test-org-id-" + resourceIndex)
-                        .totalRoutes(10)
-                        .build())
-                .build();
-    }
-
     public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationSpaceQuotaDefinitionsRequest request1 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+            ListOrganizationSpaceQuotaDefinitionsRequest request = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
-                    .page(1)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
-
-            ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                    .id(TEST_ORGANIZATION_ID)
-                    .page(2)
+            ListOrganizationSpaceQuotaDefinitionsResponse response = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                    .resource(fill(SpaceQuotaDefinitionResource.builder(),"spaceQuotaDefinition-").build())
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(request))
+                    .thenReturn(Mono.just(response));
         }
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(getSpaceQuota(2));
+                    .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition-").build());
         }
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
-                    .name("test-name-2")
-                    .build();
-
-            return this.spaceQuotas.get(request);
+            return this.spaceQuotas.get(fill(GetSpaceQuotaRequest.builder(), "spaceQuotaDefinition-").build());
         }
 
     }
 
     public static final class GetInvalid extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
@@ -115,16 +71,13 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
-                    .build();
-
-            return this.spaceQuotas.get(request);
+            return this.spaceQuotas.get(GetSpaceQuotaRequest.builder().build());
         }
     }
 
     public static final class GetNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
@@ -134,11 +87,7 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
-                    .name("test-name-2")
-                    .build();
-
-            return this.spaceQuotas.get(request);
+            return this.spaceQuotas.get(fill(GetSpaceQuotaRequest.builder()).build());
         }
 
     }
@@ -146,24 +95,15 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class GetNotFound extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationSpaceQuotaDefinitionsRequest request1 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                    .id(TEST_ORGANIZATION_ID)
-                    .page(1)
-                    .build();
-
-            ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
-
-            ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                    .id(TEST_ORGANIZATION_ID)
-                    .page(2)
-                    .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+                            .id(TEST_ORGANIZATION_ID)
+                            .build()))
+                    .thenReturn(Mono.just(fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder()).build()));
         }
 
         @Override
@@ -174,41 +114,46 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Mono<SpaceQuota> invoke() {
-            GetSpaceQuotaRequest request = GetSpaceQuotaRequest.builder()
-                    .name("test-name-0")
-                    .build();
-
-            return this.spaceQuotas.get(request);
+            return this.spaceQuotas.get(fill(GetSpaceQuotaRequest.builder(), "does-not-exist").build());
         }
 
     }
 
     public static final class List extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationSpaceQuotaDefinitionsRequest request1 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+            ListOrganizationSpaceQuotaDefinitionsRequest request1 = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
-                    .page(1)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse page1 = getListOrganizationSpaceQuotaDefinitionsResponse(1, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request1)).thenReturn(Mono.just(page1));
-
-            ListOrganizationSpaceQuotaDefinitionsRequest request2 = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+            ListOrganizationSpaceQuotaDefinitionsResponse response1 = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition1-").build())
+                    .totalPages(2)
+                    .build();
+            ListOrganizationSpaceQuotaDefinitionsRequest request2 = fill(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
                     .page(2)
                     .build();
-            ListOrganizationSpaceQuotaDefinitionsResponse page2 = getListOrganizationSpaceQuotaDefinitionsResponse(2, 2);
-            when(this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request2)).thenReturn(Mono.just(page2));
+            ListOrganizationSpaceQuotaDefinitionsResponse response2 = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition2-").build())
+                    .totalPages(2)
+                    .build();
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(request1))
+                    .thenReturn(Mono.just(response1));
+            when(this.cloudFoundryClient.organizations()
+                    .listSpaceQuotaDefinitions(request2))
+                    .thenReturn(Mono.just(response2));
         }
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(getSpaceQuota(1))
-                    .assertEquals(getSpaceQuota(2));
+                    .assertEquals(fill(SpaceQuota.builder(),"spaceQuotaDefinition1-").build())
+                    .assertEquals(fill(SpaceQuota.builder(),"spaceQuotaDefinition2-").build())
+            ;
         }
 
         @Override
@@ -220,7 +165,7 @@ public final class DefaultSpaceQuotasTest {
 
     public static final class ListNoOrganization extends AbstractOperationsApiTest<SpaceQuota> {
 
-        private final SpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
+        private final DefaultSpaceQuotas spaceQuotas = new DefaultSpaceQuotas(this.cloudFoundryClient, MISSING_ID);
 
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
