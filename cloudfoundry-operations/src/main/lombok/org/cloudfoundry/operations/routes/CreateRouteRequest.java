@@ -44,6 +44,14 @@ public final class CreateRouteRequest implements Validatable {
     private final String host;
 
     /**
+     * The path of the route.
+     *
+     * @param path the path
+     * @return the path
+     */
+    private final String path;
+
+    /**
      * The space to create the route in
      *
      * @param space the space
@@ -52,9 +60,10 @@ public final class CreateRouteRequest implements Validatable {
     private final String space;
 
     @Builder
-    CreateRouteRequest(String domain, String host, String space) {
+    CreateRouteRequest(String domain, String host, String path, String space) {
         this.domain = domain;
         this.host = host;
+        this.path = path;
         this.space = space;
     }
 

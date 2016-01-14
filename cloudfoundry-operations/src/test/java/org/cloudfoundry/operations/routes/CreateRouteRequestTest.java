@@ -38,6 +38,19 @@ public final class CreateRouteRequestTest {
     }
 
     @Test
+    public void isValidWithPath() {
+        ValidationResult result = CreateRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .path("test-path")
+                .space("test-space")
+                .build()
+                .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
     public void isValidNoDomain() {
         ValidationResult result = CreateRouteRequest.builder()
                 .host("test-hostname")

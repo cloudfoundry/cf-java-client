@@ -371,6 +371,62 @@ public final class DefaultRoutesTest {
 
     }
 
+    public static final class CreateRoutePath extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
+                    .id(TEST_ORGANIZATION_ID)
+                    .name("test-specific-space")
+                    .build();
+            ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
+                    .resource(fill(SpaceResource.builder(), "ourSpace-").build())
+                    .build();
+            when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
+
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
+                    .id(TEST_ORGANIZATION_ID)
+                    .name("test-specific-domain")
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
+
+            ListSharedDomainsRequest request2 = fillPage(ListSharedDomainsRequest.builder())
+                    .name("test-specific-domain")
+                    .build();
+            ListSharedDomainsResponse response2 = fillPage(ListSharedDomainsResponse.builder())
+                    .resource(fill(SharedDomainResource.builder(), "specificDomain-").build())
+                    .build();
+            when(this.sharedDomains.list(request2)).thenReturn(Mono.just(response2));
+
+            org.cloudfoundry.client.v2.routes.CreateRouteRequest request3 = org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
+                    .domainId("test-specificDomain-id")
+                    .host("test-specific-host")
+                    .path("test-specific-path")
+                    .spaceId("test-ourSpace-id")
+                    .build();
+            CreateRouteResponse response3 = CreateRouteResponse.builder().build();
+            when(this.cloudFoundryClient.routes().create(request3)).thenReturn(Mono.just(response3));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            CreateRouteRequest request = fill(CreateRouteRequest.builder(), "specific-")
+                    .path("test-specific-path")
+                    .build();
+
+            return this.routes.create(request);
+        }
+
+    }
+    
     public static final class CreateRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
@@ -416,59 +472,6 @@ public final class DefaultRoutesTest {
                     .host("test-specific-host")
                     .space("test-specificSpace-name")
                     .build();
-
-            return this.routes.create(request);
-        }
-
-    }
-
-    public static final class CreateRouteSharedDomain extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
-
-        @Before
-        public void setUp() throws Exception {
-            ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
-                    .name("test-specific-space")
-                    .build();
-            ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "ourSpace-").build())
-                    .build();
-            when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
-
-            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
-                    .name("test-specific-domain")
-                    .build();
-            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
-            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
-
-            ListSharedDomainsRequest request2 = fillPage(ListSharedDomainsRequest.builder())
-                    .name("test-specific-domain")
-                    .build();
-            ListSharedDomainsResponse response2 = fillPage(ListSharedDomainsResponse.builder())
-                    .resource(fill(SharedDomainResource.builder(), "specificDomain-").build())
-                    .build();
-            when(this.sharedDomains.list(request2)).thenReturn(Mono.just(response2));
-
-            org.cloudfoundry.client.v2.routes.CreateRouteRequest request3 = org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
-                    .domainId("test-specificDomain-id")
-                    .host("test-specific-host")
-                    .spaceId("test-ourSpace-id")
-                    .build();
-            CreateRouteResponse response3 = CreateRouteResponse.builder().build();
-            when(this.cloudFoundryClient.routes().create(request3)).thenReturn(Mono.just(response3));
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            CreateRouteRequest request = fill(CreateRouteRequest.builder(), "specific-").build();
 
             return this.routes.create(request);
         }
