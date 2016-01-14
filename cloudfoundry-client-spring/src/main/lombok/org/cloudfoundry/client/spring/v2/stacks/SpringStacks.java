@@ -18,8 +18,12 @@ package org.cloudfoundry.client.spring.v2.stacks;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
+import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -53,6 +57,20 @@ public final class SpringStacks extends AbstractSpringOperations implements Stac
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "stacks", request.getId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListStacksResponse> list(final ListStacksRequest request) {
+        return get(request, ListStacksResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "stacks");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
             }
 
         });
