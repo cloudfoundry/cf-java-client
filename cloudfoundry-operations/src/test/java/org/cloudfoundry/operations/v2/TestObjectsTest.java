@@ -107,7 +107,7 @@ public final class TestObjectsTest {
 
         assertEquals(expected, actual);
     }
-    
+
     @Test
     public void fillResource() {
 

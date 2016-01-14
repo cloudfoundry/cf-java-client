@@ -39,7 +39,7 @@ public final class DefaultSpaceQuotasTest {
                     .id(TEST_ORGANIZATION_ID)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse response = fill(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
-                    .resource(fill(SpaceQuotaDefinitionResource.builder(),"spaceQuotaDefinition-").build())
+                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition-").build())
                     .build();
             when(this.cloudFoundryClient.organizations()
                     .listSpaceQuotaDefinitions(request))
@@ -151,8 +151,8 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(fill(SpaceQuota.builder(),"spaceQuotaDefinition1-").build())
-                    .assertEquals(fill(SpaceQuota.builder(),"spaceQuotaDefinition2-").build())
+                    .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition1-").build())
+                    .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition2-").build())
             ;
         }
 

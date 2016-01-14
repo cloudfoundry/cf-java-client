@@ -239,7 +239,7 @@ public final class DefaultRoutesTest {
                     .id("test-route-spaceId")
                     .build();
             GetSpaceResponse response3 = GetSpaceResponse.builder()
-                    .entity(fill(SpaceEntity.builder(),"space-response-").build())
+                    .entity(fill(SpaceEntity.builder(), "space-response-").build())
                     .build();
             when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 

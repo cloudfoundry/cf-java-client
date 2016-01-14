@@ -81,7 +81,7 @@ public final class DefaultApplicationsTest {
                         .build())
                 .build();
         when(client.applicationsV2().statistics(statsRequest)).thenReturn(Mono.just(statsResponse));
-        
+
         GetStackRequest stackRequest = GetStackRequest.builder()
                 .id("stack-id")
                 .build();
@@ -132,7 +132,7 @@ public final class DefaultApplicationsTest {
                     .build();
             when(this.cloudFoundryClient.applicationsV2().instances(instancesRequest)).thenReturn(Mono.just(instancesResponse));
         }
-        
+
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
@@ -175,7 +175,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
-            
+
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
                     .id("test-id")
                     .build();
@@ -195,7 +195,7 @@ public final class DefaultApplicationsTest {
                     .detectedBuildpack("detected-buildpack")
                     .build();
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
-            
+
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
                     .id("test-id")
                     .build();
@@ -274,7 +274,7 @@ public final class DefaultApplicationsTest {
                     .instances(9)
                     .build();
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
-            
+
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
                     .id("test-id")
                     .build();
@@ -377,7 +377,7 @@ public final class DefaultApplicationsTest {
         protected Publisher<ApplicationSummary> invoke() {
             return this.applications.list();
         }
-        
+
     }
 
     public static final class ListNoSpace extends AbstractOperationsApiTest<ApplicationSummary> {
