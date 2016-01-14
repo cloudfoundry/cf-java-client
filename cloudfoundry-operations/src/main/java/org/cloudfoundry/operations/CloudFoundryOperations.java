@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.operations.applications.Applications;
+import org.cloudfoundry.operations.organizations.Organizations;
+import org.cloudfoundry.operations.routes.Routes;
+import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
+import org.cloudfoundry.operations.spaces.Spaces;
+
 /**
  * Main entry point to the Cloud Foundry Operations API
  */
@@ -48,17 +54,17 @@ public interface CloudFoundryOperations {
     Routes routes();
 
     /**
-     * Main entry point to the Cloud Foundry Spaces Operations API
-     *
-     * @return the Cloud Foundry Spaces Operations API
-     */
-    Spaces spaces();
-
-    /**
      * Main entry point to the Cloud Foundry Space Quotas Operations API
      *
      * @return the Cloud Foundry Space Quotas Operations API
      */
     SpaceQuotas spaceQuotas();
+
+    /**
+     * Main entry point to the Cloud Foundry Spaces Operations API
+     *
+     * @return the Cloud Foundry Spaces Operations API
+     */
+    Spaces spaces();
 
 }

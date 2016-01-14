@@ -17,6 +17,16 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.operations.applications.Applications;
+import org.cloudfoundry.operations.applications.DefaultApplications;
+import org.cloudfoundry.operations.organizations.DefaultOrganizations;
+import org.cloudfoundry.operations.organizations.Organizations;
+import org.cloudfoundry.operations.routes.DefaultRoutes;
+import org.cloudfoundry.operations.routes.Routes;
+import org.cloudfoundry.operations.spacequotas.DefaultSpaceQuotas;
+import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
+import org.cloudfoundry.operations.spaces.DefaultSpaces;
+import org.cloudfoundry.operations.spaces.Spaces;
 import reactor.Mono;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {

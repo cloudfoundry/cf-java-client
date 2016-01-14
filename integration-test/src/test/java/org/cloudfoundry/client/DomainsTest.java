@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.operations.v2.Resources;
+import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
-import org.cloudfoundry.operations.v2.Resources;
+import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
