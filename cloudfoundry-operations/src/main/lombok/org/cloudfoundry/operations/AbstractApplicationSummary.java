@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.operations;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
 import java.util.List;
 
 /**
- * A Cloud Foundry Application
+ * A Cloud Foundry Application summary base class
  */
 @Data
-public final class Application {
+public class AbstractApplicationSummary {
 
     /**
      * The disk quota in bytes
@@ -47,7 +46,7 @@ public final class Application {
     /**
      * The number of instances
      *
-     * @param name the number of instances
+     * @param instances the number of instances
      * @return the number of instances
      */
     private final Integer instances;
@@ -92,15 +91,14 @@ public final class Application {
      */
     private final List<String> urls;
 
-    @Builder
-    private Application(Integer diskQuota,
-                        String id,
-                        Integer instances,
-                        Integer memoryLimit,
-                        String name,
-                        String requestedState,
-                        Integer runningInstances,
-                        @Singular List<String> urls) {
+    protected AbstractApplicationSummary(Integer diskQuota,
+                                         String id,
+                                         Integer instances,
+                                         Integer memoryLimit,
+                                         String name,
+                                         String requestedState,
+                                         Integer runningInstances,
+                                         @Singular List<String> urls) {
 
         this.diskQuota = diskQuota;
         this.id = id;
