@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.operations.v2.Paginated;
+import org.cloudfoundry.operations.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.Mono;
 import reactor.fn.Function;
@@ -66,7 +67,7 @@ final class DefaultApplications implements Applications {
                 .and(this.spaceId)
                 .then(requestApplicationResource(this.cloudFoundryClient))
                 .then(gatherApplicationInfo(this.cloudFoundryClient))
-                .then(toApplicationDetail());
+                .map(toApplicationDetail());
     }
 
     @Override
@@ -93,17 +94,18 @@ final class DefaultApplications implements Applications {
     }
 
     private static Function<ApplicationResource, Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>>>
-    gatherApplicationInfo(final CloudFoundryClient client) {
+    gatherApplicationInfo(final CloudFoundryClient cloudFoundryClient) {
         return new Function<ApplicationResource, Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>>>() {
 
             @Override
             public Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> apply(ApplicationResource applicationResource) {
-                String appId = applicationResource.getMetadata().getId();
-                String stackId = applicationResource.getEntity().getStackId();
+                String applicationId = Resources.getId(applicationResource);
+                String stackId = Resources.getEntity(applicationResource).getStackId();
 
-                return Mono.when(requestApplicationStats(client, appId), requestApplicationSummary(client, appId), requestStack(client, stackId), requestApplicationInstances(client, appId));
+                return Mono.when(requestApplicationStats(cloudFoundryClient, applicationId), requestApplicationSummary(cloudFoundryClient, applicationId), requestStack(cloudFoundryClient, stackId),
+                        requestApplicationInstances(cloudFoundryClient, applicationId));
             }
-            
+
         };
     }
 
@@ -113,42 +115,44 @@ final class DefaultApplications implements Applications {
                 .orElse(emptyNull(response.getDetectedBuildpack()));
     }
 
-    private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient client, String appId) {
+    private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
-                .id(appId)
+                .id(applicationId)
                 .build();
 
-        return client.applicationsV2().instances(request);
+        return cloudFoundryClient.applicationsV2().instances(request);
     }
 
-    private static Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>> requestApplicationResource(final CloudFoundryClient client) {
+    private static Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>> requestApplicationResource(final CloudFoundryClient cloudFoundryClient) {
         return new Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>>() {
 
             @Override
-            public Mono<ApplicationResource> apply(final Tuple2<GetApplicationRequest, String> tuple) {
-                return Paginated.requestResources(requestListApplicationsPage(client, tuple)).single();
+            public Mono<ApplicationResource> apply(Tuple2<GetApplicationRequest, String> tuple) {
+                return Paginated
+                        .requestResources(requestListApplicationsPage(cloudFoundryClient, tuple))
+                        .single();
             }
 
         };
     }
 
-    private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient client, String appId) {
+    private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
         ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
-                .id(appId)
+                .id(applicationId)
                 .build();
 
-        return client.applicationsV2().statistics(request);
+        return cloudFoundryClient.applicationsV2().statistics(request);
     }
 
-    private static Mono<SummaryApplicationResponse> requestApplicationSummary(CloudFoundryClient client, String appId) {
+    private static Mono<SummaryApplicationResponse> requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {
         SummaryApplicationRequest request = SummaryApplicationRequest.builder()
-                .id(appId)
+                .id(applicationId)
                 .build();
 
-        return client.applicationsV2().summary(request);
+        return cloudFoundryClient.applicationsV2().summary(request);
     }
 
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient client, final Tuple2<GetApplicationRequest, String> tuple) {
+    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient cloudFoundryClient, final Tuple2<GetApplicationRequest, String> tuple) {
         return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
             @Override
@@ -162,13 +166,13 @@ final class DefaultApplications implements Applications {
                         .page(page)
                         .build();
 
-                return client.spaces().listApplications(request);
+                return cloudFoundryClient.spaces().listApplications(request);
             }
 
         };
     }
 
-    private static Function<String, Mono<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient client) {
+    private static Function<String, Mono<GetSpaceSummaryResponse>> requestSpaceSummary(final CloudFoundryClient cloudFoundryClient) {
         return new Function<String, Mono<GetSpaceSummaryResponse>>() {
 
             @Override
@@ -177,32 +181,18 @@ final class DefaultApplications implements Applications {
                         .id(targetedSpace)
                         .build();
 
-                return client.spaces().getSummary(request);
+                return cloudFoundryClient.spaces().getSummary(request);
             }
 
         };
     }
 
-    private static Mono<GetStackResponse> requestStack(CloudFoundryClient client, String stackId) {
+    private static Mono<GetStackResponse> requestStack(CloudFoundryClient cloudFoundryClient, String stackId) {
         GetStackRequest request = GetStackRequest.builder()
                 .id(stackId)
                 .build();
 
-        return client.stacks().get(request);
-    }
-
-    private static Function<Route, String> routeToUrlString() {
-        return new Function<Route, String>() {
-
-            @Override
-            public String apply(Route r) {
-                String hostName = r.getHost();
-                String domainName = r.getDomain().getName();
-
-                return hostName.isEmpty() ? domainName : String.format("%s.%s", hostName, domainName);
-            }
-
-        };
+        return cloudFoundryClient.stacks().get(request);
     }
 
     private static Function<SpaceApplicationSummary, ApplicationSummary> toApplication() {
@@ -225,42 +215,29 @@ final class DefaultApplications implements Applications {
         };
     }
 
-    private static Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, Mono<ApplicationDetail>> toApplicationDetail() {
-        return new Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, Mono<ApplicationDetail>>() {
+    private static Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, ApplicationDetail> toApplicationDetail() {
+        return new Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, ApplicationDetail>() {
 
             @Override
-            public Mono<ApplicationDetail> apply(Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse> tuple) {
-                ApplicationStatisticsResponse statisticsResponse = tuple.t1;
-                SummaryApplicationResponse summary = tuple.t2;
-                GetStackResponse stackResponse = tuple.t3;
-                ApplicationInstancesResponse instancesResponse = tuple.t4;
+            public ApplicationDetail apply(Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse> tuple) {
+                ApplicationStatisticsResponse applicationStatisticsResponse = tuple.t1;
+                SummaryApplicationResponse summaryApplicationResponse = tuple.t2;
+                GetStackResponse getStackResponse = tuple.t3;
+                ApplicationInstancesResponse applicationInstancesResponse = tuple.t4;
 
-                return Stream.fromIterable(summary.getRoutes())
-                        .map(routeToUrlString())
-                        .toList()
-                        .map(toApplicationDetail(summary, stackResponse, toInstanceDetailList(instancesResponse, statisticsResponse)));
-            }
+                List<String> urls = toUrls(summaryApplicationResponse.getRoutes());
 
-        };
-    }
-
-    private static Function<List<String>, ApplicationDetail> toApplicationDetail(final SummaryApplicationResponse summary, final GetStackResponse stackResponse,
-                                                                                 final List<ApplicationDetail.InstanceDetail> instanceDetails) {
-        return new Function<List<String>, ApplicationDetail>() {
-
-            @Override
-            public ApplicationDetail apply(List<String> urls) {
                 return ApplicationDetail.builder()
-                        .id(summary.getId())
-                        .diskQuota(summary.getDiskQuota())
-                        .memoryLimit(summary.getMemory())
-                        .requestedState(summary.getState())
-                        .instances(summary.getInstances())
+                        .id(summaryApplicationResponse.getId())
+                        .diskQuota(summaryApplicationResponse.getDiskQuota())
+                        .memoryLimit(summaryApplicationResponse.getMemory())
+                        .requestedState(summaryApplicationResponse.getState())
+                        .instances(summaryApplicationResponse.getInstances())
                         .urls(urls)
-                        .lastUploaded(toDate(summary.getPackageUpdatedAt()))
-                        .stack(stackResponse.getEntity().getName())
-                        .buildpack(getBuildpack(summary))
-                        .instanceDetails(instanceDetails)
+                        .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
+                        .stack(getStackResponse.getEntity().getName())
+                        .buildpack(getBuildpack(summaryApplicationResponse))
+                        .instanceDetails(toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse))
                         .build();
             }
 
@@ -303,12 +280,26 @@ final class DefaultApplications implements Applications {
     }
 
     private static List<ApplicationDetail.InstanceDetail> toInstanceDetailList(ApplicationInstancesResponse instancesResponse, ApplicationStatisticsResponse statisticsResponse) {
-        List<ApplicationDetail.InstanceDetail> instanceDetails = new ArrayList<>();
+        List<ApplicationDetail.InstanceDetail> instanceDetails = new ArrayList<>(instancesResponse.size());
+
         for (Map.Entry<String, ApplicationInstanceInfo> entry : instancesResponse.entrySet()) {
             instanceDetails.add(toInstanceDetail(entry, statisticsResponse));
         }
 
         return instanceDetails;
+    }
+
+    private static List<String> toUrls(List<Route> routes) {
+        List<String> urls = new ArrayList<>(routes.size());
+
+        for (Route route : routes) {
+            String hostName = route.getHost();
+            String domainName = route.getDomain().getName();
+
+            urls.add(hostName.isEmpty() ? domainName : String.format("%s.%s", hostName, domainName));
+        }
+
+        return urls;
     }
 
 }
