@@ -102,7 +102,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                 })
                 .map(response -> response.getMetadata().getId())
-                .to(Promise.prepare());
+                .as(Promise::from);
     }
 
     @Test

@@ -98,12 +98,12 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No organization targeted"));
         }
 
-        Mono<String> organizationId = Paginated
-                .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
-                .single()
-                .map(Resources.extractId())
-                .otherwise(Exceptions.<String>convert(String.format("Organization %s does not exist", organization)))
-                .to(Promise.<String>prepare());
+        Mono<String> organizationId = Promise
+                .from(Paginated
+                        .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
+                        .single()
+                        .map(Resources.extractId())
+                        .otherwise(Exceptions.<String>convert(String.format("Organization %s does not exist", organization))));
 
         organizationId.get();
         return organizationId;
@@ -114,13 +114,13 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
 
-        Mono<String> spaceId = Stream
-                .from(organizationId
-                        .flatMap(requestResources(cloudFoundryClient, space)))
-                .single()
-                .map(Resources.extractId())
-                .otherwise(Exceptions.<String>convert(String.format("Space %s does not exist", space)))
-                .to(Promise.<String>prepare());
+        Mono<String> spaceId = Promise
+                .from(Stream
+                        .from(organizationId
+                                .flatMap(requestResources(cloudFoundryClient, space)))
+                        .single()
+                        .map(Resources.extractId())
+                        .otherwise(Exceptions.<String>convert(String.format("Space %s does not exist", space))));
 
         spaceId.get();
         return spaceId;

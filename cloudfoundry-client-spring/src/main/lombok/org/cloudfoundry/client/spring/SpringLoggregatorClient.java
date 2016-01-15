@@ -41,7 +41,6 @@ import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.BiConsumer;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
-import reactor.rx.Promise;
 import reactor.rx.Stream;
 
 import javax.websocket.ClientEndpointConfig;
@@ -157,7 +156,6 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                     }
 
                 })
-                .to(Promise.<URI>prepare())
                 .get();
 
     }
