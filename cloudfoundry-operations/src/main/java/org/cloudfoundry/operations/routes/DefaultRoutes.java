@@ -210,6 +210,7 @@ public final class DefaultRoutes implements Routes {
                 org.cloudfoundry.client.v2.routes.CreateRouteRequest request = org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                         .domainId(domainId)
                         .host(createRouteRequest.getHost())
+                        .path(createRouteRequest.getPath())
                         .spaceId(spaceId)
                         .build();
 
