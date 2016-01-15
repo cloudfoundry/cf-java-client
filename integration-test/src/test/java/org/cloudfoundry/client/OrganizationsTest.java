@@ -22,7 +22,6 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
@@ -32,7 +31,6 @@ import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
-import reactor.fn.tuple.Tuple;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
@@ -136,23 +134,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .build();
 
         this.cloudFoundryClient.organizations().create(request)
-                .map(response -> Tuple.of(response.getEntity().getName(), response.getMetadata().getId()))
-                .doOnSuccess(tuple -> deleteOrg(this.cloudFoundryClient, tuple.t2)) // avoid polluting test environment
-                .map(tuple -> tuple.t1)
-                .subscribe(this.testSubscriber().assertEquals("test-org"));
-    }
-
-    private static final void deleteOrg(CloudFoundryClient client, String orgId) {
-        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
-                .id(orgId)
-                .build();
-
-        client.organizations().delete(request).get();
+                .map(response -> Resources.getEntity(response).getName())
+                .subscribe(this.testSubscriber()
+                        .assertEquals("test-org"));
     }
 
     private Mono<String> getAdminId() {
-        return Paginated.requestResources(
-                page -> {
+        return Paginated
+                .requestResources(page -> {
                     ListUsersRequest request = ListUsersRequest.builder()
                             .page(page)
                             .build();
@@ -163,4 +152,5 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .single()
                 .map(Resources::getId);
     }
+
 }
