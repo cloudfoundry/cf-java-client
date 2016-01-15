@@ -19,21 +19,11 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-29thread %-5level:  %msg%n</pattern>
+            <pattern>%-28thread %-26logger %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="STREAM" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%date{mm:ss.SSS} %-29thread %-35logger  %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <logger name="stream" level="INFO" additivity="false">
-        <appender-ref ref="STREAM" />
-    </logger>
-
-    <logger name="cloudfoundry-client-spring" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="stream" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

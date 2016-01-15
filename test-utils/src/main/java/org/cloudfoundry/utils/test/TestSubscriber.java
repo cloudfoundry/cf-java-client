@@ -19,8 +19,13 @@ package org.cloudfoundry.utils.test;
 import org.junit.Assert;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.error.Exceptions;
 import reactor.fn.Consumer;
+import reactor.fn.Supplier;
+import reactor.fn.tuple.Tuple;
+import reactor.fn.tuple.Tuple2;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -40,6 +45,10 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private volatile Throwable errorActual;
 
     private Consumer<? super Throwable> errorExpectation;
+
+    private Consumer<Tuple2<Long, Long>> performanceCallback;
+
+    private long startTime;
 
     public TestSubscriber<T> assertEquals(final T expected) {
         assertThat(new Consumer<T>() {
@@ -92,12 +101,35 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onSubscribe(Subscription s) {
+        this.startTime = System.currentTimeMillis();
         s.request(Long.MAX_VALUE);
+    }
+
+    public TestSubscriber<T> setPerformanceCallback(Consumer<Tuple2<Long, Long>> performanceCallback) {
+        this.performanceCallback = performanceCallback;
+        return this;
+    }
+
+    public TestSubscriber<T> setPerformanceLoggerName(final Supplier<String> name) {
+        return setPerformanceCallback(new Consumer<Tuple2<Long, Long>>() {
+            @Override
+            public void accept(Tuple2<Long, Long> tuple) {
+                Long startTime = tuple.t1;
+                Long finishTime = tuple.t2;
+
+                Logger logger = LoggerFactory.getLogger(String.format("performance.%s", name.get()));
+                logger.debug("{} ms", finishTime - startTime);
+            }
+        });
     }
 
     public void verify(long timeout, TimeUnit unit) throws InterruptedException {
         if (!this.latch.await(timeout, unit)) {
             throw new IllegalStateException("Subscriber timed out");
+        }
+
+        if (this.performanceCallback != null) {
+            this.performanceCallback.accept(Tuple.of(this.startTime, System.currentTimeMillis()));
         }
 
         verifyError();

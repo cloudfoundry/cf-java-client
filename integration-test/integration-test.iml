@@ -48,14 +48,14 @@
     <orderEntry type="module" module-name="cloudfoundry-operations" scope="TEST" />
     <orderEntry type="module" module-name="test-utils" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter:1.3.1.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot:1.3.1.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-autoconfigure:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-classic:1.1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-core:1.1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:jul-to-slf4j:1.7.13" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:log4j-over-slf4j:1.7.13" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter:1.3.1.RELEASE" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot:1.3.1.RELEASE" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-autoconfigure:1.3.1.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-core:4.2.4.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.yaml:snakeyaml:1.16" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:1.3.1.RELEASE" level="project" />

@@ -28,6 +28,8 @@ import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,11 @@ public abstract class AbstractIntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger("test");
 
-    private final TestSubscriber<?> testSubscriber = new TestSubscriber<>();
+    @Rule
+    public final TestName testName = new TestName();
+
+    private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
+            .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
 
     @Autowired
     protected CloudFoundryClient cloudFoundryClient;

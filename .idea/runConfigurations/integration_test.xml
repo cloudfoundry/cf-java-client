@@ -25,6 +25,8 @@
       <env name="TEST_USERNAME" value="admin" />
       <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
       <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
+      <env name="PERFORMANCE_LOGGING_LEVEL" value="INFO" />
+      <env name="" value="" />
     </envs>
     <patterns />
     <method />
