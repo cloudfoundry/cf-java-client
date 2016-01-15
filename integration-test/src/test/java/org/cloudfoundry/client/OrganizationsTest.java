@@ -19,17 +19,20 @@ package org.cloudfoundry.client;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple;
-import reactor.rx.Stream;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
@@ -75,6 +78,53 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeAuditorByUsername(request);
+                })
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void billingManager() {
+        getAdminId()
+                .and(this.organizationId)
+                .then(tuple -> {
+                    AssociateOrganizationBillingManagerRequest request = AssociateOrganizationBillingManagerRequest.builder()
+                            .billingManagerId(tuple.t1)
+                            .id(tuple.t2)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().associateBillingManager(request)
+                            .and(Mono.just(tuple.t1));
+                })
+                .then(tuple -> {
+                    RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
+                            .billingManagerId(tuple.t2)
+                            .id(Resources.getId(tuple.t1))
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removeBillingManager(request);
+                })
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void billingManagerByUsername() {
+        this.organizationId
+                .then(orgId -> {
+                    AssociateOrganizationBillingManagerByUsernameRequest request = AssociateOrganizationBillingManagerByUsernameRequest.builder()
+                            .username("admin")
+                            .id(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().associateBillingManagerByUsername(request)
+                            .and(Mono.just(orgId));
+                })
+                .then(tuple -> {
+                    RemoveOrganizationBillingManagerByUsernameRequest request = RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                            .username("admin")
+                            .id(tuple.t2)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removeBillingManagerByUsername(request);
                 })
                 .subscribe(this.testSubscriber());
     }
