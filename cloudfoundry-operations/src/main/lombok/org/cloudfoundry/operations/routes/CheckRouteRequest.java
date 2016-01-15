@@ -43,10 +43,21 @@ public final class CheckRouteRequest implements Validatable {
      */
     private final String host;
 
+    /**
+     * The path of the route.
+     * 
+     * Note: the path must be specified without a leading "/"
+     *
+     * @param path the path of the route
+     * @return the path of the route
+     */
+    private final String path;
+
     @Builder
-    CheckRouteRequest(String domain, String host) {
+    CheckRouteRequest(String domain, String host, String path) {
         this.domain = domain;
         this.host = host;
+        this.path = path;
     }
 
     @Override
