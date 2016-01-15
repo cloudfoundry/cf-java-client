@@ -17,8 +17,11 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,5 +49,26 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
         client.organizations().delete(request).get();
     }
+    
+    @Test
+    public void auditorByUsername() {
+        this.organizationId
+                .then(orgId -> {
+                    AssociateOrganizationAuditorByUsernameRequest request = AssociateOrganizationAuditorByUsernameRequest.builder()
+                            .username("admin")
+                            .id(orgId)
+                            .build();
 
+                    return this.cloudFoundryClient.organizations().associateAuditorByUsername(request);
+                })
+                .then(response -> {
+                    RemoveOrganizationAuditorByUsernameRequest request = RemoveOrganizationAuditorByUsernameRequest.builder()
+                            .username("admin")
+                            .id(response.getMetadata().getId())
+                            .build();
+                    
+                    return this.cloudFoundryClient.organizations().removeAuditorByUsername(request);
+                })
+                .subscribe(this.testSubscriber());
+    }
 }
