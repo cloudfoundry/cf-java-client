@@ -21,8 +21,12 @@ import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -38,6 +42,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.Mono;
+import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
@@ -76,6 +81,8 @@ public abstract class AbstractIntegrationTest {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
                 .after(() -> cleanupDomains(this.cloudFoundryClient))
+                .after(() -> cleanupSpaces(this.cloudFoundryClient, this.spaceId))
+                .after(() -> cleanupOrganizations(this.cloudFoundryClient, this.organizationId))
                 .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
                 .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
                 .after()
@@ -139,6 +146,33 @@ public abstract class AbstractIntegrationTest {
                 });
     }
 
+    private static Stream<Void> cleanupOrganizations(CloudFoundryClient cloudFoundryClient, Mono<String> defaultOrganizationId) {
+        return Paginated
+                .requestResources(page -> {
+                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return cloudFoundryClient.organizations().list(request);
+                })
+                .map(Resources::getId)
+                .withLatestFrom(defaultOrganizationId, Tuple::of)
+                .filter(tuple -> {
+                    String organizationId = tuple.t1;
+                    String defaultOrganizationId2 = tuple.t2;
+
+                    return !organizationId.equals(defaultOrganizationId2);
+                })
+                .map(Tuple2::getT1)
+                .flatMap(organizationId -> {
+                    DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                            .id(organizationId)
+                            .build();
+
+                    return cloudFoundryClient.organizations().delete(request);
+                });
+    }
+
     private static Stream<Void> cleanupRoutes(CloudFoundryClient cloudFoundryClient) {
         return Paginated
                 .requestResources(page -> {
@@ -154,6 +188,33 @@ public abstract class AbstractIntegrationTest {
                             .build();
 
                     return cloudFoundryClient.routes().delete(request);
+                });
+    }
+
+    private static Stream<Void> cleanupSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> defaultSpaceId) {
+        return Paginated
+                .requestResources(page -> {
+                    ListSpacesRequest request = ListSpacesRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return cloudFoundryClient.spaces().list(request);
+                })
+                .map(Resources::getId)
+                .withLatestFrom(defaultSpaceId, Tuple::of)
+                .filter(tuple -> {
+                    String spaceId = tuple.t1;
+                    String defaultSpaceId2 = tuple.t2;
+
+                    return !spaceId.equals(defaultSpaceId2);
+                })
+                .map(Tuple2::getT1)
+                .flatMap(spaceId -> {
+                    DeleteSpaceRequest request = DeleteSpaceRequest.builder()
+                            .id(spaceId)
+                            .build();
+
+                    return cloudFoundryClient.spaces().delete(request);
                 });
     }
 
