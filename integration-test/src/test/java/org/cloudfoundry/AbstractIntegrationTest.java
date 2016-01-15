@@ -73,6 +73,9 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected Mono<String> spaceId;
 
+    @Autowired
+    protected Mono<String> stackId;
+
     @Value("${test.space}")
     protected String testSpaceName;
 
@@ -92,7 +95,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(10, SECONDS);
+        this.testSubscriber.verify(25, SECONDS);
     }
 
     @After

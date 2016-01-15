@@ -34,6 +34,7 @@
     "enable_ssh": true,
     "docker_credentials_json": {
       "redacted_message": "[PRIVATE DATA HIDDEN]"
-    }
+    },
+    "ports": []
   }
 }

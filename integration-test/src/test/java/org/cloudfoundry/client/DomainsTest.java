@@ -274,7 +274,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private Mono<String> createDomainId(String organizationId) {
         return createDomain(organizationId)
-                .map(response -> response.getMetadata().getId());
+                .map(Resources::getId);
     }
 
 }

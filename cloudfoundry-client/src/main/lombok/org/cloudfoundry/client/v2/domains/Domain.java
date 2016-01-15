@@ -50,13 +50,23 @@ public final class Domain {
      */
     private final String owningOrganizationId;
 
+    /**
+     * The router group id
+     *
+     * @param routerGroupId the router group id
+     * @return the router group id
+     */
+    private final String routerGroupId;
+
     @Builder
     Domain(@JsonProperty("guid") String id,
            @JsonProperty("name") String name,
-           @JsonProperty("owning_organization_guid") String owningOrganizationId) {
+           @JsonProperty("owning_organization_guid") String owningOrganizationId,
+           @JsonProperty("router_group_guid") String routerGroupId) {
         this.id = id;
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
+        this.routerGroupId = routerGroupId;
     }
 
 }

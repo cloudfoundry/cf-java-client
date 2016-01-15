@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
 import reactor.Mono;
-import reactor.core.error.ReactorFatalException;
+import reactor.core.error.Exceptions.UpstreamException;
 import reactor.fn.BiFunction;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -135,7 +135,7 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
                     out.write(bytes);
                     return out;
                 } catch (IOException e) {
-                    throw ReactorFatalException.create(e);
+                    throw new UpstreamException(e);
                 }
             }
         };

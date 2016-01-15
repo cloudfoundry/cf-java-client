@@ -33,6 +33,10 @@
     <name>Integration Test</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <commons-compress.version>1.10</commons-compress.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -47,6 +51,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

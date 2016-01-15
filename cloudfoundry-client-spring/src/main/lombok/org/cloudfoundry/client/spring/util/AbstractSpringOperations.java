@@ -161,7 +161,7 @@ public abstract class AbstractSpringOperations {
                 });
             }
 
-        });
+        }).onBackpressureBlock();
     }
 
     protected final <T> Mono<T> patch(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
