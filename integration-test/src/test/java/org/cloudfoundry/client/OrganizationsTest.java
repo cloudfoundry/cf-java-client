@@ -22,34 +22,41 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequ
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.operations.util.v2.Paginated;
+import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import reactor.Mono;
 import reactor.fn.tuple.Tuple;
+import reactor.rx.Stream;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
-    public void create() {
-        CreateOrganizationRequest createOrganizationRequest = CreateOrganizationRequest.builder()
-                .name("test-org")
-                .build();
+    public void auditor() {
+        getAdminId()
+                .and(this.organizationId)
+                .then(tuple -> {
+                    AssociateOrganizationAuditorRequest request = AssociateOrganizationAuditorRequest.builder()
+                            .auditorId(tuple.t1)
+                            .organizationId(tuple.t2)
+                            .build();
 
-        this.cloudFoundryClient.organizations().create(createOrganizationRequest)
-                .map(response -> Tuple.of(response.getEntity().getName(),response.getMetadata().getId()))
-                .doOnSuccess(tuple -> deleteOrg(this.cloudFoundryClient, tuple.t2)) // avoid polluting test environment
-                .map(tuple -> tuple.t1)
-                .subscribe(this.testSubscriber().assertEquals("test-org"));
+                    return this.cloudFoundryClient.organizations().associateAuditor(request)
+                            .and(Mono.just(tuple.t1));
+                })
+                .then(tuple -> {
+                    RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
+                            .auditorId(tuple.t2)
+                            .id(Resources.getId(tuple.t1))
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removeAuditor(request);
+                })
+                .subscribe(this.testSubscriber());
     }
 
-    private static final void deleteOrg(CloudFoundryClient client, String orgId) {
-        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
-                .id(orgId)
-                .build();
-
-        client.organizations().delete(request).get();
-    }
-    
     @Test
     public void auditorByUsername() {
         this.organizationId
@@ -66,9 +73,44 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .username("admin")
                             .id(response.getMetadata().getId())
                             .build();
-                    
+
                     return this.cloudFoundryClient.organizations().removeAuditorByUsername(request);
                 })
                 .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void create() {
+        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                .name("test-org")
+                .build();
+
+        this.cloudFoundryClient.organizations().create(request)
+                .map(response -> Tuple.of(response.getEntity().getName(), response.getMetadata().getId()))
+                .doOnSuccess(tuple -> deleteOrg(this.cloudFoundryClient, tuple.t2)) // avoid polluting test environment
+                .map(tuple -> tuple.t1)
+                .subscribe(this.testSubscriber().assertEquals("test-org"));
+    }
+
+    private static final void deleteOrg(CloudFoundryClient client, String orgId) {
+        DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                .id(orgId)
+                .build();
+
+        client.organizations().delete(request).get();
+    }
+
+    private Mono<String> getAdminId() {
+        return Paginated.requestResources(
+                page -> {
+                    ListUsersRequest request = ListUsersRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return this.cloudFoundryClient.users().listUsers(request);
+                })
+                .filter(userResource -> Resources.getEntity(userResource).getUsername().equals("admin"))
+                .single()
+                .map(Resources::getId);
     }
 }
