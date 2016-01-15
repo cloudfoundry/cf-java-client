@@ -16,10 +16,11 @@
 
 package org.cloudfoundry.client.spring;
 
+import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
+import org.cloudfoundry.utils.test.TestSubscriber;
 import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
-import reactor.rx.Stream;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.WebSocketContainer;
@@ -31,7 +32,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringLoggregatorClientTest {
 
-    public static final class Recent extends AbstractApiTest<RecentLogsRequest, Long> {
+    public static final class Recent extends AbstractApiTest<RecentLogsRequest, LoggregatorMessage> {
 
         private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
 
@@ -40,6 +41,12 @@ public final class SpringLoggregatorClientTest {
         private final WebSocketContainer webSocketContainer = mock(WebSocketContainer.class, RETURNS_SMART_NULLS);
 
         private final SpringLoggregatorClient client = new SpringLoggregatorClient(this.clientEndpointConfig, this.webSocketContainer, this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected void assertions(TestSubscriber<LoggregatorMessage> testSubscriber, LoggregatorMessage expected) {
+            testSubscriber
+                    .assertCount(14);
+        }
 
         @Override
         protected RecentLogsRequest getInvalidRequest() {
@@ -56,8 +63,8 @@ public final class SpringLoggregatorClientTest {
         }
 
         @Override
-        protected Long getResponse() {
-            return 14L;
+        protected LoggregatorMessage getResponse() {
+            return null;
         }
 
         @Override
@@ -68,10 +75,8 @@ public final class SpringLoggregatorClientTest {
         }
 
         @Override
-        protected Publisher<Long> invoke(RecentLogsRequest request) {
-            return Stream
-                    .from(this.client.recent(request))
-                    .count();
+        protected Publisher<LoggregatorMessage> invoke(RecentLogsRequest request) {
+            return this.client.recent(request);
         }
 
     }

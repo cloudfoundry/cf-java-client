@@ -118,7 +118,7 @@ public final class CloudFoundryOperationsBuilder {
                 .from(Stream
                         .from(organizationId
                                 .flatMap(requestResources(cloudFoundryClient, space)))
-                        .single()
+                        .single()                                                            // TODO: Flux.single() Flux.singleOrEmpty()
                         .map(Resources.extractId())
                         .otherwise(Exceptions.<String>convert(String.format("Space %s does not exist", space))));
 

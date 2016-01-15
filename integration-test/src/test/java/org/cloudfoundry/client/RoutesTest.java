@@ -38,7 +38,6 @@ import reactor.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 import reactor.rx.Promise;
-import reactor.rx.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -60,10 +59,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -241,10 +238,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -261,10 +256,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -282,10 +275,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -303,10 +294,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -328,10 +317,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -353,10 +340,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Ignore("TODO: implement once list stacks available")
@@ -389,10 +374,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -419,10 +402,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -449,10 +430,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -479,10 +458,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -512,10 +489,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(0L));
+                        .assertCount(0));
     }
 
     @Test

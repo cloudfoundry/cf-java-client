@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.loggregator;
 
+import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -53,12 +54,11 @@ public final class LoggregatorMessageHttpMessageConverterTest {
         MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
-        TestSubscriber<Long> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<LoggregatorMessage> testSubscriber = new TestSubscriber<>();
 
         this.messageConverter.readInternal(null, inputMessage)
-                .count()
                 .subscribe(testSubscriber
-                        .assertEquals(14L));
+                        .assertCount(14));
 
         testSubscriber.verify(5, SECONDS);
     }

@@ -33,22 +33,21 @@ public final class MultipartTest {
 
     @Test
     public void test() throws IOException, InterruptedException {
-        TestSubscriber<Long> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<LogMessage> testSubscriber = new TestSubscriber<>();
 
         Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
                 .map(toLogMessage())
-                .count()
                 .subscribe(testSubscriber
-                        .assertEquals(14L));
+                        .assertCount(14));
 
         testSubscriber.verify(5, SECONDS);
     }
 
-    private Function<byte[], Object> toLogMessage() {
-        return new Function<byte[], Object>() {
+    private Function<byte[], LogMessage> toLogMessage() {
+        return new Function<byte[], LogMessage>() {
 
             @Override
-            public Object apply(byte[] part) {
+            public LogMessage apply(byte[] part) {
                 try {
                     return LogMessage.parseFrom(part);
                 } catch (InvalidProtocolBufferException e) {

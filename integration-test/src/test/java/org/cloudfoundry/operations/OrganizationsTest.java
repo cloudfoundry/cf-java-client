@@ -18,17 +18,14 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.junit.Test;
-import reactor.rx.Stream;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        Stream
-                .from(this.cloudFoundryOperations.organizations().list())
-                .count()
+        this.cloudFoundryOperations.organizations().list()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
 }

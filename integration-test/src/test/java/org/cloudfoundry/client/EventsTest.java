@@ -89,7 +89,6 @@ public final class EventsTest extends AbstractIntegrationTest {
 
                     Mono<EventResource> actual = this.cloudFoundryClient.events().list(request)
                             .flatMap(Resources::getResources)
-                            .as(Stream::from)
                             .next();
 
                     return Mono.when(Mono.just(resource), actual);
@@ -108,7 +107,6 @@ public final class EventsTest extends AbstractIntegrationTest {
 
                     Mono<EventResource> actual = this.cloudFoundryClient.events().list(request)
                             .flatMap(Resources::getResources)
-                            .as(Stream::from)
                             .next();
 
                     return Mono.when(Mono.just(resource), actual);

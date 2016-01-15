@@ -34,7 +34,6 @@ import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -91,10 +90,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(2L));
+                        .assertCount(2));
     }
 
     @Test
@@ -110,7 +107,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
-                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -168,10 +164,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().listSpaces(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Ignore("TODO: implement once list users available")
@@ -194,7 +188,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
-                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -218,7 +211,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
                 })
-                .as(Stream::from)
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -236,10 +228,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     @Test
@@ -255,10 +245,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(1L));
+                        .assertCount(1));
     }
 
     private void assertDomainNameAndOrganizationId(Tuple2<DomainEntity, String> tuple) {

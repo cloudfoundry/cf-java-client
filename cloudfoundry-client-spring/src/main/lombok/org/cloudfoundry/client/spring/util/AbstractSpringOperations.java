@@ -85,32 +85,32 @@ public abstract class AbstractSpringOperations {
     protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<ReactiveSession<T>, T> exchange) {
         return Stream
                 .from(Validators
-                        .validate(request))
-                .flatMap(new Function<V, Stream<T>>() {
+                        .validate(request)
+                        .flatMap(new Function<V, Stream<T>>() {
 
-                    @Override
-                    public Stream<T> apply(V request) {
-                        return Stream
-                                .yield(new Consumer<ReactiveSession<T>>() {
+                            @Override
+                            public Stream<T> apply(V request) {
+                                return Stream
+                                        .yield(new Consumer<ReactiveSession<T>>() {
 
-                                    @Override
-                                    public void accept(ReactiveSession<T> session) {
-                                        try {
-                                            T result = exchange.apply(session);
-                                            if (result != null) {
-                                                session.onNext(result);
+                                            @Override
+                                            public void accept(ReactiveSession<T> session) {
+                                                try {
+                                                    T result = exchange.apply(session);
+                                                    if (result != null) {
+                                                        session.onNext(result);
+                                                    }
+
+                                                    session.onComplete();
+                                                } catch (HttpStatusCodeException e) {
+                                                    session.onError(CloudFoundryExceptionBuilder.build(e));
+                                                }
                                             }
 
-                                            session.onComplete();
-                                        } catch (HttpStatusCodeException e) {
-                                            session.onError(CloudFoundryExceptionBuilder.build(e));
-                                        }
-                                    }
+                                        });
+                            }
 
-                                });
-                    }
-
-                })
+                        }))
                 .publishOn(this.processorGroup);
     }
 

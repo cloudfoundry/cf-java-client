@@ -42,6 +42,8 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     private final CountDownLatch latch = new CountDownLatch(1);
 
+    private Integer countExpectation;
+
     private volatile Throwable errorActual;
 
     private Consumer<? super Throwable> errorExpectation;
@@ -49,6 +51,11 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private Consumer<Tuple2<Long, Long>> performanceCallback;
 
     private long startTime;
+
+    public TestSubscriber<T> assertCount(Integer expected) {
+        this.countExpectation = expected;
+        return this;
+    }
 
     public TestSubscriber<T> assertEquals(final T expected) {
         assertThat(new Consumer<T>() {
@@ -133,7 +140,14 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         }
 
         verifyError();
+        verifyCount();
         verifyItems();
+    }
+
+    private void verifyCount() {
+        if (this.countExpectation != null) {
+            Assert.assertEquals("Item count expectation not met", this.countExpectation, (Integer) this.actuals.size());
+        }
     }
 
     private void verifyError() {
@@ -155,11 +169,11 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         for (T actual : this.actuals) {
             Consumer<T> expectation = this.expectations.poll();
 
-            if (expectation == null) {
+            if (expectation != null) {
+                expectation.accept(actual);
+            } else if (this.countExpectation == null) {
                 fail(String.format("Unexpected item %s", actual));
             }
-
-            expectation.accept(actual);
         }
 
         if (!this.expectations.isEmpty()) {
