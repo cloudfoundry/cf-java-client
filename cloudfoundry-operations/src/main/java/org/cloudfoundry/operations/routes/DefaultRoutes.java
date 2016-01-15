@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
@@ -190,6 +191,7 @@ public final class DefaultRoutes implements Routes {
                 RouteExistsRequest request = RouteExistsRequest.builder()
                         .domainId(domainId)
                         .host(checkRouteRequest.getHost())
+                        .path(checkRouteRequest.getPath())
                         .build();
 
                 return cloudFoundryClient.routes().exists(request);
@@ -422,10 +424,13 @@ public final class DefaultRoutes implements Routes {
                 String domainId = tuple.t2;
                 String spaceId = tuple.t3;
 
+                RouteEntity routeEntity = Resources.getEntity(resource);
+                
                 return Route.builder()
                         .applications(applications)
                         .domain(domainId)
-                        .host(Resources.getEntity(resource).getHost())
+                        .host(routeEntity.getHost())
+                        .path(routeEntity.getPath())
                         .routeId(Resources.getId(resource))
                         .space(spaceId)
                         .build();

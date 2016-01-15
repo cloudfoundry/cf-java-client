@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
@@ -120,6 +121,7 @@ public final class DefaultRoutesTest {
         protected Mono<Boolean> invoke() {
             return this.routes.check(fill(CheckRouteRequest.builder())
                     .host("test-invalid-host")
+                    .path(null)
                     .build());
         }
 
@@ -172,7 +174,45 @@ public final class DefaultRoutesTest {
 
         @Override
         protected Mono<Boolean> invoke() {
-            return this.routes.check(fill(CheckRouteRequest.builder()).build());
+            return this.routes.check(fill(CheckRouteRequest.builder())
+                    .path(null)
+                    .build());
+        }
+
+    }
+
+    public static final class CheckRoutePath extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
+                    .id(TEST_ORGANIZATION_ID)
+                    .name("test-domain")
+                    .build();
+            ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
+                    .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
+                    .build();
+            when(this.organizations.listPrivateDomains(request1)).thenReturn(Mono.just(response1));
+
+            RouteExistsRequest request2 = fill(RouteExistsRequest.builder())
+                    .domainId("test-privateDomain-id")
+                    .build();
+            when(this.cloudFoundryClient.routes().exists(request2)).thenReturn(Mono.just(true));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(true);
+        }
+
+        @Override
+        protected Mono<Boolean> invoke() {
+            return this.routes.check(fill(CheckRouteRequest.builder())
+                    .path("test-path")
+                    .build());
         }
 
     }
@@ -215,7 +255,9 @@ public final class DefaultRoutesTest {
 
         @Override
         protected Mono<Boolean> invoke() {
-            return this.routes.check(fill(CheckRouteRequest.builder()).build());
+            return this.routes.check(fill(CheckRouteRequest.builder())
+                    .path(null)
+                    .build());
         }
 
     }
@@ -489,19 +531,21 @@ public final class DefaultRoutesTest {
                     .page(1)
                     .build();
             ListRoutesResponse response1 = fillPage(ListRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-").build())
+                    .resource(fill(RouteResource.builder(), "route-")
+                            .entity(fill(RouteEntity.builder(), "routeEntity-").build())
+                            .build())
                     .build();
             when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Mono.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
-                    .id("test-route-domainId")
+                    .id("test-routeEntity-domainId")
                     .build();
             GetDomainResponse response2 = fill(GetDomainResponse.builder(), "domain-").build();
 
             when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
-                    .id("test-route-spaceId")
+                    .id("test-routeEntity-spaceId")
                     .build();
             GetSpaceResponse response3 = GetSpaceResponse.builder()
                     .entity(fill(SpaceEntity.builder(), "space-response-").build())
@@ -523,7 +567,8 @@ public final class DefaultRoutesTest {
                     .assertEquals(Route.builder()
                             .application("test-application-name")
                             .domain("test-domain-name")
-                            .host("test-route-host")
+                            .host("test-routeEntity-host")
+                            .path("test-routeEntity-path")
                             .routeId("test-route-id")
                             .space("test-space-response-name")
                             .build());
@@ -603,6 +648,7 @@ public final class DefaultRoutesTest {
                             .application("test-routeApplication-name")
                             .domain("test-domain-name")
                             .host("test-route-host")
+                            .path("test-route-path")
                             .space(TEST_SPACE_NAME)
                             .build());
         }
