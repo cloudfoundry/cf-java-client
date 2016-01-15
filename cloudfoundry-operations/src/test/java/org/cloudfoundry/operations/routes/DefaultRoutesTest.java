@@ -477,10 +477,10 @@ public final class DefaultRoutesTest {
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
                     .id(TEST_ORGANIZATION_ID)
-                    .name("test-specificSpace-name")
+                    .name("test-specific-space")
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "specificSpace-").build())
+                    .resource(fill(SpaceResource.builder(), "specific-space-").build())
                     .build();
             when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
 
@@ -496,7 +496,7 @@ public final class DefaultRoutesTest {
             org.cloudfoundry.client.v2.routes.CreateRouteRequest request2 = org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                     .domainId("test-private-id")
                     .host("test-specific-host")
-                    .spaceId("test-specificSpace-id")
+                    .spaceId("test-specific-space-id")
                     .build();
             CreateRouteResponse response2 = CreateRouteResponse.builder().build();
             when(this.cloudFoundryClient.routes().create(request2)).thenReturn(Mono.just(response2));
@@ -509,10 +509,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected Publisher<Void> invoke() {
-            CreateRouteRequest request = CreateRouteRequest.builder()
-                    .domain("test-specific-domain")
-                    .host("test-specific-host")
-                    .space("test-specificSpace-name")
+            CreateRouteRequest request = fill(CreateRouteRequest.builder(), "specific-")
+                    .path(null)
                     .build();
 
             return this.routes.create(request);
