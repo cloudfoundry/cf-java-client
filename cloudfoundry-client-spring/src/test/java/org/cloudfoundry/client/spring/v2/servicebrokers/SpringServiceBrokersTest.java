@@ -26,7 +26,6 @@ import reactor.Mono;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 
-
 public final class SpringServiceBrokersTest {
 
     public static final class Create extends AbstractApiTest<CreateServiceBrokerRequest, CreateServiceBrokerResponse> {
@@ -43,9 +42,9 @@ public final class SpringServiceBrokersTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(POST).path("v2/service_brokers")
-                    .requestPayload("v2/service_brokers/POST_{id}_create_service_broker_request.json")
+                    .requestPayload("v2/service_brokers/POST_request.json")
                     .status(CREATED)
-                    .responsePayload("v2/service_brokers/POST_{id}_create_service_broker_response.json");
+                    .responsePayload("v2/service_brokers/POST_response.json");
         }
 
         @Override
@@ -59,7 +58,7 @@ public final class SpringServiceBrokersTest {
                     .entity(ServiceBrokerEntity.builder()
                             .name("service-broker-name")
                             .brokerUrl("https://broker.example.com")
-                            .authUsername("admin")
+                            .authenticationUsername("admin")
                             .build())
                     .build();
         }
@@ -68,8 +67,8 @@ public final class SpringServiceBrokersTest {
         protected CreateServiceBrokerRequest getValidRequest() throws Exception {
             return CreateServiceBrokerRequest.builder()
                     .name("service-broker-name")
-                    .authPassword("secretpassw0rd")
-                    .authUsername("admin")
+                    .authenticationPassword("secretpassw0rd")
+                    .authenticationUsername("admin")
                     .brokerUrl("https://broker.example.com")
                     .build();
         }

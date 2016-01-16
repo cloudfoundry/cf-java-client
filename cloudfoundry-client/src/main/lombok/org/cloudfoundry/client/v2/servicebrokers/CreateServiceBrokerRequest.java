@@ -34,7 +34,7 @@ public final class CreateServiceBrokerRequest implements Validatable {
      * @return the password for authentication
      */
     @Getter(onMethod = @__(@JsonProperty("auth_password")))
-    private final String authPassword;
+    private final String authenticationPassword;
 
     /**
      * The username with which to authenticate against the service broker.
@@ -43,7 +43,7 @@ public final class CreateServiceBrokerRequest implements Validatable {
      * @return the username for authentication
      */
     @Getter(onMethod = @__(@JsonProperty("auth_username")))
-    private final String authUsername;
+    private final String authenticationUsername;
 
     /**
      * The url of the service broker.
@@ -73,13 +73,13 @@ public final class CreateServiceBrokerRequest implements Validatable {
     private final String spaceId;
 
     @Builder
-    CreateServiceBrokerRequest(String authPassword,
-                               String authUsername,
+    CreateServiceBrokerRequest(String authenticationPassword,
+                               String authenticationUsername,
                                String brokerUrl,
                                String name,
                                String spaceId) {
-        this.authPassword = authPassword;
-        this.authUsername = authUsername;
+        this.authenticationPassword = authenticationPassword;
+        this.authenticationUsername = authenticationUsername;
         this.brokerUrl = brokerUrl;
         this.name = name;
         this.spaceId = spaceId;
@@ -93,16 +93,16 @@ public final class CreateServiceBrokerRequest implements Validatable {
             builder.message("name must be specified");
         }
 
-        if (this.authUsername == null) {
-            builder.message("username must be specified");
+        if (this.authenticationUsername == null) {
+            builder.message("authentication username must be specified");
         }
 
-        if (this.authPassword == null) {
-            builder.message("password must be specified");
+        if (this.authenticationPassword == null) {
+            builder.message("authentication password must be specified");
         }
 
         if (this.brokerUrl == null) {
-            builder.message("url must be specified");
+            builder.message("broker url must be specified");
         }
 
         return builder.build();

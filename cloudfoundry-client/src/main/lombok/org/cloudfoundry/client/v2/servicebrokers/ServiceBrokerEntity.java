@@ -32,7 +32,7 @@ public final class ServiceBrokerEntity {
      * @param authUsername the authentication username
      * @return the authentication username
      */
-    private final String authUsername;
+    private final String authenticationUsername;
 
     /**
      * The url of the service broker.
@@ -59,11 +59,11 @@ public final class ServiceBrokerEntity {
     private final String spaceId;
 
     @Builder
-    ServiceBrokerEntity(@JsonProperty("auth_username") String authUsername,
+    ServiceBrokerEntity(@JsonProperty("auth_username") String authenticationUsername,
                         @JsonProperty("broker_url") String brokerUrl,
                         @JsonProperty("name") String name,
                         @JsonProperty("space_guid") String spaceId) {
-        this.authUsername = authUsername;
+        this.authenticationUsername = authenticationUsername;
         this.brokerUrl = brokerUrl;
         this.name = name;
         this.spaceId = spaceId;
