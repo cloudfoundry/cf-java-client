@@ -176,35 +176,4 @@ public final class ServiceInstanceEntity {
         this.type = type;
     }
 
-    /**
-     * The last operation payload for the List Service Instances operation
-     */
-    @Data
-    public static final class LastOperation {
-
-        private final String createdAt;
-
-        private final String description;
-
-        private final String state;
-
-        private final String type;
-
-        private final String updatedAt;
-
-        @Builder
-        LastOperation(@JsonProperty("created_at") String createdAt,
-                      @JsonProperty("description") String description,
-                      @JsonProperty("state") String state,
-                      @JsonProperty("type") String type,
-                      @JsonProperty("updated_at") String updatedAt) {
-            this.createdAt = createdAt;
-            this.description = description;
-            this.state = state;
-            this.type = type;
-            this.updatedAt = updatedAt;
-        }
-
-    }
-
 }

@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
@@ -79,7 +80,7 @@ public final class SpringServiceInstancesTest {
                             .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
                             .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
                             .type("managed_service_instance")
-                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                            .lastOperation(LastOperation.builder()
                                     .createdAt("2015-07-27T22:43:08Z")
                                     .updatedAt("2015-07-27T22:43:08Z")
                                     .description("")
@@ -186,7 +187,7 @@ public final class SpringServiceInstancesTest {
                             .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
                             .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
                             .type("managed_service_instance")
-                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                            .lastOperation(LastOperation.builder()
                                     .type("create")
                                     .state("succeeded")
                                     .description("service broker-provided description")
@@ -253,7 +254,7 @@ public final class SpringServiceInstancesTest {
                                     .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
                                     .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
                                     .type("managed_service_instance")
-                                    .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                                    .lastOperation(LastOperation.builder()
                                             .type("create")
                                             .state("succeeded")
                                             .description("service broker-provided description")
@@ -380,7 +381,7 @@ public final class SpringServiceInstancesTest {
                             .servicePlanId("b07ff29a-78b8-486f-87a8-3f695368b83d")
                             .spaceId("04219ffa-a817-459f-bbd7-c161bdca541b")
                             .type("managed_service_instance")
-                            .lastOperation(ServiceInstanceEntity.LastOperation.builder()
+                            .lastOperation(LastOperation.builder()
                                     .createdAt("2015-07-27T22:43:08Z")
                                     .updatedAt("2015-07-27T22:43:08Z")
                                     .description("")
