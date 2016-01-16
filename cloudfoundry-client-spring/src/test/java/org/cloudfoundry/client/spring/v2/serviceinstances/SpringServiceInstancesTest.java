@@ -61,9 +61,9 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(POST).path("v2/service_instances?accepts_incomplete=true")
-                    .requestPayload("v2/service_instances/POST_{id}_create_service_instance_request.json")
+                    .requestPayload("v2/service_instances/POST_request.json")
                     .status(CREATED)
-                    .responsePayload("v2/service_instances/POST_{id}_create_service_binding_response.json");
+                    .responsePayload("v2/service_instances/POST_response.json");
         }
 
         @Override
@@ -362,9 +362,9 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(PUT).path("v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41?accepts_incomplete=true")
-                    .requestPayload("v2/service_instances/PUT_{id}_update_service_instance_request.json")
+                    .requestPayload("v2/service_instances/PUT_{id}_request.json")
                     .status(CREATED)
-                    .responsePayload("v2/service_instances/PUT_{id}_update_service_instance_response.json");
+                    .responsePayload("v2/service_instances/PUT_{id}_response.json");
         }
 
         @Override
