@@ -56,7 +56,7 @@ public final class ServiceInstance {
      * @param lastOperation the last operation
      * @return the last operation
      */
-    private final String lastOperation;
+    private final LastOperation lastOperation;
 
     /**
      * The name
@@ -78,7 +78,7 @@ public final class ServiceInstance {
     ServiceInstance(@JsonProperty("bound_app_count") Integer boundApplicationCount,
                     @JsonProperty("dashboard_url") String dashboardUrl,
                     @JsonProperty("guid") String id,
-                    @JsonProperty("last_operation") String lastOperation,
+                    @JsonProperty("last_operation") LastOperation lastOperation,
                     @JsonProperty("name") String name,
                     @JsonProperty("service_plan") Plan servicePlan) {
         this.boundApplicationCount = boundApplicationCount;
