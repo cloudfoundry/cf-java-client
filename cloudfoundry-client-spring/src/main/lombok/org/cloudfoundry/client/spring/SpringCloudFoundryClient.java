@@ -35,6 +35,7 @@ import org.cloudfoundry.client.spring.v2.jobs.SpringJobs;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.servicebindings.SpringServiceBindings;
+import org.cloudfoundry.client.spring.v2.servicebrokers.SpringServiceBrokers;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
 import org.cloudfoundry.client.spring.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.client.spring.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
@@ -52,6 +53,7 @@ import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
@@ -123,6 +125,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final ServiceBindings serviceBindings;
 
+    private final ServiceBrokers serviceBrokers;
+
     private final ServiceInstances serviceInstances;
 
     private final SharedDomains sharedDomains;
@@ -185,6 +189,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
         this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
         this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
@@ -209,6 +214,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
         this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
         this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
@@ -269,6 +275,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public ServiceBindings serviceBindings() {
         return this.serviceBindings;
+    }
+
+    @Override
+    public ServiceBrokers serviceBrokers() {
+        return this.serviceBrokers;
     }
 
     @Override
