@@ -55,9 +55,9 @@ public final class SpringServiceBindingsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(POST).path("v2/service_bindings")
-                    .requestPayload("v2/service_bindings/POST_{id}_create_service_binding_request.json")
+                    .requestPayload("v2/service_bindings/POST_request.json")
                     .status(CREATED)
-                    .responsePayload("v2/service_bindings/POST_{id}_create_service_binding_response.json");
+                    .responsePayload("v2/service_bindings/POST_response.json");
         }
 
         @Override
