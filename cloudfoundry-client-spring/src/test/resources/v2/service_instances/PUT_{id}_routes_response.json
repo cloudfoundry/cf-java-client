@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "guid": "e7e5b08e-c530-4c1c-b420-fa0b09b3770d",
+    "url": "/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d",
+    "created_at": "2015-12-22T18:27:58Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-160",
+    "credentials": {
+      "creds-key-89": "creds-val-89"
+    },
+    "service_plan_guid": "957307f5-6811-4eba-8667-ffee5a704a4a",
+    "space_guid": "36b01ada-ef02-4ff5-9f78-cd9e704211d2",
+    "gateway_data": null,
+    "dashboard_url": null,
+    "type": "managed_service_instance",
+    "last_operation": null,
+    "tags": [
+
+    ],
+    "space_url": "/v2/spaces/36b01ada-ef02-4ff5-9f78-cd9e704211d2",
+    "service_plan_url": "/v2/service_plans/957307f5-6811-4eba-8667-ffee5a704a4a",
+    "service_bindings_url": "/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/service_bindings",
+    "service_keys_url": "/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/service_keys",
+    "routes_url": "/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/routes"
+  }
+}

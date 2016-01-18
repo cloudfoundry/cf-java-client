@@ -20,6 +20,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
@@ -55,6 +57,18 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
      */
     public SpringServiceInstances(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
         super(restOperations, root, processorGroup);
+    }
+
+    @Override
+    public Mono<BindServiceInstanceToRouteResponse> bindToRoute(final BindServiceInstanceToRouteRequest request) {
+        return put(request, BindServiceInstanceToRouteResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances", request.getId(), "routes", request.getRouteId());
+            }
+
+        });
     }
 
     @Override
