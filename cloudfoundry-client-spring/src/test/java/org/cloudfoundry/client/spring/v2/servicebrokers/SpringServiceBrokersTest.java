@@ -20,11 +20,14 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
+import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import reactor.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 public final class SpringServiceBrokersTest {
 
@@ -78,6 +81,38 @@ public final class SpringServiceBrokersTest {
             return this.serviceBrokers.create(request);
         }
 
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceBrokerRequest, Void> {
+
+        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceBrokerRequest getInvalidRequest() {
+            return DeleteServiceBrokerRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/service_brokers/test-id")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceBrokerRequest getValidRequest() throws Exception {
+            return DeleteServiceBrokerRequest.builder().id("test-id").build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteServiceBrokerRequest request) {
+            return this.serviceBrokers.delete(request);
+        }
     }
 
 }
