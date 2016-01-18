@@ -31,4 +31,12 @@ public interface ServiceBrokers {
      */
     Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_brokers/delete_a_particular_service_broker.html">Delete the Service Broker</a> request
+     *
+     * @param request the Delete Service Broker request
+     * @return the response from the Delete Service Broker request
+     */
+    Mono<Void> delete(DeleteServiceBrokerRequest request);
+
 }
