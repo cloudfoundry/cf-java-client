@@ -17,18 +17,21 @@
 package org.cloudfoundry.client;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
@@ -36,6 +39,7 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManager
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
@@ -231,6 +235,62 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.organizations().removeManagerByUsername(request);
                 })
                 .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void privateDomain() {
+        this.organizationId
+                .then(orgId -> {
+                    CreateDomainRequest request = CreateDomainRequest.builder()
+                            .name("test.private.domain")
+                            .owningOrganizationId(orgId)
+                            .wildcard(false)
+                            .build();
+                    return this.organizationId.and(this.cloudFoundryClient.domains().create(request));
+                })
+                .then(tuple -> {
+                    CreateOrganizationRequest request = CreateOrganizationRequest.builder()
+                            .name("test-org")
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().create(request)
+                            .and(Mono.just(tuple.t2));
+                })
+                .then(tuple -> {
+                    String privateDomainId = Resources.getId(tuple.t2);
+                    String testOrgId = Resources.getId(tuple.t1);
+                    AssociateOrganizationPrivateDomainRequest request = AssociateOrganizationPrivateDomainRequest.builder()
+                            .id(testOrgId)
+                            .privateDomainId(privateDomainId)
+                            .build();
+                    return Mono.just(privateDomainId).and(this.cloudFoundryClient.organizations().associatePrivateDomain(request));
+                })
+                .doOnSuccess(tuple -> {
+                    String privateDomainId = tuple.t1;
+                    String testOrgId = Resources.getId(tuple.t2);
+                    assertTrue("test.private.domain is not associated", Paginated
+                            .requestResources(page -> {
+                                ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
+                                        .page(page)
+                                        .id(testOrgId)
+                                        .build();
+                                return this.cloudFoundryClient.organizations().listPrivateDomains(request);
+                            })
+                            .exists(privateDomain -> Resources.getId(privateDomain).equals(privateDomainId))
+                            .get());
+                })
+                .then(tuple -> {
+                    String privateDomainId = tuple.t1;
+                    String testOrgId = Resources.getId(tuple.t2);
+                    RemoveOrganizationPrivateDomainRequest request = RemoveOrganizationPrivateDomainRequest.builder()
+                            .privateDomainId(privateDomainId)
+                            .id(testOrgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removePrivateDomain(request);
+                })
+                .subscribe(this.testSubscriber());
+
     }
 
     @Test
