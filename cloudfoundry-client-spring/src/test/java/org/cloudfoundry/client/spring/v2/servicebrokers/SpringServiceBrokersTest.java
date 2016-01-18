@@ -89,7 +89,8 @@ public final class SpringServiceBrokersTest {
 
         @Override
         protected DeleteServiceBrokerRequest getInvalidRequest() {
-            return DeleteServiceBrokerRequest.builder().build();
+            return DeleteServiceBrokerRequest.builder()
+                    .build();
         }
 
         @Override
@@ -106,7 +107,8 @@ public final class SpringServiceBrokersTest {
 
         @Override
         protected DeleteServiceBrokerRequest getValidRequest() throws Exception {
-            return DeleteServiceBrokerRequest.builder().id("test-id").build();
+            return DeleteServiceBrokerRequest.builder().id("test-id")
+                    .build();
         }
 
         @Override
