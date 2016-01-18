@@ -51,7 +51,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateAuditor(request));
                 })
                 .doOnSuccess(tuple -> {
-                    assertTrue(Paginated
+                    assertTrue("admin is not an auditor", Paginated
                             .requestResources(page -> {
                                 ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
                                         .page(page)
@@ -108,7 +108,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateBillingManager(request));
                 })
                 .doOnSuccess(tuple -> {
-                    assertTrue(Paginated
+                    assertTrue("admin is not a billing manager", Paginated
                             .requestResources(page -> {
                                 ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
                                         .page(page)
