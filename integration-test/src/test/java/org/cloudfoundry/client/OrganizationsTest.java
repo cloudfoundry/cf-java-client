@@ -21,13 +21,18 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUs
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -51,7 +56,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateAuditor(request));
                 })
                 .doOnSuccess(tuple -> {
-                    assertTrue(Paginated
+                    assertTrue("admin is not an auditor", Paginated
                             .requestResources(page -> {
                                 ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
                                         .page(page)
@@ -108,7 +113,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateBillingManager(request));
                 })
                 .doOnSuccess(tuple -> {
-                    assertTrue(Paginated
+                    assertTrue("admin is not a billing manager", Paginated
                             .requestResources(page -> {
                                 ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
                                         .page(page)
@@ -163,6 +168,64 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(response -> Resources.getEntity(response).getName())
                 .subscribe(this.testSubscriber()
                         .assertEquals("test-org"));
+    }
+
+    @Test
+    public void manager() {
+        getAdminId()
+                .and(this.organizationId)
+                .then(tuple -> {
+                    AssociateOrganizationManagerRequest request = AssociateOrganizationManagerRequest.builder()
+                            .managerId(tuple.t1)
+                            .id(tuple.t2)
+                            .build();
+
+                    return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateManager(request));
+                })
+                .doOnSuccess(tuple -> {
+                    assertTrue("admin is not a manager", Paginated
+                            .requestResources(page -> {
+                                ListOrganizationManagersRequest request = ListOrganizationManagersRequest.builder()
+                                        .page(page)
+                                        .id(Resources.getId(tuple.t2))
+                                        .build();
+                                return this.cloudFoundryClient.organizations().listManagers(request);
+                            })
+                            .exists(manager -> Resources.getId(manager).equals(tuple.t1))
+                            .get());
+                })
+                .then(tuple -> {
+                    RemoveOrganizationManagerRequest request = RemoveOrganizationManagerRequest.builder()
+                            .managerId(tuple.t1)
+                            .id(Resources.getId(tuple.t2))
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removeManager(request);
+                })
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void managerByUsername() {
+        this.organizationId
+                .then(orgId -> {
+                    AssociateOrganizationManagerByUsernameRequest request = AssociateOrganizationManagerByUsernameRequest.builder()
+                            .username("admin")
+                            .id(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().associateManagerByUsername(request)
+                            .and(Mono.just(orgId));
+                })
+                .then(tuple -> {
+                    RemoveOrganizationManagerByUsernameRequest request = RemoveOrganizationManagerByUsernameRequest.builder()
+                            .username("admin")
+                            .id(tuple.t2)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().removeManagerByUsername(request);
+                })
+                .subscribe(this.testSubscriber());
     }
 
     private Mono<String> getAdminId() {
