@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
@@ -31,6 +32,8 @@ import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
+
+import static org.junit.Assert.assertTrue;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
@@ -44,13 +47,24 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .organizationId(tuple.t2)
                             .build();
 
-                    return this.cloudFoundryClient.organizations().associateAuditor(request)
-                            .and(Mono.just(tuple.t1));
+                    return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateAuditor(request));
+                })
+                .doOnSuccess(tuple -> {
+                    assertTrue(Paginated
+                            .requestResources(page -> {
+                                ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
+                                        .page(page)
+                                        .id(Resources.getId(tuple.t2))
+                                        .build();
+                                return this.cloudFoundryClient.organizations().listAuditors(request);
+                            })
+                            .exists(auditor -> Resources.getId(auditor).equals(tuple.t1))
+                            .get());
                 })
                 .then(tuple -> {
                     RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
-                            .auditorId(tuple.t2)
-                            .id(Resources.getId(tuple.t1))
+                            .auditorId(tuple.t1)
+                            .id(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeAuditor(request);
