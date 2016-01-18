@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
+import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,6 +56,17 @@ public final class SpringServiceBrokers extends AbstractSpringOperations impleme
                 builder.pathSegment("v2", "service_brokers");
             }
 
+        });
+    }
+
+    @Override
+    public Mono<Void> delete(final DeleteServiceBrokerRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_brokers", request.getId());
+            }
         });
     }
 
