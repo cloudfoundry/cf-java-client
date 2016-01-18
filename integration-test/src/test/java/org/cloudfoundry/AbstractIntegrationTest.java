@@ -77,6 +77,11 @@ public abstract class AbstractIntegrationTest {
     protected String spaceName;
 
     @After
+    public final void verifyAndCleanup() throws Exception {
+        verify();
+        cleanup();
+    }
+    
     public final void cleanup() throws Exception {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
@@ -88,8 +93,7 @@ public abstract class AbstractIntegrationTest {
                 .after()
                 .get();
     }
-
-    @After
+    
     public final void verify() throws InterruptedException {
         this.testSubscriber.verify(10, SECONDS);
     }
