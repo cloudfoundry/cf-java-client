@@ -39,6 +39,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersR
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
@@ -48,16 +49,12 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
-import org.cloudfoundry.client.v2.organizations.UserOrganizationRoleResource;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
-
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -244,6 +241,20 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
                                     return this.cloudFoundryClient.organizations().getUserRoles(request);
                                 }))
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void list() {
+        Paginated
+                .requestResources(page -> {
+                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().list(request);
+                })
+                .after()
                 .subscribe(this.testSubscriber());
     }
 
