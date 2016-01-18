@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingMana
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
@@ -104,13 +105,24 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .id(tuple.t2)
                             .build();
 
-                    return this.cloudFoundryClient.organizations().associateBillingManager(request)
-                            .and(Mono.just(tuple.t1));
+                    return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateBillingManager(request));
+                })
+                .doOnSuccess(tuple -> {
+                    assertTrue(Paginated
+                            .requestResources(page -> {
+                                ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
+                                        .page(page)
+                                        .id(Resources.getId(tuple.t2))
+                                        .build();
+                                return this.cloudFoundryClient.organizations().listBillingManagers(request);
+                            })
+                            .exists(billingManager -> Resources.getId(billingManager).equals(tuple.t1))
+                            .get());
                 })
                 .then(tuple -> {
                     RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
-                            .billingManagerId(tuple.t2)
-                            .id(Resources.getId(tuple.t1))
+                            .billingManagerId(tuple.t1)
+                            .id(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeBillingManager(request);
