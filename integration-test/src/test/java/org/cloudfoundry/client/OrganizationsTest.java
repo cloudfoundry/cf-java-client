@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
@@ -209,6 +211,19 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.organizations().getInstanceUsage(request);
                 })
                 .subscribe(this.<GetOrganizationInstanceUsageResponse>testSubscriber().assertThat(response -> assertNotNull(response.getInstanceUsage())));
+    }
+
+    @Test
+    public void getMemoryUsage() {
+        this.organizationId
+                .then(orgId -> {
+                    GetOrganizationMemoryUsageRequest request = GetOrganizationMemoryUsageRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().getMemoryUsage(request);
+                })
+                .subscribe(this.<GetOrganizationMemoryUsageResponse>testSubscriber().assertThat(response -> assertNotNull(response.getMemoryUsageInMb())));
     }
 
     @Test
