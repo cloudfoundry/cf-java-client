@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDoma
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
@@ -47,6 +48,7 @@ import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
 import reactor.Mono;
+import reactor.fn.tuple.Tuple2;
 
 import static org.junit.Assert.assertTrue;
 
@@ -177,6 +179,20 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .map(response -> Resources.getEntity(response).getName())
                 .subscribe(this.testSubscriber()
                         .assertEquals("test-org"));
+    }
+
+    @Test
+    public void get() {
+        this.organizationId
+                .then(orgId -> {
+                    GetOrganizationRequest request = GetOrganizationRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return Mono.just(orgId).and(this.cloudFoundryClient.organizations().get(request)
+                            .map(Resources::getId));
+                })
+                .subscribe(this.<Tuple2<String, String>>testSubscriber().assertThat(tuple -> assertTupleEquality(tuple)));
     }
 
     @Test
