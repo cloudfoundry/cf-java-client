@@ -40,6 +40,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
@@ -295,6 +296,24 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                                 })
                 )
                 .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void listSpaces() {
+        this.organizationId
+                .flatMap(orgId ->
+                        Paginated
+                                .requestResources(page -> {
+                                    ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
+                                            .id(orgId)
+                                            .page(page)
+                                            .build();
+
+                                    return this.cloudFoundryClient.organizations().listSpaces(request);
+                                })
+                )
+                .map(resource -> Resources.getEntity(resource).getName())
+                .subscribe(this.testSubscriber().assertEquals("integration-test"));
     }
 
     @Test
