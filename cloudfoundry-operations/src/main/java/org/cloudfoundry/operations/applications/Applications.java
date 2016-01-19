@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Applications Operations API

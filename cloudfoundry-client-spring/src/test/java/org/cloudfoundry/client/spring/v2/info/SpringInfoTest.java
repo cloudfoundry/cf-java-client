@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.v2.info;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;

@@ -77,8 +77,8 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Processors;
-import reactor.core.processor.ProcessorGroup;
+import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.Processors;
 import reactor.core.support.ReactiveState;
 import reactor.fn.Consumer;
 

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Processes Client API

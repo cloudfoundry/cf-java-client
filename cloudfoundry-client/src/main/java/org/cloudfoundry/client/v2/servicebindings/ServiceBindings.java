@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.servicebindings;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Service Bindings Client API

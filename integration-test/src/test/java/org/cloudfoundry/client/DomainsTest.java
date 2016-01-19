@@ -31,7 +31,7 @@ import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 

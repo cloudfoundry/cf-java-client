@@ -51,8 +51,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-import reactor.Mono;
-import reactor.core.error.Exceptions.UpstreamException;
+import reactor.core.publisher.Mono;
+import reactor.core.support.Exceptions;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Promise;
 import reactor.rx.Stream;
@@ -688,7 +688,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             out.write(bytes);
             return out;
         } catch (IOException e) {
-            throw new UpstreamException(e);
+            throw new Exceptions.UpstreamException(e);
         }
     }
 

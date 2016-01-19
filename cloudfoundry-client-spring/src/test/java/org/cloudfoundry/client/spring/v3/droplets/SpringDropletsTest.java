@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
 import org.cloudfoundry.client.v3.droplets.GetDropletResponse;
 import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.droplets.ListDropletsResponse;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 

@@ -23,7 +23,7 @@ import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
 import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;

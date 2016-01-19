@@ -28,7 +28,7 @@ import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.users.Users;
 import org.junit.Before;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;

@@ -18,7 +18,7 @@ package org.cloudfoundry.operations.util.v2;
 
 import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.Resource;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.rx.Stream;
 

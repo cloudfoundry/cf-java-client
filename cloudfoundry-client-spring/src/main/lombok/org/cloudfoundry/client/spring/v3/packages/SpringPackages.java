@@ -40,8 +40,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Mono;
-import reactor.core.processor.ProcessorGroup;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
 

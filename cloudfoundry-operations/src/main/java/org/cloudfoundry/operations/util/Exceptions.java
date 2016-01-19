@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.util;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 
 import java.util.NoSuchElementException;

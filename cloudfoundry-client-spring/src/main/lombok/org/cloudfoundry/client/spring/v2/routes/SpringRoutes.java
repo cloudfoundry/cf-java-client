@@ -39,8 +39,8 @@ import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteResponse;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Mono;
-import reactor.core.processor.ProcessorGroup;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.ProcessorGroup;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 

@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.routes;
 
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Routes Operations API
@@ -49,7 +49,7 @@ public interface Routes {
 
     /**
      * Add a URL route to an application
-     * 
+     *
      * @param request the Map Route request
      */
     Publisher<Void> map(MapRouteRequest request);

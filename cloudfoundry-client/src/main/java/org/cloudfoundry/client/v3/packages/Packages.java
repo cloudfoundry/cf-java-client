@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3.packages;
 
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Packages Client API

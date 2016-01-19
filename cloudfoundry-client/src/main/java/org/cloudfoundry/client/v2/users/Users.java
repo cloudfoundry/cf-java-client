@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 public interface Users {
 

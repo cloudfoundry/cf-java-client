@@ -41,7 +41,7 @@ import org.cloudfoundry.operations.util.Dates;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.when;
 
