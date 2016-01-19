@@ -38,6 +38,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
@@ -49,6 +52,8 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -56,6 +61,7 @@ import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple2;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -259,6 +265,58 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void listServices() {
+        this.organizationId
+                .flatMap(orgId ->
+                        Paginated
+                                .requestResources(page -> {
+                                    ListOrganizationServicesRequest request = ListOrganizationServicesRequest.builder()
+                                            .id(orgId)
+                                            .page(page)
+                                            .build();
+
+                                    return this.cloudFoundryClient.organizations().listServices(request);
+                                })
+                )
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void listSpaceQuotaDefinitions() {
+        this.organizationId
+                .flatMap(orgId ->
+                        Paginated
+                                .requestResources(page -> {
+                                    ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                                            .id(orgId)
+                                            .page(page)
+                                            .build();
+
+                                    return this.cloudFoundryClient.organizations().listSpaceQuotaDefinitions(request);
+                                })
+                )
+                .subscribe(this.testSubscriber());
+    }
+
+    @Test
+    public void listSpaces() {
+        this.organizationId
+                .flatMap(orgId ->
+                        Paginated
+                                .requestResources(page -> {
+                                    ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
+                                            .id(orgId)
+                                            .page(page)
+                                            .build();
+
+                                    return this.cloudFoundryClient.organizations().listSpaces(request);
+                                })
+                )
+                .map(resource -> Resources.getEntity(resource).getName())
+                .subscribe(this.testSubscriber().assertEquals("integration-test"));
+    }
+
+    @Test
     public void manager() {
         getAdminId()
                 .and(this.organizationId)
@@ -370,6 +428,34 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 })
                 .subscribe(this.testSubscriber());
 
+    }
+
+    @Test
+    public void summary() {
+        this.organizationId
+                .then(orgId -> {
+                    SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().summary(request)
+                            .map(response -> response.getName());
+                })
+                .subscribe(this.testSubscriber().assertEquals("integration-test"));
+    }
+
+    @Test
+    public void update() {
+        this.organizationId
+                .then(orgId -> {
+                    UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return Mono.just(orgId).and(this.cloudFoundryClient.organizations().update(request)
+                            .map(response -> Resources.getId(response)));
+                })
+                .subscribe(this.<Tuple2<String, String>>testSubscriber().assertThat(tuple -> assertEquals(tuple.t1, tuple.t2)));
     }
 
     @Test
