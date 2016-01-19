@@ -57,8 +57,9 @@ import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
+import org.junit.Ignore;
 import org.junit.Test;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 
 import static org.junit.Assert.assertEquals;

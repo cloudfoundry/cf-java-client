@@ -25,8 +25,8 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Mono;
-import reactor.core.processor.ProcessorGroup;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.ProcessorGroup;
 import reactor.fn.Consumer;
 
 import java.net.URI;

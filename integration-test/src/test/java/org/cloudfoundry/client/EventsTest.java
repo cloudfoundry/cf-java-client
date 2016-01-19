@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Test;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 

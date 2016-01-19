@@ -52,7 +52,7 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 

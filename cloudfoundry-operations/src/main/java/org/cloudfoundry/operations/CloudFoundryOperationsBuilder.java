@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.util.Exceptions;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.rx.Promise;
 import reactor.rx.Stream;

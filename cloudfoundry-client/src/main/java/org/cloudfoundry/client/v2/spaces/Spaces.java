@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Spaces Client API

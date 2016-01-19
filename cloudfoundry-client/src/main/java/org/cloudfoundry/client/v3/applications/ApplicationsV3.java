@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Applications V3 Client API

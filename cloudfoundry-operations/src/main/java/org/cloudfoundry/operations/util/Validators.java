@@ -19,7 +19,7 @@ package org.cloudfoundry.operations.util;
 import org.cloudfoundry.operations.RequestValidationException;
 import org.cloudfoundry.operations.Validatable;
 import org.cloudfoundry.operations.ValidationResult;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Utiltities for dealing with {@link Validatable} types

@@ -17,7 +17,7 @@
 package org.cloudfoundry.operations.spacequotas;
 
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Spaces Operations API

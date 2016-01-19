@@ -20,7 +20,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.junit.Test;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.rx.Stream;
 

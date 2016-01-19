@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.applications;
 
 import org.reactivestreams.Publisher;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Applications V2 Client API

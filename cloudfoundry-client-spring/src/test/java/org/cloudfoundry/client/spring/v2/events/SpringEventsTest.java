@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 

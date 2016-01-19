@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.util;
 import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 public final class Validators {
 

@@ -37,8 +37,8 @@ import org.springframework.test.web.client.ResponseActions;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.Processors;
-import reactor.core.processor.ProcessorGroup;
+import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.Processors;
 import reactor.core.support.ReactiveState;
 import reactor.fn.Consumer;
 

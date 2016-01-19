@@ -27,7 +27,7 @@ import org.cloudfoundry.operations.spacequotas.DefaultSpaceQuotas;
 import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
 import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 

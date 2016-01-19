@@ -67,7 +67,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.springframework.core.io.ClassPathResource;
-import reactor.Mono;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
