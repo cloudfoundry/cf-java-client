@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +41,8 @@ public final class RestageApplicationEntity extends AbstractApplicationEntity {
     private final String packageState;
 
     private final String packageUpdatedAt;
+
+    private final List<Integer> ports;
 
     private final String stagingTaskId;
 
@@ -65,6 +68,7 @@ public final class RestageApplicationEntity extends AbstractApplicationEntity {
                              @JsonProperty("name") String name,
                              @JsonProperty("package_state") String packageState,
                              @JsonProperty("package_updated_at") String packageUpdatedAt,
+                             @JsonProperty("ports") @Singular List<Integer> ports,
                              @JsonProperty("production") @Deprecated Boolean production,
                              @JsonProperty("space_guid") String spaceId,
                              @JsonProperty("stack_guid") String stackId,
@@ -79,6 +83,7 @@ public final class RestageApplicationEntity extends AbstractApplicationEntity {
         this.enableSsh = enableSsh;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
+        this.ports = ports;
         this.stagingTaskId = stagingTaskId;
         this.version = version;
     }

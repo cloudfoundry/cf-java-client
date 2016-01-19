@@ -49,6 +49,8 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
 
     private final String packageUpdatedAt;
 
+    private final List<Integer> ports;
+
     private final List<Route> routes;
 
     private final Integer runningInstances;
@@ -80,6 +82,7 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
                                @JsonProperty("memory") Integer memory,
                                @JsonProperty("name") String name,
                                @JsonProperty("package_state") String packageState,
+                               @JsonProperty("ports") @Singular List<Integer> ports,
                                @JsonProperty("package_updated_at") String packageUpdatedAt,
                                @JsonProperty("production") @Deprecated Boolean production,
                                @JsonProperty("routes") @Singular List<Route> routes,
@@ -100,6 +103,7 @@ public final class SummaryApplicationResponse extends AbstractApplicationEntity 
         this.id = id;
         this.packageState = packageState;
         this.packageUpdatedAt = packageUpdatedAt;
+        this.ports = ports;
         this.routes = routes;
         this.runningInstances = runningInstances;
         this.services = services;
