@@ -1,0 +1,404 @@
+
+REQUEST: [2016-01-19T11:27:32Z]
+GET /v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/apps?q=name%3Abounder&inline-relations-depth=1 HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/json
+User-Agent: go-cli 6.15.0+fa1bfe2 / darwin
+
+
+
+RESPONSE: [2016-01-19T11:27:32Z]
+HTTP/1.1 200 OK
+Content-Length: 7115
+Connection: keep-alive
+Content-Type: application/json;charset=utf-8
+Date: Tue, 19 Jan 2016 11:27:32 GMT
+Server: nginx
+X-Cf-Requestid: 02478fbd-a828-4c52-722b-793c3ad76bf8
+X-Content-Type-Options: nosniff
+X-Vcap-Request-Id: d0932473-d109-4896-657a-5cdeabad359b::c1972d23-837a-473b-9836-f4526bbdd6d4
+
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "bb697d3b-ca10-44db-88c5-ddadf26e23c6",
+        "url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6",
+        "created_at": "2016-01-15T09:55:08Z",
+        "updated_at": "2016-01-19T11:25:14Z"
+      },
+      "entity": {
+        "name": "bounder",
+        "production": false,
+        "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+        "stack_guid": "86205f38-84fc-4bc2-b2b8-af7f55669f04",
+        "buildpack": null,
+        "detected_buildpack": "java-buildpack=v3.5 open-jdk-like-jre=1.8.0_65 open-jdk-like-memory-calculator=2.0.1_RELEASE tomcat-access-logging-support=2.4.0_RELEASE tomcat-instance=8.0.30 tomcat-lifecycle-support=2.4.0_RELEASE tomcat-logging-support=2.4.0_RELEASE",
+        "environment_json": {
+
+        },
+        "memory": 1024,
+        "instances": 1,
+        "disk_quota": 1024,
+        "state": "STARTED",
+        "version": "562cb970-9d1c-42d1-871f-ef667bc94d95",
+        "command": null,
+        "console": false,
+        "debug": null,
+        "staging_task_id": "563243de084a49a19b0406da7b8759ee",
+        "package_state": "STAGED",
+        "health_check_type": "port",
+        "health_check_timeout": null,
+        "staging_failed_reason": null,
+        "staging_failed_description": null,
+        "diego": true,
+        "docker_image": null,
+        "package_updated_at": "2016-01-15T09:55:12Z",
+        "detected_start_command": "CALCULATED_MEMORY=$($PWD/.java-buildpack/open_jdk_jre/bin/java-buildpack-memory-calculator-2.0.1_RELEASE -memorySizes=metaspace:64m.. -memoryWeights=heap:75,metaspace:10,native:10,stack:5 -memoryInitials=heap:100%,metaspace:100% -totMemory=$MEMORY_LIMIT) &&  JAVA_HOME=$PWD/.java-buildpack/open_jdk_jre JAVA_OPTS=\"-Djava.io.tmpdir=$TMPDIR -XX:OnOutOfMemoryError=$PWD/.java-buildpack/open_jdk_jre/bin/killjava.sh $CALCULATED_MEMORY -Daccess.logging.enabled=false -Dhttp.port=$PORT\" exec $PWD/.java-buildpack/tomcat/bin/catalina.sh run",
+        "enable_ssh": true,
+        "docker_credentials_json": {
+          "redacted_message": "[PRIVATE DATA HIDDEN]"
+        },
+        "ports": null,
+        "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+        "space": {
+          "metadata": {
+            "guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+            "url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+            "created_at": "2013-07-11T19:20:16Z",
+            "updated_at": null
+          },
+          "entity": {
+            "name": "development",
+            "organization_guid": "47027c3d-5d72-4429-b3ab-0e3936e916f2",
+            "space_quota_definition_guid": null,
+            "allow_ssh": true,
+            "organization_url": "/v2/organizations/47027c3d-5d72-4429-b3ab-0e3936e916f2",
+            "developers_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/developers",
+            "managers_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/managers",
+            "auditors_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/auditors",
+            "apps_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/apps",
+            "routes_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/routes",
+            "domains_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/domains",
+            "service_instances_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/service_instances",
+            "app_events_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/app_events",
+            "events_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/events",
+            "security_groups_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/security_groups"
+          }
+        },
+        "stack_url": "/v2/stacks/86205f38-84fc-4bc2-b2b8-af7f55669f04",
+        "stack": {
+          "metadata": {
+            "guid": "86205f38-84fc-4bc2-b2b8-af7f55669f04",
+            "url": "/v2/stacks/86205f38-84fc-4bc2-b2b8-af7f55669f04",
+            "created_at": "2015-03-04T18:58:42Z",
+            "updated_at": null
+          },
+          "entity": {
+            "name": "cflinuxfs2",
+            "description": "Cloud Foundry Linux-based filesystem"
+          }
+        },
+        "events_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/events",
+        "service_bindings_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/service_bindings",
+        "service_bindings": [
+
+        ],
+        "routes_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/routes",
+        "routes": [
+          {
+            "metadata": {
+              "guid": "df94c4a4-50ae-43a5-83f1-830b71bc3a8b",
+              "url": "/v2/routes/df94c4a4-50ae-43a5-83f1-830b71bc3a8b",
+              "created_at": "2016-01-15T09:55:10Z",
+              "updated_at": null
+            },
+            "entity": {
+              "host": "bounder",
+              "path": "/bounderpath",
+              "domain_guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "service_instance_guid": null,
+              "port": 0,
+              "domain_url": "/v2/domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "apps_url": "/v2/routes/df94c4a4-50ae-43a5-83f1-830b71bc3a8b/apps"
+            }
+          },
+          {
+            "metadata": {
+              "guid": "c3402f43-94e3-4e53-9c8a-cb5f54847b16",
+              "url": "/v2/routes/c3402f43-94e3-4e53-9c8a-cb5f54847b16",
+              "created_at": "2016-01-15T10:01:54Z",
+              "updated_at": null
+            },
+            "entity": {
+              "host": "bounderhost2",
+              "path": "/bounderpath2",
+              "domain_guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "service_instance_guid": null,
+              "port": 0,
+              "domain_url": "/v2/domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "apps_url": "/v2/routes/c3402f43-94e3-4e53-9c8a-cb5f54847b16/apps"
+            }
+          },
+          {
+            "metadata": {
+              "guid": "2ff0b947-84e9-4512-b6fa-9c6236288945",
+              "url": "/v2/routes/2ff0b947-84e9-4512-b6fa-9c6236288945",
+              "created_at": "2016-01-19T11:23:43Z",
+              "updated_at": null
+            },
+            "entity": {
+              "host": "somehost",
+              "path": "",
+              "domain_guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "service_instance_guid": null,
+              "port": 0,
+              "domain_url": "/v2/domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+              "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+              "apps_url": "/v2/routes/2ff0b947-84e9-4512-b6fa-9c6236288945/apps"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+REQUEST: [2016-01-19T11:27:32Z]
+GET /v2/organizations/47027c3d-5d72-4429-b3ab-0e3936e916f2/private_domains?q=name%3Acfapps.io HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/json
+User-Agent: go-cli 6.15.0+fa1bfe2 / darwin
+
+
+
+RESPONSE: [2016-01-19T11:27:33Z]
+HTTP/1.1 200 OK
+Content-Length: 107
+Connection: keep-alive
+Content-Type: application/json;charset=utf-8
+Date: Tue, 19 Jan 2016 11:27:33 GMT
+Server: nginx
+X-Cf-Requestid: 764b7752-ee01-4bc2-63d0-93ef821af2bc
+X-Content-Type-Options: nosniff
+X-Vcap-Request-Id: 4da3a05e-4ac3-4e18-567d-6b4a1d3f5f70::f0b76891-91e2-4ddb-a324-bf5722e96c70
+
+{
+  "total_results": 0,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+
+  ]
+}
+
+REQUEST: [2016-01-19T11:27:33Z]
+GET /v2/shared_domains?q=name%3Acfapps.io HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/json
+User-Agent: go-cli 6.15.0+fa1bfe2 / darwin
+
+
+
+RESPONSE: [2016-01-19T11:27:33Z]
+HTTP/1.1 200 OK
+Content-Length: 439
+Connection: keep-alive
+Content-Type: application/json;charset=utf-8
+Date: Tue, 19 Jan 2016 11:27:33 GMT
+Server: nginx
+X-Cf-Requestid: 3013d25a-f243-4ed7-6026-72d595a51795
+X-Content-Type-Options: nosniff
+X-Vcap-Request-Id: eb1a7feb-b210-4dce-7474-89572707f443::cce511c3-7437-493e-943b-bfa753d39148
+
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+        "url": "/v2/shared_domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+        "created_at": "2013-05-04T00:29:46Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "cfapps.io",
+        "router_group_guid": null
+      }
+    }
+  ]
+}
+Creating route xsomehost.cfapps.io for org FrameworksAndRuntimes / space development as gnormington@pivotal.io...
+
+REQUEST: [2016-01-19T11:27:33Z]
+POST /v2/routes?async=true&inline-relations-depth=1 HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/json
+User-Agent: go-cli 6.15.0+fa1bfe2 / darwin
+
+{"host":"xsomehost","path":"","domain_guid":"fb6bd89f-2ed9-49d4-9ad1-97951a573135","space_guid":"3a2dbac3-baa6-474e-8eb9-82f9182d5457"}
+
+RESPONSE: [2016-01-19T11:27:34Z]
+HTTP/1.1 201 Created
+Content-Length: 2388
+Connection: keep-alive
+Content-Type: application/json;charset=utf-8
+Date: Tue, 19 Jan 2016 11:27:34 GMT
+Location: /v2/routes/a405b436-0c42-43a0-852b-1e6e79f31595
+Server: nginx
+X-Cf-Requestid: 877b1e31-0bcb-4f5b-46d0-f10827dc82bb
+X-Content-Type-Options: nosniff
+X-Vcap-Request-Id: dffa5ac5-434c-4600-7801-96081f5da263::9582976f-d3c4-4664-a364-aaf9a25c16bb
+
+{
+  "metadata": {
+    "guid": "a405b436-0c42-43a0-852b-1e6e79f31595",
+    "url": "/v2/routes/a405b436-0c42-43a0-852b-1e6e79f31595",
+    "created_at": "2016-01-19T11:27:34Z",
+    "updated_at": null
+  },
+  "entity": {
+    "host": "xsomehost",
+    "path": "",
+    "domain_guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+    "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+    "service_instance_guid": null,
+    "port": 0,
+    "domain_url": "/v2/domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+    "domain": {
+      "metadata": {
+        "guid": "fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+        "url": "/v2/domains/fb6bd89f-2ed9-49d4-9ad1-97951a573135",
+        "created_at": "2013-05-04T00:29:46Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "cfapps.io",
+        "router_group_guid": null
+      }
+    },
+    "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+    "space": {
+      "metadata": {
+        "guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+        "url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+        "created_at": "2013-07-11T19:20:16Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "development",
+        "organization_guid": "47027c3d-5d72-4429-b3ab-0e3936e916f2",
+        "space_quota_definition_guid": null,
+        "allow_ssh": true,
+        "organization_url": "/v2/organizations/47027c3d-5d72-4429-b3ab-0e3936e916f2",
+        "developers_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/developers",
+        "managers_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/managers",
+        "auditors_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/auditors",
+        "apps_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/apps",
+        "routes_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/routes",
+        "domains_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/domains",
+        "service_instances_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/service_instances",
+        "app_events_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/app_events",
+        "events_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/events",
+        "security_groups_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457/security_groups"
+      }
+    },
+    "apps_url": "/v2/routes/a405b436-0c42-43a0-852b-1e6e79f31595/apps",
+    "apps": [
+
+    ]
+  }
+}
+OK
+Adding route xsomehost.cfapps.io to app bounder in org FrameworksAndRuntimes / space development as gnormington@pivotal.io...
+
+REQUEST: [2016-01-19T11:27:34Z]
+PUT /v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/routes/a405b436-0c42-43a0-852b-1e6e79f31595 HTTP/1.1
+Host: api.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/json
+User-Agent: go-cli 6.15.0+fa1bfe2 / darwin
+
+
+
+RESPONSE: [2016-01-19T11:27:34Z]
+HTTP/1.1 201 Created
+Content-Length: 2334
+Connection: keep-alive
+Content-Type: application/json;charset=utf-8
+Date: Tue, 19 Jan 2016 11:27:34 GMT
+Server: nginx
+X-Cf-Requestid: 423d8e32-5ffa-4e55-7983-3f907676c40e
+X-Content-Type-Options: nosniff
+X-Vcap-Request-Id: 4417ea6d-aa18-4e4c-5b10-7f31b6db1b50::c2a6b4dc-3988-4eee-aba6-0c2381cecb9e
+
+{
+  "metadata": {
+    "guid": "bb697d3b-ca10-44db-88c5-ddadf26e23c6",
+    "url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6",
+    "created_at": "2016-01-15T09:55:08Z",
+    "updated_at": "2016-01-19T11:27:34Z"
+  },
+  "entity": {
+    "name": "bounder",
+    "production": false,
+    "space_guid": "3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+    "stack_guid": "86205f38-84fc-4bc2-b2b8-af7f55669f04",
+    "buildpack": null,
+    "detected_buildpack": "java-buildpack=v3.5 open-jdk-like-jre=1.8.0_65 open-jdk-like-memory-calculator=2.0.1_RELEASE tomcat-access-logging-support=2.4.0_RELEASE tomcat-instance=8.0.30 tomcat-lifecycle-support=2.4.0_RELEASE tomcat-logging-support=2.4.0_RELEASE",
+    "environment_json": {
+
+    },
+    "memory": 1024,
+    "instances": 1,
+    "disk_quota": 1024,
+    "state": "STARTED",
+    "version": "562cb970-9d1c-42d1-871f-ef667bc94d95",
+    "command": null,
+    "console": false,
+    "debug": null,
+    "staging_task_id": "563243de084a49a19b0406da7b8759ee",
+    "package_state": "STAGED",
+    "health_check_type": "port",
+    "health_check_timeout": null,
+    "staging_failed_reason": null,
+    "staging_failed_description": null,
+    "diego": true,
+    "docker_image": null,
+    "package_updated_at": "2016-01-15T09:55:12Z",
+    "detected_start_command": "CALCULATED_MEMORY=$($PWD/.java-buildpack/open_jdk_jre/bin/java-buildpack-memory-calculator-2.0.1_RELEASE -memorySizes=metaspace:64m.. -memoryWeights=heap:75,metaspace:10,native:10,stack:5 -memoryInitials=heap:100%,metaspace:100% -totMemory=$MEMORY_LIMIT) &&  JAVA_HOME=$PWD/.java-buildpack/open_jdk_jre JAVA_OPTS=\"-Djava.io.tmpdir=$TMPDIR -XX:OnOutOfMemoryError=$PWD/.java-buildpack/open_jdk_jre/bin/killjava.sh $CALCULATED_MEMORY -Daccess.logging.enabled=false -Dhttp.port=$PORT\" exec $PWD/.java-buildpack/tomcat/bin/catalina.sh run",
+    "enable_ssh": true,
+    "docker_credentials_json": {
+      "redacted_message": "[PRIVATE DATA HIDDEN]"
+    },
+    "ports": null,
+    "space_url": "/v2/spaces/3a2dbac3-baa6-474e-8eb9-82f9182d5457",
+    "stack_url": "/v2/stacks/86205f38-84fc-4bc2-b2b8-af7f55669f04",
+    "events_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/events",
+    "service_bindings_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/service_bindings",
+    "routes_url": "/v2/apps/bb697d3b-ca10-44db-88c5-ddadf26e23c6/routes"
+  }
+}
+OK
