@@ -21,13 +21,19 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
+import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
+import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceBrokersTest {
 
@@ -114,6 +120,83 @@ public final class SpringServiceBrokersTest {
         @Override
         protected Mono<Void> invoke(DeleteServiceBrokerRequest request) {
             return this.serviceBrokers.delete(request);
+        }
+    }
+
+    public static final class List extends AbstractApiTest<ListServiceBrokersRequest, ListServiceBrokersResponse> {
+
+        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceBrokersRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_brokers?q=name%20IN%20test-name&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/service_brokers/GET_response.json");
+        }
+
+        @Override
+        protected ListServiceBrokersResponse getResponse() {
+            return ListServiceBrokersResponse.builder()
+                    .totalResults(3)
+                    .totalPages(1)
+                    .resource(ServiceBrokerResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .id("b52de6f1-15dd-4069-8b42-f052cc9333fc")
+                                    .updatedAt("2015-07-27T22:43:23Z")
+                                    .url("/v2/service_brokers/b52de6f1-15dd-4069-8b42-f052cc9333fc")
+                                    .build())
+                            .entity(ServiceBrokerEntity.builder()
+                                    .name("name-980")
+                                    .brokerUrl("https://foo.com/url-39")
+                                    .authenticationUsername("auth_username-39")
+                                    .spaceId("4f34c35e-be0d-409e-9279-1ccd7058c5d8")
+                                    .build())
+                            .build())
+                    .resource(ServiceBrokerResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .id("812e9e7f-b5b0-4587-ba3c-b4a7c574fb88")
+                                    .url("/v2/service_brokers/812e9e7f-b5b0-4587-ba3c-b4a7c574fb88")
+                                    .build())
+                            .entity(ServiceBrokerEntity.builder()
+                                    .name("name-981")
+                                    .brokerUrl("https://foo.com/url-40")
+                                    .authenticationUsername("auth_username-40")
+                                    .build())
+                            .build())
+                    .resource(ServiceBrokerResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:23Z")
+                                    .id("93e760c4-ff3d-447a-9cff-a17f4454eaee")
+                                    .url("/v2/service_brokers/93e760c4-ff3d-447a-9cff-a17f4454eaee")
+                                    .build())
+                            .entity(ServiceBrokerEntity.builder()
+                                    .name("name-982")
+                                    .brokerUrl("https://foo.com/url-41")
+                                    .authenticationUsername("auth_username-41")
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected ListServiceBrokersRequest getValidRequest() throws Exception {
+            return ListServiceBrokersRequest.builder()
+                    .name("test-name")
+                    .page(-1)
+                    .build();
+        }
+
+        @Override
+        protected Publisher<ListServiceBrokersResponse> invoke(ListServiceBrokersRequest request) {
+            return this.serviceBrokers.list(request);
         }
     }
 
