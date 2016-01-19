@@ -32,6 +32,7 @@ import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -82,6 +83,7 @@ public abstract class AbstractIntegrationTest {
     @Value("${test.username}")
     protected String testUsername;
 
+    @Before
     public final void cleanup() throws Exception {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
@@ -94,14 +96,9 @@ public abstract class AbstractIntegrationTest {
                 .get();
     }
 
+    @After
     public final void verify() throws InterruptedException {
         this.testSubscriber.verify(25, SECONDS);
-    }
-
-    @After
-    public final void verifyAndCleanup() throws Exception {
-        verify();
-        cleanup();
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
