@@ -36,7 +36,6 @@ public interface Routes {
      * Create a new route
      *
      * @param request The Create Route request
-     * @return the route
      */
     Publisher<Void> create(CreateRouteRequest request);
 
@@ -47,5 +46,12 @@ public interface Routes {
      * @return the routes and the applications bound to those routes
      */
     Publisher<Route> list(ListRoutesRequest request);
+
+    /**
+     * Add a URL route to an application
+     * 
+     * @param request the Map Route request
+     */
+    Publisher<Void> map(MapRouteRequest request);
 
 }
