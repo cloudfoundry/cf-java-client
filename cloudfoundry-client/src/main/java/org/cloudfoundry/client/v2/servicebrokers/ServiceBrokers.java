@@ -39,4 +39,12 @@ public interface ServiceBrokers {
      */
     Mono<Void> delete(DeleteServiceBrokerRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_brokers/list_all_service_brokers.html">List all Service Brokers</a> request
+     *
+     * @param request the List Service Brokers request
+     * @return the response from the List Service Brokers request
+     */
+    Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request);
+
 }
