@@ -470,7 +470,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     //TODO Implement missing client API
-    @Ignore("Awaiting implementation of Port")
+    @Ignore("TODO: port filter parameter https://www.pivotaltracker.com/story/show/111997999")
     @Test
     public void listRoutesFilterByPort() {
         createApplicationRoute()
@@ -492,7 +492,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     //TODO Implement missing client API
-    @Ignore("Awaiting CUPS: https://www.pivotaltracker.com/story/show/101452058")
+    @Ignore("TODO: Awaiting CUPS https://www.pivotaltracker.com/story/show/101452058")
     @Test
     public void listServiceBindings() {
         this.applicationId
@@ -525,7 +525,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     //TODO Implement missing client API
-    @Ignore("Awaiting CUPS: https://www.pivotaltracker.com/story/show/101452058")
+    @Ignore("TODO: Awaiting CUPS https://www.pivotaltracker.com/story/show/101452058")
     @Test
     public void listServiceBindingsFilterByServiceInstanceId() {
         this.applicationId
@@ -565,7 +565,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     //TODO Implement missing client API
-    @Ignore("Awaiting CUPS: https://www.pivotaltracker.com/story/show/101452058")
+    @Ignore("TODO: Awaiting CUPS https://www.pivotaltracker.com/story/show/101452058")
     @Test
     public void removeServiceBinding() {
         Assert.fail();
@@ -596,7 +596,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Ignore("https://www.pivotaltracker.com/story/show/111976811")
+    @Ignore("TODO: wait for different state https://www.pivotaltracker.com/story/show/111976811")
     public void statistics() {
         this.applicationId
                 .then(this::uploadAndStartApplication)

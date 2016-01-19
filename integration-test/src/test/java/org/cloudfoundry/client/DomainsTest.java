@@ -168,7 +168,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                         .assertCount(1));
     }
 
-    @Ignore("TODO: implement once list users available")
+    @Ignore("TODO: implement once list users available https://www.pivotaltracker.com/story/show/101522708")
     @Test
     public void listDomainSpacesFilterByDeveloperId() {
         Assert.fail();

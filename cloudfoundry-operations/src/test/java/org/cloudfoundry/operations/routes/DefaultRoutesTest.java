@@ -797,7 +797,6 @@ public final class DefaultRoutesTest {
                     .port(null)
                     .spaceId(null)
                     .build();
-            System.out.println(request3);
             CreateRouteResponse response3 = fill(CreateRouteResponse.builder(), "createdRoute")
                     .build();
             when(this.routes.create(request3)).thenReturn(Mono.just(response3));
@@ -805,7 +804,6 @@ public final class DefaultRoutesTest {
             AssociateApplicationRouteRequest request4 = fill(AssociateApplicationRouteRequest.builder())
                     .routeId("test-createdRouteid")
                     .build();
-            System.out.println(request4);
             AssociateApplicationRouteResponse response4 = fill(AssociateApplicationRouteResponse.builder())
                     .build();
             when(this.applications.associateRoute(request4)).thenReturn(Mono.just(response4));
@@ -864,7 +862,6 @@ public final class DefaultRoutesTest {
                     .port(null)
                     .spaceId(null)
                     .build();
-            System.out.println(request4);
             CreateRouteResponse response4 = fill(CreateRouteResponse.builder(), "createdRoute")
                     .build();
             when(this.routes.create(request4)).thenReturn(Mono.just(response4));
@@ -872,7 +869,6 @@ public final class DefaultRoutesTest {
             AssociateApplicationRouteRequest request5 = fill(AssociateApplicationRouteRequest.builder())
                     .routeId("test-createdRouteid")
                     .build();
-            System.out.println(request5);
             AssociateApplicationRouteResponse response5 = fill(AssociateApplicationRouteResponse.builder())
                     .build();
             when(this.applications.associateRoute(request5)).thenReturn(Mono.just(response5));
