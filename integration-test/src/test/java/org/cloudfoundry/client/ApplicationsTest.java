@@ -596,6 +596,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @Ignore("https://www.pivotaltracker.com/story/show/111976811")
     public void statistics() {
         this.applicationId
                 .then(this::uploadAndStartApplication)
