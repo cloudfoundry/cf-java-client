@@ -74,14 +74,11 @@ public abstract class AbstractIntegrationTest {
     protected Mono<String> spaceId;
 
     @Value("${test.space}")
-    protected String spaceName;
+    protected String testSpaceName;
 
-    @After
-    public final void verifyAndCleanup() throws Exception {
-        verify();
-        cleanup();
-    }
-    
+    @Value("${test.username}")
+    protected String testUsername;
+
     public final void cleanup() throws Exception {
         cleanupApplications(this.cloudFoundryClient)
                 .after(() -> cleanupRoutes(this.cloudFoundryClient))
@@ -93,9 +90,15 @@ public abstract class AbstractIntegrationTest {
                 .after()
                 .get();
     }
-    
+
     public final void verify() throws InterruptedException {
         this.testSubscriber.verify(10, SECONDS);
+    }
+
+    @After
+    public final void verifyAndCleanup() throws Exception {
+        verify();
+        cleanup();
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
