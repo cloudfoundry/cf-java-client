@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainR
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -57,6 +58,7 @@ import org.junit.Test;
 import reactor.Mono;
 import reactor.fn.tuple.Tuple2;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -385,6 +387,20 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .map(response -> response.getName());
                 })
                 .subscribe(this.testSubscriber().assertEquals("integration-test"));
+    }
+
+    @Test
+    public void update() {
+        this.organizationId
+                .then(orgId -> {
+                    UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return Mono.just(orgId).and(this.cloudFoundryClient.organizations().update(request)
+                            .map(response -> Resources.getId(response)));
+                })
+                .subscribe(this.<Tuple2<String, String>>testSubscriber().assertThat(tuple -> assertEquals(tuple.t1, tuple.t2)));
     }
 
     @Test
