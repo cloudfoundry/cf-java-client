@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerRequest
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.RemoveOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -370,6 +371,20 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 })
                 .subscribe(this.testSubscriber());
 
+    }
+
+    @Test
+    public void summary() {
+        this.organizationId
+                .then(orgId -> {
+                    SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
+                            .id(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().summary(request)
+                            .map(response -> response.getName());
+                })
+                .subscribe(this.testSubscriber().assertEquals("integration-test"));
     }
 
     @Test
