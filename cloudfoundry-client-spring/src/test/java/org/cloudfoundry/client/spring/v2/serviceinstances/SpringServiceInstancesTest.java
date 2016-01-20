@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
@@ -46,6 +48,62 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceInstancesTest {
+
+    public static final class BindToRoute extends AbstractApiTest<BindServiceInstanceToRouteRequest, BindServiceInstanceToRouteResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected BindServiceInstanceToRouteRequest getInvalidRequest() {
+            return BindServiceInstanceToRouteRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(PUT).path("v2/service_instances/test-id/routes/route-id")
+                    .status(CREATED)
+                    .responsePayload("v2/service_instances/PUT_{id}_routes_response.json");
+        }
+
+        @Override
+        protected BindServiceInstanceToRouteResponse getResponse() {
+            return BindServiceInstanceToRouteResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-12-22T18:27:58Z")
+                            .id("e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
+                            .url("/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
+                            .build())
+                    .entity(ServiceInstanceEntity.builder()
+                            .name("name-160")
+                            .credential("creds-key-89", "creds-val-89")
+                            .servicePlanId("957307f5-6811-4eba-8667-ffee5a704a4a")
+                            .spaceId("36b01ada-ef02-4ff5-9f78-cd9e704211d2")
+                            .type("managed_service_instance")
+                            .spaceUrl("/v2/spaces/36b01ada-ef02-4ff5-9f78-cd9e704211d2")
+                            .servicePlanUrl("/v2/service_plans/957307f5-6811-4eba-8667-ffee5a704a4a")
+                            .serviceBindingsUrl("/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/service_bindings")
+                            .serviceKeysUrl("/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/service_keys")
+                            .routesUrl("/v2/service_instances/e7e5b08e-c530-4c1c-b420-fa0b09b3770d/routes")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected BindServiceInstanceToRouteRequest getValidRequest() throws Exception {
+            return BindServiceInstanceToRouteRequest.builder()
+                    .id("test-id")
+                    .routeId("route-id")
+                    .build();
+        }
+
+        @Override
+        protected Mono<BindServiceInstanceToRouteResponse> invoke(BindServiceInstanceToRouteRequest request) {
+            return this.serviceInstances.bindToRoute(request);
+        }
+
+    }
 
     public static final class Create extends AbstractApiTest<CreateServiceInstanceRequest, CreateServiceInstanceResponse> {
 
