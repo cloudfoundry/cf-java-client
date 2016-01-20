@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.ProcessorGroup;
 import reactor.core.publisher.Processors;
-import reactor.core.support.ReactiveState;
+import reactor.core.util.ReactiveState;
 import reactor.fn.Consumer;
 
 import java.net.URI;

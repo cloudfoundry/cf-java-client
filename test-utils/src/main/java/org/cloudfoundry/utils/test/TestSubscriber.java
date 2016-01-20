@@ -21,7 +21,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.support.Exceptions;
+import reactor.core.util.Exceptions;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple;

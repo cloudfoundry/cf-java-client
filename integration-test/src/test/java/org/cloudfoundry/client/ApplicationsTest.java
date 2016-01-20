@@ -52,7 +52,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
-import reactor.core.support.Exceptions;
+import reactor.core.util.Exceptions;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Promise;
 import reactor.rx.Stream;

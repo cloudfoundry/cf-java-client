@@ -30,7 +30,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ProcessorGroup;
-import reactor.core.subscription.ReactiveSession;
+import reactor.core.subscriber.ReactiveSession;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.fn.Supplier;

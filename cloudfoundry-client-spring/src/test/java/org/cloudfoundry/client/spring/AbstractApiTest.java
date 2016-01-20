@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
 import reactor.core.publisher.Mono;
-import reactor.core.support.Exceptions;
+import reactor.core.util.Exceptions;
 import reactor.fn.BiFunction;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
