@@ -48,7 +48,6 @@ public final class BindServiceInstanceToRouteRequestTest {
         assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
-
     @Test
     public void isValid() {
         ValidationResult result = BindServiceInstanceToRouteRequest.builder()
@@ -59,4 +58,5 @@ public final class BindServiceInstanceToRouteRequestTest {
 
         assertEquals(VALID, result.getStatus());
     }
+
 }

@@ -55,7 +55,8 @@ public final class SpringServiceInstancesTest {
 
         @Override
         protected BindServiceInstanceToRouteRequest getInvalidRequest() {
-            return BindServiceInstanceToRouteRequest.builder().build();
+            return BindServiceInstanceToRouteRequest.builder()
+                    .build();
         }
 
         @Override
@@ -91,7 +92,10 @@ public final class SpringServiceInstancesTest {
 
         @Override
         protected BindServiceInstanceToRouteRequest getValidRequest() throws Exception {
-            return BindServiceInstanceToRouteRequest.builder().id("test-id").routeId("route-id").build();
+            return BindServiceInstanceToRouteRequest.builder()
+                    .id("test-id")
+                    .routeId("route-id")
+                    .build();
         }
 
         @Override
