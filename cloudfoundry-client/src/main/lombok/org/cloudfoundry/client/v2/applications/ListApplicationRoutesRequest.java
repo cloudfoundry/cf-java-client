@@ -26,7 +26,6 @@ import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
-import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -84,19 +83,30 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     @Getter(onMethod = @__(@InFilterParameter("path")))
     private final List<String> paths;
 
+    /**
+     * The ports
+     *
+     * @param paths the ports
+     * @return the ports
+     */
+    @Getter(onMethod = @__(@InFilterParameter("port")))
+    private final List<String> ports;
+
     @Builder
     ListApplicationRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                  @Singular List<String> domainIds,
                                  String id,
                                  @Singular List<String> hosts,
                                  @Singular List<String> organizationIds,
-                                 @Singular List<String> paths) {
+                                 @Singular List<String> paths,
+                                 @Singular List<String> ports) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
         this.id = id;
         this.hosts = hosts;
         this.organizationIds = organizationIds;
         this.paths = paths;
+        this.ports = ports;
     }
 
     @Override
