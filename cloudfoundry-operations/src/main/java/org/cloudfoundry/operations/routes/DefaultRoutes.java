@@ -269,6 +269,21 @@ public final class DefaultRoutes implements Routes {
                 .singleOrEmpty();
     }
 
+    private static Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>> requestDomainIdAndSpaceIdWithContext(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>>() {
+
+            @Override
+            public Mono<Tuple3<String, String, CreateRouteRequest>> apply(Tuple2<CreateRouteRequest, String> tuple) {
+                CreateRouteRequest request = tuple.t1;
+                String organizationId = tuple.t2;
+
+                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
+                        Mono.just(request));
+            }
+
+        };
+    }
+
     private static Function<String, Mono<String>> requestDomainIdAssociateRoute(final CloudFoundryClient cloudFoundryClient, final String domain) {
         return new Function<String, Mono<String>>() {
 
@@ -361,6 +376,22 @@ public final class DefaultRoutes implements Routes {
                 .cast(DomainResource.class);
     }
 
+    private static Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient, final Mono<String>
+            organizationId) {
+        return new Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>>() {
+
+            @Override
+            public Mono<Tuple2<String, String>> apply(Tuple2<MapRouteRequest, String> tuple) {
+                MapRouteRequest request = tuple.t1;
+                String spaceId = tuple.t2;
+
+                return Mono
+                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestApplicationId(cloudFoundryClient, request, spaceId));
+            }
+
+        };
+    }
+
     private static Function<ListRoutesRequest, Stream<RouteResource>> requestRoutesResources(final CloudFoundryClient cloudFoundryClient, final Mono<String> organizationId,
                                                                                              final Mono<String> spaceId) {
         return new Function<ListRoutesRequest, Stream<RouteResource>>() {
@@ -380,20 +411,6 @@ public final class DefaultRoutes implements Routes {
 
         };
     }
-
-//    private static Mono<String> requestDomainId(final CloudFoundryClient cloudFoundryClient, final Mono<String> organizationId, final String domain) {
-//        return organizationId.then(new Function<String, Mono<String>>() {
-//
-//            @Override
-//            public Mono<String> apply(String orgId) {
-//                return requestPrivateDomain(cloudFoundryClient, domain, orgId)
-//                        .otherwiseIfEmpty(requestSharedDomain(cloudFoundryClient, domain))
-//                        .map(Resources.extractId());
-//            }
-//
-//        });
-//
-//    }
 
     private static Function<Integer, Mono<ListSharedDomainsResponse>> requestSharedDomainsPage(final CloudFoundryClient cloudFoundryClient, final String domain) {
         return new Function<Integer, Mono<ListSharedDomainsResponse>>() {
@@ -524,36 +541,6 @@ public final class DefaultRoutes implements Routes {
                         .space(space)
                         .build();
             }
-        };
-    }
-
-    private Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>> requestDomainIdAndSpaceIdWithContext(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>>() {
-
-            @Override
-            public Mono<Tuple3<String, String, CreateRouteRequest>> apply(Tuple2<CreateRouteRequest, String> tuple) {
-                CreateRouteRequest request = tuple.t1;
-                String organizationId = tuple.t2;
-
-                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
-                        Mono.just(request));
-            }
-
-        };
-    }
-
-    private Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient, final Mono<String> organizationId) {
-        return new Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>>() {
-
-            @Override
-            public Mono<Tuple2<String, String>> apply(Tuple2<MapRouteRequest, String> tuple) {
-                MapRouteRequest request = tuple.t1;
-                String spaceId = tuple.t2;
-
-                return Mono
-                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestApplicationId(cloudFoundryClient, request, spaceId));
-            }
-
         };
     }
 
