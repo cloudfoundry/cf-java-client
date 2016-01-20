@@ -30,8 +30,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServicePlansTest {
 
-    public static final class ListServiceInstances
-            extends AbstractApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
+    public static final class ListServiceInstances extends AbstractApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
 
         private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -91,6 +90,5 @@ public final class SpringServicePlansTest {
         }
 
     }
-
 
 }

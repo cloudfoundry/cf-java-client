@@ -289,13 +289,13 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
-    public ServicePlans servicePlans() {
-        return this.servicePlans;
+    public ServiceInstances serviceInstances() {
+        return this.serviceInstances;
     }
 
     @Override
-    public ServiceInstances serviceInstances() {
-        return this.serviceInstances;
+    public ServicePlans servicePlans() {
+        return this.servicePlans;
     }
 
     @Override

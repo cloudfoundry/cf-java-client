@@ -99,8 +99,7 @@ public final class ListServicePlanServiceInstancesRequest extends PaginatedReque
                                            @Singular List<String> names,
                                            @Singular List<String> serviceBindingIds,
                                            @Singular List<String> serviceKeyIds,
-                                           @Singular List<String> spaceIds
-    ) {
+                                           @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.gatewayNames = gatewayNames;
         this.id = id;
