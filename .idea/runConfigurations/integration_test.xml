@@ -26,7 +26,7 @@
       <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
       <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
       <env name="PERFORMANCE_LOGGING_LEVEL" value="INFO" />
-      <env name="" value="" />
+      <env name="SCAN_LOGGING_LEVEL" value="INFO" />
     </envs>
     <patterns />
     <method />

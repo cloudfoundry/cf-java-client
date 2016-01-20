@@ -22,6 +22,7 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.util.Exceptions;
+import reactor.core.util.ReactiveStateUtils;
 import reactor.fn.Consumer;
 import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple;
@@ -49,6 +50,10 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private Consumer<? super Throwable> errorExpectation;
 
     private Consumer<Tuple2<Long, Long>> performanceCallback;
+
+    private Consumer<Subscription> scanningCallback;
+
+    private Subscription subscription;
 
     private long startTime;
 
@@ -104,11 +109,17 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     @Override
     public void onNext(T t) {
         this.actuals.add(t);
+
+        if (this.scanningCallback != null) {
+            this.scanningCallback.accept(this.subscription);
+        }
     }
 
     @Override
     public void onSubscribe(Subscription s) {
+        this.subscription = s;
         this.startTime = System.currentTimeMillis();
+
         s.request(Long.MAX_VALUE);
     }
 
@@ -119,14 +130,38 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     public TestSubscriber<T> setPerformanceLoggerName(final Supplier<String> name) {
         return setPerformanceCallback(new Consumer<Tuple2<Long, Long>>() {
+
             @Override
             public void accept(Tuple2<Long, Long> tuple) {
                 Long startTime = tuple.t1;
                 Long finishTime = tuple.t2;
 
                 Logger logger = LoggerFactory.getLogger(String.format("performance.%s", name.get()));
-                logger.debug("{} ms", finishTime - startTime);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{} ms", finishTime - startTime);
+                }
             }
+
+        });
+    }
+
+    public TestSubscriber<T> setScanningCallback(Consumer<Subscription> scanningCallback) {
+        this.scanningCallback = scanningCallback;
+        return this;
+    }
+
+    public TestSubscriber<T> setScanningLoggerName(final Supplier<String> name) {
+        return setScanningCallback(new Consumer<Subscription>() {
+
+            @Override
+            public void accept(Subscription subscription) {
+                Logger logger = LoggerFactory.getLogger(String.format("scan.%s", name.get()));
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug(ReactiveStateUtils.scan(subscription).toString());
+                }
+            }
+
         });
     }
 

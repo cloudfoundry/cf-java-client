@@ -16,7 +16,9 @@
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="singleModule" />
     </option>
-    <envs />
+    <envs>
+      <env name="SCAN_LOGGING_LEVEL" value="INFO" />
+    </envs>
     <patterns />
     <method />
   </configuration>

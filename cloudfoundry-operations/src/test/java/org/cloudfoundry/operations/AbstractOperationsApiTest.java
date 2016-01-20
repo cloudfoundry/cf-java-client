@@ -17,16 +17,24 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.utils.test.TestSubscriber;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.reactivestreams.Publisher;
+import reactor.fn.Supplier;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTest {
 
+    @Rule
+    public final TestName testName = new TestName();
+
     @Test
     public final void test() throws Exception {
-        TestSubscriber<T> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<T> testSubscriber = new TestSubscriber<T>()
+                .setScanningLoggerName(getScanningLoggerName());
+
         assertions(testSubscriber);
 
         invoke().subscribe(testSubscriber);
@@ -36,5 +44,16 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
     protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;
 
     protected abstract Publisher<T> invoke();
+
+    private Supplier<String> getScanningLoggerName() {
+        return new Supplier<String>() {
+
+            @Override
+            public String get() {
+                return String.format("%s.%s", AbstractOperationsApiTest.this.getClass().getSimpleName(), AbstractOperationsApiTest.this.testName.getMethodName());
+            }
+
+        };
+    }
 
 }
