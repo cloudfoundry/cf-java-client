@@ -1,0 +1,35 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f",
+        "url": "/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f",
+        "created_at": "2015-07-27T22:43:16Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-457",
+        "credentials": {
+          "creds-key-268": "creds-val-268"
+        },
+        "service_plan_guid": "bb29926c-7482-4ae5-803c-ec99e95aa278",
+        "space_guid": "cf5812f5-bf43-40cc-88d4-d50b76d7797d",
+        "gateway_data": null,
+        "dashboard_url": null,
+        "type": "managed_service_instance",
+        "last_operation": null,
+        "tags": [
+
+        ],
+        "space_url": "/v2/spaces/cf5812f5-bf43-40cc-88d4-d50b76d7797d",
+        "service_plan_url": "/v2/service_plans/bb29926c-7482-4ae5-803c-ec99e95aa278",
+        "service_bindings_url": "/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_bindings",
+        "service_keys_url": "/v2/service_instances/b95c56b9-f81b-4d34-9a00-a1a1ddba5f2f/service_keys"
+      }
+    }
+  ]
+}
