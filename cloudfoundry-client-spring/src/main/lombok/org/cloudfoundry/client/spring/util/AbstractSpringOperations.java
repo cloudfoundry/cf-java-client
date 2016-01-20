@@ -111,7 +111,8 @@ public abstract class AbstractSpringOperations {
                             }
 
                         }))
-                .publishOn(this.processorGroup);
+                .publishOn(this.processorGroup)
+                .onBackpressureBlock();
     }
 
     protected final <T> Mono<T> get(Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
@@ -161,7 +162,7 @@ public abstract class AbstractSpringOperations {
                 });
             }
 
-        }).onBackpressureBlock();
+        });
     }
 
     protected final <T> Mono<T> patch(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
