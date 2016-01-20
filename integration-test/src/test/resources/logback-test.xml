@@ -25,6 +25,7 @@
 
     <logger name="cloudfoundry-client-spring" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="performance" level="${PERFORMANCE_LOGGING_LEVEL:-INFO}"/>
+    <logger name="scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
     <logger name="stream" level="INFO"/>
     <logger name="test" level="${TEST_LOGGING_LEVEL:-INFO}"/>
 

@@ -23,6 +23,7 @@
         </encoder>
     </appender>
 
+    <logger name="scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
     <logger name="stream" level="INFO"/>
 
     <root level="WARN">

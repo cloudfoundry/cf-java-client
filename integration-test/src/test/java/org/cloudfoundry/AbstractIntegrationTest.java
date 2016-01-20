@@ -60,6 +60,7 @@ public abstract class AbstractIntegrationTest {
     public final TestName testName = new TestName();
 
     private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
+            .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()))
             .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
 
     @Autowired
