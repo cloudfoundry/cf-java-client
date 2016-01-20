@@ -37,7 +37,6 @@ import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
-import reactor.rx.Promise;
 
 import static org.junit.Assert.assertEquals;
 
@@ -79,7 +78,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     Mono<RouteEntity> entity = this.cloudFoundryClient.routes().create(request)
                             .map(Resources::getEntity);
 
-                    return Mono.when(this.domainId, this.spaceId, entity);
+                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
                 })
                 .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                         .assertThat(this::assertDomainIdAndSpaceId));
@@ -98,8 +97,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().create(organization);
 
                 })
-                .map(response -> response.getMetadata().getId())
-                .as(Promise::from);
+                .map(Resources::getId);
     }
 
     @Test
@@ -143,7 +141,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request)
-                            .then(response -> this.domainId);
+                            .map(response -> domainId);
                 })
                 .then(domainId -> {
                     RouteExistsRequest request = RouteExistsRequest.builder()
@@ -172,7 +170,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request)
-                            .then(response -> this.domainId);
+                            .map(response -> domainId);
                 })
                 .then(domainId -> {
                     RouteExistsRequest request = RouteExistsRequest.builder()
@@ -199,10 +197,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    return this.cloudFoundryClient.routes().create(request)
+                    Mono<String> routeId = this.cloudFoundryClient.routes().create(request)
                             .map(Resources::getId);
+
+                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), routeId);
                 })
-                .then(routeId -> {
+                .then(tuple -> {
+                    String domainId = tuple.t1;
+                    String spaceId = tuple.t2;
+                    String routeId = tuple.t3;
+
                     GetRouteRequest request = GetRouteRequest.builder()
                             .id(routeId)
                             .build();
@@ -210,7 +214,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     Mono<RouteEntity> entity = this.cloudFoundryClient.routes().get(request)
                             .map(Resources::getEntity);
 
-                    return Mono.when(this.domainId, this.spaceId, entity);
+                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
                 })
                 .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                         .assertThat(this::assertDomainIdAndSpaceId));
@@ -364,7 +368,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request)
-                            .then(response -> this.domainId);
+                            .map(response -> domainId);
                 })
                 .flatMap(domainId -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
@@ -556,7 +560,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build();
 
         Mono<String> applicationId = this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
-                .map(response -> response.getMetadata().getId());
+                .map(Resources::getId);
 
         CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
                 .domainId(domainId)
@@ -564,7 +568,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build();
 
         Mono<String> routeId = this.cloudFoundryClient.routes().create(createRouteRequest)
-                .map(resource -> resource.getMetadata().getId());
+                .map(Resources::getId);
 
         return Mono.when(applicationId, routeId);
     }
