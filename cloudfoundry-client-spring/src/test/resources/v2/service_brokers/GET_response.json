@@ -1,0 +1,50 @@
+{
+  "total_results": 3,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "b52de6f1-15dd-4069-8b42-f052cc9333fc",
+        "url": "/v2/service_brokers/b52de6f1-15dd-4069-8b42-f052cc9333fc",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": "2015-07-27T22:43:23Z"
+      },
+      "entity": {
+        "name": "name-980",
+        "broker_url": "https://foo.com/url-39",
+        "auth_username": "auth_username-39",
+        "space_guid": "4f34c35e-be0d-409e-9279-1ccd7058c5d8"
+      }
+    },
+    {
+      "metadata": {
+        "guid": "812e9e7f-b5b0-4587-ba3c-b4a7c574fb88",
+        "url": "/v2/service_brokers/812e9e7f-b5b0-4587-ba3c-b4a7c574fb88",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-981",
+        "broker_url": "https://foo.com/url-40",
+        "auth_username": "auth_username-40",
+        "space_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "93e760c4-ff3d-447a-9cff-a17f4454eaee",
+        "url": "/v2/service_brokers/93e760c4-ff3d-447a-9cff-a17f4454eaee",
+        "created_at": "2015-07-27T22:43:23Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-982",
+        "broker_url": "https://foo.com/url-41",
+        "auth_username": "auth_username-41",
+        "space_guid": null
+      }
+    }
+  ]
+}
