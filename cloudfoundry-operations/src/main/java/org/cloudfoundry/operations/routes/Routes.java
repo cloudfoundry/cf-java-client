@@ -37,7 +37,7 @@ public interface Routes {
      *
      * @param request The Create Route request
      */
-    Publisher<Void> create(CreateRouteRequest request);
+    Mono<Void> create(CreateRouteRequest request);
 
     /**
      * Lists the routes and the applications bound to those routes
@@ -52,6 +52,6 @@ public interface Routes {
      *
      * @param request the Map Route request
      */
-    Publisher<Void> map(MapRouteRequest request);
+    Mono<Void> map(MapRouteRequest request);
 
 }

@@ -74,7 +74,6 @@ public final class DefaultRoutesTest {
             ListSharedDomainsRequest request2 = fillPage(ListSharedDomainsRequest.builder())
                     .name("test-invalid-domain")
                     .build();
-
             ListSharedDomainsResponse response2 = ListSharedDomainsResponse.builder()
                     .totalPages(1)
                     .build();
@@ -89,7 +88,10 @@ public final class DefaultRoutesTest {
 
         @Override
         protected Mono<Boolean> invoke() {
-            return this.routes.check(fill(CheckRouteRequest.builder(), "invalid-").build());
+            CheckRouteRequest request = fill(CheckRouteRequest.builder(), "invalid-")
+                    .build();
+
+            return this.routes.check(request);
         }
 
     }
@@ -795,14 +797,14 @@ public final class DefaultRoutesTest {
                     .domainId("test-privateDomain-id")
                     .generatePort(null)
                     .port(null)
-                    .spaceId(null)
+                    .spaceId(TEST_SPACE_ID)
                     .build();
-            CreateRouteResponse response3 = fill(CreateRouteResponse.builder(), "createdRoute")
+            CreateRouteResponse response3 = fill(CreateRouteResponse.builder(), "createdRoute-")
                     .build();
             when(this.routes.create(request3)).thenReturn(Mono.just(response3));
 
             AssociateApplicationRouteRequest request4 = fill(AssociateApplicationRouteRequest.builder())
-                    .routeId("test-createdRouteid")
+                    .routeId("test-createdRoute-id")
                     .build();
             AssociateApplicationRouteResponse response4 = fill(AssociateApplicationRouteResponse.builder())
                     .build();
@@ -860,14 +862,14 @@ public final class DefaultRoutesTest {
                     .domainId("test-sharedDomain-id")
                     .generatePort(null)
                     .port(null)
-                    .spaceId(null)
+                    .spaceId(TEST_SPACE_ID)
                     .build();
-            CreateRouteResponse response4 = fill(CreateRouteResponse.builder(), "createdRoute")
+            CreateRouteResponse response4 = fill(CreateRouteResponse.builder(), "createdRoute-")
                     .build();
             when(this.routes.create(request4)).thenReturn(Mono.just(response4));
 
             AssociateApplicationRouteRequest request5 = fill(AssociateApplicationRouteRequest.builder())
-                    .routeId("test-createdRouteid")
+                    .routeId("test-createdRoute-id")
                     .build();
             AssociateApplicationRouteResponse response5 = fill(AssociateApplicationRouteResponse.builder())
                     .build();
