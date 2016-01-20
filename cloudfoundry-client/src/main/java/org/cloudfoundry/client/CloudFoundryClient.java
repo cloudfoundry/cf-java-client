@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -135,6 +136,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Service Instances Client API
      */
     ServiceInstances serviceInstances();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Plans Client API
+     *
+     * @return the Cloud Foundry Service Plans Client API
+     */
+    ServicePlans servicePlans();
 
     /**
      * Main entry point to the Cloud Foundry Shared Domains Client API
