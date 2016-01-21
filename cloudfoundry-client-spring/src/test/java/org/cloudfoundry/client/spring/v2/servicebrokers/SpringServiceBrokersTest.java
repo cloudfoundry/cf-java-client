@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring.v2.servicebrokers;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
