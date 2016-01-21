@@ -77,7 +77,7 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     /**
      * The ports
      *
-     * @param paths the ports
+     * @param ports the ports
      * @return the ports
      */
     @Getter(onMethod = @__(@InFilterParameter("port")))
