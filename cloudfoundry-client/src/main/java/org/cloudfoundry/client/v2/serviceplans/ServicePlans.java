@@ -22,6 +22,14 @@ import reactor.core.publisher.Mono;
 public interface ServicePlans {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plans/list_all_service_plans.html">List Service Plans</a> request
+     *
+     * @param request the List Service Plans request
+     * @return the response from the List Service Plans request
+     */
+    Mono<ListServicePlansResponse> list(ListServicePlansRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plans/list_all_service_instances_for_the_service_plan.html">List all Service Instances for the Service Plan</a> request
      *
      * @param request the List Service Instances request
