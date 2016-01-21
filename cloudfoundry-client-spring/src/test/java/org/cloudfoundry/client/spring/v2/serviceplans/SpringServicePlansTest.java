@@ -22,6 +22,11 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -29,6 +34,64 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringServicePlansTest {
+
+    public static final class List extends AbstractApiTest<ListServicePlansRequest, ListServicePlansResponse> {
+
+        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServicePlansRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET)
+                    .path("v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/service_plans/GET_{id}_response.json");
+        }
+
+        @Override
+        protected ListServicePlansResponse getResponse() {
+            return ListServicePlansResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(ServicePlanResource.builder()
+                            .metadata(Resource.Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:16Z")
+                                    .id("956cb355-3acc-4ced-8161-a57b9b5c7943")
+                                    .url("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943")
+                                    .build())
+                            .entity(ServicePlanEntity.builder()
+                                    .name("name-464")
+                                    .free(false)
+                                    .description("desc-54")
+                                    .serviceId("83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
+                                    .uniqueId("49aee95b-2108-4bbb-9769-c6197f308acf")
+                                    .visible(true)
+                                    .active(true)
+                                    .serviceUrl("/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
+                                    .serviceInstanceUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected ListServicePlansRequest getValidRequest() throws Exception {
+            return ListServicePlansRequest.builder()
+                    .serviceId("test-service-id")
+                    .page(-1)
+                    .build();
+        }
+
+        @Override
+        protected Publisher<ListServicePlansResponse> invoke(ListServicePlansRequest request) {
+            return this.servicePlans.list(request);
+        }
+    }
 
     public static final class ListServiceInstances extends AbstractApiTest<ListServicePlanServiceInstancesRequest, ListServicePlanServiceInstancesResponse> {
 
