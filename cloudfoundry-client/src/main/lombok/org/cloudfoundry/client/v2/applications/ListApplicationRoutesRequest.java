@@ -90,7 +90,7 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
      * @return the ports
      */
     @Getter(onMethod = @__(@InFilterParameter("port")))
-    private final List<String> ports;
+    private final List<Integer> ports;
 
     @Builder
     ListApplicationRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
@@ -99,7 +99,7 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
                                  @Singular List<String> hosts,
                                  @Singular List<String> organizationIds,
                                  @Singular List<String> paths,
-                                 @Singular List<String> ports) {
+                                 @Singular List<Integer> ports) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
         this.id = id;
