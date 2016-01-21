@@ -67,6 +67,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.cloudfoundry.operations.util.Tuples.consumer;
+import static org.cloudfoundry.operations.util.Tuples.function;
 import static org.junit.Assert.assertEquals;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -78,10 +80,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void associateRoute() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(tuple -> {
-                    String applicationId = tuple.t2;
-
+                .then(response -> this.applicationId)
+                .then(applicationId -> {
                     ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .build();
@@ -97,10 +97,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void copy() {
         Mono
                 .when(this.applicationId, this.spaceId)
-                .then(tuple -> {
-                    String sourceId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((sourceId, spaceId) -> {
                     CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
                             .name("copy-application")
                             .spaceId(spaceId)
@@ -109,11 +106,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
                             .map(Resources::getId)
                             .and(Mono.just(sourceId));
-                })
-                .then(tuple -> {
-                    String targetId = tuple.t1;
-                    String sourceId = tuple.t2;
-
+                }))
+                .then(function((targetId, sourceId) -> {
                     CopyApplicationRequest copyApplicationRequest = CopyApplicationRequest.builder()
                             .id(targetId)
                             .sourceAppId(sourceId)
@@ -121,7 +115,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.applicationsV2().copy(copyApplicationRequest)
                             .map(Resources::getId);
-                })
+                }))
                 .flatMap(applicationCopyId -> {
                     ListApplicationsRequest request = ListApplicationsRequest.builder()
                             .build();
@@ -150,13 +144,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     return Mono.when(Mono.just(spaceId), entity);
                 })
                 .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
-                        .assertThat(tuple -> {
-                            String spaceId = tuple.t1;
-                            ApplicationEntity entity = tuple.t2;
-
+                        .assertThat(consumer((spaceId, entity) -> {
                             assertEquals(spaceId, entity.getSpaceId());
                             assertEquals("test-application-2", entity.getName());
-                        }));
+                        })));
     }
 
     @Before
@@ -266,15 +257,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return Mono.when(Mono.just(applicationId), environment);
                 })
-                .then(tuple -> {
-                    String applicationId = tuple.t1;
-                    ApplicationEnvironmentResponse response = tuple.t2;
-
+                .then(function((applicationId, response) -> {
                     Map<String, String> vcapApplication = (Map<String, String>) response.getApplicationEnvironmentJsons().get("VCAP_APPLICATION");
                     String actual = vcapApplication.get("application_id");
 
                     return Mono.when(Mono.just(applicationId), Mono.just(actual));
-                })
+                }))
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
     }
@@ -342,10 +330,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByOrganizationId() {
-        Mono.when(this.applicationId, this.organizationId)
-                .then(tuple -> {
-                    String organizationId = tuple.t2;
-
+        this.applicationId
+                .then(applicationId -> this.organizationId)
+                .then(organizationId -> {
                     ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
                             .organizationId(organizationId)
                             .build();
@@ -359,10 +346,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterBySpaceId() {
-        Mono.when(this.applicationId, this.spaceId)
-                .then(tuple -> {
-                    String spaceId = tuple.t2;
-
+        this.applicationId
+                .then(applicationId -> this.spaceId)
+                .then(spaceId -> {
                     ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
                             .spaceId(spaceId)
                             .build();
@@ -376,10 +362,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByStackId() {
-        Mono.when(this.applicationId, this.stackId)
-                .then(tuple -> {
-                    String stackId = tuple.t2;
-
+        this.applicationId
+                .then(applicationId -> this.stackId)
+                .then(stackId -> {
                     ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
                             .stackId(stackId)
                             .build();
@@ -394,10 +379,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void listRoutes() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(tuple -> {
-                    String applicationId = tuple.t2;
-
+                .then(response -> this.applicationId)
+                .then(applicationId -> {
                     ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .build();
@@ -413,10 +396,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listRoutesFilterByDomainId() {
         createApplicationRoute()
                 .and(this.applicationId)
-                .then(tuple -> {
-                    CreateRouteResponse routeResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .domainId(routeResponse.getEntity().getDomainId())
@@ -424,7 +404,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
                             .map(PaginatedResponse::getTotalResults);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertEquals(1));
     }
@@ -433,10 +413,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listRoutesFilterByHost() {
         createApplicationRoute()
                 .and(this.applicationId)
-                .then(tuple -> {
-                    CreateRouteResponse routeResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .host(routeResponse.getEntity().getHost())
@@ -444,7 +421,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
                             .map(PaginatedResponse::getTotalResults);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertEquals(1));
     }
@@ -453,10 +430,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listRoutesFilterByPath() {
         createApplicationRoute()
                 .and(this.applicationId)
-                .then(tuple -> {
-                    CreateRouteResponse routeResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .path(routeResponse.getEntity().getPath())
@@ -464,7 +438,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
                             .map(PaginatedResponse::getTotalResults);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertEquals(1));
     }
@@ -473,10 +447,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listRoutesFilterByPort() {
         createApplicationRoute()
                 .and(this.applicationId)
-                .then(tuple -> {
-                    CreateRouteResponse routeResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
                             .port(routeResponse.getEntity().getPort())
@@ -484,7 +455,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
                             .map(PaginatedResponse::getTotalResults);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertEquals(1));
     }
@@ -498,10 +469,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     Mono<String> serviceInstanceId = Mono.just("");
                     return Mono.just(applicationId).and(serviceInstanceId);
                 })
-                .then(tuple -> {
-                    String applicationId = tuple.t1;
-                    String serviceInstanceId = tuple.t2;
-
+                .then(function((applicationId, serviceInstanceId) -> {
                     CreateServiceBindingRequest serviceBindingRequest = CreateServiceBindingRequest.builder()
                             .applicationId(applicationId)
                             .serviceInstanceId(serviceInstanceId)
@@ -509,7 +477,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.serviceBindings().create(serviceBindingRequest)
                             .map(response -> applicationId);
-                })
+                }))
                 .then(applicationId -> {
                     ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
                             .id(applicationId)
@@ -546,10 +514,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void removeRoute() {
         createApplicationRoute()
                 .and(this.applicationId)
-                .then(tuple -> {
-                    CreateRouteResponse routeResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                .then(function((routeResponse, applicationId) -> {
                     String routeId = Resources.getId(routeResponse);
 
                     RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
@@ -558,7 +523,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().removeRoute(request);
-                })
+                }))
                 .subscribe(testSubscriber());
     }
 
@@ -705,10 +670,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .map(Resources::getId);
                 })
                 .and(this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .host("test-host")
@@ -719,11 +681,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     Mono<CreateRouteResponse> response = this.cloudFoundryClient.routes().create(createRouteRequest);
 
                     return response.and(this.applicationId);
-                })
-                .then(tuple -> {
-                    CreateRouteResponse createRouteResponse = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                }))
+                .then(function((createRouteResponse, applicationId) -> {
                     AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
                             .id(applicationId)
                             .routeId(createRouteResponse.getMetadata().getId())
@@ -731,7 +690,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.applicationsV2().associateRoute(request)
                             .map(response -> createRouteResponse);
-                });
+                }));
     }
 
     private Mono<String> getApplicationState(String applicationId) {

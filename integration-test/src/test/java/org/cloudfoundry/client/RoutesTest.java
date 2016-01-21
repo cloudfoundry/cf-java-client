@@ -35,9 +35,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
+import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 
+import static org.cloudfoundry.operations.util.Tuples.consumer;
+import static org.cloudfoundry.operations.util.Tuples.function;
 import static org.junit.Assert.assertEquals;
 
 public final class RoutesTest extends AbstractIntegrationTest {
@@ -48,8 +51,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void associateApplication() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
@@ -66,10 +69,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void create() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -79,9 +79,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .map(Resources::getEntity);
 
                     return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
-                })
+                }))
                 .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                        .assertThat(this::assertDomainIdAndSpaceId));
+                        .assertThat(consumer(this::assertDomainIdAndSpaceId)));
     }
 
     @Before
@@ -104,10 +104,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void delete() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -115,7 +112,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .map(Resources::getId);
-                })
+                }))
                 .then(routeId -> {
                     DeleteRouteRequest request = DeleteRouteRequest.builder()
                             .id(routeId)
@@ -130,10 +127,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void exists() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .host("test-host")
@@ -142,7 +136,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .map(response -> domainId);
-                })
+                }))
                 .then(domainId -> {
                     RouteExistsRequest request = RouteExistsRequest.builder()
                             .domainId(domainId)
@@ -159,10 +153,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void existsDoesNotExist() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .host("test-host")
@@ -171,7 +162,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .map(response -> domainId);
-                })
+                }))
                 .then(domainId -> {
                     RouteExistsRequest request = RouteExistsRequest.builder()
                             .domainId(domainId)
@@ -188,10 +179,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void get() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -201,12 +189,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .map(Resources::getId);
 
                     return Mono.when(Mono.just(domainId), Mono.just(spaceId), routeId);
-                })
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-                    String routeId = tuple.t3;
-
+                }))
+                .then(function((domainId, spaceId, routeId) -> {
                     GetRouteRequest request = GetRouteRequest.builder()
                             .id(routeId)
                             .build();
@@ -215,26 +199,23 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .map(Resources::getEntity);
 
                     return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
-                })
+                }))
                 .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                        .assertThat(this::assertDomainIdAndSpaceId));
+                        .assertThat(consumer(this::assertDomainIdAndSpaceId)));
     }
 
     @Test
     public void list() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request);
-                })
+                }))
                 .flatMap(response -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .build();
@@ -250,8 +231,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listApplications() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
@@ -268,8 +249,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listApplicationsFilterByDiego() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .diego(true)
@@ -287,8 +268,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listApplicationsFilterByName() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
@@ -306,13 +287,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listApplicationsFilterByOrganizationId() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .and(this.organizationId)
-                .flatMap(tuple -> {
-                    String routeId = tuple.t1;
-                    String organizationId = tuple.t2;
-
+                .flatMap(function((routeId, organizationId) -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
                             .organizationId(organizationId)
@@ -320,7 +298,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertCount(1));
     }
@@ -329,13 +307,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listApplicationsFilterBySpaceId() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(this::associateApplicationWithRoute)
+                .then(function(this::createApplicationAndRoute))
+                .then(function(this::associateApplicationWithRoute))
                 .and(this.spaceId)
-                .flatMap(tuple -> {
-                    String routeId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .flatMap(function((routeId, spaceId) -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
                             .spaceId(spaceId)
@@ -343,7 +318,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().listApplications(request)
                             .flatMap(Resources::getResources);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertCount(1));
     }
@@ -358,10 +333,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByDomainId() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -369,7 +341,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .map(response -> domainId);
-                })
+                }))
                 .flatMap(domainId -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .domainId(domainId)
@@ -386,10 +358,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByHost() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .host("test-host")
@@ -397,7 +366,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request);
-                })
+                }))
                 .flatMap(response -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .host("test-host")
@@ -414,10 +383,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByOrganizationId() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -425,7 +391,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .then(response -> this.organizationId);
-                })
+                }))
                 .flatMap(organizationId -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .organizationId(organizationId)
@@ -442,10 +408,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listFilterByPath() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .path("/test-path")
@@ -453,7 +416,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.routes().create(request);
-                })
+                }))
                 .flatMap(response -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
                             .path("/test-path")
@@ -470,13 +433,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void removeApplication() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(this::createApplicationAndRoute)
-                .then(tuple -> associateApplicationWithRoute(tuple)
-                        .map(response -> tuple))
-                .then(tuple -> {
-                    String applicationId = tuple.t1;
-                    String routeId = tuple.t2;
-
+                .then(function(this::createApplicationAndRoute))
+                .then(function((applicationId, routeId) -> {
+                    return associateApplicationWithRoute(applicationId, routeId)
+                            .map(response -> Tuple.of(applicationId, routeId));
+                }))
+                .then(function((applicationId, routeId) -> {
                     RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
                             .applicationId(applicationId)
                             .id(routeId)
@@ -484,7 +446,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().removeApplication(request)
                             .map(response -> routeId);
-                })
+                }))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .id(routeId)
@@ -501,10 +463,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void update() {
         Mono
                 .when(this.domainId, this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateRouteRequest request = CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
@@ -512,7 +471,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().create(request)
                             .map(Resources::getId);
-                })
+                }))
                 .then(routeId -> {
                     UpdateRouteRequest request = UpdateRouteRequest.builder()
                             .host("test-host")
@@ -527,19 +486,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .assertThat(entity -> assertEquals("test-host", entity.getHost())));
     }
 
-    private void assertDomainIdAndSpaceId(Tuple3<String, String, RouteEntity> tuple) {
-        String domainId = tuple.t1;
-        String spaceId = tuple.t2;
-        RouteEntity entity = tuple.t3;
-
+    private void assertDomainIdAndSpaceId(String domainId, String spaceId, RouteEntity entity) {
         assertEquals(domainId, entity.getDomainId());
         assertEquals(spaceId, entity.getSpaceId());
     }
 
-    private Mono<String> associateApplicationWithRoute(Tuple2<String, String> tuple) {
-        String applicationId = tuple.t1;
-        String routeId = tuple.t2;
-
+    private Mono<String> associateApplicationWithRoute(String applicationId, String routeId) {
         AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
                 .applicationId(applicationId)
                 .id(routeId)
@@ -549,10 +501,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .map(response -> routeId);
     }
 
-    private Mono<Tuple2<String, String>> createApplicationAndRoute(Tuple2<String, String> tuple) {
-        String domainId = tuple.t1;
-        String spaceId = tuple.t2;
-
+    private Mono<Tuple2<String, String>> createApplicationAndRoute(String domainId, String spaceId) {
         CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
                 .diego(true)
                 .name("test-application-name")

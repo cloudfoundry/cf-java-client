@@ -34,7 +34,10 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.operations.util.Dates;
+import org.cloudfoundry.operations.util.Function2;
+import org.cloudfoundry.operations.util.Function4;
 import org.cloudfoundry.operations.util.Optional;
+import org.cloudfoundry.operations.util.Tuples;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -127,16 +130,16 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>> requestApplicationResource(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>>() {
+        return Tuples.function(new Function2<GetApplicationRequest, String, Mono<ApplicationResource>>() {
 
             @Override
-            public Mono<ApplicationResource> apply(Tuple2<GetApplicationRequest, String> tuple) {
+            public Mono<ApplicationResource> apply(GetApplicationRequest getApplicationRequest, String spaceId) {
                 return Paginated
-                        .requestResources(requestListApplicationsPage(cloudFoundryClient, tuple))
+                        .requestResources(requestListApplicationsPage(cloudFoundryClient, getApplicationRequest, spaceId))
                         .single();
             }
 
-        };
+        });
     }
 
     private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -155,14 +158,12 @@ public final class DefaultApplications implements Applications {
         return cloudFoundryClient.applicationsV2().summary(request);
     }
 
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient cloudFoundryClient, final Tuple2<GetApplicationRequest, String> tuple) {
+    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient cloudFoundryClient, final GetApplicationRequest getApplicationRequest,
+                                                                                                      final String spaceId) {
         return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
-                GetApplicationRequest getApplicationRequest = tuple.t1;
-                String spaceId = tuple.t2;
-
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
                         .id(spaceId)
                         .name(getApplicationRequest.getName())
@@ -219,14 +220,11 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, ApplicationDetail> toApplicationDetail() {
-        return new Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, ApplicationDetail>() {
+        return Tuples.function(new Function4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, ApplicationDetail>() {
 
             @Override
-            public ApplicationDetail apply(Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse> tuple) {
-                ApplicationStatisticsResponse applicationStatisticsResponse = tuple.t1;
-                SummaryApplicationResponse summaryApplicationResponse = tuple.t2;
-                GetStackResponse getStackResponse = tuple.t3;
-                ApplicationInstancesResponse applicationInstancesResponse = tuple.t4;
+            public ApplicationDetail apply(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse, GetStackResponse getStackResponse,
+                                           ApplicationInstancesResponse applicationInstancesResponse) {
 
                 List<String> urls = toUrls(summaryApplicationResponse.getRoutes());
 
@@ -244,7 +242,7 @@ public final class DefaultApplications implements Applications {
                         .build();
             }
 
-        };
+        });
     }
 
     private static Date toDate(String date) {

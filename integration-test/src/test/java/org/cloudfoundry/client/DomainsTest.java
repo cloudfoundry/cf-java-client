@@ -35,6 +35,8 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
+import static org.cloudfoundry.operations.util.Tuples.consumer;
+import static org.cloudfoundry.operations.util.Tuples.function;
 import static org.junit.Assert.assertEquals;
 
 public final class DomainsTest extends AbstractIntegrationTest {
@@ -45,7 +47,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(this::createDomainEntity)
                 .and(this.organizationId)
                 .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                        .assertThat(this::assertDomainNameAndOrganizationId));
+                        .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
     }
 
     @Test
@@ -76,7 +78,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 })
                 .and(this.organizationId)
                 .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                        .assertThat(this::assertDomainNameAndOrganizationId));
+                        .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
     }
 
     @Test
@@ -117,10 +119,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(this::createDomainId)
                 .and(this.spaceId)
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String spaceId = tuple.t2;
-
+                .then(function((domainId, spaceId) -> {
                     CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
                             .name("test-application-name")
                             .spaceId(spaceId)
@@ -138,12 +137,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .map(Resources::getId);
 
                     return Mono.when(Mono.just(domainId), applicationId, routeId);
-                })
-                .then(tuple -> {
-                    String domainId = tuple.t1;
-                    String applicationId = tuple.t2;
-                    String routeId = tuple.t3;
-
+                }))
+                .then(function((domainId, applicationId, routeId) -> {
                     AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
                             .id(routeId)
                             .applicationId(applicationId)
@@ -151,11 +146,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.routes().associateApplication(request)
                             .map(response -> Tuple.of(domainId, applicationId));
-                })
-                .flatMap((Tuple2<String, String> tuple) -> {
-                    String domainId = tuple.t1;
-                    String applicationId = tuple.t2;
-
+                }))
+                .flatMap(function((domainId, applicationId) -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .applicationId(applicationId)
                             .id(domainId)
@@ -163,7 +155,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
                     return this.cloudFoundryClient.domains().listSpaces(request)
                             .flatMap(Resources::getResources);
-                })
+                }))
                 .subscribe(testSubscriber()
                         .assertCount(1));
     }
@@ -198,10 +190,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(this::createDomainId)
                 .and(this.organizationId)
-                .flatMap(tuple -> {
-                    String domainId = tuple.t1;
-                    String organizationId = tuple.t2;
-
+                .flatMap(function((domainId, organizationId) -> {
                     ListDomainSpacesRequest response = ListDomainSpacesRequest.builder()
                             .id(domainId)
                             .organizationId(organizationId)
@@ -210,7 +199,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.domains().listSpaces(response)
                             .flatMap(Resources::getResources)
                             .map(Resources::getId);
-                })
+                }))
                 .zipWith(this.spaceId)
                 .subscribe(this.<Tuple2<String, String>>testSubscriber()
                         .assertThat(this::assertTupleEquality));
@@ -249,10 +238,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                         .assertCount(1));
     }
 
-    private void assertDomainNameAndOrganizationId(Tuple2<DomainEntity, String> tuple) {
-        DomainEntity entity = tuple.t1;
-        String organizationId = tuple.t2;
-
+    private void assertDomainNameAndOrganizationId(DomainEntity entity, String organizationId) {
         assertEquals("test.domain.name", entity.getName());
         assertEquals(organizationId, entity.getOwningOrganizationId());
     }

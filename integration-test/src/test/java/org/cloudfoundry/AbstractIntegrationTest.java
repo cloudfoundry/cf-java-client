@@ -48,6 +48,7 @@ import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.cloudfoundry.operations.util.Tuples.predicate;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -165,12 +166,7 @@ public abstract class AbstractIntegrationTest {
                 })
                 .map(Resources::getId)
                 .withLatestFrom(defaultOrganizationId, Tuple::of)
-                .filter(tuple -> {
-                    String organizationId = tuple.t1;
-                    String defaultOrganizationId2 = tuple.t2;
-
-                    return !organizationId.equals(defaultOrganizationId2);
-                })
+                .filter(predicate((organizationId, defaultOrganizationId2) -> !organizationId.equals(defaultOrganizationId2)))
                 .map(Tuple2::getT1)
                 .flatMap(organizationId -> {
                     DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
@@ -210,12 +206,7 @@ public abstract class AbstractIntegrationTest {
                 })
                 .map(Resources::getId)
                 .withLatestFrom(defaultSpaceId, Tuple::of)
-                .filter(tuple -> {
-                    String spaceId = tuple.t1;
-                    String defaultSpaceId2 = tuple.t2;
-
-                    return !spaceId.equals(defaultSpaceId2);
-                })
+                .filter(predicate((spaceId, defaultSpaceId2) -> !spaceId.equals(defaultSpaceId2)))
                 .map(Tuple2::getT1)
                 .flatMap(spaceId -> {
                     DeleteSpaceRequest request = DeleteSpaceRequest.builder()
