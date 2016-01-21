@@ -66,15 +66,6 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     private final String id;
 
     /**
-     * The organization ids
-     *
-     * @param organizationIds the organization ids
-     * @return the organization ids
-     */
-    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
-    private final List<String> organizationIds;
-
-    /**
      * The paths
      *
      * @param paths the paths
@@ -97,14 +88,12 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
                                  @Singular List<String> domainIds,
                                  String id,
                                  @Singular List<String> hosts,
-                                 @Singular List<String> organizationIds,
                                  @Singular List<String> paths,
                                  @Singular List<Integer> ports) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
         this.id = id;
         this.hosts = hosts;
-        this.organizationIds = organizationIds;
         this.paths = paths;
         this.ports = ports;
     }
