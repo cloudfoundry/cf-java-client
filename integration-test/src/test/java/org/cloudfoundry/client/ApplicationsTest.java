@@ -469,19 +469,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .assertEquals(1));
     }
 
-    //TODO Implement missing client API
-    @Ignore("TODO: port filter parameter https://www.pivotaltracker.com/story/show/111997999")
     @Test
     public void listRoutesFilterByPort() {
         createApplicationRoute()
                 .and(this.applicationId)
                 .then(tuple -> {
-//                    RouteEntity routeEntity = tuple.t1;
+                    CreateRouteResponse routeResponse = tuple.t1;
                     String applicationId = tuple.t2;
 
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
                             .id(applicationId)
-//                            .port(routeEntity.getPort())
+                            .port(routeResponse.getEntity().getPort())
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
@@ -718,11 +716,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
                     Mono<CreateRouteResponse> response = this.cloudFoundryClient.routes().create(createRouteRequest);
 
-                    return this.applicationId.and(response);
+                    return response.and(this.applicationId);
                 })
                 .then(tuple -> {
-                    String applicationId = tuple.t1;
-                    CreateRouteResponse createRouteResponse = tuple.t2;
+                    CreateRouteResponse createRouteResponse = tuple.t1;
+                    String applicationId = tuple.t2;
 
                     AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
                             .id(applicationId)

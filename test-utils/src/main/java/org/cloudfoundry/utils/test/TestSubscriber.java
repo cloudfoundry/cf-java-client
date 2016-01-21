@@ -53,9 +53,9 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
     private Consumer<Subscription> scanningCallback;
 
-    private Subscription subscription;
-
     private long startTime;
+
+    private Subscription subscription;
 
     public TestSubscriber<T> assertCount(Integer expected) {
         this.countExpectation = expected;
