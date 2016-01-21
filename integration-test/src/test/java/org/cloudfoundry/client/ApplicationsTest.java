@@ -594,7 +594,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Ignore("TODO: wait for different state https://www.pivotaltracker.com/story/show/111976811")
     public void statistics() {
         this.applicationId
                 .then(this::uploadAndStartApplication)
@@ -604,7 +603,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().statistics(request)
-                            .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName());
+                            .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName())
+                            .as(Stream::from)
+                            .retry(5l, throwable -> throwable instanceof NullPointerException)
+                            .single();
                 })
                 .subscribe(testSubscriber()
                         .assertEquals(TEST_APPLICATION_NAME));
