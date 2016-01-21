@@ -22,6 +22,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.util.Exceptions;
+import org.cloudfoundry.operations.util.Function2;
+import org.cloudfoundry.operations.util.Predicate2;
+import org.cloudfoundry.operations.util.Tuples;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -29,7 +32,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
-import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
@@ -65,40 +67,26 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
                 .map(toSpaceQuota());
     }
 
-    private static Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> combineRequestWithDefinition(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-        return new Function<SpaceQuotaDefinitionResource, Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
+    private static Predicate<Tuple2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>> equalRequestAndDefinitionName() {
+        return Tuples.predicate(new Predicate2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>() {
 
             @Override
-            public Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource) {
-                return Tuple.of(tuple.t1, spaceQuotaDefinitionResource);
-            }
-
-        };
-    }
-
-    private static Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> equalRequestAndDefinitionName() {
-        return new Predicate<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>() {
-
-            @Override
-            public boolean test(Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> tuple) {
-                GetSpaceQuotaRequest request = tuple.t1;
-                SpaceQuotaDefinitionResource resource = tuple.t2;
-
+            public boolean test(SpaceQuotaDefinitionResource resource, GetSpaceQuotaRequest request) {
                 return request.getName().equals(Resources.getEntity(resource).getName());
             }
 
-        };
+        });
     }
 
-    private static Function<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, SpaceQuotaDefinitionResource> extractQuotaDefinition() {
-        return new Function<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>, SpaceQuotaDefinitionResource>() {
+    private static Function<Tuple2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>, SpaceQuotaDefinitionResource> extractQuotaDefinition() {
+        return Tuples.function(new Function2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>() {
 
             @Override
-            public SpaceQuotaDefinitionResource apply(Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource> tuple) {
-                return tuple.t2;
+            public SpaceQuotaDefinitionResource apply(SpaceQuotaDefinitionResource spaceQuotaDefinitionResource, GetSpaceQuotaRequest getSpaceQuotaRequest) {
+                return spaceQuotaDefinitionResource;
             }
 
-        };
+        });
     }
 
     private static Stream<SpaceQuotaDefinitionResource> fromSpaceQuotaDefinitionResourceStream(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
@@ -129,19 +117,18 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
         };
     }
 
-    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>> requestSpaceQuotaDefinitionsWithContext(
+    private static Function<Tuple2<GetSpaceQuotaRequest, String>, Stream<Tuple2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>>> requestSpaceQuotaDefinitionsWithContext(
             final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<GetSpaceQuotaRequest, String>, Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>>>() {
+
+        return Tuples.function(new Function2<GetSpaceQuotaRequest, String, Stream<Tuple2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>>>() {
 
             @Override
-            public Stream<Tuple2<GetSpaceQuotaRequest, SpaceQuotaDefinitionResource>> apply(final Tuple2<GetSpaceQuotaRequest, String> tuple) {
-                String organizationId = tuple.t2;
-
+            public Stream<Tuple2<SpaceQuotaDefinitionResource, GetSpaceQuotaRequest>> apply(GetSpaceQuotaRequest request, String organizationId) {
                 return fromSpaceQuotaDefinitionResourceStream(cloudFoundryClient, organizationId)
-                        .map(combineRequestWithDefinition(tuple));
+                        .zipWith(Mono.just(request));
             }
 
-        };
+        });
     }
 
     private static Function<SpaceQuotaDefinitionResource, SpaceQuota> toSpaceQuota() {

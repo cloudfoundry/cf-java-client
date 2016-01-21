@@ -40,8 +40,11 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.util.Function2;
+import org.cloudfoundry.operations.util.Function6;
 import org.cloudfoundry.operations.util.Optional;
 import org.cloudfoundry.operations.util.Optionals;
+import org.cloudfoundry.operations.util.Tuples;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -137,13 +140,10 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Function<Tuple2<SpaceResource, GetSpaceRequest>, Mono<SpaceDetail>> getAuxiliaryContent(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<SpaceResource, GetSpaceRequest>, Mono<SpaceDetail>>() {
+        return Tuples.function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
 
             @Override
-            public Mono<SpaceDetail> apply(Tuple2<SpaceResource, GetSpaceRequest> tuple) {
-                SpaceResource spaceResource = tuple.t1;
-                GetSpaceRequest request = tuple.t2;
-
+            public Mono<SpaceDetail> apply(SpaceResource spaceResource, GetSpaceRequest request) {
                 return Mono
                         .when(requestApplicationNames(cloudFoundryClient, spaceResource), requestDomainNames(cloudFoundryClient, spaceResource),
                                 requestOrganizationName(cloudFoundryClient, spaceResource), requestSecurityGroups(cloudFoundryClient, spaceResource),
@@ -151,7 +151,7 @@ public final class DefaultSpaces implements Spaces {
                         .map(toSpaceDetail(spaceResource));
             }
 
-        };
+        });
     }
 
     private static Mono<List<String>> requestApplicationNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
@@ -272,20 +272,17 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>> requestSpaceResourceWithContext(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
+        return Tuples.function(new Function2<GetSpaceRequest, String, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
 
             @Override
-            public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(Tuple2<GetSpaceRequest, String> tuple) {
-                GetSpaceRequest request = tuple.t1;
-                String organizationId = tuple.t2;
-
+            public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(GetSpaceRequest request, String organizationId) {
                 return Paginated
                         .requestResources(requestOrganizationSpacePage(cloudFoundryClient, organizationId, request))
                         .single()
                         .and(Mono.just(request));
             }
 
-        };
+        });
     }
 
     private static Function<String, Stream<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
@@ -332,17 +329,10 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Function<Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>>, SpaceDetail> toSpaceDetail(final SpaceResource spaceResource) {
-        return new Function<Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>>, SpaceDetail>() {
+        return Tuples.function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
 
             @Override
-            public SpaceDetail apply(Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>> tuple) {
-                List<String> applications = tuple.t1;
-                List<String> domains = tuple.t2;
-                String organization = tuple.t3;
-                List<String> securityGroups = tuple.t4;
-                List<String> services = tuple.t5;
-                Optional<SpaceQuota> spaceQuota = tuple.t6;
-
+            public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota> spaceQuota) {
                 return SpaceDetail.builder()
                         .applications(applications)
                         .domains(domains)
@@ -355,7 +345,7 @@ public final class DefaultSpaces implements Spaces {
                         .build();
             }
 
-        };
+        });
     }
 
     private static Function<GetSpaceQuotaDefinitionResponse, SpaceQuota> toSpaceQuotaDefinition() {

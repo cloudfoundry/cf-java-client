@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
+import static org.cloudfoundry.operations.util.Tuples.consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,12 +46,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     return Mono.when(Mono.just(resource), actual);
                 })
                 .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
-                        .assertThat(tuple -> {
-                            EventResource expected = tuple.t1;
-                            GetEventResponse actual = tuple.t2;
-
-                            assertEquals(Resources.getId(expected), Resources.getId(actual));
-                        }));
+                        .assertThat(consumer((expected, actual) -> assertEquals(Resources.getId(expected), Resources.getId(actual)))));
     }
 
     @Test
