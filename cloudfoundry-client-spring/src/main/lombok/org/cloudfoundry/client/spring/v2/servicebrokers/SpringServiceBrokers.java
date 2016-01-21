@@ -23,6 +23,8 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.GetServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.GetServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -71,6 +73,18 @@ public final class SpringServiceBrokers extends AbstractSpringOperations impleme
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_brokers", request.getId());
             }
+        });
+    }
+
+    @Override
+    public Mono<GetServiceBrokerResponse> get(final GetServiceBrokerRequest request) {
+        return get(request, GetServiceBrokerResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_brokers", request.getId());
+            }
+
         });
     }
 

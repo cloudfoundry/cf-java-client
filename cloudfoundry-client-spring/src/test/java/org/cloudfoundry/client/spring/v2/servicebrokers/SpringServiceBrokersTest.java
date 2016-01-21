@@ -17,10 +17,13 @@
 package org.cloudfoundry.client.spring.v2.servicebrokers;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.spring.AbstractRestTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.GetServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.GetServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
@@ -120,6 +123,54 @@ public final class SpringServiceBrokersTest {
         @Override
         protected Mono<Void> invoke(DeleteServiceBrokerRequest request) {
             return this.serviceBrokers.delete(request);
+        }
+    }
+
+    public static final class Get extends AbstractApiTest<GetServiceBrokerRequest, GetServiceBrokerResponse> {
+
+        private final SpringServiceBrokers serviceBrokers = new SpringServiceBrokers(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServiceBrokerRequest getInvalidRequest() {
+            return GetServiceBrokerRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_brokers/test-id")
+                    .status(OK)
+                    .responsePayload("v2/service_brokers/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServiceBrokerResponse getResponse() {
+            return GetServiceBrokerResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-07-27T22:43:23Z")
+                            .id("1311f77f-cfb6-499e-bcba-82c7ef968ae6")
+                            .updatedAt("2015-07-27T22:43:23Z")
+                            .url("/v2/service_brokers/1311f77f-cfb6-499e-bcba-82c7ef968ae6")
+                            .build())
+                    .entity(ServiceBrokerEntity.builder()
+                            .name("name-974")
+                            .brokerUrl("https://foo.com/url-36")
+                            .authenticationUsername("auth_username-36")
+                            .spaceId("7878cee1-a484-4148-92bf-84beae20842f")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetServiceBrokerRequest getValidRequest() throws Exception {
+            return GetServiceBrokerRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetServiceBrokerResponse> invoke(GetServiceBrokerRequest request) {
+            return this.serviceBrokers.get(request);
         }
     }
 
