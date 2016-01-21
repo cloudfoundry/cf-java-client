@@ -188,7 +188,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
     private void verifyError() {
         if (this.errorActual != null) {
             if (this.errorExpectation == null) {
-                fail(String.format("Unexpected error %s", this.errorActual));
+                throw new AssertionError("Unexpected error", this.errorActual);
             }
 
             this.errorExpectation.accept(this.errorActual);
