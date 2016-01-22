@@ -33,7 +33,7 @@ public final class ServicePlanEntity {
      * @param public the visible flag
      * @return the visible flag
      */
-    private final boolean active;
+    private final Boolean active;
 
     /**
      * The description
@@ -57,7 +57,7 @@ public final class ServicePlanEntity {
      * @param free the free flag
      * @return the free flag
      */
-    private final boolean free;
+    private final Boolean free;
 
     /**
      * The name
@@ -76,12 +76,12 @@ public final class ServicePlanEntity {
     private final String serviceId;
 
     /**
-     * The service instance url
+     * The service instances url
      *
-     * @param serviceUrl the service instance url
-     * @return the service instance url
+     * @param serviceUrl the service instances url
+     * @return the service instances url
      */
-    private final String serviceInstanceUrl;
+    private final String serviceInstancesUrl;
 
     /**
      * The service url
@@ -105,26 +105,26 @@ public final class ServicePlanEntity {
      * @param public the visible flag
      * @return the visible flag
      */
-    private final boolean visible;
+    private final Boolean visible;
 
     @Builder
-    ServicePlanEntity(@JsonProperty("active") boolean active,
+    ServicePlanEntity(@JsonProperty("active") Boolean active,
                       @JsonProperty("description") String description,
                       @JsonProperty("extra") String extra,
-                      @JsonProperty("free") boolean free,
+                      @JsonProperty("free") Boolean free,
                       @JsonProperty("name") String name,
                       @JsonProperty("service_guid") String serviceId,
-                      @JsonProperty("service_instances_url") String serviceInstanceUrl,
+                      @JsonProperty("service_instances_url") String serviceInstancesUrl,
                       @JsonProperty("service_url") String serviceUrl,
                       @JsonProperty("unique_id") String uniqueId,
-                      @JsonProperty("public") boolean visible) {
+                      @JsonProperty("public") Boolean visible) {
         this.active = active;
         this.description = description;
         this.extra = extra;
         this.free = free;
         this.name = name;
         this.serviceId = serviceId;
-        this.serviceInstanceUrl = serviceInstanceUrl;
+        this.serviceInstancesUrl = serviceInstancesUrl;
         this.serviceUrl = serviceUrl;
         this.uniqueId = uniqueId;
         this.visible = visible;

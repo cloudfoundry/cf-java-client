@@ -73,7 +73,7 @@ public final class SpringServicePlansTest {
                                     .visible(true)
                                     .active(true)
                                     .serviceUrl("/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2")
-                                    .serviceInstanceUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
+                                    .serviceInstancesUrl("/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances")
                                     .build())
                             .build())
                     .build();

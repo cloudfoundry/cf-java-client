@@ -22,7 +22,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
@@ -44,7 +43,7 @@ public final class ListServicePlansRequest extends PaginatedRequest implements V
      * @param active the active flag
      * @return the active flag
      */
-    @Getter(onMethod = @__(@QueryParameter("active")))
+    @Getter(onMethod = @__(@InFilterParameter("active")))
     private final Boolean active;
 
     /**
