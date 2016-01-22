@@ -26,17 +26,61 @@ import lombok.Data;
 @Data
 public final class ApplicationInstanceInfo {
 
+    /**
+     * The console IP
+     *
+     * @param consoleIp the console IP
+     * @return the console IP
+     */
     private final String consoleIp;
 
+    /**
+     * The console port
+     *
+     * @param consolePort the console port
+     * @return the console port
+     */
     private final Integer consolePort;
 
+    /**
+     * The debug IP
+     *
+     * @param debugIp the debug IP
+     * @return the debug IP
+     */
     private final String debugIp;
 
+    /**
+     * The debug port
+     *
+     * @param debugPort the debug port
+     * @return the debug port
+     */
     private final Integer debugPort;
 
+    /**
+     * The since
+     *
+     * @param since the since
+     * @return the since
+     */
     private final Double since;
 
+    /**
+     * The state
+     *
+     * @param state the state
+     * @return the state
+     */
     private final String state;
+
+    /**
+     * The update
+     *
+     * @param update the uptime
+     * @return the uptime
+     */
+    private final Double uptime;
 
     @Builder
     ApplicationInstanceInfo(@JsonProperty("console_ip") String consoleIp,
@@ -44,13 +88,15 @@ public final class ApplicationInstanceInfo {
                             @JsonProperty("debug_ip") String debugIp,
                             @JsonProperty("debug_port") Integer debugPort,
                             @JsonProperty("since") Double since,
-                            @JsonProperty("state") String state) {
+                            @JsonProperty("state") String state,
+                            @JsonProperty("uptime") Double uptime) {
         this.consoleIp = consoleIp;
         this.consolePort = consolePort;
         this.debugIp = debugIp;
         this.debugPort = debugPort;
         this.since = since;
         this.state = state;
+        this.uptime = uptime;
     }
 
 }
