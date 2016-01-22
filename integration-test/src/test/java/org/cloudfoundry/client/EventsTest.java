@@ -38,7 +38,7 @@ public final class EventsTest extends AbstractIntegrationTest {
         getFirstEvent()
                 .then(resource -> {
                     GetEventRequest request = GetEventRequest.builder()
-                            .id(Resources.getId(resource))
+                            .eventId(Resources.getId(resource))
                             .build();
 
                     Mono<GetEventResponse> actual = this.cloudFoundryClient.events().get(request);

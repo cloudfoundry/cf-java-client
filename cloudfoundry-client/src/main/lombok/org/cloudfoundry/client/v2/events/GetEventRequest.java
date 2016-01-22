@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetEventRequest implements Validatable {
 
     /**
-     * The id
+     * The event id
      *
-     * @param id the id
-     * @return the id
+     * @param eventId the event id
+     * @return the event id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String eventId;
 
     @Builder
-    GetEventRequest(String id) {
-        this.id = id;
+    GetEventRequest(String eventId) {
+        this.eventId = eventId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.eventId == null) {
+            builder.message("event id must be specified");
         }
 
         return builder.build();

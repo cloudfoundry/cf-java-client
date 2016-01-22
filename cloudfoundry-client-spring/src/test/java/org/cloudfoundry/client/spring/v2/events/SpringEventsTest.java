@@ -46,7 +46,7 @@ public final class SpringEventsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/events/test-id")
+                    .method(GET).path("/v2/events/test-event-id")
                     .status(OK)
                     .responsePayload("v2/events/GET_{id}_response.json");
         }
@@ -78,7 +78,7 @@ public final class SpringEventsTest {
         @Override
         protected GetEventRequest getValidRequest() {
             return GetEventRequest.builder()
-                    .id("test-id")
+                    .eventId("test-event-id")
                     .build();
         }
 

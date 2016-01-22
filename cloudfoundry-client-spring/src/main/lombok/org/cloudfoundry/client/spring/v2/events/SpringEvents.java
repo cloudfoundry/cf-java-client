@@ -56,7 +56,7 @@ public final class SpringEvents extends AbstractSpringOperations implements Even
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "events", request.getId());
+                builder.pathSegment("v2", "events", request.getEventId());
             }
 
         });
