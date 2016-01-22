@@ -42,6 +42,7 @@
         <module>cloudfoundry-gradle-plugin</module>
         <module>cloudfoundry-maven-plugin</module>
         <module>cloudfoundry-operations</module>
+        <module>integration-test</module>
         <module>test-utils</module>
     </modules>
 
@@ -193,9 +194,6 @@
     <profiles>
         <profile>
             <id>integration-test</id>
-            <modules>
-                <module>integration-test</module>
-            </modules>
             <build>
                 <plugins>
                     <plugin>
