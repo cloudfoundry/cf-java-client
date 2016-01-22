@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
@@ -546,14 +547,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.applicationsV2().restage(request)
                             .map(Resources::getId);
                 })
-                .then(applicationId -> ApplicationsTest.this.getApplicationState(applicationId)
-                        .where("STAGED"::equals)
-                        .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
-                        .repeatWhen(volumes -> volumes
-                                .takeWhile(count -> count == 0)
-                                .flatMap(count -> Mono.delay(2, SECONDS)))
-                        .single()                                           // TODO: Remove once Mono.repeatWhen()
-                        .map(state -> true))
+                .then(applicationId -> {
+                    return waitForStaging(applicationId)
+                            .map(state -> true);
+                })
                 .subscribe(testSubscriber()
                         .assertEquals(true));
     }
@@ -678,9 +675,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .spaceId(spaceId)
                             .build();
 
-                    Mono<CreateRouteResponse> response = this.cloudFoundryClient.routes().create(createRouteRequest);
-
-                    return response.and(this.applicationId);
+                    return this.cloudFoundryClient.routes().create(createRouteRequest)
+                            .and(this.applicationId);
                 }))
                 .then(function((createRouteResponse, applicationId) -> {
                     AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
@@ -693,15 +689,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 }));
     }
 
-    private Mono<String> getApplicationState(String applicationId) {
-        GetApplicationRequest request = GetApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build();
-
-        return ApplicationsTest.this.cloudFoundryClient.applicationsV2().get(request)
-                .map(response -> response.getEntity().getPackageState());
-    }
-
     private Mono<String> startApplication(String applicationId) {
         UpdateApplicationRequest request = UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
@@ -710,14 +697,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         return this.cloudFoundryClient.applicationsV2().update(request)
                 .map(Resources::getId)
-                .then(updatedApplicationId -> this.getApplicationState(updatedApplicationId)
-                        .where("STAGED"::equals)
-                        .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
-                        .repeatWhen(volumes -> volumes
-                                .takeWhile(count -> count == 0)
-                                .flatMap(count -> Mono.delay(2, SECONDS)))
-                        .single()                                           // TODO: Remove once Mono.repeatWhen()
-                        .map(state -> applicationId));
+                .then(this::waitForStaging)
+                .then(this::waitForStarting);
     }
 
     private Mono<String> uploadAndStartApplication(String applicationId) {
@@ -734,6 +715,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         return this.cloudFoundryClient.applicationsV2().upload(request)
                 .map(response -> applicationId);
+    }
+
+    private Mono<String> waitForStaging(String applicationId) {
+        GetApplicationRequest request = GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build();
+
+        return this.cloudFoundryClient.applicationsV2().get(request)
+                .map(response -> response.getEntity().getPackageState())
+                .where("STAGED"::equals)
+                .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
+                .repeatWhen(volumes -> volumes
+                        .takeWhile(count -> count == 0)
+                        .flatMap(count -> Mono.delay(2, SECONDS)))
+                .single()                                           // TODO: Remove once Mono.repeatWhen()
+                .map(state -> applicationId);
+    }
+
+    private Mono<String> waitForStarting(String applicationId) {
+        ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build();
+
+        return this.cloudFoundryClient.applicationsV2().instances(request)
+                .flatMap(response -> Stream.fromIterable(response.values()))
+                .as(Stream::from)
+                .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
+                .repeatWhen(volumes -> volumes
+                        .takeWhile(count -> count == 0)
+                        .flatMap(count -> Mono.delay(2, SECONDS)))
+                .single()
+                .map(info -> applicationId);
     }
 
 }
