@@ -19,7 +19,6 @@ package org.cloudfoundry.client;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.client.v2.PaginatedResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
@@ -88,10 +87,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().listRoutes(request)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -293,10 +292,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().list(request)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -308,10 +307,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -323,10 +322,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -339,10 +338,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -355,10 +354,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -371,10 +370,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -387,10 +386,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().listRoutes(request)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -404,10 +403,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 }))
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -421,10 +420,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 }))
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -438,10 +437,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 }))
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
@@ -455,10 +454,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 }))
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     //TODO Implement missing client API
@@ -485,10 +484,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listServiceBindings(request)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     //TODO Implement missing client API
@@ -505,10 +504,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listServiceBindings(expectFound)
-                            .map(PaginatedResponse::getTotalResults);
+                            .map(Resources::getResources);
                 })
                 .subscribe(testSubscriber()
-                        .assertEquals(1));
+                        .assertCount(1));
     }
 
     @Test
