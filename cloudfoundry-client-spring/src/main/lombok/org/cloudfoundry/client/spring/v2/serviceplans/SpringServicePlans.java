@@ -23,6 +23,8 @@ import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,6 +47,20 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      */
     public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup<?> processorGroup) {
         super(restOperations, root, processorGroup);
+    }
+
+    @Override
+    public Mono<ListServicePlansResponse> list(final ListServicePlansRequest request) {
+        return get(request, ListServicePlansResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plans");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
     }
 
     @Override
