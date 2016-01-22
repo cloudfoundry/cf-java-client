@@ -80,7 +80,7 @@ public final class ApplicationInstanceInfo {
      * @param update the uptime
      * @return the uptime
      */
-    private final Double uptime;
+    private final Long uptime;
 
     @Builder
     ApplicationInstanceInfo(@JsonProperty("console_ip") String consoleIp,
@@ -89,7 +89,7 @@ public final class ApplicationInstanceInfo {
                             @JsonProperty("debug_port") Integer debugPort,
                             @JsonProperty("since") Double since,
                             @JsonProperty("state") String state,
-                            @JsonProperty("uptime") Double uptime) {
+                            @JsonProperty("uptime") Long uptime) {
         this.consoleIp = consoleIp;
         this.consolePort = consolePort;
         this.debugIp = debugIp;
