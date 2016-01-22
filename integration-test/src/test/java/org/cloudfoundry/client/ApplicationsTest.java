@@ -123,10 +123,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.applicationsV2().list(request)
                             .flatMap(Resources::getResources);
                 })
-                .as(Stream::from)
-                .count()
                 .subscribe(testSubscriber()
-                        .assertEquals(2L));
+                        .assertCount(2));
     }
 
     @Test
