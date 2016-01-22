@@ -20,16 +20,12 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggregatorClient;
+import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
-import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
@@ -40,8 +36,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import reactor.core.publisher.Mono;
+import reactor.fn.Predicate;
 import reactor.rx.Promise;
-import reactor.rx.Stream;
 
 import java.util.List;
 
@@ -79,6 +75,14 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    Predicate<DomainResource> domainsPredicate() {
+        return resource -> {
+            String name = Resources.getEntity(resource).getName();
+            return !name.equals("local.micropcf.io") && !name.endsWith(".xip.io");
+        };
+    }
+
+    @Bean
     FailingDeserializationProblemHandler failingDeserializationProblemHandler() {
         return new FailingDeserializationProblemHandler();
     }
@@ -91,8 +95,9 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization) throws InterruptedException {
-        Mono<String> organizationId = deleteOrganizations(cloudFoundryClient)
+    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, @Value("${test.organization}") String organization, Predicate<DomainResource> domainsPredicate) throws InterruptedException {
+        Mono<String> organizationId = CloudFoundryCleaner
+                .clean(cloudFoundryClient, r -> true, domainsPredicate, r -> true, r -> true, r -> true)
                 .after(() -> {
                     CreateOrganizationRequest request = CreateOrganizationRequest.builder()
                             .name(organization)
@@ -100,10 +105,9 @@ public class IntegrationTestConfiguration {
 
                     return cloudFoundryClient.organizations().create(request);
                 })
-                .single()
                 .map(Resources::getId)
                 .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
-                .doOnTerminate((v, t) -> this.logger.debug("<< ORGANIZATION >>"))
+                .doOnComplete(() -> this.logger.debug("<< ORGANIZATION >>"))
                 .as(Promise::from);
 
         organizationId.get();
@@ -137,46 +141,6 @@ public class IntegrationTestConfiguration {
 
         return cloudFoundryClient.stacks().list(request)
                 .map(listStacksResponse -> listStacksResponse.getResources().get(0).getMetadata().getId());
-    }
-
-    private static Stream<Void> deleteOrganizations(CloudFoundryClient cloudFoundryClient) {
-        return Paginated
-                .requestResources(page -> {
-                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.organizations().list(request);
-                })
-                .map(Resources::getId)
-                .flatMap(organizationId -> deleteSpaces(cloudFoundryClient, organizationId)
-                        .after(() -> Mono.just(organizationId)))
-                .flatMap(organizationId -> {
-                    DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
-                            .id(organizationId)
-                            .build();
-
-                    return cloudFoundryClient.organizations().delete(request);
-                });
-    }
-
-    private static Stream<Void> deleteSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return Paginated
-                .requestResources(page -> {
-                    ListSpacesRequest request = ListSpacesRequest.builder()
-                            .organizationId(organizationId)
-                            .build();
-
-                    return cloudFoundryClient.spaces().list(request);
-                })
-                .map(Resources::getId)
-                .flatMap(spaceId -> {
-                    DeleteSpaceRequest request = DeleteSpaceRequest.builder()
-                            .id(spaceId)
-                            .build();
-
-                    return cloudFoundryClient.spaces().delete(request);
-                });
     }
 
 }
