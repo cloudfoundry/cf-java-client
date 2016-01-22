@@ -36,6 +36,7 @@ public interface Routes {
      * Create a new route
      *
      * @param request The Create Route request
+     * @return a completion indicator
      */
     Mono<Void> create(CreateRouteRequest request);
 
@@ -51,6 +52,7 @@ public interface Routes {
      * Add a URL route to an application
      *
      * @param request the Map Route request
+     * @return a completion indicator
      */
     Mono<Void> map(MapRouteRequest request);
 
