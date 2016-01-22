@@ -108,7 +108,7 @@ public final class SpringDomainsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/domains/test-id")
+                    .method(DELETE).path("v2/domains/test-domain-id")
                     .status(NO_CONTENT);
         }
 
@@ -120,7 +120,7 @@ public final class SpringDomainsTest {
         @Override
         protected DeleteDomainRequest getValidRequest() throws Exception {
             return DeleteDomainRequest.builder()
-                    .id("test-id")
+                    .domainId("test-domain-id")
                     .build();
         }
 
@@ -143,7 +143,7 @@ public final class SpringDomainsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/domains/test-id")
+                    .method(GET).path("/v2/domains/test-domain-id")
                     .status(OK)
                     .responsePayload("v2/domains/GET_{id}_response.json");
         }
@@ -165,7 +165,7 @@ public final class SpringDomainsTest {
         @Override
         protected GetDomainRequest getValidRequest() {
             return GetDomainRequest.builder()
-                    .id("test-id")
+                    .domainId("test-domain-id")
                     .build();
         }
 
@@ -270,7 +270,7 @@ public final class SpringDomainsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/domains/test-id/spaces?page=-1")
+                    .method(GET).path("v2/domains/test-domain-id/spaces?page=-1")
                     .status(OK)
                     .responsePayload("v2/domains/GET_{id}_spaces_response.json");
         }
@@ -309,7 +309,7 @@ public final class SpringDomainsTest {
         @Override
         protected ListDomainSpacesRequest getValidRequest() throws Exception {
             return ListDomainSpacesRequest.builder()
-                    .id("test-id")
+                    .domainId("test-domain-id")
                     .page(-1)
                     .build();
         }

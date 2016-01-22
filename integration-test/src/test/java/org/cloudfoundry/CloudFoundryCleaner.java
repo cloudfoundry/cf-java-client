@@ -89,7 +89,7 @@ final class CloudFoundryCleaner {
                 .map(Resources::getId)
                 .flatMap(domainId -> {
                     DeleteDomainRequest request = DeleteDomainRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .build();
 
                     return cloudFoundryClient.domains().delete(request);

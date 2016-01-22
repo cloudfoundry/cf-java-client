@@ -40,26 +40,26 @@ public final class DeleteDomainRequest implements Validatable {
     private final Boolean async;
 
     /**
-     * The id
+     * The domain id
      *
-     * @param id the id
-     * @return the id
+     * @param domainId the domain id
+     * @return the domain id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String domainId;
 
     @Builder
-    DeleteDomainRequest(Boolean async, String id) {
+    DeleteDomainRequest(Boolean async, String domainId) {
         this.async = async;
-        this.id = id;
+        this.domainId = domainId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.domainId == null) {
+            builder.message("domain id must be specified");
         }
 
         return builder.build();

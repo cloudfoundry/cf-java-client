@@ -28,7 +28,7 @@ public final class ListDomainSpacesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListDomainSpacesRequest.builder()
-                .id("test-id")
+                .domainId("test-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class ListDomainSpacesRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("domain id must be specified", result.getMessages().get(0));
     }
 
 }

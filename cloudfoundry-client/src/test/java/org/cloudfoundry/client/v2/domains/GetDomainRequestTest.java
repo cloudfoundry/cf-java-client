@@ -28,7 +28,7 @@ public final class GetDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetDomainRequest.builder()
-                .id("test-id")
+                .domainId("test-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetDomainRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("domain id must be specified", result.getMessages().get(0));
     }
 
 }

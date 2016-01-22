@@ -73,7 +73,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains", request.getId());
+                builder.pathSegment("v2", "domains", request.getDomainId());
             }
 
         });
@@ -85,7 +85,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
 
             @Override
             public void accept(UriComponentsBuilder uriComponentsBuilder) {
-                uriComponentsBuilder.pathSegment("v2", "domains", request.getId());
+                uriComponentsBuilder.pathSegment("v2", "domains", request.getDomainId());
             }
 
         });
@@ -111,7 +111,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "domains", request.getId(), "spaces");
+                builder.pathSegment("v2", "domains", request.getDomainId(), "spaces");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }

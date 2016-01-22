@@ -57,13 +57,13 @@ public final class ListDomainSpacesRequest extends PaginatedRequest implements V
     private final List<String> developerIds;
 
     /**
-     * The id
+     * The domain id
      *
-     * @param id the id
-     * @return the id
+     * @param domainId the domain id
+     * @return the domain id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String domainId;
 
     /**
      * The names
@@ -87,13 +87,13 @@ public final class ListDomainSpacesRequest extends PaginatedRequest implements V
     ListDomainSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                             @Singular List<String> applicationIds,
                             @Singular List<String> developerIds,
-                            String id,
+                            String domainId,
                             @Singular List<String> names,
                             @Singular List<String> organizationIds) {
         super(orderDirection, page, resultsPerPage);
         this.applicationIds = applicationIds;
         this.developerIds = developerIds;
-        this.id = id;
+        this.domainId = domainId;
         this.names = names;
         this.organizationIds = organizationIds;
     }
@@ -102,8 +102,8 @@ public final class ListDomainSpacesRequest extends PaginatedRequest implements V
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.domainId == null) {
+            builder.message("domain id must be specified");
         }
 
         return builder.build();

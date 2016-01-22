@@ -56,7 +56,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(this::createDomainId)
                 .then(domainId -> {
                     DeleteDomainRequest request = DeleteDomainRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .build();
 
                     return this.cloudFoundryClient.domains().delete(request);
@@ -70,7 +70,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(this::createDomainId)
                 .then(domainId -> {
                     GetDomainRequest request = GetDomainRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .build();
 
                     return this.cloudFoundryClient.domains().get(request)
@@ -102,7 +102,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(this::createDomainId)
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .build();
 
                     return this.cloudFoundryClient.domains().listSpaces(request)
@@ -150,7 +150,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .flatMap(function((domainId, applicationId) -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .applicationId(applicationId)
-                            .id(domainId)
+                            .domainId(domainId)
                             .build();
 
                     return this.cloudFoundryClient.domains().listSpaces(request)
@@ -172,7 +172,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .then(this::createDomainId)
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .name(this.testSpaceName)
                             .build();
 
@@ -192,7 +192,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .and(this.organizationId)
                 .flatMap(function((domainId, organizationId) -> {
                     ListDomainSpacesRequest response = ListDomainSpacesRequest.builder()
-                            .id(domainId)
+                            .domainId(domainId)
                             .organizationId(organizationId)
                             .build();
 

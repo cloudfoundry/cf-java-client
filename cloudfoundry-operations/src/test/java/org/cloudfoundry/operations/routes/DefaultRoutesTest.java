@@ -543,7 +543,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.routes().list(request1)).thenReturn(Mono.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
-                    .id("test-routeEntity-domainId")
+                    .domainId("test-routeEntity-domainId")
                     .build();
             GetDomainResponse response2 = fill(GetDomainResponse.builder(), "domain-").build();
 
@@ -624,7 +624,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
 
             GetDomainRequest request2 = GetDomainRequest.builder()
-                    .id("test-route-domainId")
+                    .domainId("test-route-domainId")
                     .build();
             GetDomainResponse response2 = fill(GetDomainResponse.builder(), "domain-").build();
             when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));

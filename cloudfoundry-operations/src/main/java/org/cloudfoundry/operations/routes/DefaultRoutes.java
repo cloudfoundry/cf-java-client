@@ -306,7 +306,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<String> requestDomainName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
         GetDomainRequest request = GetDomainRequest.builder()
-                .id(Resources.getEntity(resource).getDomainId())
+                .domainId(Resources.getEntity(resource).getDomainId())
                 .build();
 
         return cloudFoundryClient.domains().get(request)
