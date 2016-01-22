@@ -34,8 +34,8 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
-import org.cloudfoundry.client.v2.applications.DownloadDropletRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
@@ -91,7 +91,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId());
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId());
             }
 
         });
@@ -103,7 +103,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "copy_bits");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "copy_bits");
             }
 
         });
@@ -127,7 +127,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId());
+                builder.pathSegment("v2", "apps", request.getApplicationId());
             }
 
         });
@@ -139,18 +139,18 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
                 new Consumer<UriComponentsBuilder>() {
                     @Override
                     public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getId(), "download");
+                        builder.pathSegment("v2", "apps", request.getApplicationId(), "download");
                     }
                 });
     }
 
     @Override
-    public Publisher<byte[]> downloadDroplet(final DownloadDropletRequest request) {
+    public Publisher<byte[]> downloadDroplet(final DownloadApplicationDropletRequest request) {
         return getStream(request,
                 new Consumer<UriComponentsBuilder>() {
                     @Override
                     public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getId(), "droplet", "download");
+                        builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download");
                     }
                 });
     }
@@ -161,7 +161,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "env");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "env");
             }
 
         });
@@ -173,7 +173,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId());
+                builder.pathSegment("v2", "apps", request.getApplicationId());
             }
 
         });
@@ -185,7 +185,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "instances");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances");
             }
 
         });
@@ -211,7 +211,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "routes");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -225,7 +225,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "service_bindings");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -239,7 +239,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "routes", request.getRouteId());
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "routes", request.getRouteId());
             }
 
         });
@@ -251,7 +251,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "service_bindings", request.getServiceBindingId());
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "service_bindings", request.getServiceBindingId());
             }
 
         });
@@ -263,7 +263,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "restage");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "restage");
             }
 
         });
@@ -275,7 +275,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "stats");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "stats");
             }
 
         });
@@ -287,7 +287,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "summary");
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "summary");
             }
 
         });
@@ -299,7 +299,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId(), "instances", request.getIndex());
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances", request.getIndex());
             }
 
         });
@@ -311,7 +311,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getId());
+                builder.pathSegment("v2", "apps", request.getApplicationId());
             }
 
         });
@@ -336,7 +336,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
                     @Override
                     public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getId(), "bits");
+                        builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
                     }
 
                 }

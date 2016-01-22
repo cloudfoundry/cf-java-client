@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Download Droplet operation
  */
 @Data
-public final class DownloadDropletRequest implements Validatable {
+public final class DownloadApplicationDropletRequest implements Validatable {
 
     /**
      * The application id
@@ -36,19 +36,19 @@ public final class DownloadDropletRequest implements Validatable {
      * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     @Builder
-    DownloadDropletRequest(String id) {
-        this.id = id;
+    DownloadApplicationDropletRequest(String applicationId) {
+        this.applicationId = applicationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

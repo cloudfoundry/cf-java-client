@@ -35,8 +35,8 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
-import org.cloudfoundry.client.v2.applications.DownloadDropletRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
@@ -100,7 +100,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/apps/test-id/routes/test-route-id")
+                    .method(PUT).path("v2/apps/test-application-id/routes/test-route-id")
                     .status(OK)
                     .responsePayload("v2/apps/PUT_{id}_routes_{route-id}_response.json");
         }
@@ -144,7 +144,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected AssociateApplicationRouteRequest getValidRequest() {
             return AssociateApplicationRouteRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .routeId("test-route-id")
                     .build();
         }
@@ -169,7 +169,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("v2/apps/test-id/copy_bits")
+                    .method(POST).path("v2/apps/test-application-id/copy_bits")
                     .requestPayload("v2/apps/POST_{id}_copy_bits_request.json")
                     .status(OK)
                     .responsePayload("v2/apps/POST_{id}_copy_bits_response.json");
@@ -193,8 +193,8 @@ public final class SpringApplicationsV2Test {
         @Override
         protected CopyApplicationRequest getValidRequest() {
             return CopyApplicationRequest.builder()
-                    .id("test-id")
-                    .sourceAppId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
+                    .applicationId("test-application-id")
+                    .sourceApplicationId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
                     .build();
         }
 
@@ -288,7 +288,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/apps/test-id")
+                    .method(DELETE).path("/v2/apps/test-application-id")
                     .status(NO_CONTENT);
         }
 
@@ -300,7 +300,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected DeleteApplicationRequest getValidRequest() {
             return DeleteApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -330,7 +330,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/apps/test-id/download")
+                    .method(GET).path("v2/apps/test-application-id/download")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_download_response.bin");
         }
@@ -343,7 +343,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected DownloadApplicationRequest getValidRequest() throws Exception {
             return DownloadApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -354,7 +354,7 @@ public final class SpringApplicationsV2Test {
 
     }
 
-    public static final class DownloadDroplet extends AbstractApiTest<DownloadDropletRequest, byte[]> {
+    public static final class DownloadDroplet extends AbstractApiTest<DownloadApplicationDropletRequest, byte[]> {
 
         private final SpringApplicationsV2 applications = new SpringApplicationsV2(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -365,15 +365,15 @@ public final class SpringApplicationsV2Test {
         }
 
         @Override
-        protected DownloadDropletRequest getInvalidRequest() {
-            return DownloadDropletRequest.builder()
+        protected DownloadApplicationDropletRequest getInvalidRequest() {
+            return DownloadApplicationDropletRequest.builder()
                     .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/apps/test-id/droplet/download")
+                    .method(GET).path("v2/apps/test-application-id/droplet/download")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_download_response.bin");
         }
@@ -384,14 +384,14 @@ public final class SpringApplicationsV2Test {
         }
 
         @Override
-        protected DownloadDropletRequest getValidRequest() throws Exception {
-            return DownloadDropletRequest.builder()
-                    .id("test-id")
+        protected DownloadApplicationDropletRequest getValidRequest() throws Exception {
+            return DownloadApplicationDropletRequest.builder()
+                    .applicationId("test-application-id")
                     .build();
         }
 
         @Override
-        protected Mono<byte[]> invoke(DownloadDropletRequest request) {
+        protected Mono<byte[]> invoke(DownloadApplicationDropletRequest request) {
             return getContents(this.applications.downloadDroplet(request));
         }
     }
@@ -410,7 +410,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/apps/test-id/env")
+                    .method(GET).path("/v2/apps/test-application-id/env")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_env_response.json");
         }
@@ -445,7 +445,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ApplicationEnvironmentRequest getValidRequest() throws Exception {
             return ApplicationEnvironmentRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -469,7 +469,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/apps/test-id")
+                    .method(GET).path("/v2/apps/test-application-id")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_response.json");
         }
@@ -513,7 +513,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected GetApplicationRequest getValidRequest() throws Exception {
             return GetApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -538,7 +538,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/apps/test-id/instances")
+                    .method(GET).path("/v2/apps/test-application-id/instances")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_instances_response.json");
         }
@@ -556,7 +556,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ApplicationInstancesRequest getValidRequest() throws Exception {
             return ApplicationInstancesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -721,7 +721,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/apps/test-id/routes?page=-1")
+                    .method(GET).path("v2/apps/test-application-id/routes?page=-1")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_routes_response.json");
         }
@@ -753,7 +753,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ListApplicationRoutesRequest getValidRequest() throws Exception {
             return ListApplicationRoutesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .page(-1)
                     .build();
         }
@@ -780,7 +780,7 @@ public final class SpringApplicationsV2Test {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(GET)
-                    .path("v2/apps/test-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
+                    .path("v2/apps/test-application-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_service_bindings_response.json");
         }
@@ -811,7 +811,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ListApplicationServiceBindingsRequest getValidRequest() throws Exception {
             return ListApplicationServiceBindingsRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .serviceInstanceId("test-instance-id")
                     .page(-1)
                     .build();
@@ -837,7 +837,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/apps/test-id/routes/test-route-id")
+                    .method(DELETE).path("v2/apps/test-application-id/routes/test-route-id")
                     .status(NO_CONTENT);
         }
 
@@ -849,7 +849,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RemoveApplicationRouteRequest getValidRequest() throws Exception {
             return RemoveApplicationRouteRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .routeId("test-route-id")
                     .build();
         }
@@ -875,7 +875,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/apps/test-id/service_bindings/test-service-binding-id")
+                    .method(DELETE).path("v2/apps/test-application-id/service_bindings/test-service-binding-id")
                     .status(NO_CONTENT);
         }
 
@@ -887,7 +887,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RemoveApplicationServiceBindingRequest getValidRequest() throws Exception {
             return RemoveApplicationServiceBindingRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .serviceBindingId("test-service-binding-id")
                     .build();
         }
@@ -911,7 +911,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("v2/apps/test-id/restage")
+                    .method(POST).path("v2/apps/test-application-id/restage")
                     .status(OK)
                     .responsePayload("v2/apps/POST_{id}_restage_response.json");
         }
@@ -950,7 +950,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RestageApplicationRequest getValidRequest() throws Exception {
             return RestageApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -975,7 +975,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/apps/test-id/stats")
+                    .method(GET).path("/v2/apps/test-application-id/stats")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_stats_response.json");
         }
@@ -1008,7 +1008,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected ApplicationStatisticsRequest getValidRequest() throws Exception {
             return ApplicationStatisticsRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -1032,7 +1032,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/apps/test-id/summary")
+                    .method(GET).path("/v2/apps/test-application-id/summary")
                     .status(OK)
                     .responsePayload("v2/apps/GET_{id}_summary_response.json");
         }
@@ -1099,7 +1099,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected SummaryApplicationRequest getValidRequest() throws Exception {
             return SummaryApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -1124,7 +1124,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/apps/test-id/instances/test-index")
+                    .method(DELETE).path("/v2/apps/test-application-id/instances/test-index")
                     .status(NO_CONTENT);
         }
 
@@ -1136,7 +1136,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected TerminateApplicationInstanceRequest getValidRequest() throws Exception {
             return TerminateApplicationInstanceRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .index("test-index")
                     .build();
         }
@@ -1161,7 +1161,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/apps/test-id")
+                    .method(PUT).path("/v2/apps/test-application-id")
                     .requestPayload("v2/apps/PUT_{id}_request.json")
                     .status(CREATED)
                     .responsePayload("v2/apps/PUT_{id}_response.json");
@@ -1206,7 +1206,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected UpdateApplicationRequest getValidRequest() throws Exception {
             return UpdateApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .name("new_name")
                     .build();
         }
@@ -1232,7 +1232,7 @@ public final class SpringApplicationsV2Test {
         @SuppressWarnings("unchecked")
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/apps/test-id/bits")
+                    .method(PUT).path("/v2/apps/test-application-id/bits")
                     .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
                     .anyRequestPayload()
                     .status(CREATED)
@@ -1258,7 +1258,7 @@ public final class SpringApplicationsV2Test {
         protected UploadApplicationRequest getValidRequest() throws Exception {
             return UploadApplicationRequest.builder()
                     .application(new ClassPathResource("v2/apps/application.zip").getFile())
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .resource(UploadApplicationRequest.Resource.builder()
                             .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
                             .path("path/to/content.txt")

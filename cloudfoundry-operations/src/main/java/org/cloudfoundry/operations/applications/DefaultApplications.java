@@ -123,7 +123,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
-                .id(applicationId)
+                .applicationId(applicationId)
                 .build();
 
         return cloudFoundryClient.applicationsV2().instances(request);
@@ -144,7 +144,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
         ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
-                .id(applicationId)
+                .applicationId(applicationId)
                 .build();
 
         return cloudFoundryClient.applicationsV2().statistics(request);
@@ -152,7 +152,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<SummaryApplicationResponse> requestApplicationSummary(CloudFoundryClient cloudFoundryClient, String applicationId) {
         SummaryApplicationRequest request = SummaryApplicationRequest.builder()
-                .id(applicationId)
+                .applicationId(applicationId)
                 .build();
 
         return cloudFoundryClient.applicationsV2().summary(request);

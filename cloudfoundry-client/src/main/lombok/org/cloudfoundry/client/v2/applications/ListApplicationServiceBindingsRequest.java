@@ -39,13 +39,13 @@ import java.util.List;
 public final class ListApplicationServiceBindingsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id of the App
+     * The application id
      *
-     * @param id the id of the App
-     * @return the id of the App
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The ids of the service instances
@@ -58,19 +58,19 @@ public final class ListApplicationServiceBindingsRequest extends PaginatedReques
 
     @Builder
     ListApplicationServiceBindingsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                          @Singular List<String> serviceInstanceIds,
-                                          String id) {
+                                          String applicationId,
+                                          @Singular List<String> serviceInstanceIds) {
         super(orderDirection, page, resultsPerPage);
+        this.applicationId = applicationId;
         this.serviceInstanceIds = serviceInstanceIds;
-        this.id = id;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

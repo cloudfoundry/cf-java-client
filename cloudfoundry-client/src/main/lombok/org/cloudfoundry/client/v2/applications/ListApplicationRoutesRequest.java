@@ -39,6 +39,15 @@ import java.util.List;
 public final class ListApplicationRoutesRequest extends PaginatedRequest implements Validatable {
 
     /**
+     * The application id
+     *
+     * @param applicationId the application id
+     * @return the application id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String applicationId;
+
+    /**
      * The domain ids
      *
      * @param domainIds the domain ids
@@ -55,15 +64,6 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
      */
     @Getter(onMethod = @__(@InFilterParameter("host")))
     private final List<String> hosts;
-
-    /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
 
     /**
      * The paths
@@ -85,14 +85,14 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
 
     @Builder
     ListApplicationRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                                 String applicationId,
                                  @Singular List<String> domainIds,
-                                 String id,
                                  @Singular List<String> hosts,
                                  @Singular List<String> paths,
                                  @Singular List<Integer> ports) {
         super(orderDirection, page, resultsPerPage);
+        this.applicationId = applicationId;
         this.domainIds = domainIds;
-        this.id = id;
         this.hosts = hosts;
         this.paths = paths;
         this.ports = ports;
@@ -102,8 +102,8 @@ public final class ListApplicationRoutesRequest extends PaginatedRequest impleme
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

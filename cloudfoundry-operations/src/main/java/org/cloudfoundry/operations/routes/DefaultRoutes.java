@@ -176,7 +176,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<AssociateApplicationRouteResponse> apply(String routeId, String applicationId) {
                 AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
-                        .id(applicationId)
+                        .applicationId(applicationId)
                         .routeId(routeId)
                         .build();
 

@@ -32,13 +32,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class AssociateApplicationRouteRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The route id
@@ -50,8 +50,8 @@ public final class AssociateApplicationRouteRequest implements Validatable {
     private final String routeId;
 
     @Builder
-    AssociateApplicationRouteRequest(String id, String routeId) {
-        this.id = id;
+    AssociateApplicationRouteRequest(String applicationId, String routeId) {
+        this.applicationId = applicationId;
         this.routeId = routeId;
     }
 
@@ -59,8 +59,8 @@ public final class AssociateApplicationRouteRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.routeId == null) {
@@ -69,4 +69,5 @@ public final class AssociateApplicationRouteRequest implements Validatable {
 
         return builder.build();
     }
+
 }

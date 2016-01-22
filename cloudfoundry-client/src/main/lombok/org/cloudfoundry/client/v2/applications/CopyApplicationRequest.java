@@ -31,39 +31,39 @@ import org.cloudfoundry.client.ValidationResult;
 public final class CopyApplicationRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The source app id
      *
-     * @param sourceAppId the source app id
-     * @return the source app id
+     * @param sourceApplicationId the source application id
+     * @return the source application id
      */
     @Getter(onMethod = @__(@JsonProperty("source_app_guid")))
-    private final String sourceAppId;
+    private final String sourceApplicationId;
 
     @Builder
-    CopyApplicationRequest(String id, String sourceAppId) {
-        this.id = id;
-        this.sourceAppId = sourceAppId;
+    CopyApplicationRequest(String applicationId, String sourceApplicationId) {
+        this.applicationId = applicationId;
+        this.sourceApplicationId = sourceApplicationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
-        if (this.sourceAppId == null) {
-            builder.message("source app id must be specified");
+        if (this.sourceApplicationId == null) {
+            builder.message("source application id must be specified");
         }
 
         return builder.build();

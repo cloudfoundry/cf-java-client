@@ -47,7 +47,7 @@ import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.cloudfoundry.operations.util.Tuples.predicate;
 import static org.junit.Assert.assertEquals;
 
@@ -100,7 +100,7 @@ public abstract class AbstractIntegrationTest {
 
     @After
     public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(25, SECONDS);
+        this.testSubscriber.verify(1, MINUTES);
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
@@ -126,7 +126,7 @@ public abstract class AbstractIntegrationTest {
                 })
                 .flatMap(response -> {
                     DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                            .id(Resources.getId(response))
+                            .applicationId(Resources.getId(response))
                             .build();
 
                     return cloudFoundryClient.applicationsV2().delete(request);

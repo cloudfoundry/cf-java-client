@@ -28,7 +28,7 @@ public final class RemoveApplicationServiceBindingRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveApplicationServiceBindingRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .serviceBindingId("test-service-binding-id")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class RemoveApplicationServiceBindingRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoServiceBindingId() {
         ValidationResult result = RemoveApplicationServiceBindingRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 

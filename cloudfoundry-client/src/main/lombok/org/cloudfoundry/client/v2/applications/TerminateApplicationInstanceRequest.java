@@ -30,13 +30,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class TerminateApplicationInstanceRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The index
@@ -48,8 +48,8 @@ public final class TerminateApplicationInstanceRequest implements Validatable {
     private final String index;
 
     @Builder
-    TerminateApplicationInstanceRequest(String id, String index) {
-        this.id = id;
+    TerminateApplicationInstanceRequest(String applicationId, String index) {
+        this.applicationId = applicationId;
         this.index = index;
     }
 
@@ -57,8 +57,8 @@ public final class TerminateApplicationInstanceRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.index == null) {

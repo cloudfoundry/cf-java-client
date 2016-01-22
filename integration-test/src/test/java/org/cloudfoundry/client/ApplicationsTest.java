@@ -28,8 +28,8 @@ import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
-import org.cloudfoundry.client.v2.applications.DownloadDropletRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
@@ -83,7 +83,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(response -> this.applicationId)
                 .then(applicationId -> {
                     ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().listRoutes(request)
@@ -109,8 +109,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 }))
                 .then(function((targetId, sourceId) -> {
                     CopyApplicationRequest copyApplicationRequest = CopyApplicationRequest.builder()
-                            .id(targetId)
-                            .sourceAppId(sourceId)
+                            .applicationId(targetId)
+                            .sourceApplicationId(sourceId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().copy(copyApplicationRequest)
@@ -174,7 +174,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(applicationId -> {
                     DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().delete(request);
@@ -188,7 +188,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(this::uploadApplication)
                 .flatMap(applicationId -> {
                     DownloadApplicationRequest request = DownloadApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().download(request);
@@ -214,8 +214,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(this::uploadAndStartApplication)
                 .flatMap(applicationId -> {
-                    DownloadDropletRequest request = DownloadDropletRequest.builder()
-                            .id(applicationId)
+                    DownloadApplicationDropletRequest request = DownloadApplicationDropletRequest.builder()
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().downloadDroplet(request);
@@ -250,7 +250,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(applicationId -> {
                     ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     Mono<ApplicationEnvironmentResponse> environment = this.cloudFoundryClient.applicationsV2().environment(request);
@@ -272,7 +272,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(applicationId -> {
                     GetApplicationRequest request = GetApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     Mono<String> actual = this.cloudFoundryClient.applicationsV2().get(request)
@@ -382,7 +382,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(response -> this.applicationId)
                 .then(applicationId -> {
                     ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().listRoutes(request)
@@ -398,7 +398,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .and(this.applicationId)
                 .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .domainId(routeResponse.getEntity().getDomainId())
                             .build();
 
@@ -415,7 +415,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .and(this.applicationId)
                 .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .host(routeResponse.getEntity().getHost())
                             .build();
 
@@ -432,7 +432,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .and(this.applicationId)
                 .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .path(routeResponse.getEntity().getPath())
                             .build();
 
@@ -449,7 +449,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .and(this.applicationId)
                 .then(function((routeResponse, applicationId) -> {
                     ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .port(routeResponse.getEntity().getPort())
                             .build();
 
@@ -480,7 +480,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 }))
                 .then(applicationId -> {
                     ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listServiceBindings(request)
@@ -499,7 +499,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     String serviceInstanceId = "CREATE ME";
 
                     ListApplicationServiceBindingsRequest expectFound = ListApplicationServiceBindingsRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .serviceInstanceId(serviceInstanceId)
                             .build();
 
@@ -518,7 +518,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     String routeId = Resources.getId(routeResponse);
 
                     RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .routeId(routeId)
                             .build();
 
@@ -540,7 +540,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(this::uploadAndStartApplication)
                 .then(applicationId -> {
                     RestageApplicationRequest request = RestageApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().restage(request)
@@ -564,7 +564,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(this::uploadAndStartApplication)
                 .then(applicationId -> {
                     ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().statistics(request)
@@ -582,7 +582,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(applicationId -> {
                     SummaryApplicationRequest request = SummaryApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().summary(request)
@@ -600,7 +600,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(applicationId -> {
 
                     TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .index("0")
                             .build();
 
@@ -614,7 +614,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.applicationId
                 .then(applicationId -> {
                     UpdateApplicationRequest request = UpdateApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .name("another-test-application-name")
                             .build();
 
@@ -623,7 +623,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 })
                 .then(applicationId -> {
                     GetApplicationRequest request = GetApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().get(request)
@@ -639,7 +639,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(this::uploadApplication)
                 .flatMap(applicationId -> {
                     DownloadApplicationRequest request = DownloadApplicationRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().download(request);
@@ -684,7 +684,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 }))
                 .then(function((createRouteResponse, applicationId) -> {
                     AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
-                            .id(applicationId)
+                            .applicationId(applicationId)
                             .routeId(createRouteResponse.getMetadata().getId())
                             .build();
 
@@ -695,7 +695,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private Mono<String> getApplicationState(String applicationId) {
         GetApplicationRequest request = GetApplicationRequest.builder()
-                .id(applicationId)
+                .applicationId(applicationId)
                 .build();
 
         return ApplicationsTest.this.cloudFoundryClient.applicationsV2().get(request)
@@ -704,7 +704,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private Mono<String> startApplication(String applicationId) {
         UpdateApplicationRequest request = UpdateApplicationRequest.builder()
-                .id(applicationId)
+                .applicationId(applicationId)
                 .state("STARTED")
                 .build();
 
@@ -729,7 +729,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         UploadApplicationRequest request = UploadApplicationRequest.builder()
                 .application(new File("./src/test/resources/testApplication.zip"))
                 .async(false)
-                .id(applicationId)
+                .applicationId(applicationId)
                 .build();
 
         return this.cloudFoundryClient.applicationsV2().upload(request)

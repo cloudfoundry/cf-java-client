@@ -23,12 +23,12 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DownloadDropletRequestTest {
+public final class DownloadApplicationDropletRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = DownloadDropletRequest.builder()
-                .id("test-id")
+        ValidationResult result = DownloadApplicationDropletRequest.builder()
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 
@@ -37,12 +37,12 @@ public final class DownloadDropletRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = DownloadDropletRequest.builder()
+        ValidationResult result = DownloadApplicationDropletRequest.builder()
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }

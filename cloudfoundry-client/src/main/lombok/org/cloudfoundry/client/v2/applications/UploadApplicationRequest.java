@@ -44,6 +44,15 @@ public final class UploadApplicationRequest implements Validatable {
     private final File application;
 
     /**
+     * The application id
+     *
+     * @param applicationId the application id
+     * @return the application id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String applicationId;
+
+    /**
      * If true, a new asynchronous job is submitted to persist the bits and the job id is included in the response.
      *
      * @param async whether to persist in a separate job
@@ -51,15 +60,6 @@ public final class UploadApplicationRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final Boolean async;
-
-    /**
-     * The id of the App
-     *
-     * @param id the id of the App
-     * @return the id of the App
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
 
     /**
      * Fingerprints of the application bits that have previously been pushed to Cloud Foundry.
@@ -72,12 +72,12 @@ public final class UploadApplicationRequest implements Validatable {
 
     @Builder
     UploadApplicationRequest(File application,
+                             String applicationId,
                              Boolean async,
-                             String id,
                              @Singular List<Resource> resources) {
         this.application = application;
+        this.applicationId = applicationId;
         this.async = async;
-        this.id = id;
         this.resources = resources;
     }
 
@@ -89,8 +89,8 @@ public final class UploadApplicationRequest implements Validatable {
             builder.message("application must be specified");
         }
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         for (Resource resource : this.resources) {

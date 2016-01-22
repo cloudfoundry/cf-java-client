@@ -804,6 +804,7 @@ public final class DefaultRoutesTest {
             when(this.routes.create(request3)).thenReturn(Mono.just(response3));
 
             AssociateApplicationRouteRequest request4 = fill(AssociateApplicationRouteRequest.builder())
+                    .applicationId("test-id")
                     .routeId("test-createdRoute-id")
                     .build();
             AssociateApplicationRouteResponse response4 = fill(AssociateApplicationRouteResponse.builder())
@@ -869,6 +870,7 @@ public final class DefaultRoutesTest {
             when(this.routes.create(request4)).thenReturn(Mono.just(response4));
 
             AssociateApplicationRouteRequest request5 = fill(AssociateApplicationRouteRequest.builder())
+                    .applicationId("test-id")
                     .routeId("test-createdRoute-id")
                     .build();
             AssociateApplicationRouteResponse response5 = fill(AssociateApplicationRouteResponse.builder())

@@ -67,7 +67,7 @@ public final class DefaultApplicationsTest {
         when(client.spaces().listApplications(request)).thenReturn(Mono.just(response));
 
         ApplicationStatisticsRequest statsRequest = ApplicationStatisticsRequest.builder()
-                .id("test-id")
+                .applicationId("test-id")
                 .build();
         ApplicationStatisticsResponse statsResponse = ApplicationStatisticsResponse.builder()
                 .instance("instance-0", ApplicationStatisticsResponse.InstanceStats.builder()
@@ -105,7 +105,7 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
                     .id("test-id")
@@ -125,7 +125,7 @@ public final class DefaultApplicationsTest {
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
                     .instance("instance-0", ApplicationInstanceInfo.builder()
@@ -180,7 +180,7 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
                     .id("test-id")
@@ -200,7 +200,7 @@ public final class DefaultApplicationsTest {
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
                     .build();
@@ -260,7 +260,7 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
                     .id("test-id")
@@ -279,7 +279,7 @@ public final class DefaultApplicationsTest {
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-id")
                     .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
                     .build();

@@ -28,7 +28,7 @@ public final class UpdateApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateApplicationRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 
@@ -43,7 +43,7 @@ public final class UpdateApplicationRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }

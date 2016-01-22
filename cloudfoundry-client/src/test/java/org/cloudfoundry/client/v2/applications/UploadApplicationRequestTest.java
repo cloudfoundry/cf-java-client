@@ -31,7 +31,7 @@ public final class UploadApplicationRequestTest {
     public void isValid() {
         ValidationResult result = UploadApplicationRequest.builder()
                 .application(new File("test-file"))
-                .id("test-id")
+                .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                         .hash("test-hash")
                         .path("test-path")
@@ -46,7 +46,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoApplication() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                         .hash("test-hash")
                         .path("test-path")
@@ -72,14 +72,14 @@ public final class UploadApplicationRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoResourceHash() {
         ValidationResult result = UploadApplicationRequest.builder()
                 .application(new File("test-file"))
-                .id("test-id")
+                .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                         .path("test-path")
                         .size(-1)
@@ -95,7 +95,7 @@ public final class UploadApplicationRequestTest {
     public void isValidNoResourcePath() {
         ValidationResult result = UploadApplicationRequest.builder()
                 .application(new File("test-file"))
-                .id("test-id")
+                .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                         .hash("test-hash")
                         .size(-1)
@@ -111,7 +111,7 @@ public final class UploadApplicationRequestTest {
     public void isValidNoResourceSize() {
         ValidationResult result = UploadApplicationRequest.builder()
                 .application(new File("test-file"))
-                .id("test-id")
+                .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                         .hash("test-hash")
                         .path("test-path")
@@ -127,7 +127,7 @@ public final class UploadApplicationRequestTest {
     public void isValidNoResources() {
         ValidationResult result = UploadApplicationRequest.builder()
                 .application(new File("test-file"))
-                .id("test-id")
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 

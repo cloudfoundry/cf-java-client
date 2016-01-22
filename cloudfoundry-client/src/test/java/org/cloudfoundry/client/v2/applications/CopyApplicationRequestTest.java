@@ -28,8 +28,8 @@ public final class CopyApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CopyApplicationRequest.builder()
-                .id("test-id")
-                .sourceAppId("test-source-app-id")
+                .applicationId("test-application-id")
+                .sourceApplicationId("test-source-application-id")
                 .build()
                 .isValid();
 
@@ -39,23 +39,23 @@ public final class CopyApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = CopyApplicationRequest.builder()
-                .sourceAppId("test-source-app-id")
+                .sourceApplicationId("test-source-application-id")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoSourceAppId() {
         ValidationResult result = CopyApplicationRequest.builder()
-                .id("test-id")
+                .applicationId("test-application id")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("source app id must be specified", result.getMessages().get(0));
+        assertEquals("source application id must be specified", result.getMessages().get(0));
     }
 
 }

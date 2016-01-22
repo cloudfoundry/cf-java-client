@@ -72,7 +72,7 @@ public interface ApplicationsV2 {
      * @param request the Download Droplet request
      * @return the response from the Download Droplet request
      */
-    Publisher<byte[]> downloadDroplet(DownloadDropletRequest request);
+    Publisher<byte[]> downloadDroplet(DownloadApplicationDropletRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps/get_the_env_for_an_app.html">Get the env for an App</a> request
