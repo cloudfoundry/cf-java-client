@@ -52,7 +52,7 @@ public final class SpringJobs extends AbstractSpringOperations implements Jobs {
 
             @Override
             public void accept(UriComponentsBuilder uriComponentsBuilder) {
-                uriComponentsBuilder.pathSegment("v2", "jobs", request.getId());
+                uriComponentsBuilder.pathSegment("v2", "jobs", request.getJobId());
             }
 
         });

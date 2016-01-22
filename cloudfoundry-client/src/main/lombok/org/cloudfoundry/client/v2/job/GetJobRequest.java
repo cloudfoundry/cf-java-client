@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetJobRequest implements Validatable {
 
     /**
-     * The id
+     * The job id
      *
-     * @param id the id
-     * @return the id
+     * @param jobId the job id
+     * @return the job id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String jobId;
 
     @Builder
-    GetJobRequest(String id) {
-        this.id = id;
+    GetJobRequest(String jobId) {
+        this.jobId = jobId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.jobId == null) {
+            builder.message("job id must be specified");
         }
 
         return builder.build();

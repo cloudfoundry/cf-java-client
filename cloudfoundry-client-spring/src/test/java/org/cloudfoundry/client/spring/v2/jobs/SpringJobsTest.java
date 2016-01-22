@@ -41,7 +41,7 @@ public final class SpringJobsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/jobs/test-id")
+                    .method(GET).path("/v2/jobs/test-job-id")
                     .status(OK)
                     .responsePayload("v2/jobs/GET_{id}_response.json");
         }
@@ -70,7 +70,7 @@ public final class SpringJobsTest {
         @Override
         protected GetJobRequest getValidRequest() throws Exception {
             return GetJobRequest.builder()
-                    .id("test-id")
+                    .jobId("test-job-id")
                     .build();
         }
 

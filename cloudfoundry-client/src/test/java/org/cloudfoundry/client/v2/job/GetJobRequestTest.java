@@ -28,7 +28,7 @@ public final class GetJobRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetJobRequest.builder()
-                .id("test-id")
+                .jobId("test-job-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetJobRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("job id must be specified", result.getMessages().get(0));
     }
 
 }
