@@ -21,6 +21,8 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
+import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -47,6 +49,18 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      */
     public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup<?> processorGroup) {
         super(restOperations, root, processorGroup);
+    }
+
+    @Override
+    public Mono<GetServicePlanResponse> get(final GetServicePlanRequest request) {
+        return get(request, GetServicePlanResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plans", request.getId());
+            }
+
+        });
     }
 
     @Override
