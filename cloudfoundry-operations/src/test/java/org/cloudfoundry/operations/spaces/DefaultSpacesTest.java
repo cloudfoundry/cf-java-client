@@ -55,7 +55,6 @@ public final class DefaultSpacesTest {
     private static void setupExpectations(CloudFoundryClient cloudFoundryClient, String testOrgId, String testSpaceName, String testSpaceId) {
         ListOrganizationSpacesRequest request1 = fillPage(ListOrganizationSpacesRequest.builder())
                 .name(testSpaceName)
-                .id(null)
                 .organizationId(testOrgId)
                 .build();
         ListOrganizationSpacesResponse response1 = fillPage(ListOrganizationSpacesResponse.builder())
@@ -81,7 +80,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listDomains(request3)).thenReturn(Mono.just(response3));
 
         GetOrganizationRequest request4 = fill(GetOrganizationRequest.builder())
-                .id("test-space-organizationId")
+                .organizationId("test-space-organizationId")
                 .build();
         GetOrganizationResponse response4 = fill(GetOrganizationResponse.builder(), "organization-").build();
         when(cloudFoundryClient.organizations().get(request4)).thenReturn(Mono.just(response4));

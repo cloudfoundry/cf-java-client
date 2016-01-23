@@ -348,7 +348,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListOrganizationPrivateDomainsResponse> apply(Integer page) {
                 ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
-                        .id(organizationId)
+                        .organizationId(organizationId)
                         .name(domain)
                         .page(page)
                         .build();
@@ -496,7 +496,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
                 ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
-                        .id(organizationId)
+                        .organizationId(organizationId)
                         .name(spaceName)
                         .page(page)
                         .build();

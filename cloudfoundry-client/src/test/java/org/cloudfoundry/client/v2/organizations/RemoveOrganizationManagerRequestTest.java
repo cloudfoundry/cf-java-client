@@ -29,7 +29,7 @@ public final class RemoveOrganizationManagerRequestTest {
     public void isValid() {
         ValidationResult result = RemoveOrganizationManagerRequest.builder()
                 .managerId("test-manager-id")
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -44,13 +44,13 @@ public final class RemoveOrganizationManagerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoManagerId() {
         ValidationResult result = RemoveOrganizationManagerRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 

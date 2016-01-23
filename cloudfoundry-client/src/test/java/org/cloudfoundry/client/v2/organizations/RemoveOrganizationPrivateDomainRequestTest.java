@@ -28,7 +28,7 @@ public final class RemoveOrganizationPrivateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .privateDomainId("test-private-domain-id")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class RemoveOrganizationPrivateDomainRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoPrivateDomainId() {
         ValidationResult result = RemoveOrganizationPrivateDomainRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 

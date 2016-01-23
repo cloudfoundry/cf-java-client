@@ -28,7 +28,7 @@ public final class RemoveOrganizationUserRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveOrganizationUserRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .userId("test-user-id")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class RemoveOrganizationUserRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoUserId() {
         ValidationResult result = RemoveOrganizationUserRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 

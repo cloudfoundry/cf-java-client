@@ -30,13 +30,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RemoveOrganizationPrivateDomainRequest implements Validatable {
 
     /**
-     * The id
+     * The organization id
      *
-     * @param id the id
-     * @return the id
+     * @param organizationId the organization id
+     * @return the organization id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String organizationId;
 
     /**
      * The private domain id
@@ -48,8 +48,8 @@ public final class RemoveOrganizationPrivateDomainRequest implements Validatable
     private final String privateDomainId;
 
     @Builder
-    RemoveOrganizationPrivateDomainRequest(String id, String privateDomainId) {
-        this.id = id;
+    RemoveOrganizationPrivateDomainRequest(String organizationId, String privateDomainId) {
+        this.organizationId = organizationId;
         this.privateDomainId = privateDomainId;
     }
 
@@ -57,8 +57,8 @@ public final class RemoveOrganizationPrivateDomainRequest implements Validatable
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         if (this.privateDomainId == null) {

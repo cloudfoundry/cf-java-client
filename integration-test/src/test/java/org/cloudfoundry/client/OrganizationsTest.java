@@ -86,7 +86,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .requestResources(page -> {
                                 ListOrganizationAuditorsRequest request = ListOrganizationAuditorsRequest.builder()
                                         .page(page)
-                                        .id(Resources.getId(tuple.t2))
+                                        .organizationId(Resources.getId(tuple.t2))
                                         .build();
                                 return this.cloudFoundryClient.organizations().listAuditors(request);
                             })
@@ -96,7 +96,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationAuditorRequest request = RemoveOrganizationAuditorRequest.builder()
                             .auditorId(tuple.t1)
-                            .id(Resources.getId(tuple.t2))
+                            .organizationId(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeAuditor(request);
@@ -110,7 +110,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(orgId -> {
                     AssociateOrganizationAuditorByUsernameRequest request = AssociateOrganizationAuditorByUsernameRequest.builder()
                             .username("admin")
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().associateAuditorByUsername(request);
@@ -118,7 +118,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(response -> {
                     RemoveOrganizationAuditorByUsernameRequest request = RemoveOrganizationAuditorByUsernameRequest.builder()
                             .username("admin")
-                            .id(response.getMetadata().getId())
+                            .organizationId(response.getMetadata().getId())
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeAuditorByUsername(request);
@@ -133,7 +133,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     AssociateOrganizationBillingManagerRequest request = AssociateOrganizationBillingManagerRequest.builder()
                             .billingManagerId(tuple.t1)
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateBillingManager(request));
@@ -143,7 +143,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .requestResources(page -> {
                                 ListOrganizationBillingManagersRequest request = ListOrganizationBillingManagersRequest.builder()
                                         .page(page)
-                                        .id(Resources.getId(tuple.t2))
+                                        .organizationId(Resources.getId(tuple.t2))
                                         .build();
                                 return this.cloudFoundryClient.organizations().listBillingManagers(request);
                             })
@@ -153,7 +153,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationBillingManagerRequest request = RemoveOrganizationBillingManagerRequest.builder()
                             .billingManagerId(tuple.t1)
-                            .id(Resources.getId(tuple.t2))
+                            .organizationId(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeBillingManager(request);
@@ -167,7 +167,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(orgId -> {
                     AssociateOrganizationBillingManagerByUsernameRequest request = AssociateOrganizationBillingManagerByUsernameRequest.builder()
                             .username("admin")
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().associateBillingManagerByUsername(request)
@@ -176,7 +176,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationBillingManagerByUsernameRequest request = RemoveOrganizationBillingManagerByUsernameRequest.builder()
                             .username("admin")
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeBillingManagerByUsername(request);
@@ -201,7 +201,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(orgId -> {
                     GetOrganizationRequest request = GetOrganizationRequest.builder()
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return Mono.just(orgId).and(this.cloudFoundryClient.organizations().get(request)
@@ -215,7 +215,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(orgId -> {
                     GetOrganizationInstanceUsageRequest request = GetOrganizationInstanceUsageRequest.builder()
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().getInstanceUsage(request);
@@ -228,7 +228,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(orgId -> {
                     GetOrganizationMemoryUsageRequest request = GetOrganizationMemoryUsageRequest.builder()
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().getMemoryUsage(request);
@@ -243,7 +243,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                         Paginated
                                 .requestResources(page -> {
                                     GetOrganizationUserRolesRequest request = GetOrganizationUserRolesRequest.builder()
-                                            .id(orgId)
+                                            .organizationId(orgId)
                                             .page(page)
                                             .build();
 
@@ -273,7 +273,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                         Paginated
                                 .requestResources(page -> {
                                     ListOrganizationServicesRequest request = ListOrganizationServicesRequest.builder()
-                                            .id(orgId)
+                                            .organizationId(orgId)
                                             .page(page)
                                             .build();
 
@@ -290,7 +290,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                         Paginated
                                 .requestResources(page -> {
                                     ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                                            .id(orgId)
+                                            .organizationId(orgId)
                                             .page(page)
                                             .build();
 
@@ -307,7 +307,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                         Paginated
                                 .requestResources(page -> {
                                     ListOrganizationSpacesRequest request = ListOrganizationSpacesRequest.builder()
-                                            .id(orgId)
+                                            .organizationId(orgId)
                                             .page(page)
                                             .build();
 
@@ -325,7 +325,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     AssociateOrganizationManagerRequest request = AssociateOrganizationManagerRequest.builder()
                             .managerId(tuple.t1)
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateManager(request));
@@ -335,7 +335,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .requestResources(page -> {
                                 ListOrganizationManagersRequest request = ListOrganizationManagersRequest.builder()
                                         .page(page)
-                                        .id(Resources.getId(tuple.t2))
+                                        .organizationId(Resources.getId(tuple.t2))
                                         .build();
                                 return this.cloudFoundryClient.organizations().listManagers(request);
                             })
@@ -345,7 +345,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationManagerRequest request = RemoveOrganizationManagerRequest.builder()
                             .managerId(tuple.t1)
-                            .id(Resources.getId(tuple.t2))
+                            .organizationId(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeManager(request);
@@ -359,7 +359,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(orgId -> {
                     AssociateOrganizationManagerByUsernameRequest request = AssociateOrganizationManagerByUsernameRequest.builder()
                             .username("admin")
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().associateManagerByUsername(request)
@@ -368,7 +368,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationManagerByUsernameRequest request = RemoveOrganizationManagerByUsernameRequest.builder()
                             .username("admin")
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeManagerByUsername(request);
@@ -399,7 +399,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     String privateDomainId = Resources.getId(tuple.t2);
                     String testOrgId = Resources.getId(tuple.t1);
                     AssociateOrganizationPrivateDomainRequest request = AssociateOrganizationPrivateDomainRequest.builder()
-                            .id(testOrgId)
+                            .organizationId(testOrgId)
                             .privateDomainId(privateDomainId)
                             .build();
                     return Mono.just(privateDomainId).and(this.cloudFoundryClient.organizations().associatePrivateDomain(request));
@@ -411,7 +411,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .requestResources(page -> {
                                 ListOrganizationPrivateDomainsRequest request = ListOrganizationPrivateDomainsRequest.builder()
                                         .page(page)
-                                        .id(testOrgId)
+                                        .organizationId(testOrgId)
                                         .build();
                                 return this.cloudFoundryClient.organizations().listPrivateDomains(request);
                             })
@@ -423,7 +423,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     String testOrgId = Resources.getId(tuple.t2);
                     RemoveOrganizationPrivateDomainRequest request = RemoveOrganizationPrivateDomainRequest.builder()
                             .privateDomainId(privateDomainId)
-                            .id(testOrgId)
+                            .organizationId(testOrgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().removePrivateDomain(request);
@@ -437,7 +437,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(orgId -> {
                     SummaryOrganizationRequest request = SummaryOrganizationRequest.builder()
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().summary(request)
@@ -451,7 +451,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         this.organizationId
                 .then(orgId -> {
                     UpdateOrganizationRequest request = UpdateOrganizationRequest.builder()
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return Mono.just(orgId).and(this.cloudFoundryClient.organizations().update(request)
@@ -467,7 +467,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     AssociateOrganizationUserRequest request = AssociateOrganizationUserRequest.builder()
                             .userId(tuple.t1)
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return Mono.just(tuple.t1).and(this.cloudFoundryClient.organizations().associateUser(request));
@@ -477,7 +477,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                             .requestResources(page -> {
                                 ListOrganizationUsersRequest request = ListOrganizationUsersRequest.builder()
                                         .page(page)
-                                        .id(Resources.getId(tuple.t2))
+                                        .organizationId(Resources.getId(tuple.t2))
                                         .build();
                                 return this.cloudFoundryClient.organizations().listUsers(request);
                             })
@@ -487,7 +487,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationUserRequest request = RemoveOrganizationUserRequest.builder()
                             .userId(tuple.t1)
-                            .id(Resources.getId(tuple.t2))
+                            .organizationId(Resources.getId(tuple.t2))
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeUser(request);
@@ -501,7 +501,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(orgId -> {
                     AssociateOrganizationUserByUsernameRequest request = AssociateOrganizationUserByUsernameRequest.builder()
                             .username("admin")
-                            .id(orgId)
+                            .organizationId(orgId)
                             .build();
 
                     return this.cloudFoundryClient.organizations().associateUserByUsername(request)
@@ -510,7 +510,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .then(tuple -> {
                     RemoveOrganizationUserByUsernameRequest request = RemoveOrganizationUserByUsernameRequest.builder()
                             .username("admin")
-                            .id(tuple.t2)
+                            .organizationId(tuple.t2)
                             .build();
 
                     return this.cloudFoundryClient.organizations().removeUserByUsername(request);

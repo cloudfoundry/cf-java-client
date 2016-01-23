@@ -40,26 +40,26 @@ public final class DeleteOrganizationRequest implements Validatable {
     private final Boolean async;
 
     /**
-     * The id
+     * The organization id
      *
-     * @param id the id
-     * @return the id
+     * @param organizationId the organization id
+     * @return the organization id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String organizationId;
 
     @Builder
-    DeleteOrganizationRequest(Boolean async, String id) {
+    DeleteOrganizationRequest(Boolean async, String organizationId) {
         this.async = async;
-        this.id = id;
+        this.organizationId = organizationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

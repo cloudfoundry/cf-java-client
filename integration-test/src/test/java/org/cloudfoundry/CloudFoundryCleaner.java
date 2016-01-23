@@ -109,7 +109,7 @@ final class CloudFoundryCleaner {
                 .map(Resources::getId)
                 .flatMap(organizationId -> {
                     DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
-                            .id(organizationId)
+                            .organizationId(organizationId)
                             .build();
 
                     return cloudFoundryClient.organizations().delete(request);

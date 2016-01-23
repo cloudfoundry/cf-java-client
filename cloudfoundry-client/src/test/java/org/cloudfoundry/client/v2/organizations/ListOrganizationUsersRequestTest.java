@@ -28,7 +28,7 @@ public final class ListOrganizationUsersRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListOrganizationUsersRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class ListOrganizationUsersRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
 }

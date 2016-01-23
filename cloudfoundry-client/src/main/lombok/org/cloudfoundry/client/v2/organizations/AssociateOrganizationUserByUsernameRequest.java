@@ -31,13 +31,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class AssociateOrganizationUserByUsernameRequest implements Validatable {
 
     /**
-     * The id
+     * The organization id
      *
-     * @param id the id
-     * @return the id
+     * @param organizationId the organization id
+     * @return the organization id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String organizationId;
 
     /**
      * The username
@@ -49,8 +49,8 @@ public final class AssociateOrganizationUserByUsernameRequest implements Validat
     private final String username;
 
     @Builder
-    AssociateOrganizationUserByUsernameRequest(String id, String username) {
-        this.id = id;
+    AssociateOrganizationUserByUsernameRequest(String organizationId, String username) {
+        this.organizationId = organizationId;
         this.username = username;
     }
 
@@ -58,8 +58,8 @@ public final class AssociateOrganizationUserByUsernameRequest implements Validat
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         if (this.username == null) {

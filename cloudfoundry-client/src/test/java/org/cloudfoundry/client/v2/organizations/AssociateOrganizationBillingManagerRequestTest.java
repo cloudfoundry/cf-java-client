@@ -29,7 +29,7 @@ public final class AssociateOrganizationBillingManagerRequestTest {
     public void isValid() {
         ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
                 .billingManagerId("test-billing-manager-id")
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class AssociateOrganizationBillingManagerRequestTest {
     @Test
     public void isValidNoBillingManagerId() {
         ValidationResult result = AssociateOrganizationBillingManagerRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class AssociateOrganizationBillingManagerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
 }

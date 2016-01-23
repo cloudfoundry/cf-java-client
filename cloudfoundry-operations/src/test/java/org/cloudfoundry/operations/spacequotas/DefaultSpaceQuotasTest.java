@@ -39,7 +39,7 @@ public final class DefaultSpaceQuotasTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpaceQuotaDefinitionsRequest request = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse response = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition-").build())
@@ -104,7 +104,7 @@ public final class DefaultSpaceQuotasTest {
         public void setUp() throws Exception {
             when(this.cloudFoundryClient.organizations()
                     .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                            .id(TEST_ORGANIZATION_ID)
+                            .organizationId(TEST_ORGANIZATION_ID)
                             .build()))
                     .thenReturn(Mono.just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder()).build()));
         }
@@ -129,14 +129,14 @@ public final class DefaultSpaceQuotasTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpaceQuotaDefinitionsRequest request1 = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse response1 = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
                     .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition1-").build())
                     .totalPages(2)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsRequest request2 = fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .page(2)
                     .build();
             ListOrganizationSpaceQuotaDefinitionsResponse response2 = fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())

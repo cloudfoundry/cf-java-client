@@ -48,15 +48,6 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
     private final List<Boolean> actives;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The labels
      *
      * @param labels the labels
@@ -64,6 +55,15 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
      */
     @Getter(onMethod = @__(@InFilterParameter("label")))
     private final List<String> labels;
+
+    /**
+     * The organization id
+     *
+     * @param organizationId the organization id
+     * @return the organization id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String organizationId;
 
     /**
      * The providers
@@ -86,14 +86,14 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
     @Builder
     ListOrganizationServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                     @Singular List<Boolean> actives,
-                                    String id,
                                     @Singular List<String> labels,
+                                    String organizationId,
                                     @Singular List<String> providers,
                                     @Singular List<String> serviceBrokerIds) {
         super(orderDirection, page, resultsPerPage);
         this.actives = actives;
-        this.id = id;
         this.labels = labels;
+        this.organizationId = organizationId;
         this.providers = providers;
         this.serviceBrokerIds = serviceBrokerIds;
     }
@@ -102,8 +102,8 @@ public final class ListOrganizationServicesRequest extends PaginatedRequest impl
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

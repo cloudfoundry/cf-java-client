@@ -28,7 +28,7 @@ public final class UpdateOrganizationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateOrganizationRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .name("test-name")
                 .quotaDefinitionId("test-quota-definition-id")
                 .status("test-status")
@@ -48,7 +48,7 @@ public final class UpdateOrganizationRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
 }

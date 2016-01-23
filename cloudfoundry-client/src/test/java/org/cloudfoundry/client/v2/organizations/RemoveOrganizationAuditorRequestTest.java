@@ -29,7 +29,7 @@ public final class RemoveOrganizationAuditorRequestTest {
     public void isValid() {
         ValidationResult result = RemoveOrganizationAuditorRequest.builder()
                 .auditorId("test-auditor-id")
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class RemoveOrganizationAuditorRequestTest {
     @Test
     public void isValidNoAuditorId() {
         ValidationResult result = RemoveOrganizationAuditorRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class RemoveOrganizationAuditorRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
 }

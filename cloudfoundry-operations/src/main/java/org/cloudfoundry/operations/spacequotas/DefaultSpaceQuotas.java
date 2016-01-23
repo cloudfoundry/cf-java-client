@@ -96,7 +96,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
                     @Override
                     public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
                         ListOrganizationSpaceQuotaDefinitionsRequest request = ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                                .id(organizationId)
+                                .organizationId(organizationId)
                                 .page(page)
                                 .build();
 

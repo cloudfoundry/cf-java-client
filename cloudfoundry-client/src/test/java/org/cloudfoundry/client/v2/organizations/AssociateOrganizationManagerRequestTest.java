@@ -28,7 +28,7 @@ public final class AssociateOrganizationManagerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateOrganizationManagerRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .managerId("test-manager-id")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class AssociateOrganizationManagerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoManagerId() {
         ValidationResult result = AssociateOrganizationManagerRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 

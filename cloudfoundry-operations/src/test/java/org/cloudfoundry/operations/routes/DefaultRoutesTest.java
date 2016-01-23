@@ -65,7 +65,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-invalid-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
@@ -103,7 +103,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder())
@@ -158,7 +158,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
@@ -194,7 +194,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
@@ -231,7 +231,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = ListOrganizationPrivateDomainsResponse.builder()
@@ -276,7 +276,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name(TEST_SPACE_NAME)
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
@@ -285,7 +285,7 @@ public final class DefaultRoutesTest {
             when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
 
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-invalid-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
@@ -324,7 +324,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-routeSpace-name")
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
@@ -333,7 +333,7 @@ public final class DefaultRoutesTest {
             when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
 
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder())
@@ -375,7 +375,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-routeSpace-name")
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder()).build();
@@ -427,7 +427,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-specific-space")
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
@@ -436,7 +436,7 @@ public final class DefaultRoutesTest {
             when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
 
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-specific-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder()).build();
@@ -483,7 +483,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationSpacesRequest request0 = fillPage(ListOrganizationSpacesRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-specific-space")
                     .build();
             ListOrganizationSpacesResponse response0 = fillPage(ListOrganizationSpacesResponse.builder())
@@ -492,7 +492,7 @@ public final class DefaultRoutesTest {
             when(this.organizations.listSpaces(request0)).thenReturn(Mono.just(response0));
 
             ListOrganizationPrivateDomainsRequest request1 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-specific-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response1 = fillPage(ListOrganizationPrivateDomainsResponse.builder())
@@ -785,7 +785,7 @@ public final class DefaultRoutesTest {
             when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
 
             ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
@@ -844,7 +844,7 @@ public final class DefaultRoutesTest {
             when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
 
             ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .id(TEST_ORGANIZATION_ID)
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .name("test-domain")
                     .build();
             ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")

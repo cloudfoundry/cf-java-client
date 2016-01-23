@@ -118,7 +118,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/organizations/83c4fac5-cd9e-41ee-96df-b4f50fff4aef/auditors/uaa-id-71")
+                    .method(PUT).path("/v2/organizations/test-organization-id/auditors/uaa-id-71")
                     .status(CREATED)
                     .responsePayload("v2/organizations/PUT_{id}_auditors_{auditor-id}_response.json");
         }
@@ -154,7 +154,7 @@ public final class SpringOrganizationsTest {
         protected AssociateOrganizationAuditorRequest getValidRequest() throws Exception {
             return AssociateOrganizationAuditorRequest.builder()
                     .auditorId("uaa-id-71")
-                    .organizationId("83c4fac5-cd9e-41ee-96df-b4f50fff4aef")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -178,7 +178,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/auditors")
+                    .method(PUT).path("v2/organizations/test-organization-id/auditors")
                     .requestPayload("v2/organizations/PUT_{id}_auditors_request.json")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_auditors_response.json");
@@ -214,7 +214,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationAuditorByUsernameRequest getValidRequest() throws Exception {
             return AssociateOrganizationAuditorByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("user@example.com")
                     .build();
         }
@@ -239,7 +239,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                    .method(PUT).path("v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_billing_managers_{billing-manager-id}_response.json");
         }
@@ -275,7 +275,7 @@ public final class SpringOrganizationsTest {
         protected AssociateOrganizationBillingManagerRequest getValidRequest() throws Exception {
             return AssociateOrganizationBillingManagerRequest.builder()
                     .billingManagerId("test-billing-manager-id")
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -300,7 +300,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/billing_managers")
+                    .method(PUT).path("v2/organizations/test-organization-id/billing_managers")
                     .requestPayload("v2/organizations/PUT_{id}_billing_managers_request.json")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_billing_managers_response.json");
@@ -336,7 +336,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationBillingManagerByUsernameRequest getValidRequest() throws Exception {
             return AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("user@example.com")
                     .build();
         }
@@ -361,7 +361,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/managers/test-manager-id")
+                    .method(PUT).path("v2/organizations/test-organization-id/managers/test-manager-id")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_managers_{manager-id}_response.json");
         }
@@ -396,7 +396,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationManagerRequest getValidRequest() throws Exception {
             return AssociateOrganizationManagerRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .managerId("test-manager-id")
                     .build();
         }
@@ -421,7 +421,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/managers")
+                    .method(PUT).path("v2/organizations/test-organization-id/managers")
                     .requestPayload("v2/organizations/PUT_{id}_managers_request.json")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_managers_response.json");
@@ -457,7 +457,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationManagerByUsernameRequest getValidRequest() throws Exception {
             return AssociateOrganizationManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("user@example.com")
                     .build();
         }
@@ -482,7 +482,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/users/test-user-id")
+                    .method(PUT).path("v2/organizations/test-organization-id/users/test-user-id")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_users_{user-id}_response.json");
         }
@@ -517,7 +517,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationUserRequest getValidRequest() throws Exception {
             return AssociateOrganizationUserRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .userId("test-user-id")
                     .build();
         }
@@ -542,7 +542,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/users")
+                    .method(PUT).path("v2/organizations/test-organization-id/users")
                     .requestPayload("v2/organizations/PUT_{id}_users_request.json")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_users_response.json");
@@ -578,7 +578,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationUserByUsernameRequest getValidRequest() throws Exception {
             return AssociateOrganizationUserByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("user@example.com")
                     .build();
         }
@@ -603,7 +603,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                    .method(PUT).path("v2/organizations/test-organization-id/private_domains/test-private-domain-id")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_private_domains_{private-domain-id}_response.json");
         }
@@ -638,7 +638,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected AssociateOrganizationPrivateDomainRequest getValidRequest() throws Exception {
             return AssociateOrganizationPrivateDomainRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .privateDomainId("test-private-domain-id")
                     .build();
         }
@@ -724,7 +724,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id?async=true")
+                    .method(DELETE).path("v2/organizations/test-organization-id?async=true")
                     .status(NO_CONTENT);
         }
 
@@ -737,7 +737,7 @@ public final class SpringOrganizationsTest {
         protected DeleteOrganizationRequest getValidRequest() throws Exception {
             return DeleteOrganizationRequest.builder()
                     .async(true)
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -760,7 +760,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id")
+                    .method(GET).path("v2/organizations/test-organization-id")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_response.json");
         }
@@ -795,7 +795,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected GetOrganizationRequest getValidRequest() throws Exception {
             return GetOrganizationRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -819,7 +819,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/instance_usage")
+                    .method(GET).path("v2/organizations/test-organization-id/instance_usage")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_instance_usage_response.json");
         }
@@ -834,7 +834,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected GetOrganizationInstanceUsageRequest getValidRequest() throws Exception {
             return GetOrganizationInstanceUsageRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -858,7 +858,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/memory_usage")
+                    .method(GET).path("v2/organizations/test-organization-id/memory_usage")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_memory_usage_response.json");
         }
@@ -873,7 +873,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected GetOrganizationMemoryUsageRequest getValidRequest() throws Exception {
             return GetOrganizationMemoryUsageRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -897,7 +897,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/user_roles?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/user_roles?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_user_roles_response.json");
         }
@@ -938,7 +938,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected GetOrganizationUserRolesRequest getValidRequest() throws Exception {
             return GetOrganizationUserRolesRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1026,7 +1026,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/auditors?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/auditors?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_auditors_response.json");
         }
@@ -1062,7 +1062,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationAuditorsRequest getValidRequest() throws Exception {
             return ListOrganizationAuditorsRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1088,7 +1088,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/billing_managers?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/billing_managers?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_billing_managers_response.json");
         }
@@ -1124,7 +1124,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationBillingManagersRequest getValidRequest() throws Exception {
             return ListOrganizationBillingManagersRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1149,7 +1149,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/managers?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/managers?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_managers_response.json");
         }
@@ -1204,7 +1204,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationManagersRequest getValidRequest() throws Exception {
             return ListOrganizationManagersRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1229,7 +1229,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/private_domains?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/private_domains?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_private_domains_response.json");
         }
@@ -1259,7 +1259,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationPrivateDomainsRequest getValidRequest() throws Exception {
             return ListOrganizationPrivateDomainsRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1284,7 +1284,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/services?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/services?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_services_response.json");
         }
@@ -1317,7 +1317,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationServicesRequest getValidRequest() throws Exception {
             return ListOrganizationServicesRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1342,7 +1342,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/space_quota_definitions?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/space_quota_definitions?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_space_quota_definitions_response.json");
         }
@@ -1376,7 +1376,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationSpaceQuotaDefinitionsRequest getValidRequest() throws Exception {
             return ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1401,7 +1401,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/spaces?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/spaces?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_spaces_response.json");
         }
@@ -1441,7 +1441,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationSpacesRequest getValidRequest() throws Exception {
             return ListOrganizationSpacesRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1466,7 +1466,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/organizations/test-id/users?page=-1")
+                    .method(GET).path("v2/organizations/test-organization-id/users?page=-1")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_users_response.json");
         }
@@ -1502,7 +1502,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected ListOrganizationUsersRequest getValidRequest() throws Exception {
             return ListOrganizationUsersRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .page(-1)
                     .build();
         }
@@ -1527,7 +1527,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/auditors/test-auditor-id")
+                    .method(DELETE).path("v2/organizations/test-organization-id/auditors/test-auditor-id")
                     .status(NO_CONTENT);
         }
 
@@ -1540,7 +1540,7 @@ public final class SpringOrganizationsTest {
         protected RemoveOrganizationAuditorRequest getValidRequest() throws Exception {
             return RemoveOrganizationAuditorRequest.builder()
                     .auditorId("test-auditor-id")
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -1564,7 +1564,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/auditors")
+                    .method(DELETE).path("v2/organizations/test-organization-id/auditors")
                     .requestPayload("v2/organizations/DELETE_{id}_auditors_request.json")
                     .status(NO_CONTENT);
         }
@@ -1577,7 +1577,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationAuditorByUsernameRequest getValidRequest() throws Exception {
             return RemoveOrganizationAuditorByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("auditor@example.com")
                     .build();
         }
@@ -1602,7 +1602,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/billing_managers/test-billing-manager-id")
+                    .method(DELETE).path("v2/organizations/test-organization-id/billing_managers/test-billing-manager-id")
                     .status(NO_CONTENT);
         }
 
@@ -1615,7 +1615,7 @@ public final class SpringOrganizationsTest {
         protected RemoveOrganizationBillingManagerRequest getValidRequest() throws Exception {
             return RemoveOrganizationBillingManagerRequest.builder()
                     .billingManagerId("test-billing-manager-id")
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -1639,7 +1639,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/managers/test-manager-id")
+                    .method(DELETE).path("v2/organizations/test-organization-id/managers/test-manager-id")
                     .status(NO_CONTENT);
         }
 
@@ -1651,7 +1651,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationManagerRequest getValidRequest() throws Exception {
             return RemoveOrganizationManagerRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .managerId("test-manager-id")
                     .build();
         }
@@ -1676,7 +1676,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/billing_managers")
+                    .method(DELETE).path("v2/organizations/test-organization-id/billing_managers")
                     .requestPayload("v2/organizations/DELETE_{id}_billing_managers_request.json")
                     .status(NO_CONTENT);
         }
@@ -1689,7 +1689,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationBillingManagerByUsernameRequest getValidRequest() throws Exception {
             return RemoveOrganizationBillingManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("billing_manager@example.com")
                     .build();
         }
@@ -1714,7 +1714,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/managers")
+                    .method(DELETE).path("v2/organizations/test-organization-id/managers")
                     .requestPayload("v2/organizations/DELETE_{id}_managers_request.json")
                     .status(NO_CONTENT);
         }
@@ -1727,7 +1727,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationManagerByUsernameRequest getValidRequest() throws Exception {
             return RemoveOrganizationManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("manage@example.com")
                     .build();
         }
@@ -1752,7 +1752,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/private_domains/test-private-domain-id")
+                    .method(DELETE).path("v2/organizations/test-organization-id/private_domains/test-private-domain-id")
                     .status(NO_CONTENT);
         }
 
@@ -1764,7 +1764,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationPrivateDomainRequest getValidRequest() throws Exception {
             return RemoveOrganizationPrivateDomainRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .privateDomainId("test-private-domain-id")
                     .build();
         }
@@ -1788,7 +1788,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/users/test-user-id")
+                    .method(DELETE).path("v2/organizations/test-organization-id/users/test-user-id")
                     .status(NO_CONTENT);
         }
 
@@ -1800,7 +1800,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationUserRequest getValidRequest() throws Exception {
             return RemoveOrganizationUserRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .userId("test-user-id")
                     .build();
         }
@@ -1824,7 +1824,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/organizations/test-id/users")
+                    .method(DELETE).path("v2/organizations/test-organization-id/users")
                     .requestPayload("v2/organizations/DELETE_{id}_users_request.json")
                     .status(NO_CONTENT);
         }
@@ -1837,7 +1837,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RemoveOrganizationUserByUsernameRequest getValidRequest() throws Exception {
             return RemoveOrganizationUserByUsernameRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .username("user@example.com")
                     .build();
         }
@@ -1862,7 +1862,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/organizations/test-id/summary")
+                    .method(GET).path("/v2/organizations/test-organization-id/summary")
                     .status(OK)
                     .responsePayload("v2/organizations/GET_{id}_summary_response.json");
         }
@@ -1887,7 +1887,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected SummaryOrganizationRequest getValidRequest() throws Exception {
             return SummaryOrganizationRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .build();
         }
 
@@ -1911,7 +1911,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/organizations/test-id")
+                    .method(PUT).path("v2/organizations/test-organization-id")
                     .requestPayload("v2/organizations/PUT_{id}_request.json")
                     .status(OK)
                     .responsePayload("v2/organizations/PUT_{id}_response.json");
@@ -1948,7 +1948,7 @@ public final class SpringOrganizationsTest {
         @Override
         protected UpdateOrganizationRequest getValidRequest() throws Exception {
             return UpdateOrganizationRequest.builder()
-                    .id("test-id")
+                    .organizationId("test-organization-id")
                     .name("New Organization Name")
                     .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
                     .build();

@@ -39,18 +39,18 @@ public final class RemoveOrganizationBillingManagerRequest implements Validatabl
     private final String billingManagerId;
 
     /**
-     * The id
+     * The organization id
      *
-     * @param id the id
-     * @return the id
+     * @param organizationId the organization id
+     * @return the organization id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String organizationId;
 
     @Builder
-    RemoveOrganizationBillingManagerRequest(String billingManagerId, String id) {
+    RemoveOrganizationBillingManagerRequest(String billingManagerId, String organizationId) {
         this.billingManagerId = billingManagerId;
-        this.id = id;
+        this.organizationId = organizationId;
     }
 
     @Override
@@ -61,8 +61,8 @@ public final class RemoveOrganizationBillingManagerRequest implements Validatabl
             builder.message("billing manager id must be specified");
         }
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

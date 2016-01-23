@@ -170,7 +170,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Mono<String> requestOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
         GetOrganizationRequest request = GetOrganizationRequest.builder()
-                .id(Resources.getEntity(spaceResource).getOrganizationId())
+                .organizationId(Resources.getEntity(spaceResource).getOrganizationId())
                 .build();
 
         return cloudFoundryClient.organizations().get(request)

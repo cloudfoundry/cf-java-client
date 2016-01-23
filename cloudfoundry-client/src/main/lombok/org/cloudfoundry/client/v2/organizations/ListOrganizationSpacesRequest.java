@@ -57,15 +57,6 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
     private final List<String> developerIds;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names
      *
      * @param names the names
@@ -75,36 +66,33 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
     private final List<String> names;
 
     /**
-     * The organization ids
+     * The organization id
      *
-     * @param organizationIds the organization ids
-     * @return the organization ids
+     * @param organizationId the organization id
+     * @return the organization id
      */
-    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
-    private final List<String> organizationIds;
-
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String organizationId;
     @Builder
     ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                   @Singular List<String> appIds,
                                   @Singular List<String> developerIds,
-                                  String id,
                                   @Singular List<String> names,
-                                  @Singular List<String> organizationIds) {
+                                  String organizationId) {
         super(orderDirection, page, resultsPerPage);
 
         this.appIds = appIds;
         this.developerIds = developerIds;
-        this.id = id;
         this.names = names;
-        this.organizationIds = organizationIds;
+        this.organizationId = organizationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

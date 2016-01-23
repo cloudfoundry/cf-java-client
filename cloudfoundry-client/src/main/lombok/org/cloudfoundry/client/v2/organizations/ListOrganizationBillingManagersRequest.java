@@ -66,15 +66,6 @@ public final class ListOrganizationBillingManagersRequest extends PaginatedReque
     private final List<String> billingManagedOrganizationIds;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The managed organization ids
      *
      * @param managedOrganizationIds the managed organization ids
@@ -93,13 +84,13 @@ public final class ListOrganizationBillingManagersRequest extends PaginatedReque
     private final List<String> managedSpaceIds;
 
     /**
-     * The organization ids
+     * The organization id
      *
-     * @param organizationIds the organization ids
-     * @return the organization ids
+     * @param organizationId the organization id
+     * @return the organization id
      */
-    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
-    private final List<String> organizationIds;
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String organizationId;
 
     /**
      * The space ids
@@ -115,19 +106,17 @@ public final class ListOrganizationBillingManagersRequest extends PaginatedReque
                                            @Singular List<String> auditedOrganizationIds,
                                            @Singular List<String> auditedSpaceIds,
                                            @Singular List<String> billingManagedOrganizationIds,
-                                           String id,
                                            @Singular List<String> managedOrganizationIds,
                                            @Singular List<String> managedSpaceIds,
-                                           @Singular List<String> organizationIds,
+                                           String organizationId,
                                            @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;
-        this.id = id;
         this.managedOrganizationIds = managedOrganizationIds;
         this.managedSpaceIds = managedSpaceIds;
-        this.organizationIds = organizationIds;
+        this.organizationId = organizationId;
         this.spaceIds = spaceIds;
     }
 
@@ -135,8 +124,8 @@ public final class ListOrganizationBillingManagersRequest extends PaginatedReque
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

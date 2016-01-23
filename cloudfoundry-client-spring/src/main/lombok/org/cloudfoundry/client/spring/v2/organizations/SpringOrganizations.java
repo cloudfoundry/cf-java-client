@@ -125,7 +125,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "auditors");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors");
             }
 
         });
@@ -137,7 +137,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers",
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers",
                         request.getBillingManagerId());
             }
 
@@ -150,7 +150,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers");
             }
 
         });
@@ -162,7 +162,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "managers", request.getManagerId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers", request.getManagerId());
             }
 
         });
@@ -174,7 +174,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers");
             }
 
         });
@@ -186,7 +186,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "private_domains", request
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains", request
                         .getPrivateDomainId());
             }
 
@@ -199,7 +199,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "users", request.getUserId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users", request.getUserId());
             }
 
         });
@@ -211,7 +211,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "users");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users");
             }
 
         });
@@ -235,7 +235,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId());
                 QueryBuilder.augment(builder, request);
             }
 
@@ -248,7 +248,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId());
             }
 
         });
@@ -260,7 +260,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "instance_usage");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "instance_usage");
             }
 
         });
@@ -272,7 +272,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "memory_usage");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "memory_usage");
             }
 
         });
@@ -284,7 +284,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "user_roles");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "user_roles");
                 QueryBuilder.augment(builder, request);
             }
 
@@ -311,7 +311,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "auditors");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -325,7 +325,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -339,7 +339,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -353,7 +353,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "private_domains");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -367,7 +367,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "services");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "services");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -381,7 +381,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "space_quota_definitions");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "space_quota_definitions");
                 QueryBuilder.augment(builder, request);
             }
 
@@ -394,7 +394,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "spaces");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "spaces");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -408,7 +408,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "users");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -422,7 +422,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "auditors", request.getAuditorId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors", request.getAuditorId());
             }
 
         });
@@ -434,7 +434,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "auditors");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "auditors");
             }
         });
     }
@@ -445,7 +445,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers", request
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers", request
                         .getBillingManagerId());
             }
 
@@ -458,7 +458,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "billing_managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers");
             }
 
         });
@@ -470,7 +470,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "managers", request.getManagerId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers", request.getManagerId());
             }
 
         });
@@ -482,7 +482,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "managers");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "managers");
             }
 
         });
@@ -494,7 +494,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "private_domains",
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "private_domains",
                         request.getPrivateDomainId());
             }
 
@@ -507,7 +507,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "users", request.getUserId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users", request.getUserId());
             }
 
         });
@@ -519,7 +519,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "users");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "users");
             }
 
         });
@@ -531,7 +531,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId(), "summary");
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "summary");
             }
 
         });
@@ -543,7 +543,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "organizations", request.getId());
+                builder.pathSegment("v2", "organizations", request.getOrganizationId());
             }
 
         });

@@ -28,7 +28,7 @@ public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .username("test-username")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoUsername() {
         ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 

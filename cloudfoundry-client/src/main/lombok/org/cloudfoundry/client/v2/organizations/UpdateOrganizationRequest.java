@@ -31,15 +31,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class UpdateOrganizationRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The name
      *
      * @param name the name
@@ -47,6 +38,15 @@ public final class UpdateOrganizationRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
+
+    /**
+     * The organization id
+     *
+     * @param organizationId the organization id
+     * @return the organization id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String organizationId;
 
     /**
      * The quota definition id
@@ -67,9 +67,9 @@ public final class UpdateOrganizationRequest implements Validatable {
     private final String status;
 
     @Builder
-    UpdateOrganizationRequest(String id, String name, String quotaDefinitionId, String status) {
-        this.id = id;
+    UpdateOrganizationRequest(String name, String organizationId, String quotaDefinitionId, String status) {
         this.name = name;
+        this.organizationId = organizationId;
         this.quotaDefinitionId = quotaDefinitionId;
         this.status = status;
     }
@@ -78,8 +78,8 @@ public final class UpdateOrganizationRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

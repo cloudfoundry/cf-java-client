@@ -29,7 +29,7 @@ public final class RemoveOrganizationAuditorByUsernameRequestTest {
     public void isValid() {
         ValidationResult result = RemoveOrganizationAuditorByUsernameRequest.builder()
                 .username("test-username")
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class RemoveOrganizationAuditorByUsernameRequestTest {
     @Test
     public void isValidNoAuditorUsername() {
         ValidationResult result = RemoveOrganizationAuditorByUsernameRequest.builder()
-                .id("test-id")
+                .organizationId("test-organization-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class RemoveOrganizationAuditorByUsernameRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("organization id must be specified", result.getMessages().get(0));
     }
 
 }

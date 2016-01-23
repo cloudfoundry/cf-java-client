@@ -30,15 +30,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RemoveOrganizationManagerRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The manager id
      *
      * @param managerId the manager id
@@ -47,22 +38,31 @@ public final class RemoveOrganizationManagerRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String managerId;
 
+    /**
+     * The organization id
+     *
+     * @param organizationId the organization id
+     * @return the organization id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String organizationId;
+
     @Builder
-    RemoveOrganizationManagerRequest(String id, String managerId) {
-        this.id = id;
+    RemoveOrganizationManagerRequest(String managerId, String organizationId) {
         this.managerId = managerId;
+        this.organizationId = organizationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.managerId == null) {
             builder.message("manager id must be specified");
+        }
+
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();

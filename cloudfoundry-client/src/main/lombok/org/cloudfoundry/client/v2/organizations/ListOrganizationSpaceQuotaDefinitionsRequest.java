@@ -35,27 +35,27 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 public final class ListOrganizationSpaceQuotaDefinitionsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id
+     * The organization id
      *
-     * @param id the id
-     * @return the id
+     * @param organizationId the organization id
+     * @return the organization id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String organizationId;
 
     @Builder
     ListOrganizationSpaceQuotaDefinitionsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                                 String id) {
+                                                 String organizationId) {
         super(orderDirection, page, resultsPerPage);
-        this.id = id;
+        this.organizationId = organizationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.organizationId == null) {
+            builder.message("organization id must be specified");
         }
 
         return builder.build();
