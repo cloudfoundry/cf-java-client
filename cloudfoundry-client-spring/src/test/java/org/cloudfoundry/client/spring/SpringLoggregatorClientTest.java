@@ -57,7 +57,7 @@ public final class SpringLoggregatorClientTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/recent?app=test-id")
+                    .method(GET).path("/recent?app=test-application-id")
                     .status(OK)
                     .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin");
         }
@@ -70,7 +70,7 @@ public final class SpringLoggregatorClientTest {
         @Override
         protected RecentLogsRequest getValidRequest() throws Exception {
             return RecentLogsRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 

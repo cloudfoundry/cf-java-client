@@ -28,7 +28,7 @@ public final class StreamLogsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = StreamLogsRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class StreamLogsRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }

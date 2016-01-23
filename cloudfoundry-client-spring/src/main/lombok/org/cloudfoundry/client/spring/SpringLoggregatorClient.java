@@ -94,7 +94,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("recent").queryParam("app", request.getId());
+                builder.pathSegment("recent").queryParam("app", request.getApplicationId());
             }
 
         })
@@ -114,7 +114,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.path("tail/").queryParam("app", request.getId());
+                builder.path("tail/").queryParam("app", request.getApplicationId());
             }
 
         }, new Function<Subscriber<LoggregatorMessage>, MessageHandler>() {
