@@ -48,29 +48,29 @@ public final class ListServiceInstanceServiceBindingsRequest extends PaginatedRe
     private final List<String> applicationIds;
 
     /**
-     * The id of the Service Instance
+     * The service instance id
      *
-     * @param id the id of the Service Instance
-     * @return the id of the Service Instance
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String serviceInstanceId;
 
     @Builder
     ListServiceInstanceServiceBindingsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                               @Singular List<String> applicationIds,
-                                              String id) {
+                                              String serviceInstanceId) {
         super(orderDirection, page, resultsPerPage);
         this.applicationIds = applicationIds;
-        this.id = id;
+        this.serviceInstanceId = serviceInstanceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceInstanceId == null) {
+            builder.message("service instance id must be specified");
         }
 
         return builder.build();

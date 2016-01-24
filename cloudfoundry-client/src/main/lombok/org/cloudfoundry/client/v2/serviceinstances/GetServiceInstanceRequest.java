@@ -31,25 +31,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetServiceInstanceRequest implements Validatable {
 
     /**
-     * The id
+     * The service instance id
      *
-     * @param id the id
-     * @return the id
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String serviceInstanceId;
 
     @Builder
-    GetServiceInstanceRequest(String id) {
-        this.id = id;
+    GetServiceInstanceRequest(String serviceInstanceId) {
+        this.serviceInstanceId = serviceInstanceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceInstanceId == null) {
+            builder.message("service instance id must be specified");
         }
 
         return builder.build();

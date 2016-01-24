@@ -33,16 +33,7 @@ public final class DeleteServiceInstanceRequest implements Validatable {
      * @return the accept incomplete flag
      */
     @Getter(onMethod = @__(@QueryParameter("accepts_incomplete")))
-    private final boolean acceptsIncomplete;
-
-    /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final Boolean acceptsIncomplete;
 
     /**
      * The purge flag
@@ -51,23 +42,32 @@ public final class DeleteServiceInstanceRequest implements Validatable {
      * @return the purge flag
      */
     @Getter(onMethod = @__(@QueryParameter("purge")))
-    private final boolean purge;
+    private final Boolean purge;
+
+    /**
+     * The service instance id
+     *
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String serviceInstanceId;
 
     @Builder
-    DeleteServiceInstanceRequest(boolean acceptsIncomplete,
-                                 String id,
-                                 boolean purge) {
+    DeleteServiceInstanceRequest(Boolean acceptsIncomplete,
+                                 Boolean purge,
+                                 String serviceInstanceId) {
         this.acceptsIncomplete = acceptsIncomplete;
-        this.id = id;
         this.purge = purge;
+        this.serviceInstanceId = serviceInstanceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceInstanceId == null) {
+            builder.message("service instance id must be specified");
         }
 
         return builder.build();

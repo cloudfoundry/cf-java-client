@@ -29,18 +29,18 @@ public final class BindServiceInstanceToRouteRequestTest {
     @Test
     public void isNotValidNoId() {
         ValidationResult result = BindServiceInstanceToRouteRequest.builder()
-                .routeId("route-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service instance id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isNotValidNoRouteId() {
         ValidationResult result = BindServiceInstanceToRouteRequest.builder()
-                .id("service-instance-id")
+                .serviceInstanceId("test-service-instance-id")
                 .build()
                 .isValid();
 
@@ -51,8 +51,8 @@ public final class BindServiceInstanceToRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = BindServiceInstanceToRouteRequest.builder()
-                .id("service-instance-id")
-                .routeId("route-id")
+                .serviceInstanceId("test-service-instance-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 

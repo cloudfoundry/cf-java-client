@@ -29,7 +29,7 @@ public final class GetServiceInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServiceInstanceRequest.builder()
-                .id("test-id")
+                .serviceInstanceId("test-service-instance-id")
                 .build()
                 .isValid();
 
@@ -43,7 +43,7 @@ public final class GetServiceInstanceRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service instance id must be specified", result.getMessages().get(0));
     }
 
 }

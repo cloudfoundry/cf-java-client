@@ -44,15 +44,6 @@ public final class UpdateServiceInstanceRequest implements Validatable {
     private final boolean acceptsIncomplete;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The name
      *
      * @param name the name
@@ -68,6 +59,15 @@ public final class UpdateServiceInstanceRequest implements Validatable {
      */
     @Getter(onMethod = @__({@JsonProperty("parameters"), @JsonInclude(NON_EMPTY)}))
     private final Map<String, Object> parameters;
+
+    /**
+     * The service instance id
+     *
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String serviceInstanceId;
 
     /**
      * The service plan id
@@ -89,15 +89,15 @@ public final class UpdateServiceInstanceRequest implements Validatable {
 
     @Builder
     UpdateServiceInstanceRequest(boolean acceptsIncomplete,
-                                 String id,
                                  String name,
                                  @Singular Map<String, Object> parameters,
+                                 String serviceInstanceId,
                                  String servicePlanId,
                                  @Singular List<String> tags) {
         this.acceptsIncomplete = acceptsIncomplete;
-        this.id = id;
         this.name = name;
         this.parameters = parameters;
+        this.serviceInstanceId = serviceInstanceId;
         this.servicePlanId = servicePlanId;
         this.tags = tags;
     }
@@ -106,8 +106,8 @@ public final class UpdateServiceInstanceRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceInstanceId == null) {
+            builder.message("service instance id must be specified");
         }
 
         return builder.build();

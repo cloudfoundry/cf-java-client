@@ -62,7 +62,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/service_instances/test-id/routes/route-id")
+                    .method(PUT).path("v2/service_instances/test-service-instance-id/routes/route-id")
                     .status(CREATED)
                     .responsePayload("v2/service_instances/PUT_{id}_routes_response.json");
         }
@@ -93,7 +93,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected BindServiceInstanceToRouteRequest getValidRequest() throws Exception {
             return BindServiceInstanceToRouteRequest.builder()
-                    .id("test-id")
+                    .serviceInstanceId("test-service-instance-id")
                     .routeId("route-id")
                     .build();
         }
@@ -188,7 +188,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/service_instances/test-id?accepts_incomplete=true&purge=true")
+                    .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&purge=true")
                     .status(NO_CONTENT);
         }
 
@@ -200,7 +200,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected DeleteServiceInstanceRequest getValidRequest() {
             return DeleteServiceInstanceRequest.builder()
-                    .id("test-id")
+                    .serviceInstanceId("test-service-instance-id")
                     .acceptsIncomplete(true)
                     .purge(true)
                     .build();
@@ -226,7 +226,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/service_instances/test-id")
+                    .method(GET).path("/v2/service_instances/test-service-instance-id")
                     .status(OK)
                     .responsePayload("v2/service_instances/GET_{id}_response.json");
         }
@@ -267,7 +267,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected GetServiceInstanceRequest getValidRequest() throws Exception {
             return GetServiceInstanceRequest.builder()
-                    .id("test-id")
+                    .serviceInstanceId("test-service-instance-id")
                     .build();
         }
 
@@ -362,7 +362,7 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(GET)
-                    .path("v2/service_instances/test-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
+                    .path("v2/service_instances/test-service-instance-id/service_bindings?q=app_guid%20IN%20test-application-id&page=-1")
                     .status(OK)
                     .responsePayload("v2/service_instances/GET_{id}_service_bindings_response.json");
         }
@@ -393,7 +393,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected ListServiceInstanceServiceBindingsRequest getValidRequest() throws Exception {
             return ListServiceInstanceServiceBindingsRequest.builder()
-                    .id("test-id")
+                    .serviceInstanceId("test-service-instance-id")
                     .applicationId("test-application-id")
                     .page(-1)
                     .build();
@@ -419,7 +419,7 @@ public final class SpringServiceInstancesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41?accepts_incomplete=true")
+                    .method(PUT).path("v2/service_instances/test-service-instance-id?accepts_incomplete=true")
                     .requestPayload("v2/service_instances/PUT_{id}_request.json")
                     .status(CREATED)
                     .responsePayload("v2/service_instances/PUT_{id}_response.json");
@@ -458,7 +458,7 @@ public final class SpringServiceInstancesTest {
         protected UpdateServiceInstanceRequest getValidRequest() throws Exception {
             return UpdateServiceInstanceRequest.builder()
                     .acceptsIncomplete(true)
-                    .id("2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41")
+                    .serviceInstanceId("test-service-instance-id")
                     .servicePlanId("5b5e984f-bbf6-477b-9d3a-b6d5df941b50")
                     .parameter("the_service_broker", "wants this object")
                     .build();

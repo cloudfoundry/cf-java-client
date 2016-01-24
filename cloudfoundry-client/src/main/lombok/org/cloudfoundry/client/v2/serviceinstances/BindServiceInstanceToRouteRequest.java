@@ -29,15 +29,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class BindServiceInstanceToRouteRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The route id
      *
      * @param routeId the route id
@@ -46,18 +37,27 @@ public final class BindServiceInstanceToRouteRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String routeId;
 
+    /**
+     * The service instance id
+     *
+     * @param serviceInstanceId the service instance id
+     * @return the service instance id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String serviceInstanceId;
+
     @Builder
-    BindServiceInstanceToRouteRequest(String id, String routeId) {
-        this.id = id;
+    BindServiceInstanceToRouteRequest(String routeId, String serviceInstanceId) {
         this.routeId = routeId;
+        this.serviceInstanceId = serviceInstanceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceInstanceId == null) {
+            builder.message("service instance id must be specified");
         }
 
         if (this.routeId == null) {

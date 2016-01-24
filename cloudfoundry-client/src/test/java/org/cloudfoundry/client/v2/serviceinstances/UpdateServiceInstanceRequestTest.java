@@ -28,7 +28,7 @@ public final class UpdateServiceInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateServiceInstanceRequest.builder()
-                .id("test-id")
+                .serviceInstanceId("test-service-instance-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class UpdateServiceInstanceRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service instance id must be specified", result.getMessages().get(0));
     }
 
 }

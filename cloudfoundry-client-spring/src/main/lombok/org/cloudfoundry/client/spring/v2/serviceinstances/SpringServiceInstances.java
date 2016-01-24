@@ -65,7 +65,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_instances", request.getId(), "routes", request.getRouteId());
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId());
             }
 
         });
@@ -90,7 +90,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_instances", request.getId());
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
                 QueryBuilder.augment(builder, request);
             }
         });
@@ -102,7 +102,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_instances", request.getId());
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
             }
 
         });
@@ -128,7 +128,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_instances", request.getId(), "service_bindings");
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_bindings");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -142,7 +142,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_instances", request.getId());
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
                 QueryBuilder.augment(builder, request);
             }
 
