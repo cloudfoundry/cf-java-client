@@ -193,7 +193,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<GetStackResponse> requestStack(CloudFoundryClient cloudFoundryClient, String stackId) {
         GetStackRequest request = GetStackRequest.builder()
-                .id(stackId)
+                .stackId(stackId)
                 .build();
 
         return cloudFoundryClient.stacks().get(request);

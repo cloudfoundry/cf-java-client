@@ -86,7 +86,7 @@ public final class DefaultApplicationsTest {
         when(client.applicationsV2().statistics(statsRequest)).thenReturn(Mono.just(statsResponse));
 
         GetStackRequest stackRequest = GetStackRequest.builder()
-                .id("stack-id")
+                .stackId("stack-id")
                 .build();
         GetStackResponse stackResponse = GetStackResponse.builder()
                 .entity(StackEntity.builder()

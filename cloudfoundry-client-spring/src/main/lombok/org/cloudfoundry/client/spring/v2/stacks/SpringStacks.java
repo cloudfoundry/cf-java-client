@@ -56,7 +56,7 @@ public final class SpringStacks extends AbstractSpringOperations implements Stac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "stacks", request.getId());
+                builder.pathSegment("v2", "stacks", request.getStackId());
             }
 
         });

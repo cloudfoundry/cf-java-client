@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetStackRequest implements Validatable {
 
     /**
-     * The id
+     * The stack id
      *
-     * @param id the id
-     * @return the id
+     * @param stackId the stack id
+     * @return the stack id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String stackId;
 
     @Builder
-    GetStackRequest(String id) {
-        this.id = id;
+    GetStackRequest(String stackId) {
+        this.stackId = stackId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.stackId == null) {
+            builder.message("stack id must be specified");
         }
 
         return builder.build();

@@ -45,7 +45,7 @@ public final class SpringStacksTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/stacks/test-id")
+                    .method(GET).path("/v2/stacks/test-stack-id")
                     .status(OK)
                     .responsePayload("v2/stacks/GET_{id}_response.json");
         }
@@ -68,7 +68,7 @@ public final class SpringStacksTest {
         @Override
         protected GetStackRequest getValidRequest() throws Exception {
             return GetStackRequest.builder()
-                    .id("test-id")
+                    .stackId("test-stack-id")
                     .build();
         }
 
