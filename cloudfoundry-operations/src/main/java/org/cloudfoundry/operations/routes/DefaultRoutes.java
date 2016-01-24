@@ -160,7 +160,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListRouteApplicationsResponse> apply(Integer page) {
                 ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                        .id(Resources.getId(resource))
+                        .routeId(Resources.getId(resource))
                         .page(page)
                         .build();
 

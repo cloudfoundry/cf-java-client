@@ -71,7 +71,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId(), "apps", request.getApplicationId());
+                builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId());
             }
 
         });
@@ -96,7 +96,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId());
+                builder.pathSegment("v2", "routes", request.getRouteId());
                 QueryBuilder.augment(builder, request);
             }
 
@@ -136,7 +136,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId());
+                builder.pathSegment("v2", "routes", request.getRouteId());
             }
 
         });
@@ -162,7 +162,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId(), "apps");
+                builder.pathSegment("v2", "routes", request.getRouteId(), "apps");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -176,7 +176,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId(), "apps", request.getApplicationId());
+                builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId());
             }
 
         });
@@ -188,7 +188,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "routes", request.getId());
+                builder.pathSegment("v2", "routes", request.getRouteId());
             }
 
         });

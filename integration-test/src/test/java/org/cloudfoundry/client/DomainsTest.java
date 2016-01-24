@@ -140,7 +140,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 }))
                 .then(function((domainId, applicationId, routeId) -> {
                     AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .applicationId(applicationId)
                             .build();
 

@@ -40,26 +40,26 @@ public final class DeleteRouteRequest implements Validatable {
     private final String async;
 
     /**
-     * The id
+     * The route id
      *
-     * @param id the id
-     * @return the id
+     * @param routeId the route id
+     * @return the route id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String routeId;
 
     @Builder
-    DeleteRouteRequest(String async, String id) {
+    DeleteRouteRequest(String async, String routeId) {
         this.async = async;
-        this.id = id;
+        this.routeId = routeId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.routeId == null) {
+            builder.message("route id must be specified");
         }
 
         return builder.build();

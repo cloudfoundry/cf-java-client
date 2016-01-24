@@ -55,7 +55,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().listApplications(request)
@@ -115,7 +115,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 }))
                 .then(routeId -> {
                     DeleteRouteRequest request = DeleteRouteRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().delete(request);
@@ -192,7 +192,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 }))
                 .then(function((domainId, spaceId, routeId) -> {
                     GetRouteRequest request = GetRouteRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     Mono<RouteEntity> entity = this.cloudFoundryClient.routes().get(request)
@@ -235,7 +235,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().listApplications(request)
@@ -254,7 +254,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
                             .diego(true)
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().listApplications(request)
@@ -272,7 +272,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(function(this::associateApplicationWithRoute))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .name("test-application-name")
                             .build();
 
@@ -292,7 +292,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .and(this.organizationId)
                 .flatMap(function((routeId, organizationId) -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .organizationId(organizationId)
                             .build();
 
@@ -312,7 +312,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .and(this.spaceId)
                 .flatMap(function((routeId, spaceId) -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .spaceId(spaceId)
                             .build();
 
@@ -441,7 +441,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(function((applicationId, routeId) -> {
                     RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
                             .applicationId(applicationId)
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().removeApplication(request)
@@ -449,7 +449,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 }))
                 .flatMap(routeId -> {
                     ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return this.cloudFoundryClient.routes().listApplications(request)
@@ -475,7 +475,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .then(routeId -> {
                     UpdateRouteRequest request = UpdateRouteRequest.builder()
                             .host("test-host")
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
 
@@ -494,7 +494,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private Mono<String> associateApplicationWithRoute(String applicationId, String routeId) {
         AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
                 .applicationId(applicationId)
-                .id(routeId)
+                .routeId(routeId)
                 .build();
 
         return this.cloudFoundryClient.routes().associateApplication(request)

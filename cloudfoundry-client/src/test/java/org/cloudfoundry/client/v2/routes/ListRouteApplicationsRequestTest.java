@@ -28,7 +28,7 @@ public final class ListRouteApplicationsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListRouteApplicationsRequest.builder()
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class ListRouteApplicationsRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
 }

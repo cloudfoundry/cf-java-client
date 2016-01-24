@@ -49,15 +49,6 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
     private final Boolean diego;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names
      *
      * @param names the names
@@ -74,6 +65,15 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
      */
     @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
+
+    /**
+     * The route id
+     *
+     * @param routeId the route id
+     * @return the route id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String routeId;
 
     /**
      * The space ids
@@ -96,17 +96,17 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
     @Builder
     ListRouteApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                  Boolean diego,
-                                 String id,
                                  @Singular List<String> names,
                                  @Singular List<String> organizationIds,
+                                 String routeId,
                                  @Singular List<String> spaceIds,
                                  @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
 
         this.diego = diego;
-        this.id = id;
         this.names = names;
         this.organizationIds = organizationIds;
+        this.routeId = routeId;
         this.spaceIds = spaceIds;
         this.stackIds = stackIds;
     }
@@ -115,8 +115,8 @@ public final class ListRouteApplicationsRequest extends PaginatedRequest impleme
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.routeId == null) {
+            builder.message("route id must be specified");
         }
 
         return builder.build();

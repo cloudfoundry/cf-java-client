@@ -29,7 +29,7 @@ public final class DeleteRouteRequestTest {
     public void isValid() {
         ValidationResult result = DeleteRouteRequest.builder()
                 .async("test-async")
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -44,7 +44,7 @@ public final class DeleteRouteRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
 }

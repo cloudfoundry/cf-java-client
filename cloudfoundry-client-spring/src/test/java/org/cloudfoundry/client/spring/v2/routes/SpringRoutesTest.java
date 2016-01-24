@@ -62,7 +62,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/routes/test-id/apps/test-app-id")
+                    .method(PUT).path("v2/routes/test-route-id/apps/test-app-id")
                     .status(OK)
                     .responsePayload("v2/routes/PUT_{id}_apps_{app-id}_response.json");
         }
@@ -92,7 +92,7 @@ public final class SpringRoutesTest {
         protected AssociateRouteApplicationRequest getValidRequest() throws Exception {
             return AssociateRouteApplicationRequest.builder()
                     .applicationId("test-app-id")
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .build();
         }
 
@@ -172,7 +172,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/routes/test-id")
+                    .method(DELETE).path("v2/routes/test-route-id")
                     .status(NO_CONTENT);
         }
 
@@ -184,7 +184,7 @@ public final class SpringRoutesTest {
         @Override
         protected DeleteRouteRequest getValidRequest() throws Exception {
             return DeleteRouteRequest.builder()
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .build();
         }
 
@@ -245,7 +245,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/routes/test-id")
+                    .method(GET).path("v2/routes/test-route-id")
                     .status(OK)
                     .responsePayload("v2/routes/GET_{id}_response.json");
         }
@@ -276,7 +276,7 @@ public final class SpringRoutesTest {
         @Override
         protected GetRouteRequest getValidRequest() throws Exception {
             return GetRouteRequest.builder()
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .build();
         }
 
@@ -355,7 +355,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/routes/test-id/apps?page=-1")
+                    .method(GET).path("v2/routes/test-route-id/apps?page=-1")
                     .status(OK)
                     .responsePayload("v2/routes/GET_{id}_apps_response.json");
         }
@@ -403,7 +403,7 @@ public final class SpringRoutesTest {
         @Override
         protected ListRouteApplicationsRequest getValidRequest() {
             return ListRouteApplicationsRequest.builder()
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .page(-1)
                     .build();
         }
@@ -428,7 +428,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/routes/test-id/apps/test-app-id")
+                    .method(DELETE).path("v2/routes/test-route-id/apps/test-app-id")
                     .status(NO_CONTENT);
         }
 
@@ -441,7 +441,7 @@ public final class SpringRoutesTest {
         protected RemoveRouteApplicationRequest getValidRequest() throws Exception {
             return RemoveRouteApplicationRequest.builder()
                     .applicationId("test-app-id")
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .build();
         }
 
@@ -465,7 +465,7 @@ public final class SpringRoutesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/routes/test-id")
+                    .method(PUT).path("v2/routes/test-route-id")
                     .requestPayload("v2/routes/PUT_{id}_request.json")
                     .status(CREATED)
                     .responsePayload("v2/routes/PUT_{id}_response.json");
@@ -496,7 +496,7 @@ public final class SpringRoutesTest {
         @Override
         protected UpdateRouteRequest getValidRequest() throws Exception {
             return UpdateRouteRequest.builder()
-                    .id("test-id")
+                    .routeId("test-route-id")
                     .port(10000)
                     .build();
         }

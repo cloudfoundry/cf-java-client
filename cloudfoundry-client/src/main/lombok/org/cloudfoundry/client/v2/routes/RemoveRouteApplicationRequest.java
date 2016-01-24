@@ -39,18 +39,18 @@ public final class RemoveRouteApplicationRequest implements Validatable {
     private final String applicationId;
 
     /**
-     * The id
+     * The route id
      *
-     * @param id the id
-     * @return the id
+     * @param routeId the route id
+     * @return the route id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String routeId;
 
     @Builder
-    RemoveRouteApplicationRequest(String applicationId, String id) {
+    RemoveRouteApplicationRequest(String applicationId, String routeId) {
         this.applicationId = applicationId;
-        this.id = id;
+        this.routeId = routeId;
     }
 
     @Override
@@ -61,8 +61,8 @@ public final class RemoveRouteApplicationRequest implements Validatable {
             builder.message("application id must be specified");
         }
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.routeId == null) {
+            builder.message("route id must be specified");
         }
 
         return builder.build();

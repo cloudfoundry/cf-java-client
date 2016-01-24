@@ -28,12 +28,7 @@ public final class UpdateRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateRouteRequest.builder()
-                .domainId("test-domain-id")
-                .id("test-id")
-                .host("test-host")
-                .path("test-path")
-                .port(3030)
-                .spaceId("test-space-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -43,16 +38,11 @@ public final class UpdateRouteRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UpdateRouteRequest.builder()
-                .domainId("test-domain-id")
-                .host("test-host")
-                .path("test-path")
-                .port(3030)
-                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
 }

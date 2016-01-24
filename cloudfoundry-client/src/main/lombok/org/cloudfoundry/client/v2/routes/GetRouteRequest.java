@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetRouteRequest implements Validatable {
 
     /**
-     * The id
+     * The route id
      *
-     * @param id the id
-     * @return the id
+     * @param routeId the route id
+     * @return the route id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String routeId;
 
     @Builder
-    GetRouteRequest(String id) {
-        this.id = id;
+    GetRouteRequest(String routeId) {
+        this.routeId = routeId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.routeId == null) {
+            builder.message("route id must be specified");
         }
 
         return builder.build();

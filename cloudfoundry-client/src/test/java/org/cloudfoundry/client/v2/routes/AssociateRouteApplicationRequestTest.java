@@ -29,7 +29,7 @@ public final class AssociateRouteApplicationRequestTest {
     public void isValid() {
         ValidationResult result = AssociateRouteApplicationRequest.builder()
                 .applicationId("test-app-id")
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class AssociateRouteApplicationRequestTest {
     @Test
     public void isValidNoAppId() {
         ValidationResult result = AssociateRouteApplicationRequest.builder()
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class AssociateRouteApplicationRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
 }

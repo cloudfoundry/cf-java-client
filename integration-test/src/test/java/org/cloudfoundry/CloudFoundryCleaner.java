@@ -129,7 +129,7 @@ final class CloudFoundryCleaner {
                 .map(Resources::getId)
                 .flatMap(routeId -> {
                     DeleteRouteRequest request = DeleteRouteRequest.builder()
-                            .id(routeId)
+                            .routeId(routeId)
                             .build();
 
                     return cloudFoundryClient.routes().delete(request);

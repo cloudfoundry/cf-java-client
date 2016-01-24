@@ -29,7 +29,7 @@ public final class RemoveRouteApplicationRequestTest {
     public void isValid() {
         ValidationResult result = RemoveRouteApplicationRequest.builder()
                 .applicationId("test-app-id")
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class RemoveRouteApplicationRequestTest {
     @Test
     public void isValidNoAppId() {
         ValidationResult result = RemoveRouteApplicationRequest.builder()
-                .id("test-id")
+                .routeId("test-route-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class RemoveRouteApplicationRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("route id must be specified", result.getMessages().get(0));
     }
 
 }

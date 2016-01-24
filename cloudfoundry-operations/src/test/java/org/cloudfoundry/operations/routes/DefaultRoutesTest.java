@@ -558,6 +558,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 
             ListRouteApplicationsRequest request4 = fillPage(ListRouteApplicationsRequest.builder(), "route-")
+                    .routeId("test-route-id")
                     .diego(null)
                     .build();
             ListRouteApplicationsResponse response4 = fillPage(ListRouteApplicationsResponse.builder())
@@ -636,7 +637,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
 
             ListRouteApplicationsRequest request4 = ListRouteApplicationsRequest.builder()
-                    .id("test-route-id")
+                    .routeId("test-route-id")
                     .page(1)
                     .build();
             ListRouteApplicationsResponse response4 = fillPage(ListRouteApplicationsResponse.builder())

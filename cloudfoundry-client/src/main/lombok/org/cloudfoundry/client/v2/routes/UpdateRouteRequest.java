@@ -49,15 +49,6 @@ public final class UpdateRouteRequest implements Validatable {
     private final String host;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The path
      *
      * @param path the path
@@ -76,6 +67,15 @@ public final class UpdateRouteRequest implements Validatable {
     private final Integer port;
 
     /**
+     * The route id
+     *
+     * @param routeId the route id
+     * @return the route id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String routeId;
+
+    /**
      * The space id
      *
      * @param spaceId the space id
@@ -85,12 +85,12 @@ public final class UpdateRouteRequest implements Validatable {
     private final String spaceId;
 
     @Builder
-    UpdateRouteRequest(String domainId, String id, String host, String path, Integer port, String spaceId) {
+    UpdateRouteRequest(String domainId, String host, String path, Integer port, String routeId, String spaceId) {
         this.domainId = domainId;
-        this.id = id;
         this.host = host;
         this.path = path;
         this.port = port;
+        this.routeId = routeId;
         this.spaceId = spaceId;
     }
 
@@ -98,8 +98,8 @@ public final class UpdateRouteRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.routeId == null) {
+            builder.message("route id must be specified");
         }
 
         return builder.build();
