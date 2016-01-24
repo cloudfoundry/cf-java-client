@@ -26,25 +26,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class DeleteServiceBrokerRequest implements Validatable {
 
     /**
-     * The id
+     * The service broker id
      *
-     * @param id the id
-     * @return the id
+     * @param serviceBrokerId the service broker id
+     * @return the service broker id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String serviceBrokerId;
 
     @Builder
-    DeleteServiceBrokerRequest(String id) {
-        this.id = id;
+    DeleteServiceBrokerRequest(String serviceBrokerId) {
+        this.serviceBrokerId = serviceBrokerId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceBrokerId == null) {
+            builder.message("service broker id must be specified");
         }
 
         return builder.build();

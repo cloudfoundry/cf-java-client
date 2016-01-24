@@ -29,7 +29,7 @@ public final class DeleteServiceBrokerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteServiceBrokerRequest.builder()
-                .id("test-id")
+                .serviceBrokerId("test-service-broker-id")
                 .build()
                 .isValid();
 
@@ -43,7 +43,7 @@ public final class DeleteServiceBrokerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service broker id must be specified", result.getMessages().get(0));
     }
 
 }

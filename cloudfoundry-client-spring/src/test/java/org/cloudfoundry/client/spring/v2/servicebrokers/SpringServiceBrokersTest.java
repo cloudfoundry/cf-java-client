@@ -104,7 +104,7 @@ public final class SpringServiceBrokersTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/service_brokers/test-id")
+                    .method(DELETE).path("/v2/service_brokers/test-service-broker-id")
                     .status(NO_CONTENT);
         }
 
@@ -115,7 +115,8 @@ public final class SpringServiceBrokersTest {
 
         @Override
         protected DeleteServiceBrokerRequest getValidRequest() throws Exception {
-            return DeleteServiceBrokerRequest.builder().id("test-id")
+            return DeleteServiceBrokerRequest.builder()
+                    .serviceBrokerId("test-service-broker-id")
                     .build();
         }
 
@@ -137,7 +138,7 @@ public final class SpringServiceBrokersTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/service_brokers/test-id")
+                    .method(GET).path("/v2/service_brokers/test-service-broker-id")
                     .status(OK)
                     .responsePayload("v2/service_brokers/GET_{id}_response.json");
         }
@@ -163,7 +164,7 @@ public final class SpringServiceBrokersTest {
         @Override
         protected GetServiceBrokerRequest getValidRequest() throws Exception {
             return GetServiceBrokerRequest.builder()
-                    .id("test-id")
+                    .serviceBrokerId("test-service-broker-id")
                     .build();
         }
 
