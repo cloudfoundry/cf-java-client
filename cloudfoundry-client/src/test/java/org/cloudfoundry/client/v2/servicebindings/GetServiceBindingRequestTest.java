@@ -28,7 +28,7 @@ public class GetServiceBindingRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServiceBindingRequest.builder()
-                .id("test-id")
+                .serviceBindingId("test-service-binding-id")
                 .build()
                 .isValid();
 
@@ -42,6 +42,6 @@ public class GetServiceBindingRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service binding id must be specified", result.getMessages().get(0));
     }
 }

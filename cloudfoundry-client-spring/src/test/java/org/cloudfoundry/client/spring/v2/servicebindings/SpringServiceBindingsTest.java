@@ -108,7 +108,7 @@ public final class SpringServiceBindingsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/service_bindings/test-id")
+                    .method(DELETE).path("/v2/service_bindings/test-service-binding-id")
                     .status(NO_CONTENT);
         }
 
@@ -120,7 +120,7 @@ public final class SpringServiceBindingsTest {
         @Override
         protected DeleteServiceBindingRequest getValidRequest() {
             return DeleteServiceBindingRequest.builder()
-                    .id("test-id")
+                    .serviceBindingId("test-service-binding-id")
                     .build();
         }
 
@@ -145,7 +145,7 @@ public final class SpringServiceBindingsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/service_bindings/test-id")
+                    .method(GET).path("/v2/service_bindings/test-service-binding-id")
                     .status(OK)
                     .responsePayload("v2/service_bindings/GET_{id}_response.json");
         }
@@ -173,7 +173,7 @@ public final class SpringServiceBindingsTest {
         @Override
         protected GetServiceBindingRequest getValidRequest() throws Exception {
             return GetServiceBindingRequest.builder()
-                    .id("test-id")
+                    .serviceBindingId("test-service-binding-id")
                     .build();
         }
 

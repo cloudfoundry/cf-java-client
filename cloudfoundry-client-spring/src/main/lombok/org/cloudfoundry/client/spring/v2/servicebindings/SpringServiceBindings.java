@@ -71,7 +71,7 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings", request.getId());
+                builder.pathSegment("v2", "service_bindings", request.getServiceBindingId());
             }
 
         });
@@ -82,7 +82,7 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
         return get(request, GetServiceBindingResponse.class, new Consumer<UriComponentsBuilder>() {
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_bindings", request.getId());
+                builder.pathSegment("v2", "service_bindings", request.getServiceBindingId());
             }
         });
     }

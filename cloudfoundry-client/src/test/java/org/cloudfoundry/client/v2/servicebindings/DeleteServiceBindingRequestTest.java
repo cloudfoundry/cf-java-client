@@ -29,7 +29,7 @@ public final class DeleteServiceBindingRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteServiceBindingRequest.builder()
-                .id("test-id")
+                .serviceBindingId("test-service-binding-id")
                 .build()
                 .isValid();
 
@@ -43,7 +43,7 @@ public final class DeleteServiceBindingRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service binding id must be specified", result.getMessages().get(0));
     }
 
 }

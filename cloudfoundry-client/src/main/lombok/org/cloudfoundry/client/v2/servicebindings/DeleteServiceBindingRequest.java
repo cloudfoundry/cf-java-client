@@ -31,25 +31,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class DeleteServiceBindingRequest implements Validatable {
 
     /**
-     * The id
+     * The service binding id
      *
-     * @param id the id
-     * @return the id
+     * @param serviceBindingId the service binding id
+     * @return the service binding id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String serviceBindingId;
 
     @Builder
-    DeleteServiceBindingRequest(String id) {
-        this.id = id;
+    DeleteServiceBindingRequest(String serviceBindingId) {
+        this.serviceBindingId = serviceBindingId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceBindingId == null) {
+            builder.message("service binding id must be specified");
         }
 
         return builder.build();
