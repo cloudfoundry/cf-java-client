@@ -48,15 +48,6 @@ public final class ListServicePlanServiceInstancesRequest extends PaginatedReque
     private final List<String> gatewayNames;
 
     /**
-     * The id of the Service Plan
-     *
-     * @param id the id of the Service Plan
-     * @return the id of the Service Plan
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names of the service instances
      *
      * @param names the names of the service instances to filter on
@@ -84,6 +75,15 @@ public final class ListServicePlanServiceInstancesRequest extends PaginatedReque
     private final List<String> serviceKeyIds;
 
     /**
+     * The service plan id
+     *
+     * @param servicePlanId the service plan id
+     * @return the service plan id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String servicePlanId;
+
+    /**
      * The space ids
      *
      * @param spaceIds the space ids to filter on
@@ -95,17 +95,17 @@ public final class ListServicePlanServiceInstancesRequest extends PaginatedReque
     @Builder
     ListServicePlanServiceInstancesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                            @Singular List<String> gatewayNames,
-                                           String id,
                                            @Singular List<String> names,
                                            @Singular List<String> serviceBindingIds,
                                            @Singular List<String> serviceKeyIds,
+                                           String servicePlanId,
                                            @Singular List<String> spaceIds) {
         super(orderDirection, page, resultsPerPage);
         this.gatewayNames = gatewayNames;
-        this.id = id;
         this.names = names;
         this.serviceBindingIds = serviceBindingIds;
         this.serviceKeyIds = serviceKeyIds;
+        this.servicePlanId = servicePlanId;
         this.spaceIds = spaceIds;
     }
 
@@ -113,8 +113,8 @@ public final class ListServicePlanServiceInstancesRequest extends PaginatedReque
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.servicePlanId == null) {
+            builder.message("service plan id must be specified");
         }
 
         return builder.build();

@@ -107,7 +107,7 @@ public final class SpringServicePlansTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(GET)
-                    .path("v2/service_plans/test-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
+                    .path("v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
                     .status(OK)
                     .responsePayload("v2/service_plans/GET_{id}_service_instances_response.json");
         }
@@ -141,7 +141,7 @@ public final class SpringServicePlansTest {
         @Override
         protected ListServicePlanServiceInstancesRequest getValidRequest() throws Exception {
             return ListServicePlanServiceInstancesRequest.builder()
-                    .id("test-id")
+                    .servicePlanId("test-service-plan-id")
                     .spaceId("test-space-id")
                     .page(-1)
                     .build();
