@@ -49,8 +49,8 @@ public final class DefaultApplicationsTest {
 
     private static void setupExpectations(CloudFoundryClient client, String spaceId) {
         ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                .id(spaceId)
                 .name("test-app")
+                .spaceId(spaceId)
                 .page(1)
                 .build();
         ListSpaceApplicationsResponse response = ListSpaceApplicationsResponse.builder()
@@ -319,7 +319,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                    .id(TEST_SPACE_ID)
+                    .spaceId(TEST_SPACE_ID)
                     .build();
 
             GetSpaceSummaryResponse response = GetSpaceSummaryResponse.builder()

@@ -30,15 +30,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RemoveSpaceSecurityGroupRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The security group id
      *
      * @param securityGroupId the security group id
@@ -47,22 +38,31 @@ public final class RemoveSpaceSecurityGroupRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String securityGroupId;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
-    RemoveSpaceSecurityGroupRequest(String id, String securityGroupId) {
-        this.id = id;
+    RemoveSpaceSecurityGroupRequest(String securityGroupId, String spaceId) {
         this.securityGroupId = securityGroupId;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.securityGroupId == null) {
             builder.message("security group id must be specified");
+        }
+
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

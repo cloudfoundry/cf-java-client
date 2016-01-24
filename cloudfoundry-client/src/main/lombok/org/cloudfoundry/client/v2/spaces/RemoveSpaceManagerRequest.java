@@ -30,15 +30,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RemoveSpaceManagerRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The manager id
      *
      * @param managerId the id
@@ -47,9 +38,18 @@ public final class RemoveSpaceManagerRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String managerId;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
-    RemoveSpaceManagerRequest(String id, String managerId) {
-        this.id = id;
+    RemoveSpaceManagerRequest(String managerId, String spaceId) {
+        this.spaceId = spaceId;
         this.managerId = managerId;
     }
 
@@ -57,12 +57,12 @@ public final class RemoveSpaceManagerRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.managerId == null) {
             builder.message("manager id must be specified");
+        }
+
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

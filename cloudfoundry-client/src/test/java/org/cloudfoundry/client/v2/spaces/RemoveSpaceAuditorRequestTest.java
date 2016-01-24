@@ -29,7 +29,7 @@ public final class RemoveSpaceAuditorRequestTest {
     public void isValid() {
         ValidationResult result = RemoveSpaceAuditorRequest.builder()
                 .auditorId("test-auditor-id")
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class RemoveSpaceAuditorRequestTest {
     @Test
     public void isValidNoAuditorId() {
         ValidationResult result = RemoveSpaceAuditorRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class RemoveSpaceAuditorRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
 }

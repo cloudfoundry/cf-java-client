@@ -34,20 +34,20 @@ public final class DeleteSpaceRequest implements Validatable {
     private final Boolean async;
 
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     @Builder
-    DeleteSpaceRequest(Boolean async, String id) {
+    DeleteSpaceRequest(Boolean async, String spaceId) {
         this.async = async;
-        this.id = id;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

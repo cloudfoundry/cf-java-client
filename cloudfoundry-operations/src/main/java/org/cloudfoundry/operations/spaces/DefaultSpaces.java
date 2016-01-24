@@ -215,7 +215,7 @@ public final class DefaultSpaces implements Spaces {
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .id(Resources.getId(spaceResource))
+                        .spaceId(Resources.getId(spaceResource))
                         .page(page)
                         .build();
 
@@ -231,7 +231,7 @@ public final class DefaultSpaces implements Spaces {
             @Override
             public Mono<ListSpaceDomainsResponse> apply(Integer page) {
                 ListSpaceDomainsRequest request = ListSpaceDomainsRequest.builder()
-                        .id(Resources.getId(spaceResource))
+                        .spaceId(Resources.getId(spaceResource))
                         .page(page)
                         .build();
 
@@ -302,7 +302,7 @@ public final class DefaultSpaces implements Spaces {
             @Override
             public Mono<ListSpaceSecurityGroupsResponse> apply(Integer page) {
                 ListSpaceSecurityGroupsRequest request = ListSpaceSecurityGroupsRequest.builder()
-                        .id(Resources.getId(spaceResource))
+                        .spaceId(Resources.getId(spaceResource))
                         .page(page)
                         .build();
 
@@ -318,7 +318,7 @@ public final class DefaultSpaces implements Spaces {
             @Override
             public Mono<ListSpaceServicesResponse> apply(Integer page) {
                 ListSpaceServicesRequest request = ListSpaceServicesRequest.builder()
-                        .id(Resources.getId(spaceResource))
+                        .spaceId(Resources.getId(spaceResource))
                         .page(page)
                         .build();
 

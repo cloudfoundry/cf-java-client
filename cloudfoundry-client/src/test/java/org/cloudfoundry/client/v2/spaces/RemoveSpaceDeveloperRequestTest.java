@@ -29,7 +29,7 @@ public final class RemoveSpaceDeveloperRequestTest {
     public void isValid() {
         ValidationResult result = RemoveSpaceDeveloperRequest.builder()
                 .developerId("test-developer-id")
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -39,7 +39,7 @@ public final class RemoveSpaceDeveloperRequestTest {
     @Test
     public void isValidNoDeveloperId() {
         ValidationResult result = RemoveSpaceDeveloperRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class RemoveSpaceDeveloperRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
 }

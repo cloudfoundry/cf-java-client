@@ -35,26 +35,27 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 public final class ListSpaceUserRolesRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     @Builder
-    ListSpaceUserRolesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage, String id) {
+    ListSpaceUserRolesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                              String spaceId) {
         super(orderDirection, page, resultsPerPage);
-        this.id = id;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

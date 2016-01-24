@@ -66,15 +66,6 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
     private final List<String> billingManagedOrganizationIds;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The managed organization ids
      *
      * @param managedOrganizationIds the managed organization ids
@@ -101,31 +92,40 @@ public final class ListSpaceManagersRequest extends PaginatedRequest implements 
     @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
     private final List<String> organizationIds;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
     ListSpaceManagersRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                              @Singular List<String> auditedOrganizationIds,
                              @Singular List<String> auditedSpaceIds,
                              @Singular List<String> billingManagedOrganizationIds,
-                             String id,
                              @Singular List<String> managedOrganizationIds,
                              @Singular List<String> managedSpaceIds,
-                             @Singular List<String> organizationIds) {
+                             @Singular List<String> organizationIds,
+                             String spaceId) {
         super(orderDirection, page, resultsPerPage);
         this.auditedOrganizationIds = auditedOrganizationIds;
         this.auditedSpaceIds = auditedSpaceIds;
         this.billingManagedOrganizationIds = billingManagedOrganizationIds;
-        this.id = id;
         this.managedOrganizationIds = managedOrganizationIds;
         this.managedSpaceIds = managedSpaceIds;
         this.organizationIds = organizationIds;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

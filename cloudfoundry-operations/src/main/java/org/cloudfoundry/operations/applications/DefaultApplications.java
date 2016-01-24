@@ -165,8 +165,8 @@ public final class DefaultApplications implements Applications {
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .id(spaceId)
                         .name(getApplicationRequest.getName())
+                        .spaceId(spaceId)
                         .page(page)
                         .build();
 
@@ -182,7 +182,7 @@ public final class DefaultApplications implements Applications {
             @Override
             public Mono<GetSpaceSummaryResponse> apply(String targetedSpace) {
                 GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                        .id(targetedSpace)
+                        .spaceId(targetedSpace)
                         .build();
 
                 return cloudFoundryClient.spaces().getSummary(request);

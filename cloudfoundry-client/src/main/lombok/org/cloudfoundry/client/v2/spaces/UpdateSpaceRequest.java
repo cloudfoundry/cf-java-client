@@ -73,15 +73,6 @@ public final class UpdateSpaceRequest implements Validatable {
     private final List<String> domainIds;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The manager ids
      *
      * @param managerIds the manager ids
@@ -117,33 +108,42 @@ public final class UpdateSpaceRequest implements Validatable {
     @Getter(onMethod = @__({@JsonProperty("security_group_guids"), @JsonInclude(NON_EMPTY)}))
     private final List<String> securityGroupIds;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
     UpdateSpaceRequest(Boolean allowSsh,
                        @Singular List<String> auditorIds,
                        @Singular List<String> developerIds,
                        @Singular List<String> domainIds,
-                       String id,
                        @Singular List<String> managerIds,
                        String name,
                        String organizationId,
-                       @Singular List<String> securityGroupIds) {
+                       @Singular List<String> securityGroupIds,
+                       String spaceId) {
         this.allowSsh = allowSsh;
         this.auditorIds = auditorIds;
         this.developerIds = developerIds;
         this.domainIds = domainIds;
-        this.id = id;
         this.managerIds = managerIds;
         this.name = name;
         this.organizationId = organizationId;
         this.securityGroupIds = securityGroupIds;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

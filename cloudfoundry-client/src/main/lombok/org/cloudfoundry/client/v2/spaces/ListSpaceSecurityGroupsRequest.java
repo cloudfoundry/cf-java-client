@@ -39,15 +39,6 @@ import java.util.List;
 public final class ListSpaceSecurityGroupsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names
      *
      * @param names the names
@@ -56,21 +47,30 @@ public final class ListSpaceSecurityGroupsRequest extends PaginatedRequest imple
     @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
 
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
     ListSpaceSecurityGroupsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                   String id,
-                                   @Singular List<String> names) {
+                                   @Singular List<String> names,
+                                   String spaceId) {
         super(orderDirection, page, resultsPerPage);
-        this.id = id;
         this.names = names;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

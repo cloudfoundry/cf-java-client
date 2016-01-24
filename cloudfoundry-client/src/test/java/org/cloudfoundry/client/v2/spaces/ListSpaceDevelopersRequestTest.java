@@ -28,7 +28,7 @@ public final class ListSpaceDevelopersRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceDevelopersRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class ListSpaceDevelopersRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
 }

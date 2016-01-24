@@ -25,14 +25,21 @@ public final class ListSpaceUserRolesRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-                ListSpaceUserRolesRequest.builder().id("test-id").build().isValid().getStatus());
+        ValidationResult result = ListSpaceUserRolesRequest.builder()
+                .spaceId("test-space-id")
+                .build()
+                .isValid();
+
+        assertEquals(ValidationResult.Status.VALID, result.getStatus());
     }
 
     @Test
     public void isValidNoId() {
-        assertEquals(ValidationResult.Status.INVALID,
-                ListSpaceUserRolesRequest.builder().build().isValid().getStatus());
+        ValidationResult result = ListSpaceUserRolesRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
     }
 
 }

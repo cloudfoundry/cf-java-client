@@ -25,13 +25,21 @@ public final class ListSpaceApplicationsRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-                ListSpaceApplicationsRequest.builder().id("test-id").build().isValid().getStatus());
+        ValidationResult result = ListSpaceApplicationsRequest.builder()
+                .spaceId("test-space-id")
+                .build()
+                .isValid();
+
+        assertEquals(ValidationResult.Status.VALID, result.getStatus());
     }
 
     @Test
     public void isValidNoId() {
-        assertEquals(ValidationResult.Status.INVALID, ListSpaceApplicationsRequest.builder().build().isValid().getStatus());
+        ValidationResult result = ListSpaceApplicationsRequest.builder()
+                .build()
+                .isValid();
+
+        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
     }
 
 }

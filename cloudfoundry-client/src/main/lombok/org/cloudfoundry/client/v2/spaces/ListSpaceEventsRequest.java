@@ -48,13 +48,13 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
     private final List<String> actees;
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     /**
      * The timestamps
@@ -77,12 +77,12 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
     @Builder
     ListSpaceEventsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                            @Singular List<String> actees,
-                           String id,
+                           String spaceId,
                            @Singular List<String> timestamps,
                            @Singular List<String> types) {
         super(orderDirection, page, resultsPerPage);
         this.actees = actees;
-        this.id = id;
+        this.spaceId = spaceId;
         this.timestamps = timestamps;
         this.types = types;
     }
@@ -91,8 +91,8 @@ public final class ListSpaceEventsRequest extends PaginatedRequest implements Va
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

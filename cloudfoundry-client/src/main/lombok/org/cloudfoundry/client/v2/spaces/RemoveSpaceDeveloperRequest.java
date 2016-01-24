@@ -39,18 +39,18 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
     private final String developerId;
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     @Builder
-    RemoveSpaceDeveloperRequest(String developerId, String id) {
+    RemoveSpaceDeveloperRequest(String developerId, String spaceId) {
         this.developerId = developerId;
-        this.id = id;
+        this.spaceId = spaceId;
     }
 
     @Override
@@ -61,8 +61,8 @@ public final class RemoveSpaceDeveloperRequest implements Validatable {
             builder.message("developer id must be specified");
         }
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

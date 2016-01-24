@@ -28,8 +28,8 @@ public final class AssociateSpaceSecurityGroupRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-                .id("test-id")
                 .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -44,13 +44,13 @@ public final class AssociateSpaceSecurityGroupRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoSecurityGroupId() {
         ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 

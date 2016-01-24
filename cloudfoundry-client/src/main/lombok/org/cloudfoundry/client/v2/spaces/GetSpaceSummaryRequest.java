@@ -31,25 +31,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetSpaceSummaryRequest implements Validatable {
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     @Builder
-    GetSpaceSummaryRequest(String id) {
-        this.id = id;
+    GetSpaceSummaryRequest(String spaceId) {
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

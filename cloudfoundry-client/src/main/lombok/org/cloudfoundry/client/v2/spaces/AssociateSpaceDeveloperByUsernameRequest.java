@@ -31,13 +31,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class AssociateSpaceDeveloperByUsernameRequest implements Validatable {
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     /**
      * The username
@@ -50,10 +50,10 @@ public final class AssociateSpaceDeveloperByUsernameRequest implements Validatab
 
     @Builder
     AssociateSpaceDeveloperByUsernameRequest(
-            String id,
+            String spaceId,
             String username) {
 
-        this.id = id;
+        this.spaceId = spaceId;
         this.username = username;
     }
 
@@ -61,12 +61,12 @@ public final class AssociateSpaceDeveloperByUsernameRequest implements Validatab
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.username == null) {
             builder.message("username must be specified");
+        }
+
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

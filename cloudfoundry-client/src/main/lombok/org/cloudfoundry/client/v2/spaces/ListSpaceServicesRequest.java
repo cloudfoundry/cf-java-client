@@ -48,15 +48,6 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
     private final List<String> actives;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The labels
      *
      * @param labels the labels
@@ -83,27 +74,36 @@ public final class ListSpaceServicesRequest extends PaginatedRequest implements 
     @Getter(onMethod = @__(@InFilterParameter("service_broker_guid")))
     private final List<String> serviceBrokerIds;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
     ListSpaceServicesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                              @Singular List<String> actives,
-                             String id,
                              @Singular List<String> labels,
                              @Singular List<String> providers,
-                             @Singular List<String> serviceBrokerIds) {
+                             @Singular List<String> serviceBrokerIds,
+                             String spaceId) {
         super(orderDirection, page, resultsPerPage);
         this.actives = actives;
-        this.id = id;
         this.labels = labels;
         this.providers = providers;
         this.serviceBrokerIds = serviceBrokerIds;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

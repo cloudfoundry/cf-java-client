@@ -29,7 +29,7 @@ public final class DeleteSpaceRequestTest {
     public void isValid() {
         ValidationResult result = DeleteSpaceRequest.builder()
                 .async(true)
-                .id("test-id")
+                .spaceId("space-test-id")
                 .build()
                 .isValid();
 
@@ -44,7 +44,7 @@ public final class DeleteSpaceRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
 }

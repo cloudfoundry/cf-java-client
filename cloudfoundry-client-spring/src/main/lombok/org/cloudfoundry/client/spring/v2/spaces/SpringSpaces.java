@@ -106,7 +106,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors", request.getAuditorId());
             }
 
         });
@@ -118,7 +118,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors");
             }
 
         });
@@ -130,7 +130,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "developers", request.getDeveloperId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers", request.getDeveloperId());
             }
 
         });
@@ -142,7 +142,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "developers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers");
             }
 
         });
@@ -154,7 +154,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers", request.getManagerId());
             }
 
         });
@@ -166,7 +166,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "managers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers");
             }
 
         });
@@ -178,7 +178,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "security_groups", request.getSecurityGroupId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups", request.getSecurityGroupId());
             }
 
         });
@@ -202,7 +202,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId());
                 QueryBuilder.augment(builder, request);
             }
 
@@ -215,7 +215,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId());
             }
 
         });
@@ -227,7 +227,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "summary");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "summary");
             }
 
         });
@@ -253,7 +253,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "apps");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "apps");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -267,7 +267,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -281,7 +281,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "developers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -295,7 +295,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "domains");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "domains");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -309,7 +309,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "events");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "events");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -323,7 +323,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "managers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -337,7 +337,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "routes");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "routes");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -351,7 +351,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "security_groups");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -365,7 +365,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "service_instances");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "service_instances");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -379,7 +379,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "services");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "services");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -393,7 +393,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "user_roles");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "user_roles");
                 QueryBuilder.augment(builder, request);
             }
 
@@ -406,7 +406,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "auditors", request.getAuditorId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors", request.getAuditorId());
             }
 
         });
@@ -418,7 +418,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "auditors");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "auditors");
             }
 
         });
@@ -430,7 +430,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "developers", request.getDeveloperId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers", request.getDeveloperId());
             }
 
         });
@@ -442,7 +442,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "developers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "developers");
             }
 
         });
@@ -454,7 +454,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "managers", request.getManagerId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers", request.getManagerId());
             }
 
         });
@@ -466,7 +466,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "managers");
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "managers");
             }
 
         });
@@ -478,7 +478,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId(), "security_groups", request.getSecurityGroupId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId(), "security_groups", request.getSecurityGroupId());
             }
 
         });
@@ -490,7 +490,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "spaces", request.getId());
+                builder.pathSegment("v2", "spaces", request.getSpaceId());
             }
 
         });

@@ -39,30 +39,30 @@ public final class AssociateSpaceDeveloperRequest implements Validatable {
     private final String developerId;
 
     /**
-     * The id
+     * The space id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceId the space id
+     * @return the space id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceId;
 
     @Builder
-    AssociateSpaceDeveloperRequest(String developerId, String id) {
+    AssociateSpaceDeveloperRequest(String developerId, String spaceId) {
         this.developerId = developerId;
-        this.id = id;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.developerId == null) {
             builder.message("developer id must be specified");
+        }
+
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

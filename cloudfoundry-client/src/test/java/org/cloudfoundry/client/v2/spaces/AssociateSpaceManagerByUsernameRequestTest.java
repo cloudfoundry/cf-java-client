@@ -28,7 +28,7 @@ public final class AssociateSpaceManagerByUsernameRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceManagerByUsernameRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .username("test-username")
                 .build()
                 .isValid();
@@ -44,13 +44,13 @@ public final class AssociateSpaceManagerByUsernameRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoUsername() {
         ValidationResult result = AssociateSpaceManagerByUsernameRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 

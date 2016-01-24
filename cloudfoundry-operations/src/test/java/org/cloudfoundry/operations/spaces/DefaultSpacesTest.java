@@ -63,8 +63,8 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.organizations().listSpaces(request1)).thenReturn(Mono.just(response1));
 
         ListSpaceApplicationsRequest request2 = fillPage(ListSpaceApplicationsRequest.builder(), "spaceApplications-")
-                .id(testSpaceId)
                 .diego(null)
+                .spaceId(testSpaceId)
                 .build();
         ListSpaceApplicationsResponse response2 = fillPage(ListSpaceApplicationsResponse.builder())
                 .resource(fill(ApplicationResource.builder(), "spaceApplication-").build())
@@ -72,7 +72,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listApplications(request2)).thenReturn(Mono.just(response2));
 
         ListSpaceDomainsRequest request3 = fillPage(ListSpaceDomainsRequest.builder())
-                .id(testSpaceId)
+                .spaceId(testSpaceId)
                 .build();
         ListSpaceDomainsResponse response3 = fillPage(ListSpaceDomainsResponse.builder())
                 .resource(fill(DomainResource.builder(), "spaceDomain-").build())
@@ -86,7 +86,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.organizations().get(request4)).thenReturn(Mono.just(response4));
 
         ListSpaceSecurityGroupsRequest request5 = fillPage(ListSpaceSecurityGroupsRequest.builder())
-                .id(testSpaceId)
+                .spaceId(testSpaceId)
                 .build();
         ListSpaceSecurityGroupsResponse response5 = fillPage(ListSpaceSecurityGroupsResponse.builder())
                 .resource(fill(SecurityGroupResource.builder(), "securityGroup-").build())
@@ -94,7 +94,7 @@ public final class DefaultSpacesTest {
         when(cloudFoundryClient.spaces().listSecurityGroups(request5)).thenReturn(Mono.just(response5));
 
         ListSpaceServicesRequest request6 = fillPage(ListSpaceServicesRequest.builder())
-                .id(testSpaceId)
+                .spaceId(testSpaceId)
                 .build();
         ListSpaceServicesResponse response6 = fillPage(ListSpaceServicesResponse.builder())
                 .resource(fill(ServiceResource.builder(), "service-").build())

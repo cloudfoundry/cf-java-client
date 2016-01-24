@@ -39,15 +39,6 @@ import java.util.List;
 public final class ListSpaceDomainsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names
      *
      * @param names the names
@@ -66,33 +57,31 @@ public final class ListSpaceDomainsRequest extends PaginatedRequest implements V
     private final List<String> owningOrganizationIds;
 
     /**
-     * The space ids
+     * The space id
      *
-     * @param spaceIds the space ids
-     * @return the space ids
+     * @param spaceId the space id
+     * @return the space id
      */
-    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
-    private final List<String> spaceIds;
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
 
     @Builder
     ListSpaceDomainsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                            String id,
                             @Singular List<String> names,
                             @Singular List<String> owningOrganizationIds,
-                            @Singular List<String> spaceIds) {
+                            String spaceId) {
         super(orderDirection, page, resultsPerPage);
-        this.id = id;
         this.names = names;
         this.owningOrganizationIds = owningOrganizationIds;
-        this.spaceIds = spaceIds;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

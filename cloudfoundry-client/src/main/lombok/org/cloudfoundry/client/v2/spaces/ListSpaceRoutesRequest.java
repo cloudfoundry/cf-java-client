@@ -57,15 +57,6 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
     private final List<String> hosts;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The organization ids
      *
      * @param organizationIds the organization ids
@@ -83,27 +74,36 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
     @Getter(onMethod = @__(@InFilterParameter("path")))
     private final List<String> paths;
 
+    /**
+     * The space id
+     *
+     * @param spaceId the space id
+     * @return the space id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
+
     @Builder
     ListSpaceRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                            @Singular List<String> domainIds,
-                           String id,
                            @Singular List<String> hosts,
                            @Singular List<String> organizationIds,
-                           @Singular List<String> paths) {
+                           @Singular List<String> paths,
+                           String spaceId) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
-        this.id = id;
         this.hosts = hosts;
         this.organizationIds = organizationIds;
         this.paths = paths;
+        this.spaceId = spaceId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

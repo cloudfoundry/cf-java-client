@@ -49,15 +49,6 @@ public final class ListSpaceApplicationsRequest extends PaginatedRequest impleme
     private final Boolean diego;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The names
      *
      * @param names the names
@@ -76,13 +67,13 @@ public final class ListSpaceApplicationsRequest extends PaginatedRequest impleme
     private final List<String> organizationIds;
 
     /**
-     * The space ids
+     * The space id
      *
-     * @param spaceIds the space ids
-     * @return the space ids
+     * @param spaceId the space id
+     * @return the space id
      */
-    @Getter(onMethod = @__(@InFilterParameter("space_guid")))
-    private final List<String> spaceIds;
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceId;
 
     /**
      * The stack ids
@@ -96,17 +87,15 @@ public final class ListSpaceApplicationsRequest extends PaginatedRequest impleme
     @Builder
     ListSpaceApplicationsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                  Boolean diego,
-                                 String id,
                                  @Singular List<String> names,
                                  @Singular List<String> organizationIds,
-                                 @Singular List<String> spaceIds,
+                                 String spaceId,
                                  @Singular List<String> stackIds) {
         super(orderDirection, page, resultsPerPage);
         this.diego = diego;
-        this.id = id;
         this.names = names;
         this.organizationIds = organizationIds;
-        this.spaceIds = spaceIds;
+        this.spaceId = spaceId;
         this.stackIds = stackIds;
     }
 
@@ -114,8 +103,8 @@ public final class ListSpaceApplicationsRequest extends PaginatedRequest impleme
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceId == null) {
+            builder.message("space id must be specified");
         }
 
         return builder.build();

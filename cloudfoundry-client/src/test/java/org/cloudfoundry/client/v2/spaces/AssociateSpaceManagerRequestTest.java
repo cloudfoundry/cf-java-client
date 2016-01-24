@@ -28,8 +28,8 @@ public final class AssociateSpaceManagerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceManagerRequest.builder()
-                .id("test-id")
                 .managerId("test-manager-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
@@ -44,13 +44,13 @@ public final class AssociateSpaceManagerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoManagerId() {
         ValidationResult result = AssociateSpaceManagerRequest.builder()
-                .id("test-id")
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 

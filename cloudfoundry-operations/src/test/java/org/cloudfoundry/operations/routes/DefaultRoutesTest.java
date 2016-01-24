@@ -550,7 +550,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
-                    .id("test-routeEntity-spaceId")
+                    .spaceId("test-routeEntity-spaceId")
                     .build();
             GetSpaceResponse response3 = GetSpaceResponse.builder()
                     .entity(fill(SpaceEntity.builder(), "space-response-").build())
@@ -617,7 +617,7 @@ public final class DefaultRoutesTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder(), "space-")
-                    .id(TEST_SPACE_ID)
+                    .spaceId(TEST_SPACE_ID)
                     .build();
             ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder(), "spaceRoute-")
                     .resource(fill(RouteResource.builder(), "route-").build())
@@ -631,7 +631,7 @@ public final class DefaultRoutesTest {
             when(this.cloudFoundryClient.domains().get(request2)).thenReturn(Mono.just(response2));
 
             GetSpaceRequest request3 = GetSpaceRequest.builder()
-                    .id("test-route-spaceId")
+                    .spaceId("test-route-spaceId")
                     .build();
             GetSpaceResponse response3 = fill(GetSpaceResponse.builder(), "space-").build();
             when(this.cloudFoundryClient.spaces().get(request3)).thenReturn(Mono.just(response3));
@@ -776,8 +776,8 @@ public final class DefaultRoutesTest {
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
                     .diego(null)
-                    .id("test-space-id")
                     .name("test-applicationName")
+                    .spaceId("test-space-id")
                     .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder())
@@ -835,8 +835,8 @@ public final class DefaultRoutesTest {
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
                     .diego(null)
-                    .id("test-space-id")
                     .name("test-applicationName")
+                    .spaceId("test-space-id")
                     .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder())
@@ -901,8 +901,8 @@ public final class DefaultRoutesTest {
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
                     .diego(null)
-                    .id("test-space-id")
                     .name("test-applicationName")
+                    .spaceId("test-space-id")
                     .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder())

@@ -149,7 +149,7 @@ final class CloudFoundryCleaner {
                 .map(Resources::getId)
                 .flatMap(spaceId -> {
                     DeleteSpaceRequest request = DeleteSpaceRequest.builder()
-                            .id(spaceId)
+                            .spaceId(spaceId)
                             .build();
 
                     return cloudFoundryClient.spaces().delete(request);

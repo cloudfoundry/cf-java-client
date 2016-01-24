@@ -124,7 +124,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/spaces/test-id/auditors/test-auditor-id")
+                    .method(PUT).path("/v2/spaces/test-space-id/auditors/test-auditor-id")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_auditors_{id}_response.json");
         }
@@ -159,7 +159,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceAuditorRequest getValidRequest() throws Exception {
             return AssociateSpaceAuditorRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .auditorId("test-auditor-id")
                     .build();
         }
@@ -184,7 +184,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/spaces/test-id/auditors")
+                    .method(PUT).path("v2/spaces/test-space-id/auditors")
                     .requestPayload("v2/spaces/PUT_{id}_auditors_request.json")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_auditors_response.json");
@@ -220,7 +220,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceAuditorByUsernameRequest getValidRequest() throws Exception {
             return AssociateSpaceAuditorByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("user@example.com")
                     .build();
         }
@@ -245,7 +245,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/spaces/test-id/developers/test-developer-id")
+                    .method(PUT).path("/v2/spaces/test-space-id/developers/test-developer-id")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_developers_{id}_response.json");
         }
@@ -280,7 +280,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceDeveloperRequest getValidRequest() throws Exception {
             return AssociateSpaceDeveloperRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .developerId("test-developer-id")
                     .build();
         }
@@ -305,7 +305,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/spaces/test-id/managers/test-manager-id")
+                    .method(PUT).path("/v2/spaces/test-space-id/managers/test-manager-id")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_managers_{id}_response.json");
         }
@@ -340,7 +340,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceManagerRequest getValidRequest() throws Exception {
             return AssociateSpaceManagerRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .managerId("test-manager-id")
                     .build();
         }
@@ -365,7 +365,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/spaces/test-id/security_groups/test-security-group-id")
+                    .method(PUT).path("/v2/spaces/test-space-id/security_groups/test-security-group-id")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_security_group_{id}_response.json");
         }
@@ -400,7 +400,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceSecurityGroupRequest getValidRequest() throws Exception {
             return AssociateSpaceSecurityGroupRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .securityGroupId("test-security-group-id")
                     .build();
         }
@@ -425,7 +425,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/spaces/test-id/developers")
+                    .method(PUT).path("v2/spaces/test-space-id/developers")
                     .requestPayload("v2/spaces/PUT_{id}_developers_request.json")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_developers_response.json");
@@ -461,7 +461,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceDeveloperByUsernameRequest getValidRequest() throws Exception {
             return AssociateSpaceDeveloperByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("user@example.com")
                     .build();
         }
@@ -486,7 +486,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/spaces/test-id/managers")
+                    .method(PUT).path("v2/spaces/test-space-id/managers")
                     .requestPayload("v2/spaces/PUT_{id}_managers_request.json")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_managers_response.json");
@@ -522,7 +522,7 @@ public final class SpringSpacesTest {
         @Override
         protected AssociateSpaceManagerByUsernameRequest getValidRequest() throws Exception {
             return AssociateSpaceManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("user@example.com")
                     .build();
         }
@@ -608,7 +608,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id?async=true")
+                    .method(DELETE).path("v2/spaces/test-space-id?async=true")
                     .status(NO_CONTENT);
         }
 
@@ -621,7 +621,7 @@ public final class SpringSpacesTest {
         protected DeleteSpaceRequest getValidRequest() throws Exception {
             return DeleteSpaceRequest.builder()
                     .async(true)
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .build();
         }
 
@@ -645,7 +645,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/spaces/test-id")
+                    .method(GET).path("/v2/spaces/test-space-id")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_response.json");
         }
@@ -680,7 +680,7 @@ public final class SpringSpacesTest {
         @Override
         protected GetSpaceRequest getValidRequest() throws Exception {
             return GetSpaceRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .build();
         }
 
@@ -704,7 +704,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/spaces/test-id/summary")
+                    .method(GET).path("/v2/spaces/test-space-id/summary")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_summary_response.json");
         }
@@ -765,7 +765,7 @@ public final class SpringSpacesTest {
         @Override
         protected GetSpaceSummaryRequest getValidRequest() throws Exception {
             return GetSpaceSummaryRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .build();
         }
 
@@ -851,7 +851,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/spaces/test-id/apps?q=name%20IN%20test-name&page=-1")
+                    .method(GET).path("/v2/spaces/test-space-id/apps?q=name%20IN%20test-name&page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_apps_response.json");
         }
@@ -899,7 +899,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceApplicationsRequest getValidRequest() throws Exception {
             return ListSpaceApplicationsRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .name("test-name")
                     .page(-1)
                     .build();
@@ -925,7 +925,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/auditors?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/auditors?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_auditors_response.json");
         }
@@ -961,7 +961,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceAuditorsRequest getValidRequest() throws Exception {
             return ListSpaceAuditorsRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -985,7 +985,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/developers?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/developers?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_developers_response.json");
         }
@@ -1021,7 +1021,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceDevelopersRequest getValidRequest() throws Exception {
             return ListSpaceDevelopersRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1046,7 +1046,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/domains?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/domains?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_domains_response.json");
         }
@@ -1082,7 +1082,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceDomainsRequest getValidRequest() throws Exception {
             return ListSpaceDomainsRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1106,7 +1106,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/events?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/events?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_events_response.json");
         }
@@ -1146,7 +1146,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceEventsRequest getValidRequest() throws Exception {
             return ListSpaceEventsRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1171,7 +1171,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/managers?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/managers?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_managers_response.json");
         }
@@ -1207,7 +1207,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceManagersRequest getValidRequest() throws Exception {
             return ListSpaceManagersRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1232,7 +1232,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/routes?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/routes?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_routes_response.json");
         }
@@ -1264,7 +1264,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceRoutesRequest getValidRequest() throws Exception {
             return ListSpaceRoutesRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1289,7 +1289,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/security_groups?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/security_groups?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_security_groups_response.json");
         }
@@ -1323,7 +1323,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceSecurityGroupsRequest getValidRequest() throws Exception {
             return ListSpaceSecurityGroupsRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1348,7 +1348,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/service_instances?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/service_instances?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_service_instances_response.json");
         }
@@ -1384,7 +1384,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceServiceInstancesRequest getValidRequest() throws Exception {
             return ListSpaceServiceInstancesRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .returnUserProvidedServiceInstances(true)
                     .page(-1)
                     .build();
@@ -1410,7 +1410,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/services?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/services?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_services_response.json");
         }
@@ -1443,7 +1443,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceServicesRequest getValidRequest() throws Exception {
             return ListSpaceServicesRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1469,7 +1469,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/spaces/test-id/user_roles?page=-1")
+                    .method(GET).path("v2/spaces/test-space-id/user_roles?page=-1")
                     .status(OK)
                     .responsePayload("v2/spaces/GET_{id}_user_roles_response.json");
         }
@@ -1508,7 +1508,7 @@ public final class SpringSpacesTest {
         @Override
         protected ListSpaceUserRolesRequest getValidRequest() throws Exception {
             return ListSpaceUserRolesRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .page(-1)
                     .build();
         }
@@ -1533,7 +1533,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/auditors/test-auditor-id")
+                    .method(DELETE).path("v2/spaces/test-space-id/auditors/test-auditor-id")
                     .status(NO_CONTENT);
         }
 
@@ -1546,7 +1546,7 @@ public final class SpringSpacesTest {
         protected RemoveSpaceAuditorRequest getValidRequest() throws Exception {
             return RemoveSpaceAuditorRequest.builder()
                     .auditorId("test-auditor-id")
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .build();
         }
 
@@ -1570,7 +1570,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/auditors")
+                    .method(DELETE).path("v2/spaces/test-space-id/auditors")
                     .requestPayload("v2/spaces/DELETE_{id}_auditors_request.json")
                     .status(NO_CONTENT);
         }
@@ -1583,7 +1583,7 @@ public final class SpringSpacesTest {
         @Override
         protected RemoveSpaceAuditorByUsernameRequest getValidRequest() throws Exception {
             return RemoveSpaceAuditorByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("auditor@example.com")
                     .build();
         }
@@ -1608,7 +1608,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/developers/test-developer-id")
+                    .method(DELETE).path("v2/spaces/test-space-id/developers/test-developer-id")
                     .status(NO_CONTENT);
         }
 
@@ -1621,7 +1621,7 @@ public final class SpringSpacesTest {
         protected RemoveSpaceDeveloperRequest getValidRequest() throws Exception {
             return RemoveSpaceDeveloperRequest.builder()
                     .developerId("test-developer-id")
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .build();
         }
 
@@ -1644,7 +1644,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/developers")
+                    .method(DELETE).path("v2/spaces/test-space-id/developers")
                     .requestPayload("v2/spaces/DELETE_{id}_developers_request.json")
                     .status(NO_CONTENT);
         }
@@ -1657,7 +1657,7 @@ public final class SpringSpacesTest {
         @Override
         protected RemoveSpaceDeveloperByUsernameRequest getValidRequest() throws Exception {
             return RemoveSpaceDeveloperByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("developer@example.com")
                     .build();
         }
@@ -1682,7 +1682,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/managers/test-manager-id")
+                    .method(DELETE).path("v2/spaces/test-space-id/managers/test-manager-id")
                     .status(NO_CONTENT);
         }
 
@@ -1694,7 +1694,7 @@ public final class SpringSpacesTest {
         @Override
         protected RemoveSpaceManagerRequest getValidRequest() throws Exception {
             return RemoveSpaceManagerRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .managerId("test-manager-id")
                     .build();
         }
@@ -1719,7 +1719,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/managers")
+                    .method(DELETE).path("v2/spaces/test-space-id/managers")
                     .requestPayload("v2/spaces/DELETE_{id}_managers_request.json")
                     .status(NO_CONTENT);
         }
@@ -1732,7 +1732,7 @@ public final class SpringSpacesTest {
         @Override
         protected RemoveSpaceManagerByUsernameRequest getValidRequest() throws Exception {
             return RemoveSpaceManagerByUsernameRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .username("manager@example.com")
                     .build();
         }
@@ -1757,7 +1757,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("v2/spaces/test-id/security_groups/test-security-group-id")
+                    .method(DELETE).path("v2/spaces/test-space-id/security_groups/test-security-group-id")
                     .status(NO_CONTENT);
         }
 
@@ -1769,7 +1769,7 @@ public final class SpringSpacesTest {
         @Override
         protected RemoveSpaceSecurityGroupRequest getValidRequest() throws Exception {
             return RemoveSpaceSecurityGroupRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .securityGroupId("test-security-group-id")
                     .build();
         }
@@ -1794,7 +1794,7 @@ public final class SpringSpacesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/spaces/test-id")
+                    .method(PUT).path("v2/spaces/test-space-id")
                     .requestPayload("v2/spaces/PUT_{id}_request.json")
                     .status(OK)
                     .responsePayload("v2/spaces/PUT_{id}_response.json");
@@ -1831,7 +1831,7 @@ public final class SpringSpacesTest {
         @Override
         protected UpdateSpaceRequest getValidRequest() throws Exception {
             return UpdateSpaceRequest.builder()
-                    .id("test-id")
+                    .spaceId("test-space-id")
                     .name("New Space Name")
                     .build();
         }

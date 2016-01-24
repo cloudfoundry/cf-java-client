@@ -433,8 +433,8 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .id(spaceId)
                         .name(applicationName)
+                        .spaceId(spaceId)
                         .page(page)
                         .build();
 
@@ -454,7 +454,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<String> requestSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
         GetSpaceRequest request = GetSpaceRequest.builder()
-                .id(Resources.getEntity(resource).getSpaceId())
+                .spaceId(Resources.getEntity(resource).getSpaceId())
                 .build();
 
         return cloudFoundryClient.spaces().get(request)
@@ -467,7 +467,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListSpaceRoutesResponse> apply(Integer page) {
                 ListSpaceRoutesRequest request = ListSpaceRoutesRequest.builder()
-                        .id(spaceId)
+                        .spaceId(spaceId)
                         .page(page)
                         .build();
 
