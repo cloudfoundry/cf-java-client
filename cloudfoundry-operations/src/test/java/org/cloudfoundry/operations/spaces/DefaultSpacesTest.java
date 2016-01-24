@@ -111,7 +111,7 @@ public final class DefaultSpacesTest {
             setupExpectations(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, TEST_SPACE_ID);
 
             GetSpaceQuotaDefinitionRequest request = fill(GetSpaceQuotaDefinitionRequest.builder())
-                    .id("test-space-spaceQuotaDefinitionId")
+                    .spaceQuotaDefinitionId("test-space-spaceQuotaDefinitionId")
                     .build();
             GetSpaceQuotaDefinitionResponse response = fill(GetSpaceQuotaDefinitionResponse.builder(), "spaceQuota-")
                     .build();

@@ -59,7 +59,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getId(), "spaces", request.getSpaceId());
+                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId());
             }
 
         });
@@ -71,7 +71,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getId());
+                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId());
             }
 
         });
@@ -96,7 +96,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "space_quota_definitions", request.getId(), "spaces", request.getSpaceId());
+                builder.pathSegment("v2", "space_quota_definitions", request.getSpaceQuotaDefinitionId(), "spaces", request.getSpaceId());
             }
 
         });

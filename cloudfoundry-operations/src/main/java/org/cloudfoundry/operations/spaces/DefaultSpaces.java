@@ -263,7 +263,7 @@ public final class DefaultSpaces implements Spaces {
         }
 
         GetSpaceQuotaDefinitionRequest request = GetSpaceQuotaDefinitionRequest.builder()
-                .id(Resources.getEntity(spaceResource).getSpaceQuotaDefinitionId())
+                .spaceQuotaDefinitionId(Resources.getEntity(spaceResource).getSpaceQuotaDefinitionId())
                 .build();
 
         return cloudFoundryClient.spaceQuotaDefinitions().get(request)

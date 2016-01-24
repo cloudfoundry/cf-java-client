@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetSpaceQuotaDefinitionRequest implements Validatable {
 
     /**
-     * The id
+     * The space quota definition id
      *
-     * @param id the id
-     * @return the id
+     * @param spaceQuotaDefinitionId the space quota definition id
+     * @return the space quota definition id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String spaceQuotaDefinitionId;
 
     @Builder
-    GetSpaceQuotaDefinitionRequest(String id) {
-        this.id = id;
+    GetSpaceQuotaDefinitionRequest(String spaceQuotaDefinitionId) {
+        this.spaceQuotaDefinitionId = spaceQuotaDefinitionId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.spaceQuotaDefinitionId == null) {
+            builder.message("space quota definition id must be specified");
         }
 
         return builder.build();

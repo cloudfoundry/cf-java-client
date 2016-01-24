@@ -28,7 +28,7 @@ public final class GetSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetSpaceQuotaDefinitionRequest.builder()
-                .id("test-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetSpaceQuotaDefinitionRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space quota definition id must be specified", result.getMessages().get(0));
     }
 
 }

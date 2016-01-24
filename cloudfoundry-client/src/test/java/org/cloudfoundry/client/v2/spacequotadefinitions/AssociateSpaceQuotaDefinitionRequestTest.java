@@ -28,8 +28,8 @@ public class AssociateSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
-                .id("test-id")
-                .spaceId("space-id")
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .build()
                 .isValid();
 
@@ -39,17 +39,18 @@ public class AssociateSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
+                .spaceId("test-space-id")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("space quota definition id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoSpaceId() {
         ValidationResult result = AssociateSpaceQuotaDefinitionRequest.builder()
-                .id("test-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .build()
                 .isValid();
 

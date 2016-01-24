@@ -50,7 +50,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/space_quota_definitions/test-id/spaces/test-space-id")
+                    .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                     .status(OK)
                     .responsePayload("v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
         }
@@ -80,7 +80,10 @@ public final class SpringSpaceQuotaDefinitionsTest {
 
         @Override
         protected AssociateSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
-            return AssociateSpaceQuotaDefinitionRequest.builder().id("test-id").spaceId("test-space-id").build();
+            return AssociateSpaceQuotaDefinitionRequest.builder()
+                    .spaceId("test-space-id")
+                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                    .build();
         }
 
         @Override
@@ -102,7 +105,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/space_quota_definitions/test-id")
+                    .method(GET).path("v2/space_quota_definitions/test-space-quota-definition-id")
                     .status(OK)
                     .responsePayload("v2/space_quota_definitions/GET_{id}_response.json");
         }
@@ -133,7 +136,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected GetSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
             return GetSpaceQuotaDefinitionRequest.builder()
-                    .id("test-id")
+                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
                     .build();
         }
 
@@ -215,7 +218,7 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/space_quota_definitions/test-id/spaces/test-space-id")
+                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                     .status(NO_CONTENT);
         }
 
@@ -227,8 +230,8 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
             return RemoveSpaceQuotaDefinitionRequest.builder()
-                    .id("test-id")
                     .spaceId("test-space-id")
+                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
                     .build();
         }
 

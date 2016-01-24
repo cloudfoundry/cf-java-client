@@ -30,15 +30,6 @@ import org.cloudfoundry.client.ValidationResult;
 public class AssociateSpaceQuotaDefinitionRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The space id
      *
      * @param spaceId the space id
@@ -47,22 +38,31 @@ public class AssociateSpaceQuotaDefinitionRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String spaceId;
 
+    /**
+     * The space quota definition id
+     *
+     * @param spaceQuotaDefinitionId the space quota definition id
+     * @return the space quota definition id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String spaceQuotaDefinitionId;
+
     @Builder
-    AssociateSpaceQuotaDefinitionRequest(String spaceId, String id) {
+    AssociateSpaceQuotaDefinitionRequest(String spaceId, String spaceQuotaDefinitionId) {
         this.spaceId = spaceId;
-        this.id = id;
+        this.spaceQuotaDefinitionId = spaceQuotaDefinitionId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.spaceId == null) {
             builder.message("space id must be specified");
+        }
+
+        if (this.spaceQuotaDefinitionId == null) {
+            builder.message("space quota definition id must be specified");
         }
 
         return builder.build();
