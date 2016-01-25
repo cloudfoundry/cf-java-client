@@ -1,28 +1,20 @@
 {
-  "total_results": 1,
-  "total_pages": 1,
-  "prev_url": null,
-  "next_url": null,
-  "resources": [
-    {
-      "metadata": {
-        "guid": "956cb355-3acc-4ced-8161-a57b9b5c7943",
-        "url": "/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943",
-        "created_at": "2015-07-27T22:43:16Z",
-        "updated_at": null
-      },
-      "entity": {
-        "name": "name-464",
-        "free": false,
-        "description": "desc-54",
-        "service_guid": "83dc64ef-eb0a-454c-b3d9-c554921f3bd2",
-        "extra": null,
-        "unique_id": "49aee95b-2108-4bbb-9769-c6197f308acf",
-        "public": true,
-        "active": true,
-        "service_url": "/v2/services/83dc64ef-eb0a-454c-b3d9-c554921f3bd2",
-        "service_instances_url": "/v2/service_plans/956cb355-3acc-4ced-8161-a57b9b5c7943/service_instances"
-      }
-    }
-  ]
+  "metadata": {
+    "guid": "f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7",
+    "url": "/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7",
+    "created_at": "2015-07-27T22:43:16Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-462",
+    "free": false,
+    "description": "desc-52",
+    "service_guid": "8ac39757-0f9d-4295-9b6f-e626f7ee3cd4",
+    "extra": null,
+    "unique_id": "2aa0162c-9c88-4084-ad1d-566a09e8d316",
+    "public": true,
+    "active": true,
+    "service_url": "/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4",
+    "service_instances_url": "/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances"
+  }
 }
