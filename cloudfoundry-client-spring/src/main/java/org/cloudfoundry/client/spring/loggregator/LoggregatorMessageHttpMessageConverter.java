@@ -42,7 +42,6 @@ public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMe
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
         return Multipart.from(inputMessage.getBody(), boundary)
