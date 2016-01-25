@@ -49,8 +49,8 @@ public final class RemoveSpaceManagerRequest implements Validatable {
 
     @Builder
     RemoveSpaceManagerRequest(String managerId, String spaceId) {
-        this.spaceId = spaceId;
         this.managerId = managerId;
+        this.spaceId = spaceId;
     }
 
     @Override

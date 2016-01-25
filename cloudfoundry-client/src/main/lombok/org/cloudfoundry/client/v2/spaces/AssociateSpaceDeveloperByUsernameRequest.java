@@ -61,12 +61,12 @@ public final class AssociateSpaceDeveloperByUsernameRequest implements Validatab
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.username == null) {
-            builder.message("username must be specified");
-        }
-
         if (this.spaceId == null) {
             builder.message("space id must be specified");
+        }
+
+        if (this.username == null) {
+            builder.message("username must be specified");
         }
 
         return builder.build();
