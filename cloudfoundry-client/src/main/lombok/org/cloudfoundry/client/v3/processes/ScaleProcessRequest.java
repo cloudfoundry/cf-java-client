@@ -40,15 +40,6 @@ public final class ScaleProcessRequest implements Validatable {
     private final Integer diskInMb;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The number of instances
      *
      * @param instances the number of instances
@@ -66,20 +57,29 @@ public final class ScaleProcessRequest implements Validatable {
     @Getter(onMethod = @__(@JsonProperty("memory_in_mb")))
     private final Integer memoryInMb;
 
+    /**
+     * The process id
+     *
+     * @param processId the process id
+     * @return the process id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String processId;
+
     @Builder
-    ScaleProcessRequest(Integer diskInMb, String id, Integer instances, Integer memoryInMb) {
+    ScaleProcessRequest(Integer diskInMb, Integer instances, Integer memoryInMb, String processId) {
         this.diskInMb = diskInMb;
-        this.id = id;
         this.instances = instances;
         this.memoryInMb = memoryInMb;
+        this.processId = processId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.processId == null) {
+            builder.message("process id must be specified");
         }
 
         return builder.build();

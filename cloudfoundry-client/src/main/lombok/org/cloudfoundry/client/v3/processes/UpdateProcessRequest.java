@@ -40,26 +40,26 @@ public final class UpdateProcessRequest implements Validatable {
     private final String command;
 
     /**
-     * The id
+     * The process id
      *
-     * @param id the id
-     * @return the id
+     * @param processId the process id
+     * @return the process id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String processId;
 
     @Builder
-    UpdateProcessRequest(String command, String id) {
+    UpdateProcessRequest(String command, String processId) {
         this.command = command;
-        this.id = id;
+        this.processId = processId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.processId == null) {
+            builder.message("process id must be specified");
         }
 
         if (this.command == null) {

@@ -28,7 +28,7 @@ public final class GetProcessRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetProcessRequest.builder()
-                .id("test-id")
+                .processId("test-process-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetProcessRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("process id must be specified", result.getMessages().get(0));
     }
 
 }

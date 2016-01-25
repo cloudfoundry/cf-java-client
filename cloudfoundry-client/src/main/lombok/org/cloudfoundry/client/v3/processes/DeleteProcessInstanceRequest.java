@@ -30,15 +30,6 @@ import org.cloudfoundry.client.ValidationResult;
 public final class DeleteProcessInstanceRequest implements Validatable {
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The index
      *
      * @param index the index
@@ -47,22 +38,31 @@ public final class DeleteProcessInstanceRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String index;
 
+    /**
+     * The process id
+     *
+     * @param processId the process id
+     * @return the process id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String processId;
+
     @Builder
-    DeleteProcessInstanceRequest(String id, String index) {
-        this.id = id;
+    DeleteProcessInstanceRequest(String index, String processId) {
         this.index = index;
+        this.processId = processId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
-        }
-
         if (this.index == null) {
             builder.message("index must be specified");
+        }
+
+        if (this.processId == null) {
+            builder.message("process id must be specified");
         }
 
         return builder.build();

@@ -28,7 +28,7 @@ public final class UpdateProcessRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateProcessRequest.builder()
-                .id("test-id")
+                .processId("test-process-id")
                 .command("test-command")
                 .build()
                 .isValid();
@@ -39,7 +39,7 @@ public final class UpdateProcessRequestTest {
     @Test
     public void isValidNoCommand() {
         ValidationResult result = UpdateProcessRequest.builder()
-                .id("test-id")
+                .processId("test-process-id")
                 .build()
                 .isValid();
 
@@ -55,7 +55,7 @@ public final class UpdateProcessRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("process id must be specified", result.getMessages().get(0));
     }
 
 }

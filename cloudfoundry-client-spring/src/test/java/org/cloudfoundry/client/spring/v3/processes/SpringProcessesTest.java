@@ -54,7 +54,7 @@ public final class SpringProcessesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/processes/test-id/instances/test-index")
+                    .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
                     .status(NO_CONTENT);
         }
 
@@ -66,7 +66,7 @@ public final class SpringProcessesTest {
         @Override
         protected DeleteProcessInstanceRequest getValidRequest() {
             return DeleteProcessInstanceRequest.builder()
-                    .id("test-id")
+                    .processId("test-process-id")
                     .index("test-index")
                     .build();
         }
@@ -91,7 +91,7 @@ public final class SpringProcessesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/processes/test-id")
+                    .method(GET).path("/v3/processes/test-process-id")
                     .status(OK)
                     .responsePayload("v3/processes/GET_{id}_response.json");
         }
@@ -125,7 +125,7 @@ public final class SpringProcessesTest {
         @Override
         protected GetProcessRequest getValidRequest() {
             return GetProcessRequest.builder()
-                    .id("test-id")
+                    .processId("test-process-id")
                     .build();
         }
 
@@ -245,7 +245,7 @@ public final class SpringProcessesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/processes/test-id/scale")
+                    .method(PUT).path("/v3/processes/test-process-id/scale")
                     .requestPayload("v3/processes/PUT_{id}_scale_request.json")
                     .status(OK)
                     .responsePayload("v3/processes/PUT_{id}_scale_response.json");
@@ -281,7 +281,7 @@ public final class SpringProcessesTest {
         protected ScaleProcessRequest getValidRequest() {
             return ScaleProcessRequest.builder()
                     .diskInMb(100)
-                    .id("test-id")
+                    .processId("test-process-id")
                     .instances(3)
                     .memoryInMb(100)
                     .build();
@@ -306,7 +306,7 @@ public final class SpringProcessesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PATCH).path("/v3/processes/test-id")
+                    .method(PATCH).path("/v3/processes/test-process-id")
                     .requestPayload("v3/processes/PATCH_{id}_request.json")
                     .status(OK)
                     .responsePayload("v3/processes/PATCH_{id}_response.json");
@@ -342,7 +342,7 @@ public final class SpringProcessesTest {
         @Override
         protected UpdateProcessRequest getValidRequest() {
             return UpdateProcessRequest.builder()
-                    .id("test-id")
+                    .processId("test-process-id")
                     .command("test-command")
                     .build();
         }

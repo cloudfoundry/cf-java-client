@@ -60,7 +60,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getId(), "instances", request.getIndex());
+                builder.pathSegment("v3", "processes", request.getProcessId(), "instances", request.getIndex());
             }
 
         });
@@ -72,7 +72,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getId());
+                builder.pathSegment("v3", "processes", request.getProcessId());
             }
 
         });
@@ -96,7 +96,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getId(), "scale");
+                builder.pathSegment("v3", "processes", request.getProcessId(), "scale");
             }
 
         });
@@ -108,7 +108,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "processes", request.getId());
+                builder.pathSegment("v3", "processes", request.getProcessId());
             }
 
         });

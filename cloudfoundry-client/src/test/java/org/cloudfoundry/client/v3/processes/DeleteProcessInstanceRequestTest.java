@@ -28,8 +28,8 @@ public final class DeleteProcessInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteProcessInstanceRequest.builder()
-                .id("test-id")
                 .index("test-index")
+                .processId("test-process-id")
                 .build()
                 .isValid();
 
@@ -44,13 +44,13 @@ public final class DeleteProcessInstanceRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("process id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoIndex() {
         ValidationResult result = DeleteProcessInstanceRequest.builder()
-                .id("test-id")
+                .processId("test-process-id")
                 .build()
                 .isValid();
 
