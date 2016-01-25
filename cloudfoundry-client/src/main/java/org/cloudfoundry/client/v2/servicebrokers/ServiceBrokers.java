@@ -56,4 +56,12 @@ public interface ServiceBrokers {
      */
     Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_brokers/update_a_service_broker.html">Update Service Broker</a> request
+     *
+     * @param request the Update Service Broker request
+     * @return the response from the Update Service Broker request
+     */
+    Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request);
+
 }

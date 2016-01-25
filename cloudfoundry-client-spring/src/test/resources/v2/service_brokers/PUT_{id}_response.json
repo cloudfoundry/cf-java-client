@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "guid": "92b935f5-20e2-4377-a7e2-f15faa110eab",
+    "created_at": "2015-07-27T22:43:23Z",
+    "updated_at": "2015-07-27T22:43:23Z",
+    "url": "/v2/service_brokers/92b935f5-20e2-4377-a7e2-f15faa110eab"
+  },
+  "entity": {
+    "name": "name-998",
+    "broker_url": "https://mybroker.example.com",
+    "auth_username": "admin-user",
+    "space_guid": "85e59d96-b68b-4908-8ff5-8d54f4371f14"
+  }
+}

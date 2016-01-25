@@ -1,0 +1,5 @@
+{
+  "auth_username": "admin-user",
+  "auth_password": "some-secret",
+  "broker_url": "https://mybroker.example.com"
+}
