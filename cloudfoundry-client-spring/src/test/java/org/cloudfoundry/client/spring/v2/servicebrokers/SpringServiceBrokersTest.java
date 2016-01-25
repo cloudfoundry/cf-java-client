@@ -266,7 +266,7 @@ public final class SpringServiceBrokersTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v2/service_brokers/test-id")
+                    .method(PUT).path("v2/service_brokers/test-service-broker-id")
                     .requestPayload("v2/service_brokers/PUT_{id}_request.json")
                     .status(OK)
                     .responsePayload("v2/service_brokers/PUT_{id}_response.json");
@@ -295,8 +295,8 @@ public final class SpringServiceBrokersTest {
             return UpdateServiceBrokerRequest.builder()
                     .authenticationUsername("admin-user")
                     .authenticationPassword("some-secret")
-                    .id("test-id")
                     .brokerUrl("https://mybroker.example.com")
+                    .serviceBrokerId("test-service-broker-id")
                     .build();
         }
 

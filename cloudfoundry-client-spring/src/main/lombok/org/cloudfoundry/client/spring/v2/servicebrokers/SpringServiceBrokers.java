@@ -110,9 +110,10 @@ public final class SpringServiceBrokers extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_brokers", request.getId());
+                builder.pathSegment("v2", "service_brokers", request.getServiceBrokerId());
             }
 
         });
     }
+
 }

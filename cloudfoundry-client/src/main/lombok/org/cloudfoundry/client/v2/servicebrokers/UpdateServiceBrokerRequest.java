@@ -54,15 +54,6 @@ public final class UpdateServiceBrokerRequest implements Validatable {
     private final String brokerUrl;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The name
      *
      * @param name the name
@@ -71,16 +62,25 @@ public final class UpdateServiceBrokerRequest implements Validatable {
     @Getter(onMethod = @__(@JsonProperty("name")))
     private final String name;
 
+    /**
+     * The service broker id
+     *
+     * @param serviceBrokerId the service broker id
+     * @return the service broker id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String serviceBrokerId;
+
     @Builder
     UpdateServiceBrokerRequest(String authenticationPassword,
                                String authenticationUsername,
                                String brokerUrl,
-                               String id,
-                               String name) {
+                               String name,
+                               String serviceBrokerId) {
         this.authenticationPassword = authenticationPassword;
         this.authenticationUsername = authenticationUsername;
         this.brokerUrl = brokerUrl;
-        this.id = id;
+        this.serviceBrokerId = serviceBrokerId;
         this.name = name;
     }
 
@@ -88,8 +88,8 @@ public final class UpdateServiceBrokerRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.serviceBrokerId == null) {
+            builder.message("service broker id must be specified");
         }
 
         return builder.build();

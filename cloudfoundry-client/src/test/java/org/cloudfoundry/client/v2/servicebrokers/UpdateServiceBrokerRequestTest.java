@@ -29,7 +29,7 @@ public final class UpdateServiceBrokerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateServiceBrokerRequest.builder()
-                .id("test-id")
+                .serviceBrokerId("test-service-broker-id")
                 .build()
                 .isValid();
 
@@ -43,7 +43,7 @@ public final class UpdateServiceBrokerRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("service broker id must be specified", result.getMessages().get(0));
     }
 
 }
