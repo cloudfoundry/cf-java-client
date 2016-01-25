@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetDropletRequest implements Validatable {
 
     /**
-     * The id
+     * The droplet id
      *
-     * @param id the id
-     * @return the id
+     * @param dropletId the droplet id
+     * @return the droplet id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String dropletId;
 
     @Builder
-    GetDropletRequest(String id) {
-        this.id = id;
+    GetDropletRequest(String dropletId) {
+        this.dropletId = dropletId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.dropletId == null) {
+            builder.message("droplet id must be specified");
         }
 
         return builder.build();

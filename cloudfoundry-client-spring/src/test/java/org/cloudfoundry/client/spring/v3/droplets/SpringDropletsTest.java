@@ -51,7 +51,7 @@ public final class SpringDropletsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/droplets/test-id")
+                    .method(DELETE).path("/v3/droplets/test-droplet-id")
                     .status(NO_CONTENT);
         }
 
@@ -63,7 +63,7 @@ public final class SpringDropletsTest {
         @Override
         protected DeleteDropletRequest getValidRequest() throws Exception {
             return DeleteDropletRequest.builder()
-                    .id("test-id")
+                    .dropletId("test-droplet-id")
                     .build();
         }
 
@@ -88,7 +88,7 @@ public final class SpringDropletsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/droplets/test-id")
+                    .method(GET).path("/v3/droplets/test-droplet-id")
                     .status(OK)
                     .responsePayload("v3/droplets/GET_{id}_response.json");
         }
@@ -137,7 +137,7 @@ public final class SpringDropletsTest {
         @Override
         protected GetDropletRequest getValidRequest() throws Exception {
             return GetDropletRequest.builder()
-                    .id("test-id")
+                    .dropletId("test-droplet-id")
                     .build();
         }
 

@@ -55,7 +55,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "droplets", request.getId());
+                builder.pathSegment("v3", "droplets", request.getDropletId());
             }
 
         });
@@ -67,7 +67,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "droplets", request.getId());
+                builder.pathSegment("v3", "droplets", request.getDropletId());
             }
 
         });

@@ -28,7 +28,7 @@ public final class DeleteDropletRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteDropletRequest.builder()
-                .id("test-id")
+                .dropletId("test-droplet-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class DeleteDropletRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("droplet id must be specified", result.getMessages().get(0));
     }
 
 }

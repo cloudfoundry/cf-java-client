@@ -28,7 +28,7 @@ public final class GetDropletRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetDropletRequest.builder()
-                .id("test-id")
+                .dropletId("test-droplet-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetDropletRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("droplet id must be specified", result.getMessages().get(0));
     }
 
 }
