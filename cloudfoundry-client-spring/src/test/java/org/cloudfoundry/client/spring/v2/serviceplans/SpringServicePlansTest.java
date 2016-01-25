@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
+import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
@@ -34,6 +36,59 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringServicePlansTest {
+
+    public static final class Get extends AbstractApiTest<GetServicePlanRequest, GetServicePlanResponse> {
+
+        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServicePlanRequest getInvalidRequest() {
+            return GetServicePlanRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET)
+                    .path("v2/service_plans/test-id")
+                    .status(OK)
+                    .responsePayload("v2/service_plans/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServicePlanResponse getResponse() {
+            return GetServicePlanResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-07-27T22:43:16Z")
+                            .id("f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
+                            .url("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7")
+                            .build())
+                    .entity(ServicePlanEntity.builder()
+                            .name("name-462")
+                            .free(false)
+                            .description("desc-52")
+                            .serviceId("8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
+                            .uniqueId("2aa0162c-9c88-4084-ad1d-566a09e8d316")
+                            .visible(true)
+                            .active(true)
+                            .serviceUrl("/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
+                            .serviceInstancesUrl("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetServicePlanRequest getValidRequest() throws Exception {
+            return GetServicePlanRequest.builder()
+                    .id("test-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetServicePlanResponse> invoke(GetServicePlanRequest request) {
+            return this.servicePlans.get(request);
+        }
+    }
 
     public static final class List extends AbstractApiTest<ListServicePlansRequest, ListServicePlansResponse> {
 
@@ -50,7 +105,7 @@ public final class SpringServicePlansTest {
                     .method(GET)
                     .path("v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
                     .status(OK)
-                    .responsePayload("v2/service_plans/GET_{id}_response.json");
+                    .responsePayload("v2/service_plans/GET_response.json");
         }
 
         @Override
