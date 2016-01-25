@@ -61,15 +61,6 @@ public final class StagePackageRequest implements Validatable {
     private final Map<String, Object> environmentVariables;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The memory limit
      *
      * @param memoryLimit the memoty limit
@@ -77,6 +68,15 @@ public final class StagePackageRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("memory_limit")))
     private final Integer memoryLimit;
+
+    /**
+     * The package id
+     *
+     * @param packageId the package id
+     * @return the package id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String packageId;
 
     /**
      * The stack
@@ -91,14 +91,14 @@ public final class StagePackageRequest implements Validatable {
     StagePackageRequest(String buildpack,
                         Integer diskLimit,
                         @Singular Map<String, Object> environmentVariables,
-                        String id,
                         Integer memoryLimit,
+                        String packageId,
                         String stack) {
         this.buildpack = buildpack;
         this.diskLimit = diskLimit;
         this.environmentVariables = environmentVariables;
-        this.id = id;
         this.memoryLimit = memoryLimit;
+        this.packageId = packageId;
         this.stack = stack;
     }
 
@@ -106,8 +106,8 @@ public final class StagePackageRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.packageId == null) {
+            builder.message("package id must be specified");
         }
 
         return builder.build();

@@ -28,7 +28,7 @@ public final class DeletePackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeletePackageRequest.builder()
-                .id("test-id")
+                .packageId("test-package-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class DeletePackageRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("package id must be specified", result.getMessages().get(0));
     }
 
 }

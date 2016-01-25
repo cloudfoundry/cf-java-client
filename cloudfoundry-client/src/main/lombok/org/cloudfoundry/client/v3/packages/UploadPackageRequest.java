@@ -41,18 +41,18 @@ public final class UploadPackageRequest implements Validatable {
     private final File file;
 
     /**
-     * The id
+     * The package id
      *
-     * @param id the id
-     * @return the id
+     * @param packageId the package id
+     * @return the package id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String packageId;
 
     @Builder
-    UploadPackageRequest(File file, String id) {
+    UploadPackageRequest(File file, String packageId) {
         this.file = file;
-        this.id = id;
+        this.packageId = packageId;
     }
 
     @Override
@@ -63,8 +63,8 @@ public final class UploadPackageRequest implements Validatable {
             builder.message("file must be specified");
         }
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.packageId == null) {
+            builder.message("package id must be specified");
         }
 
         return builder.build();

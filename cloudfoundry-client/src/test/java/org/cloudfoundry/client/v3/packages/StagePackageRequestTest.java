@@ -28,7 +28,7 @@ public final class StagePackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = StagePackageRequest.builder()
-                .id("test-application-id")
+                .packageId("test-package-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class StagePackageRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("package id must be specified", result.getMessages().get(0));
     }
 
 }

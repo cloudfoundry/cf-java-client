@@ -95,7 +95,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getId());
+                builder.pathSegment("v3", "packages", request.getPackageId());
             }
 
         });
@@ -107,7 +107,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getId(), "download");
+                builder.pathSegment("v3", "packages", request.getPackageId(), "download");
             }
 
         });
@@ -119,7 +119,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getId());
+                builder.pathSegment("v3", "packages", request.getPackageId());
             }
 
         });
@@ -143,7 +143,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getId(), "droplets");
+                builder.pathSegment("v3", "packages", request.getPackageId(), "droplets");
             }
 
         });
@@ -162,7 +162,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "packages", request.getId(), "upload");
+                builder.pathSegment("v3", "packages", request.getPackageId(), "upload");
             }
 
         });

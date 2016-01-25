@@ -31,7 +31,7 @@ public final class UploadPackageRequestTest {
     public void isValid() {
         ValidationResult result = UploadPackageRequest.builder()
                 .file(new File(""))
-                .id("test-id")
+                .packageId("test-package-id")
                 .build()
                 .isValid();
 
@@ -41,7 +41,7 @@ public final class UploadPackageRequestTest {
     @Test
     public void isValidNoFile() {
         ValidationResult result = UploadPackageRequest.builder()
-                .id("test-id")
+                .packageId("test-package-id")
                 .build()
                 .isValid();
 
@@ -57,7 +57,7 @@ public final class UploadPackageRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("package id must be specified", result.getMessages().get(0));
     }
 
 }

@@ -172,7 +172,7 @@ public final class SpringPackagesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/packages/test-id")
+                    .method(DELETE).path("/v3/packages/test-package-id")
                     .status(OK);
         }
 
@@ -184,7 +184,7 @@ public final class SpringPackagesTest {
         @Override
         protected DeletePackageRequest getValidRequest() {
             return DeletePackageRequest.builder()
-                    .id("test-id")
+                    .packageId("test-package-id")
                     .build();
         }
 
@@ -214,7 +214,7 @@ public final class SpringPackagesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v3/packages/test-id/download")
+                    .method(GET).path("v3/packages/test-package-id/download")
                     .status(OK)
                     .responsePayload("v3/packages/GET_{id}_download_response.bin");
         }
@@ -227,7 +227,7 @@ public final class SpringPackagesTest {
         @Override
         protected DownloadPackageRequest getValidRequest() {
             return DownloadPackageRequest.builder()
-                    .id("test-id")
+                    .packageId("test-package-id")
                     .build();
         }
 
@@ -251,7 +251,7 @@ public final class SpringPackagesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/packages/test-id")
+                    .method(GET).path("/v3/packages/test-package-id")
                     .status(OK)
                     .responsePayload("v3/packages/GET_{id}_response.json");
         }
@@ -290,7 +290,7 @@ public final class SpringPackagesTest {
         @Override
         protected GetPackageRequest getValidRequest() {
             return GetPackageRequest.builder()
-                    .id("test-id")
+                    .packageId("test-package-id")
                     .build();
         }
 
@@ -408,7 +408,7 @@ public final class SpringPackagesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("/v3/packages/test-id/droplets")
+                    .method(POST).path("/v3/packages/test-package-id/droplets")
                     .requestPayload("v3/packages/POST_{id}_droplets_request.json")
                     .status(CREATED)
                     .responsePayload("v3/packages/POST_{id}_droplets_response.json");
@@ -447,7 +447,7 @@ public final class SpringPackagesTest {
             return StagePackageRequest.builder()
                     .buildpack("http://github.com/myorg/awesome-buildpack")
                     .environmentVariable("CUSTOM_ENV_VAR", "hello")
-                    .id("test-id")
+                    .packageId("test-package-id")
                     .stack("cflinuxfs2")
                     .build();
         }
@@ -472,7 +472,7 @@ public final class SpringPackagesTest {
         @SuppressWarnings("unchecked")
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("/v3/packages/test-id/upload")
+                    .method(POST).path("/v3/packages/test-package-id/upload")
                     .requestMatcher(header("Content-Type", startsWith(MULTIPART_FORM_DATA_VALUE)))
                     .anyRequestPayload()
                     .status(CREATED)
@@ -515,7 +515,7 @@ public final class SpringPackagesTest {
         protected UploadPackageRequest getValidRequest() throws Exception {
             return UploadPackageRequest.builder()
                     .file(new ClassPathResource("v3/packages/test-file").getFile())
-                    .id("test-id")
+                    .packageId("test-package-id")
                     .build();
         }
 

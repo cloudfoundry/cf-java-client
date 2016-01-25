@@ -28,7 +28,7 @@ public final class DownloadPackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DownloadPackageRequest.builder()
-                .id("test-id")
+                .packageId("test-package-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class DownloadPackageRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("package id must be specified", result.getMessages().get(0));
     }
 
 }

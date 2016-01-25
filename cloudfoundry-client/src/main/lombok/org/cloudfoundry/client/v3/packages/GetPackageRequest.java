@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetPackageRequest implements Validatable {
 
     /**
-     * The id
+     * The package id
      *
-     * @param id the id
-     * @return the id
+     * @param packageId the package id
+     * @return the package id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String packageId;
 
     @Builder
-    GetPackageRequest(String id) {
-        this.id = id;
+    GetPackageRequest(String packageId) {
+        this.packageId = packageId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.packageId == null) {
+            builder.message("package id must be specified");
         }
 
         return builder.build();
