@@ -30,25 +30,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class StartApplicationRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     @Builder
-    StartApplicationRequest(String id) {
-        this.id = id;
+    StartApplicationRequest(String applicationId) {
+        this.applicationId = applicationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

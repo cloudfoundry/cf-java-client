@@ -30,13 +30,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class DeleteApplicationInstanceRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The index
@@ -57,8 +57,8 @@ public final class DeleteApplicationInstanceRequest implements Validatable {
     private final String type;
 
     @Builder
-    DeleteApplicationInstanceRequest(String id, String index, String type) {
-        this.id = id;
+    DeleteApplicationInstanceRequest(String applicationId, String index, String type) {
+        this.applicationId = applicationId;
         this.index = index;
         this.type = type;
     }
@@ -67,8 +67,8 @@ public final class DeleteApplicationInstanceRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.index == null) {

@@ -34,6 +34,15 @@ import java.util.Map;
 public final class UpdateApplicationRequest implements Validatable {
 
     /**
+     * The application id
+     *
+     * @param applicationId the application id
+     * @return the application id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String applicationId;
+
+    /**
      * The buildpack
      *
      * @param buildpack the buildpack
@@ -52,15 +61,6 @@ public final class UpdateApplicationRequest implements Validatable {
     private final Map<String, String> environmentVariables;
 
     /**
-     * The id
-     *
-     * @param id the id
-     * @return the id
-     */
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
-    /**
      * The name
      *
      * @param name the name
@@ -70,13 +70,13 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String name;
 
     @Builder
-    UpdateApplicationRequest(String buildpack,
+    UpdateApplicationRequest(String applicationId,
+                             String buildpack,
                              @Singular Map<String, String> environmentVariables,
-                             String id,
                              String name) {
+        this.applicationId = applicationId;
         this.buildpack = buildpack;
         this.environmentVariables = environmentVariables;
-        this.id = id;
         this.name = name;
     }
 
@@ -84,8 +84,8 @@ public final class UpdateApplicationRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

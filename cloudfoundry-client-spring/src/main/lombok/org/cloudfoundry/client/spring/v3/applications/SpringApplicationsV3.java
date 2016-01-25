@@ -84,7 +84,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "current_droplet");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet");
             }
 
         });
@@ -108,7 +108,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId());
+                builder.pathSegment("v3", "apps", request.getApplicationId());
             }
 
         });
@@ -120,7 +120,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "instances",
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances",
                         request.getIndex());
             }
 
@@ -133,7 +133,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId());
+                builder.pathSegment("v3", "apps", request.getApplicationId());
             }
 
         });
@@ -145,7 +145,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "env");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "env");
             }
 
         });
@@ -157,7 +157,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType());
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType());
             }
 
         });
@@ -183,7 +183,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "droplets");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
@@ -197,7 +197,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "packages");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "packages");
             }
 
         });
@@ -209,7 +209,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "processes");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes");
             }
 
         });
@@ -221,7 +221,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "routes");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
             }
 
         });
@@ -233,7 +233,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "routes");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
             }
 
         });
@@ -245,7 +245,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "processes", request.getType(), "scale");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale");
             }
 
         });
@@ -257,7 +257,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "start");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "start");
             }
 
         });
@@ -269,7 +269,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "stop");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "stop");
             }
 
         });
@@ -281,7 +281,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId(), "routes");
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
             }
 
         });
@@ -293,7 +293,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getId());
+                builder.pathSegment("v3", "apps", request.getApplicationId());
             }
 
         });

@@ -28,7 +28,7 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .index("test-index")
                 .type("test-type")
                 .build()
@@ -46,13 +46,13 @@ public final class DeleteApplicationInstanceRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoIndex() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .type("test-type")
                 .build()
                 .isValid();
@@ -64,7 +64,7 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValidNoType() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .index("test-index")
                 .build()
                 .isValid();

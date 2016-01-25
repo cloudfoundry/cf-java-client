@@ -30,13 +30,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetApplicationProcessRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The type
@@ -48,8 +48,8 @@ public final class GetApplicationProcessRequest implements Validatable {
     private final String type;
 
     @Builder
-    GetApplicationProcessRequest(String id, String type) {
-        this.id = id;
+    GetApplicationProcessRequest(String applicationId, String type) {
+        this.applicationId = applicationId;
         this.type = type;
     }
 
@@ -57,8 +57,8 @@ public final class GetApplicationProcessRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.type == null) {

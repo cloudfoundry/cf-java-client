@@ -84,7 +84,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("v3/apps/test-id/current_droplet")
+                    .method(PUT).path("v3/apps/test-application-id/current_droplet")
                     .requestPayload("v3/apps/PUT_{id}_current_droplet_request.json")
                     .status(OK)
                     .responsePayload("v3/apps/PUT_{id}_current_droplet_response.json");
@@ -133,7 +133,7 @@ public final class SpringApplicationsV3Test {
         protected AssignApplicationDropletRequest getValidRequest() throws Exception {
             return AssignApplicationDropletRequest.builder()
                     .dropletId("guid-3b5793e7-f6c8-40cb-a8d8-07080280da83")
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -230,7 +230,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/apps/test-id")
+                    .method(DELETE).path("/v3/apps/test-application-id")
                     .status(NO_CONTENT);
         }
 
@@ -242,7 +242,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected DeleteApplicationRequest getValidRequest() throws Exception {
             return DeleteApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -266,7 +266,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/apps/test-id/processes/test-type/instances/test-index")
+                    .method(DELETE).path("/v3/apps/test-application-id/processes/test-type/instances/test-index")
                     .status(NO_CONTENT);
         }
 
@@ -278,7 +278,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected DeleteApplicationInstanceRequest getValidRequest() throws Exception {
             return DeleteApplicationInstanceRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .index("test-index")
                     .type("test-type")
                     .build();
@@ -304,7 +304,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id")
+                    .method(GET).path("/v3/apps/test-application-id")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_response.json");
         }
@@ -352,7 +352,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationRequest getValidRequest() throws Exception {
             return GetApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -376,7 +376,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/env")
+                    .method(GET).path("/v3/apps/test-application-id/env")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_env_response.json");
         }
@@ -405,7 +405,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationEnvironmentRequest getValidRequest() throws Exception {
             return GetApplicationEnvironmentRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -429,7 +429,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/processes/web")
+                    .method(GET).path("/v3/apps/test-application-id/processes/web")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_processes_{type}_response.json");
         }
@@ -463,7 +463,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationProcessRequest getValidRequest() throws Exception {
             return GetApplicationProcessRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .type("web")
                     .build();
         }
@@ -605,7 +605,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
+                    .method(GET).path("/v3/apps/test-application-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_droplets_response.json");
         }
@@ -681,7 +681,7 @@ public final class SpringApplicationsV3Test {
                     .perPage(2)
                     .orderBy(CREATED_AT)
                     .orderDirection(ASC)
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -705,7 +705,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/packages")
+                    .method(GET).path("/v3/apps/test-application-id/packages")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_packages_response.json");
         }
@@ -756,7 +756,7 @@ public final class SpringApplicationsV3Test {
         protected ListApplicationPackagesRequest getValidRequest() throws Exception {
             return ListApplicationPackagesRequest.builder()
                     .page(1)
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -780,7 +780,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/processes")
+                    .method(GET).path("/v3/apps/test-application-id/processes")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_processes_response.json");
         }
@@ -826,7 +826,7 @@ public final class SpringApplicationsV3Test {
         protected ListApplicationProcessesRequest getValidRequest() throws Exception {
             return ListApplicationProcessesRequest.builder()
                     .page(1)
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -850,7 +850,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/apps/test-id/routes")
+                    .method(GET).path("/v3/apps/test-application-id/routes")
                     .status(OK)
                     .responsePayload("v3/apps/GET_{id}_routes_response.json");
         }
@@ -897,7 +897,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected ListApplicationRoutesRequest getValidRequest() throws Exception {
             return ListApplicationRoutesRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -921,7 +921,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/apps/test-id/routes")
+                    .method(PUT).path("/v3/apps/test-application-id/routes")
                     .requestPayload("v3/apps/PUT_{id}_routes_request.json")
                     .status(NO_CONTENT);
         }
@@ -934,7 +934,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected MapApplicationRouteRequest getValidRequest() throws Exception {
             return MapApplicationRouteRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .routeId("9cf0271a-420f-4ae4-b227-16683db93573")
                     .build();
         }
@@ -959,7 +959,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/apps/test-id/processes/web/scale")
+                    .method(PUT).path("/v3/apps/test-application-id/processes/web/scale")
                     .requestPayload("v3/apps/PUT_{id}_processes_{type}_scale_request.json")
                     .status(OK)
                     .responsePayload("v3/apps/PUT_{id}_processes_{type}_scale_response.json");
@@ -995,7 +995,7 @@ public final class SpringApplicationsV3Test {
         protected ScaleApplicationRequest getValidRequest() throws Exception {
             return ScaleApplicationRequest.builder()
                     .diskInMb(100)
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .instances(3)
                     .memoryInMb(100)
                     .type("web")
@@ -1022,7 +1022,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/apps/test-id/start")
+                    .method(PUT).path("/v3/apps/test-application-id/start")
                     .status(OK)
                     .responsePayload("v3/apps/PUT_{id}_start_response.json");
         }
@@ -1069,7 +1069,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected StartApplicationRequest getValidRequest() throws Exception {
             return StartApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -1093,7 +1093,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/apps/test-id/stop")
+                    .method(PUT).path("/v3/apps/test-application-id/stop")
                     .status(OK)
                     .responsePayload("v3/apps/PUT_{id}_stop_response.json");
         }
@@ -1140,7 +1140,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected StopApplicationRequest getValidRequest() throws Exception {
             return StopApplicationRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 
@@ -1164,7 +1164,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/apps/test-id/routes")
+                    .method(DELETE).path("/v3/apps/test-application-id/routes")
                     .requestPayload("v3/apps/DELETE_{id}_routes_request.json")
                     .status(NO_CONTENT);
         }
@@ -1177,7 +1177,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected UnmapApplicationRouteRequest getValidRequest() throws Exception {
             return UnmapApplicationRouteRequest.builder()
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .routeId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091")
                     .build();
         }
@@ -1202,7 +1202,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PATCH).path("/v3/apps/test-id")
+                    .method(PATCH).path("/v3/apps/test-application-id")
                     .requestPayload("v3/apps/PATCH_{id}_request.json")
                     .status(OK)
                     .responsePayload("v3/apps/PATCH_{id}_response.json");
@@ -1254,7 +1254,7 @@ public final class SpringApplicationsV3Test {
                     .environmentVariable("MY_ENV_VAR", "foobar")
                     .environmentVariable("FOOBAR", "MY_ENV_VAR")
                     .buildpack("http://gitwheel.org/my-app")
-                    .id("test-id")
+                    .applicationId("test-application-id")
                     .build();
         }
 

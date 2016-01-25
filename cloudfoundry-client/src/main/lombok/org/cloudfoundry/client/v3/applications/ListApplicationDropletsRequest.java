@@ -39,13 +39,13 @@ import java.util.List;
 public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The states
@@ -58,10 +58,10 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
 
     @Builder
     ListApplicationDropletsRequest(Integer page, Integer perPage, OrderBy orderBy, OrderDirection orderDirection,
-                                   String id,
+                                   String applicationId,
                                    @Singular List<String> states) {
         super(page, perPage, orderBy, orderDirection);
-        this.id = id;
+        this.applicationId = applicationId;
         this.states = states;
     }
 
@@ -69,8 +69,8 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = isPaginatedAndSortedRequestValid();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

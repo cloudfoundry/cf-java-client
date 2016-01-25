@@ -35,26 +35,26 @@ import org.cloudfoundry.client.v3.PaginatedRequest;
 public final class ListApplicationPackagesRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     @Builder
-    ListApplicationPackagesRequest(Integer page, Integer perPage, String id) {
+    ListApplicationPackagesRequest(Integer page, Integer perPage, String applicationId) {
         super(page, perPage);
-        this.id = id;
+        this.applicationId = applicationId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = isPaginatedRequestValid();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         return builder.build();

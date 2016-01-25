@@ -30,25 +30,55 @@ import org.cloudfoundry.client.ValidationResult;
 @Data
 public final class ScaleApplicationRequest implements Validatable {
 
+    /**
+     * The application id
+     *
+     * @param applicationId the application id
+     * @return the application id
+     */
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String applicationId;
+
+    /**
+     * The disk size
+     *
+     * @param diskInMb the disk size
+     * @return the disk size
+     */
     @Getter(onMethod = @__(@JsonProperty("disk_in_mb")))
     private final Integer diskInMb;
 
-    @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
-
+    /**
+     * The number of instances
+     *
+     * @param instances the number of instances
+     * @return the number of instances
+     */
     @Getter(onMethod = @__(@JsonProperty("instances")))
     private final Integer instances;
 
+    /**
+     * The memory size
+     *
+     * @param memoryInMb the memory size
+     * @return the memory size
+     */
     @Getter(onMethod = @__(@JsonProperty("memory_in_mb")))
     private final Integer memoryInMb;
 
+    /**
+     * The type
+     *
+     * @param type the type
+     * @return the type
+     */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String type;
 
     @Builder
-    ScaleApplicationRequest(Integer diskInMb, String id, Integer instances, Integer memoryInMb, String type) {
+    ScaleApplicationRequest(String applicationId, Integer diskInMb, Integer instances, Integer memoryInMb, String type) {
+        this.applicationId = applicationId;
         this.diskInMb = diskInMb;
-        this.id = id;
         this.instances = instances;
         this.memoryInMb = memoryInMb;
         this.type = type;
@@ -58,8 +88,8 @@ public final class ScaleApplicationRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.type == null) {

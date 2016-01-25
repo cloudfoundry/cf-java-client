@@ -28,7 +28,7 @@ public final class ListApplicationProcessesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListApplicationProcessesRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .build()
                 .isValid();
 
@@ -53,7 +53,7 @@ public final class ListApplicationProcessesRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }

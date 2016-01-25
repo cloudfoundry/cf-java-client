@@ -31,13 +31,13 @@ import org.cloudfoundry.client.ValidationResult;
 public final class UnmapApplicationRouteRequest implements Validatable {
 
     /**
-     * The id
+     * The application id
      *
-     * @param id the id
-     * @return the id
+     * @param applicationId the application id
+     * @return the application id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String applicationId;
 
     /**
      * The route id
@@ -49,8 +49,8 @@ public final class UnmapApplicationRouteRequest implements Validatable {
     private final String routeId;
 
     @Builder
-    UnmapApplicationRouteRequest(String id, String routeId) {
-        this.id = id;
+    UnmapApplicationRouteRequest(String applicationId, String routeId) {
+        this.applicationId = applicationId;
         this.routeId = routeId;
     }
 
@@ -58,8 +58,8 @@ public final class UnmapApplicationRouteRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.applicationId == null) {
+            builder.message("application id must be specified");
         }
 
         if (this.routeId == null) {

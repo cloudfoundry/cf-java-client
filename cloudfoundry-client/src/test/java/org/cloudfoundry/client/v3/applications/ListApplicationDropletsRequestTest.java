@@ -28,7 +28,7 @@ public final class ListApplicationDropletsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListApplicationDropletsRequest.builder()
-                .id("test-id")
+                .applicationId("test-application-id")
                 .state("test-state-1")
                 .build()
                 .isValid();
@@ -55,7 +55,7 @@ public final class ListApplicationDropletsRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }
