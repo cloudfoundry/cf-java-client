@@ -57,7 +57,7 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_plans", request.getId());
+                builder.pathSegment("v2", "service_plans", request.getServicePlanId());
             }
 
         });

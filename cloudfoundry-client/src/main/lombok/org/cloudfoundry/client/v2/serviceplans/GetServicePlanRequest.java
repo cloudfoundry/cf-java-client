@@ -31,25 +31,25 @@ import org.cloudfoundry.client.ValidationResult;
 public final class GetServicePlanRequest implements Validatable {
 
     /**
-     * The id
+     * The service plan id
      *
-     * @param id the id
-     * @return the id
+     * @param servicePlanId the service plan id
+     * @return the service plan id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String id;
+    private final String servicePlanId;
 
     @Builder
-    GetServicePlanRequest(String id) {
-        this.id = id;
+    GetServicePlanRequest(String servicePlanId) {
+        this.servicePlanId = servicePlanId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.id == null) {
-            builder.message("id must be specified");
+        if (this.servicePlanId == null) {
+            builder.message("service plan id must be specified");
         }
 
         return builder.build();

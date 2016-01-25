@@ -50,7 +50,7 @@ public final class SpringServicePlansTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                     .method(GET)
-                    .path("v2/service_plans/test-id")
+                    .path("v2/service_plans/test-service-plan-id")
                     .status(OK)
                     .responsePayload("v2/service_plans/GET_{id}_response.json");
         }
@@ -80,7 +80,7 @@ public final class SpringServicePlansTest {
         @Override
         protected GetServicePlanRequest getValidRequest() throws Exception {
             return GetServicePlanRequest.builder()
-                    .id("test-id")
+                    .servicePlanId("test-service-plan-id")
                     .build();
         }
 

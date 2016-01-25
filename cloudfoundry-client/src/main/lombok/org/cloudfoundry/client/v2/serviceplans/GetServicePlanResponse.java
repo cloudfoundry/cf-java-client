@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 
 /**
  * The resource response payload for the Get Service Plan Response
