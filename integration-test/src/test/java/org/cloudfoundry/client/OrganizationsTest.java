@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDoma
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
@@ -180,14 +181,22 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
-        CreateOrganizationRequest request = CreateOrganizationRequest.builder()
-                .name("test-org")
-                .build();
+        this.testOrganizationId
+                .after()
+                .subscribe(this.testSubscriber());
+    }
 
-        this.cloudFoundryClient.organizations().create(request)
-                .map(response -> Resources.getEntity(response).getName())
-                .subscribe(this.testSubscriber()
-                        .assertEquals("test-org"));
+    @Test
+    public void delete() {
+        this.testOrganizationId
+                .then(orgId -> {
+                    DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
+                            .organizationId(orgId)
+                            .build();
+
+                    return this.cloudFoundryClient.organizations().delete(request);
+                })
+                .subscribe(this.testSubscriber());
     }
 
     @Test
@@ -320,7 +329,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                                     .page(page)
                                     .organizationId(testOrgId)
                                     .build();
-                            
+
                             return this.cloudFoundryClient.organizations().listPrivateDomains(request);
                         })
                         .map(Resources::getId)
