@@ -27,7 +27,6 @@ public final class ListRoutesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListRoutesRequest.builder()
-                .level(ListRoutesRequest.Level.ORGANIZATION)
                 .build()
                 .isValid();
 

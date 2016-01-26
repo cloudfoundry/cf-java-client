@@ -84,10 +84,6 @@ public final class DefaultApplications implements Applications {
                 .map(toApplication());
     }
 
-    private static String emptyNull(String s) {
-        return s == null ? "" : s;
-    }
-
     private static Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>> extractApplications() {
         return new Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>>() {
 
@@ -118,7 +114,7 @@ public final class DefaultApplications implements Applications {
     private static String getBuildpack(SummaryApplicationResponse response) {
         return Optional
                 .ofNullable(response.getBuildpack())
-                .orElse(emptyNull(response.getDetectedBuildpack()));
+                .orElse(response.getDetectedBuildpack());
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
