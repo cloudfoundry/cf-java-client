@@ -291,6 +291,7 @@ public final class DefaultApplicationsTest {
             testSubscriber
                     .assertEquals(ApplicationDetail.builder()
                             .id("test-id")
+                            .buildpack("")
                             .diskQuota(1073741824)
                             .memoryLimit(536870912)
                             .requestedState("requested-state")
