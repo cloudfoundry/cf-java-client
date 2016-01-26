@@ -22,6 +22,14 @@ import reactor.core.publisher.Mono;
 public interface ServicePlans {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plans/delete_a_particular_service_plans.html">Delete the Service Plan</a> request
+     *
+     * @param request the Delete Service Plan request
+     * @return the response from the Delete Service Plan request
+     */
+    Mono<Void> delete(DeleteServicePlanRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plans/retrieve_a_particular_service_plan.html">Retrieve a Particular Service Plan</a> request
      *
      * @param request the Get Service Plan request
