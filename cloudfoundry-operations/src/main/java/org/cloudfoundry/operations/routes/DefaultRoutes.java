@@ -446,8 +446,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<Tuple3<String, String, CreateRouteRequest>> apply(CreateRouteRequest request, String organizationId) {
                 return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
-                        Mono.just(request))
-                        .log("stream.postWhen");
+                        Mono.just(request));
             }
 
         });
