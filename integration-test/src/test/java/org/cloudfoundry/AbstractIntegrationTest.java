@@ -65,14 +65,17 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected Mono<String> spaceId;
 
+    @Value("${test.space}")
+    protected String spaceName;
+
     @Autowired
     protected Mono<String> stackId;
 
-    @Value("${test.space}")
-    protected String testSpaceName;
+    @Autowired
+    protected Mono<String> userId;
 
     @Value("${test.username}")
-    protected String testUsername;
+    protected String userName;
 
     @Autowired
     private Predicate<DomainResource> domainsPredicate;

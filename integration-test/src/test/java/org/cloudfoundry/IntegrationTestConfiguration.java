@@ -24,8 +24,10 @@ import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
+import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
@@ -136,11 +138,43 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient) throws InterruptedException {
-        ListStacksRequest request = ListStacksRequest.builder()
-                .build();
+        Mono<String> stackId = Paginated
+                .requestResources(page -> {
+                    ListStacksRequest request = ListStacksRequest.builder()
+                            .page(page)
+                            .build();
 
-        return cloudFoundryClient.stacks().list(request)
-                .map(listStacksResponse -> listStacksResponse.getResources().get(0).getMetadata().getId());
+                    return cloudFoundryClient.stacks().list(request);
+                })
+                .single()
+                .map(Resources::getId)
+                .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
+                .doOnTerminate((v, t) -> this.logger.debug("<< STACK >>"))
+                .as(Promise::from);
+
+        stackId.get();
+        return stackId;
+    }
+
+    @Bean
+    Mono<String> userId(CloudFoundryClient cloudFoundryClient, @Value("${test.username}") String user) {  // TODO: Create new user when APIs available
+        Mono<String> userId = Paginated
+                .requestResources(page -> {
+                    ListUsersRequest request = ListUsersRequest.builder()
+                            .page(page)
+                            .build();
+
+                    return cloudFoundryClient.users().listUsers(request);
+                })
+                .filter(resource -> Resources.getEntity(resource).getUsername().equals(user))
+                .map(Resources::getId)
+                .single()
+                .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
+                .doOnTerminate((v, t) -> this.logger.debug("<< USER >>"))
+                .as(Promise::from);
+
+        userId.get();
+        return userId;
     }
 
 }

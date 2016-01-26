@@ -173,7 +173,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .flatMap(domainId -> {
                     ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
                             .domainId(domainId)
-                            .name(this.testSpaceName)
+                            .name(this.spaceName)
                             .build();
 
                     return this.cloudFoundryClient.domains().listSpaces(request)
