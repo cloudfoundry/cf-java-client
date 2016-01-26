@@ -87,7 +87,7 @@ public final class DefaultRoutes implements Routes {
         return Validators
                 .validate(request)
                 .and(this.organizationId)
-                .then(requestDomainIdAndSpaceIdWithContext(this.cloudFoundryClient))
+                .then(requestSpaceIdAndDomainIdWithContext(this.cloudFoundryClient))
                 .then(requestCreateRoute(this.cloudFoundryClient));
     }
 
@@ -264,18 +264,6 @@ public final class DefaultRoutes implements Routes {
                 .singleOrEmpty();
     }
 
-    private static Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>> requestDomainIdAndSpaceIdWithContext(final CloudFoundryClient cloudFoundryClient) {
-        return Tuples.function(new Function2<CreateRouteRequest, String, Mono<Tuple3<String, String, CreateRouteRequest>>>() {
-
-            @Override
-            public Mono<Tuple3<String, String, CreateRouteRequest>> apply(CreateRouteRequest request, String organizationId) {
-                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
-                        Mono.just(request));
-            }
-
-        });
-    }
-
     private static Function<String, Mono<String>> requestDomainIdAssociateRoute(final CloudFoundryClient cloudFoundryClient, final String domain) {
         return new Function<String, Mono<String>>() {
 
@@ -450,6 +438,19 @@ public final class DefaultRoutes implements Routes {
                 .map(Resources.extractId())
                 .single()
                 .otherwise(Exceptions.<String>convert("Space %s does not exist", space));
+    }
+
+    private static Function<Tuple2<CreateRouteRequest, String>, Mono<Tuple3<String, String, CreateRouteRequest>>> requestSpaceIdAndDomainIdWithContext(final CloudFoundryClient cloudFoundryClient) {
+        return Tuples.function(new Function2<CreateRouteRequest, String, Mono<Tuple3<String, String, CreateRouteRequest>>>() {
+
+            @Override
+            public Mono<Tuple3<String, String, CreateRouteRequest>> apply(CreateRouteRequest request, String organizationId) {
+                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
+                        Mono.just(request))
+                        .log("stream.postWhen");
+            }
+
+        });
     }
 
     private static Mono<String> requestSpaceName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
