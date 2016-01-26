@@ -298,7 +298,6 @@ public final class DefaultApplicationsTest {
                             .url("route-host.routedomain")
                             .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
                             .stack("test-stack")
-                            .buildpack("")
                             .build());
         }
 
