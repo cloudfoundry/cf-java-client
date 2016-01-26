@@ -212,7 +212,8 @@ public final class TestSubscriber<T> implements Subscriber<T> {
         }
 
         if (!this.expectations.isEmpty()) {
-            fail(String.format("Unexpected completion. %d expectations not met.", this.expectations.size()));
+            int count = this.expectations.size();
+            fail(String.format("Unexpected completion. %d %s not met.", count, (count == 1) ? "expectation" : "expectations"));
         }
     }
 
