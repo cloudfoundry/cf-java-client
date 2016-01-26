@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.utils.test;
 
+import org.atteo.evo.inflector.English;
 import org.junit.Assert;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -213,7 +214,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
         if (!this.expectations.isEmpty()) {
             int count = this.expectations.size();
-            fail(String.format("Unexpected completion. %d %s not met.", count, (count == 1) ? "expectation" : "expectations"));
+            fail(String.format("Unexpected completion. %d %s not met.", count, English.plural("expectation", count)));
         }
     }
 
