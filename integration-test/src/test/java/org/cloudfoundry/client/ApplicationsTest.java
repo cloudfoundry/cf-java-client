@@ -562,10 +562,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build();
 
                     return this.cloudFoundryClient.applicationsV2().statistics(request)
-                            .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName())
-                            .as(Stream::from)
-                            .retry(5l, throwable -> throwable instanceof NullPointerException)
-                            .single();
+                            .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName());
                 })
                 .subscribe(testSubscriber()
                         .assertEquals(TEST_APPLICATION_NAME));
