@@ -124,7 +124,7 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("GET {}", uri);
+                AbstractSpringOperations.this.logger.debug("GET    {}", uri);
                 return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
             }
 
@@ -141,7 +141,7 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("GET {}", uri);
+                AbstractSpringOperations.this.logger.debug("GET    {}", uri);
                 return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
 
                     @Override
@@ -174,7 +174,7 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("PATCH {}", uri);
+                AbstractSpringOperations.this.logger.debug("PATCH  {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
             }
 
@@ -202,7 +202,7 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("POST {}", uri);
+                AbstractSpringOperations.this.logger.debug("POST   {}", uri);
                 return AbstractSpringOperations.this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
             }
 
@@ -230,7 +230,7 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("PUT {}", uri);
+                AbstractSpringOperations.this.logger.debug("PUT    {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
             }
 

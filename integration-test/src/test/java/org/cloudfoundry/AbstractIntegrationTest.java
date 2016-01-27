@@ -17,7 +17,11 @@
 package org.cloudfoundry;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.cloudfoundry.utils.test.TestSubscriber;
@@ -35,6 +39,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.core.publisher.Mono;
 import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
+
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.cloudfoundry.operations.util.Tuples.function;
@@ -72,6 +79,12 @@ public abstract class AbstractIntegrationTest {
     protected Mono<String> stackId;
 
     @Autowired
+    protected Mono<Optional<String>> systemOrganizationId;
+
+    @Autowired
+    protected Mono<List<String>> systemSpaceIds;
+
+    @Autowired
     protected Mono<String> userId;
 
     @Value("${test.username}")
@@ -83,16 +96,25 @@ public abstract class AbstractIntegrationTest {
     @Before
     public final void cleanup() throws Exception {
         Mono
-                .when(this.organizationId, this.spaceId)
-                .flatMap(function((organizationId, spaceId) -> {
-                    return CloudFoundryCleaner.clean(this.cloudFoundryClient,
-                            r -> true,
-                            this.domainsPredicate,
-                            r -> !organizationId.equals(Resources.getId(r)),
-                            r -> true,
-                            r -> !spaceId.equals(Resources.getId(r)));
+                .when(this.systemOrganizationId, this.systemSpaceIds, this.organizationId, this.spaceId)
+                .flatMap(function((systemOrganizationId, systemSpaceIds, organizationId, spaceId) -> {
+
+                    Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(Resources.getEntity(r).getSpaceId());
+
+                    Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
+                            .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id) && !organizationId.equals(Resources.getId(r)))
+                            .orElse(r -> !organizationId.equals(Resources.getId(r)));
+
+                    Predicate<RouteResource> routePredicate = r -> true;
+
+                    Predicate<SpaceResource> spacePredicate = systemOrganizationId
+                            .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(Resources.getId(r)))
+                            .orElse(r -> !spaceId.equals(Resources.getId(r)));
+
+                    return CloudFoundryCleaner.clean(this.cloudFoundryClient, applicationPredicate, this.domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
                 }))
                 .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
+                .doOnError(Throwable::printStackTrace)
                 .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
                 .after()
                 .get();

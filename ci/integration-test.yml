@@ -10,6 +10,8 @@ run:
   path: cf-java-client/ci/integration-test.sh
 
 params:
+  TEST_DOMAIN:
+  TEST_HOST:
   TEST_ORGANIZATION:
   TEST_PASSWORD:
   TEST_SKIPSSLVALIDATION:

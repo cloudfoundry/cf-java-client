@@ -27,6 +27,7 @@
       <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
       <env name="PERFORMANCE_LOGGING_LEVEL" value="INFO" />
       <env name="SCAN_LOGGING_LEVEL" value="INFO" />
+      <env name="TEST_DOMAIN" value="local.micropcf.io" />
     </envs>
     <patterns />
     <method />
