@@ -18,7 +18,6 @@ package org.cloudfoundry.client;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +29,7 @@ public final class ValidationResultTest {
                 .message("Test Message")
                 .build();
 
-        assertEquals(INVALID, result.getStatus());
+        assertEquals(VALID, result.getStatus());
     }
 
     @Test
