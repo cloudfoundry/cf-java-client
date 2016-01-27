@@ -118,12 +118,11 @@ public abstract class AbstractIntegrationTest {
                 .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
                 .after()
                 .get();
-
     }
 
     @After
     public final void verify() throws InterruptedException {
-        this.testSubscriber.verify(1, MINUTES);
+        this.testSubscriber.verify(5, MINUTES);
     }
 
     protected final <T> void assertTupleEquality(Tuple2<T, T> tuple) {
