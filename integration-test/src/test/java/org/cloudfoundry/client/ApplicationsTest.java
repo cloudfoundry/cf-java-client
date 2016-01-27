@@ -549,10 +549,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     return this.cloudFoundryClient.applicationsV2().restage(request)
                             .map(Resources::getId);
                 })
-                .then(applicationId -> waitForStaging(applicationId)
-                        .map(state -> true))
+                .then(this::waitForStaging)
                 .subscribe(testSubscriber()
-                        .assertEquals(true));
+                        .assertCount(1));
     }
 
     @Test
