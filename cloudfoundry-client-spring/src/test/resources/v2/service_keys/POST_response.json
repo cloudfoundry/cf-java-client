@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "guid": "79aa4b11-99f3-484b-adfc-a63fa818c4d1",
+    "url": "/v2/service_keys/79aa4b11-99f3-484b-adfc-a63fa818c4d1",
+    "created_at": "2015-07-27T22:43:22Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "name-960",
+    "service_instance_guid": "132944c8-c31d-4bb8-9155-ae4e2ebe1a0c",
+    "credentials": {
+      "creds-key-392": "creds-val-392"
+    },
+    "service_instance_url": "/v2/service_instances/132944c8-c31d-4bb8-9155-ae4e2ebe1a0c"
+  }
+}
