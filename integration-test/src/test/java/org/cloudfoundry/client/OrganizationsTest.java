@@ -61,6 +61,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
@@ -436,6 +437,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                         .assertThat(this::assertTupleEquality));
     }
 
+    @Ignore("TODO: implement once create service plan visibility available https://www.pivotaltracker.com/story/show/101451560")
     @Test
     public void listServices() {
         this.organizationId
