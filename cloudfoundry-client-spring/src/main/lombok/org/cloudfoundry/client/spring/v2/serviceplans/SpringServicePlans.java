@@ -21,6 +21,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.spring.v2.FilterBuilder;
+import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
@@ -49,6 +50,17 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      */
     public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup<?> processorGroup) {
         super(restOperations, root, processorGroup);
+    }
+
+    @Override
+    public Mono<Void> delete(final DeleteServicePlanRequest request) {
+        return delete(request, new Consumer<UriComponentsBuilder>() {
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plans", request.getServicePlanId());
+                QueryBuilder.augment(builder, request);
+            }
+        });
     }
 
     @Override
