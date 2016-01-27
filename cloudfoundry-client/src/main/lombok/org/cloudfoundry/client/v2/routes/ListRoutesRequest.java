@@ -25,6 +25,7 @@ import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.IsFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public final class ListRoutesRequest extends PaginatedRequest implements Validat
      * @param organizationIds the organization ids
      * @return the organization ids
      */
-    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
+    @Getter(onMethod = @__(@IsFilterParameter("organization_guid")))
     private final String organizationId;
 
     /**
