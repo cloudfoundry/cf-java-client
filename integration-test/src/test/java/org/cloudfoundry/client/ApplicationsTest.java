@@ -120,8 +120,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     ListApplicationsRequest request = ListApplicationsRequest.builder()
                             .build();
 
-                    return this.cloudFoundryClient.applicationsV2().list(request)
-                            .flatMap(Resources::getResources);
+                    return Stream
+                            .from(this.cloudFoundryClient.applicationsV2().list(request))
+                            .flatMap(Resources::getResources)
+                            .filter(r -> {
+                                String name = Resources.getEntity(r).getName();
+                                return TEST_APPLICATION_NAME.equals(name) || "copy-application".equals(name);
+                            });
                 })
                 .subscribe(testSubscriber()
                         .assertCount(2));
