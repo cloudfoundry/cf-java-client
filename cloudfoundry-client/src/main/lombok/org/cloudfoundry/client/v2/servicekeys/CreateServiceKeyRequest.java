@@ -22,11 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
-import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
@@ -48,6 +46,7 @@ public final class CreateServiceKeyRequest implements Validatable {
     /**
      * Key/value pairs of all arbitrary parameters to pass along to the service broker
      *
+     * @param parameters the arbitrary parameters to pass along to the service broker
      * @return the arbitrary parameters to pass along to the service broker
      */
     @Getter(onMethod = @__({@JsonProperty("parameters"), @JsonInclude(NON_EMPTY)}))
@@ -61,7 +60,6 @@ public final class CreateServiceKeyRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("service_instance_guid")))
     private final String serviceInstanceId;
-
 
     @Builder
     CreateServiceKeyRequest(String name,

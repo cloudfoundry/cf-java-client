@@ -17,40 +17,14 @@
 package org.cloudfoundry.client.spring.v2.servicekeys;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.spring.AbstractRestTest;
-import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
-import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
-import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
-import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
-import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
-import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
-import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
-import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
-import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
-import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
-import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
-import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
-import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
-import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceKeysTest {
 
@@ -102,6 +76,5 @@ public final class SpringServiceKeysTest {
             return this.serviceKeys.create(request);
         }
     }
-
 
 }

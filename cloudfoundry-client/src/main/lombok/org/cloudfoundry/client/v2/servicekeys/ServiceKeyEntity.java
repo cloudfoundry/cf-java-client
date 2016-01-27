@@ -20,11 +20,8 @@ package org.cloudfoundry.client.v2.servicekeys;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Singular;
-import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 
-import java.util.List;
 import java.util.Map;
 
 /**
