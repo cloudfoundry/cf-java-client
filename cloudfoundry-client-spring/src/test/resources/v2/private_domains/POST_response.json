@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "guid": "4af3234e-813d-453f-b3ae-fcdecfd87a47",
+    "url": "/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47",
+    "created_at": "2016-01-19T19:41:12Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "exmaple.com",
+    "owning_organization_guid": "22bb8ae1-6324-40eb-b077-bd1bfad773f8",
+    "owning_organization_url": "/v2/organizations/22bb8ae1-6324-40eb-b077-bd1bfad773f8",
+    "shared_organizations_url": "/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47/shared_organizations"
+  }
+}
