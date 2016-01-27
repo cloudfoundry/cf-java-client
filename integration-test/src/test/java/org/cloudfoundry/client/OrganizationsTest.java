@@ -331,14 +331,17 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        Paginated
-                .requestResources(page -> {
-                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                            .page(page)
-                            .build();
+        this.organizationId
+                .flatMap(organizationId -> Paginated
+                        .requestResources(page -> {
+                            ListOrganizationsRequest request = ListOrganizationsRequest.builder()
+                                    .page(page)
+                                    .build();
 
-                    return this.cloudFoundryClient.organizations().list(request);
-                })
+                            return this.cloudFoundryClient.organizations().list(request);
+                        })
+                        .map(Resources::getId)
+                        .filter(id -> id.equals(organizationId)))
                 .subscribe(this.testSubscriber()
                         .assertCount(1));
     }
