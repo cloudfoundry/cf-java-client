@@ -163,9 +163,9 @@ public final class DefaultRoutes implements Routes {
                         .single()
                         .map(Resources.extractId());
 
-                Mono<String> routeId =
-                        requestDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
+                Mono<String> routeId = requestDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
                                 .then(new Function<String, Mono<String>>() {
+
                                     @Override
                                     public Mono<String> apply(String domainId) {
                                         return Paginated.
@@ -173,6 +173,7 @@ public final class DefaultRoutes implements Routes {
                                                 .single()
                                                 .map(Resources.extractId());
                                     }
+
                                 });
 
                 return Mono.when(Mono.just(unmapRouteRequest), applicationId, routeId);
@@ -432,6 +433,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Function<Tuple3<UnmapRouteRequest, String, String>, Mono<Void>> requestRemoveRouteFromApplication(final CloudFoundryClient cloudFoundryClient) {
         return function(new Function3<UnmapRouteRequest, String, String, Mono<Void>>() {
+
             @Override
             public Mono<Void> apply(UnmapRouteRequest unmapRouteRequest, String applicationId, String routeId) {
                 RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
@@ -441,6 +443,7 @@ public final class DefaultRoutes implements Routes {
 
                 return cloudFoundryClient.routes().removeApplication(request);
             }
+
         });
     }
 
