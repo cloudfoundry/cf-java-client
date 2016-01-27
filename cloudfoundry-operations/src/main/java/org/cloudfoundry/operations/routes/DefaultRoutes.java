@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -58,6 +59,8 @@ import reactor.fn.tuple.Tuple3;
 import reactor.rx.Stream;
 
 import java.util.List;
+
+import static org.cloudfoundry.operations.util.Tuples.function;
 
 public final class DefaultRoutes implements Routes {
 
@@ -109,6 +112,14 @@ public final class DefaultRoutes implements Routes {
                 .after();
     }
 
+    @Override
+    public Mono<Void> unmap(UnmapRouteRequest request) {
+        return Mono
+                .when(Validators.validate(request), this.organizationId, this.spaceId)
+                .then(findApplicationAndRouteIds(this.cloudFoundryClient))
+                .then(requestRemoveRouteFromApplication(this.cloudFoundryClient));
+    }
+
     private static Function<ApplicationResource, String> extractApplicationName() {
         return new Function<ApplicationResource, String>() {
 
@@ -142,8 +153,36 @@ public final class DefaultRoutes implements Routes {
         };
     }
 
-    private static Mono<String> requestApplicationId(CloudFoundryClient cloudFoundryClient, MapRouteRequest request, String spaceId) {
-        return requestSpaceApplication(cloudFoundryClient, request.getApplicationName(), spaceId)
+    private static Function<Tuple3<UnmapRouteRequest, String, String>, Mono<Tuple3<UnmapRouteRequest, String, String>>> findApplicationAndRouteIds(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function3<UnmapRouteRequest, String, String, Mono<Tuple3<UnmapRouteRequest, String, String>>>() {
+
+            @Override
+            public Mono<Tuple3<UnmapRouteRequest, String, String>> apply(final UnmapRouteRequest unmapRouteRequest, final String orgId, final String spaceId) {
+                Mono<String> applicationId = Paginated
+                        .requestResources(requestListSpaceApplicationsPage(cloudFoundryClient, unmapRouteRequest, spaceId))
+                        .single()
+                        .map(Resources.extractId());
+
+                Mono<String> routeId =
+                        requestDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
+                                .then(new Function<String, Mono<String>>() {
+                                    @Override
+                                    public Mono<String> apply(String domainId) {
+                                        return Paginated.
+                                                requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
+                                                .single()
+                                                .map(Resources.extractId());
+                                    }
+                                });
+
+                return Mono.when(Mono.just(unmapRouteRequest), applicationId, routeId);
+            }
+
+        });
+    }
+
+    private static Mono<String> requestApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return requestSpaceApplication(cloudFoundryClient, applicationName, spaceId)
                 .map(Resources.extractId());
     }
 
@@ -301,6 +340,44 @@ public final class DefaultRoutes implements Routes {
                 .map(extractDomainName());
     }
 
+    private static Function<Integer, Mono<ListRoutesResponse>> requestListRoutesPage(final CloudFoundryClient cloudFoundryClient, final String domainId, final UnmapRouteRequest unmapRouteRequest) {
+        return new Function<Integer, Mono<ListRoutesResponse>>() {
+
+            @Override
+            public Mono<ListRoutesResponse> apply(Integer page) {
+                org.cloudfoundry.client.v2.routes.ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                        .page(page)
+                        .domainId(domainId);
+
+                String host = unmapRouteRequest.getHost();
+                if (host != "") {
+                    requestBuilder.host(host);
+                }
+
+                return cloudFoundryClient.routes().list(requestBuilder.build());
+            }
+
+        };
+    }
+
+    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListSpaceApplicationsPage(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest,
+                                                                                                           final String spaceId) {
+        return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
+
+            @Override
+            public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
+                ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                        .name(unmapRouteRequest.getApplicationName())
+                        .page(page)
+                        .spaceId(spaceId)
+                        .build();
+
+                return cloudFoundryClient.spaces().listApplications(request);
+            }
+
+        };
+    }
+
     private static Function<Integer, Mono<ListRoutesResponse>> requestOrganizationRoutesPage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return new Function<Integer, Mono<ListRoutesResponse>>() {
 
@@ -353,6 +430,20 @@ public final class DefaultRoutes implements Routes {
                 .cast(DomainResource.class);
     }
 
+    private static Function<Tuple3<UnmapRouteRequest, String, String>, Mono<Void>> requestRemoveRouteFromApplication(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function3<UnmapRouteRequest, String, String, Mono<Void>>() {
+            @Override
+            public Mono<Void> apply(UnmapRouteRequest unmapRouteRequest, String applicationId, String routeId) {
+                RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .routeId(routeId)
+                        .build();
+
+                return cloudFoundryClient.routes().removeApplication(request);
+            }
+        });
+    }
+
     private static Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient,
                                                                                                                           final Mono<String> organizationId) {
         return Tuples.function(new Function2<MapRouteRequest, String, Mono<Tuple2<String, String>>>() {
@@ -360,7 +451,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<Tuple2<String, String>> apply(MapRouteRequest request, String spaceId) {
                 return Mono
-                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestApplicationId(cloudFoundryClient, request, spaceId));
+                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestApplicationId(cloudFoundryClient, spaceId, request.getApplicationName()));
             }
 
         });

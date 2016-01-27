@@ -25,7 +25,7 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the Map Application Route operation
+ * The request payload for the Unmap Application Route operation
  */
 @Data
 public final class UnmapApplicationRouteRequest implements Validatable {
