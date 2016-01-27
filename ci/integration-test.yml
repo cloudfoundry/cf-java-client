@@ -4,7 +4,6 @@ image: docker:///java#8-jdk
 
 inputs:
 - name: cf-java-client
-- name: connection
 
 run:
   path: cf-java-client/ci/integration-test.sh
