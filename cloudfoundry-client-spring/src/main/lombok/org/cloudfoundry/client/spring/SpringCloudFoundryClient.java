@@ -37,6 +37,7 @@ import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.servicebindings.SpringServiceBindings;
 import org.cloudfoundry.client.spring.v2.servicebrokers.SpringServiceBrokers;
 import org.cloudfoundry.client.spring.v2.serviceinstances.SpringServiceInstances;
+import org.cloudfoundry.client.spring.v2.servicekeys.SpringServiceKeys;
 import org.cloudfoundry.client.spring.v2.serviceplans.SpringServicePlans;
 import org.cloudfoundry.client.spring.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.client.spring.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
@@ -56,6 +57,7 @@ import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
@@ -131,6 +133,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final ServiceInstances serviceInstances;
 
+    private final ServiceKeys serviceKeys;
+
     private final ServicePlans servicePlans;
 
     private final SharedDomains sharedDomains;
@@ -195,6 +199,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
         this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
         this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.processorGroup);
         this.servicePlans = new SpringServicePlans(this.restOperations, root, this.processorGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
@@ -221,6 +226,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
         this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
         this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.processorGroup);
         this.servicePlans = new SpringServicePlans(this.restOperations, root, this.processorGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
@@ -291,6 +297,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public ServiceInstances serviceInstances() {
         return this.serviceInstances;
+    }
+
+    @Override
+    public ServiceKeys serviceKeys() {
+        return this.serviceKeys;
     }
 
     @Override
