@@ -347,14 +347,10 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<ListRoutesResponse> apply(Integer page) {
                 org.cloudfoundry.client.v2.routes.ListRoutesRequest.ListRoutesRequestBuilder requestBuilder = org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                        .host(unmapRouteRequest.getHost())
                         .page(page)
                         .domainId(domainId);
-
-                String host = unmapRouteRequest.getHost();
-                if (host != "") {
-                    requestBuilder.host(host);
-                }
-
+                
                 return cloudFoundryClient.routes().list(requestBuilder.build());
             }
 
