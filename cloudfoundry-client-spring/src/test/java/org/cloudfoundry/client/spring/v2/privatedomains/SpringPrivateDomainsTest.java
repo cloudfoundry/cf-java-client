@@ -67,7 +67,7 @@ public final class SpringPrivateDomainsTest {
         @Override
         protected CreatePrivateDomainRequest getValidRequest() throws Exception {
             return CreatePrivateDomainRequest.builder()
-                    .name("exmaple.com")
+                    .domainName("exmaple.com")
                     .owningOrganizationId("22bb8ae1-6324-40eb-b077-bd1bfad773f8")
                     .build();
         }

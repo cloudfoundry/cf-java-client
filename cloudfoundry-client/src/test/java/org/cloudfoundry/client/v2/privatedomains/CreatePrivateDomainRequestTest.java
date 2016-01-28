@@ -28,7 +28,7 @@ public final class CreatePrivateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreatePrivateDomainRequest.builder()
-                .name("test-name")
+                .domainName("test-name")
                 .owningOrganizationId("test-owning-organization-id")
                 .build()
                 .isValid();
@@ -44,7 +44,7 @@ public final class CreatePrivateDomainRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+        assertEquals("domain name must be specified", result.getMessages().get(0));
     }
 
 }

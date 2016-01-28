@@ -245,7 +245,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private Mono<CreateDomainResponse> createDomain(String organizationId) {
         CreateDomainRequest request = CreateDomainRequest.builder()
-                .name("test.domain.name")
+                .domainName("test.domain.name")
                 .owningOrganizationId(organizationId)
                 .wildcard(true)
                 .build();

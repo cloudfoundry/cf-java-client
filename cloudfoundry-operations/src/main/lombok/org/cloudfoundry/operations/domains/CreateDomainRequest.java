@@ -14,53 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.privatedomains;
+package org.cloudfoundry.operations.domains;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.operations.Validatable;
+import org.cloudfoundry.operations.ValidationResult;
 
 /**
- * The request payload for the deprecated Create a Private Domain operation
+ * The request options for the create domain operation
  */
 @Data
-public final class CreatePrivateDomainRequest implements Validatable {
+public final class CreateDomainRequest implements Validatable {
 
     /**
      * The domain name
      *
-     * @param name the name
-     * @return the name
+     * @param domain the domain name
+     * @return the domain name
      */
-    @Getter(onMethod = @__(@JsonProperty("name")))
     private final String domainName;
 
     /**
-     * The owning organization id
+     * The organization name of the domain.
      *
-     * @param owningOrganizationId the owning organization id
-     * @return the owning organization id
+     * @param host the organization name
+     * @return the organization name
      */
-    @Getter(onMethod = @__(@JsonProperty("owning_organization_guid")))
-    private final String owningOrganizationId;
-
-    /**
-     * The wildcard
-     *
-     * @param wildcard the wildcard
-     * @return the wildcard
-     */
-    @Getter(onMethod = @__(@JsonProperty("wildcard")))
-    private final Boolean wildcard;
+    private final String organizationName;
 
     @Builder
-    CreatePrivateDomainRequest(String domainName, String owningOrganizationId, Boolean wildcard) {
+    CreateDomainRequest(String domainName, String organizationName) {
         this.domainName = domainName;
-        this.owningOrganizationId = owningOrganizationId;
-        this.wildcard = wildcard;
+        this.organizationName = organizationName;
     }
 
     @Override
@@ -69,6 +55,10 @@ public final class CreatePrivateDomainRequest implements Validatable {
 
         if (this.domainName == null) {
             builder.message("domain name must be specified");
+        }
+
+        if (this.organizationName == null) {
+            builder.message("organization name must be specified");
         }
 
         return builder.build();

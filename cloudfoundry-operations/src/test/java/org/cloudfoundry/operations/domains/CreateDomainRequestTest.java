@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.domains;
+package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.operations.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateDomainRequestTest {
@@ -28,9 +28,8 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domainName("test-domain-name")
-                .owningOrganizationId("test-owning-organization-id")
-                .wildcard(true)
+                .domainName("test-domain")
+                .organizationName("test-organization")
                 .build()
                 .isValid();
 
@@ -38,10 +37,9 @@ public final class CreateDomainRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
+    public void isValidNoDomain() {
         ValidationResult result = CreateDomainRequest.builder()
-                .owningOrganizationId("test-owning-organization-id")
-                .wildcard(true)
+                .organizationName("test-organization")
                 .build()
                 .isValid();
 
@@ -50,15 +48,14 @@ public final class CreateDomainRequestTest {
     }
 
     @Test
-    public void isValidNoWildcard() {
+    public void isValidNoOrganization() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domainName("test-domain-name")
-                .owningOrganizationId("test-owning-organization-id")
+                .domainName("test-domain")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("wildcard must be specified", result.getMessages().get(0));
+        assertEquals("organization name must be specified", result.getMessages().get(0));
     }
 
 }

@@ -89,7 +89,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.domainId = this.organizationId
                 .then(organizationId -> {
                     CreateDomainRequest organization = CreateDomainRequest.builder()
-                            .name("test.domain.name")
+                            .domainName("test.domain.name")
                             .owningOrganizationId(organizationId)
                             .wildcard(true)
                             .build();

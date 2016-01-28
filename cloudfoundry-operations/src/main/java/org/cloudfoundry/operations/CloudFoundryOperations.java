@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.operations.applications.Applications;
+import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
@@ -38,6 +39,13 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Applications Operations API
      */
     Applications applications();
+
+    /**
+     * Main entry point to the Cloud Foundry Domains Operations API
+     *
+     * @return the Cloud Foundry Domains Operations API
+     */    
+    Domains domains();
 
     /**
      * Main entry point to the Cloud Foundry Organizations Operations API
