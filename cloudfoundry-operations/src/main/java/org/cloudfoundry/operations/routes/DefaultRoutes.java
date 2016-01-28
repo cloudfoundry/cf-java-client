@@ -120,13 +120,6 @@ public final class DefaultRoutes implements Routes {
                 .then(requestRemoveRouteFromApplication(this.cloudFoundryClient));
     }
 
-    private static String createInvalidRouteMessage(UnmapRouteRequest unmapRouteRequest) {
-        String host = unmapRouteRequest.getHost();
-        String hostInsert = host == null ? "" : String.format(" and host %s", host);
-
-        return String.format("Route for domain %s%s does not exist", unmapRouteRequest.getDomain(), hostInsert);
-    }
-
     private static Function<ApplicationResource, String> extractApplicationName() {
         return new Function<ApplicationResource, String>() {
 
@@ -165,23 +158,15 @@ public final class DefaultRoutes implements Routes {
 
             @Override
             public Mono<Tuple3<UnmapRouteRequest, String, String>> apply(final UnmapRouteRequest unmapRouteRequest, final String orgId, final String spaceId) {
-                Mono<String> applicationId = Paginated
-                        .requestResources(requestListSpaceApplicationsPage(cloudFoundryClient, unmapRouteRequest, spaceId))
-                        .single()
-                        .map(Resources.extractId());
+                Mono<String> applicationId = requestValidApplicationId(cloudFoundryClient, unmapRouteRequest.getApplicationName(), spaceId);
 
                 Mono<String> routeId = requestValidDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
-                        .then(requestValidRouteId(cloudFoundryClient, unmapRouteRequest));
+                        .then(requestRouteId(cloudFoundryClient, unmapRouteRequest));
 
                 return Mono.when(Mono.just(unmapRouteRequest), applicationId, routeId);
             }
 
         });
-    }
-
-    private static Mono<String> requestApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return requestSpaceApplication(cloudFoundryClient, applicationName, spaceId)
-                .map(Resources.extractId());
     }
 
     private static Mono<List<String>> requestApplicationNames(CloudFoundryClient cloudFoundryClient, RouteResource routeResource) {
@@ -306,7 +291,7 @@ public final class DefaultRoutes implements Routes {
 
             @Override
             public Mono<String> apply(String organizationId) {
-                return requestDomainId(cloudFoundryClient, organizationId, domain);
+                return requestValidDomainId(cloudFoundryClient, organizationId, domain);
             }
 
         };
@@ -349,14 +334,14 @@ public final class DefaultRoutes implements Routes {
         };
     }
 
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListSpaceApplicationsPage(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest,
+    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListSpaceApplicationsPage(final CloudFoundryClient cloudFoundryClient, final String application,
                                                                                                            final String spaceId) {
         return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .name(unmapRouteRequest.getApplicationName())
+                        .name(application)
                         .page(page)
                         .spaceId(spaceId)
                         .build();
@@ -435,6 +420,20 @@ public final class DefaultRoutes implements Routes {
         });
     }
 
+    private static Function<String, Mono<String>> requestRouteId(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest) {
+        return new Function<String, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(String domainId) {
+                return Paginated.
+                        requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
+                        .singleOrEmpty()
+                        .map(Resources.extractId());
+            }
+
+        };
+    }
+
     private static Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient,
                                                                                                                           final Mono<String> organizationId) {
         return Tuples.function(new Function2<MapRouteRequest, String, Mono<Tuple2<String, String>>>() {
@@ -442,7 +441,7 @@ public final class DefaultRoutes implements Routes {
             @Override
             public Mono<Tuple2<String, String>> apply(MapRouteRequest request, String spaceId) {
                 return Mono
-                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestApplicationId(cloudFoundryClient, spaceId, request.getApplicationName()));
+                        .when(requestCreateRouteId(cloudFoundryClient, request, organizationId, spaceId), requestValidApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId));
             }
 
         });
@@ -488,30 +487,6 @@ public final class DefaultRoutes implements Routes {
         return Paginated
                 .requestResources(requestSharedDomainsPage(cloudFoundryClient, domain))
                 .cast(DomainResource.class);
-    }
-
-    private static Mono<ApplicationResource> requestSpaceApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
-        return Paginated
-                .requestResources(requestSpaceApplicationsPage(cloudFoundryClient, spaceId, applicationName))
-                .single();
-    }
-
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestSpaceApplicationsPage(final CloudFoundryClient cloudFoundryClient, final String spaceId,
-                                                                                                       final String applicationName) {
-        return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
-
-            @Override
-            public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
-                ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .name(applicationName)
-                        .spaceId(spaceId)
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.spaces().listApplications(request);
-            }
-
-        };
     }
 
     private static Mono<String> requestSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -589,24 +564,17 @@ public final class DefaultRoutes implements Routes {
         };
     }
 
+    private static Mono<String> requestValidApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+        return Paginated
+                .requestResources(requestListSpaceApplicationsPage(cloudFoundryClient, application, spaceId))
+                .single()
+                .map(Resources.extractId())
+                .otherwise(Exceptions.<String>convert("Application %s does not exist", application));
+    }
+
     private static Mono<String> requestValidDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return requestDomainId(cloudFoundryClient, organizationId, domain)
                 .otherwiseIfEmpty(Mono.<String>error(new IllegalArgumentException(String.format("Domain %s does not exist", domain))));
-    }
-
-    private static Function<String, Mono<String>> requestValidRouteId(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest) {
-        return new Function<String, Mono<String>>() {
-
-            @Override
-            public Mono<String> apply(String domainId) {
-                return Paginated.
-                        requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
-                        .switchIfEmpty(Stream.<RouteResource>fail(new IllegalArgumentException(createInvalidRouteMessage(unmapRouteRequest))))
-                        .single()
-                        .map(Resources.extractId());
-            }
-
-        };
     }
 
     private static Function<Tuple3<List<String>, String, String>, Route> toRoute(final RouteResource resource) {

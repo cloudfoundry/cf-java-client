@@ -81,8 +81,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
             @Override
             public void accept(Throwable actual) {
-                Assert.assertTrue(String.format("Unexpected error %s", actual),
-                        expected.isAssignableFrom(actual.getClass()));
+                Assert.assertEquals(String.format("Unexpected error %s", actual), expected, actual.getClass());
             }
 
         };

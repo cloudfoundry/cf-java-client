@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.loggregator;
 
+import org.cloudfoundry.client.LoggregatorException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public final class ReactiveEndpointTest {
         this.reactiveEndpoint.onClose(this.session, new CloseReason(CloseReason.CloseCodes.NO_STATUS_CODE, "test-reason-phrase"));
 
         this.testSubscriber
-                .assertError(Exception.class)
+                .assertError(LoggregatorException.class)
                 .verify(1, SECONDS);
     }
 
@@ -61,7 +62,7 @@ public final class ReactiveEndpointTest {
         this.reactiveEndpoint.onError(this.session, new RuntimeException());
 
         this.testSubscriber
-                .assertError(Exception.class)
+                .assertError(LoggregatorException.class)
                 .verify(5, SECONDS);
     }
 

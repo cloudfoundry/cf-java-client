@@ -38,7 +38,6 @@ import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.ProcessorGroup;
-import reactor.core.publisher.Processors;
 import reactor.core.util.PlatformDependent;
 import reactor.fn.Consumer;
 
@@ -56,7 +55,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected static final ProcessorGroup<?> PROCESSOR_GROUP = Processors.ioGroup("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, Processors.DEFAULT_POOL_SIZE,
+    protected static final ProcessorGroup<?> PROCESSOR_GROUP = ProcessorGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, ProcessorGroup.DEFAULT_POOL_SIZE,
             uncaughtExceptionHandler(), null, false);
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));

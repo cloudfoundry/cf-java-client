@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.spring.loggregator;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers;
 import org.cloudfoundry.utils.test.TestSubscriber;
@@ -69,7 +70,7 @@ public final class LoggregatorMessageHandlerTest {
         this.messageHandler.onMessage(new byte[0]);
 
         this.testSubscriber
-                .assertError(Exception.class)
+                .assertError(InvalidProtocolBufferException.class)
                 .verify(5, SECONDS);
     }
 

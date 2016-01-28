@@ -47,7 +47,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.operations.RequestValidationException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -714,16 +713,55 @@ public final class DefaultRoutesTest {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-applicationName")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .build();
+            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
+
+            ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
+                    .organizationId(TEST_ORGANIZATION_ID)
+                    .name("test-domain")
+                    .build();
+            ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
+                    .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
+                    .build();
+            when(this.organizations.listPrivateDomains(request2)).thenReturn(Mono.just(response2));
+
+            org.cloudfoundry.client.v2.routes.ListRoutesRequest request3 = fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+                    .domainId("test-privateDomain-id")
+                    .host("test-host")
+                    .organizationId(null)
+                    .build();
+            ListRoutesResponse response3 = fillPage(ListRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-").build())
+                    .build();
+            when(super.routes.list(request3)).thenReturn(Mono.just(response3));
+
+            org.cloudfoundry.client.v2.routes.CreateRouteRequest request4 = org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
+                    .domainId("test-privateDomain-id")
+                    .host("test-host")
+                    .path("test-path")
+                    .spaceId("test-space-id")
+                    .build();
+            CreateRouteResponse response4 = fill(CreateRouteResponse.builder()).build();
+            when(this.cloudFoundryClient.routes().create(request4)).thenReturn(Mono.just(response4));
+        }
+
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                    .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             MapRouteRequest request = fill(MapRouteRequest.builder())
-                    .applicationName(null)
                     .build();
 
             return this.routes.map(request);
@@ -734,16 +772,77 @@ public final class DefaultRoutesTest {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-applicationName")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                            .build())
+                    .build();
+            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
+
+            ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
+                    .organizationId(TEST_ORGANIZATION_ID)
+                    .name("test-domain")
+                    .build();
+            ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
+                    .build();
+            when(this.organizations.listPrivateDomains(request2)).thenReturn(Mono.just(response2));
+
+            ListSharedDomainsRequest request3 = fillPage(ListSharedDomainsRequest.builder())
+                    .name("test-domain")
+                    .build();
+            ListSharedDomainsResponse response3 = fillPage(ListSharedDomainsResponse.builder(), "sharedDomains-")
+                    .build();
+            when(this.sharedDomains.list(request3)).thenReturn(Mono.just(response3));
+        }
+
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                    .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             MapRouteRequest request = fill(MapRouteRequest.builder())
-                    .domain(null)
+                    .build();
+
+            return this.routes.map(request);
+        }
+    }
+
+    public static final class MapRouteNoOrganization extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-applicationName")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder())
+                            .build())
+                    .build();
+            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            MapRouteRequest request = fill(MapRouteRequest.builder())
                     .build();
 
             return this.routes.map(request);
@@ -771,7 +870,7 @@ public final class DefaultRoutesTest {
 
     public static final class MapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -803,7 +902,7 @@ public final class DefaultRoutesTest {
                     .build();
             CreateRouteResponse response3 = fill(CreateRouteResponse.builder(), "createdRoute-")
                     .build();
-            when(this.routes.create(request3)).thenReturn(Mono.just(response3));
+            when(super.routes.create(request3)).thenReturn(Mono.just(response3));
 
             AssociateApplicationRouteRequest request4 = fill(AssociateApplicationRouteRequest.builder())
                     .applicationId("test-id")
@@ -824,13 +923,13 @@ public final class DefaultRoutesTest {
             MapRouteRequest request = fill(MapRouteRequest.builder())
                     .build();
 
-            return this.operationRoutes.map(request);
+            return this.routes.map(request);
         }
     }
 
     public static final class MapRouteSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -869,7 +968,7 @@ public final class DefaultRoutesTest {
                     .build();
             CreateRouteResponse response4 = fill(CreateRouteResponse.builder(), "createdRoute-")
                     .build();
-            when(this.routes.create(request4)).thenReturn(Mono.just(response4));
+            when(super.routes.create(request4)).thenReturn(Mono.just(response4));
 
             AssociateApplicationRouteRequest request5 = fill(AssociateApplicationRouteRequest.builder())
                     .applicationId("test-id")
@@ -890,13 +989,13 @@ public final class DefaultRoutesTest {
             MapRouteRequest request = fill(MapRouteRequest.builder())
                     .build();
 
-            return this.operationRoutes.map(request);
+            return this.routes.map(request);
         }
     }
 
-    public static final class MapRouteSharedDomainNoOrganization extends AbstractOperationsApiTest<Void> {
+    public static final class UnmapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -906,8 +1005,6 @@ public final class DefaultRoutesTest {
                     .spaceId("test-space-id")
                     .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder())
-                            .build())
                     .build();
             when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
         }
@@ -915,32 +1012,12 @@ public final class DefaultRoutesTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalStateException.class);
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            MapRouteRequest request = fill(MapRouteRequest.builder())
-                    .build();
-
-            return this.operationRoutes.map(request);
-        }
-    }
-
-    public static final class UnmapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(RequestValidationException.class);
+                    .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
-                    .applicationName(null)
                     .build();
 
             return this.routes.unmap(request);
@@ -949,7 +1026,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRouteInvalidDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -991,116 +1068,7 @@ public final class DefaultRoutesTest {
             UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
                     .build();
 
-            return this.operationRoutes.unmap(request);
-        }
-    }
-
-    public static final class UnmapRouteInvalidRoute extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .diego(null)
-                    .name("test-applicationName")
-                    .spaceId("test-space-id")
-                    .build();
-            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .build())
-                    .build();
-            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
-
-            ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .organizationId(TEST_ORGANIZATION_ID)
-                    .name("test-domain")
-                    .build();
-            ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
-                    .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
-                    .build();
-            when(this.organizations.listPrivateDomains(request2)).thenReturn(Mono.just(response2));
-
-            org.cloudfoundry.client.v2.routes.ListRoutesRequest request3 = fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
-                    .domainId("test-privateDomain-id")
-                    .host("test-host")
-                    .organizationId(null)
-                    .build();
-            ListRoutesResponse response3 = fillPage(ListRoutesResponse.builder())
-                    .build();
-            when(this.routes.list(request3)).thenReturn(Mono.just(response3));
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(IllegalArgumentException.class);
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
-                    .build();
-
-            return this.operationRoutes.unmap(request);
-        }
-    }
-
-    public static final class UnmapRouteNoHost extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .diego(null)
-                    .name("test-applicationName")
-                    .spaceId("test-space-id")
-                    .build();
-            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .build())
-                    .build();
-            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
-
-            ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
-                    .organizationId(TEST_ORGANIZATION_ID)
-                    .name("test-domain")
-                    .build();
-            ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
-                    .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
-                    .build();
-            when(this.organizations.listPrivateDomains(request2)).thenReturn(Mono.just(response2));
-
-            org.cloudfoundry.client.v2.routes.ListRoutesRequest request3 = fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
-                    .domainId("test-privateDomain-id")
-                    .host(null)
-                    .organizationId(null)
-                    .build();
-            ListRoutesResponse response3 = fillPage(ListRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-").build())
-                    .build();
-            when(this.routes.list(request3)).thenReturn(Mono.just(response3));
-
-            RemoveRouteApplicationRequest request4 = fill(RemoveRouteApplicationRequest.builder())
-                    .applicationId("test-application-id")
-                    .routeId("test-route-id")
-                    .build();
-            when(this.routes.removeApplication(request4)).thenReturn(Mono.<Void>empty());
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
-                    .host(null)
-                    .build();
-
-            return this.operationRoutes.unmap(request);
+            return this.routes.unmap(request);
         }
     }
 
@@ -1144,7 +1112,7 @@ public final class DefaultRoutesTest {
 
     public static final class UnmapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1176,13 +1144,13 @@ public final class DefaultRoutesTest {
             ListRoutesResponse response3 = fillPage(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-").build())
                     .build();
-            when(this.routes.list(request3)).thenReturn(Mono.just(response3));
+            when(super.routes.list(request3)).thenReturn(Mono.just(response3));
 
             RemoveRouteApplicationRequest request4 = fill(RemoveRouteApplicationRequest.builder())
                     .applicationId("test-application-id")
                     .routeId("test-route-id")
                     .build();
-            when(this.routes.removeApplication(request4)).thenReturn(Mono.<Void>empty());
+            when(super.routes.removeApplication(request4)).thenReturn(Mono.<Void>empty());
         }
 
         @Override
@@ -1195,13 +1163,13 @@ public final class DefaultRoutesTest {
             UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
                     .build();
 
-            return this.operationRoutes.unmap(request);
+            return this.routes.unmap(request);
         }
     }
 
     public static final class UnmapRouteSharedDomain extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultRoutes operationRoutes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
@@ -1240,13 +1208,13 @@ public final class DefaultRoutesTest {
             ListRoutesResponse response4 = fillPage(ListRoutesResponse.builder())
                     .resource(fill(RouteResource.builder(), "route-").build())
                     .build();
-            when(this.routes.list(request4)).thenReturn(Mono.just(response4));
+            when(super.routes.list(request4)).thenReturn(Mono.just(response4));
 
             RemoveRouteApplicationRequest request5 = fill(RemoveRouteApplicationRequest.builder())
                     .applicationId("test-application-id")
                     .routeId("test-route-id")
                     .build();
-            when(this.routes.removeApplication(request5)).thenReturn(Mono.<Void>empty());
+            when(super.routes.removeApplication(request5)).thenReturn(Mono.<Void>empty());
         }
 
         @Override
@@ -1259,7 +1227,7 @@ public final class DefaultRoutesTest {
             UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
                     .build();
 
-            return this.operationRoutes.unmap(request);
+            return this.routes.unmap(request);
         }
     }
 
