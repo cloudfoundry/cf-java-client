@@ -19,12 +19,15 @@ package org.cloudfoundry.client.spring.v2.servicekeys;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
+import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
 import org.reactivestreams.Publisher;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 public final class SpringServiceKeysTest {
 
@@ -74,6 +77,40 @@ public final class SpringServiceKeysTest {
         @Override
         protected Publisher<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
             return this.serviceKeys.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceKeyRequest, Void> {
+
+        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceKeyRequest getInvalidRequest() {
+            return DeleteServiceKeyRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/service_keys/test-service-key-id")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceKeyRequest getValidRequest() throws Exception {
+            return DeleteServiceKeyRequest.builder()
+                    .serviceKeyId("test-service-key-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(DeleteServiceKeyRequest request) {
+            return this.serviceKeys.delete(request);
         }
     }
 
