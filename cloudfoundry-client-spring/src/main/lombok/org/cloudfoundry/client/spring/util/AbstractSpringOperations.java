@@ -30,7 +30,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ProcessorGroup;
-import reactor.core.subscriber.ReactiveSession;
+import reactor.core.subscriber.SignalEmitter;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.fn.Supplier;
@@ -65,10 +65,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final Mono<Void> delete(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<Void>, Void>() {
+        return exchange(request, new Function<SignalEmitter<Void>, Void>() {
 
             @Override
-            public Void apply(ReactiveSession<Void> session) {
+            public Void apply(SignalEmitter<Void> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
@@ -82,7 +82,7 @@ public abstract class AbstractSpringOperations {
                 .next();
     }
 
-    protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<ReactiveSession<T>, T> exchange) {
+    protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<SignalEmitter<T>, T> exchange) {
         return Stream
                 .from(Validators
                         .validate(request)
@@ -91,19 +91,19 @@ public abstract class AbstractSpringOperations {
                             @Override
                             public Stream<T> apply(V request) {
                                 return Stream
-                                        .yield(new Consumer<ReactiveSession<T>>() {
+                                        .yield(new Consumer<SignalEmitter<T>>() {
 
                                             @Override
-                                            public void accept(ReactiveSession<T> session) {
+                                            public void accept(SignalEmitter<T> signalEmitter) {
                                                 try {
-                                                    T result = exchange.apply(session);
+                                                    T result = exchange.apply(signalEmitter);
                                                     if (result != null) {
-                                                        session.onNext(result);
+                                                        signalEmitter.onNext(result);
                                                     }
 
-                                                    session.onComplete();
+                                                    signalEmitter.onComplete();
                                                 } catch (HttpStatusCodeException e) {
-                                                    session.onError(CloudFoundryExceptionBuilder.build(e));
+                                                    signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
                                                 }
                                             }
 
@@ -116,10 +116,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> get(Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<T>, T>() {
+        return exchange(request, new Function<SignalEmitter<T>, T>() {
 
             @Override
-            public T apply(ReactiveSession<T> session) {
+            public T apply(SignalEmitter<T> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
@@ -133,10 +133,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final Stream<byte[]> getStream(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<byte[]>, byte[]>() {
+        return exchange(request, new Function<SignalEmitter<byte[]>, byte[]>() {
 
             @Override
-            public byte[] apply(final ReactiveSession<byte[]> session) {
+            public byte[] apply(final SignalEmitter<byte[]> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
@@ -150,9 +150,9 @@ public abstract class AbstractSpringOperations {
                             int len;
                             byte[] buffer = new byte[BYTE_ARRAY_BUFFER_LENGTH];
 
-                            ReactiveSession.Emission emission = ReactiveSession.Emission.OK;
+                            SignalEmitter.Emission emission = SignalEmitter.Emission.OK;
                             while (emission.isOk() && (len = in.read(buffer)) != -1) {
-                                emission = session.emit(Arrays.copyOf(buffer, len));
+                                emission = signalEmitter.emit(Arrays.copyOf(buffer, len));
                             }
 
                             return null;
@@ -166,10 +166,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T> Mono<T> patch(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<T>, T>() {
+        return exchange(request, new Function<SignalEmitter<T>, T>() {
 
             @Override
-            public T apply(ReactiveSession<T> session) {
+            public T apply(SignalEmitter<T> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
@@ -194,10 +194,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T, B> Mono<T> postWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<T>, T>() {
+        return exchange(request, new Function<SignalEmitter<T>, T>() {
 
             @Override
-            public T apply(ReactiveSession<T> session) {
+            public T apply(SignalEmitter<T> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
@@ -222,10 +222,10 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T, B> Mono<T> putWithBody(Validatable request, final Supplier<B> bodySupplier, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<ReactiveSession<T>, T>() {
+        return exchange(request, new Function<SignalEmitter<T>, T>() {
 
             @Override
-            public T apply(ReactiveSession<T> session) {
+            public T apply(SignalEmitter<T> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
