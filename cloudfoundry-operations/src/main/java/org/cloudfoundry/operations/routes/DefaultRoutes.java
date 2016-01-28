@@ -164,17 +164,7 @@ public final class DefaultRoutes implements Routes {
                         .map(Resources.extractId());
 
                 Mono<String> routeId = requestDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
-                                .then(new Function<String, Mono<String>>() {
-
-                                    @Override
-                                    public Mono<String> apply(String domainId) {
-                                        return Paginated.
-                                                requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
-                                                .single()
-                                                .map(Resources.extractId());
-                                    }
-
-                                });
+                        .then(requestRouteId(cloudFoundryClient, unmapRouteRequest));
 
                 return Mono.when(Mono.just(unmapRouteRequest), applicationId, routeId);
             }
@@ -350,7 +340,7 @@ public final class DefaultRoutes implements Routes {
                         .host(unmapRouteRequest.getHost())
                         .page(page)
                         .domainId(domainId);
-                
+
                 return cloudFoundryClient.routes().list(requestBuilder.build());
             }
 
@@ -441,6 +431,20 @@ public final class DefaultRoutes implements Routes {
             }
 
         });
+    }
+
+    private static Function<String, Mono<String>> requestRouteId(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest) {
+        return new Function<String, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(String domainId) {
+                return Paginated.
+                        requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
+                        .single()
+                        .map(Resources.extractId());
+            }
+
+        };
     }
 
     private static Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient,
