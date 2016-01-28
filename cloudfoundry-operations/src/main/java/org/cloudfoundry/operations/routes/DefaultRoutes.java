@@ -120,6 +120,13 @@ public final class DefaultRoutes implements Routes {
                 .then(requestRemoveRouteFromApplication(this.cloudFoundryClient));
     }
 
+    private static String createInvalidRouteMessage(UnmapRouteRequest unmapRouteRequest) {
+        String host = unmapRouteRequest.getHost();
+        String hostInsert = host == null ? "" : String.format(" and host %s", host);
+
+        return String.format("Route for domain %s%s does not exist", unmapRouteRequest.getDomain(), hostInsert);
+    }
+
     private static Function<ApplicationResource, String> extractApplicationName() {
         return new Function<ApplicationResource, String>() {
 
@@ -163,8 +170,8 @@ public final class DefaultRoutes implements Routes {
                         .single()
                         .map(Resources.extractId());
 
-                Mono<String> routeId = requestDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
-                        .then(requestRouteId(cloudFoundryClient, unmapRouteRequest));
+                Mono<String> routeId = requestValidDomainId(cloudFoundryClient, orgId, unmapRouteRequest.getDomain())
+                        .then(requestValidRouteId(cloudFoundryClient, unmapRouteRequest));
 
                 return Mono.when(Mono.just(unmapRouteRequest), applicationId, routeId);
             }
@@ -317,11 +324,6 @@ public final class DefaultRoutes implements Routes {
         });
     }
 
-    private static Mono<String> requestDomainIdCreateRoute(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
-        return requestDomainId(cloudFoundryClient, organizationId, domain)
-                .otherwiseIfEmpty(Mono.<String>error(new IllegalArgumentException(String.format("Domain %s does not exist", domain))));
-    }
-
     private static Mono<String> requestDomainName(CloudFoundryClient cloudFoundryClient, RouteResource resource) {
         GetDomainRequest request = GetDomainRequest.builder()
                 .domainId(Resources.getEntity(resource).getDomainId())
@@ -433,20 +435,6 @@ public final class DefaultRoutes implements Routes {
         });
     }
 
-    private static Function<String, Mono<String>> requestRouteId(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest) {
-        return new Function<String, Mono<String>>() {
-
-            @Override
-            public Mono<String> apply(String domainId) {
-                return Paginated.
-                        requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
-                        .single()
-                        .map(Resources.extractId());
-            }
-
-        };
-    }
-
     private static Function<Tuple2<MapRouteRequest, String>, Mono<Tuple2<String, String>>> requestRouteIdAndApplicationId(final CloudFoundryClient cloudFoundryClient,
                                                                                                                           final Mono<String> organizationId) {
         return Tuples.function(new Function2<MapRouteRequest, String, Mono<Tuple2<String, String>>>() {
@@ -539,7 +527,7 @@ public final class DefaultRoutes implements Routes {
 
             @Override
             public Mono<Tuple3<String, String, CreateRouteRequest>> apply(CreateRouteRequest request, String organizationId) {
-                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestDomainIdCreateRoute(cloudFoundryClient, organizationId, request.getDomain()),
+                return Mono.when(requestSpaceId(cloudFoundryClient, organizationId, request.getSpace()), requestValidDomainId(cloudFoundryClient, organizationId, request.getDomain()),
                         Mono.just(request));
             }
 
@@ -596,6 +584,26 @@ public final class DefaultRoutes implements Routes {
                         .build();
 
                 return cloudFoundryClient.organizations().listSpaces(request);
+            }
+
+        };
+    }
+
+    private static Mono<String> requestValidDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
+        return requestDomainId(cloudFoundryClient, organizationId, domain)
+                .otherwiseIfEmpty(Mono.<String>error(new IllegalArgumentException(String.format("Domain %s does not exist", domain))));
+    }
+
+    private static Function<String, Mono<String>> requestValidRouteId(final CloudFoundryClient cloudFoundryClient, final UnmapRouteRequest unmapRouteRequest) {
+        return new Function<String, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(String domainId) {
+                return Paginated.
+                        requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
+                        .switchIfEmpty(Stream.<RouteResource>fail(new IllegalArgumentException(createInvalidRouteMessage(unmapRouteRequest))))
+                        .single()
+                        .map(Resources.extractId());
             }
 
         };
