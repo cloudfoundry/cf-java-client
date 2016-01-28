@@ -20,11 +20,13 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
@@ -43,6 +45,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -159,7 +162,7 @@ public final class SpringRoutesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteRouteRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteRouteRequest, DeleteRouteResponse> {
 
         private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -177,7 +180,7 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Void getResponse() {
+        protected DeleteRouteResponse getResponse() {
             return null;
         }
 
@@ -189,7 +192,55 @@ public final class SpringRoutesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteRouteRequest request) {
+        protected Mono<DeleteRouteResponse> invoke(DeleteRouteRequest request) {
+            return this.routes.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteRouteRequest, DeleteRouteResponse> {
+
+        private final SpringRoutes routes = new SpringRoutes(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteRouteRequest getInvalidRequest() {
+            return DeleteRouteRequest.builder()
+                    .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("v2/routes/test-route-id?async=true")
+                    .status(ACCEPTED)
+                    .responsePayload("v2/routes/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeleteRouteResponse getResponse() {
+            return DeleteRouteResponse.builder()
+                    .metadata(Resource.Metadata.builder()
+                            .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                            .createdAt("2016-02-02T17:16:31Z")
+                            .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                            .build())
+                    .entity(JobEntity.builder()
+                            .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                            .status("queued")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected DeleteRouteRequest getValidRequest() throws Exception {
+            return DeleteRouteRequest.builder()
+                    .async(true)
+                    .routeId("test-route-id")
+                    .build();
+        }
+
+        @Override
+        protected Mono<DeleteRouteResponse> invoke(DeleteRouteRequest request) {
             return this.routes.delete(request);
         }
 

@@ -56,7 +56,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
 
     @Override
     public Mono<Void> deleteInstance(final DeleteProcessInstanceRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

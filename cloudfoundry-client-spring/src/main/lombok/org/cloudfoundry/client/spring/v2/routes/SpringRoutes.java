@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
@@ -91,8 +92,8 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
     }
 
     @Override
-    public Mono<Void> delete(final DeleteRouteRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+    public Mono<DeleteRouteResponse> delete(final DeleteRouteRequest request) {
+        return delete(request, DeleteRouteResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -114,7 +115,6 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
             }
 
         })
-
                 .defaultIfEmpty(true)
                 .otherwise(new Function<Throwable, Mono<? extends Boolean>>() {
 
@@ -172,7 +172,7 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
 
     @Override
     public Mono<Void> removeApplication(final RemoveRouteApplicationRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

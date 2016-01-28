@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
@@ -181,10 +182,10 @@ public final class DefaultApplications implements Applications {
                             }
 
                         })
-                        .flatMap(new Function<String, Mono<Void>>() {
+                        .flatMap(new Function<String, Mono<DeleteRouteResponse>>() {
 
                             @Override
-                            public Mono<Void> apply(String routeId) {
+                            public Mono<DeleteRouteResponse> apply(String routeId) {
                                 return cloudFoundryClient.routes().delete(DeleteRouteRequest.builder()
                                         .routeId(routeId)
                                         .build());

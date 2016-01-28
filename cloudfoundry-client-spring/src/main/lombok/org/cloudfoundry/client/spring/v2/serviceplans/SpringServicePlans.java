@@ -54,7 +54,7 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
 
     @Override
     public Mono<Void> delete(final DeleteServicePlanRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plans", request.getServicePlanId());

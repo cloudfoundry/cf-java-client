@@ -68,7 +68,7 @@ public final class SpringServiceKeys extends AbstractSpringOperations implements
 
     @Override
     public Mono<Void> delete(final DeleteServiceKeyRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

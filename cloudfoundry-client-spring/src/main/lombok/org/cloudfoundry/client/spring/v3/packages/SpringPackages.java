@@ -91,7 +91,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Mono<Void> delete(final DeletePackageRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

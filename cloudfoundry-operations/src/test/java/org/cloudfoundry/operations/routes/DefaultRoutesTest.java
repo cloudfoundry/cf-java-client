@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
@@ -569,7 +570,7 @@ public final class DefaultRoutesTest {
                     .async(null)
                     .routeId("test-route1-id")
                     .build();
-            when(this.cloudFoundryClient.routes().delete(request4)).thenReturn(Mono.<Void>error(new IllegalStateException("failure")));
+            when(this.cloudFoundryClient.routes().delete(request4)).thenReturn(Mono.<DeleteRouteResponse>error(new IllegalStateException("failure")));
         }
 
         @Override
@@ -618,7 +619,7 @@ public final class DefaultRoutesTest {
                     .async(null)
                     .routeId("test-route-id")
                     .build();
-            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<Void>empty());
+            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<DeleteRouteResponse>empty());
         }
 
         @Override

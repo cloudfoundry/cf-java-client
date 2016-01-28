@@ -69,7 +69,7 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
 
     @Override
     public Mono<Void> delete(final DeleteDomainRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

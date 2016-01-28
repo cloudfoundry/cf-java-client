@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
@@ -132,7 +133,7 @@ public final class DefaultApplicationsTest {
                     .async(null)
                     .routeId("test-route-id")
                     .build();
-            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<Void>empty());
+            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<DeleteRouteResponse>empty());
 
             org.cloudfoundry.client.v2.applications.DeleteApplicationRequest request4 = fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
                     .applicationId("test-application-id")

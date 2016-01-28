@@ -45,7 +45,7 @@ public interface Routes {
      * @param request the Delete a Particular Route request
      * @return the response from the Delete a Particular Route request
      */
-    Mono<Void> delete(DeleteRouteRequest request);
+    Mono<DeleteRouteResponse> delete(DeleteRouteRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/226/routes/check_a_route_exists.html">Check a Route exists</a> request

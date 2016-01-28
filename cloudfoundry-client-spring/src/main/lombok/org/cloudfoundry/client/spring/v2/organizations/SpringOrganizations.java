@@ -231,7 +231,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> delete(final DeleteOrganizationRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -418,7 +418,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeAuditor(final RemoveOrganizationAuditorRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -430,7 +430,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeAuditorByUsername(final RemoveOrganizationAuditorByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -441,7 +441,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeBillingManager(final RemoveOrganizationBillingManagerRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -454,7 +454,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeBillingManagerByUsername(final RemoveOrganizationBillingManagerByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -466,7 +466,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeManager(final RemoveOrganizationManagerRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -478,7 +478,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeManagerByUsername(final RemoveOrganizationManagerByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -490,7 +490,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removePrivateDomain(final RemoveOrganizationPrivateDomainRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -503,7 +503,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeUser(final RemoveOrganizationUserRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -515,7 +515,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
 
     @Override
     public Mono<Void> removeUserByUsername(final RemoveOrganizationUserByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

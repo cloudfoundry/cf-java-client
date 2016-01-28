@@ -67,7 +67,7 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
 
     @Override
     public Mono<Void> delete(final DeleteServiceBindingRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

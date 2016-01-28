@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
@@ -43,11 +44,11 @@ final class CloudFoundryCleaner {
     }
 
     static Stream<Void> clean(CloudFoundryClient cloudFoundryClient,
-                            Predicate<ApplicationResource> applicationPredicate,
-                            Predicate<DomainResource> domainPredicate,
-                            Predicate<OrganizationResource> organizationPredicate,
-                            Predicate<RouteResource> routePredicate,
-                            Predicate<SpaceResource> spacePredicate) {
+                              Predicate<ApplicationResource> applicationPredicate,
+                              Predicate<DomainResource> domainPredicate,
+                              Predicate<OrganizationResource> organizationPredicate,
+                              Predicate<RouteResource> routePredicate,
+                              Predicate<SpaceResource> spacePredicate) {
 
         return cleanApplications(cloudFoundryClient, applicationPredicate)
                 .after(() -> cleanRoutes(cloudFoundryClient, routePredicate))
@@ -116,7 +117,7 @@ final class CloudFoundryCleaner {
                 });
     }
 
-    private static Stream<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
+    private static Stream<DeleteRouteResponse> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
         return Paginated
                 .requestResources(page -> {
                     ListRoutesRequest request = ListRoutesRequest.builder()
@@ -133,7 +134,7 @@ final class CloudFoundryCleaner {
                             .build();
 
                     return cloudFoundryClient.routes().delete(request);
-                });
+                });  // TODO: Wait for jobs to complete before progressing
     }
 
     private static Stream<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {

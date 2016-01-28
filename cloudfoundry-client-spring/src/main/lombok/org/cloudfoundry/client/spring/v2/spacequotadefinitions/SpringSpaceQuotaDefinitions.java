@@ -92,7 +92,7 @@ public final class SpringSpaceQuotaDefinitions extends AbstractSpringOperations 
 
     @Override
     public Mono<Void> removeSpace(final RemoveSpaceQuotaDefinitionRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

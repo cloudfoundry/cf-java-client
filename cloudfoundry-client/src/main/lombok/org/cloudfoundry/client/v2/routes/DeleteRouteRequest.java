@@ -37,7 +37,7 @@ public final class DeleteRouteRequest implements Validatable {
      * @return the async
      */
     @Getter(onMethod = @__(@QueryParameter("async")))
-    private final String async;
+    private final Boolean async;
 
     /**
      * The route id
@@ -49,7 +49,7 @@ public final class DeleteRouteRequest implements Validatable {
     private final String routeId;
 
     @Builder
-    DeleteRouteRequest(String async, String routeId) {
+    DeleteRouteRequest(Boolean async, String routeId) {
         this.async = async;
         this.routeId = routeId;
     }

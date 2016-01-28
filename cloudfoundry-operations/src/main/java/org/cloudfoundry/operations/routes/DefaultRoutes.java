@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
@@ -618,11 +619,11 @@ public final class DefaultRoutes implements Routes {
         });
     }
 
-    private Function<String, Mono<Void>> deleteRoute(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<String, Mono<Void>>() {
+    private Function<String, Mono<DeleteRouteResponse>> deleteRoute(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<DeleteRouteResponse>>() {
 
             @Override
-            public Mono<Void> apply(String routeId) {
+            public Mono<DeleteRouteResponse> apply(String routeId) {
                 DeleteRouteRequest request = DeleteRouteRequest.builder()
                         .routeId(routeId)
                         .build();

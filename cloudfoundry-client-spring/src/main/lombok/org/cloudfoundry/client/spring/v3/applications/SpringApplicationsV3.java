@@ -104,7 +104,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<Void> delete(final DeleteApplicationRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -116,7 +116,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<Void> deleteInstance(final DeleteApplicationInstanceRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -277,7 +277,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
     @Override
     public Mono<Void> unmapRoute(final UnmapApplicationRouteRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

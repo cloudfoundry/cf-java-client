@@ -198,7 +198,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> delete(final DeleteSpaceRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -402,7 +402,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeAuditor(final RemoveSpaceAuditorRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -414,7 +414,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeAuditorByUsername(final RemoveSpaceAuditorByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -426,7 +426,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeDeveloper(final RemoveSpaceDeveloperRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -438,7 +438,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeDeveloperByUsername(final RemoveSpaceDeveloperByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -450,7 +450,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeManager(final RemoveSpaceManagerRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -462,7 +462,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeManagerByUsername(final RemoveSpaceManagerByUsernameRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
@@ -474,7 +474,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
 
     @Override
     public Mono<Void> removeSecurityGroup(final RemoveSpaceSecurityGroupRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

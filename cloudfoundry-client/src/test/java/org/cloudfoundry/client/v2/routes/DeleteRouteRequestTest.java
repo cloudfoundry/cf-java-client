@@ -28,7 +28,6 @@ public final class DeleteRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteRouteRequest.builder()
-                .async("test-async")
                 .routeId("test-route-id")
                 .build()
                 .isValid();
@@ -39,7 +38,6 @@ public final class DeleteRouteRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteRouteRequest.builder()
-                .async("test-async")
                 .build()
                 .isValid();
 

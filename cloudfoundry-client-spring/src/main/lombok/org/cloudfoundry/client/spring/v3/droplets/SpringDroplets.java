@@ -51,7 +51,7 @@ public final class SpringDroplets extends AbstractSpringOperations implements Dr
 
     @Override
     public Mono<Void> delete(final DeleteDropletRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

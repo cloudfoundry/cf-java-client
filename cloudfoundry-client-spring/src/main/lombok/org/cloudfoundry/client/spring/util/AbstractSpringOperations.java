@@ -64,18 +64,17 @@ public abstract class AbstractSpringOperations {
         this.processorGroup = processorGroup;
     }
 
-    protected final Mono<Void> delete(final Validatable request, final Consumer<UriComponentsBuilder> builderCallback) {
-        return exchange(request, new Function<SignalEmitter<Void>, Void>() {
+    protected final <T> Mono<T> delete(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
+        return exchange(request, new Function<SignalEmitter<T>, T>() {
 
             @Override
-            public Void apply(SignalEmitter<Void> signalEmitter) {
+            public T apply(SignalEmitter<T> signalEmitter) {
                 UriComponentsBuilder builder = UriComponentsBuilder.fromUri(AbstractSpringOperations.this.root);
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
                 AbstractSpringOperations.this.logger.debug("DELETE {}", uri);
-                AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), Void.class);
-                return null;
+                return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
             }
 
         })

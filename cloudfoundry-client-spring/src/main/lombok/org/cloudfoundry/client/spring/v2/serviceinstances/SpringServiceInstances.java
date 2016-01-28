@@ -86,7 +86,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
 
     @Override
     public Mono<Void> delete(final DeleteServiceInstanceRequest request) {
-        return delete(request, new Consumer<UriComponentsBuilder>() {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
