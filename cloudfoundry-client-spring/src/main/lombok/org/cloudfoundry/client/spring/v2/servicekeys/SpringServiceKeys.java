@@ -18,10 +18,14 @@ package org.cloudfoundry.client.spring.v2.servicekeys;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -67,6 +71,20 @@ public final class SpringServiceKeys extends AbstractSpringOperations implements
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_keys", request.getServiceKeyId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListServiceKeysResponse> list(final ListServiceKeysRequest request) {
+        return get(request, ListServiceKeysResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_keys");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
             }
 
         });
