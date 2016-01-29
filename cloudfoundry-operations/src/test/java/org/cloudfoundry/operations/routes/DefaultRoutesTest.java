@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
+import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
@@ -49,11 +50,13 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
+import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
 import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {
@@ -521,6 +524,173 @@ public final class DefaultRoutesTest {
                     .build();
 
             return this.routes.create(request);
+        }
+
+    }
+
+    public static final class DeleteOrphanedRoutesAbortsOnError extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder())
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route1-").build())
+                    .resource(fill(RouteResource.builder(), "route2-").build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
+
+            ListRouteApplicationsRequest request2 = fillPage(ListRouteApplicationsRequest.builder())
+                    .diego(null)
+                    .routeId("test-route1-id")
+                    .spaceId("test-route1-spaceId")
+                    .build();
+            ListRouteApplicationsResponse response2 = fillPage(ListRouteApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application1-")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request2)).thenReturn(Mono.just(response2));
+
+            ListRouteApplicationsRequest request3 = fillPage(ListRouteApplicationsRequest.builder())
+                    .diego(null)
+                    .routeId("test-route2-id")
+                    .spaceId("test-route2-spaceId")
+                    .build();
+            ListRouteApplicationsResponse response3 = fillPage(ListRouteApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application2-")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request3)).thenReturn(Mono.just(response3));
+
+            DeleteRouteRequest request4 = fill(DeleteRouteRequest.builder())
+                    .async(null)
+                    .routeId("test-route1-id")
+                    .build();
+            when(this.cloudFoundryClient.routes().delete(request4)).thenReturn(Mono.<Void>error(new IllegalStateException("failure")));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber.assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.routes.deleteOrphanedRoutes();
+        }
+
+        @Override
+        protected void extraVerifications() throws Exception {
+            verify(this.cloudFoundryClient.routes(), Mockito.times(1)).delete(Mockito.any(DeleteRouteRequest.class));
+        }
+
+    }
+
+    public static final class DeleteOrphanedRoutesAssociatedApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder())
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-").build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
+
+            ListRouteApplicationsRequest request2 = fillPage(ListRouteApplicationsRequest.builder())
+                    .diego(null)
+                    .routeId("test-route-id")
+                    .spaceId("test-route-spaceId")
+                    .build();
+            ListRouteApplicationsResponse response2 = fillPage(ListRouteApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder())
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request2)).thenReturn(Mono.just(response2));
+
+            DeleteRouteRequest request3 = fill(DeleteRouteRequest.builder())
+                    .async(null)
+                    .routeId("test-route-id")
+                    .build();
+            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<Void>empty());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.routes.deleteOrphanedRoutes();
+        }
+
+    }
+
+    public static final class DeleteOrphanedRoutesNoAssociatedApplications extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder())
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-").build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
+
+            ListRouteApplicationsRequest request2 = fillPage(ListRouteApplicationsRequest.builder())
+                    .diego(null)
+                    .routeId("test-route-id")
+                    .spaceId("test-route-spaceId")
+                    .build();
+            ListRouteApplicationsResponse response2 = fillPage(ListRouteApplicationsResponse.builder())
+                    .build();
+            when(this.cloudFoundryClient.routes().listApplications(request2)).thenReturn(Mono.just(response2));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.routes.deleteOrphanedRoutes();
+        }
+
+    }
+
+    public static final class DeleteOrphanedRoutesNoRoutes extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceRoutesRequest request1 = fillPage(ListSpaceRoutesRequest.builder())
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceRoutesResponse response1 = fillPage(ListSpaceRoutesResponse.builder())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listRoutes(request1)).thenReturn(Mono.just(response1));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.routes.deleteOrphanedRoutes();
         }
 
     }
