@@ -1110,6 +1110,57 @@ public final class DefaultRoutesTest {
         }
     }
 
+    public static final class UnmapRouteInvalidRoute extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-applicationName")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                            .build())
+                    .build();
+            when(this.spaces.listApplications(request1)).thenReturn(Mono.just(response1));
+
+            ListOrganizationPrivateDomainsRequest request2 = fillPage(ListOrganizationPrivateDomainsRequest.builder())
+                    .organizationId(TEST_ORGANIZATION_ID)
+                    .name("test-domain")
+                    .build();
+            ListOrganizationPrivateDomainsResponse response2 = fillPage(ListOrganizationPrivateDomainsResponse.builder(), "privateDomain-")
+                    .resource(fill(PrivateDomainResource.builder(), "privateDomain-").build())
+                    .build();
+            when(this.organizations.listPrivateDomains(request2)).thenReturn(Mono.just(response2));
+
+            org.cloudfoundry.client.v2.routes.ListRoutesRequest request3 = fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+                    .domainId("test-privateDomain-id")
+                    .host("test-host")
+                    .organizationId(null)
+                    .build();
+            ListRoutesResponse response3 = fillPage(ListRoutesResponse.builder())
+                    .build();
+            when(super.routes.list(request3)).thenReturn(Mono.just(response3));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber.assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            UnmapRouteRequest request = fill(UnmapRouteRequest.builder())
+                    .build();
+
+            return this.routes.unmap(request);
+        }
+    }
+
+
     public static final class UnmapRoutePrivateDomain extends AbstractOperationsApiTest<Void> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));

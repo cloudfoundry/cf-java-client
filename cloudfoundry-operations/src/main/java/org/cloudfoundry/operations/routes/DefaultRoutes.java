@@ -427,8 +427,9 @@ public final class DefaultRoutes implements Routes {
             public Mono<String> apply(String domainId) {
                 return Paginated.
                         requestResources(requestListRoutesPage(cloudFoundryClient, domainId, unmapRouteRequest))
-                        .singleOrEmpty()
-                        .map(Resources.extractId());
+                        .single()
+                        .map(Resources.extractId())
+                        .otherwise(Exceptions.<String>convert("Route %s.%s does not exist", unmapRouteRequest.getHost(), unmapRouteRequest.getDomain()));
             }
 
         };
