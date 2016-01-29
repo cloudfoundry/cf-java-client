@@ -19,6 +19,8 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.DefaultApplications;
+import org.cloudfoundry.operations.domains.DefaultDomains;
+import org.cloudfoundry.operations.domains.Domains;
 import org.cloudfoundry.operations.organizations.DefaultOrganizations;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.DefaultRoutes;
@@ -33,6 +35,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Applications applications;
 
+    private final DefaultDomains domains;
+
     private final Organizations organizations;
 
     private final Routes routes;
@@ -43,6 +47,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
+        this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient);
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
         this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
@@ -52,6 +57,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Applications applications() {
         return this.applications;
+    }
+
+    @Override
+    public Domains domains() {
+        return this.domains;
     }
 
     @Override
