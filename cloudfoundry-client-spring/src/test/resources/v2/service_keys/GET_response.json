@@ -1,0 +1,24 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "3936801c-9d3f-4b9f-8465-aa3bd263612e",
+        "url": "/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e",
+        "created_at": "2015-07-27T22:43:22Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-934",
+        "service_instance_guid": "84d384d9-42c2-4e4b-a8c6-865e9446e024",
+        "credentials": {
+          "creds-key-383": "creds-val-383"
+        },
+        "service_instance_url": "/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024"
+      }
+    }
+  ]
+}

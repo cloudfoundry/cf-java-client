@@ -20,14 +20,19 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
+import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
+import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
 import org.reactivestreams.Publisher;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceKeysTest {
 
@@ -111,6 +116,58 @@ public final class SpringServiceKeysTest {
         @Override
         protected Publisher<Void> invoke(DeleteServiceKeyRequest request) {
             return this.serviceKeys.delete(request);
+        }
+    }
+
+    public static final class List extends AbstractApiTest<ListServiceKeysRequest, ListServiceKeysResponse> {
+
+        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceKeysRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_keys?q=name%20IN%20test-name&page=-1")
+                    .status(OK)
+                    .responsePayload("v2/service_keys/GET_response.json");
+        }
+
+        @Override
+        protected ListServiceKeysResponse getResponse() {
+            return ListServiceKeysResponse.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .resource(ServiceKeyResource.builder()
+                            .metadata(Metadata.builder()
+                                    .createdAt("2015-07-27T22:43:22Z")
+                                    .id("3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                                    .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
+                                    .build())
+                            .entity(ServiceKeyEntity.builder()
+                                    .credential("creds-key-383", "creds-val-383")
+                                    .name("name-934")
+                                    .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                                    .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")
+                                    .build())
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected ListServiceKeysRequest getValidRequest() throws Exception {
+            return ListServiceKeysRequest.builder()
+                    .name("test-name")
+                    .page(-1)
+                    .build();
+        }
+
+        @Override
+        protected Publisher<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
+            return this.serviceKeys.list(request);
         }
     }
 
