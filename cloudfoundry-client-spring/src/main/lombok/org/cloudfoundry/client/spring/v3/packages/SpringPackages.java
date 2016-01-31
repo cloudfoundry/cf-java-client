@@ -60,7 +60,7 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringPackages(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringPackages(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

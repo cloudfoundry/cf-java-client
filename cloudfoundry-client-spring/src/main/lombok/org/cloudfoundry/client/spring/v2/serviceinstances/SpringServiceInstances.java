@@ -55,7 +55,7 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringServiceInstances(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringServiceInstances(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

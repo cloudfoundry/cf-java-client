@@ -46,7 +46,7 @@ public final class SpringStacks extends AbstractSpringOperations implements Stac
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringStacks(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringStacks(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

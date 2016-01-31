@@ -48,7 +48,7 @@ public final class SpringServiceKeys extends AbstractSpringOperations implements
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringServiceKeys(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringServiceKeys(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

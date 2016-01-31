@@ -49,7 +49,7 @@ public final class SpringServiceBindings extends AbstractSpringOperations implem
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringServiceBindings(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringServiceBindings(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

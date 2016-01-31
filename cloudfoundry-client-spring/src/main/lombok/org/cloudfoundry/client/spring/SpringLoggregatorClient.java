@@ -80,7 +80,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         this.webSocketContainer = webSocketContainer;
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
@@ -127,7 +127,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         });
     }
 
-    private static ProcessorGroup<?> getProcessorGroup(SpringCloudFoundryClient cloudFoundryClient) {
+    private static ProcessorGroup getProcessorGroup(SpringCloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.getProcessorGroup();
     }
 

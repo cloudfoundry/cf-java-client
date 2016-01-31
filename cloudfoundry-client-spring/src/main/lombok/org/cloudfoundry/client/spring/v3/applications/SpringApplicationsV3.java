@@ -74,7 +74,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringApplicationsV3(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringApplicationsV3(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 
