@@ -654,7 +654,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return this.organizationId
                 .then(organizationId -> {
                     CreateDomainRequest request = CreateDomainRequest.builder()
-                            .domainName("test.domain.name")
+                            .name("test.domain.name")
                             .owningOrganizationId(organizationId)
                             .wildcard(true)
                             .build();

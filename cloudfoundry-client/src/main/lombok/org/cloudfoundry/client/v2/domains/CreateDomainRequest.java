@@ -36,7 +36,7 @@ public final class CreateDomainRequest implements Validatable {
      * @return the name
      */
     @Getter(onMethod = @__(@JsonProperty("name")))
-    private final String domainName;
+    private final String name;
 
     /**
      * The owning organization id
@@ -57,8 +57,8 @@ public final class CreateDomainRequest implements Validatable {
     private final Boolean wildcard;
 
     @Builder
-    CreateDomainRequest(String domainName, String owningOrganizationId, Boolean wildcard) {
-        this.domainName = domainName;
+    CreateDomainRequest(String name, String owningOrganizationId, Boolean wildcard) {
+        this.name = name;
         this.owningOrganizationId = owningOrganizationId;
         this.wildcard = wildcard;
     }
@@ -67,8 +67,8 @@ public final class CreateDomainRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.domainName == null) {
-            builder.message("domain name must be specified");
+        if (this.name == null) {
+            builder.message("name must be specified");
         }
 
         if (this.wildcard == null) {
