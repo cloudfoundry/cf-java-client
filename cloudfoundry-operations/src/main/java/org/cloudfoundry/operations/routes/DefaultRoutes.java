@@ -629,13 +629,14 @@ public final class DefaultRoutes implements Routes {
 
     private Function<RouteResource, Mono<String>> detectOrphanedRoutes(final CloudFoundryClient cloudFoundryClient) {
         return new Function<RouteResource, Mono<String>>() {
-           
+
             @Override
             public Mono<String> apply(RouteResource routeResource) {
                 final String routeId = Resources.getId(routeResource);
                 final String spaceId = Resources.getEntity(routeResource).getSpaceId();
 
-                return Paginated.requestResources(requestApplicationPage(cloudFoundryClient, spaceId, routeId))
+                return Paginated
+                        .requestResources(requestApplicationPage(cloudFoundryClient, spaceId, routeId))
                         .hasElements()
                         .then(new Function<Boolean, Mono<String>>() {
 
@@ -646,7 +647,7 @@ public final class DefaultRoutes implements Routes {
 
                         });
             }
-            
+
         };
     }
 
