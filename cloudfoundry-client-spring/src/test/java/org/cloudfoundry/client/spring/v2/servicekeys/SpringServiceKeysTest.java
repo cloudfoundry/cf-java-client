@@ -20,6 +20,8 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.GetServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.GetServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
@@ -116,6 +118,53 @@ public final class SpringServiceKeysTest {
         @Override
         protected Publisher<Void> invoke(DeleteServiceKeyRequest request) {
             return this.serviceKeys.delete(request);
+        }
+    }
+
+    public static final class Get extends AbstractApiTest<GetServiceKeyRequest, GetServiceKeyResponse> {
+
+        private final SpringServiceKeys serviceKeys = new SpringServiceKeys(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServiceKeyRequest getInvalidRequest() {
+            return GetServiceKeyRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(GET).path("/v2/service_keys/test-service-key-id")
+                    .status(OK)
+                    .responsePayload("v2/service_keys/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServiceKeyResponse getResponse() {
+            return GetServiceKeyResponse.builder()
+                    .metadata(Metadata.builder()
+                            .createdAt("2015-07-27T22:43:22Z")
+                            .id("7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                            .url("/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5")
+                            .build())
+                    .entity(ServiceKeyEntity.builder()
+                            .credential("creds-key-388", "creds-val-388")
+                            .name("name-947")
+                            .serviceInstanceId("011457da-c205-4415-a578-de5df82b15a8")
+                            .serviceInstanceUrl("/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8")
+                            .build())
+                    .build();
+        }
+
+        @Override
+        protected GetServiceKeyRequest getValidRequest() throws Exception {
+            return GetServiceKeyRequest.builder()
+                    .serviceKeyId("test-service-key-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
+            return this.serviceKeys.get(request);
         }
     }
 
