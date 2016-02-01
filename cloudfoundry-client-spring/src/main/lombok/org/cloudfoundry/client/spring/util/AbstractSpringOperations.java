@@ -56,9 +56,9 @@ public abstract class AbstractSpringOperations {
 
     protected final URI root;
 
-    private final ProcessorGroup<?> processorGroup;
+    private final ProcessorGroup processorGroup;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         this.restOperations = restOperations;
         this.root = root;
         this.processorGroup = processorGroup;

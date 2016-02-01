@@ -124,7 +124,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final PrivateDomains privateDomains;
 
-    private final ProcessorGroup<?> processorGroup;
+    private final ProcessorGroup processorGroup;
 
     private final OAuth2RestOperations restOperations;
 
@@ -211,7 +211,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
     }
 
-    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         this.processorGroup = processorGroup;
         this.restOperations = restOperations;
 
@@ -347,7 +347,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations.getAccessToken().getValue();
     }
 
-    ProcessorGroup<?> getProcessorGroup() {
+    ProcessorGroup getProcessorGroup() {
         return this.processorGroup;
     }
 
@@ -355,7 +355,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations;
     }
 
-    private static ProcessorGroup<?> createProcessorGroup() {
+    private static ProcessorGroup createProcessorGroup() {
         return ProcessorGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, ProcessorGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
     }
 

@@ -48,7 +48,7 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup<?> processorGroup) {
+    public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

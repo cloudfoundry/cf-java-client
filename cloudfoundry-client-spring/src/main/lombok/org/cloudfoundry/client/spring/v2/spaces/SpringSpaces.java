@@ -96,7 +96,7 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringSpaces(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringSpaces(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

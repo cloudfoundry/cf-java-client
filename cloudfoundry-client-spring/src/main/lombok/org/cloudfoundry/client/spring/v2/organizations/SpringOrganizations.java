@@ -102,7 +102,7 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringOrganizations(RestOperations restOperations, URI root, ProcessorGroup<?> processorGroup) {
+    public SpringOrganizations(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 
