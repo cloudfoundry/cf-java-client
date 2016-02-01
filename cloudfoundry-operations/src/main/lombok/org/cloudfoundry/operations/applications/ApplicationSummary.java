@@ -30,10 +30,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ApplicationSummary extends AbstractApplicationSummary {
+public final class ApplicationSummary extends AbstractApplicationSummary {
 
     @Builder
-    protected ApplicationSummary(Integer diskQuota,
+    private ApplicationSummary(Integer diskQuota,
                                  String id,
                                  Integer instances,
                                  Integer memoryLimit,
