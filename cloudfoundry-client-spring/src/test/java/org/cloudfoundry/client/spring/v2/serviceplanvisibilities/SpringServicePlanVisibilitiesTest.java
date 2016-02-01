@@ -20,12 +20,15 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity;
 import org.reactivestreams.Publisher;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 
 public final class SpringServicePlanVisibilitiesTest {
@@ -76,6 +79,41 @@ public final class SpringServicePlanVisibilitiesTest {
         @Override
         protected Publisher<CreateServicePlanVisibilityResponse> invoke(CreateServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.create(request);
+        }
+    }
+
+    public static final class Delete extends AbstractApiTest<DeleteServicePlanVisibilityRequest, Void> {
+
+        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
+            return DeleteServicePlanVisibilityRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                    .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
+                    .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServicePlanVisibilityRequest getValidRequest() throws Exception {
+            return DeleteServicePlanVisibilityRequest.builder()
+                    .async(true)
+                    .servicePlanVisibilityId("test-service-plan-visibility-id")
+                    .build();
+        }
+
+        @Override
+        protected Publisher<Void> invoke(DeleteServicePlanVisibilityRequest request) {
+            return this.servicePlanVisibilities.delete(request);
         }
     }
 
