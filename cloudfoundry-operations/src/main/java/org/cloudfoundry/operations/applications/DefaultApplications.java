@@ -17,6 +17,8 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
@@ -25,6 +27,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
@@ -34,10 +37,10 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.operations.util.Dates;
+import org.cloudfoundry.operations.util.Exceptions;
 import org.cloudfoundry.operations.util.Function2;
 import org.cloudfoundry.operations.util.Function4;
 import org.cloudfoundry.operations.util.Optional;
-import org.cloudfoundry.operations.util.Tuples;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -54,6 +57,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static org.cloudfoundry.operations.util.Tuples.function;
 
 public final class DefaultApplications implements Applications {
 
@@ -82,6 +87,53 @@ public final class DefaultApplications implements Applications {
                 .then(requestSpaceSummary(this.cloudFoundryClient))
                 .flatMap(extractApplications())
                 .map(toApplication());
+    }
+
+    @Override
+    public Publisher<ApplicationScale> scale(final ScaleApplicationRequest request) {
+        return this.spaceId
+                .then(new Function<String, Mono<Tuple2<String, Resource<ApplicationEntity>>>>() {
+                    @Override
+                    public Mono<Tuple2<String, Resource<ApplicationEntity>>> apply(String spaceId) {
+                        return Mono
+                                .when(
+                                        Mono.just(spaceId),
+                                        getSpaceApplication(DefaultApplications.this.cloudFoundryClient, spaceId, request.getName())
+                                                .otherwise(Exceptions.<Resource<ApplicationEntity>>convert("Application %s does not exist", request.getName()))
+                                );
+                    }
+                })
+                .then(function(new Function2<String, Resource<ApplicationEntity>, Mono<? extends Resource<ApplicationEntity>>>() {
+                    @Override
+                    public Mono<? extends Resource<ApplicationEntity>> apply(String spaceId, Resource<ApplicationEntity> applicationResource) {
+                        if (scaleModifiersPresent(request)) {
+                            return updateApplication(DefaultApplications.this.cloudFoundryClient,
+                                    Resources.getId(applicationResource),
+                                    request.getDiskLimit(),
+                                    request.getInstances(),
+                                    request.getMemoryLimit()
+                            );
+                        } else {
+                            return Mono.just(applicationResource);
+                        }
+                    }
+                }))
+                .map(new Function<Resource<ApplicationEntity>, ApplicationEntity>() {
+                    @Override
+                    public ApplicationEntity apply(Resource<ApplicationEntity> applicationResource) {
+                        return Resources.getEntity(applicationResource);
+                    }
+                })
+                .map(new Function<ApplicationEntity, ApplicationScale>() {
+                    @Override
+                    public ApplicationScale apply(ApplicationEntity applicationEntity) {
+                        return ApplicationScale.builder()
+                                .diskLimit(applicationEntity.getDiskQuota())
+                                .instances(applicationEntity.getInstances())
+                                .memoryLimit(applicationEntity.getMemory())
+                                .build();
+                    }
+                });
     }
 
     private static Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>> extractApplications() {
@@ -117,6 +169,29 @@ public final class DefaultApplications implements Applications {
                 .orElse(response.getDetectedBuildpack());
     }
 
+    private static Mono<Resource<ApplicationEntity>> getSpaceApplication(final CloudFoundryClient cloudFoundryClient, final String spaceId, final String name) {
+        return Paginated
+                .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
+                    @Override
+                    public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
+                        ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                                .spaceId(spaceId)
+                                .name(name)
+                                .page(page)
+                                .build();
+
+                        return cloudFoundryClient.spaces().listApplications(request);
+                    }
+                })
+                .map(new Function<ApplicationResource, Resource<ApplicationEntity>>() {
+                    @Override
+                    public Resource<ApplicationEntity> apply(ApplicationResource appResource) {
+                        return appResource;
+                    }
+                })
+                .single();
+    }
+
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
@@ -126,7 +201,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Function<Tuple2<GetApplicationRequest, String>, Mono<ApplicationResource>> requestApplicationResource(final CloudFoundryClient cloudFoundryClient) {
-        return Tuples.function(new Function2<GetApplicationRequest, String, Mono<ApplicationResource>>() {
+        return function(new Function2<GetApplicationRequest, String, Mono<ApplicationResource>>() {
 
             @Override
             public Mono<ApplicationResource> apply(GetApplicationRequest getApplicationRequest, String spaceId) {
@@ -195,6 +270,10 @@ public final class DefaultApplications implements Applications {
         return cloudFoundryClient.stacks().get(request);
     }
 
+    private static boolean scaleModifiersPresent(ScaleApplicationRequest request) {
+        return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
+    }
+
     private static Function<SpaceApplicationSummary, ApplicationSummary> toApplication() {
         return new Function<SpaceApplicationSummary, ApplicationSummary>() {
 
@@ -216,7 +295,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Function<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>, ApplicationDetail> toApplicationDetail() {
-        return Tuples.function(new Function4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, ApplicationDetail>() {
+        return function(new Function4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse, ApplicationDetail>() {
 
             @Override
             public ApplicationDetail apply(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse, GetStackResponse getStackResponse,
@@ -297,6 +376,18 @@ public final class DefaultApplications implements Applications {
         }
 
         return urls;
+    }
+
+    private static Mono<? extends Resource<ApplicationEntity>> updateApplication(final CloudFoundryClient cloudFoundryClient, final String applicationId, final Integer disk, final Integer
+            instances, final Integer memory) {
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .diskQuota(disk)
+                .instances(instances)
+                .memory(memory)
+                .build();
+
+        return cloudFoundryClient.applicationsV2().update(request);
     }
 
 }
