@@ -45,8 +45,7 @@ public final class DeleteServicePlanVisibilityRequest implements Validatable {
     private final String servicePlanVisibilityId;
 
     @Builder
-    DeleteServicePlanVisibilityRequest(Boolean async,
-                                       String servicePlanVisibilityId) {
+    DeleteServicePlanVisibilityRequest(Boolean async, String servicePlanVisibilityId) {
         this.async = async;
         this.servicePlanVisibilityId = servicePlanVisibilityId;
     }
