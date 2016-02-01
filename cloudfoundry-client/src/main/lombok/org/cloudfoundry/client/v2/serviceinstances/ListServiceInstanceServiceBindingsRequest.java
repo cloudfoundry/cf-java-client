@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import java.util.List;
 
 /**
- * The request payload for the List all Service Bindings for the Service Binding operation
+ * The request payload for the List all Service Bindings for the Service Instance operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -74,7 +74,7 @@ public final class CreateServiceInstanceRequest implements Validatable {
     /**
      * The space id
      *
-     * @param servicePlanId the space id
+     * @param spaceId the space id
      * @return the space id
      */
     @Getter(onMethod = @__(@JsonProperty("space_guid")))

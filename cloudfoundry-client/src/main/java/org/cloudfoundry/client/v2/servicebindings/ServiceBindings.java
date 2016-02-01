@@ -42,8 +42,8 @@ public interface ServiceBindings {
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/223/service_bindings/retrieve_a_particular_service_binding.html">Retrieve a Particular Service Binding</a> request
      *
-     * @param request the Get Application request
-     * @return the response from the Get Application request
+     * @param request the Get Service Binding request
+     * @return the response from the Get Service Binding request
      */
     Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request);
 
