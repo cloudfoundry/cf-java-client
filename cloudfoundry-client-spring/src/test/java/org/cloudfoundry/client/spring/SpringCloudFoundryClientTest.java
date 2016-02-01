@@ -163,6 +163,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void servicePlanVisibilities() {
+        assertNotNull(this.client.servicePlanVisibilities());
+    }
+
+    @Test
     public void servicePlans() {
         assertNotNull(this.client.servicePlans());
     }
