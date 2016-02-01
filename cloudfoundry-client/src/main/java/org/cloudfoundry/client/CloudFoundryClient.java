@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -152,6 +153,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Service Keys Client API
      */
     ServiceKeys serviceKeys();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Plan Visibilities Client API
+     *
+     * @return the Cloud Foundry Service Plan Visibilities Client API
+     */
+    ServicePlanVisibilities servicePlanVisibilities();
 
     /**
      * Main entry point to the Cloud Foundry Service Plans Client API
