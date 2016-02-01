@@ -33,7 +33,7 @@ public final class CreateDomainRequest implements Validatable {
      * @param domain the domain name
      * @return the domain name
      */
-    private final String domainName;
+    private final String domain;
 
     /**
      * The organization name of the domain.
@@ -41,24 +41,24 @@ public final class CreateDomainRequest implements Validatable {
      * @param host the organization name
      * @return the organization name
      */
-    private final String organizationName;
+    private final String organization;
 
     @Builder
-    CreateDomainRequest(String domainName, String organizationName) {
-        this.domainName = domainName;
-        this.organizationName = organizationName;
+    CreateDomainRequest(String domain, String organization) {
+        this.domain = domain;
+        this.organization = organization;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.domainName == null) {
-            builder.message("domain name must be specified");
+        if (this.domain == null) {
+            builder.message("domain must be specified");
         }
 
-        if (this.organizationName == null) {
-            builder.message("organization name must be specified");
+        if (this.organization == null) {
+            builder.message("organization must be specified");
         }
 
         return builder.build();

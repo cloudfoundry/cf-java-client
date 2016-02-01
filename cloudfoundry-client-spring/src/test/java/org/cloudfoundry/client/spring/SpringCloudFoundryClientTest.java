@@ -138,6 +138,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void privateDomains() {
+        assertNotNull(this.client.privateDomains());
+    }
+
+    @Test
     public void routes() {
         assertNotNull(this.client.routes());
     }

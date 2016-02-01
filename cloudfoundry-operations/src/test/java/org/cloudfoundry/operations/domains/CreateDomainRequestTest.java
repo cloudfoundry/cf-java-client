@@ -28,8 +28,8 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domainName("test-domain")
-                .organizationName("test-organization")
+                .domain("test-domain")
+                .organization("test-organization")
                 .build()
                 .isValid();
 
@@ -39,23 +39,23 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValidNoDomain() {
         ValidationResult result = CreateDomainRequest.builder()
-                .organizationName("test-organization")
+                .organization("test-organization")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("domain name must be specified", result.getMessages().get(0));
+        assertEquals("domain must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoOrganization() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domainName("test-domain")
+                .domain("test-domain")
                 .build()
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("organization name must be specified", result.getMessages().get(0));
+        assertEquals("organization must be specified", result.getMessages().get(0));
     }
 
 }

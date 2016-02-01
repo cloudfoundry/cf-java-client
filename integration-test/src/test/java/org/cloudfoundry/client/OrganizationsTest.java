@@ -756,7 +756,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String organizationId) {
         CreateDomainRequest request = CreateDomainRequest.builder()
-                .domainName("test.private.domain")
+                .name("test.private.domain")
                 .owningOrganizationId(organizationId)
                 .wildcard(false)
                 .build();

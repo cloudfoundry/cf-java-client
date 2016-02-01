@@ -41,7 +41,7 @@ public final class DefaultDomainsTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization-name")
+                    .name("test-organization")
                     .build();
             ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
                     .resource(OrganizationResource.builder()
@@ -54,7 +54,7 @@ public final class DefaultDomainsTest {
             when(this.organizations.list(request1)).thenReturn(Mono.just(response1));
 
             CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
-                    .domainName("test-domain-name")
+                    .name("test-domain-name")
                     .owningOrganizationId("test-organization-id")
                     .wildcard(true)
                     .build();
@@ -71,8 +71,8 @@ public final class DefaultDomainsTest {
         @Override
         protected Publisher<Void> invoke() {
             CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domainName("test-domain-name")
-                    .organizationName("test-organization-name")
+                    .domain("test-domain-name")
+                    .organization("test-organization")
                     .build();
 
             return this.domains.create(request);
@@ -87,7 +87,7 @@ public final class DefaultDomainsTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization-name")
+                    .name("test-organization")
                     .build();
             ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
                     .resource(OrganizationResource.builder()
@@ -100,7 +100,7 @@ public final class DefaultDomainsTest {
             when(this.organizations.list(request1)).thenReturn(Mono.just(response1));
 
             CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
-                    .domainName("test-domain-name")
+                    .name("test-domain-name")
                     .owningOrganizationId("test-organization-id")
                     .wildcard(true)
                     .build();
@@ -117,8 +117,8 @@ public final class DefaultDomainsTest {
         @Override
         protected Publisher<Void> invoke() {
             CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domainName("test-domain-name")
-                    .organizationName("test-organization-name")
+                    .domain("test-domain-name")
+                    .organization("test-organization")
                     .build();
 
             return this.domains.create(request);
@@ -133,7 +133,7 @@ public final class DefaultDomainsTest {
         @Before
         public void setUp() throws Exception {
             ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization-name")
+                    .name("test-organization")
                     .build();
             ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
                     .build();
@@ -149,8 +149,8 @@ public final class DefaultDomainsTest {
         @Override
         protected Publisher<Void> invoke() {
             CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domainName("test-domain-name")
-                    .organizationName("test-organization-name")
+                    .domain("test-domain-name")
+                    .organization("test-organization")
                     .build();
 
             return this.domains.create(request);

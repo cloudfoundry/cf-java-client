@@ -83,7 +83,7 @@ public final class SpringDomainsTest {
         @Override
         protected CreateDomainRequest getValidRequest() throws Exception {
             return CreateDomainRequest.builder()
-                    .domainName("exmaple.com")
+                    .name("exmaple.com")
                     .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
                     .wildcard(true)
                     .build();

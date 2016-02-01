@@ -19,15 +19,14 @@ package org.cloudfoundry.operations.domains;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
+import org.cloudfoundry.operations.util.Exceptions;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
-import reactor.rx.Stream;
 
 public final class DefaultDomains implements Domains {
 
@@ -44,10 +43,6 @@ public final class DefaultDomains implements Domains {
                 .then(requestCreateDomain(this.cloudFoundryClient));
     }
 
-    private static String createInvalidOrganizationMessage(CreateDomainRequest createDomainRequest) {
-        return String.format("Organization %s does not exist", createDomainRequest.getOrganizationName());
-    }
-
     private static Function<Tuple2<String, String>, Mono<Void>> requestCreateDomain(final CloudFoundryClient cloudFoundryClient) {
         return new Function<Tuple2<String, String>, Mono<Void>>() {
 
@@ -59,7 +54,7 @@ public final class DefaultDomains implements Domains {
                 return cloudFoundryClient.privateDomains().create(
                         CreatePrivateDomainRequest.builder()
                                 .owningOrganizationId(organizationId)
-                                .domainName(domainName)
+                                .name(domainName)
                                 .wildcard(true)
                                 .build())
                         .after();
@@ -89,11 +84,11 @@ public final class DefaultDomains implements Domains {
             @Override
             public Mono<Tuple2<String, String>> apply(CreateDomainRequest createDomainRequest) {
                 return Paginated
-                        .requestResources(requestOrganizationPage(cloudFoundryClient, createDomainRequest.getOrganizationName()))
-                        .switchIfEmpty(Stream.<OrganizationResource>fail(new IllegalArgumentException(createInvalidOrganizationMessage(createDomainRequest))))
+                        .requestResources(requestOrganizationPage(cloudFoundryClient, createDomainRequest.getOrganization()))
                         .single()
                         .map(Resources.extractId())
-                        .and(Mono.just(createDomainRequest.getDomainName()));
+                        .otherwise(Exceptions.<String>convert("Organization %s does not exist", createDomainRequest.getOrganization()))
+                        .and(Mono.just(createDomainRequest.getDomain()));
             }
 
         };
