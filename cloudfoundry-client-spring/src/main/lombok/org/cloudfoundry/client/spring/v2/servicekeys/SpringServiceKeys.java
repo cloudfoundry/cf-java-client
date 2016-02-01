@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyRequest;
 import org.cloudfoundry.client.v2.servicekeys.CreateServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.GetServiceKeyRequest;
+import org.cloudfoundry.client.v2.servicekeys.GetServiceKeyResponse;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
@@ -67,6 +69,18 @@ public final class SpringServiceKeys extends AbstractSpringOperations implements
     @Override
     public Mono<Void> delete(final DeleteServiceKeyRequest request) {
         return delete(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_keys", request.getServiceKeyId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<GetServiceKeyResponse> get(final GetServiceKeyRequest request) {
+        return get(request, GetServiceKeyResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

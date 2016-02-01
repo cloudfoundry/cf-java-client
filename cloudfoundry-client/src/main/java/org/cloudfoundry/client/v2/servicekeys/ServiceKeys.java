@@ -40,6 +40,14 @@ public interface ServiceKeys {
     Mono<Void> delete(DeleteServiceKeyRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_keys/retrieve_a_particular_service_key.html">Retrieve a Particular Service Key</a> request
+     *
+     * @param request the Get Service Key request
+     * @return the response from the Get Service Key request
+     */
+    Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_keys/list_all_service_keys.html">List Service Keys</a> request
      *
      * @param request the List Service Keys request
