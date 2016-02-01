@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRe
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
+import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
@@ -52,6 +53,7 @@ import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
@@ -92,6 +94,20 @@ public final class DefaultRoutes implements Routes {
                 .and(this.organizationId)
                 .then(requestSpaceIdAndDomainIdWithContext(this.cloudFoundryClient))
                 .then(requestCreateRoute(this.cloudFoundryClient));
+    }
+
+    public Mono<Void> deleteOrphanedRoutes() {
+        return this.spaceId
+                .flatMap(requestSpaceRoutesResources(this.cloudFoundryClient))
+                .as(new Function<Flux<RouteResource>, Stream<RouteResource>>() {
+                    @Override
+                    public Stream<RouteResource> apply(Flux<RouteResource> flux) {
+                        return Stream.from(flux);
+                    }
+                })
+                .flatMap(detectOrphanedRoutes(this.cloudFoundryClient))
+                .flatMap(deleteRoute(this.cloudFoundryClient))
+                .after();
     }
 
     @Override
@@ -596,6 +612,55 @@ public final class DefaultRoutes implements Routes {
             }
 
         });
+    }
+
+    private Function<String, Mono<Void>> deleteRoute(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<Void>>() {
+
+            @Override
+            public Mono<Void> apply(String routeId) {
+                return cloudFoundryClient.routes().delete(DeleteRouteRequest.builder()
+                        .routeId(routeId)
+                        .build());
+            }
+
+        };
+    }
+
+    private Function<RouteResource, Mono<String>> detectOrphanedRoutes(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<RouteResource, Mono<String>>() {
+           
+            @Override
+            public Mono<String> apply(RouteResource routeResource) {
+                final String routeId = Resources.getId(routeResource);
+                final String spaceId = Resources.getEntity(routeResource).getSpaceId();
+
+                return Paginated.requestResources(requestApplicationPage(cloudFoundryClient, spaceId, routeId))
+                        .hasElements()
+                        .then(new Function<Boolean, Mono<String>>() {
+
+                            @Override
+                            public Mono<String> apply(Boolean routeIsBoundToApplication) {
+                                return routeIsBoundToApplication ? Mono.<String>empty() : Mono.just(routeId);
+                            }
+
+                        });
+            }
+            
+        };
+    }
+
+    private Function<Integer, Mono<ListRouteApplicationsResponse>> requestApplicationPage(final CloudFoundryClient cloudFoundryClient, final String spaceId, final String routeId) {
+        return new Function<Integer, Mono<ListRouteApplicationsResponse>>() {
+            @Override
+            public Mono<ListRouteApplicationsResponse> apply(Integer page) {
+                return cloudFoundryClient.routes().listApplications(ListRouteApplicationsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .routeId(routeId)
+                        .build());
+            }
+        };
     }
 
 }

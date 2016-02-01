@@ -39,11 +39,15 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
 
         invoke().subscribe(testSubscriber);
         testSubscriber.verify(5, SECONDS);
+        extraVerifications();
     }
 
     protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;
 
     protected abstract Publisher<T> invoke();
+
+    protected void extraVerifications() throws Exception {
+    }
 
     private Supplier<String> getScanningLoggerName() {
         return new Supplier<String>() {
@@ -55,5 +59,4 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
 
         };
     }
-
 }
