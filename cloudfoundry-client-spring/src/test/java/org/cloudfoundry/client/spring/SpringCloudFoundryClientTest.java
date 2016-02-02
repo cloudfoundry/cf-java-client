@@ -56,12 +56,12 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void builder() throws Exception {
         mockRequest(new RequestContext()
-                .method(GET).path("/info")
-                .status(OK)
-                .responsePayload("info_GET_response.json"));
+            .method(GET).path("/info")
+            .status(OK)
+            .responsePayload("info_GET_response.json"));
 
         SpringCloudFoundryClient client = new SpringCloudFoundryClient("api.run.pivotal.io", false, "test-client-id", "test-client-secret", "test-username", "test-password", this.restTemplate,
-                this.sslCertificateTruster, this.deserializationProblemHandlers);
+            this.sslCertificateTruster, this.deserializationProblemHandlers);
 
         OAuth2RestOperations restOperations = client.getRestOperations();
         OAuth2ProtectedResourceDetails details = restOperations.getResource();
@@ -77,12 +77,12 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void builderNullSkipSslVerification() throws Exception {
         mockRequest(new RequestContext()
-                .method(GET).path("/info")
-                .status(OK)
-                .responsePayload("info_GET_response.json"));
+            .method(GET).path("/info")
+            .status(OK)
+            .responsePayload("info_GET_response.json"));
 
         new SpringCloudFoundryClient("api.run.pivotal.io", null, "test-client-id", "test-client-secret", "test-username", "test-password", this.restTemplate, this.sslCertificateTruster,
-                this.deserializationProblemHandlers);
+            this.deserializationProblemHandlers);
 
         verifyZeroInteractions(this.sslCertificateTruster);
         verify();
@@ -91,12 +91,12 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void builderSkipSslVerification() throws Exception {
         mockRequest(new RequestContext()
-                .method(GET).path("/info")
-                .status(OK)
-                .responsePayload("info_GET_response.json"));
+            .method(GET).path("/info")
+            .status(OK)
+            .responsePayload("info_GET_response.json"));
 
         new SpringCloudFoundryClient("api.run.pivotal.io", true, "test-client-id", "test-client-secret", "test-username", "test-password", this.restTemplate, this.sslCertificateTruster,
-                this.deserializationProblemHandlers);
+            this.deserializationProblemHandlers);
 
         Mockito.verify(this.sslCertificateTruster).trust("api.run.pivotal.io", 443, 5, SECONDS);
         verify();

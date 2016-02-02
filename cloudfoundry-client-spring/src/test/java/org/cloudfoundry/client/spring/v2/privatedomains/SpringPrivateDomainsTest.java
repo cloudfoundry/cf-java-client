@@ -35,41 +35,41 @@ public final class SpringPrivateDomainsTest {
         @Override
         protected CreatePrivateDomainRequest getInvalidRequest() {
             return CreatePrivateDomainRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("v2/private_domains")
-                    .requestPayload("v2/private_domains/POST_request.json")
-                    .status(OK)
-                    .responsePayload("v2/private_domains/POST_response.json");
+                .method(POST).path("v2/private_domains")
+                .requestPayload("v2/private_domains/POST_request.json")
+                .status(OK)
+                .responsePayload("v2/private_domains/POST_response.json");
         }
 
         @Override
         protected CreatePrivateDomainResponse getResponse() {
             return CreatePrivateDomainResponse.builder()
-                    .metadata(Resource.Metadata.builder()
-                            .id("4af3234e-813d-453f-b3ae-fcdecfd87a47")
-                            .url("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47")
-                            .createdAt("2016-01-19T19:41:12Z")
-                            .build())
-                    .entity(PrivateDomainEntity.builder()
-                            .name("exmaple.com")
-                            .owningOrganizationId("22bb8ae1-6324-40eb-b077-bd1bfad773f8")
-                            .owningOrganizationUrl("/v2/organizations/22bb8ae1-6324-40eb-b077-bd1bfad773f8")
-                            .sharedOrganizationsUrl("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47/shared_organizations")
-                            .build())
-                    .build();
+                .metadata(Resource.Metadata.builder()
+                    .id("4af3234e-813d-453f-b3ae-fcdecfd87a47")
+                    .url("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47")
+                    .createdAt("2016-01-19T19:41:12Z")
+                    .build())
+                .entity(PrivateDomainEntity.builder()
+                    .name("exmaple.com")
+                    .owningOrganizationId("22bb8ae1-6324-40eb-b077-bd1bfad773f8")
+                    .owningOrganizationUrl("/v2/organizations/22bb8ae1-6324-40eb-b077-bd1bfad773f8")
+                    .sharedOrganizationsUrl("/v2/private_domains/4af3234e-813d-453f-b3ae-fcdecfd87a47/shared_organizations")
+                    .build())
+                .build();
         }
 
         @Override
         protected CreatePrivateDomainRequest getValidRequest() throws Exception {
             return CreatePrivateDomainRequest.builder()
-                    .name("exmaple.com")
-                    .owningOrganizationId("22bb8ae1-6324-40eb-b077-bd1bfad773f8")
-                    .build();
+                .name("exmaple.com")
+                .owningOrganizationId("22bb8ae1-6324-40eb-b077-bd1bfad773f8")
+                .build();
         }
 
         @Override

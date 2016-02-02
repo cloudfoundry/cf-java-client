@@ -40,29 +40,29 @@ public final class LoggregatorMessageHandlerTest {
         Date timestamp = new Date();
 
         LoggregatorProtocolBuffers.LogMessage logMessage = LoggregatorProtocolBuffers.LogMessage.newBuilder()
-                .setAppId("test-app-id")
-                .addDrainUrls("test-drain-url")
-                .setMessage(ByteString.copyFromUtf8("test-message"))
-                .setMessageType(LoggregatorProtocolBuffers.LogMessage.MessageType.ERR)
-                .setSourceId("test-source-id")
-                .setSourceName("test-source-name")
-                .setTimestamp(MILLISECONDS.toNanos(timestamp.getTime()))
-                .build();
+            .setAppId("test-app-id")
+            .addDrainUrls("test-drain-url")
+            .setMessage(ByteString.copyFromUtf8("test-message"))
+            .setMessageType(LoggregatorProtocolBuffers.LogMessage.MessageType.ERR)
+            .setSourceId("test-source-id")
+            .setSourceName("test-source-name")
+            .setTimestamp(MILLISECONDS.toNanos(timestamp.getTime()))
+            .build();
 
         this.messageHandler.onMessage(logMessage.toByteArray());
 
         this.testSubscriber.onComplete();
         this.testSubscriber
-                .assertEquals(LoggregatorMessage.builder()
-                        .applicationId("test-app-id")
-                        .drainUrl("test-drain-url")
-                        .message("test-message")
-                        .messageType(ERR)
-                        .sourceId("test-source-id")
-                        .sourceName("test-source-name")
-                        .timestamp(timestamp)
-                        .build())
-                .verify(5, SECONDS);
+            .assertEquals(LoggregatorMessage.builder()
+                .applicationId("test-app-id")
+                .drainUrl("test-drain-url")
+                .message("test-message")
+                .messageType(ERR)
+                .sourceId("test-source-id")
+                .sourceName("test-source-name")
+                .timestamp(timestamp)
+                .build())
+            .verify(5, SECONDS);
     }
 
     @Test
@@ -70,8 +70,8 @@ public final class LoggregatorMessageHandlerTest {
         this.messageHandler.onMessage(new byte[0]);
 
         this.testSubscriber
-                .assertError(InvalidProtocolBufferException.class)
-                .verify(5, SECONDS);
+            .assertError(InvalidProtocolBufferException.class)
+            .verify(5, SECONDS);
     }
 
 }

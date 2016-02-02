@@ -57,8 +57,8 @@ public final class LoggregatorMessageHttpMessageConverterTest {
         TestSubscriber<LoggregatorMessage> testSubscriber = new TestSubscriber<>();
 
         this.messageConverter.readInternal(null, inputMessage)
-                .subscribe(testSubscriber
-                        .assertCount(14));
+            .subscribe(testSubscriber
+                .assertCount(14));
 
         testSubscriber.verify(5, SECONDS);
     }

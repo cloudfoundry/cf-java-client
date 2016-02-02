@@ -98,14 +98,14 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
             }
 
         })
-                .flatMap(new Function<Stream, Stream<LoggregatorMessage>>() {
+            .flatMap(new Function<Stream, Stream<LoggregatorMessage>>() {
 
-                    @Override
-                    public Stream<LoggregatorMessage> apply(Stream stream) {
-                        return stream;
-                    }
+                @Override
+                public Stream<LoggregatorMessage> apply(Stream stream) {
+                    return stream;
+                }
 
-                });
+            });
     }
 
     @Override
@@ -137,54 +137,54 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
     private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
         GetInfoRequest request = GetInfoRequest.builder()
-                .build();
+            .build();
 
         return cloudFoundryClient.info().get(request)
-                .map(new Function<GetInfoResponse, String>() {
+            .map(new Function<GetInfoResponse, String>() {
 
-                    @Override
-                    public String apply(GetInfoResponse getInfoResponse) {
-                        return getInfoResponse.getLoggingEndpoint();
-                    }
+                @Override
+                public String apply(GetInfoResponse getInfoResponse) {
+                    return getInfoResponse.getLoggingEndpoint();
+                }
 
-                })
-                .map(new Function<String, URI>() {
+            })
+            .map(new Function<String, URI>() {
 
-                    @Override
-                    public URI apply(String loggingEndpoint) {
-                        return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
-                    }
+                @Override
+                public URI apply(String loggingEndpoint) {
+                    return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
+                }
 
-                })
-                .get();
+            })
+            .get();
 
     }
 
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
         return Stream
-                .from(Validators
-                        .validate(request))
-                .flatMap(new Function<V, Stream<T>>() {
+            .from(Validators
+                .validate(request))
+            .flatMap(new Function<V, Stream<T>>() {
 
-                    @Override
-                    public Stream<T> apply(V request) {
-                        return Stream
-                                .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
+                @Override
+                public Stream<T> apply(V request) {
+                    return Stream
+                        .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
-                                    @Override
-                                    public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
-                                        if (n != Long.MAX_VALUE) {
-                                            subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-                                        }
+                            @Override
+                            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
+                                if (n != Long.MAX_VALUE) {
+                                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
+                                }
 
-                                        exchange.accept(subscriber);
-                                    }
+                                exchange.accept(subscriber);
+                            }
 
-                                });
-                    }
+                        });
+                }
 
-                });
+            });
     }
 
     private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {

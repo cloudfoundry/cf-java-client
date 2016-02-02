@@ -45,35 +45,35 @@ public final class SpringServicePlanVisibilitiesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(POST).path("v2/service_plan_visibilities")
-                    .requestPayload("v2/service_plan_visibilities/POST_request.json")
-                    .status(CREATED)
-                    .responsePayload("v2/service_plan_visibilities/POST_response.json");
+                .method(POST).path("v2/service_plan_visibilities")
+                .requestPayload("v2/service_plan_visibilities/POST_request.json")
+                .status(CREATED)
+                .responsePayload("v2/service_plan_visibilities/POST_response.json");
         }
 
         @Override
         protected CreateServicePlanVisibilityResponse getResponse() {
             return CreateServicePlanVisibilityResponse.builder()
-                    .metadata(Resource.Metadata.builder()
-                            .createdAt("2015-07-27T22:43:28Z")
-                            .id("28a22749-25f4-44bd-a371-c37e2ee53175")
-                            .url("/v2/service_plan_visibilities/28a22749-25f4-44bd-a371-c37e2ee53175")
-                            .build())
-                    .entity(ServicePlanVisibilityEntity.builder()
-                            .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                            .organizationUrl("/v2/organizations/09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                            .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
-                            .servicePlanUrl("/v2/service_plans/43f5496b-9117-404a-a637-eb38141b05af")
-                            .build())
-                    .build();
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2015-07-27T22:43:28Z")
+                    .id("28a22749-25f4-44bd-a371-c37e2ee53175")
+                    .url("/v2/service_plan_visibilities/28a22749-25f4-44bd-a371-c37e2ee53175")
+                    .build())
+                .entity(ServicePlanVisibilityEntity.builder()
+                    .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                    .organizationUrl("/v2/organizations/09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                    .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
+                    .servicePlanUrl("/v2/service_plans/43f5496b-9117-404a-a637-eb38141b05af")
+                    .build())
+                .build();
         }
 
         @Override
         protected CreateServicePlanVisibilityRequest getValidRequest() throws Exception {
             return CreateServicePlanVisibilityRequest.builder()
-                    .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                    .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
-                    .build();
+                .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
+                .build();
         }
 
         @Override
@@ -94,8 +94,8 @@ public final class SpringServicePlanVisibilitiesTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
-                    .status(NO_CONTENT);
+                .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
+                .status(NO_CONTENT);
         }
 
         @Override
@@ -106,9 +106,9 @@ public final class SpringServicePlanVisibilitiesTest {
         @Override
         protected DeleteServicePlanVisibilityRequest getValidRequest() throws Exception {
             return DeleteServicePlanVisibilityRequest.builder()
-                    .async(true)
-                    .servicePlanVisibilityId("test-service-plan-visibility-id")
-                    .build();
+                .async(true)
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
         }
 
         @Override

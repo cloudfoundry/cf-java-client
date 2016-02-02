@@ -35,43 +35,43 @@ public final class SpringJobsTest {
         @Override
         protected GetJobRequest getInvalidRequest() {
             return GetJobRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/jobs/test-job-id")
-                    .status(OK)
-                    .responsePayload("v2/jobs/GET_{id}_response.json");
+                .method(GET).path("/v2/jobs/test-job-id")
+                .status(OK)
+                .responsePayload("v2/jobs/GET_{id}_response.json");
         }
 
         @Override
         protected GetJobResponse getResponse() {
             return GetJobResponse.builder()
-                    .metadata(Resource.Metadata.builder()
-                            .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                            .createdAt("2015-11-30T23:38:44Z")
-                            .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
-                            .build())
-                    .entity(JobEntity.builder()
-                            .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                            .status("failed")
-                            .error("Use of entity>error is deprecated in favor of entity>error_details.")
-                            .errorDetails(JobEntity.ErrorDetails.builder()
-                                    .errorCode("UnknownError")
-                                    .description("An unknown error occurred.")
-                                    .code(10001)
-                                    .build())
-                            .build())
-                    .build();
+                .metadata(Resource.Metadata.builder()
+                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .createdAt("2015-11-30T23:38:44Z")
+                    .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                    .status("failed")
+                    .error("Use of entity>error is deprecated in favor of entity>error_details.")
+                    .errorDetails(JobEntity.ErrorDetails.builder()
+                        .errorCode("UnknownError")
+                        .description("An unknown error occurred.")
+                        .code(10001)
+                        .build())
+                    .build())
+                .build();
         }
 
         @Override
         protected GetJobRequest getValidRequest() throws Exception {
             return GetJobRequest.builder()
-                    .jobId("test-job-id")
-                    .build();
+                .jobId("test-job-id")
+                .build();
         }
 
         @Override

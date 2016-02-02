@@ -115,19 +115,19 @@ public final class SpringRoutes extends AbstractSpringOperations implements Rout
             }
 
         })
-                .defaultIfEmpty(true)
-                .otherwise(new Function<Throwable, Mono<? extends Boolean>>() {
+            .defaultIfEmpty(true)
+            .otherwise(new Function<Throwable, Mono<? extends Boolean>>() {
 
-                    @Override
-                    public Mono<? extends Boolean> apply(Throwable throwable) {
-                        if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
-                            return Mono.just(false);
-                        } else {
-                            return Mono.error(throwable);
-                        }
+                @Override
+                public Mono<? extends Boolean> apply(Throwable throwable) {
+                    if (throwable instanceof CloudFoundryException && ((CloudFoundryException) throwable).getCode() == CF_NOT_FOUND) {
+                        return Mono.just(false);
+                    } else {
+                        return Mono.error(throwable);
                     }
+                }
 
-                });
+            });
     }
 
     @Override

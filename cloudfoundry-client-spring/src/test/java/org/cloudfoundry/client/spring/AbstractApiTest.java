@@ -95,9 +95,9 @@ public abstract class AbstractApiTest<REQ, RSP> extends AbstractRestTest {
 
     protected final Mono<byte[]> getContents(Publisher<byte[]> publisher) {
         return Stream
-                .from(publisher)
-                .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
-                .map(toByteArray());
+            .from(publisher)
+            .reduce(new ByteArrayOutputStream(), collectIntoByteArrayInputStream())
+            .map(toByteArray());
     }
 
     protected final byte[] getContents(Resource resource) {

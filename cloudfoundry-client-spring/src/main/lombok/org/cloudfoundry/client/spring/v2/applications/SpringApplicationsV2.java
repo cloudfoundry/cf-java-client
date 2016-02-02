@@ -135,24 +135,26 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
     @Override
     public Publisher<byte[]> download(final DownloadApplicationRequest request) {
-        return getStream(request,
-                new Consumer<UriComponentsBuilder>() {
-                    @Override
-                    public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getApplicationId(), "download");
-                    }
-                });
+        return getStream(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "download");
+            }
+
+        });
     }
 
     @Override
     public Publisher<byte[]> downloadDroplet(final DownloadApplicationDropletRequest request) {
-        return getStream(request,
-                new Consumer<UriComponentsBuilder>() {
-                    @Override
-                    public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download");
-                    }
-                });
+        return getStream(request, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download");
+            }
+
+        });
     }
 
     @Override
@@ -321,25 +323,25 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
     public Mono<UploadApplicationResponse> upload(final UploadApplicationRequest request) {
         return putWithBody(request, new Supplier<MultiValueMap<String, Object>>() {
 
-                    @Override
-                    public MultiValueMap<String, Object> get() {
-                        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                        if (request.getAsync() != null) {
-                            body.add("async", request.getAsync());
-                        }
-                        body.add("resources", request.getResources());
-                        body.add("application", new FileSystemResource(request.getApplication()));
-                        return body;
+                @Override
+                public MultiValueMap<String, Object> get() {
+                    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                    if (request.getAsync() != null) {
+                        body.add("async", request.getAsync());
                     }
-
-                }, UploadApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
-
-                    @Override
-                    public void accept(UriComponentsBuilder builder) {
-                        builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
-                    }
-
+                    body.add("resources", request.getResources());
+                    body.add("application", new FileSystemResource(request.getApplication()));
+                    return body;
                 }
+
+            }, UploadApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
+
+                @Override
+                public void accept(UriComponentsBuilder builder) {
+                    builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
+                }
+
+            }
         );
     }
 

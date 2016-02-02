@@ -38,33 +38,33 @@ public final class SpringInfoTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/info")
-                    .status(OK)
-                    .responsePayload("v2/info/GET_response.json");
+                .method(GET).path("/v2/info")
+                .status(OK)
+                .responsePayload("v2/info/GET_response.json");
         }
 
         @Override
         protected GetInfoResponse getResponse() {
             return GetInfoResponse.builder()
-                    .name("vcap")
-                    .buildNumber("2222")
-                    .support("http://support.cloudfoundry.com")
-                    .version(2)
-                    .description("Cloud Foundry sponsored by Pivotal")
-                    .authorizationEndpoint("http://localhost:8080/uaa")
-                    .tokenEndpoint("http://localhost:8080/uaa")
-                    .apiVersion("2.44.0")
-                    .applicationSshEndpoint("ssh.system.domain.example.com:2222")
-                    .applicationSshHostKeyFingerprint("47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0")
-                    .routingEndpoint("http://localhost:3000")
-                    .loggingEndpoint("ws://loggregator.vcap.me:80")
-                    .build();
+                .name("vcap")
+                .buildNumber("2222")
+                .support("http://support.cloudfoundry.com")
+                .version(2)
+                .description("Cloud Foundry sponsored by Pivotal")
+                .authorizationEndpoint("http://localhost:8080/uaa")
+                .tokenEndpoint("http://localhost:8080/uaa")
+                .apiVersion("2.44.0")
+                .applicationSshEndpoint("ssh.system.domain.example.com:2222")
+                .applicationSshHostKeyFingerprint("47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0")
+                .routingEndpoint("http://localhost:3000")
+                .loggingEndpoint("ws://loggregator.vcap.me:80")
+                .build();
         }
 
         @Override
         protected GetInfoRequest getValidRequest() {
             return GetInfoRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override

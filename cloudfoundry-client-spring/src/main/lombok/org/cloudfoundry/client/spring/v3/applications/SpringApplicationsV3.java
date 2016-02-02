@@ -120,8 +120,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances",
-                        request.getIndex());
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex());
             }
 
         });

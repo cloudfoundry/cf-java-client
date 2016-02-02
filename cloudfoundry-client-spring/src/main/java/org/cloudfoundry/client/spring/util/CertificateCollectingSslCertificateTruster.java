@@ -82,7 +82,7 @@ public final class CertificateCollectingSslCertificateTruster implements SslCert
     }
 
     private X509Certificate[] getUntrustedCertificate(String host, int port, int timeout, TimeUnit timeUnit)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException, CertificateException {
+        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException, CertificateException {
 
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(getDefaultTrustManager());
 

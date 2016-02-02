@@ -48,14 +48,14 @@ public final class SpringProcessesTest {
         @Override
         protected DeleteProcessInstanceRequest getInvalidRequest() {
             return DeleteProcessInstanceRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
-                    .status(NO_CONTENT);
+                .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
+                .status(NO_CONTENT);
         }
 
         @Override
@@ -66,9 +66,9 @@ public final class SpringProcessesTest {
         @Override
         protected DeleteProcessInstanceRequest getValidRequest() {
             return DeleteProcessInstanceRequest.builder()
-                    .processId("test-process-id")
-                    .index("test-index")
-                    .build();
+                .processId("test-process-id")
+                .index("test-index")
+                .build();
         }
 
         @Override
@@ -85,48 +85,48 @@ public final class SpringProcessesTest {
         @Override
         protected GetProcessRequest getInvalidRequest() {
             return GetProcessRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/processes/test-process-id")
-                    .status(OK)
-                    .responsePayload("v3/processes/GET_{id}_response.json");
+                .method(GET).path("/v3/processes/test-process-id")
+                .status(OK)
+                .responsePayload("v3/processes/GET_{id}_response.json");
         }
 
         @Override
         protected GetProcessResponse getResponse() {
             return GetProcessResponse.builder()
-                    .id("07063514-b0ca-4e58-adbb-8e8bd7eebd64")
-                    .type("web")
-                    .instances(1)
-                    .memoryInMb(1024)
-                    .diskInMb(1024)
-                    .createdAt("2015-07-27T22:43:31Z")
-                    .updatedAt("2015-07-27T22:43:31Z")
-                    .link("self", Link.builder()
-                            .href("/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64")
-                            .build())
-                    .link("scale", Link.builder()
-                            .href("/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64/scale")
-                            .method("PUT")
-                            .build())
-                    .link("app", Link.builder()
-                            .href("/v3/apps/")
-                            .build())
-                    .link("space", Link.builder()
-                            .href("/v2/spaces/a99fa535-dfa7-4edf-9b18-5cadc80acb0f")
-                            .build())
-                    .build();
+                .id("07063514-b0ca-4e58-adbb-8e8bd7eebd64")
+                .type("web")
+                .instances(1)
+                .memoryInMb(1024)
+                .diskInMb(1024)
+                .createdAt("2015-07-27T22:43:31Z")
+                .updatedAt("2015-07-27T22:43:31Z")
+                .link("self", Link.builder()
+                    .href("/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64")
+                    .build())
+                .link("scale", Link.builder()
+                    .href("/v3/processes/07063514-b0ca-4e58-adbb-8e8bd7eebd64/scale")
+                    .method("PUT")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/")
+                    .build())
+                .link("space", Link.builder()
+                    .href("/v2/spaces/a99fa535-dfa7-4edf-9b18-5cadc80acb0f")
+                    .build())
+                .build();
         }
 
         @Override
         protected GetProcessRequest getValidRequest() {
             return GetProcessRequest.builder()
-                    .processId("test-process-id")
-                    .build();
+                .processId("test-process-id")
+                .build();
         }
 
         @Override
@@ -143,86 +143,86 @@ public final class SpringProcessesTest {
         @Override
         protected ListProcessesRequest getInvalidRequest() {
             return ListProcessesRequest.builder()
-                    .page(-1)
-                    .build();
+                .page(-1)
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v3/processes?page=1&per_page=2")
-                    .status(OK)
-                    .responsePayload("v3/processes/GET_response.json");
+                .method(GET).path("/v3/processes?page=1&per_page=2")
+                .status(OK)
+                .responsePayload("v3/processes/GET_response.json");
         }
 
         @Override
         protected ListProcessesResponse getResponse() {
             return ListProcessesResponse.builder()
-                    .pagination(Pagination.builder()
-                            .totalResults(3)
-                            .first(Link.builder()
-                                    .href("/v3/processes?page=1&per_page=2")
-                                    .build())
-                            .last(Link.builder()
-                                    .href("/v3/processes?page=2&per_page=2")
-                                    .build())
-                            .next(Link.builder()
-                                    .href("/v3/processes?page=2&per_page=2")
-                                    .build())
-                            .build())
-                    .resource(Resource.builder()
-                            .id("fdfa71c4-5e0e-4f68-adb6-82fc250cd233")
-                            .type("web")
-                            .instances(1)
-                            .memoryInMb(1024)
-                            .diskInMb(1024)
-                            .createdAt("2015-07-27T22:43:31Z")
-                            .updatedAt("2015-07-27T22:43:31Z")
-                            .link("self", Link.builder()
-                                    .href("/v3/processes/fdfa71c4-5e0e-4f68-adb6-82fc250cd233")
-                                    .build())
-                            .link("scale", Link.builder()
-                                    .href("/v3/processes/fdfa71c4-5e0e-4f68-adb6-82fc250cd233/scale")
-                                    .method("PUT")
-                                    .build())
-                            .link("app", Link.builder()
-                                    .href("/v3/apps/guid-e7b136ef-0e53-4421-a34e-f7d5bcc3508e")
-                                    .build())
-                            .link("space", Link.builder()
-                                    .href("/v2/spaces/176b0be5-f742-4db3-a0a2-6c178351052e")
-                                    .build())
-                            .build())
-                    .resource(Resource.builder()
-                            .id("491ef052-92a1-4c82-9cb9-7cf840a79eed")
-                            .type("web")
-                            .instances(1)
-                            .memoryInMb(1024)
-                            .diskInMb(1024)
-                            .createdAt("2015-07-27T22:43:31Z")
-                            .updatedAt("2015-07-27T22:43:31Z")
-                            .link("self", Link.builder()
-                                    .href("/v3/processes/491ef052-92a1-4c82-9cb9-7cf840a79eed")
-                                    .build())
-                            .link("scale", Link.builder()
-                                    .href("/v3/processes/491ef052-92a1-4c82-9cb9-7cf840a79eed/scale")
-                                    .method("PUT")
-                                    .build())
-                            .link("app", Link.builder()
-                                    .href("/v3/apps/")
-                                    .build())
-                            .link("space", Link.builder()
-                                    .href("/v2/spaces/176b0be5-f742-4db3-a0a2-6c178351052e")
-                                    .build())
-                            .build())
-                    .build();
+                .pagination(Pagination.builder()
+                    .totalResults(3)
+                    .first(Link.builder()
+                        .href("/v3/processes?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/processes?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/processes?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(Resource.builder()
+                    .id("fdfa71c4-5e0e-4f68-adb6-82fc250cd233")
+                    .type("web")
+                    .instances(1)
+                    .memoryInMb(1024)
+                    .diskInMb(1024)
+                    .createdAt("2015-07-27T22:43:31Z")
+                    .updatedAt("2015-07-27T22:43:31Z")
+                    .link("self", Link.builder()
+                        .href("/v3/processes/fdfa71c4-5e0e-4f68-adb6-82fc250cd233")
+                        .build())
+                    .link("scale", Link.builder()
+                        .href("/v3/processes/fdfa71c4-5e0e-4f68-adb6-82fc250cd233/scale")
+                        .method("PUT")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/guid-e7b136ef-0e53-4421-a34e-f7d5bcc3508e")
+                        .build())
+                    .link("space", Link.builder()
+                        .href("/v2/spaces/176b0be5-f742-4db3-a0a2-6c178351052e")
+                        .build())
+                    .build())
+                .resource(Resource.builder()
+                    .id("491ef052-92a1-4c82-9cb9-7cf840a79eed")
+                    .type("web")
+                    .instances(1)
+                    .memoryInMb(1024)
+                    .diskInMb(1024)
+                    .createdAt("2015-07-27T22:43:31Z")
+                    .updatedAt("2015-07-27T22:43:31Z")
+                    .link("self", Link.builder()
+                        .href("/v3/processes/491ef052-92a1-4c82-9cb9-7cf840a79eed")
+                        .build())
+                    .link("scale", Link.builder()
+                        .href("/v3/processes/491ef052-92a1-4c82-9cb9-7cf840a79eed/scale")
+                        .method("PUT")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/")
+                        .build())
+                    .link("space", Link.builder()
+                        .href("/v2/spaces/176b0be5-f742-4db3-a0a2-6c178351052e")
+                        .build())
+                    .build())
+                .build();
         }
 
         @Override
         protected ListProcessesRequest getValidRequest() {
             return ListProcessesRequest.builder()
-                    .page(1)
-                    .perPage(2)
-                    .build();
+                .page(1)
+                .perPage(2)
+                .build();
         }
 
         @Override
@@ -239,52 +239,52 @@ public final class SpringProcessesTest {
         @Override
         protected ScaleProcessRequest getInvalidRequest() {
             return ScaleProcessRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v3/processes/test-process-id/scale")
-                    .requestPayload("v3/processes/PUT_{id}_scale_request.json")
-                    .status(OK)
-                    .responsePayload("v3/processes/PUT_{id}_scale_response.json");
+                .method(PUT).path("/v3/processes/test-process-id/scale")
+                .requestPayload("v3/processes/PUT_{id}_scale_request.json")
+                .status(OK)
+                .responsePayload("v3/processes/PUT_{id}_scale_response.json");
         }
 
         @Override
         protected ScaleProcessResponse getResponse() {
             return ScaleProcessResponse.builder()
-                    .id("1dbdf1dc-ec61-4ade-96bf-4e148092b2e8")
-                    .type("web")
-                    .instances(3)
-                    .memoryInMb(100)
-                    .diskInMb(100)
-                    .createdAt("2015-07-27T22:43:31Z")
-                    .updatedAt("2015-07-27T22:43:32Z")
-                    .link("self", Link.builder()
-                            .href("/v3/processes/1dbdf1dc-ec61-4ade-96bf-4e148092b2e8")
-                            .build())
-                    .link("scale", Link.builder()
-                            .href("/v3/processes/1dbdf1dc-ec61-4ade-96bf-4e148092b2e8/scale")
-                            .method("PUT")
-                            .build())
-                    .link("app", Link.builder()
-                            .href("/v3/apps/guid-1ee4b2f6-a4b6-4125-97b6-0e7997e04643")
-                            .build())
-                    .link("space", Link.builder()
-                            .href("/v2/spaces/bb0d102f-1218-48ee-bb04-377f2743d433")
-                            .build())
-                    .build();
+                .id("1dbdf1dc-ec61-4ade-96bf-4e148092b2e8")
+                .type("web")
+                .instances(3)
+                .memoryInMb(100)
+                .diskInMb(100)
+                .createdAt("2015-07-27T22:43:31Z")
+                .updatedAt("2015-07-27T22:43:32Z")
+                .link("self", Link.builder()
+                    .href("/v3/processes/1dbdf1dc-ec61-4ade-96bf-4e148092b2e8")
+                    .build())
+                .link("scale", Link.builder()
+                    .href("/v3/processes/1dbdf1dc-ec61-4ade-96bf-4e148092b2e8/scale")
+                    .method("PUT")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/guid-1ee4b2f6-a4b6-4125-97b6-0e7997e04643")
+                    .build())
+                .link("space", Link.builder()
+                    .href("/v2/spaces/bb0d102f-1218-48ee-bb04-377f2743d433")
+                    .build())
+                .build();
         }
 
         @Override
         protected ScaleProcessRequest getValidRequest() {
             return ScaleProcessRequest.builder()
-                    .diskInMb(100)
-                    .processId("test-process-id")
-                    .instances(3)
-                    .memoryInMb(100)
-                    .build();
+                .diskInMb(100)
+                .processId("test-process-id")
+                .instances(3)
+                .memoryInMb(100)
+                .build();
         }
 
         @Override
@@ -300,51 +300,51 @@ public final class SpringProcessesTest {
         @Override
         protected UpdateProcessRequest getInvalidRequest() {
             return UpdateProcessRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PATCH).path("/v3/processes/test-process-id")
-                    .requestPayload("v3/processes/PATCH_{id}_request.json")
-                    .status(OK)
-                    .responsePayload("v3/processes/PATCH_{id}_response.json");
+                .method(PATCH).path("/v3/processes/test-process-id")
+                .requestPayload("v3/processes/PATCH_{id}_request.json")
+                .status(OK)
+                .responsePayload("v3/processes/PATCH_{id}_response.json");
         }
 
         @Override
         protected UpdateProcessResponse getResponse() {
             return UpdateProcessResponse.builder()
-                    .id("92d5b770-32ed-4f5c-8def-b1f2348447fb")
-                    .type("web")
-                    .command("X")
-                    .instances(1)
-                    .memoryInMb(1024)
-                    .diskInMb(1024)
-                    .createdAt("2015-07-27T22:43:32Z")
-                    .updatedAt("2015-07-27T22:43:32Z")
-                    .link("self", Link.builder()
-                            .href("/v3/processes/92d5b770-32ed-4f5c-8def-b1f2348447fb")
-                            .build())
-                    .link("scale", Link.builder()
-                            .href("/v3/processes/92d5b770-32ed-4f5c-8def-b1f2348447fb/scale")
-                            .method("PUT")
-                            .build())
-                    .link("app", Link.builder()
-                            .href("/v3/apps/")
-                            .build())
-                    .link("space", Link.builder()
-                            .href("/v2/spaces/b7f8b3b1-3210-4151-a356-c26f31289064")
-                            .build())
-                    .build();
+                .id("92d5b770-32ed-4f5c-8def-b1f2348447fb")
+                .type("web")
+                .command("X")
+                .instances(1)
+                .memoryInMb(1024)
+                .diskInMb(1024)
+                .createdAt("2015-07-27T22:43:32Z")
+                .updatedAt("2015-07-27T22:43:32Z")
+                .link("self", Link.builder()
+                    .href("/v3/processes/92d5b770-32ed-4f5c-8def-b1f2348447fb")
+                    .build())
+                .link("scale", Link.builder()
+                    .href("/v3/processes/92d5b770-32ed-4f5c-8def-b1f2348447fb/scale")
+                    .method("PUT")
+                    .build())
+                .link("app", Link.builder()
+                    .href("/v3/apps/")
+                    .build())
+                .link("space", Link.builder()
+                    .href("/v2/spaces/b7f8b3b1-3210-4151-a356-c26f31289064")
+                    .build())
+                .build();
         }
 
         @Override
         protected UpdateProcessRequest getValidRequest() {
             return UpdateProcessRequest.builder()
-                    .processId("test-process-id")
-                    .command("test-command")
-                    .build();
+                .processId("test-process-id")
+                .command("test-command")
+                .build();
         }
 
         @Override

@@ -383,7 +383,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
                 LOGGER.debug("Modifying ObjectMapper configuration");
 
                 ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                        .setSerializationInclusion(NON_NULL);
+                    .setSerializationInclusion(NON_NULL);
 
                 for (DeserializationProblemHandler deserializationProblemHandler : deserializationProblemHandlers) {
                     objectMapper.addHandler(deserializationProblemHandler);
@@ -400,14 +400,14 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @SuppressWarnings("unchecked")
     private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations) {
         String infoUri = UriComponentsBuilder.newInstance()
-                .scheme("https").host(host).pathSegment("info")
-                .build().toUriString();
+            .scheme("https").host(host).pathSegment("info")
+            .build().toUriString();
 
         Map<String, String> results = bootstrapRestOperations.getForObject(infoUri, Map.class);
 
         return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
-                .pathSegment("oauth", "token")
-                .build().toUriString();
+            .pathSegment("oauth", "token")
+            .build().toUriString();
     }
 
     private static OAuth2ClientContext getOAuth2ClientContext() {
@@ -415,7 +415,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(String clientId, String clientSecret, String host, String username, String password, RestOperations
-            bootstrapRestOperations) {
+        bootstrapRestOperations) {
         ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
         details.setClientId(clientId != null ? clientId : "cf");
         details.setClientSecret(clientSecret != null ? clientSecret : "");

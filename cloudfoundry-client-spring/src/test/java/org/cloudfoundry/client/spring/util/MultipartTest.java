@@ -36,9 +36,9 @@ public final class MultipartTest {
         TestSubscriber<LogMessage> testSubscriber = new TestSubscriber<>();
 
         Multipart.from(new ClassPathResource("loggregator_response.bin").getInputStream(), BOUNDARY)
-                .map(toLogMessage())
-                .subscribe(testSubscriber
-                        .assertCount(14));
+            .map(toLogMessage())
+            .subscribe(testSubscriber
+                .assertCount(14));
 
         testSubscriber.verify(5, SECONDS);
     }

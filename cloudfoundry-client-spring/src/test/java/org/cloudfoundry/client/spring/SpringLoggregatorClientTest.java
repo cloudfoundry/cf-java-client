@@ -45,21 +45,21 @@ public final class SpringLoggregatorClientTest {
         @Override
         protected void assertions(TestSubscriber<LoggregatorMessage> testSubscriber, LoggregatorMessage expected) {
             testSubscriber
-                    .assertCount(14);
+                .assertCount(14);
         }
 
         @Override
         protected RecentLogsRequest getInvalidRequest() {
             return RecentLogsRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/recent?app=test-application-id")
-                    .status(OK)
-                    .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin");
+                .method(GET).path("/recent?app=test-application-id")
+                .status(OK)
+                .contentType(MEDIA_TYPE).responsePayload("loggregator_response.bin");
         }
 
         @Override
@@ -70,8 +70,8 @@ public final class SpringLoggregatorClientTest {
         @Override
         protected RecentLogsRequest getValidRequest() throws Exception {
             return RecentLogsRequest.builder()
-                    .applicationId("test-application-id")
-                    .build();
+                .applicationId("test-application-id")
+                .build();
         }
 
         @Override

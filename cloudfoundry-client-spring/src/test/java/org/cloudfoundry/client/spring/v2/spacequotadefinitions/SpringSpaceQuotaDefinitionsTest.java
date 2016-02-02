@@ -50,40 +50,40 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                    .status(OK)
-                    .responsePayload("v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
+                .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .status(OK)
+                .responsePayload("v2/space_quota_definitions/PUT_{id}_spaces_{id}_response.json");
         }
 
         @Override
         protected AssociateSpaceQuotaDefinitionResponse getResponse() {
             return AssociateSpaceQuotaDefinitionResponse.builder()
-                    .metadata(Metadata.builder()
-                            .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
-                            .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
-                            .createdAt("2015-11-30T23:38:46Z")
-                            .build())
-                    .entity(SpaceQuotaDefinitionEntity.builder()
-                            .name("name-1887")
-                            .organizationId("e188543a-cb71-4786-8703-9addbebc5bbf")
-                            .nonBasicServicesAllowed(true)
-                            .totalServices(60)
-                            .totalRoutes(1000)
-                            .memoryLimit(20480)
-                            .instanceMemoryLimit(-1)
-                            .applicationInstanceLimit(-1)
-                            .organizationUrl("/v2/organizations/e188543a-cb71-4786-8703-9addbebc5bbf")
-                            .spacesUrl("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa/spaces")
-                            .build())
-                    .build();
+                .metadata(Metadata.builder()
+                    .id("ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                    .url("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa")
+                    .createdAt("2015-11-30T23:38:46Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("name-1887")
+                    .organizationId("e188543a-cb71-4786-8703-9addbebc5bbf")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(60)
+                    .totalRoutes(1000)
+                    .memoryLimit(20480)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .organizationUrl("/v2/organizations/e188543a-cb71-4786-8703-9addbebc5bbf")
+                    .spacesUrl("/v2/space_quota_definitions/ea82f16c-c21a-4a8a-947a-f7606e7f63fa/spaces")
+                    .build())
+                .build();
         }
 
         @Override
         protected AssociateSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
             return AssociateSpaceQuotaDefinitionRequest.builder()
-                    .spaceId("test-space-id")
-                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                    .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
         }
 
         @Override
@@ -99,45 +99,45 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected GetSpaceQuotaDefinitionRequest getInvalidRequest() {
             return GetSpaceQuotaDefinitionRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("v2/space_quota_definitions/test-space-quota-definition-id")
-                    .status(OK)
-                    .responsePayload("v2/space_quota_definitions/GET_{id}_response.json");
+                .method(GET).path("v2/space_quota_definitions/test-space-quota-definition-id")
+                .status(OK)
+                .responsePayload("v2/space_quota_definitions/GET_{id}_response.json");
         }
 
         @Override
         protected GetSpaceQuotaDefinitionResponse getResponse() {
             return GetSpaceQuotaDefinitionResponse.builder()
-                    .metadata(Metadata.builder()
-                            .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
-                            .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
-                            .createdAt("2015-11-30T23:38:46Z")
-                            .build())
-                    .entity(SpaceQuotaDefinitionEntity.builder()
-                            .name("name-1892")
-                            .organizationId("0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
-                            .nonBasicServicesAllowed(true)
-                            .totalServices(60)
-                            .totalRoutes(1000)
-                            .memoryLimit(20480)
-                            .instanceMemoryLimit(-1)
-                            .applicationInstanceLimit(-1)
-                            .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
-                            .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
-                            .build())
-                    .build();
+                .metadata(Metadata.builder()
+                    .id("4b8e7d14-71bd-4abb-b474-183375c75c84")
+                    .url("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84")
+                    .createdAt("2015-11-30T23:38:46Z")
+                    .build())
+                .entity(SpaceQuotaDefinitionEntity.builder()
+                    .name("name-1892")
+                    .organizationId("0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                    .nonBasicServicesAllowed(true)
+                    .totalServices(60)
+                    .totalRoutes(1000)
+                    .memoryLimit(20480)
+                    .instanceMemoryLimit(-1)
+                    .applicationInstanceLimit(-1)
+                    .organizationUrl("/v2/organizations/0dbbac8c-16ac-4ba5-8f59-3d3a79874f5d")
+                    .spacesUrl("/v2/space_quota_definitions/4b8e7d14-71bd-4abb-b474-183375c75c84/spaces")
+                    .build())
+                .build();
         }
 
         @Override
         protected GetSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
             return GetSpaceQuotaDefinitionRequest.builder()
-                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                    .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
         }
 
         @Override
@@ -159,43 +159,43 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(GET).path("/v2/space_quota_definitions?page=-1")
-                    .status(OK)
-                    .responsePayload("v2/space_quota_definitions/GET_response.json");
+                .method(GET).path("/v2/space_quota_definitions?page=-1")
+                .status(OK)
+                .responsePayload("v2/space_quota_definitions/GET_response.json");
         }
 
         @Override
         protected ListSpaceQuotaDefinitionsResponse getResponse() {
             return ListSpaceQuotaDefinitionsResponse.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .resource(SpaceQuotaDefinitionResource.builder()
-                            .metadata(Metadata.builder()
-                                    .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                                    .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
-                                    .createdAt("2015-07-27T22:43:32Z")
-                                    .build())
-                            .entity(SpaceQuotaDefinitionEntity.builder()
-                                    .name("name-2236")
-                                    .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                                    .nonBasicServicesAllowed(true)
-                                    .totalServices(60)
-                                    .totalRoutes(1000)
-                                    .memoryLimit(20480)
-                                    .instanceMemoryLimit(-1)
-                                    .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                                    .spacesUrl
-                                            ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
-                                    .build())
-                            .build())
-                    .build();
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceQuotaDefinitionResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                        .url("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d")
+                        .createdAt("2015-07-27T22:43:32Z")
+                        .build())
+                    .entity(SpaceQuotaDefinitionEntity.builder()
+                        .name("name-2236")
+                        .organizationId("a81d5218-b473-474e-9afb-3223a8b2ae9f")
+                        .nonBasicServicesAllowed(true)
+                        .totalServices(60)
+                        .totalRoutes(1000)
+                        .memoryLimit(20480)
+                        .instanceMemoryLimit(-1)
+                        .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
+                        .spacesUrl
+                            ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
+                        .build())
+                    .build())
+                .build();
         }
 
         @Override
         protected ListSpaceQuotaDefinitionsRequest getValidRequest() {
             return ListSpaceQuotaDefinitionsRequest.builder()
-                    .page(-1)
-                    .build();
+                .page(-1)
+                .build();
         }
 
         @Override
@@ -212,14 +212,14 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getInvalidRequest() {
             return RemoveSpaceQuotaDefinitionRequest.builder()
-                    .build();
+                .build();
         }
 
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                    .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
-                    .status(NO_CONTENT);
+                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .status(NO_CONTENT);
         }
 
         @Override
@@ -230,9 +230,9 @@ public final class SpringSpaceQuotaDefinitionsTest {
         @Override
         protected RemoveSpaceQuotaDefinitionRequest getValidRequest() throws Exception {
             return RemoveSpaceQuotaDefinitionRequest.builder()
-                    .spaceId("test-space-id")
-                    .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                    .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
         }
 
         @Override
