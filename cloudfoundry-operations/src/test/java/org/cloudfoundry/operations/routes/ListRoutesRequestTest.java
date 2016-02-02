@@ -27,8 +27,8 @@ public final class ListRoutesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListRoutesRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

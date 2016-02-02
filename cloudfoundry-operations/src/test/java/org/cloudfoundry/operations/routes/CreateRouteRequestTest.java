@@ -28,24 +28,11 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateRouteRequest.builder()
-                .domain("test-domain")
-                .host("test-hostname")
-                .space("test-space")
-                .build()
-                .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidWithPath() {
-        ValidationResult result = CreateRouteRequest.builder()
-                .domain("test-domain")
-                .host("test-hostname")
-                .path("test-path")
-                .space("test-space")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .host("test-hostname")
+            .space("test-space")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -53,10 +40,10 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValidNoDomain() {
         ValidationResult result = CreateRouteRequest.builder()
-                .host("test-hostname")
-                .space("test-space")
-                .build()
-                .isValid();
+            .host("test-hostname")
+            .space("test-space")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain must be specified", result.getMessages().get(0));
@@ -65,13 +52,26 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValidNoSpace() {
         ValidationResult result = CreateRouteRequest.builder()
-                .domain("test-domain")
-                .host("test-hostname")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .host("test-hostname")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space must be specified", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidWithPath() {
+        ValidationResult result = CreateRouteRequest.builder()
+            .domain("test-domain")
+            .host("test-hostname")
+            .path("test-path")
+            .space("test-space")
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }

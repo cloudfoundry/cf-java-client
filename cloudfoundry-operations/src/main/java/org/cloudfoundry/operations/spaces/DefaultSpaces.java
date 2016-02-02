@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.spaces;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
@@ -40,11 +41,11 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.operations.util.Exceptions;
 import org.cloudfoundry.operations.util.Function2;
 import org.cloudfoundry.operations.util.Function6;
 import org.cloudfoundry.operations.util.Optional;
 import org.cloudfoundry.operations.util.Optionals;
-import org.cloudfoundry.operations.util.Tuples;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
@@ -52,10 +53,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
-import reactor.fn.tuple.Tuple6;
 import reactor.rx.Stream;
 
 import java.util.List;
+
+import static org.cloudfoundry.operations.util.Tuples.function;
 
 public final class DefaultSpaces implements Spaces {
 
@@ -71,316 +73,297 @@ public final class DefaultSpaces implements Spaces {
     @Override
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return Validators
-                .validate(request)
-                .and(this.organizationId)
-                .then(requestSpaceResourceWithContext(this.cloudFoundryClient))
-                .then(getAuxiliaryContent(this.cloudFoundryClient));
+            .validate(request)
+            .and(this.organizationId)
+            .then(function(new Function2<GetSpaceRequest, String, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(GetSpaceRequest request, String organizationId) {
+                    return requestOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName())
+                        .and(Mono.just(request));
+                }
+
+            }))
+            .then(getAuxiliaryContent(this.cloudFoundryClient));
     }
 
     @Override
     public Publisher<SpaceSummary> list() {
         return this.organizationId
-                .flatMap(requestSpaceResources(this.cloudFoundryClient))
-                .map(toSpaceSummary());
+            .flatMap(new Function<String, Stream<SpaceResource>>() {
+
+                @Override
+                public Stream<SpaceResource> apply(String organizationId) {
+                    return requestSpaces(DefaultSpaces.this.cloudFoundryClient, organizationId);
+                }
+
+            })
+            .map(new Function<SpaceResource, SpaceSummary>() {
+
+                @Override
+                public SpaceSummary apply(SpaceResource resource) {
+                    return toSpaceSummary(resource);
+                }
+
+            });
     }
 
-    private static Function<ApplicationResource, String> extractApplicationName() {
-        return new Function<ApplicationResource, String>() {
+    private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
+        return requestSpaceApplications(cloudFoundryClient, Resources.getId(spaceResource))
+            .map(new Function<ApplicationResource, String>() {
 
-            @Override
-            public String apply(ApplicationResource resource) {
-                return Resources.getEntity(resource).getName();
-            }
+                @Override
+                public String apply(ApplicationResource resource) {
+                    return Resources.getEntity(resource).getName();
+                }
 
-        };
-    }
-
-    private static Function<DomainResource, String> extractDomainName() {
-        return new Function<DomainResource, String>() {
-
-            @Override
-            public String apply(DomainResource resource) {
-                return Resources.getEntity(resource).getName();
-            }
-
-        };
-    }
-
-    private static Function<GetOrganizationResponse, String> extractOrganizationName() {
-        return new Function<GetOrganizationResponse, String>() {
-
-            @Override
-            public String apply(GetOrganizationResponse getOrganizationResponse) {
-                return Resources.getEntity(getOrganizationResponse).getName();
-            }
-
-        };
-    }
-
-    private static Function<SecurityGroupResource, String> extractSecurityGroupName() {
-        return new Function<SecurityGroupResource, String>() {
-
-            @Override
-            public String apply(SecurityGroupResource resource) {
-                return Resources.getEntity(resource).getName();
-            }
-
-        };
-    }
-
-    private static Function<ServiceResource, String> extractServiceName() {
-        return new Function<ServiceResource, String>() {
-
-            @Override
-            public String apply(ServiceResource resource) {
-                return Resources.getEntity(resource).getLabel();
-            }
-
-        };
+            })
+            .toList();
     }
 
     private static Function<Tuple2<SpaceResource, GetSpaceRequest>, Mono<SpaceDetail>> getAuxiliaryContent(final CloudFoundryClient cloudFoundryClient) {
-        return Tuples.function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
+        return function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
 
             @Override
-            public Mono<SpaceDetail> apply(SpaceResource spaceResource, GetSpaceRequest request) {
+            public Mono<SpaceDetail> apply(final SpaceResource resource, GetSpaceRequest request) {
                 return Mono
-                        .when(requestApplicationNames(cloudFoundryClient, spaceResource), requestDomainNames(cloudFoundryClient, spaceResource),
-                                requestOrganizationName(cloudFoundryClient, spaceResource), requestSecurityGroups(cloudFoundryClient, spaceResource),
-                                requestServiceNames(cloudFoundryClient, spaceResource), requestSpaceQuotaDefinition(cloudFoundryClient, request, spaceResource))
-                        .map(toSpaceDetail(spaceResource));
-            }
+                    .when(
+                        getApplicationNames(cloudFoundryClient, resource),
+                        getDomainNames(cloudFoundryClient, resource),
+                        getOrganizationName(cloudFoundryClient, resource),
+                        getSecurityGroupNames(cloudFoundryClient, resource),
+                        getServiceNames(cloudFoundryClient, resource),
+                        getOptionalSpaceQuotaDefinition(cloudFoundryClient, request, resource)
+                    )
+                    .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
 
+                        @Override
+                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services,
+                                                 Optional<SpaceQuota> spaceQuota) {
+                            return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
+                        }
+
+                    }));
+            }
         });
     }
 
-    private static Mono<List<String>> requestApplicationNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return Paginated
-                .requestResources(requestSpaceApplicationPage(cloudFoundryClient, spaceResource))
-                .map(extractApplicationName())
-                .toList();
+    private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
+        return requestSpaceDomains(cloudFoundryClient, Resources.getId(resource))
+            .map(new Function<DomainResource, String>() {
+
+                @Override
+                public String apply(DomainResource resource) {
+                    return Resources.getEntity(resource).getName();
+                }
+
+            })
+            .toList();
     }
 
-    private static Mono<List<String>> requestDomainNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return Paginated
-                .requestResources(requestSpaceDomainPage(cloudFoundryClient, spaceResource))
-                .map(extractDomainName())
-                .toList();
-    }
-
-    private static Mono<String> requestOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
-        GetOrganizationRequest request = GetOrganizationRequest.builder()
-                .organizationId(Resources.getEntity(spaceResource).getOrganizationId())
-                .build();
-
-        return cloudFoundryClient.organizations().get(request)
-                .map(extractOrganizationName());
-    }
-
-    private static Function<Integer, Mono<ListOrganizationSpacesResponse>> requestOrganizationSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId,
-                                                                                                        final GetSpaceRequest getSpaceRequest) {
-        return new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
-
-            @Override
-            public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
-                ListOrganizationSpacesRequest listOrganizationSpacesRequest = ListOrganizationSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .name(getSpaceRequest.getName())
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.organizations().listSpaces(listOrganizationSpacesRequest);
-            }
-
-        };
-    }
-
-    private static Mono<List<String>> requestSecurityGroups(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return Paginated
-                .requestResources(requestSpaceSecurityGroupsPage(cloudFoundryClient, spaceResource))
-                .map(extractSecurityGroupName())
-                .toList();
-    }
-
-    private static Mono<List<String>> requestServiceNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return Paginated
-                .requestResources(requestSpaceServicesPage(cloudFoundryClient, spaceResource))
-                .map(extractServiceName())
-                .toList();
-    }
-
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestSpaceApplicationPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
-
-            @Override
-            public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
-                ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .spaceId(Resources.getId(spaceResource))
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.spaces().listApplications(request);
-            }
-
-        };
-    }
-
-    private static Function<Integer, Mono<ListSpaceDomainsResponse>> requestSpaceDomainPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
-
-            @Override
-            public Mono<ListSpaceDomainsResponse> apply(Integer page) {
-                ListSpaceDomainsRequest request = ListSpaceDomainsRequest.builder()
-                        .spaceId(Resources.getId(spaceResource))
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.spaces().listDomains(request);
-            }
-
-        };
-    }
-
-    private static Function<Integer, Mono<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
-        return new Function<Integer, Mono<ListSpacesResponse>>() {
-
-            @Override
-            public Mono<ListSpacesResponse> apply(Integer page) {
-                ListSpacesRequest request = ListSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.spaces().list(request);
-            }
-
-        };
-    }
-
-    private static Mono<Optional<SpaceQuota>> requestSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, GetSpaceRequest getSpaceRequest, SpaceResource spaceResource) {
+    private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, GetSpaceRequest getSpaceRequest, SpaceResource spaceResource) {
         if (!getSpaceRequest.getSecurityGroupRules()) {
             return Mono.just(Optional.<SpaceQuota>empty());
         }
 
-        GetSpaceQuotaDefinitionRequest request = GetSpaceQuotaDefinitionRequest.builder()
-                .spaceQuotaDefinitionId(Resources.getEntity(spaceResource).getSpaceQuotaDefinitionId())
-                .build();
+        return requestSpaceQuotaDefinition(cloudFoundryClient, Resources.getEntity(spaceResource).getSpaceQuotaDefinitionId())
+            .map(new Function<GetSpaceQuotaDefinitionResponse, SpaceQuota>() {
 
-        return cloudFoundryClient.spaceQuotaDefinitions().get(request)
-                .map(toSpaceQuotaDefinition())
-                .map(Optionals.<SpaceQuota>toOptional());
+                @Override
+                public SpaceQuota apply(GetSpaceQuotaDefinitionResponse response) {
+                    return toSpaceQuotaDefinition(response);
+                }
+
+            })
+            .map(Optionals.<SpaceQuota>toOptional());
     }
 
-    private static Function<Tuple2<GetSpaceRequest, String>, Mono<Tuple2<SpaceResource, GetSpaceRequest>>> requestSpaceResourceWithContext(final CloudFoundryClient cloudFoundryClient) {
-        return Tuples.function(new Function2<GetSpaceRequest, String, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
+    private static Mono<String> getOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
+        return requestOrganization(cloudFoundryClient, Resources.getEntity(resource).getOrganizationId())
+            .map(new Function<GetOrganizationResponse, String>() {
 
-            @Override
-            public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(GetSpaceRequest request, String organizationId) {
-                return Paginated
-                        .requestResources(requestOrganizationSpacePage(cloudFoundryClient, organizationId, request))
-                        .single()
-                        .and(Mono.just(request));
-            }
+                @Override
+                public String apply(GetOrganizationResponse response) {
+                    return Resources.getEntity(response).getName();
+                }
 
-        });
+            });
     }
 
-    private static Function<String, Stream<SpaceResource>> requestSpaceResources(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<String, Stream<SpaceResource>>() {
+    private static Mono<List<String>> getSecurityGroupNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
+        return requestSpaceSecurityGroups(cloudFoundryClient, Resources.getId(resource))
+            .map(new Function<SecurityGroupResource, String>() {
 
-            @Override
-            public Stream<SpaceResource> apply(String organizationId) {
-                return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId));
-            }
+                @Override
+                public String apply(SecurityGroupResource resource) {
+                    return Resources.getEntity(resource).getName();
+                }
 
-        };
+            })
+            .toList();
     }
 
-    private static Function<Integer, Mono<ListSpaceSecurityGroupsResponse>> requestSpaceSecurityGroupsPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
+    private static Mono<List<String>> getServiceNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
+        return requestSpaceServices(cloudFoundryClient, Resources.getId(resource))
+            .map(new Function<ServiceResource, String>() {
 
-            @Override
-            public Mono<ListSpaceSecurityGroupsResponse> apply(Integer page) {
-                ListSpaceSecurityGroupsRequest request = ListSpaceSecurityGroupsRequest.builder()
-                        .spaceId(Resources.getId(spaceResource))
+                @Override
+                public String apply(ServiceResource resource) {
+                    return Resources.getEntity(resource).getLabel();
+                }
+
+            })
+            .toList();
+    }
+
+    private static Mono<GetOrganizationResponse> requestOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .get(GetOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<SpaceResource> requestOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .listSpaces(ListOrganizationSpacesRequest.builder()
+                            .name(space)
+                            .organizationId(organizationId)
+                            .page(page)
+                            .build());
+                }
+
+            })
+            .single()
+            .otherwise(Exceptions.<SpaceResource>convert("Space %s does not exist", space));
+    }
+
+    private static Stream<ApplicationResource> requestSpaceApplications(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
+
+                @Override
+                public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
+                    ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
                         .page(page)
+                        .spaceId(spaceId)
                         .build();
 
-                return cloudFoundryClient.spaces().listSecurityGroups(request);
-            }
+                    return cloudFoundryClient.spaces().listApplications(request);
+                }
 
-        };
+            });
     }
 
-    private static Function<Integer, Mono<ListSpaceServicesResponse>> requestSpaceServicesPage(final CloudFoundryClient cloudFoundryClient, final SpaceResource spaceResource) {
-        return new Function<Integer, Mono<ListSpaceServicesResponse>>() {
+    private static Stream<DomainResource> requestSpaceDomains(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
 
-            @Override
-            public Mono<ListSpaceServicesResponse> apply(Integer page) {
-                ListSpaceServicesRequest request = ListSpaceServicesRequest.builder()
-                        .spaceId(Resources.getId(spaceResource))
-                        .page(page)
-                        .build();
+                @Override
+                public Mono<ListSpaceDomainsResponse> apply(Integer page) {
+                    return cloudFoundryClient.spaces()
+                        .listDomains(ListSpaceDomainsRequest.builder()
+                            .page(page)
+                            .spaceId(spaceId)
+                            .build());
+                }
 
-                return cloudFoundryClient.spaces().listServices(request);
-            }
-
-        };
+            });
     }
 
-    private static Function<Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>>, SpaceDetail> toSpaceDetail(final SpaceResource spaceResource) {
-        return Tuples.function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
-
-            @Override
-            public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota> spaceQuota) {
-                return SpaceDetail.builder()
-                        .applications(applications)
-                        .domains(domains)
-                        .id(Resources.getId(spaceResource))
-                        .name(Resources.getEntity(spaceResource).getName())
-                        .organization(organization)
-                        .securityGroups(securityGroups)
-                        .services(services)
-                        .spaceQuota(spaceQuota)
-                        .build();
-            }
-
-        });
+    private static Mono<GetSpaceQuotaDefinitionResponse> requestSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, String spaceQuotaDefinitionId) {
+        return cloudFoundryClient.spaceQuotaDefinitions()
+            .get(GetSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId(spaceQuotaDefinitionId)
+                .build());
     }
 
-    private static Function<GetSpaceQuotaDefinitionResponse, SpaceQuota> toSpaceQuotaDefinition() {
-        return new Function<GetSpaceQuotaDefinitionResponse, SpaceQuota>() {
+    private static Stream<SecurityGroupResource> requestSpaceSecurityGroups(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
 
-            @Override
-            public SpaceQuota apply(GetSpaceQuotaDefinitionResponse getSpaceQuotaDefinitionResponse) {
-                SpaceQuotaDefinitionEntity entity = Resources.getEntity(getSpaceQuotaDefinitionResponse);
-                return SpaceQuota.builder()
-                        .id(Resources.getId(getSpaceQuotaDefinitionResponse))
-                        .instanceMemoryLimit(entity.getInstanceMemoryLimit())
-                        .name(entity.getName())
-                        .organizationId(entity.getOrganizationId())
-                        .paidServicePlans(entity.getNonBasicServicesAllowed())
-                        .totalMemoryLimit(entity.getMemoryLimit())
-                        .totalRoutes(entity.getTotalRoutes())
-                        .totalServiceInstances(entity.getTotalServices())
-                        .build();
-            }
+                @Override
+                public Mono<ListSpaceSecurityGroupsResponse> apply(Integer page) {
+                    return cloudFoundryClient.spaces()
+                        .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
+                            .spaceId(spaceId)
+                            .page(page)
+                            .build());
+                }
 
-        };
+            });
     }
 
-    private static Function<SpaceResource, SpaceSummary> toSpaceSummary() {
-        return new Function<SpaceResource, SpaceSummary>() {
+    private static Stream<ServiceResource> requestSpaceServices(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListSpaceServicesResponse>>() {
 
-            @Override
-            public SpaceSummary apply(SpaceResource resource) {
-                return SpaceSummary.builder()
-                        .id(Resources.getId(resource))
-                        .name(Resources.getEntity(resource).getName())
-                        .build();
-            }
+                @Override
+                public Mono<ListSpaceServicesResponse> apply(Integer page) {
+                    return cloudFoundryClient.spaces()
+                        .listServices(ListSpaceServicesRequest.builder()
+                            .page(page)
+                            .spaceId(spaceId)
+                            .build());
+                }
 
-        };
+            });
+    }
+
+    private static Stream<SpaceResource> requestSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
+
+                @Override
+                public Mono<ListSpacesResponse> apply(Integer page) {
+                    return cloudFoundryClient.spaces()
+                        .list(ListSpacesRequest.builder()
+                            .organizationId(organizationId)
+                            .page(page)
+                            .build());
+                }
+
+            });
+    }
+
+    private static SpaceDetail toSpaceDetail(List<String> applications, List<String> domains, String organization, SpaceResource resource, List<String> securityGroups, List<String> services,
+                                             Optional<SpaceQuota> spaceQuota) {
+        return SpaceDetail.builder()
+            .applications(applications)
+            .domains(domains)
+            .id(Resources.getId(resource))
+            .name(Resources.getEntity(resource).getName())
+            .organization(organization)
+            .securityGroups(securityGroups)
+            .services(services)
+            .spaceQuota(spaceQuota)
+            .build();
+    }
+
+    private static SpaceQuota toSpaceQuotaDefinition(Resource<SpaceQuotaDefinitionEntity> resource) {
+        SpaceQuotaDefinitionEntity entity = Resources.getEntity(resource);
+
+        return SpaceQuota.builder()
+            .id(Resources.getId(resource))
+            .instanceMemoryLimit(entity.getInstanceMemoryLimit())
+            .name(entity.getName())
+            .organizationId(entity.getOrganizationId())
+            .paidServicePlans(entity.getNonBasicServicesAllowed())
+            .totalMemoryLimit(entity.getMemoryLimit())
+            .totalRoutes(entity.getTotalRoutes())
+            .totalServiceInstances(entity.getTotalServices())
+            .build();
+    }
+
+    private static SpaceSummary toSpaceSummary(SpaceResource resource) {
+        return SpaceSummary.builder()
+            .id(Resources.getId(resource))
+            .name(Resources.getEntity(resource).getName())
+            .build();
     }
 
 }

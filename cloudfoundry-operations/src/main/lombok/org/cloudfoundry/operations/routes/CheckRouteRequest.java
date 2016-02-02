@@ -45,7 +45,7 @@ public final class CheckRouteRequest implements Validatable {
 
     /**
      * The path of the route.
-     * 
+     *
      * Note: the path must be specified without a leading "/"
      *
      * @param path the path of the route

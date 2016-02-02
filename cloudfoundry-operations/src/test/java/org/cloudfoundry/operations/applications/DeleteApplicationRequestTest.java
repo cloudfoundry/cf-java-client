@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.operations.ValidationResult;
-import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
@@ -30,20 +29,20 @@ public final class DeleteApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = fill(DeleteApplicationRequest.builder())
-                .build()
-                .isValid();
-     
+            .build()
+            .isValid();
+
         assertEquals(VALID, result.getStatus());
     }
 
     @Test
     public void isValidNoName() {
         ValidationResult result = DeleteApplicationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
     }
-    
+
 }

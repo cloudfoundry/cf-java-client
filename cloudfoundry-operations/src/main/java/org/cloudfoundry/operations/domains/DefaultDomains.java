@@ -19,14 +19,20 @@ package org.cloudfoundry.operations.domains;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.operations.util.Exceptions;
+import org.cloudfoundry.operations.util.Function2;
 import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
+import reactor.rx.Stream;
+
+import static org.cloudfoundry.operations.util.Tuples.function;
 
 public final class DefaultDomains implements Domains {
 
@@ -38,59 +44,56 @@ public final class DefaultDomains implements Domains {
 
     public Mono<Void> create(CreateDomainRequest request) {
         return Validators
-                .validate(request)
-                .then(requestOrganizationResources(this.cloudFoundryClient))
-                .then(requestCreateDomain(this.cloudFoundryClient));
+            .validate(request)
+            .then(new Function<CreateDomainRequest, Mono<Tuple2<String, CreateDomainRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<String, CreateDomainRequest>> apply(CreateDomainRequest request) {
+                    return getOrganizationId(DefaultDomains.this.cloudFoundryClient, request.getOrganization())
+                        .and(Mono.just(request));
+                }
+
+            })
+            .then(function(new Function2<String, CreateDomainRequest, Mono<CreatePrivateDomainResponse>>() {
+
+                @Override
+                public Mono<CreatePrivateDomainResponse> apply(String domainId, CreateDomainRequest request) {
+                    return requestCreateDomain(DefaultDomains.this.cloudFoundryClient, request.getDomain(), domainId);
+                }
+
+            }))
+            .after();
     }
 
-    private static Function<Tuple2<String, String>, Mono<Void>> requestCreateDomain(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Tuple2<String, String>, Mono<Void>>() {
-
-            @Override
-            public Mono<Void> apply(Tuple2<String, String> tuple) {
-                String organizationId = tuple.t1;
-                String domainName = tuple.t2;
-
-                return cloudFoundryClient.privateDomains().create(
-                        CreatePrivateDomainRequest.builder()
-                                .owningOrganizationId(organizationId)
-                                .name(domainName)
-                                .build())
-                        .after();
-            }
-
-        };
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+        return requestOrganizations(cloudFoundryClient, organization)
+            .single()
+            .otherwise(Exceptions.<OrganizationResource>convert("Organization %s does not exist", organization))
+            .map(Resources.extractId());
     }
 
-    private static Function<Integer, Mono<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organizationName) {
-        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
+    private static Mono<CreatePrivateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        return cloudFoundryClient.privateDomains()
+            .create(CreatePrivateDomainRequest.builder()
+                .name(domain)
+                .owningOrganizationId(organizationId)
+                .build());
+    }
 
-            @Override
-            public Mono<ListOrganizationsResponse> apply(Integer page) {
-                return cloudFoundryClient.organizations().list(
+    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organization) {
+        return Paginated
+            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations().list(
                         ListOrganizationsRequest.builder()
-                                .name(organizationName)
-                                .page(page)
-                                .build());
-            }
+                            .name(organization)
+                            .page(page)
+                            .build());
+                }
 
-        };
-    }
-
-    private static Function<CreateDomainRequest, Mono<Tuple2<String, String>>> requestOrganizationResources(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<CreateDomainRequest, Mono<Tuple2<String, String>>>() {
-
-            @Override
-            public Mono<Tuple2<String, String>> apply(CreateDomainRequest createDomainRequest) {
-                return Paginated
-                        .requestResources(requestOrganizationPage(cloudFoundryClient, createDomainRequest.getOrganization()))
-                        .single()
-                        .map(Resources.extractId())
-                        .otherwise(Exceptions.<String>convert("Organization %s does not exist", createDomainRequest.getOrganization()))
-                        .and(Mono.just(createDomainRequest.getDomain()));
-            }
-
-        };
+            });
     }
 
 

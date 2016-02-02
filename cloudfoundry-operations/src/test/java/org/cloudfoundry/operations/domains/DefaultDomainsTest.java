@@ -16,8 +16,7 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.client.v2.CloudFoundryException;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
@@ -29,10 +28,46 @@ import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
 import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {
+
+    private static void requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
+        when(cloudFoundryClient.privateDomains()
+            .create(CreatePrivateDomainRequest.builder()
+                .name(domain)
+                .owningOrganizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(CreatePrivateDomainResponse.builder().build()));
+    }
+
+    private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder())
+                .name(organization)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-").build())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestOrganizationsNoResults(CloudFoundryClient cloudFoundryClient, String organization) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder())
+                .name(organization)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .totalPages(1)
+                    .build()));
+    }
 
     public static final class CreateDomain extends AbstractOperationsApiTest<Void> {
 
@@ -40,26 +75,8 @@ public final class DefaultDomainsTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization")
-                    .build();
-            ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
-                    .resource(OrganizationResource.builder()
-                            .metadata(Resource
-                                    .Metadata.builder()
-                                    .id("test-organization-id")
-                                    .build())
-                            .build())
-                    .build();
-            when(this.organizations.list(request1)).thenReturn(Mono.just(response1));
-
-            CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
-                    .name("test-domain-name")
-                    .owningOrganizationId("test-organization-id")
-                    .build();
-
-            CreatePrivateDomainResponse response2 = CreatePrivateDomainResponse.builder().build();
-            when(this.privateDomains.create(request2)).thenReturn(Mono.just(response2));
+            requestOrganizations(this.cloudFoundryClient, "test-organization");
+            requestCreateDomain(this.cloudFoundryClient, "test-domain", "test-organization-id");
         }
 
         @Override
@@ -70,54 +87,9 @@ public final class DefaultDomainsTest {
         @Override
         protected Publisher<Void> invoke() {
             CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domain("test-domain-name")
-                    .organization("test-organization")
-                    .build();
-
-            return this.domains.create(request);
-        }
-
-    }
-
-    public static final class CreateDomainInvalidDomain extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultDomains domains = new DefaultDomains(this.cloudFoundryClient);
-
-        @Before
-        public void setUp() throws Exception {
-            ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization")
-                    .build();
-            ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
-                    .resource(OrganizationResource.builder()
-                            .metadata(Resource
-                                    .Metadata.builder()
-                                    .id("test-organization-id")
-                                    .build())
-                            .build())
-                    .build();
-            when(this.organizations.list(request1)).thenReturn(Mono.just(response1));
-
-            CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
-                    .name("test-domain-name")
-                    .owningOrganizationId("test-organization-id")
-                    .build();
-
-            when(this.privateDomains.create(request2)).thenThrow(new CloudFoundryException(130003, "The domain name is taken: local.micropcf.io", "CF-DomainNameTaken"));
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(CloudFoundryException.class);
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domain("test-domain-name")
-                    .organization("test-organization")
-                    .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
 
             return this.domains.create(request);
         }
@@ -130,26 +102,21 @@ public final class DefaultDomainsTest {
 
         @Before
         public void setUp() throws Exception {
-            ListOrganizationsRequest request1 = fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization")
-                    .build();
-            ListOrganizationsResponse response1 = fillPage(ListOrganizationsResponse.builder())
-                    .build();
-            when(this.organizations.list(request1)).thenReturn(Mono.just(response1));
+            requestOrganizationsNoResults(this.cloudFoundryClient, "test-organization");
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             CreateDomainRequest request = CreateDomainRequest.builder()
-                    .domain("test-domain-name")
-                    .organization("test-organization")
-                    .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
 
             return this.domains.create(request);
         }

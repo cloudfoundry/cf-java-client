@@ -20,6 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * Utilities for dealing with {@link Date}s
  */
@@ -33,19 +35,6 @@ public final class Dates {
     }
 
     /**
-     * Parses a string in {@code ISO8601} format to a {@link Date} object
-     *
-     * @param s the string to parse
-     * @return the parsed {@link Date}
-     * @throws ParseException if the string cannot be parsed according to {@code ISO8601}
-     */
-    public static Date parse(String s) throws ParseException {
-        synchronized (MONITOR) {
-            return ISO8601.parse(s);
-        }
-    }
-
-    /**
      * Formats a {@link Date} into a String in {@code ISO8601} format
      *
      * @param d the date to format
@@ -54,6 +43,34 @@ public final class Dates {
     public static String format(Date d) {
         synchronized (MONITOR) {
             return ISO8601.format(d);
+        }
+    }
+
+    /**
+     * Parses a double representing milliseconds from the epoch to a {@link Date} object
+     *
+     * @param d the double to parse
+     * @return the parsed {@link Date}
+     */
+    public static Date parse(Double d) {
+        synchronized (MONITOR) {
+            return new Date(SECONDS.toMillis(d.longValue()));
+        }
+    }
+
+    /**
+     * Parses a string in {@code ISO8601} format to a {@link Date} object
+     *
+     * @param s the string to parse
+     * @return the parsed {@link Date}
+     */
+    public static Date parse(String s) {
+        synchronized (MONITOR) {
+            try {
+                return ISO8601.parse(s);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException("Unable to parse date", e);
+            }
         }
     }
 

@@ -28,10 +28,10 @@ public final class CheckRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CheckRouteRequest.builder()
-                .domain("test-domain")
-                .host("test-host")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .host("test-host")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CheckRouteRequestTest {
     @Test
     public void isValidNoDomain() {
         ValidationResult result = CheckRouteRequest.builder()
-                .host("test-host")
-                .build()
-                .isValid();
+            .host("test-host")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class CheckRouteRequestTest {
     @Test
     public void isValidNoHost() {
         ValidationResult result = CheckRouteRequest.builder()
-                .domain("test-domain")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("host must be specified", result.getMessages().get(0));

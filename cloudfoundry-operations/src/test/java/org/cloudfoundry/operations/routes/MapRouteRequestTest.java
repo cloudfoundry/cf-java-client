@@ -28,10 +28,10 @@ public final class MapRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = MapRouteRequest.builder()
-                .applicationName("test-applicationName")
-                .domain("test-domain")
-                .build()
-                .isValid();
+            .applicationName("test-applicationName")
+            .domain("test-domain")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class MapRouteRequestTest {
     @Test
     public void isValidNoApplicationName() {
         ValidationResult result = MapRouteRequest.builder()
-                .domain("test-domain")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application name must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class MapRouteRequestTest {
     @Test
     public void isValidNoDomain() {
         ValidationResult result = MapRouteRequest.builder()
-                .applicationName("test-applicationName")
-                .build()
-                .isValid();
+            .applicationName("test-applicationName")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain must be specified", result.getMessages().get(0));

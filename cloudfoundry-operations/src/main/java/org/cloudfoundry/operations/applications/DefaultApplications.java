@@ -54,7 +54,6 @@ import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple4;
 import reactor.rx.Stream;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -508,11 +507,7 @@ public final class DefaultApplications implements Applications {
             return null;
         }
 
-        try {
-            return Dates.parse(date);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        return Dates.parse(date);
     }
 
     private static Date toDate(Double date) {

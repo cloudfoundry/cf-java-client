@@ -25,6 +25,7 @@ import org.cloudfoundry.operations.util.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
+import reactor.rx.Stream;
 
 public final class DefaultOrganizations implements Organizations {
 
@@ -36,38 +37,37 @@ public final class DefaultOrganizations implements Organizations {
 
     @Override
     public Publisher<Organization> list() {
+        return requestOrganizations(this.cloudFoundryClient)
+            .map(new Function<OrganizationResource, Organization>() {
+
+                @Override
+                public Organization apply(OrganizationResource resource) {
+                    return toOrganization(resource);
+                }
+
+            });
+    }
+
+    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient) {
         return Paginated
-                .requestResources(requestPage(this.cloudFoundryClient))
-                .map(toOrganization());
+            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .list(ListOrganizationsRequest.builder()
+                            .page(page)
+                            .build());
+                }
+
+            });
     }
 
-    private static Function<Integer, Mono<ListOrganizationsResponse>> requestPage(final CloudFoundryClient cloudFoundryClient) {
-        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
-
-            @Override
-            public Mono<ListOrganizationsResponse> apply(Integer page) {
-                ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                        .page(page)
-                        .build();
-
-                return cloudFoundryClient.organizations().list(request);
-            }
-
-        };
-    }
-
-    private static Function<OrganizationResource, Organization> toOrganization() {
-        return new Function<OrganizationResource, Organization>() {
-
-            @Override
-            public Organization apply(OrganizationResource resource) {
-                return Organization.builder()
-                        .id(Resources.getId(resource))
-                        .name(Resources.getEntity(resource).getName())
-                        .build();
-            }
-
-        };
+    private static Organization toOrganization(OrganizationResource resource) {
+        return Organization.builder()
+            .id(Resources.getId(resource))
+            .name(Resources.getEntity(resource).getName())
+            .build();
     }
 
 }

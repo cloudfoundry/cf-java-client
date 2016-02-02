@@ -29,7 +29,7 @@ public final class UnmapRouteRequest implements Validatable {
 
     /**
      * The name of the application to have a route remove from it
-     * 
+     *
      * @param applicationName the application name
      * @return the application name
      */
@@ -50,7 +50,7 @@ public final class UnmapRouteRequest implements Validatable {
      * @return the host of the route
      */
     private final String host;
-    
+
     @Builder
     UnmapRouteRequest(String applicationName, String domain, String host) {
         this.applicationName = applicationName;
@@ -65,11 +65,11 @@ public final class UnmapRouteRequest implements Validatable {
         if (this.applicationName == null) {
             builder.message("application name must be specified");
         }
-        
-         if (this.domain == null) {
+
+        if (this.domain == null) {
             builder.message("domain must be specified");
         }
-        
+
         return builder.build();
     }
 
