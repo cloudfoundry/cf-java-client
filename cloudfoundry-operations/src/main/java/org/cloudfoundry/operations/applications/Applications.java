@@ -39,4 +39,11 @@ public interface Applications {
      */
     Publisher<ApplicationSummary> list();
 
+    /**
+     * Scales a specific application
+     *
+     * @param request the scale application request
+     * @return the application scale
+     */
+    Publisher<ApplicationScale> scale(ScaleApplicationRequest request);
 }

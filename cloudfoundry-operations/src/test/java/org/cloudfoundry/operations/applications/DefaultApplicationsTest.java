@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -43,6 +45,8 @@ import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
+import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
@@ -397,6 +401,232 @@ public final class DefaultApplicationsTest {
             return this.applications.list();
         }
 
+    }
+
+    public static final class ScaleDiskAndInstances extends AbstractOperationsApiTest<ApplicationScale> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+
+            UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
+                    .applicationId("test-scale-app-id")
+                    .diskQuota(2)
+                    .instances(2)
+                    .build();
+
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                    .entity(fill(ApplicationEntity.builder())
+                            .instances(2)
+                            .diskQuota(2)
+                            .build())
+                    .build();
+
+            when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
+                    .thenReturn(Mono.just(updateResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(ApplicationScale.builder()
+                            .diskLimit(2)
+                            .instances(2)
+                            .memoryLimit(1)
+                            .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationScale> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                    .name("test-app-name")
+                    .instances(2)
+                    .diskLimit(2)
+                    .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleInstances extends AbstractOperationsApiTest<ApplicationScale> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+
+            UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
+                    .applicationId("test-scale-app-id")
+                    .instances(2)
+                    .build();
+
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                    .entity(fill(ApplicationEntity.builder())
+                            .instances(2)
+                            .build())
+                    .build();
+
+            when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
+                    .thenReturn(Mono.just(updateResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(ApplicationScale.builder()
+                            .diskLimit(1)
+                            .instances(2)
+                            .memoryLimit(1)
+                            .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationScale> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                    .name("test-app-name")
+                    .instances(2)
+                    .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleNoApp extends AbstractOperationsApiTest<ApplicationScale> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<ApplicationScale> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                    .name("test-app-name")
+                    .instances(2)
+                    .diskLimit(2)
+                    .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleNoChange extends AbstractOperationsApiTest<ApplicationScale> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse response = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(request))
+                    .thenReturn(Mono.just(response));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertEquals(ApplicationScale.builder()
+                            .diskLimit(1)
+                            .instances(1)
+                            .memoryLimit(1)
+                            .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationScale> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleNoSpace extends AbstractOperationsApiTest<ApplicationScale> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse response = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(request))
+                    .thenReturn(Mono.just(response));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<ApplicationScale> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build();
+
+            return this.applications.scale(request);
+        }
     }
 
 }
