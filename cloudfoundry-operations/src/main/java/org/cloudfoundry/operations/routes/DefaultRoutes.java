@@ -53,7 +53,6 @@ import org.cloudfoundry.operations.util.Validators;
 import org.cloudfoundry.operations.util.v2.Paginated;
 import org.cloudfoundry.operations.util.v2.Resources;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
@@ -99,12 +98,6 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> deleteOrphanedRoutes() {
         return this.spaceId
                 .flatMap(requestSpaceRoutesResources(this.cloudFoundryClient))
-                .as(new Function<Flux<RouteResource>, Stream<RouteResource>>() {
-                    @Override
-                    public Stream<RouteResource> apply(Flux<RouteResource> flux) {
-                        return Stream.from(flux);
-                    }
-                })
                 .flatMap(detectOrphanedRoutes(this.cloudFoundryClient))
                 .flatMap(deleteRoute(this.cloudFoundryClient))
                 .after();
@@ -594,6 +587,17 @@ public final class DefaultRoutes implements Routes {
                 .otherwiseIfEmpty(Mono.<String>error(new IllegalArgumentException(String.format("Domain %s does not exist", domain))));
     }
 
+    private static Function<Boolean, Mono<String>> streamOrphan(final String routeId) {
+        return new Function<Boolean, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(Boolean routeIsBoundToApplication) {
+                return routeIsBoundToApplication ? Mono.<String>empty() : Mono.just(routeId);
+            }
+
+        };
+    }
+
     private static Function<Tuple3<List<String>, String, String>, Route> toRoute(final RouteResource resource) {
         return Tuples.function(new Function3<List<String>, String, String, Route>() {
 
@@ -619,9 +623,11 @@ public final class DefaultRoutes implements Routes {
 
             @Override
             public Mono<Void> apply(String routeId) {
-                return cloudFoundryClient.routes().delete(DeleteRouteRequest.builder()
+                DeleteRouteRequest request = DeleteRouteRequest.builder()
                         .routeId(routeId)
-                        .build());
+                        .build();
+
+                return cloudFoundryClient.routes().delete(request);
             }
 
         };
@@ -638,14 +644,7 @@ public final class DefaultRoutes implements Routes {
                 return Paginated
                         .requestResources(requestApplicationPage(cloudFoundryClient, spaceId, routeId))
                         .hasElements()
-                        .then(new Function<Boolean, Mono<String>>() {
-
-                            @Override
-                            public Mono<String> apply(Boolean routeIsBoundToApplication) {
-                                return routeIsBoundToApplication ? Mono.<String>empty() : Mono.just(routeId);
-                            }
-
-                        });
+                        .then(streamOrphan(routeId));
             }
 
         };
