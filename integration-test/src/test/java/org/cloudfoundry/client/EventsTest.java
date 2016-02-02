@@ -36,93 +36,88 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void get() {
         getFirstEvent()
-                .then(resource -> {
-                    GetEventRequest request = GetEventRequest.builder()
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    this.cloudFoundryClient.events()
+                        .get(GetEventRequest.builder()
                             .eventId(Resources.getId(resource))
-                            .build();
-
-                    Mono<GetEventResponse> actual = this.cloudFoundryClient.events().get(request);
-
-                    return Mono.when(Mono.just(resource), actual);
-                })
-                .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
-                        .assertThat(consumer((expected, actual) -> assertEquals(Resources.getId(expected), Resources.getId(actual)))));
+                            .build())
+                ))
+            .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
+                .assertThat(consumer((expected, actual) -> assertEquals(Resources.getId(expected), Resources.getId(actual)))));
     }
 
     @Test
     public void list() {
         listEvents()
-                .count()
-                .subscribe(this.<Long>testSubscriber()
-                        .assertThat(count -> assertTrue(count > 0)));
+            .count()
+            .subscribe(this.<Long>testSubscriber()
+                .assertThat(count -> assertTrue(count > 0)));
     }
 
     @Test
     public void listFilterByActee() {
         getFirstEvent()
-                .then(resource -> {
-                    ListEventsRequest request = ListEventsRequest.builder()
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    this.cloudFoundryClient.events()
+                        .list(ListEventsRequest.builder()
                             .actee(Resources.getEntity(resource).getActee())
-                            .build();
-
-                    Mono<EventResource> actual = this.cloudFoundryClient.events().list(request)
-                            .flatMap(Resources::getResources)
-                            .next();
-
-                    return Mono.when(Mono.just(resource), actual);
-                })
-                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+                            .build())
+                        .flatMap(Resources::getResources)
+                        .next()
+                ))
+            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listFilterByTimestamp() {
         getFirstEvent()
-                .then(resource -> {
-                    ListEventsRequest request = ListEventsRequest.builder()
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    this.cloudFoundryClient.events()
+                        .list(ListEventsRequest.builder()
                             .timestamp(Resources.getEntity(resource).getTimestamp())
-                            .build();
-
-                    Mono<EventResource> actual = this.cloudFoundryClient.events().list(request)
-                            .flatMap(Resources::getResources)
-                            .next();
-
-                    return Mono.when(Mono.just(resource), actual);
-                })
-                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+                            .build())
+                        .flatMap(Resources::getResources)
+                        .next()
+                ))
+            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listFilterByType() {
         getFirstEvent()
-                .then(resource -> {
-                    ListEventsRequest request = ListEventsRequest.builder()
+            .then(resource -> Mono
+                .when(
+                    Mono.just(resource),
+                    this.cloudFoundryClient.events()
+                        .list(ListEventsRequest.builder()
                             .type(Resources.getEntity(resource).getType())
-                            .build();
-
-                    Mono<EventResource> actual = this.cloudFoundryClient.events().list(request)
-                            .flatMap(Resources::getResources)
-                            .next();
-
-                    return Mono.when(Mono.just(resource), actual);
-                })
-                .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+                            .build())
+                        .flatMap(Resources::getResources)
+                        .next()
+                ))
+            .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     private Mono<EventResource> getFirstEvent() {
         return listEvents()
-                .next();
+            .next();
     }
 
     private Stream<EventResource> listEvents() {
-        ListEventsRequest request = ListEventsRequest.builder()
-                .build();
-
         return Stream
-                .from(this.cloudFoundryClient.events().list(request))
-                .flatMap(Resources::getResources);
+            .from(this.cloudFoundryClient.events()
+                .list(ListEventsRequest.builder()
+                    .build()))
+            .flatMap(Resources::getResources);
     }
 
 }

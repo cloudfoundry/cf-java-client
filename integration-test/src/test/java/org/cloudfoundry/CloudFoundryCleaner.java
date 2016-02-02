@@ -51,110 +51,80 @@ final class CloudFoundryCleaner {
                               Predicate<SpaceResource> spacePredicate) {
 
         return cleanApplications(cloudFoundryClient, applicationPredicate)
-                .after(() -> cleanRoutes(cloudFoundryClient, routePredicate))
-                .after(() -> cleanDomains(cloudFoundryClient, domainPredicate))
-                .after(() -> cleanSpaces(cloudFoundryClient, spacePredicate))
-                .after(() -> cleanOrganizations(cloudFoundryClient, organizationPredicate));
+            .after(() -> cleanRoutes(cloudFoundryClient, routePredicate))
+            .after(() -> cleanDomains(cloudFoundryClient, domainPredicate))
+            .after(() -> cleanSpaces(cloudFoundryClient, spacePredicate))
+            .after(() -> cleanOrganizations(cloudFoundryClient, organizationPredicate));
     }
 
     private static Stream<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
         return Paginated
-                .requestResources(page -> {
-                    ListApplicationsRequest request = ListApplicationsRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.applicationsV2().list(request);
-                })
-                .filter(predicate)
-                .map(Resources::getId)
-                .flatMap(applicationId -> {
-                    DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return cloudFoundryClient.applicationsV2().delete(request);
-                });
+            .requestResources(page -> cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(Resources::getId)
+            .flatMap(applicationId -> cloudFoundryClient.applicationsV2()
+                .delete(DeleteApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()));
     }
 
     private static Stream<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
         return Paginated
-                .requestResources(page -> {
-                    ListDomainsRequest request = ListDomainsRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.domains().list(request);
-                })
-                .filter(predicate)
-                .map(Resources::getId)
-                .flatMap(domainId -> {
-                    DeleteDomainRequest request = DeleteDomainRequest.builder()
-                            .domainId(domainId)
-                            .build();
-
-                    return cloudFoundryClient.domains().delete(request);
-                });
+            .requestResources(page -> cloudFoundryClient.domains()
+                .list(ListDomainsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(Resources::getId)
+            .flatMap(domainId -> cloudFoundryClient.domains()
+                .delete(DeleteDomainRequest.builder()
+                    .domainId(domainId)
+                    .build()));
     }
 
     private static Stream<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
         return Paginated
-                .requestResources(page -> {
-                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.organizations().list(request);
-                })
-                .filter(predicate)
-                .map(Resources::getId)
-                .flatMap(organizationId -> {
-                    DeleteOrganizationRequest request = DeleteOrganizationRequest.builder()
-                            .organizationId(organizationId)
-                            .build();
-
-                    return cloudFoundryClient.organizations().delete(request);
-                });
+            .requestResources(page -> cloudFoundryClient.organizations()
+                .list(ListOrganizationsRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(Resources::getId)
+            .flatMap(organizationId -> cloudFoundryClient.organizations()
+                .delete(DeleteOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .build()));
     }
 
     private static Stream<DeleteRouteResponse> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
         return Paginated
-                .requestResources(page -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.routes().list(request);
-                })
-                .filter(predicate)
-                .map(Resources::getId)
-                .flatMap(routeId -> {
-                    DeleteRouteRequest request = DeleteRouteRequest.builder()
-                            .routeId(routeId)
-                            .build();
-
-                    return cloudFoundryClient.routes().delete(request);
-                });  // TODO: Wait for jobs to complete before progressing
+            .requestResources(page -> cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(Resources::getId)
+            .flatMap(routeId -> cloudFoundryClient.routes()
+                .delete(DeleteRouteRequest.builder()
+                    .routeId(routeId)
+                    .build()));   // TODO: Wait for jobs to complete before progressing
     }
 
     private static Stream<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
         return Paginated
-                .requestResources(page -> {
-                    ListSpacesRequest request = ListSpacesRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.spaces().list(request);
-                })
-                .filter(predicate)
-                .map(Resources::getId)
-                .flatMap(spaceId -> {
-                    DeleteSpaceRequest request = DeleteSpaceRequest.builder()
-                            .spaceId(spaceId)
-                            .build();
-
-                    return cloudFoundryClient.spaces().delete(request);
-                });
+            .requestResources(page -> cloudFoundryClient.spaces()
+                .list(ListSpacesRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(predicate)
+            .map(Resources::getId)
+            .flatMap(spaceId -> cloudFoundryClient.spaces()
+                .delete(DeleteSpaceRequest.builder()
+                    .spaceId(spaceId)
+                    .build()));
     }
 
 }

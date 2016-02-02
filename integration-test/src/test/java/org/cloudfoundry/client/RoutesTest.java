@@ -50,277 +50,234 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void associateApplication() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .flatMap(routeId -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .flatMap(routeId -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void create() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> Mono
+                .when(
+                    Mono.just(domainId),
+                    Mono.just(spaceId),
+                    this.cloudFoundryClient.routes()
+                        .create(CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
-                            .build();
-
-                    Mono<RouteEntity> entity = this.cloudFoundryClient.routes().create(request)
-                            .map(Resources::getEntity);
-
-                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
-                }))
-                .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                        .assertThat(consumer(this::assertDomainIdAndSpaceId)));
+                            .build())
+                        .map(Resources::getEntity))
+            ))
+            .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
+                .assertThat(consumer(this::assertDomainIdAndSpaceId)));
     }
 
     @Before
     public void createDomain() throws Exception {
         this.domainId = this.organizationId
-                .then(organizationId -> {
-                    CreateDomainRequest organization = CreateDomainRequest.builder()
-                            .name("test.domain.name")
-                            .owningOrganizationId(organizationId)
-                            .wildcard(true)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().create(organization);
-
-                })
-                .map(Resources::getId);
+            .then(organizationId -> this.cloudFoundryClient.domains()
+                .create(CreateDomainRequest.builder()
+                    .name("test.domain.name")
+                    .owningOrganizationId(organizationId)
+                    .wildcard(true)
+                    .build()))
+            .map(Resources::getId);
     }
 
     @Test
     public void delete() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .map(Resources::getId);
-                }))
-                .then(routeId -> {
-                    DeleteRouteRequest request = DeleteRouteRequest.builder()
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().delete(request);
-                })
-                .subscribe(testSubscriber());
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .spaceId(spaceId)
+                    .build())
+                .map(Resources::getId)))
+            .then(routeId -> this.cloudFoundryClient.routes()
+                .delete(DeleteRouteRequest.builder()
+                    .routeId(routeId)
+                    .build()))
+            .subscribe(testSubscriber());
     }
 
     @Test
     public void exists() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .map(response -> domainId);
-                }))
-                .then(domainId -> {
-                    RouteExistsRequest request = RouteExistsRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host")
-                            .build();
-
-                    return this.cloudFoundryClient.routes().exists(request);
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals(true));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host")
+                    .spaceId(spaceId)
+                    .build())
+                .map(response -> domainId)))
+            .then(domainId -> this.cloudFoundryClient.routes()
+                .exists(RouteExistsRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host")
+                    .build()))
+            .subscribe(testSubscriber()
+                .assertEquals(true));
     }
 
     @Test
     public void existsDoesNotExist() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .map(response -> domainId);
-                }))
-                .then(domainId -> {
-                    RouteExistsRequest request = RouteExistsRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host-2")
-                            .build();
-
-                    return this.cloudFoundryClient.routes().exists(request);
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals(false));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host")
+                    .spaceId(spaceId)
+                    .build())
+                .map(response -> domainId)))
+            .then(domainId -> this.cloudFoundryClient.routes()
+                .exists(RouteExistsRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host-2")
+                    .build()))
+            .subscribe(testSubscriber()
+                .assertEquals(false));
     }
 
     @Test
     public void get() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> Mono
+                .when(
+                    Mono.just(domainId),
+                    Mono.just(spaceId),
+                    this.cloudFoundryClient.routes()
+                        .create(CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
-                            .build();
-
-                    Mono<String> routeId = this.cloudFoundryClient.routes().create(request)
-                            .map(Resources::getId);
-
-                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), routeId);
-                }))
-                .then(function((domainId, spaceId, routeId) -> {
-                    GetRouteRequest request = GetRouteRequest.builder()
+                            .build())
+                        .map(Resources::getId))
+            ))
+            .then(function((domainId, spaceId, routeId) -> Mono
+                .when(
+                    Mono.just(domainId),
+                    Mono.just(spaceId),
+                    this.cloudFoundryClient.routes()
+                        .get(GetRouteRequest.builder()
                             .routeId(routeId)
-                            .build();
-
-                    Mono<RouteEntity> entity = this.cloudFoundryClient.routes().get(request)
-                            .map(Resources::getEntity);
-
-                    return Mono.when(Mono.just(domainId), Mono.just(spaceId), entity);
-                }))
-                .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
-                        .assertThat(consumer(this::assertDomainIdAndSpaceId)));
+                            .build())
+                        .map(Resources::getEntity))
+            ))
+            .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
+                .assertThat(consumer(this::assertDomainIdAndSpaceId)));
     }
 
     @Test
     public void list() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request);
-                }))
-                .flatMap(response -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .spaceId(spaceId)
+                    .build())))
+            .flatMap(response -> this.cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listApplications() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .flatMap(routeId -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .flatMap(routeId -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByDiego() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .flatMap(routeId -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .diego(true)
-                            .routeId(routeId)
-                            .build();
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .flatMap(routeId -> {
+                ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
+                    .diego(true)
+                    .routeId(routeId)
+                    .build();
 
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+                return this.cloudFoundryClient.routes().listApplications(request)
+                    .flatMap(Resources::getResources);
+            })
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByName() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .flatMap(routeId -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .name("test-application-name")
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .flatMap(routeId -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .name("test-application-name")
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterByOrganizationId() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .and(this.organizationId)
-                .flatMap(function((routeId, organizationId) -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .organizationId(organizationId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .and(this.organizationId)
+            .flatMap(function((routeId, organizationId) -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .organizationId(organizationId)
+                    .build())
+                .flatMap(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listApplicationsFilterBySpaceId() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function(this::associateApplicationWithRoute))
-                .and(this.spaceId)
-                .flatMap(function((routeId, spaceId) -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function(this::associateApplicationWithRoute))
+            .and(this.spaceId)
+            .flatMap(function((routeId, spaceId) -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .spaceId(spaceId)
+                    .build())
+                .flatMap(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Ignore("TODO: implement once list stacks available https://www.pivotaltracker.com/story/show/101527384")
@@ -332,158 +289,119 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByDomainId() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .map(response -> domainId);
-                }))
-                .flatMap(domainId -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .domainId(domainId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .spaceId(spaceId)
+                    .build())
+                .map(response -> domainId)))
+            .flatMap(domainId -> this.cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .domainId(domainId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByHost() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request);
-                }))
-                .flatMap(response -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .host("test-host")
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host")
+                    .spaceId(spaceId)
+                    .build())))
+            .flatMap(response -> this.cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .host("test-host")
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByOrganizationId() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .then(response -> this.organizationId);
-                }))
-                .flatMap(organizationId -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .organizationId(organizationId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .spaceId(spaceId)
+                    .build())
+                .then(response -> this.organizationId)))
+            .flatMap(organizationId -> this.cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .organizationId(organizationId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByPath() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .path("/test-path")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request);
-                }))
-                .flatMap(response -> {
-                    ListRoutesRequest request = ListRoutesRequest.builder()
-                            .path("/test-path")
-                            .build();
-
-                    return this.cloudFoundryClient.routes().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .path("/test-path")
+                    .spaceId(spaceId)
+                    .build())))
+            .flatMap(response -> this.cloudFoundryClient.routes()
+                .list(ListRoutesRequest.builder()
+                    .path("/test-path")
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void removeApplication() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function(this::createApplicationAndRoute))
-                .then(function((applicationId, routeId) -> {
-                    return associateApplicationWithRoute(applicationId, routeId)
-                            .map(response -> Tuple.of(applicationId, routeId));
-                }))
-                .then(function((applicationId, routeId) -> {
-                    RemoveRouteApplicationRequest request = RemoveRouteApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().removeApplication(request)
-                            .map(response -> routeId);
-                }))
-                .flatMap(routeId -> {
-                    ListRouteApplicationsRequest request = ListRouteApplicationsRequest.builder()
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().listApplications(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(0));
+            .when(this.domainId, this.spaceId)
+            .then(function(this::createApplicationAndRoute))
+            .then(function((applicationId, routeId) -> associateApplicationWithRoute(applicationId, routeId)
+                .map(response -> Tuple.of(applicationId, routeId))))
+            .then(function((applicationId, routeId) -> this.cloudFoundryClient.routes()
+                .removeApplication(RemoveRouteApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .routeId(routeId)
+                    .build())
+                .map(response -> routeId)))
+            .flatMap(routeId -> this.cloudFoundryClient.routes()
+                .listApplications(ListRouteApplicationsRequest.builder()
+                    .routeId(routeId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(0));
     }
 
     @Test
     public void update() {
         Mono
-                .when(this.domainId, this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest request = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(request)
-                            .map(Resources::getId);
-                }))
-                .then(routeId -> {
-                    UpdateRouteRequest request = UpdateRouteRequest.builder()
-                            .host("test-host")
-                            .routeId(routeId)
-                            .build();
-
-
-                    return this.cloudFoundryClient.routes().update(request)
-                            .map(Resources::getEntity);
-                })
-                .subscribe(this.<RouteEntity>testSubscriber()
-                        .assertThat(entity -> assertEquals("test-host", entity.getHost())));
+            .when(this.domainId, this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .spaceId(spaceId)
+                    .build())
+                .map(Resources::getId)))
+            .then(routeId -> this.cloudFoundryClient.routes()
+                .update(UpdateRouteRequest.builder()
+                    .host("test-host")
+                    .routeId(routeId)
+                    .build())
+                .map(Resources::getEntity))
+            .subscribe(this.<RouteEntity>testSubscriber()
+                .assertThat(entity -> assertEquals("test-host", entity.getHost())));
     }
 
     private void assertDomainIdAndSpaceId(String domainId, String spaceId, RouteEntity entity) {
@@ -492,34 +410,31 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     private Mono<String> associateApplicationWithRoute(String applicationId, String routeId) {
-        AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
+        return this.cloudFoundryClient.routes()
+            .associateApplication(AssociateRouteApplicationRequest.builder()
                 .applicationId(applicationId)
                 .routeId(routeId)
-                .build();
-
-        return this.cloudFoundryClient.routes().associateApplication(request)
-                .map(response -> routeId);
+                .build())
+            .map(response -> routeId);
     }
 
     private Mono<Tuple2<String, String>> createApplicationAndRoute(String domainId, String spaceId) {
-        CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
-                .diego(true)
-                .name("test-application-name")
-                .spaceId(spaceId)
-                .build();
-
-        Mono<String> applicationId = this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
-                .map(Resources::getId);
-
-        CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
-                .domainId(domainId)
-                .spaceId(spaceId)
-                .build();
-
-        Mono<String> routeId = this.cloudFoundryClient.routes().create(createRouteRequest)
-                .map(Resources::getId);
-
-        return Mono.when(applicationId, routeId);
+        return Mono
+            .when(
+                this.cloudFoundryClient.applicationsV2()
+                    .create(CreateApplicationRequest.builder()
+                        .diego(true)
+                        .name("test-application-name")
+                        .spaceId(spaceId)
+                        .build())
+                    .map(Resources::getId),
+                this.cloudFoundryClient.routes()
+                    .create(CreateRouteRequest.builder()
+                        .domainId(domainId)
+                        .spaceId(spaceId)
+                        .build())
+                    .map(Resources::getId)
+            );
     }
 
 }

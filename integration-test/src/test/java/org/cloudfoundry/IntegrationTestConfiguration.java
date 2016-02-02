@@ -68,12 +68,12 @@ public class IntegrationTestConfiguration {
                                                 List<DeserializationProblemHandler> deserializationProblemHandlers) {
 
         return SpringCloudFoundryClient.builder()
-                .host(host)
-                .username(username)
-                .password(password)
-                .skipSslValidation(skipSslValidation)
-                .deserializationProblemHandlers(deserializationProblemHandlers)
-                .build();
+            .host(host)
+            .username(username)
+            .password(password)
+            .skipSslValidation(skipSslValidation)
+            .deserializationProblemHandlers(deserializationProblemHandlers)
+            .build();
     }
 
     @Bean
@@ -82,9 +82,9 @@ public class IntegrationTestConfiguration {
                                                   @Value("${test.organization}") String organization,
                                                   @Value("${test.space}") String space) {
         return new CloudFoundryOperationsBuilder()
-                .cloudFoundryClient(cloudFoundryClient)
-                .target(organization, space)
-                .build();
+            .cloudFoundryClient(cloudFoundryClient)
+            .target(organization, space)
+            .build();
     }
 
     @Bean
@@ -103,8 +103,8 @@ public class IntegrationTestConfiguration {
     @Bean
     SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
         return SpringLoggregatorClient.builder()
-                .cloudFoundryClient(cloudFoundryClient)
-                .build();
+            .cloudFoundryClient(cloudFoundryClient)
+            .build();
     }
 
     @Bean
@@ -112,38 +112,35 @@ public class IntegrationTestConfiguration {
                                 Mono<List<String>> systemSpaceIds, Predicate<DomainResource> domainsPredicate) throws InterruptedException {
 
         Mono<String> organizationId = Mono
-                .when(systemOrganizationId, systemSpaceIds)
-                .flatMap(function((systemOrganizationId2, systemSpaceIds2) -> {
+            .when(systemOrganizationId, systemSpaceIds)
+            .flatMap(function((systemOrganizationId2, systemSpaceIds2) -> {
 
-                    Predicate<ApplicationResource> applicationPredicate = systemOrganizationId2
-                            .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds2.contains(Resources.getEntity(r).getSpaceId()))
-                            .orElse(r -> true);
+                Predicate<ApplicationResource> applicationPredicate = systemOrganizationId2
+                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds2.contains(Resources.getEntity(r).getSpaceId()))
+                    .orElse(r -> true);
 
-                    Predicate<OrganizationResource> organizationPredicate = systemOrganizationId2
-                            .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id))
-                            .orElse(r -> true);
+                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId2
+                    .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id))
+                    .orElse(r -> true);
 
-                    Predicate<RouteResource> routePredicate = r -> true;
+                Predicate<RouteResource> routePredicate = r -> true;
 
-                    Predicate<SpaceResource> spacePredicate = systemOrganizationId2
-                            .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id))
-                            .orElse(r -> true);
+                Predicate<SpaceResource> spacePredicate = systemOrganizationId2
+                    .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id))
+                    .orElse(r -> true);
 
-                    return CloudFoundryCleaner.clean(cloudFoundryClient, applicationPredicate, domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
-                }))
-                .as(Stream::from)
-                .after(() -> {
-                    CreateOrganizationRequest request = CreateOrganizationRequest.builder()
-                            .name(organization)
-                            .build();
-
-                    return cloudFoundryClient.organizations().create(request);
-                })
-                .map(Resources::getId)
-                .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnComplete(() -> this.logger.debug("<< ORGANIZATION >>"))
-                .as(Promise::from);
+                return CloudFoundryCleaner.clean(cloudFoundryClient, applicationPredicate, domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
+            }))
+            .as(Stream::from)
+            .after(() -> cloudFoundryClient.organizations()
+                .create(CreateOrganizationRequest.builder()
+                    .name(organization)
+                    .build()))
+            .map(Resources::getId)
+            .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnComplete(() -> this.logger.debug("<< ORGANIZATION >>"))
+            .as(Promise::from);
 
         organizationId.get();
         return organizationId;
@@ -152,19 +149,16 @@ public class IntegrationTestConfiguration {
     @Bean
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, @Value("${test.space}") String space) throws InterruptedException {
         Mono<String> spaceId = organizationId
-                .then(orgId -> {
-                    CreateSpaceRequest request = CreateSpaceRequest.builder()
-                            .name(space)
-                            .organizationId(orgId)
-                            .build();
-
-                    return cloudFoundryClient.spaces().create(request);
-                })
-                .map(Resources::getId)
-                .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnSuccess(id -> this.logger.debug("<< SPACE >>"))
-                .as(Promise::from);
+            .then(orgId -> cloudFoundryClient.spaces()
+                .create(CreateSpaceRequest.builder()
+                    .name(space)
+                    .organizationId(orgId)
+                    .build()))
+            .map(Resources::getId)
+            .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< SPACE >>"))
+            .as(Promise::from);
 
         spaceId.get();
         return spaceId;
@@ -173,20 +167,17 @@ public class IntegrationTestConfiguration {
     @Bean
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, @Value("${test.stack:cflinuxfs2}") String stack) throws InterruptedException {
         Mono<String> stackId = Paginated
-                .requestResources(page -> {
-                    ListStacksRequest request = ListStacksRequest.builder()
-                            .name(stack)
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.stacks().list(request);
-                })
-                .single()
-                .map(Resources::getId)
-                .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
-                .as(Promise::from);
+            .requestResources(page -> cloudFoundryClient.stacks()
+                .list(ListStacksRequest.builder()
+                    .name(stack)
+                    .page(page)
+                    .build()))
+            .single()
+            .map(Resources::getId)
+            .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
+            .as(Promise::from);
 
         stackId.get();
         return stackId;
@@ -195,22 +186,19 @@ public class IntegrationTestConfiguration {
     @Bean
     Mono<Optional<String>> systemOrganizationId(CloudFoundryClient cloudFoundryClient) {
         Mono<Optional<String>> systemOrganizationId = Paginated
-                .requestResources(page -> {
-                    ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                            .name("system")
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.organizations().list(request);
-                })
-                .singleOrEmpty()
-                .map(Resources::getId)
-                .map(Optional::of)
-                .otherwiseIfEmpty(Mono.just(Optional.empty()))
-                .doOnSubscribe(s -> this.logger.debug(">> SYSTEM ORGANIZATION <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnSuccess(id -> this.logger.debug("<< SYSTEM ORGANIZATION >>"))
-                .as(Promise::from);
+            .requestResources(page -> cloudFoundryClient.organizations()
+                .list(ListOrganizationsRequest.builder()
+                    .name("system")
+                    .page(page)
+                    .build()))
+            .singleOrEmpty()
+            .map(Resources::getId)
+            .map(Optional::of)
+            .otherwiseIfEmpty(Mono.just(Optional.empty()))
+            .doOnSubscribe(s -> this.logger.debug(">> SYSTEM ORGANIZATION <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< SYSTEM ORGANIZATION >>"))
+            .as(Promise::from);
 
         systemOrganizationId.get();
         return systemOrganizationId;
@@ -219,18 +207,15 @@ public class IntegrationTestConfiguration {
     @Bean
     Mono<List<String>> systemSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> systemOrganizationId) {
         Mono<List<String>> systemSpaceIds = systemOrganizationId
-                .then(systemOrganizationId2 -> systemOrganizationId2
-                        .map(id -> Paginated
-                                .requestResources(page -> {
-                                    ListSpacesRequest request = ListSpacesRequest.builder()
-                                            .organizationId(id)
-                                            .build();
-
-                                    return cloudFoundryClient.spaces().list(request);
-                                })
-                                .map(Resources::getId)
-                                .toList())
-                        .orElse(Mono.just(Collections.emptyList())));
+            .then(systemOrganizationId2 -> systemOrganizationId2
+                .map(id -> Paginated
+                    .requestResources(page -> cloudFoundryClient.spaces()
+                        .list(ListSpacesRequest.builder()
+                            .organizationId(id)
+                            .build()))
+                    .map(Resources::getId)
+                    .toList())
+                .orElse(Mono.just(Collections.emptyList())));
 
         systemSpaceIds.get();
         return systemSpaceIds;
@@ -239,20 +224,17 @@ public class IntegrationTestConfiguration {
     @Bean
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, @Value("${test.username}") String user) {  // TODO: Create new user when APIs available
         Mono<String> userId = Paginated
-                .requestResources(page -> {
-                    ListUsersRequest request = ListUsersRequest.builder()
-                            .page(page)
-                            .build();
-
-                    return cloudFoundryClient.users().listUsers(request);
-                })
-                .filter(resource -> user.equals(Resources.getEntity(resource).getUsername()))
-                .map(Resources::getId)
-                .single()
-                .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnSuccess(id -> this.logger.debug("<< USER >>"))
-                .as(Promise::from);
+            .requestResources(page -> cloudFoundryClient.users()
+                .listUsers(ListUsersRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(resource -> user.equals(Resources.getEntity(resource).getUsername()))
+            .map(Resources::getId)
+            .single()
+            .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< USER >>"))
+            .as(Promise::from);
 
         userId.get();
         return userId;

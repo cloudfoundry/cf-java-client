@@ -26,11 +26,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         this.organizationId
-                .flatMap(organizationId -> Stream
-                        .from(this.cloudFoundryOperations.organizations().list())
-                        .filter(organization -> organization.getId().equals(organizationId)))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .flatMap(organizationId -> Stream
+                .from(this.cloudFoundryOperations.organizations()
+                    .list())
+                .filter(organization -> organization.getId().equals(organizationId)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
 }

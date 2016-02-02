@@ -57,8 +57,8 @@ public abstract class AbstractIntegrationTest {
     public final TestName testName = new TestName();
 
     private final TestSubscriber<?> testSubscriber = new TestSubscriber<>()
-            .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()))
-            .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
+        .setScanningLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()))
+        .setPerformanceLoggerName(() -> String.format("%s.%s", this.getClass().getSimpleName(), AbstractIntegrationTest.this.testName.getMethodName()));
 
     @Autowired
     protected CloudFoundryClient cloudFoundryClient;
@@ -96,28 +96,28 @@ public abstract class AbstractIntegrationTest {
     @Before
     public final void cleanup() throws Exception {
         Mono
-                .when(this.systemOrganizationId, this.systemSpaceIds, this.organizationId, this.spaceId)
-                .flatMap(function((systemOrganizationId, systemSpaceIds, organizationId, spaceId) -> {
+            .when(this.systemOrganizationId, this.systemSpaceIds, this.organizationId, this.spaceId)
+            .flatMap(function((systemOrganizationId, systemSpaceIds, organizationId, spaceId) -> {
 
-                    Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(Resources.getEntity(r).getSpaceId());
+                Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(Resources.getEntity(r).getSpaceId());
 
-                    Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
-                            .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id) && !organizationId.equals(Resources.getId(r)))
-                            .orElse(r -> !organizationId.equals(Resources.getId(r)));
+                Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
+                    .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id) && !organizationId.equals(Resources.getId(r)))
+                    .orElse(r -> !organizationId.equals(Resources.getId(r)));
 
-                    Predicate<RouteResource> routePredicate = r -> true;
+                Predicate<RouteResource> routePredicate = r -> true;
 
-                    Predicate<SpaceResource> spacePredicate = systemOrganizationId
-                            .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(Resources.getId(r)))
-                            .orElse(r -> !spaceId.equals(Resources.getId(r)));
+                Predicate<SpaceResource> spacePredicate = systemOrganizationId
+                    .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(Resources.getId(r)))
+                    .orElse(r -> !spaceId.equals(Resources.getId(r)));
 
-                    return CloudFoundryCleaner.clean(this.cloudFoundryClient, applicationPredicate, this.domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
-                }))
-                .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
-                .doOnError(Throwable::printStackTrace)
-                .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
-                .after()
-                .get();
+                return CloudFoundryCleaner.clean(this.cloudFoundryClient, applicationPredicate, this.domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
+            }))
+            .doOnSubscribe(s -> this.logger.debug(">> CLEANUP <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnComplete(() -> this.logger.debug("<< CLEANUP >>"))
+            .after()
+            .get();
     }
 
     @After

@@ -21,7 +21,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
@@ -80,417 +79,349 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void associateRoute() {
         createApplicationRoute()
-                .then(response -> this.applicationId)
-                .then(applicationId -> {
-                    ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().listRoutes(request)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(response -> this.applicationId)
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void copy() {
         Mono
-                .when(this.applicationId, this.spaceId)
-                .then(function((sourceId, spaceId) -> {
-                    CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
-                            .name("copy-application")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
-                            .map(Resources::getId)
-                            .and(Mono.just(sourceId));
+            .when(this.applicationId, this.spaceId)
+            .then(function((sourceId, spaceId) -> this.cloudFoundryClient.applicationsV2()
+                .create(CreateApplicationRequest.builder()
+                    .name("copy-application")
+                    .spaceId(spaceId)
+                    .build())
+                .map(Resources::getId)
+                .and(Mono.just(sourceId))))
+            .then(function((targetId, sourceId) -> this.cloudFoundryClient.applicationsV2()
+                .copy(CopyApplicationRequest.builder()
+                    .applicationId(targetId)
+                    .sourceApplicationId(sourceId)
+                    .build())
+                .map(Resources::getId)))
+            .flatMap(applicationCopyId -> Stream
+                .from(this.cloudFoundryClient.applicationsV2()
+                    .list(ListApplicationsRequest.builder()
+                        .build()))
+                .flatMap(Resources::getResources)
+                .filter(r -> {
+                    String name = Resources.getEntity(r).getName();
+                    return TEST_APPLICATION_NAME.equals(name) || "copy-application".equals(name);
                 }))
-                .then(function((targetId, sourceId) -> {
-                    CopyApplicationRequest copyApplicationRequest = CopyApplicationRequest.builder()
-                            .applicationId(targetId)
-                            .sourceApplicationId(sourceId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().copy(copyApplicationRequest)
-                            .map(Resources::getId);
-                }))
-                .flatMap(applicationCopyId -> {
-                    ListApplicationsRequest request = ListApplicationsRequest.builder()
-                            .build();
-
-                    return Stream
-                            .from(this.cloudFoundryClient.applicationsV2().list(request))
-                            .flatMap(Resources::getResources)
-                            .filter(r -> {
-                                String name = Resources.getEntity(r).getName();
-                                return TEST_APPLICATION_NAME.equals(name) || "copy-application".equals(name);
-                            });
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(2));
+            .subscribe(testSubscriber()
+                .assertCount(2));
     }
 
     @Test
     public void create() {
         this.spaceId
-                .then(spaceId -> {
-                    CreateApplicationRequest request = CreateApplicationRequest.builder()
+            .then(spaceId -> Mono
+                .when(
+                    Mono.just(spaceId),
+                    this.cloudFoundryClient.applicationsV2()
+                        .create(CreateApplicationRequest.builder()
                             .name("test-application-2")
                             .spaceId(spaceId)
-                            .build();
-
-                    Mono<ApplicationEntity> entity = this.cloudFoundryClient.applicationsV2().create(request)
-                            .map(Resources::getEntity);
-
-                    return Mono.when(Mono.just(spaceId), entity);
-                })
-                .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
-                        .assertThat(consumer((spaceId, entity) -> {
-                            assertEquals(spaceId, entity.getSpaceId());
-                            assertEquals("test-application-2", entity.getName());
-                        })));
+                            .build())
+                        .map(Resources::getEntity)
+                ))
+            .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
+                .assertThat(consumer((spaceId, entity) -> {
+                    assertEquals(spaceId, entity.getSpaceId());
+                    assertEquals("test-application-2", entity.getName());
+                })));
     }
 
     @Before
     public void createApplicationId() throws Exception {
         this.applicationId = this.spaceId
-                .then(spaceId -> {
-                    CreateApplicationRequest request = CreateApplicationRequest.builder()
-                            .buildpack("staticfile_buildpack")
-                            .diego(true)
-                            .diskQuota(512)
-                            .memory(64)
-                            .name(TEST_APPLICATION_NAME)
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().create(request);
-                })
-                .map(Resources::getId)
-                .as(Promise::from);
+            .then(spaceId -> this.cloudFoundryClient.applicationsV2()
+                .create(CreateApplicationRequest.builder()
+                    .buildpack("staticfile_buildpack")
+                    .diego(true)
+                    .diskQuota(512)
+                    .memory(64)
+                    .name(TEST_APPLICATION_NAME)
+                    .spaceId(spaceId)
+                    .build()))
+            .map(Resources::getId)
+            .as(Promise::from);
     }
 
     @Test
     public void delete() {
         this.applicationId
-                .then(applicationId -> {
-                    DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().delete(request);
-                })
-                .subscribe(testSubscriber());
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .delete(DeleteApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .subscribe(testSubscriber());
     }
 
     @Test
     public void download() throws IOException {
         this.applicationId
-                .then(this::uploadApplication)
-                .flatMap(applicationId -> {
-                    DownloadApplicationRequest request = DownloadApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().download(request);
-                })
-                .as(Stream::from)
-                .reduce(new ByteArrayOutputStream(), ApplicationsTest::collectIntoByteArrayInputStream)
-                .map(ByteArrayOutputStream::toByteArray)
-                .map(bytes -> {
-                    try {
-                        File tempFile = File.createTempFile("downloadedFile", "zip");
-                        new FileOutputStream(tempFile).write(bytes);
-                        return new ZipFile(tempFile).size();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals(new ZipFile(new ClassPathResource("testApplication.zip").getFile()).size()));
+            .then(this::uploadApplication)
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .download(DownloadApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .as(Stream::from)
+            .reduce(new ByteArrayOutputStream(), ApplicationsTest::collectIntoByteArrayInputStream)
+            .map(ByteArrayOutputStream::toByteArray)
+            .map(bytes -> {
+                try {
+                    File tempFile = File.createTempFile("downloadedFile", "zip");
+                    new FileOutputStream(tempFile).write(bytes);
+                    return new ZipFile(tempFile).size();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .subscribe(testSubscriber()
+                .assertEquals(new ZipFile(new ClassPathResource("testApplication.zip").getFile()).size()));
     }
 
     @Test
     public void downloadDroplet() {
         this.applicationId
-                .then(this::uploadAndStartApplication)
-                .flatMap(applicationId -> {
-                    DownloadApplicationDropletRequest request = DownloadApplicationDropletRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
+            .then(this::uploadAndStartApplication)
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .downloadDroplet(DownloadApplicationDropletRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .as(Stream::from)
+            .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayInputStream)
+            .map(bytes -> {
+                boolean staticFile = false;
+                boolean indexFile = false;
 
-                    return this.cloudFoundryClient.applicationsV2().downloadDroplet(request);
-                })
-                .as(Stream::from)
-                .reduceWith(ByteArrayOutputStream::new, ApplicationsTest::collectIntoByteArrayInputStream)
-                .map(bytes -> {
-                    boolean staticFile = false;
-                    boolean indexFile = false;
-                    try {
-                        TarArchiveInputStream tis = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes.toByteArray())));
-                        for (TarArchiveEntry entry = tis.getNextTarEntry(); entry != null; entry = tis.getNextTarEntry()) {
-                            if (entry.getName().contains("Staticfile")) {
-                                staticFile = true;
-                            }
-                            if (entry.getName().contains("index.html")) {
-                                indexFile = true;
-                            }
+                try {
+                    TarArchiveInputStream tis = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes.toByteArray())));
+                    for (TarArchiveEntry entry = tis.getNextTarEntry(); entry != null; entry = tis.getNextTarEntry()) {
+                        if (entry.getName().contains("Staticfile")) {
+                            staticFile = true;
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        if (entry.getName().contains("index.html")) {
+                            indexFile = true;
+                        }
                     }
-                    return staticFile && indexFile;
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals(true));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return staticFile && indexFile;
+            })
+            .subscribe(testSubscriber()
+                .assertEquals(true));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void environment() {
         this.applicationId
-                .then(applicationId -> {
-                    ApplicationEnvironmentRequest request = ApplicationEnvironmentRequest.builder()
+            .then(applicationId -> Mono
+                .when(
+                    Mono.just(applicationId),
+                    this.cloudFoundryClient.applicationsV2()
+                        .environment(ApplicationEnvironmentRequest.builder()
                             .applicationId(applicationId)
-                            .build();
+                            .build())
+                ))
+            .then(function((applicationId, response) -> {
+                Map<String, String> vcapApplication = (Map<String, String>) response.getApplicationEnvironmentJsons().get("VCAP_APPLICATION");
+                String actual = vcapApplication.get("application_id");
 
-                    Mono<ApplicationEnvironmentResponse> environment = this.cloudFoundryClient.applicationsV2().environment(request);
-
-                    return Mono.when(Mono.just(applicationId), environment);
-                })
-                .then(function((applicationId, response) -> {
-                    Map<String, String> vcapApplication = (Map<String, String>) response.getApplicationEnvironmentJsons().get("VCAP_APPLICATION");
-                    String actual = vcapApplication.get("application_id");
-
-                    return Mono.when(Mono.just(applicationId), Mono.just(actual));
-                }))
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+                return Mono.when(Mono.just(applicationId), Mono.just(actual));
+            }))
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void get() {
         this.applicationId
-                .then(applicationId -> {
-                    GetApplicationRequest request = GetApplicationRequest.builder()
+            .then(applicationId -> Mono
+                .when(
+                    Mono.just(applicationId),
+                    this.cloudFoundryClient.applicationsV2()
+                        .get(GetApplicationRequest.builder()
                             .applicationId(applicationId)
-                            .build();
-
-                    Mono<String> actual = this.cloudFoundryClient.applicationsV2().get(request)
-                            .map(Resources::getId);
-
-                    return Mono.when(Mono.just(applicationId), actual);
-                })
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+                            .build())
+                        .map(Resources::getId)
+                ))
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void list() {
         this.applicationId
-                .flatMap(applicationId -> {
-                    ListApplicationsRequest request = ListApplicationsRequest.builder()
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().list(request)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByDiego() {
         this.applicationId
-                .then(applicationId -> {
-                    ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
-                            .diego(true)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .diego(true)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByName() {
         this.applicationId
-                .then(applicationId -> {
-                    ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
-                            .name(TEST_APPLICATION_NAME)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .name(TEST_APPLICATION_NAME)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByOrganizationId() {
         this.applicationId
-                .then(applicationId -> this.organizationId)
-                .then(organizationId -> {
-                    ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
-                            .organizationId(organizationId)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.organizationId)
+            .then(organizationId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .organizationId(organizationId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterBySpaceId() {
         this.applicationId
-                .then(applicationId -> this.spaceId)
-                .then(spaceId -> {
-                    ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
-                            .spaceId(spaceId)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.spaceId)
+            .then(spaceId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .spaceId(spaceId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByStackId() {
         this.applicationId
-                .then(applicationId -> this.stackId)
-                .then(stackId -> {
-                    ListApplicationsRequest expectFound = ListApplicationsRequest.builder()
-                            .stackId(stackId)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().list(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.stackId)
+            .then(stackId -> this.cloudFoundryClient.applicationsV2()
+                .list(ListApplicationsRequest.builder()
+                    .stackId(stackId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listRoutes() {
         createApplicationRoute()
-                .then(response -> this.applicationId)
-                .then(applicationId -> {
-                    ListApplicationRoutesRequest request = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().listRoutes(request)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(response -> this.applicationId)
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listRoutesFilterByDomainId() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(function((routeResponse, applicationId) -> {
-                    ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .domainId(routeResponse.getEntity().getDomainId())
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .and(this.applicationId)
+            .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .domainId(routeResponse.getEntity().getDomainId())
+                    .build())
+                .map(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listRoutesFilterByHost() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(function((routeResponse, applicationId) -> {
-                    ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .host(routeResponse.getEntity().getHost())
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .and(this.applicationId)
+            .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .host(routeResponse.getEntity().getHost())
+                    .build())
+                .map(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listRoutesFilterByPath() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(function((routeResponse, applicationId) -> {
-                    ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .path(routeResponse.getEntity().getPath())
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .and(this.applicationId)
+            .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .path(routeResponse.getEntity().getPath())
+                    .build())
+                .map(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listRoutesFilterByPort() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(function((routeResponse, applicationId) -> {
-                    ListApplicationRoutesRequest expectFound = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .port(routeResponse.getEntity().getPort())
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listRoutes(expectFound)
-                            .map(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .and(this.applicationId)
+            .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .listRoutes(ListApplicationRoutesRequest.builder()
+                    .applicationId(applicationId)
+                    .port(routeResponse.getEntity().getPort())
+                    .build())
+                .map(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     //TODO Implement missing client API
     @Ignore("TODO: Awaiting CUPS https://www.pivotaltracker.com/story/show/101452058")
     @Test
     public void listServiceBindings() {
-        this.applicationId
-                .then(applicationId -> {
-                    Mono<String> serviceInstanceId = Mono.just("");
-                    return Mono.just(applicationId).and(serviceInstanceId);
-                })
-                .then(function((applicationId, serviceInstanceId) -> {
-                    CreateServiceBindingRequest serviceBindingRequest = CreateServiceBindingRequest.builder()
-                            .applicationId(applicationId)
-                            .serviceInstanceId(serviceInstanceId)
-                            .build();
-
-                    return this.cloudFoundryClient.serviceBindings().create(serviceBindingRequest)
-                            .map(response -> applicationId);
-                }))
-                .then(applicationId -> {
-                    ListApplicationServiceBindingsRequest request = ListApplicationServiceBindingsRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listServiceBindings(request)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+        Mono
+            .when(this.applicationId, Mono.just(""))
+            .then(function((applicationId, serviceInstanceId) -> this.cloudFoundryClient.serviceBindings()
+                .create(CreateServiceBindingRequest.builder()
+                    .applicationId(applicationId)
+                    .serviceInstanceId(serviceInstanceId)
+                    .build())
+                .map(response -> applicationId)))
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     //TODO Implement missing client API
@@ -498,36 +429,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void listServiceBindingsFilterByServiceInstanceId() {
         this.applicationId
-                .then(applicationId -> {
-                    String serviceInstanceId = "CREATE ME";
-
-                    ListApplicationServiceBindingsRequest expectFound = ListApplicationServiceBindingsRequest.builder()
-                            .applicationId(applicationId)
-                            .serviceInstanceId(serviceInstanceId)
-                            .build();
-
-                    return ApplicationsTest.this.cloudFoundryClient.applicationsV2().listServiceBindings(expectFound)
-                            .map(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                    .applicationId(applicationId)
+                    .serviceInstanceId("CREATE ME")
+                    .build())
+                .map(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void removeRoute() {
         createApplicationRoute()
-                .and(this.applicationId)
-                .then(function((routeResponse, applicationId) -> {
-                    String routeId = Resources.getId(routeResponse);
-
-                    RemoveApplicationRouteRequest request = RemoveApplicationRouteRequest.builder()
-                            .applicationId(applicationId)
-                            .routeId(routeId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().removeRoute(request);
-                }))
-                .subscribe(testSubscriber());
+            .and(this.applicationId)
+            .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .removeRoute(RemoveApplicationRouteRequest.builder()
+                    .applicationId(applicationId)
+                    .routeId(Resources.getId(routeResponse))
+                    .build())))
+            .subscribe(testSubscriber());
     }
 
     //TODO Implement missing client API
@@ -540,105 +461,83 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void restage() {
         this.applicationId
-                .then(this::uploadAndStartApplication)
-                .then(applicationId -> {
-                    RestageApplicationRequest request = RestageApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().restage(request)
-                            .map(Resources::getId);
-                })
-                .then(this::waitForStaging)
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(this::uploadAndStartApplication)
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .restage(RestageApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(Resources::getId))
+            .then(this::waitForStaging)
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void statistics() {
         this.applicationId
-                .then(this::uploadAndStartApplication)
-                .then(applicationId -> {
-                    ApplicationStatisticsRequest request = ApplicationStatisticsRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().statistics(request)
-                            .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName());
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals(TEST_APPLICATION_NAME));
+            .then(this::uploadAndStartApplication)
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .statistics(ApplicationStatisticsRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(instanceStatistics -> instanceStatistics.get("0").getStatistics().getName()))
+            .subscribe(testSubscriber()
+                .assertEquals(TEST_APPLICATION_NAME));
     }
 
     @Test
     public void summary() {
         this.applicationId
-                .then(applicationId -> {
-                    SummaryApplicationRequest request = SummaryApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().summary(request)
-                            .map(SummaryApplicationResponse::getId)
-                            .and(Mono.just(applicationId));
-                })
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .summary(SummaryApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(SummaryApplicationResponse::getId)
+                .and(Mono.just(applicationId)))
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void terminateInstance() {
         this.applicationId
-                .then(this::uploadAndStartApplication)
-                .then(applicationId -> {
-
-                    TerminateApplicationInstanceRequest request = TerminateApplicationInstanceRequest.builder()
-                            .applicationId(applicationId)
-                            .index("0")
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().terminateInstance(request);
-                })
-                .subscribe(testSubscriber());
+            .then(this::uploadAndStartApplication)
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .terminateInstance(TerminateApplicationInstanceRequest.builder()
+                    .applicationId(applicationId)
+                    .index("0")
+                    .build()))
+            .subscribe(testSubscriber());
     }
 
     @Test
     public void update() {
         this.applicationId
-                .then(applicationId -> {
-                    UpdateApplicationRequest request = UpdateApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .name("another-test-application-name")
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().update(request)
-                            .map(Resources::getId);
-                })
-                .then(applicationId -> {
-                    GetApplicationRequest request = GetApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().get(request)
-                            .map(response -> response.getEntity().getName());
-                })
-                .subscribe(testSubscriber()
-                        .assertEquals("another-test-application-name"));
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .update(UpdateApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .name("another-test-application-name")
+                    .build())
+                .map(Resources::getId))
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .get(GetApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .map(response -> response.getEntity().getName()))
+            .subscribe(testSubscriber()
+                .assertEquals("another-test-application-name"));
     }
 
     @Test
     public void upload() throws IOException {
         this.applicationId
-                .then(this::uploadApplication)
-                .flatMap(applicationId -> {
-                    DownloadApplicationRequest request = DownloadApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().download(request);
-                })
-                .after()
-                .subscribe(testSubscriber());
+            .then(this::uploadApplication)
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .download(DownloadApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .after()
+            .subscribe(testSubscriber());
     }
 
     private static ByteArrayOutputStream collectIntoByteArrayInputStream(ByteArrayOutputStream out, byte[] bytes) {
@@ -652,97 +551,84 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private Mono<CreateRouteResponse> createApplicationRoute() {
         return this.organizationId
-                .then(organizationId -> {
-                    CreateDomainRequest request = CreateDomainRequest.builder()
-                            .name("test.domain.name")
-                            .owningOrganizationId(organizationId)
-                            .wildcard(true)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().create(request)
-                            .map(Resources::getId);
-                })
-                .and(this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
-                            .domainId(domainId)
-                            .host("test-host")
-                            .path("/test-path")
-                            .spaceId(spaceId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().create(createRouteRequest)
-                            .and(this.applicationId);
-                }))
-                .then(function((createRouteResponse, applicationId) -> {
-                    AssociateApplicationRouteRequest request = AssociateApplicationRouteRequest.builder()
-                            .applicationId(applicationId)
-                            .routeId(createRouteResponse.getMetadata().getId())
-                            .build();
-
-                    return this.cloudFoundryClient.applicationsV2().associateRoute(request)
-                            .map(response -> createRouteResponse);
-                }));
+            .then(organizationId -> this.cloudFoundryClient.domains()
+                .create(CreateDomainRequest.builder()
+                    .name("test.domain.name")
+                    .owningOrganizationId(organizationId)
+                    .wildcard(true)
+                    .build())
+                .map(Resources::getId))
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+                .create(CreateRouteRequest.builder()
+                    .domainId(domainId)
+                    .host("test-host")
+                    .path("/test-path")
+                    .spaceId(spaceId)
+                    .build())
+                .and(this.applicationId)))
+            .then(function((createRouteResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .associateRoute(AssociateApplicationRouteRequest.builder()
+                    .applicationId(applicationId)
+                    .routeId(createRouteResponse.getMetadata().getId())
+                    .build())
+                .map(response -> createRouteResponse)));
     }
 
     private Mono<String> startApplication(String applicationId) {
-        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+        return this.cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
                 .state("STARTED")
-                .build();
-
-        return this.cloudFoundryClient.applicationsV2().update(request)
-                .map(Resources::getId)
-                .then(this::waitForStaging)
-                .then(this::waitForStarting);
+                .build())
+            .map(Resources::getId)
+            .then(this::waitForStaging)
+            .then(this::waitForStarting);
     }
 
     private Mono<String> uploadAndStartApplication(String applicationId) {
         return uploadApplication(applicationId)
-                .then(this::startApplication);
+            .then(this::startApplication);
     }
 
     private Mono<String> uploadApplication(String applicationId) {
-        UploadApplicationRequest request = UploadApplicationRequest.builder()
+        return this.cloudFoundryClient.applicationsV2()
+            .upload(UploadApplicationRequest.builder()
                 .application(new File("./src/test/resources/testApplication.zip"))
                 .async(false)
                 .applicationId(applicationId)
-                .build();
-
-        return this.cloudFoundryClient.applicationsV2().upload(request)
-                .map(response -> applicationId);
+                .build())
+            .map(response -> applicationId);
     }
 
     private Mono<String> waitForStaging(String applicationId) {
-        GetApplicationRequest request = GetApplicationRequest.builder()
+        return this.cloudFoundryClient.applicationsV2()
+            .get(GetApplicationRequest.builder()
                 .applicationId(applicationId)
-                .build();
-
-        return this.cloudFoundryClient.applicationsV2().get(request)
-                .map(response -> response.getEntity().getPackageState())
-                .where("STAGED"::equals)
-                .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
-                .repeatWhen(volumes -> volumes
-                        .takeWhile(count -> count == 0)
-                        .flatMap(count -> Mono.delay(2, SECONDS)))
-                .single()                                           // TODO: Remove once Mono.repeatWhen()
-                .map(state -> applicationId);
+                .build())
+            .map(response -> response.getEntity().getPackageState())
+            .where("STAGED"::equals)
+            .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
+            .repeatWhen(volumes -> volumes
+                .takeWhile(count -> count == 0)
+                .flatMap(count -> Mono.delay(2, SECONDS)))
+            .single()                                           // TODO: Remove once Mono.repeatWhen()
+            .map(state -> applicationId);
     }
 
     private Mono<String> waitForStarting(String applicationId) {
-        ApplicationInstancesRequest request = ApplicationInstancesRequest.builder()
+        return this.cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
-                .build();
-
-        return this.cloudFoundryClient.applicationsV2().instances(request)
-                .flatMap(response -> Stream.fromIterable(response.values()))
-                .as(Stream::from)
-                .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
-                .repeatWhen(volumes -> volumes
-                        .takeWhile(count -> count == 0)
-                        .flatMap(count -> Mono.delay(2, SECONDS)))
-                .single()
-                .map(info -> applicationId);
+                .build())
+            .flatMap(response -> Stream.fromIterable(response.values()))
+            .as(Stream::from)
+            .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
+            .repeatWhen(volumes -> volumes
+                .takeWhile(count -> count == 0)
+                .flatMap(count -> Mono.delay(2, SECONDS)))
+            .single()
+            .map(info -> applicationId);
     }
 
 }

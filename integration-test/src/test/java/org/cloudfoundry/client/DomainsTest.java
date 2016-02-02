@@ -44,120 +44,99 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void create() {
         this.organizationId
-                .then(this::createDomainEntity)
-                .and(this.organizationId)
-                .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                        .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
+            .then(this::createDomainEntity)
+            .and(this.organizationId)
+            .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
+                .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
     }
 
     @Test
     public void delete() {
         this.organizationId
-                .then(this::createDomainId)
-                .then(domainId -> {
-                    DeleteDomainRequest request = DeleteDomainRequest.builder()
-                            .domainId(domainId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().delete(request);
-                })
-                .subscribe(testSubscriber());
+            .then(this::createDomainId)
+            .then(domainId -> this.cloudFoundryClient.domains()
+                .delete(DeleteDomainRequest.builder()
+                    .domainId(domainId)
+                    .build()))
+            .subscribe(testSubscriber());
     }
 
     @Test
     public void get() {
         this.organizationId
-                .then(this::createDomainId)
-                .then(domainId -> {
-                    GetDomainRequest request = GetDomainRequest.builder()
-                            .domainId(domainId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().get(request)
-                            .map(Resources::getEntity);
-                })
-                .and(this.organizationId)
-                .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                        .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
+            .then(this::createDomainId)
+            .then(domainId -> this.cloudFoundryClient.domains()
+                .get(GetDomainRequest.builder()
+                    .domainId(domainId)
+                    .build())
+                .map(Resources::getEntity))
+            .and(this.organizationId)
+            .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
+                .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
     }
 
     @Test
     public void list() {
         this.organizationId
-                .then(this::createDomain)
-                .flatMap(response -> {
-                    ListDomainsRequest request = ListDomainsRequest.builder()
-                            .build();
-
-                    return this.cloudFoundryClient.domains().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(2));
+            .then(this::createDomain)
+            .flatMap(response -> this.cloudFoundryClient.domains()
+                .list(ListDomainsRequest.builder()
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(2));
     }
 
     @Test
     public void listDomainSpaces() {
         this.organizationId
-                .then(this::createDomainId)
-                .flatMap(domainId -> {
-                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                            .domainId(domainId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().listSpaces(request)
-                            .flatMap(Resources::getResources)
-                            .map(Resources::getId);
-                })
-                .zipWith(this.spaceId)
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+            .then(this::createDomainId)
+            .flatMap(domainId -> this.cloudFoundryClient.domains()
+                .listSpaces(ListDomainSpacesRequest.builder()
+                    .domainId(domainId)
+                    .build())
+                .flatMap(Resources::getResources)
+                .map(Resources::getId))
+            .zipWith(this.spaceId)
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listDomainSpacesFilterByApplicationId() {
         this.organizationId
-                .then(this::createDomainId)
-                .and(this.spaceId)
-                .then(function((domainId, spaceId) -> {
-                    CreateApplicationRequest createApplicationRequest = CreateApplicationRequest.builder()
+            .then(this::createDomainId)
+            .and(this.spaceId)
+            .then(function((domainId, spaceId) -> Mono
+                .when(
+                    Mono.just(domainId),
+                    this.cloudFoundryClient.applicationsV2()
+                        .create(CreateApplicationRequest.builder()
                             .name("test-application-name")
                             .spaceId(spaceId)
-                            .build();
-
-                    Mono<String> applicationId = this.cloudFoundryClient.applicationsV2().create(createApplicationRequest)
-                            .map(Resources::getId);
-
-                    CreateRouteRequest createRouteRequest = CreateRouteRequest.builder()
+                            .build())
+                        .map(Resources::getId),
+                    this.cloudFoundryClient.routes()
+                        .create(CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
-                            .build();
-
-                    Mono<String> routeId = this.cloudFoundryClient.routes().create(createRouteRequest)
-                            .map(Resources::getId);
-
-                    return Mono.when(Mono.just(domainId), applicationId, routeId);
-                }))
-                .then(function((domainId, applicationId, routeId) -> {
-                    AssociateRouteApplicationRequest request = AssociateRouteApplicationRequest.builder()
-                            .routeId(routeId)
-                            .applicationId(applicationId)
-                            .build();
-
-                    return this.cloudFoundryClient.routes().associateApplication(request)
-                            .map(response -> Tuple.of(domainId, applicationId));
-                }))
-                .flatMap(function((domainId, applicationId) -> {
-                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                            .applicationId(applicationId)
-                            .domainId(domainId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().listSpaces(request)
-                            .flatMap(Resources::getResources);
-                }))
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+                            .build())
+                        .map(Resources::getId)
+                )))
+            .then(function((domainId, applicationId, routeId) -> this.cloudFoundryClient.routes()
+                .associateApplication(AssociateRouteApplicationRequest.builder()
+                    .routeId(routeId)
+                    .applicationId(applicationId)
+                    .build())
+                .map(response -> Tuple.of(domainId, applicationId))))
+            .flatMap(function((domainId, applicationId) -> this.cloudFoundryClient.domains()
+                .listSpaces(ListDomainSpacesRequest.builder()
+                    .applicationId(applicationId)
+                    .domainId(domainId)
+                    .build())
+                .flatMap(Resources::getResources)))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Ignore("TODO: implement once list users available https://www.pivotaltracker.com/story/show/101522708")
@@ -169,73 +148,61 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByName() {
         this.organizationId
-                .then(this::createDomainId)
-                .flatMap(domainId -> {
-                    ListDomainSpacesRequest request = ListDomainSpacesRequest.builder()
-                            .domainId(domainId)
-                            .name(this.spaceName)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().listSpaces(request)
-                            .flatMap(Resources::getResources)
-                            .map(Resources::getId);
-                })
-                .zipWith(this.spaceId)
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+            .then(this::createDomainId)
+            .flatMap(domainId -> this.cloudFoundryClient.domains()
+                .listSpaces(ListDomainSpacesRequest.builder()
+                    .domainId(domainId)
+                    .name(this.spaceName)
+                    .build())
+                .flatMap(Resources::getResources)
+                .map(Resources::getId))
+            .zipWith(this.spaceId)
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
         this.organizationId
-                .then(this::createDomainId)
-                .and(this.organizationId)
-                .flatMap(function((domainId, organizationId) -> {
-                    ListDomainSpacesRequest response = ListDomainSpacesRequest.builder()
-                            .domainId(domainId)
-                            .organizationId(organizationId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().listSpaces(response)
-                            .flatMap(Resources::getResources)
-                            .map(Resources::getId);
-                }))
-                .zipWith(this.spaceId)
-                .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                        .assertThat(this::assertTupleEquality));
+            .then(this::createDomainId)
+            .and(this.organizationId)
+            .flatMap(function((domainId, organizationId) -> this.cloudFoundryClient.domains()
+                .listSpaces(ListDomainSpacesRequest.builder()
+                    .domainId(domainId)
+                    .organizationId(organizationId)
+                    .build())
+                .flatMap(Resources::getResources)
+                .map(Resources::getId)))
+            .zipWith(this.spaceId)
+            .subscribe(this.<Tuple2<String, String>>testSubscriber()
+                .assertThat(this::assertTupleEquality));
     }
 
     @Test
     public void listFilterByName() {
         this.organizationId
-                .then(this::createDomain)
-                .flatMap(response -> {
-                    ListDomainsRequest request = ListDomainsRequest.builder()
-                            .name("test.domain.name")
-                            .build();
-
-                    return this.cloudFoundryClient.domains().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(this::createDomain)
+            .flatMap(response -> this.cloudFoundryClient.domains()
+                .list(ListDomainsRequest.builder()
+                    .name("test.domain.name")
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     @Test
     public void listFilterByOwningOrganizationId() {
         this.organizationId
-                .then(organizationId -> createDomain(organizationId)
-                        .then(response -> this.organizationId))
-                .flatMap(organizationId -> {
-                    ListDomainsRequest request = ListDomainsRequest.builder()
-                            .owningOrganizationId(organizationId)
-                            .build();
-
-                    return this.cloudFoundryClient.domains().list(request)
-                            .flatMap(Resources::getResources);
-                })
-                .subscribe(testSubscriber()
-                        .assertCount(1));
+            .then(organizationId -> createDomain(organizationId)
+                .then(response -> this.organizationId))
+            .flatMap(organizationId -> this.cloudFoundryClient.domains()
+                .list(ListDomainsRequest.builder()
+                    .owningOrganizationId(organizationId)
+                    .build())
+                .flatMap(Resources::getResources))
+            .subscribe(testSubscriber()
+                .assertCount(1));
     }
 
     private void assertDomainNameAndOrganizationId(DomainEntity entity, String organizationId) {
@@ -244,23 +211,22 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     private Mono<CreateDomainResponse> createDomain(String organizationId) {
-        CreateDomainRequest request = CreateDomainRequest.builder()
+        return this.cloudFoundryClient.domains()
+            .create(CreateDomainRequest.builder()
                 .name("test.domain.name")
                 .owningOrganizationId(organizationId)
                 .wildcard(true)
-                .build();
-
-        return this.cloudFoundryClient.domains().create(request);
+                .build());
     }
 
     private Mono<DomainEntity> createDomainEntity(String organizationId) {
         return createDomain(organizationId)
-                .map(Resources::getEntity);
+            .map(Resources::getEntity);
     }
 
     private Mono<String> createDomainId(String organizationId) {
         return createDomain(organizationId)
-                .map(Resources::getId);
+            .map(Resources::getId);
     }
 
 }
