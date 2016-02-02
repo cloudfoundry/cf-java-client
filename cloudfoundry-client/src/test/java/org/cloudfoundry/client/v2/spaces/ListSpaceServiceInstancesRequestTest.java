@@ -28,10 +28,10 @@ public final class ListSpaceServiceInstancesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceServiceInstancesRequest.builder()
-                .spaceId("test-space-id")
-                .returnUserProvidedServiceInstances(true)
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .returnUserProvidedServiceInstances(true)
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class ListSpaceServiceInstancesRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceServiceInstancesRequest.builder()
-                .returnUserProvidedServiceInstances(true)
-                .build()
-                .isValid();
+            .returnUserProvidedServiceInstances(true)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

@@ -28,9 +28,9 @@ public final class CreateServiceKeyRequestTest {
     @Test
     public void isNotValidNoName() {
         ValidationResult result = CreateServiceKeyRequest.builder()
-                .serviceInstanceId("service-instance-id")
-                .build()
-                .isValid();
+            .serviceInstanceId("service-instance-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -39,9 +39,9 @@ public final class CreateServiceKeyRequestTest {
     @Test
     public void isNotValidNoServiceInstanceId() {
         ValidationResult result = CreateServiceKeyRequest.builder()
-                .name("name")
-                .build()
-                .isValid();
+            .name("name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service instance id must be specified", result.getMessages().get(0));
@@ -50,10 +50,10 @@ public final class CreateServiceKeyRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServiceKeyRequest.builder()
-                .name("name")
-                .serviceInstanceId("service-instance-id")
-                .build()
-                .isValid();
+            .name("name")
+            .serviceInstanceId("service-instance-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

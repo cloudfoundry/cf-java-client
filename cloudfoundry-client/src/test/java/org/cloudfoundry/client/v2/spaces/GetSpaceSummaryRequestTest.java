@@ -28,9 +28,9 @@ public final class GetSpaceSummaryRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetSpaceSummaryRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetSpaceSummaryRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetSpaceSummaryRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

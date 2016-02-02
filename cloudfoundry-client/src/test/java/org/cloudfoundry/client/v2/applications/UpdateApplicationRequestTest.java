@@ -28,9 +28,9 @@ public final class UpdateApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,9 +38,9 @@ public final class UpdateApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UpdateApplicationRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));

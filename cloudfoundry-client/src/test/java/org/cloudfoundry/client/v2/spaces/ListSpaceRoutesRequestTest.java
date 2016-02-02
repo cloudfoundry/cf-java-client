@@ -28,9 +28,9 @@ public final class ListSpaceRoutesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceRoutesRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class ListSpaceRoutesRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceRoutesRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

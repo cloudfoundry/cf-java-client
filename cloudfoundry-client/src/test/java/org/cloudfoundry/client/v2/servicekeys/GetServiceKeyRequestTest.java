@@ -29,9 +29,9 @@ public final class GetServiceKeyRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServiceKeyRequest.builder()
-                .serviceKeyId("test-service-key-id")
-                .build()
-                .isValid();
+            .serviceKeyId("test-service-key-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,8 +39,8 @@ public final class GetServiceKeyRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetServiceKeyRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service key id must be specified", result.getMessages().get(0));

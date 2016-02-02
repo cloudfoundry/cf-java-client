@@ -29,9 +29,9 @@ public class CreateServiceBindingRequestTest {
     @Test
     public void isNotValidNoApplicationId() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .build()
-                .isValid();
+            .serviceInstanceId("test-service-instance-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -40,8 +40,8 @@ public class CreateServiceBindingRequestTest {
     @Test
     public void isNotValidNoApplicationIdNorServiceInstanceId() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public class CreateServiceBindingRequestTest {
     @Test
     public void isNotValidNoServiceInstanceId() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-                .applicationId("app-id")
-                .build()
-                .isValid();
+            .applicationId("app-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service instance id must be specified", result.getMessages().get(0));
@@ -61,10 +61,10 @@ public class CreateServiceBindingRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServiceBindingRequest.builder()
-                .applicationId("app-id")
-                .serviceInstanceId("test-service-instance-id")
-                .build()
-                .isValid();
+            .applicationId("app-id")
+            .serviceInstanceId("test-service-instance-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

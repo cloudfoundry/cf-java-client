@@ -28,10 +28,10 @@ public final class RouteExistsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RouteExistsRequest.builder()
-                .domainId("test-domain-id")
-                .host("test-host")
-                .build()
-                .isValid();
+            .domainId("test-domain-id")
+            .host("test-host")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class RouteExistsRequestTest {
     @Test
     public void isValidNoDomainId() {
         ValidationResult result = RouteExistsRequest.builder()
-                .host("test-host")
-                .build()
-                .isValid();
+            .host("test-host")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class RouteExistsRequestTest {
     @Test
     public void isValidNoHost() {
         ValidationResult result = RouteExistsRequest.builder()
-                .domainId("test-domain-id")
-                .build()
-                .isValid();
+            .domainId("test-domain-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("host must be specified", result.getMessages().get(0));

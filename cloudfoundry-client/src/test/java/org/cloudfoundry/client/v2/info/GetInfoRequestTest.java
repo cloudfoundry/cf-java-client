@@ -27,8 +27,8 @@ public final class GetInfoRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetInfoRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

@@ -28,9 +28,9 @@ public final class StopApplicationRequestTest {
     @Test
     public void isValidId() {
         ValidationResult result = StopApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class StopApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = StopApplicationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));

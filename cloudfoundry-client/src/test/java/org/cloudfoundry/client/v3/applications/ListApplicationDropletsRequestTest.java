@@ -28,10 +28,10 @@ public final class ListApplicationDropletsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListApplicationDropletsRequest.builder()
-                .applicationId("test-application-id")
-                .state("test-state-1")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .state("test-state-1")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class ListApplicationDropletsRequestTest {
     @Test
     public void isValidInvalidPaginatedRequest() {
         ValidationResult result = ListApplicationDropletsRequest.builder()
-                .page(0)
-                .build()
-                .isValid();
+            .page(0)
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class ListApplicationDropletsRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListApplicationDropletsRequest.builder()
-                .state("test-state")
-                .build()
-                .isValid();
+            .state("test-state")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));

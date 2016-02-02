@@ -28,10 +28,10 @@ public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .organizationId("test-organization-id")
-                .username("test-username")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .username("test-username")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .username("test-username")
-                .build()
-                .isValid();
+            .username("test-username")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssociateOrganizationBillingManagerByUsernameRequestTest {
     @Test
     public void isValidNoUsername() {
         ValidationResult result = AssociateOrganizationBillingManagerByUsernameRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("username must be specified", result.getMessages().get(0));

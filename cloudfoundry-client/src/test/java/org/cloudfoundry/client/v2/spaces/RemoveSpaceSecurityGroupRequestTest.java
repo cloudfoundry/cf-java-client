@@ -28,10 +28,10 @@ public final class RemoveSpaceSecurityGroupRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveSpaceSecurityGroupRequest.builder()
-                .securityGroupId("test-security-group-id")
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .securityGroupId("test-security-group-id")
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class RemoveSpaceSecurityGroupRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = RemoveSpaceSecurityGroupRequest.builder()
-                .securityGroupId("test-security-group-id")
-                .build()
-                .isValid();
+            .securityGroupId("test-security-group-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class RemoveSpaceSecurityGroupRequestTest {
     @Test
     public void isValidNoSecurityGroupId() {
         ValidationResult result = RemoveSpaceSecurityGroupRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("security group id must be specified", result.getMessages().get(0));

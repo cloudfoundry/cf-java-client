@@ -26,7 +26,7 @@ public final class ListSpaceQuotaDefinitionsRequestTest {
     @Test
     public void isValid() {
         assertEquals(ValidationResult.Status.VALID,
-                ListSpaceQuotaDefinitionsRequest.builder().build().isValid().getStatus());
+            ListSpaceQuotaDefinitionsRequest.builder().build().isValid().getStatus());
     }
 
 }

@@ -28,10 +28,10 @@ public final class DeleteProcessInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteProcessInstanceRequest.builder()
-                .index("test-index")
-                .processId("test-process-id")
-                .build()
-                .isValid();
+            .index("test-index")
+            .processId("test-process-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class DeleteProcessInstanceRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteProcessInstanceRequest.builder()
-                .index("test-index")
-                .build()
-                .isValid();
+            .index("test-index")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("process id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class DeleteProcessInstanceRequestTest {
     @Test
     public void isValidNoIndex() {
         ValidationResult result = DeleteProcessInstanceRequest.builder()
-                .processId("test-process-id")
-                .build()
-                .isValid();
+            .processId("test-process-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("index must be specified", result.getMessages().get(0));

@@ -28,10 +28,10 @@ public final class DeleteSpaceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteSpaceRequest.builder()
-                .async(true)
-                .spaceId("space-test-id")
-                .build()
-                .isValid();
+            .async(true)
+            .spaceId("space-test-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class DeleteSpaceRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteSpaceRequest.builder()
-                .async(true)
-                .build()
-                .isValid();
+            .async(true)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

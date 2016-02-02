@@ -28,10 +28,10 @@ public final class AssociateOrganizationUserRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateOrganizationUserRequest.builder()
-                .organizationId("test-organization-id")
-                .userId("test-user-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .userId("test-user-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssociateOrganizationUserRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateOrganizationUserRequest.builder()
-                .userId("test-user-id")
-                .build()
-                .isValid();
+            .userId("test-user-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssociateOrganizationUserRequestTest {
     @Test
     public void isValidNoUserId() {
         ValidationResult result = AssociateOrganizationUserRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("user id must be specified", result.getMessages().get(0));

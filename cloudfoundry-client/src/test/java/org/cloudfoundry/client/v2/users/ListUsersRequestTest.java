@@ -27,8 +27,8 @@ public final class ListUsersRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListUsersRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

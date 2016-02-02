@@ -73,6 +73,7 @@ public final class ListOrganizationSpacesRequest extends PaginatedRequest implem
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String organizationId;
+
     @Builder
     ListOrganizationSpacesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                                   @Singular List<String> appIds,

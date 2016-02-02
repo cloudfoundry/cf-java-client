@@ -28,9 +28,9 @@ public final class GetEventRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetEventRequest.builder()
-                .eventId("test-event-id")
-                .build()
-                .isValid();
+            .eventId("test-event-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetEventRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetEventRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("event id must be specified", result.getMessages().get(0));

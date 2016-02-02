@@ -28,9 +28,9 @@ public final class DeleteServicePlanVisibilityRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteServicePlanVisibilityRequest.builder()
-                .servicePlanVisibilityId("test-service-plan-visibility-id")
-                .build()
-                .isValid();
+            .servicePlanVisibilityId("test-service-plan-visibility-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class DeleteServicePlanVisibilityRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteServicePlanVisibilityRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service plan visibility id must be specified", result.getMessages().get(0));

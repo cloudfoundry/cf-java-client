@@ -29,9 +29,9 @@ public final class GetServicePlanRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServicePlanRequest.builder()
-                .servicePlanId("test-service-plan-id")
-                .build()
-                .isValid();
+            .servicePlanId("test-service-plan-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,8 +39,8 @@ public final class GetServicePlanRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetServicePlanRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service plan id must be specified", result.getMessages().get(0));

@@ -26,9 +26,9 @@ public final class ListSpaceUserRolesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceUserRolesRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.VALID, result.getStatus());
     }
@@ -36,8 +36,8 @@ public final class ListSpaceUserRolesRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceUserRolesRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
     }

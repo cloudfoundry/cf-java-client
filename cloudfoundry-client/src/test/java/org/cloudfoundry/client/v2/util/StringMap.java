@@ -33,4 +33,5 @@ public final class StringMap extends HashMap<String, Object> {
     StringMap(@Singular Map<String, Object> entries) {
         super(entries);
     }
+
 }

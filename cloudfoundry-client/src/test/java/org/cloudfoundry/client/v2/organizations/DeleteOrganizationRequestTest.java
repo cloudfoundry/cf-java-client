@@ -28,9 +28,9 @@ public final class DeleteOrganizationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteOrganizationRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class DeleteOrganizationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteOrganizationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));

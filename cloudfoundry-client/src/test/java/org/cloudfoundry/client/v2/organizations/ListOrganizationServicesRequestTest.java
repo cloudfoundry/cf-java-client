@@ -28,9 +28,9 @@ public final class ListOrganizationServicesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListOrganizationServicesRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class ListOrganizationServicesRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListOrganizationServicesRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));

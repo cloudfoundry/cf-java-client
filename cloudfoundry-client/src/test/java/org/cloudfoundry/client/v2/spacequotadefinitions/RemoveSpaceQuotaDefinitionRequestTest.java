@@ -28,10 +28,10 @@ public class RemoveSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveSpaceQuotaDefinitionRequest.builder()
-                .spaceId("test-space-id")
-                .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .spaceQuotaDefinitionId("test-space-quota-definition-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public class RemoveSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = RemoveSpaceQuotaDefinitionRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space quota definition id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public class RemoveSpaceQuotaDefinitionRequestTest {
     @Test
     public void isValidNoSpaceId() {
         ValidationResult result = RemoveSpaceQuotaDefinitionRequest.builder()
-                .spaceQuotaDefinitionId("test-space-quota-definition-id")
-                .build()
-                .isValid();
+            .spaceQuotaDefinitionId("test-space-quota-definition-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

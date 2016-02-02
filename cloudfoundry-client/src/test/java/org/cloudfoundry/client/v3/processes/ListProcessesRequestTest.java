@@ -27,8 +27,8 @@ public final class ListProcessesRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListProcessesRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -36,9 +36,9 @@ public final class ListProcessesRequestTest {
     @Test
     public void isValidInvalidPaginatedRequest() {
         ValidationResult result = ListProcessesRequest.builder()
-                .page(0)
-                .build()
-                .isValid();
+            .page(0)
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));

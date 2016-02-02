@@ -29,10 +29,10 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isNotValidNoName() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-                .servicePlanId("service-plan-id")
-                .spaceId("space-id")
-                .build()
-                .isValid();
+            .servicePlanId("service-plan-id")
+            .spaceId("space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -41,10 +41,10 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isNotValidNoServicePlanId() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-                .name("name")
-                .spaceId("space-id")
-                .build()
-                .isValid();
+            .name("name")
+            .spaceId("space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service plan id must be specified", result.getMessages().get(0));
@@ -53,10 +53,10 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isNotValidNoSpaceId() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-                .name("name")
-                .servicePlanId("service-plan-id")
-                .build()
-                .isValid();
+            .name("name")
+            .servicePlanId("service-plan-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
@@ -65,11 +65,11 @@ public final class CreateServiceInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServiceInstanceRequest.builder()
-                .name("name")
-                .servicePlanId("service-plan-id")
-                .spaceId("space-id")
-                .build()
-                .isValid();
+            .name("name")
+            .servicePlanId("service-plan-id")
+            .spaceId("space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

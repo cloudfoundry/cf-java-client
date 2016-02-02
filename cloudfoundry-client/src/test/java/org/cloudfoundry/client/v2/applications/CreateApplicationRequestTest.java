@@ -28,10 +28,10 @@ public final class CreateApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateApplicationRequest.builder()
-                .name("test-name")
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .name("test-name")
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CreateApplicationRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = CreateApplicationRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class CreateApplicationRequestTest {
     @Test
     public void isValidNoSpaceId() {
         ValidationResult result = CreateApplicationRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

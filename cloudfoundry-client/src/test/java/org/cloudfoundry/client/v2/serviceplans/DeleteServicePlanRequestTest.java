@@ -29,10 +29,10 @@ public final class DeleteServicePlanRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteServicePlanRequest.builder()
-                .async(true)
-                .servicePlanId("test-id")
-                .build()
-                .isValid();
+            .async(true)
+            .servicePlanId("test-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -40,9 +40,9 @@ public final class DeleteServicePlanRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteServicePlanRequest.builder()
-                .async(true)
-                .build()
-                .isValid();
+            .async(true)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service plan id must be specified", result.getMessages().get(0));

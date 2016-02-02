@@ -71,14 +71,14 @@ public final class LoggregatorMessage {
      */
     public static LoggregatorMessage from(LogMessage logMessage) {
         return LoggregatorMessage.builder()
-                .applicationId(logMessage.getAppId())
-                .drainUrls(logMessage.getDrainUrlsList())
-                .message(logMessage.getMessage().toStringUtf8())
-                .messageType(MessageType.valueOf(logMessage.getMessageType().toString()))
-                .sourceId(logMessage.getSourceId())
-                .sourceName(logMessage.getSourceName())
-                .timestamp(new Date(NANOSECONDS.toMillis(logMessage.getTimestamp())))
-                .build();
+            .applicationId(logMessage.getAppId())
+            .drainUrls(logMessage.getDrainUrlsList())
+            .message(logMessage.getMessage().toStringUtf8())
+            .messageType(MessageType.valueOf(logMessage.getMessageType().toString()))
+            .sourceId(logMessage.getSourceId())
+            .sourceName(logMessage.getSourceName())
+            .timestamp(new Date(NANOSECONDS.toMillis(logMessage.getTimestamp())))
+            .build();
     }
 
     /**

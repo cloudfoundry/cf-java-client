@@ -28,10 +28,10 @@ public final class ScaleApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ScaleApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .type("web")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .type("web")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class ScaleApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ScaleApplicationRequest.builder()
-                .type("web")
-                .build()
-                .isValid();
+            .type("web")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class ScaleApplicationRequestTest {
     @Test
     public void isValidNoType() {
         ValidationResult result = ScaleApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("type must be specified", result.getMessages().get(0));

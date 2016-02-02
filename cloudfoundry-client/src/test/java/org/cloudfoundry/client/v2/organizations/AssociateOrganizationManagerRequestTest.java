@@ -28,10 +28,10 @@ public final class AssociateOrganizationManagerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateOrganizationManagerRequest.builder()
-                .organizationId("test-organization-id")
-                .managerId("test-manager-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .managerId("test-manager-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssociateOrganizationManagerRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateOrganizationManagerRequest.builder()
-                .managerId("test-manager-id")
-                .build()
-                .isValid();
+            .managerId("test-manager-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssociateOrganizationManagerRequestTest {
     @Test
     public void isValidNoManagerId() {
         ValidationResult result = AssociateOrganizationManagerRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("manager id must be specified", result.getMessages().get(0));

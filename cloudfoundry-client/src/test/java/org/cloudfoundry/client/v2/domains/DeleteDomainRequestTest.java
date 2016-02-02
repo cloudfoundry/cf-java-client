@@ -28,10 +28,10 @@ public final class DeleteDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteDomainRequest.builder()
-                .async(true)
-                .domainId("test-id")
-                .build()
-                .isValid();
+            .async(true)
+            .domainId("test-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class DeleteDomainRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteDomainRequest.builder()
-                .async(true)
-                .build()
-                .isValid();
+            .async(true)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain id must be specified", result.getMessages().get(0));

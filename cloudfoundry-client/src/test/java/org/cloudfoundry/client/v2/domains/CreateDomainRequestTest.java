@@ -28,11 +28,11 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateDomainRequest.builder()
-                .name("test-name")
-                .owningOrganizationId("test-owning-organization-id")
-                .wildcard(true)
-                .build()
-                .isValid();
+            .name("test-name")
+            .owningOrganizationId("test-owning-organization-id")
+            .wildcard(true)
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -40,10 +40,10 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = CreateDomainRequest.builder()
-                .owningOrganizationId("test-owning-organization-id")
-                .wildcard(true)
-                .build()
-                .isValid();
+            .owningOrganizationId("test-owning-organization-id")
+            .wildcard(true)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -52,10 +52,10 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValidNoWildcard() {
         ValidationResult result = CreateDomainRequest.builder()
-                .name("test-name")
-                .owningOrganizationId("test-owning-organization-id")
-                .build()
-                .isValid();
+            .name("test-name")
+            .owningOrganizationId("test-owning-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("wildcard must be specified", result.getMessages().get(0));

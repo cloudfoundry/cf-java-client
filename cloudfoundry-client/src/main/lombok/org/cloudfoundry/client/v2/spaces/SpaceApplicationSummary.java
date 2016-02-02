@@ -167,7 +167,7 @@ public final class SpaceApplicationSummary extends AbstractApplicationEntity {
                             @JsonProperty("service_names") @Singular List<String> serviceNames,
                             @JsonProperty("urls") @Singular List<String> urls) {
         super(buildpack, command, console, debug, detectedStartCommand, diego, diskQuota, dockerCredentialsJsons, dockerImage, environmentJsons, healthCheckTimeout, healthCheckType, instances,
-                memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
+            memory, name, production, spaceId, stackId, stagingFailedDescription, stagingFailedReason, state);
         this.detectedBuildpack = detectedBuildpack;
         this.enableSsh = enableSsh;
         this.id = id;

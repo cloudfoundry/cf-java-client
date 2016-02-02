@@ -26,9 +26,9 @@ public final class ListSpaceApplicationsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceApplicationsRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.VALID, result.getStatus());
     }
@@ -36,8 +36,8 @@ public final class ListSpaceApplicationsRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceApplicationsRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
     }

@@ -28,10 +28,10 @@ public final class UnmapApplicationRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UnmapApplicationRouteRequest.builder()
-                .applicationId("test-application-id")
-                .routeId("test-route-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .routeId("test-route-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class UnmapApplicationRouteRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UnmapApplicationRouteRequest.builder()
-                .routeId("test-route-id")
-                .build()
-                .isValid();
+            .routeId("test-route-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class UnmapApplicationRouteRequestTest {
     @Test
     public void isValidNoRouteId() {
         ValidationResult result = UnmapApplicationRouteRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("route id must be specified", result.getMessages().get(0));

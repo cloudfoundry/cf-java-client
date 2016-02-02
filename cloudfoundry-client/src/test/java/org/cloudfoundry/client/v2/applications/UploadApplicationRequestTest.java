@@ -30,15 +30,15 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .hash("test-hash")
-                        .path("test-path")
-                        .size(-1)
-                        .build())
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .applicationId("test-application-id")
+            .resource(UploadApplicationRequest.Resource.builder()
+                .hash("test-hash")
+                .path("test-path")
+                .size(-1)
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -46,14 +46,14 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoApplication() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .hash("test-hash")
-                        .path("test-path")
-                        .size(-1)
-                        .build())
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .resource(UploadApplicationRequest.Resource.builder()
+                .hash("test-hash")
+                .path("test-path")
+                .size(-1)
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application must be specified", result.getMessages().get(0));
@@ -62,14 +62,14 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .hash("test-hash")
-                        .path("test-path")
-                        .size(-1)
-                        .build())
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .resource(UploadApplicationRequest.Resource.builder()
+                .hash("test-hash")
+                .path("test-path")
+                .size(-1)
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -78,14 +78,14 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourceHash() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .path("test-path")
-                        .size(-1)
-                        .build())
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .applicationId("test-application-id")
+            .resource(UploadApplicationRequest.Resource.builder()
+                .path("test-path")
+                .size(-1)
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("resource hash must be specified", result.getMessages().get(0));
@@ -94,14 +94,14 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourcePath() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .hash("test-hash")
-                        .size(-1)
-                        .build())
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .applicationId("test-application-id")
+            .resource(UploadApplicationRequest.Resource.builder()
+                .hash("test-hash")
+                .size(-1)
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("resource path must be specified", result.getMessages().get(0));
@@ -110,14 +110,14 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourceSize() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .applicationId("test-application-id")
-                .resource(UploadApplicationRequest.Resource.builder()
-                        .hash("test-hash")
-                        .path("test-path")
-                        .build())
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .applicationId("test-application-id")
+            .resource(UploadApplicationRequest.Resource.builder()
+                .hash("test-hash")
+                .path("test-path")
+                .build())
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("resource size must be specified", result.getMessages().get(0));
@@ -126,10 +126,10 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResources() {
         ValidationResult result = UploadApplicationRequest.builder()
-                .application(new File("test-file"))
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .application(new File("test-file"))
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

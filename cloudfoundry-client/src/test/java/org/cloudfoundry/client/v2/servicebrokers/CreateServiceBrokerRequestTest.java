@@ -28,11 +28,11 @@ public final class CreateServiceBrokerRequestTest {
     @Test
     public void isNotValidNoName() {
         ValidationResult result = CreateServiceBrokerRequest.builder()
-                .authenticationPassword("password")
-                .authenticationUsername("username")
-                .brokerUrl("http://somewhere-over-the-rainbow.org")
-                .build()
-                .isValid();
+            .authenticationPassword("password")
+            .authenticationUsername("username")
+            .brokerUrl("http://somewhere-over-the-rainbow.org")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -41,11 +41,11 @@ public final class CreateServiceBrokerRequestTest {
     @Test
     public void isNotValidNoPassword() {
         ValidationResult result = CreateServiceBrokerRequest.builder()
-                .name("name")
-                .authenticationUsername("username")
-                .brokerUrl("http://somewhere-over-the-rainbow.org")
-                .build()
-                .isValid();
+            .name("name")
+            .authenticationUsername("username")
+            .brokerUrl("http://somewhere-over-the-rainbow.org")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("authentication password must be specified", result.getMessages().get(0));
@@ -54,11 +54,11 @@ public final class CreateServiceBrokerRequestTest {
     @Test
     public void isNotValidNoUrl() {
         ValidationResult result = CreateServiceBrokerRequest.builder()
-                .name("name")
-                .authenticationPassword("password")
-                .authenticationUsername("username")
-                .build()
-                .isValid();
+            .name("name")
+            .authenticationPassword("password")
+            .authenticationUsername("username")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("broker url must be specified", result.getMessages().get(0));
@@ -67,11 +67,11 @@ public final class CreateServiceBrokerRequestTest {
     @Test
     public void isNotValidNoUsername() {
         ValidationResult result = CreateServiceBrokerRequest.builder()
-                .name("name")
-                .authenticationPassword("password")
-                .brokerUrl("http://somewhere-over-the-rainbow.org")
-                .build()
-                .isValid();
+            .name("name")
+            .authenticationPassword("password")
+            .brokerUrl("http://somewhere-over-the-rainbow.org")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("authentication username must be specified", result.getMessages().get(0));
@@ -80,12 +80,12 @@ public final class CreateServiceBrokerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServiceBrokerRequest.builder()
-                .name("name")
-                .authenticationPassword("password")
-                .authenticationUsername("username")
-                .brokerUrl("http://somewhere-over-the-rainbow.org")
-                .build()
-                .isValid();
+            .name("name")
+            .authenticationPassword("password")
+            .authenticationUsername("username")
+            .brokerUrl("http://somewhere-over-the-rainbow.org")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

@@ -28,9 +28,9 @@ public final class DeleteServiceKeyRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteServiceKeyRequest.builder()
-                .serviceKeyId("test-service-key-id")
-                .build()
-                .isValid();
+            .serviceKeyId("test-service-key-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class DeleteServiceKeyRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteServiceKeyRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service key id must be specified", result.getMessages().get(0));

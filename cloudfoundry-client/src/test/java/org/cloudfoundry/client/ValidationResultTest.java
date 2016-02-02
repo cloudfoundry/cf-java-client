@@ -27,8 +27,8 @@ public final class ValidationResultTest {
     @Test
     public void invalid() {
         ValidationResult result = ValidationResult.builder()
-                .message("Test Message")
-                .build();
+            .message("Test Message")
+            .build();
 
         assertEquals(INVALID, result.getStatus());
     }
@@ -36,7 +36,7 @@ public final class ValidationResultTest {
     @Test
     public void valid() {
         ValidationResult result = ValidationResult.builder()
-                .build();
+            .build();
 
         assertEquals(VALID, result.getStatus());
     }

@@ -25,9 +25,9 @@ public final class RequestValidationExceptionTest {
     @Test
     public void test() {
         ValidationResult validationResult = ValidationResult.builder()
-                .message("test-message-1")
-                .message("test-message-2")
-                .build();
+            .message("test-message-1")
+            .message("test-message-2")
+            .build();
 
         RequestValidationException exception = new RequestValidationException(validationResult);
 

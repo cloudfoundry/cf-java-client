@@ -33,7 +33,7 @@ public final class GetServiceBindingResponse extends Resource<ServiceBindingEnti
 
     @Builder
     GetServiceBindingResponse(@JsonProperty("entity") ServiceBindingEntity entity,
-                           @JsonProperty("metadata") Metadata metadata) {
+                              @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

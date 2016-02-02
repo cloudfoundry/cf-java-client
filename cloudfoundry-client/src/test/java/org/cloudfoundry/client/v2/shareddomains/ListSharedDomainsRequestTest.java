@@ -27,9 +27,9 @@ public final class ListSharedDomainsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSharedDomainsRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

@@ -28,12 +28,12 @@ public final class UpdateOrganizationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateOrganizationRequest.builder()
-                .organizationId("test-organization-id")
-                .name("test-name")
-                .quotaDefinitionId("test-quota-definition-id")
-                .status("test-status")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .name("test-name")
+            .quotaDefinitionId("test-quota-definition-id")
+            .status("test-status")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -41,11 +41,11 @@ public final class UpdateOrganizationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UpdateOrganizationRequest.builder()
-                .name("test-name")
-                .quotaDefinitionId("test-quota-definition-id")
-                .status("test-status")
-                .build()
-                .isValid();
+            .name("test-name")
+            .quotaDefinitionId("test-quota-definition-id")
+            .status("test-status")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));

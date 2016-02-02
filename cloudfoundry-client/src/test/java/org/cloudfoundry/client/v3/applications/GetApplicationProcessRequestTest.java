@@ -28,10 +28,10 @@ public final class GetApplicationProcessRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetApplicationProcessRequest.builder()
-                .applicationId("test-application-id")
-                .type("test-type")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .type("test-type")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class GetApplicationProcessRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetApplicationProcessRequest.builder()
-                .type("test-type")
-                .build()
-                .isValid();
+            .type("test-type")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class GetApplicationProcessRequestTest {
     @Test
     public void isValidNoType() {
         ValidationResult result = GetApplicationProcessRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("type must be specified", result.getMessages().get(0));

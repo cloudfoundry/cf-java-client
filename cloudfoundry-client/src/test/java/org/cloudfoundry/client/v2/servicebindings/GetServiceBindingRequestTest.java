@@ -25,12 +25,13 @@ import static org.junit.Assert.assertEquals;
 
 
 public class GetServiceBindingRequestTest {
+
     @Test
     public void isValid() {
         ValidationResult result = GetServiceBindingRequest.builder()
-                .serviceBindingId("test-service-binding-id")
-                .build()
-                .isValid();
+            .serviceBindingId("test-service-binding-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +39,8 @@ public class GetServiceBindingRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetServiceBindingRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service binding id must be specified", result.getMessages().get(0));

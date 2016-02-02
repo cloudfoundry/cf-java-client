@@ -29,9 +29,9 @@ public final class GetServiceBrokerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServiceBrokerRequest.builder()
-                .serviceBrokerId("test-service-broker-id")
-                .build()
-                .isValid();
+            .serviceBrokerId("test-service-broker-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,8 +39,8 @@ public final class GetServiceBrokerRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetServiceBrokerRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service broker id must be specified", result.getMessages().get(0));

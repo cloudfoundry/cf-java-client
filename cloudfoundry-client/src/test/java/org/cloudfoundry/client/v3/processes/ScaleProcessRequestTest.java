@@ -28,9 +28,9 @@ public final class ScaleProcessRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ScaleProcessRequest.builder()
-                .processId("test-process-id")
-                .build()
-                .isValid();
+            .processId("test-process-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class ScaleProcessRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ScaleProcessRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("process id must be specified", result.getMessages().get(0));

@@ -28,10 +28,10 @@ public final class AssignApplicationDropletRequestTest {
     @Test
     public void isValidId() {
         ValidationResult result = AssignApplicationDropletRequest.builder()
-                .applicationId("test-application-id")
-                .dropletId("test-droplet-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .dropletId("test-droplet-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssignApplicationDropletRequestTest {
     @Test
     public void isValidNoDropletId() {
         ValidationResult result = AssignApplicationDropletRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("droplet id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssignApplicationDropletRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssignApplicationDropletRequest.builder()
-                .dropletId("test-droplet-id")
-                .build()
-                .isValid();
+            .dropletId("test-droplet-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));

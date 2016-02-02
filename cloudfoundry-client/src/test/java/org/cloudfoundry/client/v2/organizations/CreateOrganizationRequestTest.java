@@ -28,9 +28,9 @@ public final class CreateOrganizationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateOrganizationRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class CreateOrganizationRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = CreateOrganizationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));

@@ -21,6 +21,9 @@
           <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
           <option name="WRAP_LONG_LINES" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+          <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+          </indentOptions>
           <arrangement>
             <rules>
               <section>

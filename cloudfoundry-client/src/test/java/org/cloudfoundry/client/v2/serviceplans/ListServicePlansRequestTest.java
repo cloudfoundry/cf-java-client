@@ -26,7 +26,7 @@ public final class ListServicePlansRequestTest {
     @Test
     public void isValid() {
         assertEquals(ValidationResult.Status.VALID,
-                ListServicePlansRequest.builder().build().isValid().getStatus());
+            ListServicePlansRequest.builder().build().isValid().getStatus());
     }
 
 }

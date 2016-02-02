@@ -28,9 +28,9 @@ public final class ListSpaceDevelopersRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListSpaceDevelopersRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class ListSpaceDevelopersRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListSpaceDevelopersRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

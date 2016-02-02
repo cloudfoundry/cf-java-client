@@ -29,9 +29,9 @@ public final class CreateServicePlanVisibilityRequestTest {
     @Test
     public void isNotValidNoOrganizationId() {
         ValidationResult result = CreateServicePlanVisibilityRequest.builder()
-                .servicePlanId("service-plan-id")
-                .build()
-                .isValid();
+            .servicePlanId("service-plan-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));
@@ -40,9 +40,9 @@ public final class CreateServicePlanVisibilityRequestTest {
     @Test
     public void isNotValidNoServicePlanId() {
         ValidationResult result = CreateServicePlanVisibilityRequest.builder()
-                .organizationId("organization-id")
-                .build()
-                .isValid();
+            .organizationId("organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service plan id must be specified", result.getMessages().get(0));
@@ -51,10 +51,10 @@ public final class CreateServicePlanVisibilityRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateServicePlanVisibilityRequest.builder()
-                .organizationId("organization-id")
-                .servicePlanId("service-plan-id")
-                .build()
-                .isValid();
+            .organizationId("organization-id")
+            .servicePlanId("service-plan-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

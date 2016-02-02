@@ -28,10 +28,10 @@ public final class RemoveSpaceManagerByUsernameRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("test-username")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .username("test-username")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class RemoveSpaceManagerByUsernameRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
-                .username("test-username")
-                .build()
-                .isValid();
+            .username("test-username")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class RemoveSpaceManagerByUsernameRequestTest {
     @Test
     public void isValidNoUsername() {
         ValidationResult result = RemoveSpaceManagerByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("username must be specified", result.getMessages().get(0));

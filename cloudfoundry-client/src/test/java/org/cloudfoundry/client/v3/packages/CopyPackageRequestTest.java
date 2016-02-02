@@ -28,10 +28,10 @@ public final class CopyPackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CopyPackageRequest.builder()
-                .applicationId("test-application-id")
-                .sourcePackageId("test-source-package-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .sourcePackageId("test-source-package-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CopyPackageRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = CopyPackageRequest.builder()
-                .sourcePackageId("test-source-package-id")
-                .build()
-                .isValid();
+            .sourcePackageId("test-source-package-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class CopyPackageRequestTest {
     @Test
     public void isValidNoSourceId() {
         ValidationResult result = CopyPackageRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("source package id must be specified", result.getMessages().get(0));

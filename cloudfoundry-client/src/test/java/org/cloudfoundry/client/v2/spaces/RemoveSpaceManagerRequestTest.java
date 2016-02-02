@@ -28,10 +28,10 @@ public final class RemoveSpaceManagerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveSpaceManagerRequest.builder()
-                .managerId("test-manager-id")
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .managerId("test-manager-id")
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class RemoveSpaceManagerRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = RemoveSpaceManagerRequest.builder()
-                .managerId("test-manager-id")
-                .build()
-                .isValid();
+            .managerId("test-manager-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class RemoveSpaceManagerRequestTest {
     @Test
     public void isValidNoManagerId() {
         ValidationResult result = RemoveSpaceManagerRequest.builder()
-                .spaceId("test-id")
-                .build()
-                .isValid();
+            .spaceId("test-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("manager id must be specified", result.getMessages().get(0));

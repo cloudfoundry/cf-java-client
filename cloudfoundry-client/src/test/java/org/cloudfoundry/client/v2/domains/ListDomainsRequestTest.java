@@ -27,8 +27,8 @@ public final class ListDomainsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListDomainsRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }

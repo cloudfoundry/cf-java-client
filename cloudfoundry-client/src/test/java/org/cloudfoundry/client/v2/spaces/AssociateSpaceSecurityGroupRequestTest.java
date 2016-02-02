@@ -28,10 +28,10 @@ public final class AssociateSpaceSecurityGroupRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-                .securityGroupId("test-security-group-id")
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .securityGroupId("test-security-group-id")
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssociateSpaceSecurityGroupRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-                .securityGroupId("test-security-group-id")
-                .build()
-                .isValid();
+            .securityGroupId("test-security-group-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssociateSpaceSecurityGroupRequestTest {
     @Test
     public void isValidNoSecurityGroupId() {
         ValidationResult result = AssociateSpaceSecurityGroupRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("security group id must be specified", result.getMessages().get(0));

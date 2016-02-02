@@ -50,8 +50,8 @@ public final class AssociateSpaceDeveloperByUsernameRequest implements Validatab
 
     @Builder
     AssociateSpaceDeveloperByUsernameRequest(
-            String spaceId,
-            String username) {
+        String spaceId,
+        String username) {
 
         this.spaceId = spaceId;
         this.username = username;

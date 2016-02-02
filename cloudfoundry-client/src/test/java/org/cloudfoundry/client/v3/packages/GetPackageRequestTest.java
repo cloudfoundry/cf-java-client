@@ -28,9 +28,9 @@ public final class GetPackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetPackageRequest.builder()
-                .packageId("test-package-id")
-                .build()
-                .isValid();
+            .packageId("test-package-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetPackageRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetPackageRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("package id must be specified", result.getMessages().get(0));

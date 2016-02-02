@@ -28,9 +28,9 @@ public final class DownloadApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DownloadApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class DownloadApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DownloadApplicationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));

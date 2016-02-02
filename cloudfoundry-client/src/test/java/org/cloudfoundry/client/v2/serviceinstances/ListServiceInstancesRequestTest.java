@@ -26,7 +26,7 @@ public final class ListServiceInstancesRequestTest {
     @Test
     public void isValid() {
         assertEquals(ValidationResult.Status.VALID,
-                ListServiceInstancesRequest.builder().build().isValid().getStatus());
+            ListServiceInstancesRequest.builder().build().isValid().getStatus());
     }
 
 }

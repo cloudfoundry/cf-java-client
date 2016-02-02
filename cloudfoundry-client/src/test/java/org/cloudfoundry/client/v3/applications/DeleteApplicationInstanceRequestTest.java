@@ -28,11 +28,11 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .index("test-index")
-                .type("test-type")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .index("test-index")
+            .type("test-type")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -40,10 +40,10 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .index("test-index")
-                .type("test-type")
-                .build()
-                .isValid();
+            .index("test-index")
+            .type("test-type")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -52,10 +52,10 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValidNoIndex() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .type("test-type")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .type("test-type")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("index must be specified", result.getMessages().get(0));
@@ -64,10 +64,10 @@ public final class DeleteApplicationInstanceRequestTest {
     @Test
     public void isValidNoType() {
         ValidationResult result = DeleteApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .index("test-index")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .index("test-index")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("type must be specified", result.getMessages().get(0));

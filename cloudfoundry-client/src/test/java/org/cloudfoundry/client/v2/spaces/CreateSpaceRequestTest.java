@@ -28,10 +28,10 @@ public final class CreateSpaceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateSpaceRequest.builder()
-                .name("test-name")
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .name("test-name")
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CreateSpaceRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = CreateSpaceRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class CreateSpaceRequestTest {
     @Test
     public void isValidNoOrganizationId() {
         ValidationResult result = CreateSpaceRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));

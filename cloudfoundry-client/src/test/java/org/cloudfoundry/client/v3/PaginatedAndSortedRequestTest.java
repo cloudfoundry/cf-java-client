@@ -33,9 +33,9 @@ public final class PaginatedAndSortedRequestTest {
     @Test
     public void isPaginatedAndSortedRequestValid() {
         ValidationResult result = StubPaginatedAndSortedRequest.builder()
-                .build()
-                .isPaginatedAndSortedRequestValid()
-                .build();
+            .build()
+            .isPaginatedAndSortedRequestValid()
+            .build();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -43,10 +43,10 @@ public final class PaginatedAndSortedRequestTest {
     @Test
     public void isPaginatedAndSortedRequestValidInvalidPaginatedRequest() {
         ValidationResult result = StubPaginatedAndSortedRequest.builder()
-                .page(-1)
-                .build()
-                .isPaginatedAndSortedRequestValid()
-                .build();
+            .page(-1)
+            .build()
+            .isPaginatedAndSortedRequestValid()
+            .build();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));

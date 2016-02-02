@@ -28,10 +28,10 @@ public final class TerminateApplicationInstanceRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = TerminateApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .index("test-index")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .index("test-index")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class TerminateApplicationInstanceRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = TerminateApplicationInstanceRequest.builder()
-                .index("test-index")
-                .build()
-                .isValid();
+            .index("test-index")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("application id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class TerminateApplicationInstanceRequestTest {
     @Test
     public void isValidNoIndex() {
         ValidationResult result = TerminateApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .build()
-                .isValid();
+            .applicationId("test-application-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("index must be specified", result.getMessages().get(0));

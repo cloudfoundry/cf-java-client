@@ -28,10 +28,10 @@ public final class AssociateSpaceAuditorRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = AssociateSpaceAuditorRequest.builder()
-                .auditorId("test-auditor-id")
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .auditorId("test-auditor-id")
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class AssociateSpaceAuditorRequestTest {
     @Test
     public void isValidNoAuditorId() {
         ValidationResult result = AssociateSpaceAuditorRequest.builder()
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("auditor id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class AssociateSpaceAuditorRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = AssociateSpaceAuditorRequest.builder()
-                .auditorId("test-auditor-id")
-                .build()
-                .isValid();
+            .auditorId("test-auditor-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

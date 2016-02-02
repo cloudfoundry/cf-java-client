@@ -28,10 +28,10 @@ public final class UpdateProcessRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UpdateProcessRequest.builder()
-                .processId("test-process-id")
-                .command("test-command")
-                .build()
-                .isValid();
+            .processId("test-process-id")
+            .command("test-command")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class UpdateProcessRequestTest {
     @Test
     public void isValidNoCommand() {
         ValidationResult result = UpdateProcessRequest.builder()
-                .processId("test-process-id")
-                .build()
-                .isValid();
+            .processId("test-process-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("command must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class UpdateProcessRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UpdateProcessRequest.builder()
-                .command("test-command")
-                .build()
-                .isValid();
+            .command("test-command")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("process id must be specified", result.getMessages().get(0));

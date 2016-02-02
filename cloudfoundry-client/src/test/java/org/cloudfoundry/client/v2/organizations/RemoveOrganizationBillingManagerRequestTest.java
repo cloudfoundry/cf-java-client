@@ -28,10 +28,10 @@ public final class RemoveOrganizationBillingManagerRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = RemoveOrganizationBillingManagerRequest.builder()
-                .billingManagerId("test-billing-manager-id")
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .billingManagerId("test-billing-manager-id")
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class RemoveOrganizationBillingManagerRequestTest {
     @Test
     public void isValidNoBillingManagerId() {
         ValidationResult result = RemoveOrganizationBillingManagerRequest.builder()
-                .organizationId("test-organization-id")
-                .build()
-                .isValid();
+            .organizationId("test-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("billing manager id must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class RemoveOrganizationBillingManagerRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = RemoveOrganizationBillingManagerRequest.builder()
-                .billingManagerId("test-billing-manager-id")
-                .build()
-                .isValid();
+            .billingManagerId("test-billing-manager-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization id must be specified", result.getMessages().get(0));

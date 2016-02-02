@@ -28,14 +28,14 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateRouteRequest.builder()
-                .domainId("test-domain-id")
-                .generatePort("test-generate-port")
-                .host("test-host")
-                .path("test-path")
-                .port(10000)
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .domainId("test-domain-id")
+            .generatePort("test-generate-port")
+            .host("test-host")
+            .path("test-path")
+            .port(10000)
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -43,13 +43,13 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValidNoDomainId() {
         ValidationResult result = CreateRouteRequest.builder()
-                .generatePort("test-generate-port")
-                .host("test-host")
-                .path("test-path")
-                .port(10000)
-                .spaceId("test-space-id")
-                .build()
-                .isValid();
+            .generatePort("test-generate-port")
+            .host("test-host")
+            .path("test-path")
+            .port(10000)
+            .spaceId("test-space-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain id must be specified", result.getMessages().get(0));
@@ -58,13 +58,13 @@ public final class CreateRouteRequestTest {
     @Test
     public void isValidNoSpaceId() {
         ValidationResult result = CreateRouteRequest.builder()
-                .domainId("test-domain-id")
-                .generatePort("test-generate-port")
-                .host("test-host")
-                .path("test-path")
-                .port(10000)
-                .build()
-                .isValid();
+            .domainId("test-domain-id")
+            .generatePort("test-generate-port")
+            .host("test-host")
+            .path("test-path")
+            .port(10000)
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space id must be specified", result.getMessages().get(0));

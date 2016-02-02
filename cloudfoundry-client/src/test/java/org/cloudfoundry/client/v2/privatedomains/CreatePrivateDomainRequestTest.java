@@ -28,10 +28,10 @@ public final class CreatePrivateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreatePrivateDomainRequest.builder()
-                .name("test-name")
-                .owningOrganizationId("test-owning-organization-id")
-                .build()
-                .isValid();
+            .name("test-name")
+            .owningOrganizationId("test-owning-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CreatePrivateDomainRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = CreatePrivateDomainRequest.builder()
-                .owningOrganizationId("test-owning-organization-id")
-                .build()
-                .isValid();
+            .owningOrganizationId("test-owning-organization-id")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));

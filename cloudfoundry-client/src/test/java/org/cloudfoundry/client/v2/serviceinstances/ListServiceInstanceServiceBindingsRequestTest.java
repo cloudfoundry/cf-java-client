@@ -29,9 +29,9 @@ public final class ListServiceInstanceServiceBindingsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = ListServiceInstanceServiceBindingsRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .build()
-                .isValid();
+            .serviceInstanceId("test-service-instance-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,8 +39,8 @@ public final class ListServiceInstanceServiceBindingsRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = ListServiceInstanceServiceBindingsRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("service instance id must be specified", result.getMessages().get(0));

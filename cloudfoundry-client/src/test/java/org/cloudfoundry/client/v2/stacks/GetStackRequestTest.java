@@ -28,9 +28,9 @@ public final class GetStackRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetStackRequest.builder()
-                .stackId("test-stack-id")
-                .build()
-                .isValid();
+            .stackId("test-stack-id")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetStackRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = GetStackRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("stack id must be specified", result.getMessages().get(0));
