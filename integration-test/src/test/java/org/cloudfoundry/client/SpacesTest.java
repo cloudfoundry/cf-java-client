@@ -81,15 +81,15 @@ import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 
+import static java.time.temporal.ChronoUnit.HOURS;
 import static org.cloudfoundry.operations.util.Tuples.function;
 import static org.junit.Assert.assertEquals;
 
 public final class SpacesTest extends AbstractIntegrationTest {
-
-    private static final long ONE_SECOND_IN_MS = 1000L;
 
     private static final String TEST_APPLICATION_NAME = "space-test-application-name";
 
@@ -1716,9 +1716,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private static Mono<String> getPastTimestamp() {
         return Mono
                 .fromCallable(() -> {
-                    Date now = new Date();
-                    now.setTime(now.getTime() - ONE_SECOND_IN_MS * 60 * 60); // CF's clock may vary from ours
-                    return Dates.format(now);
+                    Date past = Date.from(Instant.now().minus(1, HOURS));
+                    return Dates.format(past);
                 });
     }
 
