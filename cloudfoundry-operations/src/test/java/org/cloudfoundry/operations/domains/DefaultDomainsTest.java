@@ -56,7 +56,6 @@ public final class DefaultDomainsTest {
             CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
                     .name("test-domain-name")
                     .owningOrganizationId("test-organization-id")
-                    .wildcard(true)
                     .build();
 
             CreatePrivateDomainResponse response2 = CreatePrivateDomainResponse.builder().build();
@@ -102,7 +101,6 @@ public final class DefaultDomainsTest {
             CreatePrivateDomainRequest request2 = CreatePrivateDomainRequest.builder()
                     .name("test-domain-name")
                     .owningOrganizationId("test-organization-id")
-                    .wildcard(true)
                     .build();
 
             when(this.privateDomains.create(request2)).thenThrow(new CloudFoundryException(130003, "The domain name is taken: local.micropcf.io", "CF-DomainNameTaken"));

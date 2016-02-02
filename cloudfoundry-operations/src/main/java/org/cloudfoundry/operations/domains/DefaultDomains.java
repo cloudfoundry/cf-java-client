@@ -55,7 +55,6 @@ public final class DefaultDomains implements Domains {
                         CreatePrivateDomainRequest.builder()
                                 .owningOrganizationId(organizationId)
                                 .name(domainName)
-                                .wildcard(true)
                                 .build())
                         .after();
             }

@@ -47,20 +47,10 @@ public final class CreatePrivateDomainRequest implements Validatable {
     @Getter(onMethod = @__(@JsonProperty("owning_organization_guid")))
     private final String owningOrganizationId;
 
-    /**
-     * The wildcard
-     *
-     * @param wildcard the wildcard
-     * @return the wildcard
-     */
-    @Getter(onMethod = @__(@JsonProperty("wildcard")))
-    private final Boolean wildcard;
-
     @Builder
-    CreatePrivateDomainRequest(String name, String owningOrganizationId, Boolean wildcard) {
+    CreatePrivateDomainRequest(String name, String owningOrganizationId) {
         this.name = name;
         this.owningOrganizationId = owningOrganizationId;
-        this.wildcard = wildcard;
     }
 
     @Override
