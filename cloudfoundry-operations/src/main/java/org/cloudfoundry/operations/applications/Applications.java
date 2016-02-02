@@ -25,6 +25,15 @@ import reactor.core.publisher.Mono;
 public interface Applications {
 
     /**
+     * Deletes a specific application and, optionally, all routes mapped to the application.
+     *
+     * Warning: deleting routes mapped to the application deletes them even if they are mapped to other applications.
+     *
+     * @param request the delete application request
+     */
+    Mono<Void> delete(DeleteApplicationRequest request);
+
+    /**
      * Gets information for a specific application
      *
      * @param request the get application request

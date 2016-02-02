@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
@@ -47,6 +48,7 @@ import org.cloudfoundry.operations.util.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
+import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple4;
 import reactor.rx.Stream;
@@ -62,6 +64,8 @@ import static org.cloudfoundry.operations.util.Tuples.function;
 
 public final class DefaultApplications implements Applications {
 
+    public static final Mono<List<Route>> NO_ROUTES = Mono.just((List<Route>) new ArrayList<Route>());
+
     private final CloudFoundryClient cloudFoundryClient;
 
     private final Mono<String> spaceId;
@@ -69,6 +73,16 @@ public final class DefaultApplications implements Applications {
     public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.spaceId = spaceId;
+    }
+
+    @Override
+    public Mono<Void> delete(DeleteApplicationRequest request) {
+        return Validators
+                .validate(request)
+                .and(this.spaceId)
+                .then(determineApplicationAndRoutesToDelete(this.cloudFoundryClient))
+                .then(deleteRoutes(this.cloudFoundryClient))
+                .then(deleteApplication(this.cloudFoundryClient));
     }
 
     @Override
@@ -134,6 +148,89 @@ public final class DefaultApplications implements Applications {
                                 .build();
                     }
                 });
+    }
+
+    private static Function<String, Mono<Void>> deleteApplication(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<Void>>() {
+
+            @Override
+            public Mono<Void> apply(String applicationId) {
+                return cloudFoundryClient.applicationsV2().delete(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .build());
+            }
+
+        };
+    }
+
+    private static Function<Tuple2<List<Route>, String>, Mono<String>> deleteRoutes(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function2<List<Route>, String, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(List<Route> routes, final String applicationId) {
+                return Stream.fromIterable(routes)
+                        .map(new Function<Route, String>() {
+
+                            @Override
+                            public String apply(Route route) {
+                                return route.getId();
+                            }
+
+                        })
+                        .flatMap(new Function<String, Mono<Void>>() {
+
+                            @Override
+                            public Mono<Void> apply(String routeId) {
+                                return cloudFoundryClient.routes().delete(DeleteRouteRequest.builder()
+                                        .routeId(routeId)
+                                        .build());
+                            }
+
+                        })
+                        .after() // Convert to Mono preserving any error
+                        .after(new Supplier<Mono<String>>() {
+
+                            @Override
+                            public Mono<String> get() {
+                                return Mono.just(applicationId);
+                            }
+
+                        });
+            }
+
+        });
+    }
+
+    private static Function<Tuple2<DeleteApplicationRequest, String>, Mono<Tuple2<List<Route>, String>>> determineApplicationAndRoutesToDelete(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function2<DeleteApplicationRequest, String, Mono<Tuple2<List<Route>, String>>>() {
+
+            @Override
+            public Mono<Tuple2<List<Route>, String>> apply(final DeleteApplicationRequest deleteApplicationRequest, final String spaceId) {
+                String applicationName = deleteApplicationRequest.getName();
+                boolean deleteRoutes = deleteApplicationRequest.getDeleteRoutes();
+
+                return Paginated
+                        .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, applicationName))
+                        .map(Resources.extractId())
+                        .single()
+                        .otherwise(Exceptions.<String>convert("Application %s does not exist", applicationName))
+                        .then(determineRoutesToDelete(cloudFoundryClient, deleteRoutes));
+            }
+
+        });
+    }
+
+    private static Function<String, Mono<Tuple2<List<Route>, String>>> determineRoutesToDelete(final CloudFoundryClient cloudFoundryClient, final boolean deleteRoutes) {
+        return new Function<String, Mono<Tuple2<List<Route>, String>>>() {
+
+            @Override
+            public Mono<Tuple2<List<Route>, String>> apply(final String applicationId) {
+
+                return (deleteRoutes ? requestApplicationRoutes(cloudFoundryClient, applicationId) : NO_ROUTES)
+                        .and(Mono.just(applicationId));
+            }
+
+        };
     }
 
     private static Function<GetSpaceSummaryResponse, Stream<SpaceApplicationSummary>> extractApplications() {
@@ -206,11 +303,25 @@ public final class DefaultApplications implements Applications {
             @Override
             public Mono<ApplicationResource> apply(GetApplicationRequest getApplicationRequest, String spaceId) {
                 return Paginated
-                        .requestResources(requestListApplicationsPage(cloudFoundryClient, getApplicationRequest, spaceId))
+                        .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, getApplicationRequest.getName()))
                         .single();
             }
 
         });
+    }
+
+    private static Mono<List<Route>> requestApplicationRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2().summary(SummaryApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build())
+                .map(new Function<SummaryApplicationResponse, List<Route>>() {
+
+                    @Override
+                    public List<Route> apply(SummaryApplicationResponse summaryApplicationResponse) {
+                        return summaryApplicationResponse.getRoutes();
+                    }
+
+                });
     }
 
     private static Mono<ApplicationStatisticsResponse> requestApplicationStats(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -229,14 +340,13 @@ public final class DefaultApplications implements Applications {
         return cloudFoundryClient.applicationsV2().summary(request);
     }
 
-    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient cloudFoundryClient, final GetApplicationRequest getApplicationRequest,
-                                                                                                      final String spaceId) {
+    private static Function<Integer, Mono<ListSpaceApplicationsResponse>> requestListApplicationsPage(final CloudFoundryClient cloudFoundryClient, final String spaceId, final String applicationName) {
         return new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
             @Override
             public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
                 ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                        .name(getApplicationRequest.getName())
+                        .name(applicationName)
                         .spaceId(spaceId)
                         .page(page)
                         .build();
