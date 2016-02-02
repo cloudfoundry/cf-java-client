@@ -730,9 +730,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .assertThat(this::assertTupleEquality));
     }
 
+    @Ignore("TODO: awaiting https://www.pivotaltracker.com/story/show/101522686 really create a new user")
     @Test
     public void listFilterByDeveloperId() {
-        // TODO: this test will break if userId is a developerId for another space; see createUserId()
+        // this test will break if userId is a developerId for another space; see above
         createOrganizationId(this.cloudFoundryClient, TEST_ORGANIZATION_NAME)
                 .then(organizationId -> Mono
                         .when(
