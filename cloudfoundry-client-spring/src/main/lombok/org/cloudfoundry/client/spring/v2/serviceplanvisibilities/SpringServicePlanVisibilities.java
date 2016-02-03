@@ -19,9 +19,12 @@ package org.cloudfoundry.client.spring.v2.serviceplanvisibilities;
 
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,7 +37,7 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations } to use to communicate with the server
+     * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
@@ -62,6 +65,20 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
                 builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
                 QueryBuilder.augment(builder, request);
             }
+        });
+    }
+
+    @Override
+    public Mono<ListServicePlanVisibilitiesResponse> list(final ListServicePlanVisibilitiesRequest request) {
+        return get(request, ListServicePlanVisibilitiesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plan_visibilities");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
         });
     }
 
