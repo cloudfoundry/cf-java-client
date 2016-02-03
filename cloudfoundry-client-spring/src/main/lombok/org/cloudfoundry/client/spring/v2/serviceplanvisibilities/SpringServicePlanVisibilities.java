@@ -37,7 +37,7 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
     /**
      * Creates an instance
      *
-     * @param restOperations the {@link RestOperations } to use to communicate with the server
+     * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
@@ -81,5 +81,5 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
 
         });
     }
-    
+
 }

@@ -27,5 +27,5 @@ public final class ListServicePlanVisibilitiesRequestTest {
     public void isValid() {
         assertEquals(VALID, ListServicePlanVisibilitiesRequest.builder().build().isValid().getStatus());
     }
-    
+
 }
