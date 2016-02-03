@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -98,6 +100,120 @@ public final class DefaultApplicationsTest {
                         .build())
                 .build();
         when(client.stacks().get(stackRequest)).thenReturn(Mono.just(stackResponse));
+    }
+
+    public static final class DeleteInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            DeleteApplicationRequest request = DeleteApplicationRequest.builder()
+                    .build();
+            return this.applications.delete(request);
+        }
+    }
+
+    public static final class DeleteAndDeleteRoutes extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-name")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(),"application-")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+
+            SummaryApplicationRequest request2 = fill(SummaryApplicationRequest.builder())
+                    .applicationId("test-application-id")
+                    .build();
+            SummaryApplicationResponse response2 = fill(SummaryApplicationResponse.builder())
+                    .route(fill(Route.builder(),"route-").build())
+                    .build();
+            when(this.cloudFoundryClient.applicationsV2().summary(request2)).thenReturn(Mono.just(response2));
+
+            DeleteRouteRequest request3 = fill(DeleteRouteRequest.builder())
+                    .async(null)
+                    .routeId("test-route-id")
+                    .build();
+            System.out.println(request3);
+            when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<Void>empty());
+
+            org.cloudfoundry.client.v2.applications.DeleteApplicationRequest request4 = fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
+                    .applicationId("test-application-id")
+                    .build();
+            when(this.cloudFoundryClient.applicationsV2().delete(request4)).thenReturn(Mono.<Void>empty());
+        }
+        
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            DeleteApplicationRequest request = fill(DeleteApplicationRequest.builder())
+                    .build();
+            return this.applications.delete(request);
+        }
+    }
+    
+    public static final class DeleteAndDoNotDeleteRoutes extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .diego(null)
+                    .name("test-name")
+                    .spaceId("test-space-id")
+                    .build();
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(),"application-")
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+
+            SummaryApplicationRequest request2 = fill(SummaryApplicationRequest.builder())
+                    .applicationId("test-application-id")
+                    .build();
+            SummaryApplicationResponse response2 = fill(SummaryApplicationResponse.builder())
+                    .route(fill(Route.builder(),"route-").build())
+                    .build();
+            when(this.cloudFoundryClient.applicationsV2().summary(request2)).thenReturn(Mono.just(response2));
+          
+            org.cloudfoundry.client.v2.applications.DeleteApplicationRequest request3 = fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
+                    .applicationId("test-application-id")
+                    .build();
+            when(this.cloudFoundryClient.applicationsV2().delete(request3)).thenReturn(Mono.<Void>empty());
+        }
+        
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            DeleteApplicationRequest request = fill(DeleteApplicationRequest.builder())
+                    .deleteRoutes(false)
+                    .build();
+            return this.applications.delete(request);
+        }
     }
 
     public static final class Get extends AbstractOperationsApiTest<ApplicationDetail> {
