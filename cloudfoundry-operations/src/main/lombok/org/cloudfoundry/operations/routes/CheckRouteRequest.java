@@ -54,7 +54,7 @@ public final class CheckRouteRequest implements Validatable {
     private final String path;
 
     @Builder
-    CheckRouteRequest(String domain, String host, String path) {
+    public CheckRouteRequest(String domain, String host, String path) {
         this.domain = domain;
         this.host = host;
         this.path = path;

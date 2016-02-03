@@ -60,7 +60,7 @@ public final class CreateRouteRequest implements Validatable {
     private final String space;
 
     @Builder
-    CreateRouteRequest(String domain, String host, String path, String space) {
+    public CreateRouteRequest(String domain, String host, String path, String space) {
         this.domain = domain;
         this.host = host;
         this.path = path;
