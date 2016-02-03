@@ -49,6 +49,13 @@ public interface Applications {
     Publisher<ApplicationSummary> list();
 
     /**
+     * Rename a specific application
+     *
+     * @param request the rename application request
+     */
+    Publisher<Void> rename(RenameApplicationRequest request);
+
+    /**
      * Scales a specific application
      *
      * @param request the scale application request

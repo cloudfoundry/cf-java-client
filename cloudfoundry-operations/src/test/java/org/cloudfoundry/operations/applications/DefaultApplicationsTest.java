@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
@@ -518,6 +519,168 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class Rename extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "rename-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+
+            UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
+                    .applicationId("test-rename-app-id")
+                    .name("test-new-app-name")
+                    .build();
+
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                    .entity(fill(ApplicationEntity.builder())
+                            .name("test-new-app-name")
+                            .build())
+                    .build();
+
+            when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
+                    .thenReturn(Mono.just(updateResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            RenameApplicationRequest request = RenameApplicationRequest.builder()
+                    .name("test-app-name")
+                    .newName("test-new-app-name")
+                    .build();
+
+            return this.applications.rename(request);
+        }
+    }
+
+    public static final class RenameClash extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "rename-app-").build())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+
+            UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
+                    .applicationId("test-rename-app-id")
+                    .name("test-existing-app-name")
+                    .build();
+
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                    .entity(fill(ApplicationEntity.builder())
+                            .name("test-new-app-name")
+                            .build())
+                    .build();
+
+            when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
+                    .thenReturn(Mono.<UpdateApplicationResponse>error(new CloudFoundryException(1234, "test-description", "test-errorCode")));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(CloudFoundryException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            RenameApplicationRequest request = RenameApplicationRequest.builder()
+                    .name("test-app-name")
+                    .newName("test-existing-app-name")
+                    .build();
+
+            return this.applications.rename(request);
+        }
+    }
+
+    public static final class RenameNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .page(1)
+                    .name("test-app-name")
+                    .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                    .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                    .thenReturn(Mono.just(listResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            RenameApplicationRequest request = RenameApplicationRequest.builder()
+                    .name("test-app-name")
+                    .newName("test-new-app-name")
+                    .build();
+
+            return this.applications.rename(request);
+        }
+    }
+
+    public static final class RenameNoSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            RenameApplicationRequest request = RenameApplicationRequest.builder()
+                    .name("test-app-name")
+                    .newName("test-new-app-name")
+                    .build();
+
+            return this.applications.rename(request);
+        }
+    }
+
     public static final class ScaleDiskAndInstances extends AbstractOperationsApiTest<ApplicationScale> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -733,18 +896,6 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
-
-            ListSpaceApplicationsResponse response = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
-                    .build();
-
-            when(this.cloudFoundryClient.spaces().listApplications(request))
-                    .thenReturn(Mono.just(response));
         }
 
         @Override
