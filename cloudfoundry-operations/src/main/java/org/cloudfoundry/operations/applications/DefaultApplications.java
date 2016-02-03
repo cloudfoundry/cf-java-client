@@ -104,11 +104,20 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Publisher<Void> rename(RenameApplicationRequest request) {
+        return Mono
+                .when(Validators.validate(request), this.spaceId)
+                .then(getApplicationResourceForRename(this.cloudFoundryClient))
+                .then(renameApplication(this.cloudFoundryClient))
+                .after();
+    }
+
+    @Override
     public Publisher<ApplicationScale> scale(final ScaleApplicationRequest request) {
         return Mono
                 .when(Validators.validate(request), this.spaceId)
-                .then(getApplicationResource(this.cloudFoundryClient))
-                .then(optionallyUpdateApplication(this.cloudFoundryClient))
+                .then(getApplicationResourceForScale(this.cloudFoundryClient))
+                .then(conditionallyScaleApplication(this.cloudFoundryClient))
                 .map(buildApplicationScale());
     }
 
@@ -124,6 +133,25 @@ public final class DefaultApplications implements Applications {
                         .build();
             }
         };
+    }
+
+    private static Function<Tuple2<ScaleApplicationRequest, ApplicationResource>, Mono<ApplicationEntity>> conditionallyScaleApplication(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function2<ScaleApplicationRequest, ApplicationResource, Mono<ApplicationEntity>>() {
+
+            @Override
+            public Mono<ApplicationEntity> apply(ScaleApplicationRequest request, ApplicationResource applicationResource) {
+                if (scaleModifiersPresent(request)) {
+                    return scaleApplication(cloudFoundryClient,
+                            Resources.getId(applicationResource),
+                            request.getDiskLimit(),
+                            request.getInstances(),
+                            request.getMemoryLimit()
+                    );
+                } else {
+                    return Mono.just(Resources.getEntity(applicationResource));
+                }
+            }
+        });
     }
 
     private static Function<String, Mono<Void>> deleteApplication(final CloudFoundryClient cloudFoundryClient) {
@@ -236,7 +264,23 @@ public final class DefaultApplications implements Applications {
         };
     }
 
-    private static Function<Tuple2<ScaleApplicationRequest, String>, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>> getApplicationResource(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Tuple2<RenameApplicationRequest, String>, Mono<Tuple2<RenameApplicationRequest, ApplicationResource>>>
+    getApplicationResourceForRename(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function2<RenameApplicationRequest, String, Mono<Tuple2<RenameApplicationRequest, ApplicationResource>>>() {
+
+            @Override
+            public Mono<Tuple2<RenameApplicationRequest, ApplicationResource>> apply(RenameApplicationRequest request, String spaceId) {
+
+                return Mono.when(
+                        Mono.just(request),
+                        getSpaceApplication(cloudFoundryClient, spaceId, request.getName())
+                );
+            }
+        });
+    }
+
+    private static Function<Tuple2<ScaleApplicationRequest, String>, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>>
+    getApplicationResourceForScale(final CloudFoundryClient cloudFoundryClient) {
         return function(new Function2<ScaleApplicationRequest, String, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>>() {
 
             @Override
@@ -274,23 +318,29 @@ public final class DefaultApplications implements Applications {
                 .otherwise(Exceptions.<ApplicationResource>convert("Application %s does not exist", name));
     }
 
-    private static Function<Tuple2<ScaleApplicationRequest, ApplicationResource>, Mono<ApplicationEntity>> optionallyUpdateApplication(final CloudFoundryClient cloudFoundryClient) {
-        return function(new Function2<ScaleApplicationRequest, ApplicationResource, Mono<ApplicationEntity>>() {
+    private static Function<Tuple2<RenameApplicationRequest, ApplicationResource>, Mono<ApplicationEntity>> renameApplication(final CloudFoundryClient cloudFoundryClient) {
+        return function(new Function2<RenameApplicationRequest, ApplicationResource, Mono<ApplicationEntity>>() {
 
             @Override
-            public Mono<ApplicationEntity> apply(ScaleApplicationRequest request, ApplicationResource applicationResource) {
-                if (scaleModifiersPresent(request)) {
-                    return updateApplication(cloudFoundryClient,
-                            Resources.getId(applicationResource),
-                            request.getDiskLimit(),
-                            request.getInstances(),
-                            request.getMemoryLimit()
-                    );
-                } else {
-                    return Mono.just(Resources.getEntity(applicationResource));
-                }
+            public Mono<ApplicationEntity> apply(RenameApplicationRequest request, ApplicationResource applicationResource) {
+                return renameApplication(cloudFoundryClient, Resources.getId(applicationResource), request.getNewName());
             }
         });
+    }
+
+    private static Mono<ApplicationEntity> renameApplication(final CloudFoundryClient cloudFoundryClient, final String applicationId, final String newName) {
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .name(newName)
+                .build();
+
+        return cloudFoundryClient.applicationsV2().update(request)
+                .map(new Function<UpdateApplicationResponse, ApplicationEntity>() {
+                    @Override
+                    public ApplicationEntity apply(UpdateApplicationResponse resource) {
+                        return Resources.getEntity(resource);
+                    }
+                });
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -382,6 +432,24 @@ public final class DefaultApplications implements Applications {
                 .build();
 
         return cloudFoundryClient.stacks().get(request);
+    }
+
+    private static Mono<ApplicationEntity> scaleApplication(final CloudFoundryClient cloudFoundryClient, final String applicationId, final Integer disk, final Integer
+            instances, final Integer memory) {
+        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .diskQuota(disk)
+                .instances(instances)
+                .memory(memory)
+                .build();
+
+        return cloudFoundryClient.applicationsV2().update(request)
+                .map(new Function<UpdateApplicationResponse, ApplicationEntity>() {
+                    @Override
+                    public ApplicationEntity apply(UpdateApplicationResponse resource) {
+                        return Resources.getEntity(resource);
+                    }
+                });
     }
 
     private static boolean scaleModifiersPresent(ScaleApplicationRequest request) {
@@ -490,24 +558,6 @@ public final class DefaultApplications implements Applications {
         }
 
         return urls;
-    }
-
-    private static Mono<ApplicationEntity> updateApplication(final CloudFoundryClient cloudFoundryClient, final String applicationId, final Integer disk, final Integer
-            instances, final Integer memory) {
-        UpdateApplicationRequest request = UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .diskQuota(disk)
-                .instances(instances)
-                .memory(memory)
-                .build();
-
-        return cloudFoundryClient.applicationsV2().update(request)
-                .map(new Function<UpdateApplicationResponse, ApplicationEntity>() {
-                    @Override
-                    public ApplicationEntity apply(UpdateApplicationResponse resource) {
-                        return Resources.getEntity(resource);
-                    }
-                });
     }
 
 }
