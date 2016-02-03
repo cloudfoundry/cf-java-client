@@ -39,4 +39,12 @@ public interface ServicePlanVisibilities {
      */
     Mono<Void> delete(DeleteServicePlanVisibilityRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_bindings/list_all_service_bindings.html">List all Service Plan Visibilities</a> request
+     *
+     * @param request the List Service Plan Visibilities request
+     * @return the response from the List Service Plan Visibilities request
+     */
+    Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request);
+
 }
