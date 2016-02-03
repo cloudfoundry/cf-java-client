@@ -62,4 +62,12 @@ public interface Applications {
      * @return the application scale
      */
     Publisher<ApplicationScale> scale(ScaleApplicationRequest request);
+
+    /**
+     * Starts a specific application or, if the application is already started, simply returns.
+     *
+     * @param request the start application request
+     */
+    Mono<Void> start(StartApplicationRequest request);
+
 }
