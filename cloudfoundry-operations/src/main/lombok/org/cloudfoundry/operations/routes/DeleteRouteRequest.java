@@ -22,18 +22,10 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request options for the unmap route operation
+ * The request options for the map route operation
  */
 @Data
-public final class UnmapRouteRequest implements Validatable {
-
-    /**
-     * The name of the application to have a route remove from it
-     *
-     * @param applicationName the application name
-     * @return the application name
-     */
-    private final String applicationName;
+public final class DeleteRouteRequest implements Validatable {
 
     /**
      * The domain of the route
@@ -52,17 +44,17 @@ public final class UnmapRouteRequest implements Validatable {
     private final String host;
 
     /**
-     * The path of the route
+     * The path of the route.
+     *
+     * Note: the path must be specified without a leading "/"
      *
      * @param path the path of the route
      * @return the path of the route
      */
     private final String path;
 
-
     @Builder
-    UnmapRouteRequest(String applicationName, String domain, String host, String path) {
-        this.applicationName = applicationName;
+    DeleteRouteRequest(String domain, String host, String path) {
         this.domain = domain;
         this.host = host;
         this.path = path;
@@ -71,10 +63,6 @@ public final class UnmapRouteRequest implements Validatable {
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        if (this.applicationName == null) {
-            builder.message("application name must be specified");
-        }
 
         if (this.domain == null) {
             builder.message("domain must be specified");

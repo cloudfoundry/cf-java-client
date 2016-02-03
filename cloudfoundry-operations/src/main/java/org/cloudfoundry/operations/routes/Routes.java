@@ -41,6 +41,14 @@ public interface Routes {
     Mono<Void> create(CreateRouteRequest request);
 
     /**
+     * Remove a route
+     *
+     * @param request the Remove Route request
+     * @return a completion indicator
+     */
+    Mono<Void> delete(DeleteRouteRequest request);
+
+    /**
      * Delete orphaned routes.
      *
      * Warning: this operation is not atomic and may delete routes which are in the process of being associated with applications.
