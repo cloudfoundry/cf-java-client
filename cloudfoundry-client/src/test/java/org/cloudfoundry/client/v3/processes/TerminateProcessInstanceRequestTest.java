@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteProcessInstanceRequestTest {
+public final class TerminateProcessInstanceRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = DeleteProcessInstanceRequest.builder()
+        ValidationResult result = TerminateProcessInstanceRequest.builder()
             .index("test-index")
             .processId("test-process-id")
             .build()
@@ -38,7 +38,7 @@ public final class DeleteProcessInstanceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = DeleteProcessInstanceRequest.builder()
+        ValidationResult result = TerminateProcessInstanceRequest.builder()
             .index("test-index")
             .build()
             .isValid();
@@ -49,7 +49,7 @@ public final class DeleteProcessInstanceRequestTest {
 
     @Test
     public void isValidNoIndex() {
-        ValidationResult result = DeleteProcessInstanceRequest.builder()
+        ValidationResult result = TerminateProcessInstanceRequest.builder()
             .processId("test-process-id")
             .build()
             .isValid();
