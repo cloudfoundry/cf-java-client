@@ -57,10 +57,10 @@ public final class ListApplicationDropletsRequest extends PaginatedAndSortedRequ
     private final List<String> states;
 
     @Builder
-    ListApplicationDropletsRequest(Integer page, Integer perPage, OrderBy orderBy, OrderDirection orderDirection,
+    ListApplicationDropletsRequest(Integer page, Integer perPage, String orderBy,
                                    String applicationId,
                                    @Singular List<String> states) {
-        super(page, perPage, orderBy, orderDirection);
+        super(page, perPage, orderBy);
         this.applicationId = applicationId;
         this.states = states;
     }

@@ -22,10 +22,6 @@ import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.UPDATED_AT;
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.ASC;
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.DESC;
 import static org.junit.Assert.assertEquals;
 
 public final class PaginatedAndSortedRequestTest {
@@ -52,24 +48,11 @@ public final class PaginatedAndSortedRequestTest {
         assertEquals("page must be greater than or equal to 1", result.getMessages().get(0));
     }
 
-    @Test
-    public void orderDirection() {
-        assertEquals("asc", ASC.toString());
-        assertEquals("desc", DESC.toString());
-    }
-
-    @Test
-    public void orderedBy() {
-        assertEquals("created_at", CREATED_AT.toString());
-        assertEquals("updated_at", UPDATED_AT.toString());
-    }
-
     private static final class StubPaginatedAndSortedRequest extends PaginatedAndSortedRequest {
 
         @Builder
-        private StubPaginatedAndSortedRequest(Integer page, Integer perPage, OrderBy orderBy,
-                                              OrderDirection orderDirection) {
-            super(page, perPage, orderBy, orderDirection);
+        private StubPaginatedAndSortedRequest(Integer page, Integer perPage, String orderBy) {
+            super(page, perPage, orderBy);
         }
     }
 

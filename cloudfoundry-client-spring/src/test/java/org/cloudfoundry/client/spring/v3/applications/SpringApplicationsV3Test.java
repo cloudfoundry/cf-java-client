@@ -53,8 +53,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderBy.CREATED_AT;
-import static org.cloudfoundry.client.v3.PaginatedAndSortedRequest.OrderDirection.ASC;
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import static org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse.Resource;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -517,7 +515,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(GET).path("/v3/apps?names=test-name&order_by=created_at&page=1")
+                .method(GET).path("/v3/apps?names=test-name&order_by=%2Bcreated_at&page=1")
                 .status(OK)
                 .responsePayload("v3/apps/GET_response.json");
         }
@@ -629,7 +627,7 @@ public final class SpringApplicationsV3Test {
         protected ListApplicationsRequest getValidRequest() throws Exception {
             return ListApplicationsRequest.builder()
                 .page(1)
-                .orderBy(CREATED_AT)
+                .orderBy("+created_at")
                 .name("test-name")
                 .build();
         }
@@ -654,7 +652,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2")
+                .method(GET).path("/v3/apps/test-application-id/droplets?order_by=-created_at&page=1&per_page=2")
                 .status(OK)
                 .responsePayload("v3/apps/GET_{id}_droplets_response.json");
         }
@@ -728,8 +726,7 @@ public final class SpringApplicationsV3Test {
             return ListApplicationDropletsRequest.builder()
                 .page(1)
                 .perPage(2)
-                .orderBy(CREATED_AT)
-                .orderDirection(ASC)
+                .orderBy("-created_at")
                 .applicationId("test-application-id")
                 .build();
         }
