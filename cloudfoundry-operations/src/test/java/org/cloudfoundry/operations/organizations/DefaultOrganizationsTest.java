@@ -18,6 +18,9 @@ package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -28,13 +31,13 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.utils.RequestValidationException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -179,6 +182,61 @@ public final class DefaultOrganizationsTest {
         protected Publisher<OrganizationSummary> invoke() {
             return this.organizations
                 .list();
+        }
+
+    }
+
+    public static final class Rename extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            when(this.cloudFoundryClient.organizations()
+                .list(fillPage(ListOrganizationsRequest.builder())
+                    .name("test-rename-name")
+                    .build()))
+                .thenReturn(Mono
+                    .just(fillPage(ListOrganizationsResponse.builder())
+                        .resource(fill(OrganizationResource.builder(), "organization-").build())
+                        .build()));
+
+            when(this.cloudFoundryClient.organizations()
+                .update(UpdateOrganizationRequest.builder()
+                    .name("test-rename-newName")
+                    .organizationId("test-organization-id")
+                    .build()))
+                .thenReturn(Mono
+                    .<UpdateOrganizationResponse>empty());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.rename(fill(RenameOrganizationRequest.builder(), "rename-")
+                .build());
+        }
+
+    }
+
+    public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber.assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.rename(RenameOrganizationRequest.builder()
+                .name("test-organisation")
+                .build());
         }
 
     }

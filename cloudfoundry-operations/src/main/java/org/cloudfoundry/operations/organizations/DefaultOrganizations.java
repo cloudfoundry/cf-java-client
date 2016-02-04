@@ -18,6 +18,8 @@ package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -27,8 +29,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
@@ -99,6 +101,31 @@ public final class DefaultOrganizations implements Organizations {
                 }
 
             });
+    }
+
+    @Override
+    public Mono<Void> rename(final RenameOrganizationRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(new Function<RenameOrganizationRequest, Mono<Tuple2<String, RenameOrganizationRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<String, RenameOrganizationRequest>> apply(RenameOrganizationRequest renameOrganizationRequest) {
+                    return getOrganization(cloudFoundryClient, request.getName())
+                        .map(ResourceUtils.extractId())
+                        .and(Mono.just(request));
+                }
+
+            })
+            .then(function(new Function2<String, RenameOrganizationRequest, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String organizationId, RenameOrganizationRequest request) {
+                    return requestRenameOrganization(cloudFoundryClient, organizationId, request.getNewName())
+                        .after();
+                }
+
+            }));
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {
@@ -219,6 +246,14 @@ public final class DefaultOrganizations implements Organizations {
             });
     }
 
+    private static Mono<UpdateOrganizationResponse> requestRenameOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String newName) {
+        return cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .name(newName)
+                .build());
+    }
+
     private static Stream<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
@@ -290,7 +325,7 @@ public final class DefaultOrganizations implements Organizations {
     private Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organizations %s does not exist", organization));
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
     }
 
     private OrganizationDetail toOrganizationDetail(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces,

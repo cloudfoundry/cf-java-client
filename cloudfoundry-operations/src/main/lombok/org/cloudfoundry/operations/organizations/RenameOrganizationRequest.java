@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.operations.organizations;
 
 import lombok.Builder;
 import lombok.Data;
@@ -22,29 +22,29 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request options for the rename application operation
+ * The request options for the rename organization operation
  */
 @Data
-public final class RenameApplicationRequest implements Validatable {
+public final class RenameOrganizationRequest implements Validatable {
 
     /**
-     * The name of the application
+     * The name of the organization
      *
-     * @param name the name of the application
-     * @return the name of the application
+     * @param name the name of the organization
+     * @return the name of the organization
      */
     private final String name;
 
     /**
-     * The new name of the application
+     * The new name of the organization
      *
-     * @param newName the new name of the application
-     * @return the new name of the application
+     * @param newName the new name of the organization
+     * @return the new name of the organization
      */
     private final String newName;
 
     @Builder
-    RenameApplicationRequest(String name, String newName) {
+    RenameOrganizationRequest(String name, String newName) {
         this.name = name;
         this.newName = newName;
     }

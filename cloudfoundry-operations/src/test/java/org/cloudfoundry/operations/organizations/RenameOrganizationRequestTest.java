@@ -14,48 +14,48 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
-public final class GetApplicationProcessDetailedStatisticsRequestTest {
+public final class RenameOrganizationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
-                .applicationId("test-id")
-                .type("test-type")
-                .build()
-                .isValid();
+        ValidationResult result = fill(RenameOrganizationRequest.builder())
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
-                .type("test-type")
-                .build()
-                .isValid();
+    public void isValidNoName() {
+        ValidationResult result = RenameOrganizationRequest.builder()
+            .newName("new-name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
-
-    @Test
-    public void isValidNoType() {
-        ValidationResult result = GetApplicationProcessDetailedStatisticsRequest.builder()
-                .applicationId("test-id")
-                .build()
-                .isValid();
+    
+  @Test
+    public void isValidNoNewName() {
+        ValidationResult result = RenameOrganizationRequest.builder()
+            .name("name")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("process type must be specified", result.getMessages().get(0));
+        assertEquals("new name must be specified", result.getMessages().get(0));
     }
 
 }
