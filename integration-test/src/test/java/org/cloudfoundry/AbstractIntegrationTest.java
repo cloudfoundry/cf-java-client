@@ -67,7 +67,13 @@ public abstract class AbstractIntegrationTest {
     protected CloudFoundryOperations cloudFoundryOperations;
 
     @Autowired
+    protected Predicate<DomainResource> domainsPredicate;
+
+    @Autowired
     protected Mono<String> organizationId;
+
+    @Value("${test.organization}")
+    protected String organizationName;
 
     @Autowired
     protected Mono<String> spaceId;
@@ -89,9 +95,6 @@ public abstract class AbstractIntegrationTest {
 
     @Value("${test.username}")
     protected String userName;
-
-    @Autowired
-    protected Predicate<DomainResource> domainsPredicate;
 
     @Before
     public final void cleanup() throws Exception {
