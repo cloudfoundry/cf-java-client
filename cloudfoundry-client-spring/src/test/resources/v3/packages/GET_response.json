@@ -14,56 +14,58 @@
   },
   "resources": [
     {
-      "guid": "guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a",
+      "guid": "guid-2731172f-0714-430e-81e7-d662509d555b",
       "type": "bits",
-      "hash": {
-        "type": "sha1",
-        "value": null
+      "data": {
+        "error": null,
+        "hash": {
+          "type": "sha1",
+          "value": null
+        }
       },
-      "url": null,
       "state": "AWAITING_UPLOAD",
-      "error": null,
-      "created_at": "2015-07-27T22:43:15Z",
+      "created_at": "2016-01-26T22:20:12Z",
       "updated_at": null,
-      "_links": {
+      "links": {
         "self": {
-          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a"
+          "href": "/v3/packages/guid-2731172f-0714-430e-81e7-d662509d555b"
         },
         "upload": {
-          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/upload",
+          "href": "/v3/packages/guid-2731172f-0714-430e-81e7-d662509d555b/upload",
           "method": "POST"
         },
         "download": {
-          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/download",
+          "href": "/v3/packages/guid-2731172f-0714-430e-81e7-d662509d555b/download",
           "method": "GET"
         },
         "stage": {
-          "href": "/v3/packages/guid-84ffc554-5d3a-4ea3-bfeb-d796fa82bf7a/droplets",
+          "href": "/v3/packages/guid-2731172f-0714-430e-81e7-d662509d555b/droplets",
           "method": "POST"
         },
         "app": {
-          "href": "/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4"
+          "href": "/v3/apps/guid-f4384453-4610-4075-b2c3-c2290401dbb9"
         }
       }
     },
     {
-      "guid": "guid-caa0f920-0f24-4a80-b7e4-3119758901c3",
+      "guid": "guid-10217847-a68c-4c08-89d6-b247d8afe647",
       "type": "docker",
-      "hash": {
-        "type": "sha1",
-        "value": null
+      "data": {
+        "image": "http://location-of-image.com"
       },
-      "url": "http://docker-repo/my-image",
       "state": "READY",
-      "error": null,
-      "created_at": "2015-07-27T22:43:15Z",
+      "created_at": "2016-01-26T22:20:12Z",
       "updated_at": null,
-      "_links": {
+      "links": {
         "self": {
-          "href": "/v3/packages/guid-caa0f920-0f24-4a80-b7e4-3119758901c3"
+          "href": "/v3/packages/guid-10217847-a68c-4c08-89d6-b247d8afe647"
+        },
+        "stage": {
+          "href": "/v3/packages/guid-10217847-a68c-4c08-89d6-b247d8afe647/droplets",
+          "method": "POST"
         },
         "app": {
-          "href": "/v3/apps/guid-ec3d91b9-a9c7-4fec-a0d1-d2dfe1c7bac4"
+          "href": "/v3/apps/guid-f4384453-4610-4075-b2c3-c2290401dbb9"
         }
       }
     }

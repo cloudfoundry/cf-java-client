@@ -19,7 +19,6 @@ package org.cloudfoundry.client.v3.packages;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Singular;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
 
 import java.util.Map;
@@ -39,20 +38,12 @@ public abstract class Package {
     private final String createdAt;
 
     /**
-     * The error
+     * The datas
      *
-     * @param error the error
-     * @return the error
+     * @param datas the datas
+     * @return the datas
      */
-    private final String error;
-
-    /**
-     * The hash
-     *
-     * @param hash the hash
-     * @return the hash
-     */
-    private final Hash hash;
+    private final Map<String, Object> datas;
 
     /**
      * The id
@@ -94,32 +85,21 @@ public abstract class Package {
      */
     private final String updatedAt;
 
-    /**
-     * The url
-     *
-     * @param url the url
-     * @return the url
-     */
-    private final String url;
 
     protected Package(@JsonProperty("created_at") String createdAt,
-                      @JsonProperty("error") String error,
-                      @JsonProperty("hash") Hash hash,
+                      @JsonProperty("data") @Singular Map<String, Object> datas,
                       @JsonProperty("guid") String id,
-                      @JsonProperty("_links") @Singular Map<String, Link> links,
+                      @JsonProperty("links") @Singular Map<String, Link> links,
                       @JsonProperty("state") String state,
                       @JsonProperty("type") String type,
-                      @JsonProperty("updated_at") String updatedAt,
-                      @JsonProperty("url") String url) {
+                      @JsonProperty("updated_at") String updatedAt) {
         this.createdAt = createdAt;
-        this.error = error;
-        this.hash = hash;
+        this.datas = datas;
         this.id = id;
         this.links = links;
         this.state = state;
         this.type = type;
         this.updatedAt = updatedAt;
-        this.url = url;
     }
 
 }

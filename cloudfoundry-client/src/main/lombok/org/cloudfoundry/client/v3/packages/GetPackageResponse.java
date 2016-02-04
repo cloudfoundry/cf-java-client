@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Link;
 
 import java.util.Map;
@@ -37,15 +36,13 @@ public final class GetPackageResponse extends Package {
 
     @Builder
     GetPackageResponse(@JsonProperty("created_at") String createdAt,
-                       @JsonProperty("error") String error,
-                       @JsonProperty("hash") Hash hash,
+                       @JsonProperty("data") @Singular Map<String, Object> datas,
                        @JsonProperty("guid") String id,
-                       @JsonProperty("_links") @Singular Map<String, Link> links,
+                       @JsonProperty("links") @Singular Map<String, Link> links,
                        @JsonProperty("state") String state,
                        @JsonProperty("type") String type,
-                       @JsonProperty("updated_at") String updatedAt,
-                       @JsonProperty("url") String url) {
-        super(createdAt, error, hash, id, links, state, type, updatedAt, url);
+                       @JsonProperty("updated_at") String updatedAt) {
+        super(createdAt, datas, id, links, state, type, updatedAt);
     }
 
 }
