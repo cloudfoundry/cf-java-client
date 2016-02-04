@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
@@ -119,6 +121,53 @@ public final class SpringServicePlanVisibilitiesTest {
         @Override
         protected Publisher<Void> invoke(DeleteServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.delete(request);
+        }
+    }
+
+    public static final class Get extends AbstractApiTest<GetServicePlanVisibilityRequest, GetServicePlanVisibilityResponse> {
+
+        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServicePlanVisibilityRequest getInvalidRequest() {
+            return GetServicePlanVisibilityRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
+                .status(OK)
+                .responsePayload("v2/service_plan_visibilities/GET_{id}_response.json");
+        }
+
+        @Override
+        protected GetServicePlanVisibilityResponse getResponse() {
+            return GetServicePlanVisibilityResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2015-07-27T22:43:28Z")
+                    .id("18365c25-898b-4365-911d-6f6a09154297")
+                    .url("/v2/service_plan_visibilities/18365c25-898b-4365-911d-6f6a09154297")
+                    .build())
+                .entity(ServicePlanVisibilityEntity.builder()
+                    .organizationId("a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
+                    .organizationUrl("/v2/organizations/a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
+                    .servicePlanId("ea1ba716-e720-4aef-8a90-439924bb53d0")
+                    .servicePlanUrl("/v2/service_plans/ea1ba716-e720-4aef-8a90-439924bb53d0")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetServicePlanVisibilityRequest getValidRequest() throws Exception {
+            return GetServicePlanVisibilityRequest.builder()
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<GetServicePlanVisibilityResponse> invoke(GetServicePlanVisibilityRequest request) {
+            return this.servicePlanVisibilities.get(request);
         }
     }
 
