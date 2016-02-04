@@ -1,4 +1,6 @@
 {
   "type": "docker",
-  "url": "docker://cloudfoundry/runtime-ci"
+  "data": {
+    "image": "registry/image:latest"
+  }
 }

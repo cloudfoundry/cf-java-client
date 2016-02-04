@@ -22,7 +22,6 @@ import org.junit.Test;
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
-import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.junit.Assert.assertEquals;
 
 public final class CreatePackageRequestTest {
@@ -36,31 +35,6 @@ public final class CreatePackageRequestTest {
             .isValid();
 
         assertEquals(VALID, result.getStatus());
-    }
-
-    @Test
-    public void isValidBitsAndUrl() {
-        ValidationResult result = CreatePackageRequest.builder()
-            .applicationId("test-application-id")
-            .type(BITS)
-            .url("test-url")
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("url must only be specified if type is DOCKER", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidDockerNoUrl() {
-        ValidationResult result = CreatePackageRequest.builder()
-            .applicationId("test-application-id")
-            .type(DOCKER)
-            .build()
-            .isValid();
-
-        assertEquals(INVALID, result.getStatus());
-        assertEquals("url must be specified if type is DOCKER", result.getMessages().get(0));
     }
 
     @Test
