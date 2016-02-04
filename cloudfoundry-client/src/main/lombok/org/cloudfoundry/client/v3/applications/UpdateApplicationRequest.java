@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.v3.Lifecycle;
 
 import java.util.Map;
 
@@ -43,15 +44,6 @@ public final class UpdateApplicationRequest implements Validatable {
     private final String applicationId;
 
     /**
-     * The buildpack
-     *
-     * @param buildpack the buildpack
-     * @return the buildpack
-     */
-    @Getter(onMethod = @__(@JsonProperty("buildpack")))
-    private final String buildpack;
-
-    /**
      * The environment variables
      *
      * @param environmentVariables the environment variables
@@ -59,6 +51,15 @@ public final class UpdateApplicationRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("environment_variables")))
     private final Map<String, String> environmentVariables;
+
+    /**
+     * The lifecycle
+     *
+     * @param lifecycle the lifecycle
+     * @return the lifecycle
+     */
+    @Getter(onMethod = @__(@JsonProperty("lifecycle")))
+    private final Lifecycle lifecycle;
 
     /**
      * The name
@@ -71,12 +72,12 @@ public final class UpdateApplicationRequest implements Validatable {
 
     @Builder
     UpdateApplicationRequest(String applicationId,
-                             String buildpack,
                              @Singular Map<String, String> environmentVariables,
+                             Lifecycle lifecycle,
                              String name) {
         this.applicationId = applicationId;
-        this.buildpack = buildpack;
         this.environmentVariables = environmentVariables;
+        this.lifecycle = lifecycle;
         this.name = name;
     }
 

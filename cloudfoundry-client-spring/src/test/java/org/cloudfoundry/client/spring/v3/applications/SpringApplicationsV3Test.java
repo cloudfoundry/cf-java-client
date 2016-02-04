@@ -1187,11 +1187,15 @@ public final class SpringApplicationsV3Test {
         @Override
         protected UpdateApplicationRequest getValidRequest() throws Exception {
             return UpdateApplicationRequest.builder()
+                .applicationId("test-application-id")
                 .name("new_name")
                 .environmentVariable("MY_ENV_VAR", "foobar")
                 .environmentVariable("FOOBAR", "MY_ENV_VAR")
-                .buildpack("http://gitwheel.org/my-app")
-                .applicationId("test-application-id")
+                .lifecycle(Lifecycle.builder()
+                    .type("buildpack")
+                    .data("buildpack", "http://gitwheel.org/my-app")
+                    .data("stack", "redhat")
+                    .build())
                 .build();
         }
 
