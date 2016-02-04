@@ -48,14 +48,6 @@ public interface ApplicationsV3 {
     Mono<Void> delete(DeleteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/terminating_a_process_instance_from_its_app.html">Delete Application Process</a> request
-     *
-     * @param request the Delete Application Process Instance request
-     * @return the response from the Delete Application Process Instance request
-     */
-    Mono<Void> deleteInstance(DeleteApplicationInstanceRequest request);
-
-    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/215/apps_(experimental)/get_an_app.html">Get Application</a> request
      *
      * @param request the Get Application request
@@ -150,6 +142,14 @@ public interface ApplicationsV3 {
      * @return the response from the Stop Application request
      */
     Mono<StopApplicationResponse> stop(StopApplicationRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/terminating_a_process_instance_from_its_app.html">Delete Application Process</a> request
+     *
+     * @param request the Delete Application Process Instance request
+     * @return the response from the Delete Application Process Instance request
+     */
+    Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/unmap_a_route.html">Unmap Application Route</a> request

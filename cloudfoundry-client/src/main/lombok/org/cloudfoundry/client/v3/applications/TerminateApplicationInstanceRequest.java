@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Delete Application Process Instance operation
  */
 @Data
-public final class DeleteApplicationInstanceRequest implements Validatable {
+public final class TerminateApplicationInstanceRequest implements Validatable {
 
     /**
      * The application id
@@ -57,7 +57,7 @@ public final class DeleteApplicationInstanceRequest implements Validatable {
     private final String type;
 
     @Builder
-    DeleteApplicationInstanceRequest(String applicationId, String index, String type) {
+    TerminateApplicationInstanceRequest(String applicationId, String index, String type) {
         this.applicationId = applicationId;
         this.index = index;
         this.type = type;

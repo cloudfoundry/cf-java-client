@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteApplicationInstanceRequestTest {
+public final class TerminateApplicationInstanceRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+        ValidationResult result = TerminateApplicationInstanceRequest.builder()
             .applicationId("test-application-id")
             .index("test-index")
             .type("test-type")
@@ -39,7 +39,7 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+        ValidationResult result = TerminateApplicationInstanceRequest.builder()
             .index("test-index")
             .type("test-type")
             .build()
@@ -51,7 +51,7 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoIndex() {
-        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+        ValidationResult result = TerminateApplicationInstanceRequest.builder()
             .applicationId("test-application-id")
             .type("test-type")
             .build()
@@ -63,7 +63,7 @@ public final class DeleteApplicationInstanceRequestTest {
 
     @Test
     public void isValidNoType() {
-        ValidationResult result = DeleteApplicationInstanceRequest.builder()
+        ValidationResult result = TerminateApplicationInstanceRequest.builder()
             .applicationId("test-application-id")
             .index("test-index")
             .build()

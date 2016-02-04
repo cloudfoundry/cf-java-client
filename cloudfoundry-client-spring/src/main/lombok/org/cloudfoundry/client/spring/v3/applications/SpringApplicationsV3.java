@@ -25,7 +25,7 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationInstanceRequest;
+import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -109,18 +109,6 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "apps", request.getApplicationId());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Void> deleteInstance(final DeleteApplicationInstanceRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex());
             }
 
         });
@@ -269,6 +257,18 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "apps", request.getApplicationId(), "stop");
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<Void> terminateInstance(final TerminateApplicationInstanceRequest request) {
+        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex());
             }
 
         });
