@@ -4,5 +4,11 @@
     "MY_ENV_VAR": "foobar",
     "FOOBAR": "MY_ENV_VAR"
   },
-  "buildpack": "http://gitwheel.org/my-app"
+  "lifecycle": {
+    "type": "buildpack",
+    "data": {
+      "buildpack": "http://gitwheel.org/my-app",
+      "stack": "redhat"
+    }
+  }
 }
