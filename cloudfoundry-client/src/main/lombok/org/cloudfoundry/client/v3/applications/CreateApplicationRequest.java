@@ -23,6 +23,8 @@ import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Relationship;
 
 import java.util.Map;
 
@@ -31,15 +33,6 @@ import java.util.Map;
  */
 @Data
 public final class CreateApplicationRequest implements Validatable {
-
-    /**
-     * The buildpack
-     *
-     * @param buildpack the buildpack
-     * @return the buildpack
-     */
-    @Getter(onMethod = @__(@JsonProperty("buildpack")))
-    private final String buildpack;
 
     /**
      * The environment variables
@@ -51,6 +44,15 @@ public final class CreateApplicationRequest implements Validatable {
     private final Map<String, String> environmentVariables;
 
     /**
+     * The lifecycle
+     *
+     * @param lifecycle the lifecycle
+     * @return the lifecycle
+     */
+    @Getter(onMethod = @__(@JsonProperty("lifecycle")))
+    private final Lifecycle lifecycle;
+
+    /**
      * The name
      *
      * @param name the name
@@ -60,23 +62,22 @@ public final class CreateApplicationRequest implements Validatable {
     private final String name;
 
     /**
-     * The space id
+     * The relationships
      *
-     * @param spaceId the space id
-     * @return the space id
+     * @param relationships the relationships
      */
-    @Getter(onMethod = @__(@JsonProperty("space_guid")))
-    private final String spaceId;
+    @Getter(onMethod = @__(@JsonProperty("relationships")))
+    private final Map<String, Relationship> relationships;
 
     @Builder
-    CreateApplicationRequest(String buildpack,
-                             @Singular Map<String, String> environmentVariables,
+    CreateApplicationRequest(@Singular Map<String, String> environmentVariables,
+                             Lifecycle lifecycle,
                              String name,
-                             String spaceId) {
-        this.buildpack = buildpack;
+                             @Singular Map<String, Relationship> relationships) {
         this.environmentVariables = environmentVariables;
+        this.lifecycle = lifecycle;
         this.name = name;
-        this.spaceId = spaceId;
+        this.relationships = relationships;
     }
 
     @Override
@@ -87,8 +88,11 @@ public final class CreateApplicationRequest implements Validatable {
             builder.message("name must be specified");
         }
 
-        if (this.spaceId == null) {
-            builder.message("space id must be specified");
+        Relationship spaceRelationship = this.relationships.get("space");
+        if (spaceRelationship == null) {
+            builder.message("space relationship must be specified");
+        } else {
+            builder.messages(spaceRelationship.isValid().getMessages());
         }
 
         return builder.build();

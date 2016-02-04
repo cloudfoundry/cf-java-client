@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.Relationship;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class CreateApplicationRequestTest {
+public final class RelationshipTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = CreateApplicationRequest.builder()
-            .name("test-name")
-            .relationship("space", Relationship.builder()
-                .id("test-id")
-                .build())
+        ValidationResult result = Relationship.builder()
+            .id("test-id")
             .build()
             .isValid();
 
@@ -39,26 +35,13 @@ public final class CreateApplicationRequestTest {
     }
 
     @Test
-    public void isValidNoName() {
-        ValidationResult result = CreateApplicationRequest.builder()
-            .relationship("test-relationship", Relationship.builder()
-                .id("test-id")
-                .build())
+    public void isValidNoId() {
+        ValidationResult result = Relationship.builder()
             .build()
             .isValid();
 
         assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("name must be specified", result.getMessages().get(0));
+        assertEquals("id must be specified", result.getMessages().get(0));
     }
 
-    @Test
-    public void isValidNoSpaceRelationship() {
-        ValidationResult result = CreateApplicationRequest.builder()
-            .name("test-name")
-            .build()
-            .isValid();
-
-        assertEquals(ValidationResult.Status.INVALID, result.getStatus());
-        assertEquals("space relationship must be specified", result.getMessages().get(0));
-    }
 }
