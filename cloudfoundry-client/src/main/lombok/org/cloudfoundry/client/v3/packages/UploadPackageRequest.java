@@ -23,7 +23,7 @@ import lombok.Getter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * The request payload for the Upload Package operation
@@ -32,13 +32,13 @@ import java.io.File;
 public final class UploadPackageRequest implements Validatable {
 
     /**
-     * The file
+     * The application
      *
-     * @param file the file
-     * @return the file
+     * @param file the application
+     * @return the application
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final File file;
+    private final InputStream application;
 
     /**
      * The package id
@@ -50,8 +50,8 @@ public final class UploadPackageRequest implements Validatable {
     private final String packageId;
 
     @Builder
-    UploadPackageRequest(File file, String packageId) {
-        this.file = file;
+    UploadPackageRequest(InputStream application, String packageId) {
+        this.application = application;
         this.packageId = packageId;
     }
 
@@ -59,8 +59,8 @@ public final class UploadPackageRequest implements Validatable {
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.file == null) {
-            builder.message("file must be specified");
+        if (this.application == null) {
+            builder.message("application must be specified");
         }
 
         if (this.packageId == null) {

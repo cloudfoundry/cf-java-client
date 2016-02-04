@@ -56,7 +56,7 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.reactivestreams.Publisher;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
@@ -330,7 +330,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
                         body.add("async", request.getAsync());
                     }
                     body.add("resources", request.getResources());
-                    body.add("application", new FileSystemResource(request.getApplication()));
+                    body.add("application", new InputStreamResource(request.getApplication()));
                     return body;
                 }
 

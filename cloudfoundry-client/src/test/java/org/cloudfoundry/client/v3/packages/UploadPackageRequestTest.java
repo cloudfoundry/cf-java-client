@@ -19,7 +19,8 @@ package org.cloudfoundry.client.v3.packages;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
@@ -27,10 +28,12 @@ import static org.junit.Assert.assertEquals;
 
 public final class UploadPackageRequestTest {
 
+    private static final InputStream EMPTY_INPUT_STREAM = new ByteArrayInputStream(new byte[0]);
+
     @Test
     public void isValid() {
         ValidationResult result = UploadPackageRequest.builder()
-            .file(new File(""))
+            .application(EMPTY_INPUT_STREAM)
             .packageId("test-package-id")
             .build()
             .isValid();
@@ -46,13 +49,13 @@ public final class UploadPackageRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("file must be specified", result.getMessages().get(0));
+        assertEquals("application must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoId() {
         ValidationResult result = UploadPackageRequest.builder()
-            .file(new File(""))
+            .application(EMPTY_INPUT_STREAM)
             .build()
             .isValid();
 
