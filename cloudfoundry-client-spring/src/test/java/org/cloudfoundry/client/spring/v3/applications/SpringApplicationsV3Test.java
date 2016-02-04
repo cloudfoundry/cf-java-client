@@ -485,7 +485,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(GET).path("/v3/apps?names%5B%5D=test-name&order_by=created_at&page=1")
+                .method(GET).path("/v3/apps?names=test-name&order_by=created_at&page=1")
                 .status(OK)
                 .responsePayload("v3/apps/GET_response.json");
         }

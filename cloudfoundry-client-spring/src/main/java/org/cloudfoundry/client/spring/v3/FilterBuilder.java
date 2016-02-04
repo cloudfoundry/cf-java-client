@@ -20,6 +20,7 @@ import org.cloudfoundry.client.spring.util.MethodNameComparator;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Method;
@@ -48,27 +49,24 @@ public final class FilterBuilder {
                 continue;
             }
 
-            Object value = getValue(method, instance);
-            if (value == null) {
-                continue;
-            }
-
-            if (!(value instanceof Collection)) {
+            String value = getValue(method, instance);
+            if (StringUtils.hasText(value)) {
                 builder.queryParam(filterParameter.value(), value);
-                continue;
-            }
-
-            String name = String.format("%s[]", filterParameter.value());
-            for (Object item : (Collection) value) {
-                builder.queryParam(name, item);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object getValue(Method method, Object instance) {
+    private static String getValue(Method method, Object instance) {
         ReflectionUtils.makeAccessible(method);
-        return ReflectionUtils.invokeMethod(method, instance);
+        Object value = ReflectionUtils.invokeMethod(method, instance);
+
+        if (value == null) {
+            return "";
+        } else if (value instanceof Collection) {
+            return StringUtils.collectionToCommaDelimitedString((Collection) value);
+        } else {
+            return value.toString();
+        }
     }
 
 }
