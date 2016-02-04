@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.v3.packages;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.spring.util.StringMap;
 import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
@@ -381,7 +382,7 @@ public final class SpringPackagesTest {
                     .link("stage", Link.builder()
                         .href("/v3/packages/guid-10217847-a68c-4c08-89d6-b247d8afe647/droplets")
                         .method("POST")
-                    .build())
+                        .build())
                     .link("app", Link.builder()
                         .href("/v3/apps/guid-f4384453-4610-4075-b2c3-c2290401dbb9")
                         .build())
@@ -453,10 +454,13 @@ public final class SpringPackagesTest {
         @Override
         protected StagePackageRequest getValidRequest() {
             return StagePackageRequest.builder()
-                .buildpack("http://github.com/myorg/awesome-buildpack")
-                .environmentVariable("CUSTOM_ENV_VAR", "hello")
                 .packageId("test-package-id")
-                .stack("cflinuxfs2")
+                .environmentVariable("CUSTOM_ENV_VAR", "hello")
+                .lifecycle(Lifecycle.builder()
+                    .type("buildpack")
+                    .data("buildpack", "http://github.com/myorg/awesome-buildpack")
+                    .data("stack", "cflinuxfs2")
+                    .build())
                 .build();
         }
 

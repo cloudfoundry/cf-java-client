@@ -1,7 +1,12 @@
 {
-  "buildpack": "http://github.com/myorg/awesome-buildpack",
   "environment_variables": {
     "CUSTOM_ENV_VAR": "hello"
   },
-  "stack": "cflinuxfs2"
+  "lifecycle": {
+    "type": "buildpack",
+    "data": {
+      "buildpack": "http://github.com/myorg/awesome-buildpack",
+      "stack": "cflinuxfs2"
+    }
+  }
 }

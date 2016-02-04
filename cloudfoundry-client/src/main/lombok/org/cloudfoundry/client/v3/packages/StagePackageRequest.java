@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.client.v3.Lifecycle;
 
 import java.util.Map;
 
@@ -32,15 +33,6 @@ import java.util.Map;
  */
 @Data
 public final class StagePackageRequest implements Validatable {
-
-    /**
-     * The buildpack
-     *
-     * @param buildpack the buildpack
-     * @return the buildpack
-     */
-    @Getter(onMethod = @__(@JsonProperty("buildpack")))
-    private final String buildpack;
 
     /**
      * The disk limit
@@ -61,6 +53,15 @@ public final class StagePackageRequest implements Validatable {
     private final Map<String, Object> environmentVariables;
 
     /**
+     * The lifecycle
+     *
+     * @param lifecycle the lifecycle
+     * @return the lifecycle
+     */
+    @Getter(onMethod = @__(@JsonProperty("lifecycle")))
+    private final Lifecycle lifecycle;
+
+    /**
      * The memory limit
      *
      * @param memoryLimit the memoty limit
@@ -78,28 +79,17 @@ public final class StagePackageRequest implements Validatable {
     @Getter(onMethod = @__(@JsonIgnore))
     private final String packageId;
 
-    /**
-     * The stack
-     *
-     * @param stack the stack
-     * @return the stack
-     */
-    @Getter(onMethod = @__(@JsonProperty("stack")))
-    private final String stack;
-
     @Builder
-    StagePackageRequest(String buildpack,
-                        Integer diskLimit,
+    StagePackageRequest(Integer diskLimit,
                         @Singular Map<String, Object> environmentVariables,
+                        Lifecycle lifecycle,
                         Integer memoryLimit,
-                        String packageId,
-                        String stack) {
-        this.buildpack = buildpack;
+                        String packageId) {
         this.diskLimit = diskLimit;
         this.environmentVariables = environmentVariables;
+        this.lifecycle = lifecycle;
         this.memoryLimit = memoryLimit;
         this.packageId = packageId;
-        this.stack = stack;
     }
 
     @Override
