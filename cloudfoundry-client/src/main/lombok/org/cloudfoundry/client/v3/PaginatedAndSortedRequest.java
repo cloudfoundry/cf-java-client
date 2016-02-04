@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,21 +38,11 @@ public abstract class PaginatedAndSortedRequest extends PaginatedRequest {
      * @return the order by
      */
     @Getter(onMethod = @__(@QueryParameter("order_by")))
-    private final OrderBy orderBy;
+    private final String orderBy;
 
-    /**
-     * The order direction
-     *
-     * @param orderDirection the order direction
-     * @return the order direction
-     */
-    @Getter(onMethod = @__(@QueryParameter("order_direction")))
-    private final OrderDirection orderDirection;
-
-    protected PaginatedAndSortedRequest(Integer page, Integer perPage, OrderBy orderBy, OrderDirection orderDirection) {
+    protected PaginatedAndSortedRequest(Integer page, Integer perPage, String orderBy) {
         super(page, perPage);
         this.orderBy = orderBy;
-        this.orderDirection = orderDirection;
     }
 
     /**
@@ -65,47 +54,4 @@ public abstract class PaginatedAndSortedRequest extends PaginatedRequest {
         return isPaginatedRequestValid();
     }
 
-    /**
-     * Sorting candidates in a V3 sorted request
-     */
-    public enum OrderBy {
-
-        /**
-         * Created at
-         */
-        CREATED_AT,
-
-        /**
-         * Updated at
-         */
-        UPDATED_AT;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-    }
-
-    /**
-     * Sorting order in a V3 sorted request
-     */
-    public enum OrderDirection {
-
-        /**
-         * Indicates that order should be ascending
-         */
-        ASC,
-
-        /**
-         * Indicates that order should be descending
-         */
-        DESC;
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-    }
 }

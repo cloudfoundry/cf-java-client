@@ -74,12 +74,12 @@ public final class ListApplicationsRequest extends PaginatedAndSortedRequest imp
     private final List<String> spaceIds;
 
     @Builder
-    ListApplicationsRequest(Integer page, Integer perPage, OrderBy orderBy, OrderDirection orderDirection,
+    ListApplicationsRequest(Integer page, Integer perPage, String orderBy,
                             @Singular List<String> ids,
                             @Singular List<String> names,
                             @Singular List<String> organizationIds,
                             @Singular List<String> spaceIds) {
-        super(page, perPage, orderBy, orderDirection);
+        super(page, perPage, orderBy);
         this.ids = ids;
         this.names = names;
         this.organizationIds = organizationIds;
