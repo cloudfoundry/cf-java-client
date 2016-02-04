@@ -53,15 +53,14 @@ public interface Applications {
      *
      * @param request the rename application request
      */
-    Publisher<Void> rename(RenameApplicationRequest request);
+    Mono<Void> rename(RenameApplicationRequest request);
 
     /**
      * Scales a specific application
      *
      * @param request the scale application request
-     * @return the application scale
      */
-    Publisher<ApplicationScale> scale(ScaleApplicationRequest request);
+    Mono<Void> scale(ScaleApplicationRequest request);
 
     /**
      * Starts a specific application or, if the application is already started, simply returns.

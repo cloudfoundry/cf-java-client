@@ -29,20 +29,20 @@ public final class StartApplicationRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = fill(StartApplicationRequest.builder())
-                .build()
-                .isValid();
-     
+            .build()
+            .isValid();
+
         assertEquals(VALID, result.getStatus());
     }
 
     @Test
     public void isValidNoName() {
         ValidationResult result = StartApplicationRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
     }
-    
+
 }

@@ -25,7 +25,7 @@ import org.cloudfoundry.operations.ValidationResult;
  * The request options for the start application operation
  */
 @Data
-public class StartApplicationRequest implements Validatable {
+public final class StartApplicationRequest implements Validatable {
 
     private final String name;
 

@@ -57,50 +57,50 @@ public final class DefaultApplicationsTest {
 
     private static void setupExpectations(CloudFoundryClient client, String spaceId) {
         ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                .name("test-app")
-                .spaceId(spaceId)
-                .page(1)
-                .build();
+            .name("test-app")
+            .spaceId(spaceId)
+            .page(1)
+            .build();
         ListSpaceApplicationsResponse response = ListSpaceApplicationsResponse.builder()
-                .resource(ApplicationResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                                .id("test-id")
-                                .build())
-                        .entity(ApplicationEntity.builder()
-                                .stackId("stack-id")
-                                .build())
-                        .build())
-                .totalPages(1)
-                .build();
+            .resource(ApplicationResource.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("test-id")
+                    .build())
+                .entity(ApplicationEntity.builder()
+                    .stackId("stack-id")
+                    .build())
+                .build())
+            .totalPages(1)
+            .build();
         when(client.spaces().listApplications(request)).thenReturn(Mono.just(response));
 
         ApplicationStatisticsRequest statsRequest = ApplicationStatisticsRequest.builder()
-                .applicationId("test-id")
-                .build();
+            .applicationId("test-id")
+            .build();
         ApplicationStatisticsResponse statsResponse = ApplicationStatisticsResponse.builder()
-                .instance("instance-0", ApplicationStatisticsResponse.InstanceStats.builder()
-                        .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
-                                .uri("test-stats-uri")
-                                .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
-                                        .cpu(1.2)
-                                        .memory(1000000L)
-                                        .disk(2000000L)
-                                        .build())
-                                .memoryQuota(3000000L)
-                                .diskQuota(4000000L)
-                                .build())
+            .instance("instance-0", ApplicationStatisticsResponse.InstanceStats.builder()
+                .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
+                    .uri("test-stats-uri")
+                    .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
+                        .cpu(1.2)
+                        .memory(1000000L)
+                        .disk(2000000L)
                         .build())
-                .build();
+                    .memoryQuota(3000000L)
+                    .diskQuota(4000000L)
+                    .build())
+                .build())
+            .build();
         when(client.applicationsV2().statistics(statsRequest)).thenReturn(Mono.just(statsResponse));
 
         GetStackRequest stackRequest = GetStackRequest.builder()
-                .stackId("stack-id")
-                .build();
+            .stackId("stack-id")
+            .build();
         GetStackResponse stackResponse = GetStackResponse.builder()
-                .entity(StackEntity.builder()
-                        .name("test-stack")
-                        .build())
-                .build();
+            .entity(StackEntity.builder()
+                .name("test-stack")
+                .build())
+            .build();
         when(client.stacks().get(stackRequest)).thenReturn(Mono.just(stackResponse));
     }
 
@@ -111,33 +111,33 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .diego(null)
-                    .name("test-name")
-                    .spaceId("test-space-id")
-                    .build();
+                .diego(null)
+                .name("test-name")
+                .spaceId("test-space-id")
+                .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
 
             SummaryApplicationRequest request2 = fill(SummaryApplicationRequest.builder())
-                    .applicationId("test-application-id")
-                    .build();
+                .applicationId("test-application-id")
+                .build();
             SummaryApplicationResponse response2 = fill(SummaryApplicationResponse.builder())
-                    .route(fill(Route.builder(), "route-").build())
-                    .build();
+                .route(fill(Route.builder(), "route-").build())
+                .build();
             when(this.cloudFoundryClient.applicationsV2().summary(request2)).thenReturn(Mono.just(response2));
 
             DeleteRouteRequest request3 = fill(DeleteRouteRequest.builder())
-                    .async(null)
-                    .routeId("test-route-id")
-                    .build();
+                .async(null)
+                .routeId("test-route-id")
+                .build();
             when(this.cloudFoundryClient.routes().delete(request3)).thenReturn(Mono.<DeleteRouteResponse>empty());
 
             org.cloudfoundry.client.v2.applications.DeleteApplicationRequest request4 = fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
-                    .applicationId("test-application-id")
-                    .build();
+                .applicationId("test-application-id")
+                .build();
             when(this.cloudFoundryClient.applicationsV2().delete(request4)).thenReturn(Mono.<Void>empty());
         }
 
@@ -149,7 +149,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             DeleteApplicationRequest request = fill(DeleteApplicationRequest.builder())
-                    .build();
+                .build();
             return this.applications.delete(request);
         }
     }
@@ -161,27 +161,27 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .diego(null)
-                    .name("test-name")
-                    .spaceId("test-space-id")
-                    .build();
+                .diego(null)
+                .name("test-name")
+                .spaceId("test-space-id")
+                .build();
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
 
             SummaryApplicationRequest request2 = fill(SummaryApplicationRequest.builder())
-                    .applicationId("test-application-id")
-                    .build();
+                .applicationId("test-application-id")
+                .build();
             SummaryApplicationResponse response2 = fill(SummaryApplicationResponse.builder())
-                    .route(fill(Route.builder(), "route-").build())
-                    .build();
+                .route(fill(Route.builder(), "route-").build())
+                .build();
             when(this.cloudFoundryClient.applicationsV2().summary(request2)).thenReturn(Mono.just(response2));
 
             org.cloudfoundry.client.v2.applications.DeleteApplicationRequest request3 = fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
-                    .applicationId("test-application-id")
-                    .build();
+                .applicationId("test-application-id")
+                .build();
             when(this.cloudFoundryClient.applicationsV2().delete(request3)).thenReturn(Mono.<Void>empty());
         }
 
@@ -193,8 +193,8 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             DeleteApplicationRequest request = fill(DeleteApplicationRequest.builder())
-                    .deleteRoutes(false)
-                    .build();
+                .deleteRoutes(false)
+                .build();
             return this.applications.delete(request);
         }
     }
@@ -206,13 +206,13 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             DeleteApplicationRequest request = DeleteApplicationRequest.builder()
-                    .build();
+                .build();
             return this.applications.delete(request);
         }
     }
@@ -226,67 +226,67 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
-                    .id("test-id")
-                    .route(org.cloudfoundry.client.v2.routes.Route.builder()
-                            .host("route-host")
-                            .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                                    .name("routedomain")
-                                    .build())
-                            .build())
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
-                    .diskQuota(1073741824)
-                    .memory(536870912)
-                    .state("requested-state")
-                    .instances(9)
-                    .buildpack("buildpack")
-                    .build();
+                .id("test-id")
+                .route(org.cloudfoundry.client.v2.routes.Route.builder()
+                    .host("route-host")
+                    .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
+                        .name("routedomain")
+                        .build())
+                    .build())
+                .packageUpdatedAt("2015-06-01T14:35:40Z")
+                .diskQuota(1073741824)
+                .memory(536870912)
+                .state("requested-state")
+                .instances(9)
+                .buildpack("buildpack")
+                .build();
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
-                    .instance("instance-0", ApplicationInstanceInfo.builder()
-                            .state("instance-0-state")
-                            .since(1403140717.984577)
-                            .build())
-                    .build();
+                .instance("instance-0", ApplicationInstanceInfo.builder()
+                    .state("instance-0-state")
+                    .since(1403140717.984577)
+                    .build())
+                .build();
             when(this.cloudFoundryClient.applicationsV2().instances(instancesRequest)).thenReturn(Mono.just(instancesResponse));
         }
 
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(ApplicationDetail.builder()
-                            .id("test-id")
-                            .diskQuota(1073741824)
-                            .memoryLimit(536870912)
-                            .requestedState("requested-state")
-                            .instances(9)
-                            .url("route-host.routedomain")
-                            .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
-                            .stack("test-stack")
-                            .buildpack("buildpack")
-                            .instanceDetail(ApplicationDetail.InstanceDetail.builder()
-                                    .state("instance-0-state")
-                                    .since(Dates.parse("2014-06-19T01:18:37Z"))
-                                    .cpu(1.2)
-                                    .memoryUsage(1000000L)
-                                    .diskUsage(2000000L)
-                                    .diskQuota(4000000L)
-                                    .memoryQuota(3000000L)
-                                    .build())
-                            .build());
+                .assertEquals(ApplicationDetail.builder()
+                    .id("test-id")
+                    .diskQuota(1073741824)
+                    .memoryLimit(536870912)
+                    .requestedState("requested-state")
+                    .instances(9)
+                    .url("route-host.routedomain")
+                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .stack("test-stack")
+                    .buildpack("buildpack")
+                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
+                        .state("instance-0-state")
+                        .since(Dates.parse("2014-06-19T01:18:37Z"))
+                        .cpu(1.2)
+                        .memoryUsage(1000000L)
+                        .diskUsage(2000000L)
+                        .diskQuota(4000000L)
+                        .memoryQuota(3000000L)
+                        .build())
+                    .build());
         }
 
         @Override
         protected Publisher<ApplicationDetail> invoke() {
             GetApplicationRequest request = GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build();
+                .name("test-app")
+                .build();
             return this.applications.get(request);
         }
 
@@ -301,54 +301,54 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
-                    .id("test-id")
-                    .route(org.cloudfoundry.client.v2.routes.Route.builder()
-                            .host("route-host")
-                            .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                                    .name("routedomain")
-                                    .build())
-                            .build())
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
-                    .diskQuota(1073741824)
-                    .memory(536870912)
-                    .state("requested-state")
-                    .instances(9)
-                    .detectedBuildpack("detected-buildpack")
-                    .build();
+                .id("test-id")
+                .route(org.cloudfoundry.client.v2.routes.Route.builder()
+                    .host("route-host")
+                    .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
+                        .name("routedomain")
+                        .build())
+                    .build())
+                .packageUpdatedAt("2015-06-01T14:35:40Z")
+                .diskQuota(1073741824)
+                .memory(536870912)
+                .state("requested-state")
+                .instances(9)
+                .detectedBuildpack("detected-buildpack")
+                .build();
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
-                    .build();
+                .build();
             when(this.cloudFoundryClient.applicationsV2().instances(instancesRequest)).thenReturn(Mono.just(instancesResponse));
         }
 
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(ApplicationDetail.builder()
-                            .id("test-id")
-                            .diskQuota(1073741824)
-                            .memoryLimit(536870912)
-                            .requestedState("requested-state")
-                            .instances(9)
-                            .url("route-host.routedomain")
-                            .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
-                            .stack("test-stack")
-                            .buildpack("detected-buildpack")
-                            .build());
+                .assertEquals(ApplicationDetail.builder()
+                    .id("test-id")
+                    .diskQuota(1073741824)
+                    .memoryLimit(536870912)
+                    .requestedState("requested-state")
+                    .instances(9)
+                    .url("route-host.routedomain")
+                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .stack("test-stack")
+                    .buildpack("detected-buildpack")
+                    .build());
         }
 
         @Override
         protected Publisher<ApplicationDetail> invoke() {
             GetApplicationRequest request = GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build();
+                .name("test-app")
+                .build();
             return this.applications.get(request);
         }
 
@@ -361,13 +361,13 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class);
         }
 
         @Override
         protected Publisher<ApplicationDetail> invoke() {
             GetApplicationRequest request = GetApplicationRequest.builder()
-                    .build();
+                .build();
             return this.applications.get(request);
         }
     }
@@ -381,52 +381,52 @@ public final class DefaultApplicationsTest {
             setupExpectations(this.cloudFoundryClient, TEST_SPACE_ID);
 
             SummaryApplicationRequest summaryRequest = SummaryApplicationRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             SummaryApplicationResponse summaryResponse = SummaryApplicationResponse.builder()
-                    .id("test-id")
-                    .route(org.cloudfoundry.client.v2.routes.Route.builder()
-                            .host("route-host")
-                            .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                                    .name("routedomain")
-                                    .build())
-                            .build())
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
-                    .diskQuota(1073741824)
-                    .memory(536870912)
-                    .state("requested-state")
-                    .instances(9)
-                    .build();
+                .id("test-id")
+                .route(org.cloudfoundry.client.v2.routes.Route.builder()
+                    .host("route-host")
+                    .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
+                        .name("routedomain")
+                        .build())
+                    .build())
+                .packageUpdatedAt("2015-06-01T14:35:40Z")
+                .diskQuota(1073741824)
+                .memory(536870912)
+                .state("requested-state")
+                .instances(9)
+                .build();
             when(this.cloudFoundryClient.applicationsV2().summary(summaryRequest)).thenReturn(Mono.just(summaryResponse));
 
             ApplicationInstancesRequest instancesRequest = ApplicationInstancesRequest.builder()
-                    .applicationId("test-id")
-                    .build();
+                .applicationId("test-id")
+                .build();
             ApplicationInstancesResponse instancesResponse = ApplicationInstancesResponse.builder()
-                    .build();
+                .build();
             when(this.cloudFoundryClient.applicationsV2().instances(instancesRequest)).thenReturn(Mono.just(instancesResponse));
         }
 
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(ApplicationDetail.builder()
-                            .id("test-id")
-                            .diskQuota(1073741824)
-                            .memoryLimit(536870912)
-                            .requestedState("requested-state")
-                            .instances(9)
-                            .url("route-host.routedomain")
-                            .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
-                            .stack("test-stack")
-                            .build());
+                .assertEquals(ApplicationDetail.builder()
+                    .id("test-id")
+                    .diskQuota(1073741824)
+                    .memoryLimit(536870912)
+                    .requestedState("requested-state")
+                    .instances(9)
+                    .url("route-host.routedomain")
+                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .stack("test-stack")
+                    .build());
         }
 
         @Override
         protected Publisher<ApplicationDetail> invoke() {
             GetApplicationRequest request = GetApplicationRequest.builder()
-                    .name("test-app")
-                    .build();
+                .name("test-app")
+                .build();
             return this.applications.get(request);
         }
 
@@ -439,34 +439,34 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             GetSpaceSummaryRequest request = GetSpaceSummaryRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .build();
 
             GetSpaceSummaryResponse response = GetSpaceSummaryResponse.builder()
-                    .id(TEST_SPACE_ID)
-                    .application(SpaceApplicationSummary.builder()
-                            .spaceId(TEST_SPACE_ID)
-                            .diskQuota(1073741824)
-                            .id("test-id-1")
-                            .instances(2)
-                            .memory(536870912)
-                            .name("test-name-1")
-                            .state("RUNNING")
-                            .runningInstances(2)
-                            .url("foo.com")
-                            .build())
-                    .application(SpaceApplicationSummary.builder()
-                            .spaceId(TEST_SPACE_ID)
-                            .diskQuota(1073741824)
-                            .id("test-id-2")
-                            .instances(2)
-                            .memory(536870912)
-                            .name("test-name-2")
-                            .state("RUNNING")
-                            .runningInstances(2)
-                            .url("bar.com")
-                            .build())
-                    .build();
+                .id(TEST_SPACE_ID)
+                .application(SpaceApplicationSummary.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .diskQuota(1073741824)
+                    .id("test-id-1")
+                    .instances(2)
+                    .memory(536870912)
+                    .name("test-name-1")
+                    .state("RUNNING")
+                    .runningInstances(2)
+                    .url("foo.com")
+                    .build())
+                .application(SpaceApplicationSummary.builder()
+                    .spaceId(TEST_SPACE_ID)
+                    .diskQuota(1073741824)
+                    .id("test-id-2")
+                    .instances(2)
+                    .memory(536870912)
+                    .name("test-name-2")
+                    .state("RUNNING")
+                    .runningInstances(2)
+                    .url("bar.com")
+                    .build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().getSummary(request)).thenReturn(Mono.just(response));
         }
@@ -474,26 +474,26 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationSummary> testSubscriber) throws Exception {
             testSubscriber
-                    .assertEquals(ApplicationSummary.builder()
-                            .diskQuota(1073741824)
-                            .id("test-id-1")
-                            .instances(2)
-                            .memoryLimit(536870912)
-                            .name("test-name-1")
-                            .requestedState("RUNNING")
-                            .runningInstances(2)
-                            .url("foo.com")
-                            .build())
-                    .assertEquals(ApplicationSummary.builder()
-                            .diskQuota(1073741824)
-                            .id("test-id-2")
-                            .instances(2)
-                            .memoryLimit(536870912)
-                            .name("test-name-2")
-                            .requestedState("RUNNING")
-                            .runningInstances(2)
-                            .url("bar.com")
-                            .build());
+                .assertEquals(ApplicationSummary.builder()
+                    .diskQuota(1073741824)
+                    .id("test-id-1")
+                    .instances(2)
+                    .memoryLimit(536870912)
+                    .name("test-name-1")
+                    .requestedState("RUNNING")
+                    .runningInstances(2)
+                    .url("foo.com")
+                    .build())
+                .assertEquals(ApplicationSummary.builder()
+                    .diskQuota(1073741824)
+                    .id("test-id-2")
+                    .instances(2)
+                    .memoryLimit(536870912)
+                    .name("test-name-2")
+                    .requestedState("RUNNING")
+                    .runningInstances(2)
+                    .url("bar.com")
+                    .build());
         }
 
         @Override
@@ -510,7 +510,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationSummary> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class);
         }
 
         @Override
@@ -527,31 +527,31 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "rename-app-").build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "rename-app-").build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
+                .thenReturn(Mono.just(listResponse));
 
             UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
-                    .applicationId("test-rename-app-id")
-                    .name("test-new-app-name")
-                    .build();
+                .applicationId("test-rename-app-id")
+                .name("test-new-app-name")
+                .build();
 
             UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
-                    .entity(fill(ApplicationEntity.builder())
-                            .name("test-new-app-name")
-                            .build())
-                    .build();
+                .entity(fill(ApplicationEntity.builder())
+                    .name("test-new-app-name")
+                    .build())
+                .build();
 
             when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
-                    .thenReturn(Mono.just(updateResponse));
+                .thenReturn(Mono.just(updateResponse));
         }
 
         @Override
@@ -562,9 +562,9 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             RenameApplicationRequest request = RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-new-app-name")
-                    .build();
+                .name("test-app-name")
+                .newName("test-new-app-name")
+                .build();
 
             return this.applications.rename(request);
         }
@@ -577,45 +577,39 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "rename-app-").build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "rename-app-").build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
+                .thenReturn(Mono.just(listResponse));
 
             UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
-                    .applicationId("test-rename-app-id")
-                    .name("test-existing-app-name")
-                    .build();
-
-            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
-                    .entity(fill(ApplicationEntity.builder())
-                            .name("test-new-app-name")
-                            .build())
-                    .build();
+                .applicationId("test-rename-app-id")
+                .name("test-existing-app-name")
+                .build();
 
             when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
-                    .thenReturn(Mono.<UpdateApplicationResponse>error(new CloudFoundryException(1234, "test-description", "test-errorCode")));
+                .thenReturn(Mono.<UpdateApplicationResponse>error(new CloudFoundryException(1234, "test-description", "test-errorCode")));
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(CloudFoundryException.class);
+                .assertError(CloudFoundryException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             RenameApplicationRequest request = RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-existing-app-name")
-                    .build();
+                .name("test-app-name")
+                .newName("test-existing-app-name")
+                .build();
 
             return this.applications.rename(request);
         }
@@ -628,30 +622,30 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .build();
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
+                .thenReturn(Mono.just(listResponse));
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             RenameApplicationRequest request = RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-new-app-name")
-                    .build();
+                .name("test-app-name")
+                .newName("test-new-app-name")
+                .build();
 
             return this.applications.rename(request);
         }
@@ -668,230 +662,292 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             RenameApplicationRequest request = RenameApplicationRequest.builder()
-                    .name("test-app-name")
-                    .newName("test-new-app-name")
-                    .build();
+                .name("test-app-name")
+                .newName("test-new-app-name")
+                .build();
 
             return this.applications.rename(request);
         }
     }
 
-    public static final class ScaleDiskAndInstances extends AbstractOperationsApiTest<ApplicationScale> {
+    public static final class ScaleDiskAndInstancesNotStarted extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
+                .thenReturn(Mono.just(listResponse));
 
             UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
-                    .applicationId("test-scale-app-id")
+                .applicationId("test-scale-app-id")
+                .diskQuota(2)
+                .instances(2)
+                .build();
+
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                .entity(fill(ApplicationEntity.builder())
+                    .instances(2)
                     .diskQuota(2)
-                    .instances(2)
-                    .build();
-
-            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
-                    .entity(fill(ApplicationEntity.builder())
-                            .instances(2)
-                            .diskQuota(2)
-                            .build())
-                    .build();
+                    .build())
+                .build();
 
             when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
-                    .thenReturn(Mono.just(updateResponse));
+                .thenReturn(Mono.just(updateResponse));
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertEquals(ApplicationScale.builder()
-                            .diskLimit(2)
-                            .instances(2)
-                            .memoryLimit(1)
-                            .build());
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Nothing returned on success
         }
 
         @Override
-        protected Publisher<ApplicationScale> invoke() {
+        protected Publisher<Void> invoke() {
             ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .instances(2)
-                    .diskLimit(2)
-                    .build();
+                .name("test-app-name")
+                .instances(2)
+                .diskLimit("2m")
+                .build();
 
             return this.applications.scale(request);
         }
     }
 
-    public static final class ScaleInstances extends AbstractOperationsApiTest<ApplicationScale> {
+    public static final class ScaleDiskAndInstancesStarted extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
-
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
-                    .build();
-
+                .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
+                .thenReturn(Mono.just(listResponse));
 
             UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
-                    .applicationId("test-scale-app-id")
+                .applicationId("test-scale-app-id")
+                .diskQuota(2)
+                .instances(2)
+                .build();
+            UpdateApplicationResponse updateResponse = fill(UpdateApplicationResponse.builder(), "scale-app-")
+                .entity(fill(ApplicationEntity.builder())
                     .instances(2)
-                    .build();
-
-            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
-                    .entity(fill(ApplicationEntity.builder())
-                            .instances(2)
-                            .build())
-                    .build();
-
+                    .diskQuota(2)
+                    .state("STARTED")
+                    .build())
+                .build();
             when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
-                    .thenReturn(Mono.just(updateResponse));
-        }
+                .thenReturn(Mono.just(updateResponse));
 
-        @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertEquals(ApplicationScale.builder()
-                            .diskLimit(1)
-                            .instances(2)
-                            .memoryLimit(1)
-                            .build());
-        }
-
-        @Override
-        protected Publisher<ApplicationScale> invoke() {
-            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .name("test-app-name")
+            UpdateApplicationRequest stopRequest = UpdateApplicationRequest.builder()
+                .applicationId("test-scale-app-id")
+                .state("STOPPED")
+                .build();
+            UpdateApplicationResponse stopResponse = fill(UpdateApplicationResponse.builder(), "scale-app-")
+                .entity(fill(ApplicationEntity.builder())
                     .instances(2)
-                    .build();
+                    .diskQuota(2)
+                    .state("STOPPED")
+                    .build())
+                .build();
+            when(this.cloudFoundryClient.applicationsV2().update(stopRequest))
+                .thenReturn(Mono.just(stopResponse));
 
-            return this.applications.scale(request);
+            UpdateApplicationRequest startRequest = UpdateApplicationRequest.builder()
+                .applicationId("test-scale-app-id")
+                .state("STARTED")
+                .build();
+            UpdateApplicationResponse startResponse = fill(UpdateApplicationResponse.builder(), "scale-app-")
+                .entity(fill(ApplicationEntity.builder())
+                    .instances(2)
+                    .diskQuota(2)
+                    .state("STARTED")
+                    .build())
+                .build();
+            when(this.cloudFoundryClient.applicationsV2().update(startRequest))
+                .thenReturn(Mono.just(startResponse));
         }
-    }
-
-    public static final class ScaleInvalid extends AbstractOperationsApiTest<ApplicationScale> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(RequestValidationException.class);
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
         }
 
         @Override
-        protected Publisher<ApplicationScale> invoke() {
+        protected Publisher<Void> invoke() {
             ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .build();
+                .name("test-app-name")
+                .instances(2)
+                .diskLimit("2m")
+                .build();
 
             return this.applications.scale(request);
         }
     }
 
-    public static final class ScaleNoApp extends AbstractOperationsApiTest<ApplicationScale> {
+    public static final class ScaleInstances extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(listRequest))
-                    .thenReturn(Mono.just(listResponse));
-        }
+                .thenReturn(Mono.just(listResponse));
 
-        @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertError(IllegalArgumentException.class);
-        }
+            UpdateApplicationRequest updateRequest = UpdateApplicationRequest.builder()
+                .applicationId("test-scale-app-id")
+                .instances(2)
+                .build();
 
-        @Override
-        protected Publisher<ApplicationScale> invoke() {
-            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .name("test-app-name")
+            UpdateApplicationResponse updateResponse = UpdateApplicationResponse.builder()
+                .entity(fill(ApplicationEntity.builder())
                     .instances(2)
-                    .diskLimit(2)
-                    .build();
+                    .build())
+                .build();
+
+            when(this.cloudFoundryClient.applicationsV2().update(updateRequest))
+                .thenReturn(Mono.just(updateResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .build();
 
             return this.applications.scale(request);
         }
     }
 
-    public static final class ScaleNoChange extends AbstractOperationsApiTest<ApplicationScale> {
+    public static final class ScaleInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleInstancesNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest listRequest = ListSpaceApplicationsRequest.builder()
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
+
+            ListSpaceApplicationsResponse listResponse = fillPage(ListSpaceApplicationsResponse.builder())
+                .build();
+
+            when(this.cloudFoundryClient.spaces().listApplications(listRequest))
+                .thenReturn(Mono.just(listResponse));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            ScaleApplicationRequest request = ScaleApplicationRequest.builder()
+                .name("test-app-name")
+                .instances(2)
+                .build();
+
+            return this.applications.scale(request);
+        }
+    }
+
+    public static final class ScaleNoChange extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request = ListSpaceApplicationsRequest.builder()
-                    .spaceId(TEST_SPACE_ID)
-                    .page(1)
-                    .name("test-app-name")
-                    .build();
+                .spaceId(TEST_SPACE_ID)
+                .page(1)
+                .name("test-app-name")
+                .build();
 
             ListSpaceApplicationsResponse response = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "scale-app-").build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "scale-app-").build())
+                .build();
 
             when(this.cloudFoundryClient.spaces().listApplications(request))
-                    .thenReturn(Mono.just(response));
+                .thenReturn(Mono.just(response));
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
-            testSubscriber
-                    .assertEquals(ApplicationScale.builder()
-                            .diskLimit(1)
-                            .instances(1)
-                            .memoryLimit(1)
-                            .build());
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
         }
 
         @Override
-        protected Publisher<ApplicationScale> invoke() {
+        protected Publisher<Void> invoke() {
             ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build();
+                .name("test-app-name")
+                .build();
 
             return this.applications.scale(request);
         }
     }
 
-    public static final class ScaleNoSpace extends AbstractOperationsApiTest<ApplicationScale> {
+    public static final class ScaleNoSpace extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, MISSING_ID);
 
@@ -900,16 +956,16 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<ApplicationScale> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalStateException.class);
+                .assertError(IllegalStateException.class);
         }
 
         @Override
-        protected Publisher<ApplicationScale> invoke() {
+        protected Publisher<Void> invoke() {
             ScaleApplicationRequest request = ScaleApplicationRequest.builder()
-                    .name("test-app-name")
-                    .build();
+                .name("test-app-name")
+                .build();
 
             return this.applications.scale(request);
         }
@@ -922,13 +978,13 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             StartApplicationRequest request = StartApplicationRequest.builder()
-                    .build();
+                .build();
             return this.applications.start(request);
         }
     }
@@ -940,26 +996,26 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
 
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .build();
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             StartApplicationRequest request = fill(StartApplicationRequest.builder(), "application-")
-                    .build();
+                .build();
             return this.applications.start(request);
         }
     }
@@ -971,18 +1027,18 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
 
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .entity(fill(ApplicationEntity.builder())
-                                    .state("STARTED")
-                                    .build())
-                            .build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .entity(fill(ApplicationEntity.builder())
+                        .state("STARTED")
+                        .build())
+                    .build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
         }
 
@@ -994,30 +1050,30 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             StartApplicationRequest request = fill(StartApplicationRequest.builder(), "application-")
-                    .build();
+                .build();
             return this.applications.start(request);
         }
     }
-    
-  public static final class StartStoppedApplication extends AbstractOperationsApiTest<Void> {
+
+    public static final class StartStoppedApplication extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
 
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .entity(fill(ApplicationEntity.builder())
-                                    .state("STOPPED")
-                                    .build())
-                            .build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .entity(fill(ApplicationEntity.builder())
+                        .state("STOPPED")
+                        .build())
+                    .build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
 
             UpdateApplicationRequest request2 = UpdateApplicationRequest.builder()
@@ -1037,25 +1093,25 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             StartApplicationRequest request = fill(StartApplicationRequest.builder(), "application-")
-                    .build();
+                .build();
             return this.applications.start(request);
         }
     }
-    
-     public static final class StopInvalid extends AbstractOperationsApiTest<Void> {
+
+    public static final class StopInvalid extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(RequestValidationException.class);
+                .assertError(RequestValidationException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             StopApplicationRequest request = StopApplicationRequest.builder()
-                    .build();
+                .build();
             return this.applications.stop(request);
         }
     }
@@ -1067,84 +1123,49 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
 
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .build();
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                    .assertError(IllegalArgumentException.class);
+                .assertError(IllegalArgumentException.class);
         }
 
         @Override
         protected Publisher<Void> invoke() {
             StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
-                    .build();
+                .build();
             return this.applications.stop(request);
         }
     }
 
-    public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
+    public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
             ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
 
             ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .entity(fill(ApplicationEntity.builder())
-                                    .state("STOPPED")
-                                    .build())
-                            .build())
-                    .build();
-            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
-                    .build();
-            return this.applications.stop(request);
-        }
-    }
-    
-  public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
-                    .spaceId("test-space-id")
-                    .diego(null)
-                    .name("test-application-name")
-                    .build();
-
-            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                            .entity(fill(ApplicationEntity.builder())
-                                    .state("STARTED")
-                                    .build())
-                            .build())
-                    .build();
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .entity(fill(ApplicationEntity.builder())
+                        .state("STARTED")
+                        .build())
+                    .build())
+                .build();
             when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
 
             UpdateApplicationRequest request2 = UpdateApplicationRequest.builder()
@@ -1164,9 +1185,44 @@ public final class DefaultApplicationsTest {
         @Override
         protected Publisher<Void> invoke() {
             StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
-                    .build();
+                .build();
             return this.applications.stop(request);
         }
     }
-    
+
+    public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                .spaceId("test-space-id")
+                .diego(null)
+                .name("test-application-name")
+                .build();
+
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                .resource(fill(ApplicationResource.builder(), "application-")
+                    .entity(fill(ApplicationEntity.builder())
+                        .state("STOPPED")
+                        .build())
+                    .build())
+                .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
+                .build();
+            return this.applications.stop(request);
+        }
+    }
+
 }
