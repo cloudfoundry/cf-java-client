@@ -39,7 +39,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
-import reactor.fn.Consumer;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -55,8 +54,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected static final SchedulerGroup PROCESSOR_GROUP = SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE,
-            uncaughtExceptionHandler(), null, false);
+    protected static final SchedulerGroup PROCESSOR_GROUP = SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
 
@@ -123,17 +121,6 @@ public abstract class AbstractRestTest {
 
     protected final void verify() {
         this.mockServer.verify();
-    }
-
-    private static Consumer<Throwable> uncaughtExceptionHandler() {
-        return new Consumer<Throwable>() {
-
-            @Override
-            public void accept(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-
-        };
     }
 
     @Getter

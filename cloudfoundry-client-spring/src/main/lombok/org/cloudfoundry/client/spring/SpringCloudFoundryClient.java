@@ -87,7 +87,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
-import reactor.fn.Consumer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -367,7 +366,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
+        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,
@@ -428,17 +427,6 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static URI getRoot(String host) {
         return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
-    }
-
-    private static Consumer<Throwable> uncaughtExceptionHandler() {
-        return new Consumer<Throwable>() {
-
-            @Override
-            public void accept(Throwable throwable) {
-                LOGGER.error(throwable.getMessage());
-            }
-
-        };
     }
 
 }
