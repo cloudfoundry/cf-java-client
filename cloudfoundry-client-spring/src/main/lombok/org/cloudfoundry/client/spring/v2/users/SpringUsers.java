@@ -26,7 +26,7 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.fn.Consumer;
 
 import java.net.URI;
@@ -44,7 +44,7 @@ public final class SpringUsers extends AbstractSpringOperations implements Users
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringUsers(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
+    public SpringUsers(RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

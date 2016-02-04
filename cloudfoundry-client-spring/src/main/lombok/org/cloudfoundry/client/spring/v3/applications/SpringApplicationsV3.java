@@ -56,7 +56,7 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.fn.Consumer;
 
 import java.net.URI;
@@ -74,7 +74,7 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringApplicationsV3(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
+    public SpringApplicationsV3(RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

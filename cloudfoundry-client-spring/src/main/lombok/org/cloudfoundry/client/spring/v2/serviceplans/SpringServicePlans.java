@@ -32,7 +32,7 @@ import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.fn.Consumer;
 
 /**
@@ -48,7 +48,7 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
      * @param processorGroup The group to use when making requests
      */
-    public SpringServicePlans(RestOperations restOperations, java.net.URI root, ProcessorGroup processorGroup) {
+    public SpringServicePlans(RestOperations restOperations, java.net.URI root, SchedulerGroup processorGroup) {
         super(restOperations, root, processorGroup);
     }
 

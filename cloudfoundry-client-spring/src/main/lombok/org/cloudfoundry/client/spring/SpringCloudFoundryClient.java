@@ -85,7 +85,7 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
 import reactor.fn.Consumer;
 
@@ -126,7 +126,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final PrivateDomains privateDomains;
 
-    private final ProcessorGroup processorGroup;
+    private final SchedulerGroup processorGroup;
 
     private final OAuth2RestOperations restOperations;
 
@@ -189,7 +189,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
         URI root = getRoot(host);
 
-        this.processorGroup = createProcessorGroup();
+        this.processorGroup = createSchedulerGroup();
         this.restOperations = createRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
 
         this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.processorGroup);
@@ -216,7 +216,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
     }
 
-    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
+    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
         this.processorGroup = processorGroup;
         this.restOperations = restOperations;
 
@@ -358,7 +358,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations.getAccessToken().getValue();
     }
 
-    ProcessorGroup getProcessorGroup() {
+    SchedulerGroup getSchedulerGroup() {
         return this.processorGroup;
     }
 
@@ -366,8 +366,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations;
     }
 
-    private static ProcessorGroup createProcessorGroup() {
-        return ProcessorGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, ProcessorGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
+    private static SchedulerGroup createSchedulerGroup() {
+        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,

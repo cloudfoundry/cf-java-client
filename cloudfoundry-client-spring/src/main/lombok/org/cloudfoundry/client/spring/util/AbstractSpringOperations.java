@@ -29,7 +29,7 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SignalEmitter;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -56,9 +56,9 @@ public abstract class AbstractSpringOperations {
 
     protected final URI root;
 
-    private final ProcessorGroup processorGroup;
+    private final SchedulerGroup processorGroup;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
         this.restOperations = restOperations;
         this.root = root;
         this.processorGroup = processorGroup;
