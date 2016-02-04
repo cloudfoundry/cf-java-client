@@ -151,7 +151,7 @@ public final class SpringPackagesTest {
             return CreatePackageRequest.builder()
                 .applicationId("test-application-id")
                 .type(DOCKER)
-                .url("docker://cloudfoundry/runtime-ci")
+                .data("image", "registry/image:latest")
                 .build();
         }
 

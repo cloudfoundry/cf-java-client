@@ -22,11 +22,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
-import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.BITS;
-import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
+import java.util.Map;
 
 /**
  * The request payload for the Create Package operation
@@ -44,6 +44,15 @@ public final class CreatePackageRequest implements Validatable {
     private final String applicationId;
 
     /**
+     * The datas
+     *
+     * @param datas the datas
+     * @return the datas
+     */
+    @Getter(onMethod = @__(@JsonProperty("data")))
+    private final Map<String, Object> datas;
+
+    /**
      * The type
      *
      * @param type the type
@@ -52,20 +61,11 @@ public final class CreatePackageRequest implements Validatable {
     @Getter(onMethod = @__(@JsonProperty("type")))
     private final PackageType type;
 
-    /**
-     * The url
-     *
-     * @param url the url
-     * @return the url
-     */
-    @Getter(onMethod = @__(@JsonProperty("url")))
-    private final String url;
-
     @Builder
-    CreatePackageRequest(String applicationId, PackageType type, String url) {
+    CreatePackageRequest(String applicationId, @Singular Map<String, Object> datas, PackageType type) {
         this.applicationId = applicationId;
+        this.datas = datas;
         this.type = type;
-        this.url = url;
     }
 
     @Override
@@ -78,14 +78,6 @@ public final class CreatePackageRequest implements Validatable {
 
         if (this.type == null) {
             builder.message("type must be specified");
-        }
-
-        if (this.type == BITS && this.url != null) {
-            builder.message("url must only be specified if type is DOCKER");
-        }
-
-        if (this.type == DOCKER && this.url == null) {
-            builder.message("url must be specified if type is DOCKER");
         }
 
         return builder.build();
