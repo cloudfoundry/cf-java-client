@@ -49,6 +49,7 @@ import org.cloudfoundry.operations.util.v2.Resources;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
+import reactor.fn.Predicate;
 import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple4;
@@ -65,6 +66,8 @@ import static org.cloudfoundry.operations.util.Tuples.function;
 public final class DefaultApplications implements Applications {
 
     public static final Mono<List<Route>> NO_ROUTES = Mono.just((List<Route>) new ArrayList<Route>());
+
+    public static final String STARTED_STATE = "STARTED";
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -119,6 +122,34 @@ public final class DefaultApplications implements Applications {
                 .then(getApplicationResourceForScale(this.cloudFoundryClient))
                 .then(conditionallyScaleApplication(this.cloudFoundryClient))
                 .map(buildApplicationScale());
+    }
+
+    @Override
+    public Mono<Void> start(StartApplicationRequest request) {
+        return Validators
+                .validate(request)
+                .map(new Function<StartApplicationRequest, String>() {
+
+                    @Override
+                    public String apply(StartApplicationRequest request) {
+                        return request.getName();
+                    }
+
+                })
+                .and(this.spaceId)
+                .then(getApplicationWhere(this.cloudFoundryClient, applicationNotInState(STARTED_STATE)))
+                .then(startApplication(this.cloudFoundryClient));
+    }
+
+    private static Predicate<ApplicationResource> applicationNotInState(final String state) {
+        return new Predicate<ApplicationResource>() {
+
+            @Override
+            public boolean test(ApplicationResource resource) {
+                return !state.equals(Resources.getEntity(resource).getState());
+            }
+
+        };
     }
 
     private static Function<ApplicationEntity, ApplicationScale> buildApplicationScale() {
@@ -554,6 +585,45 @@ public final class DefaultApplications implements Applications {
         }
 
         return urls;
+    }
+
+    private Function<Tuple2<String, String>, Mono<String>> getApplicationWhere(final CloudFoundryClient cloudFoundryClient, final Predicate<ApplicationResource> predicate) {
+        return new Function<Tuple2<String, String>, Mono<String>>() {
+
+            @Override
+            public Mono<String> apply(Tuple2<String, String> tuple) {
+                return function(new Function2<String, String, Mono<String>>() {
+
+                    @Override
+                    public Mono<String> apply(String applicationName, String spaceId) {
+
+                        return Paginated
+                                .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, applicationName))
+                                .single()
+                                .otherwise(Exceptions.<ApplicationResource>convert("Application %s does not exist", applicationName))
+                                .where(predicate)
+                                .map(Resources.extractId());
+                    }
+
+                }).apply(tuple);
+            }
+
+        };
+    }
+
+    private Function<String, Mono<Void>> startApplication(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<Void>>() {
+
+            @Override
+            public Mono<Void> apply(String applicationId) {
+                return cloudFoundryClient.applicationsV2().update(UpdateApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .state(STARTED_STATE)
+                        .build())
+                        .after();
+            }
+
+        };
     }
 
 }
