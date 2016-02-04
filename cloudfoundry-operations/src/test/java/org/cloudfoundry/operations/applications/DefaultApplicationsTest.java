@@ -1042,4 +1042,131 @@ public final class DefaultApplicationsTest {
         }
     }
     
+     public static final class StopInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            StopApplicationRequest request = StopApplicationRequest.builder()
+                    .build();
+            return this.applications.stop(request);
+        }
+    }
+
+    public static final class StopInvalidApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .spaceId("test-space-id")
+                    .diego(null)
+                    .name("test-application-name")
+                    .build();
+
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                    .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
+                    .build();
+            return this.applications.stop(request);
+        }
+    }
+
+    public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .spaceId("test-space-id")
+                    .diego(null)
+                    .name("test-application-name")
+                    .build();
+
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                            .entity(fill(ApplicationEntity.builder())
+                                    .state("STOPPED")
+                                    .build())
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
+                    .build();
+            return this.applications.stop(request);
+        }
+    }
+    
+  public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            ListSpaceApplicationsRequest request1 = fillPage(ListSpaceApplicationsRequest.builder())
+                    .spaceId("test-space-id")
+                    .diego(null)
+                    .name("test-application-name")
+                    .build();
+
+            ListSpaceApplicationsResponse response1 = fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                            .entity(fill(ApplicationEntity.builder())
+                                    .state("STARTED")
+                                    .build())
+                            .build())
+                    .build();
+            when(this.cloudFoundryClient.spaces().listApplications(request1)).thenReturn(Mono.just(response1));
+
+            UpdateApplicationRequest request2 = UpdateApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .state("STOPPED")
+                .build();
+            UpdateApplicationResponse response2 = fill(UpdateApplicationResponse.builder())
+                .build();
+            when(this.cloudFoundryClient.applicationsV2().update(request2)).thenReturn(Mono.just(response2));
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            StopApplicationRequest request = fill(StopApplicationRequest.builder(), "application-")
+                    .build();
+            return this.applications.stop(request);
+        }
+    }
+    
 }

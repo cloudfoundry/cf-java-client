@@ -70,4 +70,10 @@ public interface Applications {
      */
     Mono<Void> start(StartApplicationRequest request);
 
+    /**
+     * Stops a specific application or, if the application is already stopped, simply returns.
+     *
+     * @param request the stop application request
+     */
+    Mono<Void> stop(StopApplicationRequest request);
 }

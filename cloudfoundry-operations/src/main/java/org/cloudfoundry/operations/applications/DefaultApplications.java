@@ -68,6 +68,8 @@ public final class DefaultApplications implements Applications {
     public static final Mono<List<Route>> NO_ROUTES = Mono.just((List<Route>) new ArrayList<Route>());
 
     public static final String STARTED_STATE = "STARTED";
+    
+    public static final String STOPPED_STATE = "STOPPED";
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -140,7 +142,24 @@ public final class DefaultApplications implements Applications {
                 .then(getApplicationWhere(this.cloudFoundryClient, applicationNotInState(STARTED_STATE)))
                 .then(startApplication(this.cloudFoundryClient));
     }
+    
+ @Override
+    public Mono<Void> stop(StopApplicationRequest request) {
+        return Validators
+                .validate(request)
+                .map(new Function<StopApplicationRequest, String>() {
 
+                    @Override
+                    public String apply(StopApplicationRequest request) {
+                        return request.getName();
+                    }
+
+                })
+                .and(this.spaceId)
+                .then(getApplicationWhere(this.cloudFoundryClient, applicationNotInState(STOPPED_STATE)))
+                .then(stopApplication(this.cloudFoundryClient));
+    }
+    
     private static Predicate<ApplicationResource> applicationNotInState(final String state) {
         return new Predicate<ApplicationResource>() {
 
@@ -279,8 +298,8 @@ public final class DefaultApplications implements Applications {
         };
     }
 
-    private static Function<ApplicationResource, Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>>>
-    gatherApplicationInfo(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<ApplicationResource, Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>>> gatherApplicationInfo(
+            final CloudFoundryClient cloudFoundryClient) {
         return new Function<ApplicationResource, Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>>>() {
 
             @Override
@@ -295,8 +314,8 @@ public final class DefaultApplications implements Applications {
         };
     }
 
-    private static Function<Tuple2<RenameApplicationRequest, String>, Mono<Tuple2<RenameApplicationRequest, ApplicationResource>>>
-    getApplicationResourceForRename(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Tuple2<RenameApplicationRequest, String>, Mono<Tuple2<RenameApplicationRequest, ApplicationResource>>> getApplicationResourceForRename(
+            final CloudFoundryClient cloudFoundryClient) {
         return function(new Function2<RenameApplicationRequest, String, Mono<Tuple2<RenameApplicationRequest, ApplicationResource>>>() {
 
             @Override
@@ -310,8 +329,8 @@ public final class DefaultApplications implements Applications {
         });
     }
 
-    private static Function<Tuple2<ScaleApplicationRequest, String>, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>>
-    getApplicationResourceForScale(final CloudFoundryClient cloudFoundryClient) {
+    private static Function<Tuple2<ScaleApplicationRequest, String>, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>> getApplicationResourceForScale(
+            final CloudFoundryClient cloudFoundryClient) {
         return function(new Function2<ScaleApplicationRequest, String, Mono<Tuple2<ScaleApplicationRequest, ApplicationResource>>>() {
 
             @Override
@@ -324,7 +343,7 @@ public final class DefaultApplications implements Applications {
             }
         });
     }
-
+    
     private static String getBuildpack(SummaryApplicationResponse response) {
         return Optional
                 .ofNullable(response.getBuildpack())
@@ -625,5 +644,22 @@ public final class DefaultApplications implements Applications {
 
         };
     }
+
+    private Function<String, Mono<Void>> stopApplication(final CloudFoundryClient cloudFoundryClient) {
+        return new Function<String, Mono<Void>>() {
+
+            @Override
+            public Mono<Void> apply(String applicationId) {
+                return cloudFoundryClient.applicationsV2().update(UpdateApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .state(STOPPED_STATE)
+                        .build())
+                        .after();
+            }
+
+        };
+
+    }
+
 
 }
