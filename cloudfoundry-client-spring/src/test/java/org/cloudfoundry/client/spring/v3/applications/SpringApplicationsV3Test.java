@@ -24,7 +24,7 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationInstanceRequest;
+import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -253,13 +253,13 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class DeleteProcess extends AbstractApiTest<DeleteApplicationInstanceRequest, Void> {
+    public static final class DeleteProcess extends AbstractApiTest<TerminateApplicationInstanceRequest, Void> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected DeleteApplicationInstanceRequest getInvalidRequest() {
-            return DeleteApplicationInstanceRequest.builder()
+        protected TerminateApplicationInstanceRequest getInvalidRequest() {
+            return TerminateApplicationInstanceRequest.builder()
                 .build();
         }
 
@@ -276,8 +276,8 @@ public final class SpringApplicationsV3Test {
         }
 
         @Override
-        protected DeleteApplicationInstanceRequest getValidRequest() throws Exception {
-            return DeleteApplicationInstanceRequest.builder()
+        protected TerminateApplicationInstanceRequest getValidRequest() throws Exception {
+            return TerminateApplicationInstanceRequest.builder()
                 .applicationId("test-application-id")
                 .index("test-index")
                 .type("test-type")
@@ -285,8 +285,8 @@ public final class SpringApplicationsV3Test {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteApplicationInstanceRequest request) {
-            return this.applications.deleteInstance(request);
+        protected Mono<Void> invoke(TerminateApplicationInstanceRequest request) {
+            return this.applications.terminateInstance(request);
         }
 
     }
