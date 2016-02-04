@@ -1,21 +1,22 @@
 {
-  "guid": "126e54c4-811d-4f7a-9a34-804130a75ab2",
+  "guid": "909affe0-4aa1-42f4-b399-1a67cb5a90fa",
   "type": "docker",
-  "hash": {
-    "type": "sha1",
-    "value": null
+  "data": {
+    "image": "registry/image:latest"
   },
-  "url": "docker://cloudfoundry/runtime-ci",
   "state": "READY",
-  "error": null,
-  "created_at": "2015-08-06T00:36:55Z",
+  "created_at": "2016-01-26T22:20:12Z",
   "updated_at": null,
-  "_links": {
+  "links": {
     "self": {
-      "href": "/v3/packages/126e54c4-811d-4f7a-9a34-804130a75ab2"
+      "href": "/v3/packages/909affe0-4aa1-42f4-b399-1a67cb5a90fa"
+    },
+    "stage": {
+      "href": "/v3/packages/909affe0-4aa1-42f4-b399-1a67cb5a90fa/droplets",
+      "method": "POST"
     },
     "app": {
-      "href": "/v3/apps/guid-f8e68f3f-663d-478d-98ff-5d554910fde0"
+      "href": "/v3/apps/guid-1c19b0bf-dded-45f3-8f98-85f3746f97cf"
     }
   }
 }

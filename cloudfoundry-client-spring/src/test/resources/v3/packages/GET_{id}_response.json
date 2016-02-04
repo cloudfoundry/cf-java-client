@@ -1,33 +1,34 @@
 {
-  "guid": "guid-9067cc41-b832-4de9-89a2-0987dab65e8e",
+  "guid": "guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4",
   "type": "bits",
-  "hash": {
-    "type": "sha1",
-    "value": null
+  "data": {
+    "error": null,
+    "hash": {
+      "type": "sha1",
+      "value": null
+    }
   },
-  "url": null,
   "state": "AWAITING_UPLOAD",
-  "error": null,
-  "created_at": "2015-07-27T22:43:15Z",
+  "created_at": "2016-01-26T22:20:12Z",
   "updated_at": null,
-  "_links": {
+  "links": {
     "self": {
-      "href": "/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e"
+      "href": "/v3/packages/guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4"
     },
     "upload": {
-      "href": "/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/upload",
+      "href": "/v3/packages/guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4/upload",
       "method": "POST"
     },
     "download": {
-      "href": "/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/download",
+      "href": "/v3/packages/guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4/download",
       "method": "GET"
     },
     "stage": {
-      "href": "/v3/packages/guid-9067cc41-b832-4de9-89a2-0987dab65e8e/droplets",
+      "href": "/v3/packages/guid-ebaae129-a8ee-43cf-a0a6-734c7ed0d1b4/droplets",
       "method": "POST"
     },
     "app": {
-      "href": "/v3/apps/guid-1eb7b328-4769-45c9-8c61-3d2e7b69541a"
+      "href": "/v3/apps/guid-6ca8ed35-67b6-4139-afe3-aeda3b26d647"
     }
   }
 }
