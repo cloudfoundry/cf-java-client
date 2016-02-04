@@ -24,14 +24,6 @@ import reactor.core.publisher.Mono;
 public interface Processes {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/terminating_a_process_instance.html">Terminate Process Instance</a> request
-     *
-     * @param request the Terminate Process Instance request
-     * @return the response from the Terminate Process Instance request
-     */
-    Mono<Void> deleteInstance(DeleteProcessInstanceRequest request);
-
-    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/get_a_process.html">Get Process</a> request
      *
      * @param request the Get Process request
@@ -54,6 +46,14 @@ public interface Processes {
      * @return the response from the Scale Process request
      */
     Mono<ScaleProcessResponse> scale(ScaleProcessRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/terminating_a_process_instance.html">Terminate Process Instance</a> request
+     *
+     * @param request the Terminate Process Instance request
+     * @return the response from the Terminate Process Instance request
+     */
+    Mono<Void> terminateInstance(TerminateProcessInstanceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/updating_a_process.html">Update Process</a> request

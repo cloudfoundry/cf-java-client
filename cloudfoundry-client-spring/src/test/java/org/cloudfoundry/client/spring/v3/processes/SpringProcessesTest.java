@@ -18,7 +18,7 @@ package org.cloudfoundry.client.spring.v3.processes;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.processes.DeleteProcessInstanceRequest;
+import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -40,14 +40,14 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringProcessesTest {
 
-    public static final class DeleteInstance extends AbstractApiTest<DeleteProcessInstanceRequest, Void> {
+    public static final class DeleteInstance extends AbstractApiTest<TerminateProcessInstanceRequest, Void> {
 
         private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
 
 
         @Override
-        protected DeleteProcessInstanceRequest getInvalidRequest() {
-            return DeleteProcessInstanceRequest.builder()
+        protected TerminateProcessInstanceRequest getInvalidRequest() {
+            return TerminateProcessInstanceRequest.builder()
                 .build();
         }
 
@@ -64,16 +64,16 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected DeleteProcessInstanceRequest getValidRequest() {
-            return DeleteProcessInstanceRequest.builder()
+        protected TerminateProcessInstanceRequest getValidRequest() {
+            return TerminateProcessInstanceRequest.builder()
                 .processId("test-process-id")
                 .index("test-index")
                 .build();
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteProcessInstanceRequest request) {
-            return this.processes.deleteInstance(request);
+        protected Mono<Void> invoke(TerminateProcessInstanceRequest request) {
+            return this.processes.terminateInstance(request);
         }
 
     }

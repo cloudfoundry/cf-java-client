@@ -27,7 +27,7 @@ import org.cloudfoundry.client.ValidationResult;
  * The request payload for the Terminate Process Instance operation
  */
 @Data
-public final class DeleteProcessInstanceRequest implements Validatable {
+public final class TerminateProcessInstanceRequest implements Validatable {
 
     /**
      * The index
@@ -48,7 +48,7 @@ public final class DeleteProcessInstanceRequest implements Validatable {
     private final String processId;
 
     @Builder
-    DeleteProcessInstanceRequest(String index, String processId) {
+    TerminateProcessInstanceRequest(String index, String processId) {
         this.index = index;
         this.processId = processId;
     }
