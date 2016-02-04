@@ -25,7 +25,7 @@ import org.cloudfoundry.operations.ValidationResult;
  * The request options for the delete application operation
  */
 @Data
-public class DeleteApplicationRequest implements Validatable {
+public final class DeleteApplicationRequest implements Validatable {
 
     private final Boolean deleteRoutes;
 

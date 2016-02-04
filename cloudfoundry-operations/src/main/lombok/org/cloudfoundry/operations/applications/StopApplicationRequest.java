@@ -25,8 +25,8 @@ import org.cloudfoundry.operations.ValidationResult;
  * The request options for the stop application operation
  */
 @Data
-public class StopApplicationRequest implements Validatable {
-    
+public final class StopApplicationRequest implements Validatable {
+
     private final String name;
 
     @Builder

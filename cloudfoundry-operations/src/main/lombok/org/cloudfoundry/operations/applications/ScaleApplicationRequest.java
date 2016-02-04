@@ -16,8 +16,10 @@
 
 package org.cloudfoundry.operations.applications;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import org.cloudfoundry.operations.Validatable;
 import org.cloudfoundry.operations.ValidationResult;
 
@@ -35,6 +37,12 @@ public final class ScaleApplicationRequest implements Validatable {
      */
     private final Integer diskLimit;
 
+    @Getter(AccessLevel.NONE)
+    private final String diskLimitInput;
+
+    @Getter(AccessLevel.NONE)
+    private final boolean diskLimitInvalid;
+
     /**
      * The number of instances
      *
@@ -51,6 +59,12 @@ public final class ScaleApplicationRequest implements Validatable {
      */
     private final Integer memoryLimit;
 
+    @Getter(AccessLevel.NONE)
+    private final String memoryLimitInput;
+
+    @Getter(AccessLevel.NONE)
+    private final boolean memoryLimitInvalid;
+
     /**
      * The name of the application
      *
@@ -60,13 +74,20 @@ public final class ScaleApplicationRequest implements Validatable {
     private final String name;
 
     @Builder
-    ScaleApplicationRequest(Integer diskLimit,
+    ScaleApplicationRequest(String diskLimit,
                             Integer instances,
-                            Integer memoryLimit,
+                            String memoryLimit,
                             String name) {
-        this.diskLimit = diskLimit;
+        this.diskLimitInput = diskLimit;
+        this.diskLimit = parseForMb(diskLimit);
+        this.diskLimitInvalid = null == this.diskLimit;
+
         this.instances = instances;
-        this.memoryLimit = memoryLimit;
+
+        this.memoryLimitInput = memoryLimit;
+        this.memoryLimit = parseForMb(memoryLimit);
+        this.memoryLimitInvalid = null == this.memoryLimit;
+
         this.name = name;
     }
 
@@ -78,7 +99,42 @@ public final class ScaleApplicationRequest implements Validatable {
             builder.message("name must be specified");
         }
 
+        if (this.diskLimitInput != null && this.diskLimitInvalid) {
+            builder.message(String.format("disk limit (%s) specified incorrectly", this.diskLimitInput));
+        }
+
+        if (this.memoryLimitInput != null && this.memoryLimitInvalid) {
+            builder.message(String.format("memory limit (%s) specified incorrectly", this.memoryLimitInput));
+        }
+
         return builder.build();
+    }
+
+    private static Integer getPositiveValueTimes(int factor, String intString) {
+        try {
+            int result = factor * Integer.valueOf(intString);
+            return (result <= 0) ? null : result;
+        } catch (Exception x) {
+            return null;
+        }
+    }
+
+    private static Integer parseForMb(String limit) {
+        if (null == limit || limit.length() < 2) return null;
+
+        int lastIndex = limit.length() - 1;
+        String numberPart = limit.substring(0, lastIndex);
+
+        switch (limit.charAt(lastIndex)) {
+            case 'm':
+            case 'M':
+                return getPositiveValueTimes(1, numberPart);
+            case 'g':
+            case 'G':
+                return getPositiveValueTimes(1024, numberPart);
+            default:
+                return null;
+        }
     }
 
 }
