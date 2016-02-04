@@ -29,11 +29,11 @@ import org.cloudfoundry.client.v2.Resource;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class QuotaDefinitionResource extends Resource<QuotaDefinitionEntity> {
+public final class OrganizationQuotaDefinitionResource extends Resource<OrganizationQuotaDefinitionEntity> {
 
     @Builder
-    QuotaDefinitionResource(@JsonProperty("entity") QuotaDefinitionEntity entity,
-                            @JsonProperty("metadata") Metadata metadata) {
+    OrganizationQuotaDefinitionResource(@JsonProperty("entity") OrganizationQuotaDefinitionEntity entity,
+                                        @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

@@ -138,8 +138,7 @@ public final class DefaultSpaces implements Spaces {
                     .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
 
                         @Override
-                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services,
-                                                 Optional<SpaceQuota> spaceQuota) {
+                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota> spaceQuota) {
                             return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
                         }
 
@@ -224,8 +223,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<SpaceResource> requestOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
 
                 @Override
                 public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
@@ -243,8 +241,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<ApplicationResource> requestSpaceApplications(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
@@ -260,8 +257,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<DomainResource> requestSpaceDomains(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceDomainsResponse> apply(Integer page) {
@@ -283,8 +279,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<SecurityGroupResource> requestSpaceSecurityGroups(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceSecurityGroupsResponse> apply(Integer page) {
@@ -299,8 +294,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<ServiceResource> requestSpaceServices(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListSpaceServicesResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceServicesResponse>>() {
 
                 @Override
                 public Mono<ListSpaceServicesResponse> apply(Integer page) {
@@ -315,8 +309,7 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<SpaceResource> requestSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
-        return Paginated
-            .requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
+        return Paginated.requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
 
                 @Override
                 public Mono<ListSpacesResponse> apply(Integer page) {

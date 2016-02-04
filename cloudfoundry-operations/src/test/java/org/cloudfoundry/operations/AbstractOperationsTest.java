@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.client.v2.quotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
@@ -56,6 +57,8 @@ public abstract class AbstractOperationsTest {
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
 
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
+    
+    protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
     protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
 
@@ -77,6 +80,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
+        when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);
