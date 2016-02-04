@@ -85,7 +85,7 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
 import reactor.fn.Consumer;
 
@@ -126,7 +126,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final PrivateDomains privateDomains;
 
-    private final ProcessorGroup processorGroup;
+    private final SchedulerGroup schedulerGroup;
 
     private final OAuth2RestOperations restOperations;
 
@@ -189,59 +189,59 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
         URI root = getRoot(host);
 
-        this.processorGroup = createProcessorGroup();
+        this.schedulerGroup = createSchedulerGroup();
         this.restOperations = createRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
 
-        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.processorGroup);
-        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.processorGroup);
-        this.domains = new SpringDomains(this.restOperations, root, this.processorGroup);
-        this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
-        this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
-        this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
-        this.jobs = new SpringJobs(this.restOperations, root, this.processorGroup);
-        this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
-        this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
-        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.processorGroup);
-        this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
-        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
-        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
-        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
-        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
-        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.processorGroup);
-        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, this.processorGroup);
-        this.servicePlans = new SpringServicePlans(this.restOperations, root, this.processorGroup);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
-        this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
-        this.stacks = new SpringStacks(this.restOperations, root, this.processorGroup);
-        this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.schedulerGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.schedulerGroup);
+        this.domains = new SpringDomains(this.restOperations, root, this.schedulerGroup);
+        this.droplets = new SpringDroplets(this.restOperations, root, this.schedulerGroup);
+        this.events = new SpringEvents(this.restOperations, root, this.schedulerGroup);
+        this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
+        this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
+        this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
+        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
+        this.routes = new SpringRoutes(this.restOperations, root, this.schedulerGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.schedulerGroup);
+        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.schedulerGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.schedulerGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.schedulerGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.schedulerGroup);
+        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, this.schedulerGroup);
+        this.servicePlans = new SpringServicePlans(this.restOperations, root, this.schedulerGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
+        this.spaces = new SpringSpaces(this.restOperations, root, this.schedulerGroup);
+        this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
+        this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
     }
 
-    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
-        this.processorGroup = processorGroup;
+    SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+        this.schedulerGroup = schedulerGroup;
         this.restOperations = restOperations;
 
-        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.processorGroup);
-        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.processorGroup);
-        this.domains = new SpringDomains(this.restOperations, root, this.processorGroup);
-        this.droplets = new SpringDroplets(this.restOperations, root, this.processorGroup);
-        this.events = new SpringEvents(this.restOperations, root, this.processorGroup);
-        this.info = new SpringInfo(this.restOperations, root, this.processorGroup);
-        this.jobs = new SpringJobs(this.restOperations, root, this.processorGroup);
-        this.organizations = new SpringOrganizations(this.restOperations, root, this.processorGroup);
-        this.packages = new SpringPackages(this.restOperations, root, this.processorGroup);
-        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.processorGroup);
-        this.routes = new SpringRoutes(this.restOperations, root, this.processorGroup);
-        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.processorGroup);
-        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.processorGroup);
-        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.processorGroup);
-        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.processorGroup);
-        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.processorGroup);
-        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, this.processorGroup);
-        this.servicePlans = new SpringServicePlans(this.restOperations, root, this.processorGroup);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.processorGroup);
-        this.spaces = new SpringSpaces(this.restOperations, root, this.processorGroup);
-        this.stacks = new SpringStacks(this.restOperations, root, this.processorGroup);
-        this.users = new SpringUsers(this.restOperations, root, this.processorGroup);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, this.schedulerGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, this.schedulerGroup);
+        this.domains = new SpringDomains(this.restOperations, root, this.schedulerGroup);
+        this.droplets = new SpringDroplets(this.restOperations, root, this.schedulerGroup);
+        this.events = new SpringEvents(this.restOperations, root, this.schedulerGroup);
+        this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
+        this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
+        this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
+        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
+        this.routes = new SpringRoutes(this.restOperations, root, this.schedulerGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.schedulerGroup);
+        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.schedulerGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, this.schedulerGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, this.schedulerGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, this.schedulerGroup);
+        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, this.schedulerGroup);
+        this.servicePlans = new SpringServicePlans(this.restOperations, root, this.schedulerGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
+        this.spaces = new SpringSpaces(this.restOperations, root, this.schedulerGroup);
+        this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
+        this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
     }
 
     @Override
@@ -358,16 +358,16 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations.getAccessToken().getValue();
     }
 
-    ProcessorGroup getProcessorGroup() {
-        return this.processorGroup;
+    SchedulerGroup getSchedulerGroup() {
+        return this.schedulerGroup;
     }
 
     OAuth2RestOperations getRestOperations() {
         return this.restOperations;
     }
 
-    private static ProcessorGroup createProcessorGroup() {
-        return ProcessorGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, ProcessorGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
+    private static SchedulerGroup createSchedulerGroup() {
+        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, uncaughtExceptionHandler(), null, false);
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,

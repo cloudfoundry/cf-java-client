@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SubscriberWithContext;
 import reactor.fn.BiConsumer;
 import reactor.fn.Consumer;
@@ -73,15 +73,15 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
-        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient), getProcessorGroup(cloudFoundryClient));
+        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient), getSchedulerGroup(cloudFoundryClient));
 
         this.clientEndpointConfig = getClientEndpointConfig(cloudFoundryClient);
         this.root = UriComponentsBuilder.fromUri(super.root).scheme("wss").build().toUri();
         this.webSocketContainer = webSocketContainer;
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
-        super(restOperations, root, processorGroup);
+    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+        super(restOperations, root, schedulerGroup);
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.webSocketContainer = webSocketContainer;
@@ -127,8 +127,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         });
     }
 
-    private static ProcessorGroup getProcessorGroup(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getProcessorGroup();
+    private static SchedulerGroup getSchedulerGroup(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getSchedulerGroup();
     }
 
     private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {

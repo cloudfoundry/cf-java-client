@@ -37,7 +37,7 @@ import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.fn.Consumer;
 
 import java.net.URI;
@@ -53,10 +53,10 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
      *
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param processorGroup The group to use when making requests
+     * @param schedulerGroup The group to use when making requests
      */
-    public SpringServiceInstances(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
-        super(restOperations, root, processorGroup);
+    public SpringServiceInstances(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+        super(restOperations, root, schedulerGroup);
     }
 
     @Override

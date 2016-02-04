@@ -29,7 +29,7 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ProcessorGroup;
+import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SignalEmitter;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
@@ -56,12 +56,12 @@ public abstract class AbstractSpringOperations {
 
     protected final URI root;
 
-    private final ProcessorGroup processorGroup;
+    private final SchedulerGroup schedulerGroup;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root, ProcessorGroup processorGroup) {
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.restOperations = restOperations;
         this.root = root;
-        this.processorGroup = processorGroup;
+        this.schedulerGroup = schedulerGroup;
     }
 
     protected final <T> Mono<T> delete(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
@@ -110,7 +110,7 @@ public abstract class AbstractSpringOperations {
                     }
 
                 }))
-            .publishOn(this.processorGroup)
+            .publishOn(this.schedulerGroup)
             .onBackpressureBlock();
     }
 
