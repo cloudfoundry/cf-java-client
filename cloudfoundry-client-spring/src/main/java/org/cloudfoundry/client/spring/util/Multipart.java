@@ -22,6 +22,7 @@ import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.rx.Stream;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,14 +37,15 @@ public final class Multipart {
 
     private static final String DASHES = "--";
 
-    public static Stream<byte[]> from(final InputStream inputStream, final String boundary) {
+    public static Stream<byte[]> from(final InputStream inputStream, final String boundary) throws IOException {
+        final InputStream byteStream = flushStream(inputStream);
         return Stream
             .create(new Consumer<SubscriberWithContext<byte[], Void>>() {
 
                 @Override
                 public void accept(SubscriberWithContext<byte[], Void> subscriber) {
                     try {
-                        byte[] part = getPart(inputStream, boundary);
+                        byte[] part = getPart(byteStream, boundary);
 
                         if (part == null) {
                             subscriber.onComplete();
@@ -60,7 +62,7 @@ public final class Multipart {
                 @Override
                 public Void apply(Subscriber<? super byte[]> subscriber) {
                     try {
-                        primeStream(inputStream, boundary);
+                        primeStream(byteStream, boundary);
                     } catch (IOException e) {
                         subscriber.onError(e);
                     }
@@ -77,6 +79,16 @@ public final class Multipart {
 
     private static void drain(InputStream in) throws IOException {
         in.skip(in.available());
+    }
+
+    private static InputStream flushStream(InputStream inputStream) throws IOException {
+        int byteRead;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        while ((byteRead = inputStream.read()) != -1) {
+            baos.write(byteRead);
+        }
+        byte[] bytesRead = baos.toByteArray();
+        return new ByteArrayInputStream(bytesRead);
     }
 
     private static byte[] getPart(InputStream in, String boundary) throws IOException {
