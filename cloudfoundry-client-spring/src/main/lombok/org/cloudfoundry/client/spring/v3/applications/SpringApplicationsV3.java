@@ -25,7 +25,6 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -39,18 +38,15 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v3.applications.MapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
-import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
+import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.springframework.web.client.RestOperations;
@@ -203,30 +199,6 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
     }
 
     @Override
-    public Mono<ListApplicationRoutesResponse> listRoutes(final ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Void> mapRoute(final MapApplicationRouteRequest request) {
-        return put(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
-            }
-
-        });
-    }
-
-    @Override
     public Mono<ScaleApplicationResponse> scale(final ScaleApplicationRequest request) {
         return put(request, ScaleApplicationResponse.class, new Consumer<UriComponentsBuilder>() {
 
@@ -269,18 +241,6 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex());
-            }
-
-        });
-    }
-
-    @Override
-    public Mono<Void> unmapRoute(final UnmapApplicationRouteRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v3", "apps", request.getApplicationId(), "routes");
             }
 
         });

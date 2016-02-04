@@ -24,7 +24,6 @@ import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -38,18 +37,15 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v3.applications.MapApplicationRouteRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
-import org.cloudfoundry.client.v3.applications.UnmapApplicationRouteRequest;
+import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import reactor.core.publisher.Mono;
@@ -837,115 +833,6 @@ public final class SpringApplicationsV3Test {
 
     }
 
-    public static final class ListRoutes extends AbstractApiTest<ListApplicationRoutesRequest, ListApplicationRoutesResponse> {
-
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected ListApplicationRoutesRequest getInvalidRequest() {
-            return ListApplicationRoutesRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("/v3/apps/test-application-id/routes")
-                .status(OK)
-                .responsePayload("v3/apps/GET_{id}_routes_response.json");
-        }
-
-        @Override
-        protected ListApplicationRoutesResponse getResponse() {
-            return ListApplicationRoutesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(2)
-                    .first(Link.builder()
-                        .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
-                        .build())
-                    .last(Link.builder()
-                        .href("/v3/apps/guid-7cc42bf5-2b0b-4c8b-84eb-a733c5a26762/routes?page=1&per_page=50")
-                        .build())
-                    .build())
-                .resource(ListApplicationRoutesResponse.Resource.builder()
-                    .id("cad6fe1d-d6de-4698-9b8e-caf9506ecf8d")
-                    .host("host-20")
-                    .path("")
-                    .createdAt("2015-07-27T22:43:32Z")
-                    .link("space", Link.builder()
-                        .href("/v2/spaces/5835dcab-415d-4758-b8cc-dc4246f930ce")
-                        .build())
-                    .link("domain", Link.builder()
-                        .href("/v2/domains/74797591-b1cc-40a6-8cd3-d8bfa277a306")
-                        .build())
-                    .build())
-                .resource(ListApplicationRoutesResponse.Resource.builder()
-                    .id("74f9b772-ace2-4932-aa7b-328434e712a1")
-                    .host("host-21")
-                    .path("/foo/bar")
-                    .createdAt("2015-07-27T22:43:32Z")
-                    .link("space", Link.builder()
-                        .href("/v2/spaces/5835dcab-415d-4758-b8cc-dc4246f930ce")
-                        .build())
-                    .link("domain", Link.builder()
-                        .href("/v2/domains/9274a306-f253-4bd8-9cd1-d4af023bcf90")
-                        .build())
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected ListApplicationRoutesRequest getValidRequest() throws Exception {
-            return ListApplicationRoutesRequest.builder()
-                .applicationId("test-application-id")
-                .build();
-        }
-
-        @Override
-        protected Mono<ListApplicationRoutesResponse> invoke(ListApplicationRoutesRequest request) {
-            return this.applications.listRoutes(request);
-        }
-
-    }
-
-    public static final class MapRoute extends AbstractApiTest<MapApplicationRouteRequest, Void> {
-
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected MapApplicationRouteRequest getInvalidRequest() {
-            return MapApplicationRouteRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(PUT).path("/v3/apps/test-application-id/routes")
-                .requestPayload("v3/apps/PUT_{id}_routes_request.json")
-                .status(NO_CONTENT);
-        }
-
-        @Override
-        protected Void getResponse() {
-            return null;
-        }
-
-        @Override
-        protected MapApplicationRouteRequest getValidRequest() throws Exception {
-            return MapApplicationRouteRequest.builder()
-                .applicationId("test-application-id")
-                .routeId("9cf0271a-420f-4ae4-b227-16683db93573")
-                .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(MapApplicationRouteRequest request) {
-            return this.applications.mapRoute(request);
-        }
-
-    }
-
     public static final class Scale extends AbstractApiTest<ScaleApplicationRequest, ScaleApplicationResponse> {
 
         private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
@@ -1147,44 +1034,6 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<StopApplicationResponse> invoke(StopApplicationRequest request) {
             return this.applications.stop(request);
-        }
-
-    }
-
-    public static final class UnmapRoute extends AbstractApiTest<UnmapApplicationRouteRequest, Void> {
-
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected UnmapApplicationRouteRequest getInvalidRequest() {
-            return UnmapApplicationRouteRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(DELETE).path("/v3/apps/test-application-id/routes")
-                .requestPayload("v3/apps/DELETE_{id}_routes_request.json")
-                .status(NO_CONTENT);
-        }
-
-        @Override
-        protected Void getResponse() {
-            return null;
-        }
-
-        @Override
-        protected UnmapApplicationRouteRequest getValidRequest() throws Exception {
-            return UnmapApplicationRouteRequest.builder()
-                .applicationId("test-application-id")
-                .routeId("3f0121a8-54e1-45c0-8daf-44d0f8ba1091")
-                .build();
-        }
-
-        @Override
-        protected Mono<Void> invoke(UnmapApplicationRouteRequest request) {
-            return this.applications.unmapRoute(request);
         }
 
     }

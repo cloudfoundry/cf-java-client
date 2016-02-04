@@ -104,22 +104,6 @@ public interface ApplicationsV3 {
     Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_(experimental)/list_routes.html">List Application Routes</a> request
-     *
-     * @param request the List Application Routes request
-     * @return the response from the List Application Routes request
-     */
-    Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/map_a_route.html">Map Application Route</a> request
-     *
-     * @param request the Map Application Route request
-     * @return the response from the Map Application Route request
-     */
-    Mono<Void> mapRoute(MapApplicationRouteRequest request);
-
-    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/scaling_a_process_from_its_app.html">Scale Application</a> request
      *
      * @param request the Scale Application request
@@ -150,14 +134,6 @@ public interface ApplicationsV3 {
      * @return the response from the Delete Application Process Instance request
      */
     Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request);
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/app_routes_%28experimental%29/unmap_a_route.html">Unmap Application Route</a> request
-     *
-     * @param request the Unmap Application Route request
-     * @return the response from the Unmap Application Route request
-     */
-    Mono<Void> unmapRoute(UnmapApplicationRouteRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_%28experimental%29/updating_an_app.html">Update Application</a> request
