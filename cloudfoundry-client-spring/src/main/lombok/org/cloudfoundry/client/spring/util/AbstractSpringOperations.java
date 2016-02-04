@@ -56,12 +56,12 @@ public abstract class AbstractSpringOperations {
 
     protected final URI root;
 
-    private final SchedulerGroup processorGroup;
+    private final SchedulerGroup schedulerGroup;
 
-    protected AbstractSpringOperations(RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
+    protected AbstractSpringOperations(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.restOperations = restOperations;
         this.root = root;
-        this.processorGroup = processorGroup;
+        this.schedulerGroup = schedulerGroup;
     }
 
     protected final <T> Mono<T> delete(final Validatable request, final Class<T> responseType, final Consumer<UriComponentsBuilder> builderCallback) {
@@ -110,7 +110,7 @@ public abstract class AbstractSpringOperations {
                     }
 
                 }))
-            .publishOn(this.processorGroup)
+            .publishOn(this.schedulerGroup)
             .onBackpressureBlock();
     }
 

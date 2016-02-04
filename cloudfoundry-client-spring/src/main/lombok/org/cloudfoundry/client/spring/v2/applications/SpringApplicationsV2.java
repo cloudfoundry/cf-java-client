@@ -79,10 +79,10 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
      *
      * @param restOperations the {@link RestOperations} to use to communicate with the server
      * @param root           the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
-     * @param processorGroup The group to use when making requests
+     * @param schedulerGroup The group to use when making requests
      */
-    public SpringApplicationsV2(RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
-        super(restOperations, root, processorGroup);
+    public SpringApplicationsV2(RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+        super(restOperations, root, schedulerGroup);
     }
 
     @Override

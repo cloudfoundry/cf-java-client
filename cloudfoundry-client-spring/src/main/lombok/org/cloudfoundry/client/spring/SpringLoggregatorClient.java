@@ -80,8 +80,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         this.webSocketContainer = webSocketContainer;
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup processorGroup) {
-        super(restOperations, root, processorGroup);
+    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+        super(restOperations, root, schedulerGroup);
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.webSocketContainer = webSocketContainer;
