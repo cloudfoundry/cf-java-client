@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
+import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
 
@@ -51,16 +52,16 @@ public final class ListApplicationsResponse extends PaginatedResponse<ListApplic
     public static final class Resource extends Application {
 
         @Builder
-        Resource(@JsonProperty("buildpack") String buildpack,
-                 @JsonProperty("created_at") String createdAt,
+        Resource(@JsonProperty("created_at") String createdAt,
                  @JsonProperty("desired_state") String desiredState,
                  @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
                  @JsonProperty("guid") String id,
-                 @JsonProperty("_links") @Singular Map<String, Link> links,
+                 @JsonProperty("lifecycle") Lifecycle lifecycle,
+                 @JsonProperty("links") @Singular Map<String, Link> links,
                  @JsonProperty("name") String name,
                  @JsonProperty("total_desired_instances") Integer totalDesiredInstances,
                  @JsonProperty("updated_at") String updatedAt) {
-            super(buildpack, createdAt, desiredState, environmentVariables, id, links, name, totalDesiredInstances, updatedAt);
+            super(createdAt, desiredState, environmentVariables, id, lifecycle, links, name, totalDesiredInstances, updatedAt);
         }
 
     }

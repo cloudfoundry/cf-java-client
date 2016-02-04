@@ -1,39 +1,52 @@
 {
-  "guid": "guid-40460094-d035-4663-b58c-cdf4c802a2c6",
+  "guid": "guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0",
   "name": "original_name",
   "desired_state": "STARTED",
   "total_desired_instances": 0,
-  "buildpack": null,
-  "created_at": "2015-07-27T22:43:15Z",
-  "updated_at": "2015-07-27T22:43:15Z",
-  "environment_variables": {
+  "created_at": "2016-01-26T22:20:35Z",
+  "updated_at": "2016-01-26T22:20:35Z",
+  "lifecycle": {
+    "type": "buildpack",
+    "data": {
+      "buildpack": "name-2438",
+      "stack": "name-2439"
+    }
   },
-  "_links": {
+  "environment_variables": {
+
+  },
+  "links": {
     "self": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6"
-    },
-    "processes": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/processes"
-    },
-    "packages": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/packages"
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0"
     },
     "space": {
-      "href": "/v2/spaces/24f4776a-0cfd-49d3-922b-64951eb73e49"
+      "href": "/v2/spaces/a3585834-1d6e-41ad-8b25-2ca17a3e5dca"
+    },
+    "processes": {
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/processes"
+    },
+    "routes": {
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/routes"
+    },
+    "packages": {
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/packages"
     },
     "droplet": {
-      "href": "/v3/droplets/guid-9b8fb4ff-e212-4024-bf2b-bed0d0803727"
+      "href": "/v3/droplets/guid-352f8e31-2ef0-412b-90f1-3404cd8e929d"
+    },
+    "droplets": {
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/droplets"
     },
     "start": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/start",
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/start",
       "method": "PUT"
     },
     "stop": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/stop",
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/stop",
       "method": "PUT"
     },
     "assign_current_droplet": {
-      "href": "/v3/apps/guid-40460094-d035-4663-b58c-cdf4c802a2c6/current_droplet",
+      "href": "/v3/apps/guid-76956e3e-9905-42f9-b2c1-f9b53ef24ac0/current_droplet",
       "method": "PUT"
     }
   }

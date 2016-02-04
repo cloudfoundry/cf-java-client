@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Singular;
+import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 
 import java.util.Map;
@@ -26,39 +27,93 @@ import java.util.Map;
 @Data
 public abstract class Application {
 
-    private final String buildpack;
-
+    /**
+     * When the application was created
+     *
+     * @param createdAt when the application was created
+     * @return when the application was created
+     */
     private final String createdAt;
 
+    /**
+     * The desired state
+     *
+     * @param desiredState the desired state
+     * @return the desired state
+     */
     private final String desiredState;
 
+    /**
+     * The environment variables
+     *
+     * @param environmentVariables the environment variables
+     * @return the environment variables
+     */
     private final Map<String, String> environmentVariables;
 
+    /**
+     * The id
+     *
+     * @param id the id
+     * @return the id
+     */
     private final String id;
 
+    /**
+     * The lifecycle
+     *
+     * @param lifecycle the lifecycle
+     * @return the lifecycle
+     */
+    private final Lifecycle lifecycle;
+
+    /**
+     * The links
+     *
+     * @param links the links
+     * @return the links
+     */
     private final Map<String, Link> links;
 
+    /**
+     * The name
+     *
+     * @param name the name
+     * @return the name
+     */
     private final String name;
 
+    /**
+     * The total desired instances
+     *
+     * @param totalDesiredInstances the total desired instances
+     * @return the total desired instances
+     */
     private final Integer totalDesiredInstances;
 
+    /**
+     * When the application was updated
+     *
+     * @param updatedAt when the application was updated
+     * @return when the application was updated
+     */
     private final String updatedAt;
 
-    protected Application(@JsonProperty("buildpack") String buildpack,
-                          @JsonProperty("created_at") String createdAt,
+    protected Application(@JsonProperty("created_at") String createdAt,
                           @JsonProperty("desired_state") String desiredState,
                           @JsonProperty("environment_variables") @Singular Map<String, String> environmentVariables,
                           @JsonProperty("guid") String id,
-                          @JsonProperty("_links") @Singular Map<String, Link> links,
+                          @JsonProperty("lifecycle") Lifecycle lifecycle,
+                          @JsonProperty("links") @Singular Map<String, Link> links,
                           @JsonProperty("name") String name,
                           @JsonProperty("total_desired_instances") Integer totalDesiredInstances,
                           @JsonProperty("updated_at") String updatedAt) {
-        this.buildpack = buildpack;
         this.createdAt = createdAt;
         this.desiredState = desiredState;
         this.environmentVariables = environmentVariables;
         this.id = id;
         this.links = links;
+        this.lifecycle = lifecycle;
         this.name = name;
         this.totalDesiredInstances = totalDesiredInstances;
         this.updatedAt = updatedAt;

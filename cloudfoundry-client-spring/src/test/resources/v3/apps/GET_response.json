@@ -2,88 +2,113 @@
   "pagination": {
     "total_results": 3,
     "first": {
-      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=1&per_page=2"
+      "href": "/v3/apps?order_by=-created_at&page=1&per_page=2"
     },
     "last": {
-      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2"
+      "href": "/v3/apps?order_by=-created_at&page=2&per_page=2"
     },
     "next": {
-      "href": "/v3/apps?order_by=created_at&order_direction=desc&page=2&per_page=2"
+      "href": "/v3/apps?order_by=-created_at&page=2&per_page=2"
     },
     "previous": null
   },
   "resources": [
     {
-      "guid": "guid-acfbae75-7d3a-45b1-b730-ca3cc4263045",
+      "guid": "guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa",
       "name": "my_app3",
       "desired_state": "STOPPED",
       "total_desired_instances": 0,
-      "buildpack": "name-383",
       "created_at": "1970-01-01T00:00:03Z",
       "updated_at": null,
+      "lifecycle": {
+        "type": "buildpack",
+        "data": {
+          "buildpack": "name-2374",
+          "stack": "name-2375"
+        }
+      },
       "environment_variables": {
         "magic": "beautiful"
       },
-      "_links": {
+      "links": {
         "self": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045"
-        },
-        "processes": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/processes"
-        },
-        "packages": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/packages"
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa"
         },
         "space": {
-          "href": "/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62"
+          "href": "/v2/spaces/801a008f-dfda-464f-88ed-b9abd4bf3b1b"
+        },
+        "processes": {
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/processes"
+        },
+        "routes": {
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/routes"
+        },
+        "packages": {
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/packages"
+        },
+        "droplets": {
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/droplets"
         },
         "start": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/start",
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/start",
           "method": "PUT"
         },
         "stop": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/stop",
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/stop",
           "method": "PUT"
         },
         "assign_current_droplet": {
-          "href": "/v3/apps/guid-acfbae75-7d3a-45b1-b730-ca3cc4263045/current_droplet",
+          "href": "/v3/apps/guid-fde0d401-0615-4ebf-9585-57ab0fe0d2fa/current_droplet",
           "method": "PUT"
         }
       }
     },
     {
-      "guid": "guid-f2e97073-86d2-473e-8d03-76742f16bf6e",
+      "guid": "guid-5b9fc319-1483-40f4-b868-18240a6c6e5f",
       "name": "my_app2",
       "desired_state": "STOPPED",
       "total_desired_instances": 0,
-      "buildpack": null,
       "created_at": "1970-01-01T00:00:02Z",
       "updated_at": null,
-      "environment_variables": {
+      "lifecycle": {
+        "type": "buildpack",
+        "data": {
+          "buildpack": "name-2372",
+          "stack": "name-2373"
+        }
       },
-      "_links": {
+      "environment_variables": {
+
+      },
+      "links": {
         "self": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e"
-        },
-        "processes": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/processes"
-        },
-        "packages": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/packages"
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f"
         },
         "space": {
-          "href": "/v2/spaces/a6a823be-49c0-4591-bfdc-5bf0998a9d62"
+          "href": "/v2/spaces/801a008f-dfda-464f-88ed-b9abd4bf3b1b"
+        },
+        "processes": {
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/processes"
+        },
+        "routes": {
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/routes"
+        },
+        "packages": {
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/packages"
+        },
+        "droplets": {
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/droplets"
         },
         "start": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/start",
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/start",
           "method": "PUT"
         },
         "stop": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/stop",
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/stop",
           "method": "PUT"
         },
         "assign_current_droplet": {
-          "href": "/v3/apps/guid-f2e97073-86d2-473e-8d03-76742f16bf6e/current_droplet",
+          "href": "/v3/apps/guid-5b9fc319-1483-40f4-b868-18240a6c6e5f/current_droplet",
           "method": "PUT"
         }
       }
