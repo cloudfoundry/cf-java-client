@@ -18,41 +18,38 @@ package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
-import lombok.Singular;
-
-import java.util.Map;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
- * Represents the lifecycle of an application
+ * Represents a relationship to another entity
  */
-@Data
-public final class Lifecycle {
+public final class Relationship implements Validatable {
 
     /**
-     * The datas
+     * The id
      *
-     * @param datas the datas
-     * @return the datas
+     * @param id the id
+     * @return the id
      */
-    @Getter(onMethod = @__(@JsonProperty("data")))
-    private final Map<String, String> datas;
-
-    /**
-     * The type
-     *
-     * @param type the type
-     * @return the type
-     */
-    @Getter(onMethod = @__(@JsonProperty("type")))
-    private final String type;
+    @Getter(onMethod = @__(@JsonProperty("guid")))
+    private final String id;
 
     @Builder
-    Lifecycle(@JsonProperty("data") @Singular Map<String, String> datas,
-              @JsonProperty("type") String type) {
-        this.datas = datas;
-        this.type = type;
+    Relationship(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public ValidationResult isValid() {
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.id == null) {
+            builder.message("id must be specified");
+        }
+
+        return builder.build();
     }
 
 }

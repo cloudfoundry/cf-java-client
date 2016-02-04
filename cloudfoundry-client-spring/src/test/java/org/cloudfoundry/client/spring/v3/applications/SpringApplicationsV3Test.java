@@ -21,6 +21,7 @@ import org.cloudfoundry.client.spring.util.StringMap;
 import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
 import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -220,9 +221,14 @@ public final class SpringApplicationsV3Test {
         protected CreateApplicationRequest getValidRequest() throws Exception {
             return CreateApplicationRequest.builder()
                 .name("my_app")
-                .spaceId("31627bdc-5bc4-4c4d-a883-c7b2f53db249")
                 .environmentVariable("open", "source")
-                .buildpack("name-410")
+                .lifecycle(Lifecycle.builder()
+                    .type("buildpack")
+                    .data("buildpack", "name-2443")
+                    .build())
+                .relationship("space", Relationship.builder()
+                    .id("48989e6d-bb23-480d-94da-dae7c20e7af3")
+                    .build())
                 .build();
         }
 
