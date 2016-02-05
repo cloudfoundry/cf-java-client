@@ -57,7 +57,6 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plan_visibilities");
             }
-
         });
     }
 
@@ -96,7 +95,17 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
+        });
+    }
 
+    @Override
+    public Mono<UpdateServicePlanVisibilityResponse> update(final UpdateServicePlanVisibilityRequest request) {
+        return put(request, UpdateServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
+            }
         });
     }
 
