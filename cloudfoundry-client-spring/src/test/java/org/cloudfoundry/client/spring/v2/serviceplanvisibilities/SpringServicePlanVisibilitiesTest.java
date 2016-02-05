@@ -28,11 +28,14 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibil
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityResource;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
 import org.reactivestreams.Publisher;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -222,5 +225,57 @@ public final class SpringServicePlanVisibilitiesTest {
             return this.servicePlanVisibilities.list(request);
         }
     }
+
+    public static final class Update extends AbstractApiTest<UpdateServicePlanVisibilityRequest, UpdateServicePlanVisibilityResponse> {
+
+        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected UpdateServicePlanVisibilityRequest getInvalidRequest() {
+            return UpdateServicePlanVisibilityRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT).path("v2/service_plan_visibilities/test-service-plan-visibility-id")
+                .requestPayload("v2/service_plan_visibilities/PUT_{id}_request.json")
+                .status(CREATED)
+                .responsePayload("v2/service_plan_visibilities/PUT_{id}_response.json");
+        }
+
+        @Override
+        protected UpdateServicePlanVisibilityResponse getResponse() {
+            return UpdateServicePlanVisibilityResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .createdAt("2015-07-27T22:43:28Z")
+                    .id("5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
+                    .updatedAt("2015-07-27T22:43:28Z")
+                    .url("/v2/service_plan_visibilities/5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
+                    .build())
+                .entity(ServicePlanVisibilityEntity.builder()
+                    .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                    .organizationUrl("/v2/organizations/e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                    .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
+                    .servicePlanUrl("/v2/service_plans/7288464d-3866-436a-915c-2bada4725e7e")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected UpdateServicePlanVisibilityRequest getValidRequest() throws Exception {
+            return UpdateServicePlanVisibilityRequest.builder()
+                .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<UpdateServicePlanVisibilityResponse> invoke(UpdateServicePlanVisibilityRequest request) {
+            return this.servicePlanVisibilities.update(request);
+        }
+    }
+
 
 }

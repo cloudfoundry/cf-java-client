@@ -55,4 +55,12 @@ public interface ServicePlanVisibilities {
      */
     Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plan_visibilities/updating_a_service_plan_visibility.html">Update Service Plan Visibility</a> request
+     *
+     * @param request the Update Service Plan Visibility request
+     * @return the response from the Update Service Plan Visibility request
+     */
+    Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request);
+
 }
