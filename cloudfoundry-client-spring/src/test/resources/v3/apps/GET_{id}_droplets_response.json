@@ -2,76 +2,94 @@
   "pagination": {
     "total_results": 2,
     "first": {
-      "href": "/v3/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"
+      "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349/droplets?order_by=-created_at&page=1&per_page=2"
     },
     "last": {
-      "href": "/v3/droplets?order_by=created_at&order_direction=asc&page=1&per_page=2"
+      "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349/droplets?order_by=-created_at&page=1&per_page=2"
     },
     "next": null,
     "previous": null
   },
   "resources": [
     {
-      "guid": "guid-5df0a4bb-4fcb-4393-acdd-868524ad761e",
-      "state": "STAGING",
-      "hash": {
-        "type": "sha1",
-        "value": null
-      },
-      "buildpack": "name-2089",
+      "guid": "guid-03f27a7a-9121-4dd4-833b-4a36eabfc801",
+      "state": "STAGED",
       "error": null,
-      "procfile": null,
-      "environment_variables": {
-        "yuu": "huuu"
+      "lifecycle": {
+        "type": "buildpack",
+        "data": {
+          "buildpack": "name-2303",
+          "stack": "name-2304"
+        }
       },
-      "created_at": "1970-01-01T00:00:01Z",
-      "updated_at": null,
-      "_links": {
+      "memory_limit": null,
+      "disk_limit": null,
+      "result": {
+        "execution_metadata": null,
+        "process_types": "{\"web\":\"started\"}",
+        "hash": {
+          "type": "sha1",
+          "value": "my-hash"
+        },
+        "buildpack": "https://github.com/cloudfoundry/my-buildpack.git",
+        "stack": null
+      },
+      "environment_variables": {
+
+      },
+      "created_at": "1970-01-01T00:00:02Z",
+      "updated_at": "2016-01-26T22:20:33Z",
+      "links": {
         "self": {
-          "href": "/v3/droplets/guid-5df0a4bb-4fcb-4393-acdd-868524ad761e"
+          "href": "/v3/droplets/guid-03f27a7a-9121-4dd4-833b-4a36eabfc801"
         },
         "package": {
-          "href": "/v3/packages/guid-f80c4f3c-b625-474d-b43b-2c8b223b84e3"
+          "href": "/v3/packages/guid-a4c16d72-13e7-4578-a2be-1684b4c484d9"
         },
         "app": {
-          "href": "/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1"
+          "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349"
         },
         "assign_current_droplet": {
-          "href": "/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1/current_droplet",
+          "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349/current_droplet",
           "method": "PUT"
-        },
-        "buildpack": {
-          "href": "/v2/buildpacks/9058357a-a54f-4a6c-a18d-b63b079305b3"
         }
       }
     },
     {
-      "guid": "guid-dd5fc1f8-fa34-4d97-9edd-a8fc82624fa8",
-      "state": "STAGED",
-      "hash": {
-        "type": "sha1",
-        "value": "my-hash"
-      },
-      "buildpack": "https://github.com/cloudfoundry/my-buildpack.git",
+      "guid": "guid-87d3fe05-1d32-4063-99c5-cdfbf2f66eae",
+      "state": "STAGING",
       "error": null,
-      "procfile": null,
-      "environment_variables": {
+      "lifecycle": {
+        "type": "buildpack",
+        "data": {
+          "buildpack": "name-2301",
+          "stack": "name-2302"
+        }
       },
-      "created_at": "1970-01-01T00:00:02Z",
-      "updated_at": null,
-      "_links": {
+      "memory_limit": null,
+      "disk_limit": null,
+      "result": {},
+      "environment_variables": {
+        "yuu": "huuu"
+      },
+      "created_at": "1970-01-01T00:00:01Z",
+      "updated_at": "2016-01-26T22:20:33Z",
+      "links": {
         "self": {
-          "href": "/v3/droplets/guid-dd5fc1f8-fa34-4d97-9edd-a8fc82624fa8"
+          "href": "/v3/droplets/guid-87d3fe05-1d32-4063-99c5-cdfbf2f66eae"
         },
         "package": {
-          "href": "/v3/packages/guid-f80c4f3c-b625-474d-b43b-2c8b223b84e3"
+          "href": "/v3/packages/guid-a4c16d72-13e7-4578-a2be-1684b4c484d9"
         },
         "app": {
-          "href": "/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1"
+          "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349"
         },
         "assign_current_droplet": {
-          "href": "/v3/apps/guid-2ec6e3b5-fd07-437f-882e-cb0cb298eff1/current_droplet",
+          "href": "/v3/apps/guid-7098082f-0843-4a44-a224-da72d8626349/current_droplet",
           "method": "PUT"
+        },
+        "buildpack": {
+          "href": "/v2/buildpacks/11f0ea63-2116-42ea-93e8-275ab6d912b6"
         }
       }
     }

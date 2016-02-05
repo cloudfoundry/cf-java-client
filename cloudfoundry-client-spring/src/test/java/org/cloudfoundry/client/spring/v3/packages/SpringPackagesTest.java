@@ -18,7 +18,6 @@ package org.cloudfoundry.client.spring.v3.packages;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.spring.util.StringMap;
-import org.cloudfoundry.client.v3.Hash;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -39,6 +38,8 @@ import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 import static org.cloudfoundry.client.v3.packages.CreatePackageRequest.PackageType.DOCKER;
 import static org.cloudfoundry.client.v3.packages.ListPackagesResponse.Resource;
@@ -426,26 +427,48 @@ public final class SpringPackagesTest {
         @Override
         protected StagePackageResponse getResponse() {
             return StagePackageResponse.builder()
-                .id("guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9")
-                .state("STAGED")
-                .hash(Hash.builder()
-                    .type("sha1")
+                .id("whatuuid")
+                .state("PENDING")
+                .lifecycle(Lifecycle.builder()
+                    .type("buildpack")
+                    .data("buildpack", "http://github.com/myorg/awesome-buildpack")
+                    .data("stack", "cflinuxfs2")
                     .build())
-                .buildpack("http://buildpack.git.url.com")
-                .error("example error")
-                .environmentVariable("cloud", "foundry")
-                .createdAt("2015-07-27T22:43:30Z")
+                .memoryLimit(1_024)
+                .diskLimit(4_096)
+                .environmentVariable("CUSTOM_ENV_VAR", "hello")
+                .environmentVariable("CF_STACK", "cflinuxfs2")
+                .environmentVariable("VCAP_APPLICATION", StringMap.builder()
+                    .entry("limits", StringMap.builder()
+                        .entry("mem", 1_024)
+                        .entry("disk", 4_096)
+                        .entry("fds", 16_384)
+                        .build())
+                    .entry("application_id", "guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695")
+                    .entry("application_version", "whatuuid")
+                    .entry("application_name", "name-487")
+                    .entry("application_uris", Collections.emptyList())
+                    .entry("version", "whatuuid")
+                    .entry("name", "name-487")
+                    .entry("space_name", "name-484")
+                    .entry("space_id", "78a77c68-55cc-45e2-ac82-01df0290fca9")
+                    .entry("uris", Collections.emptyList())
+                    .entry("users", null)
+                    .build())
+                .environmentVariable("MEMORY_LIMIT", 1_024)
+                .environmentVariable("VCAP_SERVICES", Collections.emptyMap())
+                .createdAt("2016-01-26T22:20:12Z")
                 .link("self", Link.builder()
-                    .href("/v3/droplets/guid-4dc396dd-9fe3-4b96-847e-d0c63768d5f9")
+                    .href("/v3/droplets/whatuuid")
                     .build())
                 .link("package", Link.builder()
-                    .href("/v3/packages/guid-1df1d953-ef12-4604-a746-d6e047314c12")
+                    .href("/v3/packages/guid-c613ad85-308b-4ba6-9097-8b21f60eef95")
                     .build())
                 .link("app", Link.builder()
-                    .href("/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8")
+                    .href("/v3/apps/guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695")
                     .build())
                 .link("assign_current_droplet", Link.builder()
-                    .href("/v3/apps/guid-059d1bf5-1b72-4ad6-b73f-6abe87bc77e8/current_droplet")
+                    .href("/v3/apps/guid-81b0a3b1-19e5-4e93-b9c4-1730cdd99695/current_droplet")
                     .method("PUT")
                     .build())
                 .build();

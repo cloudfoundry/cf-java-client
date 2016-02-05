@@ -1,47 +1,44 @@
 {
-  "guid": "whatuuid",
-  "state": "PENDING",
-  "hash": {
-    "type": "sha1",
-    "value": null
+  "guid": "guid-92bd22f3-7e80-4be8-b603-ce7e97ab68b2",
+  "state": "STAGED",
+  "error": "example error",
+  "lifecycle": {
+    "type": "buildpack",
+    "data": {
+      "buildpack": "name-2466",
+      "stack": "name-2467"
+    }
   },
-  "buildpack": "http://github.com/myorg/awesome-buildpack",
-  "error": null,
-  "procfile": null,
-  "environment_variables": {
-    "CUSTOM_ENV_VAR": "hello",
-    "VCAP_APPLICATION": {
-      "limits": {
-        "mem": 1024,
-        "disk": 4096,
-        "fds": 16384
-      },
-      "application_id": "guid-a174c559-deb6-4db7-b3ef-2a5d778d8866",
-      "application_version": "whatuuid",
-      "application_name": "name-454",
-      "application_uris": [
-      ],
-      "version": "whatuuid",
-      "name": "name-454",
-      "space_name": "name-451",
-      "space_id": "a9573106-2d65-45bb-9a93-55bfe029be33",
-      "uris": [
-      ],
-      "users": null
+  "memory_limit": null,
+  "disk_limit": null,
+  "result": {
+    "execution_metadata": null,
+    "process_types": null,
+    "hash": {
+      "type": "sha1",
+      "value": null
     },
-    "CF_STACK": "cflinuxfs2"
+    "buildpack": "http://buildpack.git.url.com",
+    "stack": null
   },
-  "created_at": "2015-07-27T22:43:16Z",
-  "updated_at": null,
-  "_links": {
+  "environment_variables": {
+    "cloud": "foundry"
+  },
+  "created_at": "2016-01-26T22:20:36Z",
+  "updated_at": "2016-01-26T22:20:36Z",
+  "links": {
     "self": {
-      "href": "/v3/droplets/whatuuid"
+      "href": "/v3/droplets/guid-92bd22f3-7e80-4be8-b603-ce7e97ab68b2"
     },
     "package": {
-      "href": "/v3/packages/guid-c89ed121-a2f1-4f78-9d98-e3b607a07d09"
+      "href": "/v3/packages/guid-f5dfcb97-6e61-4b69-8198-0c115498b70b"
     },
     "app": {
-      "href": "/v3/apps/guid-a174c559-deb6-4db7-b3ef-2a5d778d8866"
+      "href": "/v3/apps/guid-efbab1ea-3e76-45ca-baa3-98bc95f881de"
+    },
+    "assign_current_droplet": {
+      "href": "/v3/apps/guid-efbab1ea-3e76-45ca-baa3-98bc95f881de/current_droplet",
+      "method": "PUT"
     }
   }
 }
