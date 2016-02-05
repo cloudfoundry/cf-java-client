@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.spacequotadefinitions;
+package org.cloudfoundry.client.v2.quotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
 /**
- * The entity response payload for the Space Quota Definition resource
+ * The entity response payload for the Quota Definition resource
  */
 @Data
-public final class SpaceQuotaDefinitionEntity {
+public final class QuotaDefinitionEntity {
 
     /**
      * The application instance limit
@@ -67,28 +67,12 @@ public final class SpaceQuotaDefinitionEntity {
     private final Boolean nonBasicServicesAllowed;
 
     /**
-     * The organization id
+     * The total private domains
      *
-     * @param organizationId the organization id
-     * @return the organization id
+     * @param totalPrivateDomains the total private domains
+     * @return the total private domains
      */
-    private final String organizationId;
-
-    /**
-     * The organization url
-     *
-     * @param organizationUrl the organization url
-     * @return the organization url
-     */
-    private final String organizationUrl;
-
-    /**
-     * The spaces url
-     *
-     * @param spacesUrl the spaces url
-     * @return the spaces url
-     */
-    private final String spacesUrl;
+    private final Integer totalPrivateDomains;
 
     /**
      * The total routes
@@ -106,25 +90,31 @@ public final class SpaceQuotaDefinitionEntity {
      */
     private final Integer totalServices;
 
+    /**
+     * The trial db allowed
+     *
+     * @param trialDbAllowed the trial db allowed
+     * @return the trial db allowed
+     */
+    private final Boolean trialDbAllowed;
+
     @Builder
-    SpaceQuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
-                               @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
-                               @JsonProperty("memory_limit") Integer memoryLimit,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
-                               @JsonProperty("organization_guid") String organizationId,
-                               @JsonProperty("organization_url") String organizationUrl,
-                               @JsonProperty("spaces_url") String spacesUrl,
-                               @JsonProperty("total_routes") Integer totalRoutes,
-                               @JsonProperty("total_services") Integer totalServices) {
+    QuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
+                          @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
+                          @JsonProperty("memory_limit") Integer memoryLimit,
+                          @JsonProperty("name") String name,
+                          @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
+                          @JsonProperty("total_private_domains") Integer totalPrivateDomains,
+                          @JsonProperty("trial_db_allowed") Boolean trialDbAllowed,
+                          @JsonProperty("total_routes") Integer totalRoutes,
+                          @JsonProperty("total_services") Integer totalServices) {
         this.applicationInstanceLimit = applicationInstanceLimit;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;
         this.name = name;
         this.nonBasicServicesAllowed = nonBasicServicesAllowed;
-        this.organizationId = organizationId;
-        this.organizationUrl = organizationUrl;
-        this.spacesUrl = spacesUrl;
+        this.totalPrivateDomains = totalPrivateDomains;
+        this.trialDbAllowed = trialDbAllowed;
         this.totalRoutes = totalRoutes;
         this.totalServices = totalServices;
     }

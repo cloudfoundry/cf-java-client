@@ -116,7 +116,7 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     public void events() {
         assertNotNull(this.client.events());
     }
-    
+
     @Test
     public void featureFlags() {
         assertNotNull(this.client.featureFlags());
@@ -130,6 +130,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void jobs() {
         assertNotNull(this.client.jobs());
+    }
+
+    @Test
+    public void organizationQuotaDefinitions() {
+        assertNotNull(this.client.organizationQuotaDefinitions());
     }
 
     @Test
@@ -195,6 +200,11 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void space() {
         assertNotNull(this.client.spaces());
+    }
+
+    @Test
+    public void spaceQuotaDefinitions() {
+        assertNotNull(this.client.spaceQuotaDefinitions());
     }
 
     @Test

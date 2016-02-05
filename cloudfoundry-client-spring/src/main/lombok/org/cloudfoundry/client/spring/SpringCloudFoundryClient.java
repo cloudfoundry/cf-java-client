@@ -35,6 +35,7 @@ import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.jobs.SpringJobs;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
 import org.cloudfoundry.client.spring.v2.privatedomains.SpringPrivateDomains;
+import org.cloudfoundry.client.spring.v2.quotadefinitions.SpringOrganizationQuotaDefinitions;
 import org.cloudfoundry.client.spring.v2.routes.SpringRoutes;
 import org.cloudfoundry.client.spring.v2.servicebindings.SpringServiceBindings;
 import org.cloudfoundry.client.spring.v2.servicebrokers.SpringServiceBrokers;
@@ -60,6 +61,7 @@ import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
+import org.cloudfoundry.client.v2.quotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -126,6 +128,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Info info;
 
     private final Jobs jobs;
+
+    private final OrganizationQuotaDefinitions organizationQuotaDefinitions;
 
     private final Organizations organizations;
 
@@ -212,6 +216,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
         this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
+        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
         this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
         this.processes = new SpringProcesses(this.restOperations, root, this.schedulerGroup);
@@ -243,6 +248,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
         this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
+        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
         this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
         this.processes = new SpringProcesses(this.restOperations, root, this.schedulerGroup);
@@ -299,6 +305,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Jobs jobs() {
         return this.jobs;
+    }
+
+    @Override
+    public OrganizationQuotaDefinitions organizationQuotaDefinitions() {
+        return this.organizationQuotaDefinitions;
     }
 
     @Override
