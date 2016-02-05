@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -155,6 +157,18 @@ public final class SpringApplicationsV3 extends AbstractSpringOperations impleme
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats");
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<GetApplicationStatisticsResponse> getStatistics(final GetApplicationStatisticsRequest request) {
+        return get(request, GetApplicationStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "apps", request.getId(), "stats");
             }
 
         });

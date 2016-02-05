@@ -17,10 +17,6 @@
 package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsResponse;
-import org.cloudfoundry.client.v3.processes.ProcessUsage;
-import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
@@ -31,10 +27,14 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -52,6 +52,8 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.utils.StringMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -68,69 +70,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationsV3Test {
-
-    public static final class GetApplicationProcessDetailedStatistics extends AbstractApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
-
-        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
-
-        @Override
-        protected GetApplicationProcessDetailedStatisticsRequest getInvalidRequest() {
-            return GetApplicationProcessDetailedStatisticsRequest.builder()
-                .build();
-        }
-
-        @Override
-        protected RequestContext getRequestContext() {
-            return new RequestContext()
-                .method(GET).path("v3/apps/test-id/processes/test-type/stats")
-                .status(OK)
-                .responsePayload("v3/apps/GET_{id}_processes_{type}_stats_response.json");
-        }
-
-        @Override
-        protected GetApplicationProcessDetailedStatisticsResponse getResponse() {
-            return GetApplicationProcessDetailedStatisticsResponse.builder()
-                .pagination(Pagination.builder()
-                    .first(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
-                        .build())
-                    .last(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
-                        .build())
-                    .totalResults(1)
-                    .build())
-                .resource(GetApplicationProcessDetailedStatisticsResponse.Resource.builder()
-                    .diskQuota(1073741824)
-                    .fdsQuota(16384)
-                    .host("toast")
-                    .index(0)
-                    .memQuota(1073741824)
-                    .port(8080)
-                    .state("RUNNING")
-                    .type("web")
-                    .uptime(1)
-                    .usage(ProcessUsage.builder()
-                        .cpu(80.0)
-                        .disk(1024L)
-                        .memory(128L)
-                        .time("2016-01-26 22:20:33 UTC")
-                        .build())
-                    .build())
-                .build();
-        }
-
-        @Override
-        protected GetApplicationProcessDetailedStatisticsRequest getValidRequest() throws Exception {
-            return GetApplicationProcessDetailedStatisticsRequest.builder()
-                .applicationId("test-id")
-                .type("test-type")
-                .build();
-        }
-
-        @Override
-        protected Mono<GetApplicationProcessDetailedStatisticsResponse> invoke(GetApplicationProcessDetailedStatisticsRequest request) {
-            return this.applications.getProcessDetailedStatistics(request);
-        }
-
-    }
 
     public static final class AssignDroplet extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
 
@@ -456,6 +395,125 @@ public final class SpringApplicationsV3Test {
         @Override
         protected Mono<GetApplicationResponse> invoke(GetApplicationRequest request) {
             return this.applications.get(request);
+        }
+
+    }
+
+    public static final class GetApplicationProcessDetailedStatistics extends AbstractApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsRequest getInvalidRequest() {
+            return GetApplicationProcessDetailedStatisticsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("v3/apps/test-id/processes/test-type/stats")
+                .status(OK)
+                .responsePayload("v3/apps/GET_{id}_processes_{type}_stats_response.json");
+        }
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsResponse getResponse() {
+            return GetApplicationProcessDetailedStatisticsResponse.builder()
+                .pagination(Pagination.builder()
+                    .first(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
+                        .build())
+                    .last(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
+                        .build())
+                    .totalResults(1)
+                    .build())
+                .resource(GetApplicationProcessDetailedStatisticsResponse.Resource.builder()
+                    .diskQuota(1073741824L)
+                    .fdsQuota(16384)
+                    .host("toast")
+                    .index(0)
+                    .memoryQuota(1073741824L)
+                    .port(8080)
+                    .state("RUNNING")
+                    .type("web")
+                    .uptime(1L)
+                    .usage(ProcessUsage.builder()
+                        .cpu(80.0)
+                        .disk(1024L)
+                        .memory(128L)
+                        .time("2016-01-26 22:20:33 UTC")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsRequest getValidRequest() throws Exception {
+            return GetApplicationProcessDetailedStatisticsRequest.builder()
+                .applicationId("test-id")
+                .type("test-type")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetApplicationProcessDetailedStatisticsResponse> invoke(GetApplicationProcessDetailedStatisticsRequest request) {
+            return this.applications.getProcessDetailedStatistics(request);
+        }
+
+    }
+
+    public static final class GetApplicationStatistics extends AbstractApiTest<GetApplicationStatisticsRequest, GetApplicationStatisticsResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetApplicationStatisticsRequest getInvalidRequest() {
+            return GetApplicationStatisticsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("v3/apps/test-id/stats")
+                .status(OK)
+                .responsePayload("v3/apps/GET_{id}_stats_response.json");
+        }
+
+        @Override
+        protected GetApplicationStatisticsResponse getResponse() {
+            GetApplicationStatisticsResponse.Statistics.StatisticsBuilder statisticBuilder = GetApplicationStatisticsResponse.Statistics.builder()
+                .diskQuota(1073741824L)
+                .fdsQuota(16384)
+                .host("toast")
+                .memoryQuota(1073741824L)
+                .port(8080)
+                .state("RUNNING")
+                .type("web")
+                .uptime(1L)
+                .usage(ProcessUsage.builder()
+                    .cpu(80D)
+                    .disk(1024L)
+                    .memory(128L)
+                    .time("2016-01-26 22:20:35 UTC")
+                    .build());
+
+            return GetApplicationStatisticsResponse.builder()
+                .process(statisticBuilder.index(0).build())
+                .process(statisticBuilder.index(1).build())
+                .build();
+        }
+
+        @Override
+        protected GetApplicationStatisticsRequest getValidRequest() throws Exception {
+            return GetApplicationStatisticsRequest.builder()
+                .id("test-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetApplicationStatisticsResponse> invoke(GetApplicationStatisticsRequest request) {
+            return this.applications.getStatistics(request);
         }
 
     }

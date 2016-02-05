@@ -33,7 +33,7 @@ public abstract class AbstractProcessDetailedStatistics {
 
     protected final int index;
 
-    protected final long memQuota;
+    protected final long memoryQuota;
 
     protected final int port;
 
@@ -45,25 +45,25 @@ public abstract class AbstractProcessDetailedStatistics {
 
     protected final ProcessUsage usage;
 
-    protected AbstractProcessDetailedStatistics(@JsonProperty("index") int index,
-                                                @JsonProperty("mem_quota") long memQuota,
-                                                @JsonProperty("disk_quota") long diskQuota,
-                                                @JsonProperty("fds_quota") long fdsQuota,
-                                                @JsonProperty("usage") ProcessUsage usage,
-                                                @JsonProperty("port") int port,
-                                                @JsonProperty("uptime") long uptime,
+    protected AbstractProcessDetailedStatistics(@JsonProperty("disk_quota") Long diskQuota,
+                                                @JsonProperty("fds_quota") Integer fdsQuota,
                                                 @JsonProperty("host") String host,
+                                                @JsonProperty("index") Integer index,
+                                                @JsonProperty("mem_quota") Long memoryQuota,
+                                                @JsonProperty("port") Integer port,
+                                                @JsonProperty("state") String state,
                                                 @JsonProperty("type") String type,
-                                                @JsonProperty("state") String state) {
-        this.index = index;
-        this.memQuota = memQuota;
+                                                @JsonProperty("uptime") Long uptime,
+                                                @JsonProperty("usage") ProcessUsage usage) {
         this.diskQuota = diskQuota;
         this.fdsQuota = fdsQuota;
-        this.usage = usage;
-        this.port = port;
-        this.uptime = uptime;
         this.host = host;
-        this.type = type;
+        this.index = index;
+        this.memoryQuota = memoryQuota;
+        this.port = port;
         this.state = state;
+        this.type = type;
+        this.usage = usage;
+        this.uptime = uptime;
     }
 }
