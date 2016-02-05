@@ -30,6 +30,7 @@ public interface Applications {
      * Warning: deleting routes mapped to the application deletes them even if they are mapped to other applications.
      *
      * @param request the delete application request
+     * @return a completion indicator
      */
     Mono<Void> delete(DeleteApplicationRequest request);
 
@@ -52,6 +53,7 @@ public interface Applications {
      * Rename a specific application
      *
      * @param request the rename application request
+     * @return a completion indicator
      */
     Mono<Void> rename(RenameApplicationRequest request);
 
@@ -59,6 +61,7 @@ public interface Applications {
      * Scales a specific application
      *
      * @param request the scale application request
+     * @return a completion indicator
      */
     Mono<Void> scale(ScaleApplicationRequest request);
 
@@ -66,6 +69,7 @@ public interface Applications {
      * Starts a specific application or, if the application is already started, simply returns.
      *
      * @param request the start application request
+     * @return a completion indicator
      */
     Mono<Void> start(StartApplicationRequest request);
 
@@ -73,6 +77,7 @@ public interface Applications {
      * Stops a specific application or, if the application is already stopped, simply returns.
      *
      * @param request the stop application request
+     * @return a completion indicator
      */
     Mono<Void> stop(StopApplicationRequest request);
 }
