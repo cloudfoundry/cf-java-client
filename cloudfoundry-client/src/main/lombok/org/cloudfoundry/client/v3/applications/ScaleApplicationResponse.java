@@ -41,7 +41,7 @@ public final class ScaleApplicationResponse extends Process {
                              @JsonProperty("disk_in_mb") Integer diskInMb,
                              @JsonProperty("guid") String id,
                              @JsonProperty("instances") Integer instances,
-                             @JsonProperty("_links") @Singular Map<String, Link> links,
+                             @JsonProperty("links") @Singular Map<String, Link> links,
                              @JsonProperty("memory_in_mb") Integer memoryInMb,
                              @JsonProperty("type") String type,
                              @JsonProperty("updated_at") String updatedAt) {
