@@ -19,10 +19,15 @@ package org.cloudfoundry.client.v3.droplets;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.FilterParameter;
+import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+
+import java.util.List;
 
 /**
  * The request payload for the List Applications operation
@@ -30,16 +35,39 @@ import org.cloudfoundry.client.v3.PaginatedRequest;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListDropletsRequest extends PaginatedRequest implements Validatable {
+public final class ListDropletsRequest extends PaginatedAndSortedRequest implements Validatable {
+
+    /**
+     * The application ids
+     *
+     * @param applicationIds the application ids
+     * @return the application ids
+     */
+    @Getter(onMethod = @__(@FilterParameter("app_guids")))
+    private final List<String> applicationIds;
+
+    /**
+     * The states
+     *
+     * @param states the states
+     * @return the states
+     */
+    @Getter(onMethod = @__(@FilterParameter("states")))
+    private final List<String> states;
+
 
     @Builder
-    ListDropletsRequest(Integer page, Integer perPage) {
-        super(page, perPage);
+    ListDropletsRequest(Integer page, Integer perPage, String orderBy,
+                        @Singular List<String> applicationIds,
+                        @Singular List<String> states) {
+        super(page, perPage, orderBy);
+        this.applicationIds = applicationIds;
+        this.states = states;
     }
 
     @Override
     public ValidationResult isValid() {
-        return isPaginatedRequestValid().build();
+        return isPaginatedAndSortedRequestValid().build();
     }
 
 }
