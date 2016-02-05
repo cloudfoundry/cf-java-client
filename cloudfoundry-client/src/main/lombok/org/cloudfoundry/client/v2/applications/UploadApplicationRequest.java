@@ -25,7 +25,7 @@ import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ public final class UploadApplicationRequest implements Validatable {
      * @return the application bits file
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final File application;
+    private final InputStream application;
 
     /**
      * The application id
@@ -71,7 +71,7 @@ public final class UploadApplicationRequest implements Validatable {
     private final List<Resource> resources;
 
     @Builder
-    UploadApplicationRequest(File application,
+    UploadApplicationRequest(InputStream application,
                              String applicationId,
                              Boolean async,
                              @Singular List<Resource> resources) {
