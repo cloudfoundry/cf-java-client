@@ -49,6 +49,8 @@ import org.cloudfoundry.client.spring.v2.users.SpringUsers;
 import org.cloudfoundry.client.spring.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.client.spring.v3.droplets.SpringDroplets;
 import org.cloudfoundry.client.spring.v3.packages.SpringPackages;
+import org.cloudfoundry.client.spring.v3.processes.SpringProcesses;
+import org.cloudfoundry.client.spring.v3.tasks.SpringTasks;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
@@ -71,6 +73,8 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
+import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.processes.Tasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -125,11 +129,13 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final PrivateDomains privateDomains;
 
-    private final SchedulerGroup schedulerGroup;
+    private final Processes processes;
 
     private final OAuth2RestOperations restOperations;
 
     private final Routes routes;
+
+    private final SchedulerGroup schedulerGroup;
 
     private final ServiceBindings serviceBindings;
 
@@ -150,6 +156,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Spaces spaces;
 
     private final Stacks stacks;
+
+    private final Tasks tasks;
 
     private final Users users;
 
@@ -201,6 +209,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
         this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
+        this.processes = new SpringProcesses(this.restOperations, root, this.schedulerGroup);
         this.routes = new SpringRoutes(this.restOperations, root, this.schedulerGroup);
         this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.schedulerGroup);
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.schedulerGroup);
@@ -212,6 +221,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.schedulerGroup);
         this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
+        this.tasks = new SpringTasks(this.restOperations, root, this.schedulerGroup);
         this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
     }
 
@@ -229,6 +239,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
         this.packages = new SpringPackages(this.restOperations, root, this.schedulerGroup);
         this.privateDomains = new SpringPrivateDomains(this.restOperations, root, this.schedulerGroup);
+        this.processes = new SpringProcesses(this.restOperations, root, this.schedulerGroup);
         this.routes = new SpringRoutes(this.restOperations, root, this.schedulerGroup);
         this.sharedDomains = new SpringSharedDomains(this.restOperations, root, this.schedulerGroup);
         this.serviceBindings = new SpringServiceBindings(this.restOperations, root, this.schedulerGroup);
@@ -240,6 +251,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, this.schedulerGroup);
         this.spaces = new SpringSpaces(this.restOperations, root, this.schedulerGroup);
         this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
+        this.tasks = new SpringTasks(this.restOperations, root, this.schedulerGroup);
         this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
     }
 
@@ -291,6 +303,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public PrivateDomains privateDomains() {
         return this.privateDomains;
+    }
+
+    @Override
+    public Processes processes() {
+        return processes;
     }
 
     @Override
@@ -349,6 +366,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @Override
+    public Tasks tasks() {
+        return tasks;
+    }
+
+    @Override
     public Users users() {
         return this.users;
     }
@@ -357,16 +379,12 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations.getAccessToken().getValue();
     }
 
-    SchedulerGroup getSchedulerGroup() {
-        return this.schedulerGroup;
-    }
-
     OAuth2RestOperations getRestOperations() {
         return this.restOperations;
     }
 
-    private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+    SchedulerGroup getSchedulerGroup() {
+        return this.schedulerGroup;
     }
 
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,
@@ -394,6 +412,10 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         messageConverters.add(new FallbackHttpMessageConverter());
 
         return restTemplate;
+    }
+
+    private static SchedulerGroup createSchedulerGroup() {
+        return SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
     }
 
     @SuppressWarnings("unchecked")
