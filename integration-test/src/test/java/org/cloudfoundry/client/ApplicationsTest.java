@@ -59,8 +59,6 @@ import reactor.rx.Stream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -115,7 +113,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .flatMap(Resources::getResources)
                 .filter(r -> {
                     String name = Resources.getEntity(r).getName();
-                    return TEST_APPLICATION_NAME.equals(name) || "copy-application" .equals(name);
+                    return TEST_APPLICATION_NAME.equals(name) || "copy-application".equals(name);
                 }))
             .subscribe(testSubscriber()
                 .assertCount(2));
@@ -594,17 +592,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private Mono<String> uploadApplication(String applicationId) {
-        try {
-            return this.cloudFoundryClient.applicationsV2()
-                .upload(UploadApplicationRequest.builder()
-                    .application(new FileInputStream("./src/test/resources/testApplication.zip"))
-                    .async(false)
-                    .applicationId(applicationId)
-                    .build())
-                .map(response -> applicationId);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return this.cloudFoundryClient.applicationsV2()
+            .upload(UploadApplicationRequest.builder()
+                .application(new File("./src/test/resources/testApplication.zip"))
+                .async(false)
+                .applicationId(applicationId)
+                .build())
+            .map(response -> applicationId);
     }
 
     private Mono<String> waitForStaging(String applicationId) {
@@ -629,7 +623,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .flatMap(response -> Stream.fromIterable(response.values()))
             .as(Stream::from)
-            .filter(applicationInstanceInfo -> "RUNNING" .equals(applicationInstanceInfo.getState()))
+            .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .repeatWhen(volumes -> volumes
                 .takeWhile(count -> count == 0)
                 .flatMap(count -> Mono.delay(2, SECONDS)))

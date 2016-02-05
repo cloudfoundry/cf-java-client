@@ -1250,7 +1250,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected UploadApplicationRequest getValidRequest() throws Exception {
             return UploadApplicationRequest.builder()
-                .application(new ClassPathResource("v2/apps/application.zip").getInputStream())
+                .application(new ClassPathResource("v2/apps/application.zip").getFile())
                 .applicationId("test-application-id")
                 .resource(UploadApplicationRequest.Resource.builder()
                     .hash("b907173290db6a155949ab4dc9b2d019dea0c901")

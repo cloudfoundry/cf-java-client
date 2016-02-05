@@ -551,7 +551,7 @@ public final class SpringPackagesTest {
         @Override
         protected UploadPackageRequest getValidRequest() throws Exception {
             return UploadPackageRequest.builder()
-                .application(new ClassPathResource("v3/packages/test-file").getInputStream())
+                .file(new ClassPathResource("v3/packages/test-file").getFile())
                 .packageId("test-package-id")
                 .build();
         }
