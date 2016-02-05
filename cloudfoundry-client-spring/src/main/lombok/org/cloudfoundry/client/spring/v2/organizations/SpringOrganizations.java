@@ -53,6 +53,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
@@ -323,6 +325,20 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "organizations", request.getOrganizationId(), "billing_managers");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListOrganizationDomainsResponse> listDomains(final ListOrganizationDomainsRequest request) {
+        return get(request, ListOrganizationDomainsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "organizations", request.getOrganizationId(), "domains");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }

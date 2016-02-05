@@ -1,0 +1,32 @@
+{
+  "total_results": 2,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "0010dd3b-aca0-4647-87d3-679059d67600",
+        "url": "/v2/domains/0010dd3b-aca0-4647-87d3-679059d67600",
+        "created_at": "2016-01-26T22:20:04Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain1.com",
+        "router_group_guid": null
+      }
+    },
+    {
+      "metadata": {
+        "guid": "e366a4ce-73d2-4a5a-8194-04c8ff4adfe1",
+        "url": "/v2/domains/e366a4ce-73d2-4a5a-8194-04c8ff4adfe1",
+        "created_at": "2016-01-26T22:20:04Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "customer-app-domain2.com",
+        "router_group_guid": null
+      }
+    }
+  ]
+}

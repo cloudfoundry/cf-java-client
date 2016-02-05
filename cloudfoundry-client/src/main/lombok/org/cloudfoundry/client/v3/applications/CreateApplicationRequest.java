@@ -65,6 +65,7 @@ public final class CreateApplicationRequest implements Validatable {
      * The relationships
      *
      * @param relationships the relationships
+     * @return the relationships
      */
     @Getter(onMethod = @__(@JsonProperty("relationships")))
     private final Map<String, Relationship> relationships;
