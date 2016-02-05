@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.operations.ValidationResult;
 import org.junit.Test;
 
 import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
-import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
-public final class StopApplicationRequestTest {
+public final class OrganizationInfoRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = fill(StopApplicationRequest.builder())
+        ValidationResult result = OrganizationInfoRequest.builder()
+            .name("test-organization-name")
             .build()
             .isValid();
 
@@ -37,7 +37,7 @@ public final class StopApplicationRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = StopApplicationRequest.builder()
+        ValidationResult result = OrganizationInfoRequest.builder()
             .build()
             .isValid();
 

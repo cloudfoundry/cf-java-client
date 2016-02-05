@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.organizations;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Organizations Operations API
@@ -29,5 +30,12 @@ public interface Organizations {
      * @return the organizations
      */
     Publisher<Organization> list();
+
+    /**
+     * Get an Organizations Information
+     *
+     * @return the organizations info
+     */
+    Mono<OrganizationInfo> info(OrganizationInfoRequest request);
 
 }

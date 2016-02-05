@@ -24,7 +24,7 @@ import lombok.Data;
  * The entity response payload for the Quota Definition resource
  */
 @Data
-public final class QuotaDefinitionEntity {
+public final class OrganizationQuotaDefinitionEntity {
 
     /**
      * The application instance limit
@@ -99,15 +99,15 @@ public final class QuotaDefinitionEntity {
     private final Boolean trialDbAllowed;
 
     @Builder
-    QuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
-                          @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
-                          @JsonProperty("memory_limit") Integer memoryLimit,
-                          @JsonProperty("name") String name,
-                          @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
-                          @JsonProperty("total_private_domains") Integer totalPrivateDomains,
-                          @JsonProperty("trial_db_allowed") Boolean trialDbAllowed,
-                          @JsonProperty("total_routes") Integer totalRoutes,
-                          @JsonProperty("total_services") Integer totalServices) {
+    OrganizationQuotaDefinitionEntity(@JsonProperty("app_instance_limit") Integer applicationInstanceLimit,
+                                      @JsonProperty("instance_memory_limit") Integer instanceMemoryLimit,
+                                      @JsonProperty("memory_limit") Integer memoryLimit,
+                                      @JsonProperty("name") String name,
+                                      @JsonProperty("non_basic_services_allowed") Boolean nonBasicServicesAllowed,
+                                      @JsonProperty("total_private_domains") Integer totalPrivateDomains,
+                                      @JsonProperty("trial_db_allowed") Boolean trialDbAllowed,
+                                      @JsonProperty("total_routes") Integer totalRoutes,
+                                      @JsonProperty("total_services") Integer totalServices) {
         this.applicationInstanceLimit = applicationInstanceLimit;
         this.instanceMemoryLimit = instanceMemoryLimit;
         this.memoryLimit = memoryLimit;

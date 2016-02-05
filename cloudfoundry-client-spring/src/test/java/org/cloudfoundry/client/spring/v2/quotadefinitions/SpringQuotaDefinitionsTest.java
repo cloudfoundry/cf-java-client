@@ -19,7 +19,7 @@ package org.cloudfoundry.client.spring.v2.quotadefinitions;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v2.quotadefinitions.QuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.quotadefinitions.OrganizationQuotaDefinitionEntity;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -54,7 +54,7 @@ public final class SpringQuotaDefinitionsTest {
                     .url("/v2/quota_definitions/c1b8a422-e2b2-4e28-8a16-90ebef2a6922")
                     .createdAt("2016-01-26T22:20:36Z")
                     .build())
-                .entity(QuotaDefinitionEntity.builder()
+                .entity(OrganizationQuotaDefinitionEntity.builder()
                     .name("name-2527")
                     .nonBasicServicesAllowed(true)
                     .totalServices(60)
