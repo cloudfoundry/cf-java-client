@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
 
@@ -52,17 +52,18 @@ public final class ListDropletsResponse extends PaginatedResponse<ListDropletsRe
     public static final class Resource extends Droplet {
 
         @Builder
-        Resource(@JsonProperty("buildpack") String buildpack,
-                 @JsonProperty("created_at") String createdAt,
+        Resource(@JsonProperty("created_at") String createdAt,
+                 @JsonProperty("disk_limit") Integer diskLimit,
                  @JsonProperty("environment_variables") @Singular Map<String, Object> environmentVariables,
                  @JsonProperty("error") String error,
-                 @JsonProperty("hash") Hash hash,
+                 @JsonProperty("lifecycle") Lifecycle lifecycle,
                  @JsonProperty("guid") String id,
-                 @JsonProperty("_links") @Singular Map<String, Link> links,
-                 @JsonProperty("procfile") String procfile,
+                 @JsonProperty("links") @Singular Map<String, Link> links,
+                 @JsonProperty("memory_limit") Integer memoryLimit,
+                 @JsonProperty("result") @Singular Map<String, Object> results,
                  @JsonProperty("state") String state,
                  @JsonProperty("updated_at") String updatedAt) {
-            super(buildpack, createdAt, environmentVariables, error, hash, id, links, procfile, state, updatedAt);
+            super(createdAt, diskLimit, environmentVariables, error, lifecycle, id, links, memoryLimit, results, state, updatedAt);
         }
 
     }
