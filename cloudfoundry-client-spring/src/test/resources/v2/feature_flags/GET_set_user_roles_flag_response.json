@@ -1,0 +1,6 @@
+{
+  "name": "set_roles_by_username",
+  "enabled": true,
+  "error_message": null,
+  "url": "/v2/config/feature_flags/set_roles_by_username"
+}

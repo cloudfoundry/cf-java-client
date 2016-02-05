@@ -1,0 +1,6 @@
+{
+  "name": "app_scaling",
+  "enabled": true,
+  "error_message": null,
+  "url": "/v2/config/feature_flags/app_scaling"
+}

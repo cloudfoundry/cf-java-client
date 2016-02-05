@@ -19,6 +19,7 @@ package org.cloudfoundry.client;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
+import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -85,6 +86,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Application Events Client API
      */
     Events events();
+
+    /**
+     * Main entry point to the Cloud Foundry Feature Flags Client API
+     *
+     * @return the Cloud Foundry Application Feature Flags Client API
+     */
+    FeatureFlags featureFlags();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API
