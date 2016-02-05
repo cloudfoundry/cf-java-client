@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client;
+package org.cloudfoundry.utils;
+
+import org.cloudfoundry.client.ValidationResult;
 
 import java.util.List;
 

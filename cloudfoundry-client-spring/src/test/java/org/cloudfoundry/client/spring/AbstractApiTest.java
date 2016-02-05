@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.spring;
 
-import org.cloudfoundry.client.RequestValidationException;
+import org.cloudfoundry.utils.RequestValidationException;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;

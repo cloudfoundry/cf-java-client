@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.util;
+package org.cloudfoundry.utils;
 
 import lombok.Builder;
 import lombok.Singular;
@@ -27,11 +27,10 @@ import java.util.Map;
  */
 public final class StringMap extends HashMap<String, Object> {
 
-    private static final long serialVersionUID = -776863221302025181L;
+    private static final long serialVersionUID = -2835780629130145581L;
 
     @Builder
     StringMap(@Singular Map<String, Object> entries) {
         super(entries);
     }
-
 }

@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.utils;
 
-import lombok.Builder;
-import lombok.Singular;
+import org.cloudfoundry.client.ValidationResult;
+import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 
-/**
- * Utility for building maps for Json responses
- */
-public final class StringMap extends HashMap<String, Object> {
+public final class RequestValidationExceptionTest {
 
-    private static final long serialVersionUID = -2835780629130145581L;
+    @Test
+    public void test() {
+        ValidationResult validationResult = ValidationResult.builder()
+            .message("test-message-1")
+            .message("test-message-2")
+            .build();
 
-    @Builder
-    StringMap(@Singular Map<String, Object> entries) {
-        super(entries);
+        RequestValidationException exception = new RequestValidationException(validationResult);
+
+        assertEquals("Request is invalid: test-message-1, test-message-2", exception.getMessage());
     }
+
 }

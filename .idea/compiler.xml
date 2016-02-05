@@ -59,6 +59,13 @@
         <processorPath useClasspath="true" />
         <module name="cloudfoundry-operations" />
       </profile>
+      <profile default="false" name="Annotation profile for cloudfoundry-client-utils" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="cloudfoundry-client-utils" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="cloudfoundry-client" target="1.7" />

@@ -27,7 +27,7 @@ import org.cloudfoundry.client.loggregator.StreamLogsRequest;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHandler;
 import org.cloudfoundry.client.spring.loggregator.ReactiveEndpoint;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.client.spring.util.Validators;
+import org.cloudfoundry.utils.ValidationUtils;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
@@ -163,7 +163,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
         return Stream
-            .from(Validators
+            .from(ValidationUtils
                 .validate(request))
             .flatMap(new Function<V, Stream<T>>() {
 

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.utils;
 
-import org.cloudfoundry.client.RequestValidationException;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 import reactor.core.publisher.Mono;
 
-public final class Validators {
+public final class ValidationUtils {
 
-    private Validators() {
+    private ValidationUtils() {
     }
 
     public static <T extends Validatable> Mono<T> validate(T request) {
