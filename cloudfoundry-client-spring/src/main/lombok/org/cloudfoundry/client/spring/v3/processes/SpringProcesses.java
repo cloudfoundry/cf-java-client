@@ -19,6 +19,8 @@ package org.cloudfoundry.client.spring.v3.processes;
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
@@ -29,6 +31,7 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -61,6 +64,18 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "processes", request.getProcessId());
+            }
+
+        });
+    }
+
+    @Override
+    public Publisher<GetProcessDetailedStatisticsResponse> detailedStatistics(final GetProcessDetailedStatisticsRequest request) {
+        return get(request, GetProcessDetailedStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
             }
 
         });
