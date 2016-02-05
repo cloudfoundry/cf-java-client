@@ -39,11 +39,11 @@
     <modules>
         <module>cloudfoundry-client</module>
         <module>cloudfoundry-client-spring</module>
+        <module>cloudfoundry-client-utils</module>
         <module>cloudfoundry-gradle-plugin</module>
         <module>cloudfoundry-maven-plugin</module>
         <module>cloudfoundry-operations</module>
         <module>integration-test</module>
-        <module>test-utils</module>
     </modules>
 
     <properties>
