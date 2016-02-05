@@ -24,6 +24,8 @@ import lombok.Getter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
+import java.util.Map;
+
 /**
  * The request payload for the Create Task endpoint
  */
@@ -47,7 +49,16 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("command")))
     private final String command;
-
+    
+    /**
+     * The environment variables
+     *
+     * @param environmentVariables the environment variables
+     * @return the environment variables
+     */
+    @Getter(onMethod = @__(@JsonProperty("environment_variables")))
+    private final Map<String, String> environmentVariables;
+    
     /**
      * The memoryInMb
      *
@@ -67,9 +78,10 @@ public final class CreateTaskRequest implements Validatable {
     private final String name;
 
     @Builder
-    CreateTaskRequest(String applicationId, String command, String name, Integer memoryInMb) {
+    CreateTaskRequest(String applicationId, String command, Map<String, String> environmentVariables, String name, Integer memoryInMb) {
         this.applicationId = applicationId;
         this.command = command;
+        this.environmentVariables = environmentVariables;
         this.name = name;
         this.memoryInMb = memoryInMb;
     }
