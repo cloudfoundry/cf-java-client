@@ -23,6 +23,8 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
@@ -64,6 +66,16 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
                 QueryBuilder.augment(builder, request);
+            }
+        });
+    }
+
+    @Override
+    public Mono<GetServicePlanVisibilityResponse> get(final GetServicePlanVisibilityRequest request) {
+        return get(request, GetServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
             }
         });
     }
