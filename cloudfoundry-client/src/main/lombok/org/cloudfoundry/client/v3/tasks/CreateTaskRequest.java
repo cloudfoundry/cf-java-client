@@ -17,14 +17,18 @@
 package org.cloudfoundry.client.v3.tasks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 import java.util.Map;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * The request payload for the Create Task endpoint
@@ -56,7 +60,7 @@ public final class CreateTaskRequest implements Validatable {
      * @param environmentVariables the environment variables
      * @return the environment variables
      */
-    @Getter(onMethod = @__(@JsonProperty("environment_variables")))
+    @Getter(onMethod = @__({@JsonInclude(NON_EMPTY), @JsonProperty("environment_variables")}))
     private final Map<String, String> environmentVariables;
 
     /**
@@ -78,7 +82,7 @@ public final class CreateTaskRequest implements Validatable {
     private final String name;
 
     @Builder
-    CreateTaskRequest(String applicationId, String command, Map<String, String> environmentVariables, String name, Integer memoryInMb) {
+    CreateTaskRequest(String applicationId, String command, @Singular Map<String, String> environmentVariables, String name, Integer memoryInMb) {
         this.applicationId = applicationId;
         this.command = command;
         this.environmentVariables = environmentVariables;
