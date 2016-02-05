@@ -38,7 +38,7 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonIgnore))
     private final String applicationId;
-    
+
     /**
      * The command
      *
@@ -47,16 +47,7 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("command")))
     private final String command;
-    
-    /**
-     * The name
-     *
-     * @param name the name
-     * @return the name
-     */
-    @Getter(onMethod = @__(@JsonProperty("name")))
-    private final String name;
-    
+
     /**
      * The memoryInMb
      *
@@ -65,6 +56,15 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("memory_in_mb")))
     private final Integer memoryInMb;
+
+    /**
+     * The name
+     *
+     * @param name the name
+     * @return the name
+     */
+    @Getter(onMethod = @__(@JsonProperty("name")))
+    private final String name;
 
     @Builder
     CreateTaskRequest(String applicationId, String command, String name, Integer memoryInMb) {
@@ -81,11 +81,11 @@ public final class CreateTaskRequest implements Validatable {
         if (this.applicationId == null) {
             builder.message("application id must be specified");
         }
-        
+
         if (this.command == null) {
             builder.message("command must be specified");
         }
-        
+
         if (this.name == null) {
             builder.message("name must be specified");
         }

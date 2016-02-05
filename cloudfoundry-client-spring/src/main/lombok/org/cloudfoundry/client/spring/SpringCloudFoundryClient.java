@@ -74,7 +74,7 @@ import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
-import org.cloudfoundry.client.v3.processes.Tasks;
+import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageConverter;

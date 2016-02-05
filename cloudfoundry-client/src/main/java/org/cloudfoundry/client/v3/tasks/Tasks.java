@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.processes;
+package org.cloudfoundry.client.v3.tasks;
 
-import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
-import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,6 +30,13 @@ public interface Tasks {
      * @return the response from the Create Task request
      */
     Mono<CreateTaskResponse> create(CreateTaskRequest request);
-    
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/#get-a-task">Get A Task</a> request
+     *
+     * @param request the Get Task request
+     * @return the response from the Get Task request
+     */
+    Mono<GetTaskResponse> get(GetTaskRequest request);
 
 }

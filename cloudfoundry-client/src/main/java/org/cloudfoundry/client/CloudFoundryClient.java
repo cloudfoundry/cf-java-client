@@ -39,7 +39,7 @@ import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
-import org.cloudfoundry.client.v3.processes.Tasks;
+import org.cloudfoundry.client.v3.tasks.Tasks;
 
 /**
  * Main entry point to the Cloud Foundry Client API
@@ -115,25 +115,18 @@ public interface CloudFoundryClient {
     Packages packages();
 
     /**
-     * Main entry point to the Cloud Foundry Processes Client API
-     *
-     * @return the Cloud Foundry Processes Client API
-     */
-    Processes processes();
-
-    /**
-     * Main entry point to the Cloud Foundry Tasks Client API
-     *
-     * @return the Cloud Foundry Tasks Client API
-     */
-    Tasks tasks();
-
-    /**
      * Main entry point to the Cloud Foundry Private Domains Client API
      *
      * @return the Cloud Foundry Private Domains Client API
      */
     PrivateDomains privateDomains();
+
+    /**
+     * Main entry point to the Cloud Foundry Processes Client API
+     *
+     * @return the Cloud Foundry Processes Client API
+     */
+    Processes processes();
 
     /**
      * Main entry point to the Cloud Foundry Routes Client API
@@ -211,6 +204,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Stacks Client API
      */
     Stacks stacks();
+
+    /**
+     * Main entry point to the Cloud Foundry Tasks Client API
+     *
+     * @return the Cloud Foundry Tasks Client API
+     */
+    Tasks tasks();
 
     /**
      * Main entry point to the Cloud Foundry Users Client API
