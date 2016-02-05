@@ -45,6 +45,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-stream</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <optional>true</optional>

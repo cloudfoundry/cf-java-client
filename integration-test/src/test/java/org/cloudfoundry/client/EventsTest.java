@@ -21,13 +21,13 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.operations.util.Tuples.consumer;
+import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,11 +41,11 @@ public final class EventsTest extends AbstractIntegrationTest {
                     Mono.just(resource),
                     this.cloudFoundryClient.events()
                         .get(GetEventRequest.builder()
-                            .eventId(Resources.getId(resource))
+                            .eventId(ResourceUtils.getId(resource))
                             .build())
                 ))
             .subscribe(this.<Tuple2<EventResource, GetEventResponse>>testSubscriber()
-                .assertThat(consumer((expected, actual) -> assertEquals(Resources.getId(expected), Resources.getId(actual)))));
+                .assertThat(consumer((expected, actual) -> assertEquals(ResourceUtils.getId(expected), ResourceUtils.getId(actual)))));
     }
 
     @Test
@@ -64,9 +64,9 @@ public final class EventsTest extends AbstractIntegrationTest {
                     Mono.just(resource),
                     this.cloudFoundryClient.events()
                         .list(ListEventsRequest.builder()
-                            .actee(Resources.getEntity(resource).getActee())
+                            .actee(ResourceUtils.getEntity(resource).getActee())
                             .build())
-                        .flatMap(Resources::getResources)
+                        .flatMap(ResourceUtils::getResources)
                         .next()
                 ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
@@ -81,9 +81,9 @@ public final class EventsTest extends AbstractIntegrationTest {
                     Mono.just(resource),
                     this.cloudFoundryClient.events()
                         .list(ListEventsRequest.builder()
-                            .timestamp(Resources.getEntity(resource).getTimestamp())
+                            .timestamp(ResourceUtils.getEntity(resource).getTimestamp())
                             .build())
-                        .flatMap(Resources::getResources)
+                        .flatMap(ResourceUtils::getResources)
                         .next()
                 ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
@@ -98,9 +98,9 @@ public final class EventsTest extends AbstractIntegrationTest {
                     Mono.just(resource),
                     this.cloudFoundryClient.events()
                         .list(ListEventsRequest.builder()
-                            .type(Resources.getEntity(resource).getType())
+                            .type(ResourceUtils.getEntity(resource).getType())
                             .build())
-                        .flatMap(Resources::getResources)
+                        .flatMap(ResourceUtils::getResources)
                         .next()
                 ))
             .subscribe(this.<Tuple2<EventResource, EventResource>>testSubscriber()
@@ -117,7 +117,7 @@ public final class EventsTest extends AbstractIntegrationTest {
             .from(this.cloudFoundryClient.events()
                 .list(ListEventsRequest.builder()
                     .build()))
-            .flatMap(Resources::getResources);
+            .flatMap(ResourceUtils::getResources);
     }
 
 }

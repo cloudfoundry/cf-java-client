@@ -28,8 +28,8 @@ import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
-import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;
+import static org.cloudfoundry.utils.test.TestObjects.fill;
+import static org.cloudfoundry.utils.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultDomainsTest {

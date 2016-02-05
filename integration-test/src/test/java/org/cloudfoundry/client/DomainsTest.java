@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,8 +35,8 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
-import static org.cloudfoundry.operations.util.Tuples.consumer;
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class DomainsTest extends AbstractIntegrationTest {
@@ -69,7 +69,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .get(GetDomainRequest.builder()
                     .domainId(domainId)
                     .build())
-                .map(Resources::getEntity))
+                .map(ResourceUtils::getEntity))
             .and(this.organizationId)
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
                 .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
@@ -82,7 +82,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .flatMap(response -> this.cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(2));
     }
@@ -95,8 +95,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
                     .build())
-                .flatMap(Resources::getResources)
-                .map(Resources::getId))
+                .flatMap(ResourceUtils::getResources)
+                .map(ResourceUtils::getId))
             .zipWith(this.spaceId)
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -115,13 +115,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .name("test-application-name")
                             .spaceId(spaceId)
                             .build())
-                        .map(Resources::getId),
+                        .map(ResourceUtils::getId),
                     this.cloudFoundryClient.routes()
                         .create(CreateRouteRequest.builder()
                             .domainId(domainId)
                             .spaceId(spaceId)
                             .build())
-                        .map(Resources::getId)
+                        .map(ResourceUtils::getId)
                 )))
             .then(function((domainId, applicationId, routeId) -> this.cloudFoundryClient.routes()
                 .associateApplication(AssociateRouteApplicationRequest.builder()
@@ -134,7 +134,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .domainId(domainId)
                     .build())
-                .flatMap(Resources::getResources)))
+                .flatMap(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -154,8 +154,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .name(this.spaceName)
                     .build())
-                .flatMap(Resources::getResources)
-                .map(Resources::getId))
+                .flatMap(ResourceUtils::getResources)
+                .map(ResourceUtils::getId))
             .zipWith(this.spaceId)
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -171,8 +171,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .organizationId(organizationId)
                     .build())
-                .flatMap(Resources::getResources)
-                .map(Resources::getId)))
+                .flatMap(ResourceUtils::getResources)
+                .map(ResourceUtils::getId)))
             .zipWith(this.spaceId)
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -186,7 +186,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .list(ListDomainsRequest.builder()
                     .name("test.domain.name")
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -200,7 +200,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .list(ListDomainsRequest.builder()
                     .owningOrganizationId(organizationId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -221,12 +221,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     private Mono<DomainEntity> createDomainEntity(String organizationId) {
         return createDomain(organizationId)
-            .map(Resources::getEntity);
+            .map(ResourceUtils::getEntity);
     }
 
     private Mono<String> createDomainId(String organizationId) {
         return createDomain(organizationId)
-            .map(Resources::getId);
+            .map(ResourceUtils::getId);
     }
 
 }

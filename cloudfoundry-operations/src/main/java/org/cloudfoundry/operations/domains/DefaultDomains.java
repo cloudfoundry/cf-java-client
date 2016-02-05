@@ -22,17 +22,17 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
-import org.cloudfoundry.operations.util.Exceptions;
-import org.cloudfoundry.operations.util.Function2;
-import org.cloudfoundry.operations.util.Validators;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.ValidationUtils;
+import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 public final class DefaultDomains implements Domains {
 
@@ -43,7 +43,7 @@ public final class DefaultDomains implements Domains {
     }
 
     public Mono<Void> create(CreateDomainRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .then(new Function<CreateDomainRequest, Mono<Tuple2<String, CreateDomainRequest>>>() {
 
@@ -68,8 +68,8 @@ public final class DefaultDomains implements Domains {
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(Exceptions.<OrganizationResource>convert("Organization %s does not exist", organization))
-            .map(Resources.extractId());
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization))
+            .map(ResourceUtils.extractId());
     }
 
     private static Mono<CreatePrivateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
@@ -81,7 +81,7 @@ public final class DefaultDomains implements Domains {
     }
 
     private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organization) {
-        return Paginated
+        return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
 
                 @Override
