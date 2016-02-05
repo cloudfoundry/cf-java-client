@@ -50,7 +50,7 @@ public abstract class Task {
      * @return the created at
      */
     private final String createdAt;
-    
+
     /**
      * The environment variables
      *
@@ -58,7 +58,7 @@ public abstract class Task {
      * @return the environment variables
      */
     private final Map<String, String> environmentVariables;
-    
+
     /**
      * The id
      *

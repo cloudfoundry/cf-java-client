@@ -49,7 +49,7 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("command")))
     private final String command;
-    
+
     /**
      * The environment variables
      *
@@ -58,7 +58,7 @@ public final class CreateTaskRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("environment_variables")))
     private final Map<String, String> environmentVariables;
-    
+
     /**
      * The memoryInMb
      *

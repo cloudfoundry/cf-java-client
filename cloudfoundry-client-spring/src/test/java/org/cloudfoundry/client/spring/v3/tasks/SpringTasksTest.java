@@ -18,10 +18,13 @@ package org.cloudfoundry.client.spring.v3.tasks;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
 import org.cloudfoundry.client.v3.tasks.GetTaskResponse;
+import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
+import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.Task;
 import reactor.core.publisher.Mono;
 
@@ -139,6 +142,91 @@ public final class SpringTasksTest {
         @Override
         protected Mono<GetTaskResponse> invoke(GetTaskRequest request) {
             return this.tasks.get(request);
+        }
+
+    }
+
+    public static final class List extends AbstractApiTest<ListTasksRequest, ListTasksResponse> {
+
+        private final SpringTasks tasks = new SpringTasks(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListTasksRequest getInvalidRequest() {
+            return ListTasksRequest.builder()
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v3/tasks?page=1")
+                .status(OK)
+                .responsePayload("v3/tasks/GET_response.json");
+        }
+
+        @Override
+        protected ListTasksResponse getResponse() {
+            return ListTasksResponse.builder()
+                .pagination(PaginatedResponse.Pagination.builder()
+                    .totalResults(3)
+                    .first(Link.builder()
+                        .href("/v3/tasks?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/tasks?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/tasks?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(ListTasksResponse.Resource.builder()
+                    .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                    .name("hello")
+                    .command("echo \"hello world\"")
+                    .state(Task.SUCCEEDED_STATE)
+                    .memoryInMb(256)
+                    .results(Collections.singletonMap("failure_reason", null))
+                    .link("self", Link.builder()
+                        .href("/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                        .build())
+                    .link("droplet", Link.builder()
+                        .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                        .build())
+                    .build())
+                .resource(ListTasksResponse.Resource.builder()
+                    .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                    .name("migrate")
+                    .command("rake db:migrate")
+                    .state(Task.FAILED_STATE)
+                    .memoryInMb(256)
+                    .results(Collections.<String, Object>singletonMap("failure_reason", "Exited with status 1"))
+                    .link("self", Link.builder()
+                        .href("/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                        .build())
+                    .link("droplet", Link.builder()
+                        .href("/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListTasksRequest getValidRequest() throws Exception {
+            return ListTasksRequest.builder()
+                .page(1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListTasksResponse> invoke(ListTasksRequest request) {
+            return this.tasks.list(request);
         }
 
     }
