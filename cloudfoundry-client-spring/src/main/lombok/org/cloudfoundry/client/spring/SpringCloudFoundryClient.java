@@ -30,6 +30,7 @@ import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
 import org.cloudfoundry.client.spring.v2.events.SpringEvents;
+import org.cloudfoundry.client.spring.v2.featureflags.SpringFeatureFlags;
 import org.cloudfoundry.client.spring.v2.info.SpringInfo;
 import org.cloudfoundry.client.spring.v2.jobs.SpringJobs;
 import org.cloudfoundry.client.spring.v2.organizations.SpringOrganizations;
@@ -54,6 +55,7 @@ import org.cloudfoundry.client.spring.v3.tasks.SpringTasks;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
+import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -118,6 +120,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Droplets droplets;
 
     private final Events events;
+
+    private final FeatureFlags featureFlags;
 
     private final Info info;
 
@@ -204,6 +208,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.domains = new SpringDomains(this.restOperations, root, this.schedulerGroup);
         this.droplets = new SpringDroplets(this.restOperations, root, this.schedulerGroup);
         this.events = new SpringEvents(this.restOperations, root, this.schedulerGroup);
+        this.featureFlags = new SpringFeatureFlags(this.restOperations, root, this.schedulerGroup);
         this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
         this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
@@ -234,6 +239,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.domains = new SpringDomains(this.restOperations, root, this.schedulerGroup);
         this.droplets = new SpringDroplets(this.restOperations, root, this.schedulerGroup);
         this.events = new SpringEvents(this.restOperations, root, this.schedulerGroup);
+        this.featureFlags = new SpringFeatureFlags(this.restOperations, root, this.schedulerGroup);
         this.info = new SpringInfo(this.restOperations, root, this.schedulerGroup);
         this.jobs = new SpringJobs(this.restOperations, root, this.schedulerGroup);
         this.organizations = new SpringOrganizations(this.restOperations, root, this.schedulerGroup);
@@ -278,6 +284,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Events events() {
         return this.events;
+    }
+
+    @Override
+    public FeatureFlags featureFlags() {
+        return this.featureFlags;
     }
 
     @Override
