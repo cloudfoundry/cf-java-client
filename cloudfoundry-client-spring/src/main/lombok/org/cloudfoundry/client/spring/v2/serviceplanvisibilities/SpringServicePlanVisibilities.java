@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibili
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -55,13 +57,13 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plan_visibilities");
             }
-
         });
     }
 
     @Override
     public Mono<Void> delete(final DeleteServicePlanVisibilityRequest request) {
         return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
@@ -73,6 +75,7 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
     @Override
     public Mono<GetServicePlanVisibilityResponse> get(final GetServicePlanVisibilityRequest request) {
         return get(request, GetServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
@@ -90,7 +93,17 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
             }
+        });
+    }
 
+    @Override
+    public Mono<UpdateServicePlanVisibilityResponse> update(final UpdateServicePlanVisibilityRequest request) {
+        return put(request, UpdateServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId());
+            }
         });
     }
 
