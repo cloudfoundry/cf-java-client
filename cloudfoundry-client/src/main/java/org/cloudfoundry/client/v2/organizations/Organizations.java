@@ -170,6 +170,14 @@ public interface Organizations {
     Mono<ListOrganizationBillingManagersResponse> listBillingManagers(ListOrganizationBillingManagersRequest request);
 
     /**
+     * <a href="http://apidocs.cloudfoundry.org/230/organizations/list_all_domains_for_the_organization_%28deprecated%29.html">List all Domains for the Organization</a> request
+     *
+     * @param request the List all Domains for the Organization request
+     * @return the response from the List all Domains for the Organization request
+     */
+    Mono<ListOrganizationDomainsResponse> listDomains(ListOrganizationDomainsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/list_all_managers_for_the_organization.html">List all Managers for the Organization</a> request
      *
      * @param request the List all Managers for the Organization request
