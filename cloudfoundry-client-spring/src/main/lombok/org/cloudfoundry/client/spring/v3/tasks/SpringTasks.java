@@ -18,10 +18,13 @@ package org.cloudfoundry.client.spring.v3.tasks;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.GetTaskRequest;
 import org.cloudfoundry.client.v3.tasks.GetTaskResponse;
+import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
+import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -67,6 +70,19 @@ public final class SpringTasks extends AbstractSpringOperations implements Tasks
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "tasks", request.getId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListTasksResponse> list(final ListTasksRequest request) {
+        return get(request, ListTasksResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v3", "tasks");
+                QueryBuilder.augment(builder, request);
             }
 
         });

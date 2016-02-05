@@ -1,0 +1,62 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "first": {
+      "href": "/v3/tasks?page=1&per_page=2"
+    },
+    "last": {
+      "href": "/v3/tasks?page=2&per_page=2"
+    },
+    "next": {
+      "href": "/v3/tasks?page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa",
+      "name": "hello",
+      "command": "echo \"hello world\"",
+      "state": "SUCCEEDED",
+      "memory_in_mb": 256,
+      "environment_variables": {
+      },
+      "result": {
+        "failure_reason": null
+      },
+      "links": {
+        "self": {
+          "href": "/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa"
+        },
+        "app": {
+          "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
+        },
+        "droplet": {
+          "href": "/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a"
+        }
+      }
+    },
+    {
+      "guid": "63b4cd89-fd8b-4bf1-a311-7174fcc907d6",
+      "name": "migrate",
+      "command": "rake db:migrate",
+      "state": "FAILED",
+      "memory_in_mb": 256,
+      "environment_variables": {},
+      "result": {
+        "failure_reason": "Exited with status 1"
+      },
+      "links": {
+        "self": {
+          "href": "/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6"
+        },
+        "app": {
+          "href": "/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5"
+        },
+        "droplet": {
+          "href": "/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a"
+        }
+      }
+    }
+  ]
+}

@@ -39,4 +39,12 @@ public interface Tasks {
      */
     Mono<GetTaskResponse> get(GetTaskRequest request);
 
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/#list-tasks">List Tasks</a> request
+     *
+     * @param request the List Tasks request
+     * @return the response from the List Tasks request
+     */
+    Mono<ListTasksResponse> list(ListTasksRequest request);
+
 }
