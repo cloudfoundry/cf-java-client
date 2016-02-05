@@ -20,8 +20,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.cloudfoundry.operations.Validatable;
-import org.cloudfoundry.operations.ValidationResult;
+import org.cloudfoundry.client.Validatable;
+import org.cloudfoundry.client.ValidationResult;
 
 /**
  * The request options for the scale application operation

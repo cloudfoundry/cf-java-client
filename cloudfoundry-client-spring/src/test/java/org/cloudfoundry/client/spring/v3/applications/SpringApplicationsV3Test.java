@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.spring.util.StringMap;
+import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;

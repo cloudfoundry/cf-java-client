@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
-import org.cloudfoundry.operations.util.Optional;
+import org.cloudfoundry.utils.Optional;
 
 import java.util.List;
 

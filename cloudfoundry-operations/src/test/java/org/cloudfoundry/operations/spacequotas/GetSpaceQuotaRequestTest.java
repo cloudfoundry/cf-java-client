@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.operations.spacequotas;
 
-import org.cloudfoundry.operations.ValidationResult;
+import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
+import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class GetSpaceQuotaRequestTest {
@@ -28,9 +28,9 @@ public final class GetSpaceQuotaRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetSpaceQuotaRequest.builder()
-                .name("test-name")
-                .build()
-                .isValid();
+            .name("test-name")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -38,8 +38,8 @@ public final class GetSpaceQuotaRequestTest {
     @Test
     public void isValidNoName() {
         ValidationResult result = GetSpaceQuotaRequest.builder()
-                .build()
-                .isValid();
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("space quota name must be specified", result.getMessages().get(0));

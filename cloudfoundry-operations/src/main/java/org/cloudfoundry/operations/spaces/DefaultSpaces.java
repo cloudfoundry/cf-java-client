@@ -41,14 +41,14 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
-import org.cloudfoundry.operations.util.Exceptions;
-import org.cloudfoundry.operations.util.Function2;
-import org.cloudfoundry.operations.util.Function6;
-import org.cloudfoundry.operations.util.Optional;
-import org.cloudfoundry.operations.util.Optionals;
-import org.cloudfoundry.operations.util.Validators;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.Optional;
+import org.cloudfoundry.utils.OptionalUtils;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.utils.ValidationUtils;
+import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.utils.tuple.Function6;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
@@ -57,7 +57,7 @@ import reactor.rx.Stream;
 
 import java.util.List;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 public final class DefaultSpaces implements Spaces {
 
@@ -72,7 +72,7 @@ public final class DefaultSpaces implements Spaces {
 
     @Override
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .and(this.organizationId)
             .then(function(new Function2<GetSpaceRequest, String, Mono<Tuple2<SpaceResource, GetSpaceRequest>>>() {
@@ -109,12 +109,12 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
-        return requestSpaceApplications(cloudFoundryClient, Resources.getId(spaceResource))
+        return requestSpaceApplications(cloudFoundryClient, ResourceUtils.getId(spaceResource))
             .map(new Function<ApplicationResource, String>() {
 
                 @Override
                 public String apply(ApplicationResource resource) {
-                    return Resources.getEntity(resource).getName();
+                    return ResourceUtils.getEntity(resource).getName();
                 }
 
             })
@@ -138,7 +138,8 @@ public final class DefaultSpaces implements Spaces {
                     .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
 
                         @Override
-                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota> spaceQuota) {
+                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota>
+                            spaceQuota) {
                             return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
                         }
 
@@ -148,12 +149,12 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
-        return requestSpaceDomains(cloudFoundryClient, Resources.getId(resource))
+        return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<DomainResource, String>() {
 
                 @Override
                 public String apply(DomainResource resource) {
-                    return Resources.getEntity(resource).getName();
+                    return ResourceUtils.getEntity(resource).getName();
                 }
 
             })
@@ -165,7 +166,7 @@ public final class DefaultSpaces implements Spaces {
             return Mono.just(Optional.<SpaceQuota>empty());
         }
 
-        return requestSpaceQuotaDefinition(cloudFoundryClient, Resources.getEntity(spaceResource).getSpaceQuotaDefinitionId())
+        return requestSpaceQuotaDefinition(cloudFoundryClient, ResourceUtils.getEntity(spaceResource).getSpaceQuotaDefinitionId())
             .map(new Function<GetSpaceQuotaDefinitionResponse, SpaceQuota>() {
 
                 @Override
@@ -174,28 +175,28 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             })
-            .map(Optionals.<SpaceQuota>toOptional());
+            .map(OptionalUtils.<SpaceQuota>toOptional());
     }
 
     private static Mono<String> getOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
-        return requestOrganization(cloudFoundryClient, Resources.getEntity(resource).getOrganizationId())
+        return requestOrganization(cloudFoundryClient, ResourceUtils.getEntity(resource).getOrganizationId())
             .map(new Function<GetOrganizationResponse, String>() {
 
                 @Override
                 public String apply(GetOrganizationResponse response) {
-                    return Resources.getEntity(response).getName();
+                    return ResourceUtils.getEntity(response).getName();
                 }
 
             });
     }
 
     private static Mono<List<String>> getSecurityGroupNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
-        return requestSpaceSecurityGroups(cloudFoundryClient, Resources.getId(resource))
+        return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<SecurityGroupResource, String>() {
 
                 @Override
                 public String apply(SecurityGroupResource resource) {
-                    return Resources.getEntity(resource).getName();
+                    return ResourceUtils.getEntity(resource).getName();
                 }
 
             })
@@ -203,12 +204,12 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<List<String>> getServiceNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
-        return requestSpaceServices(cloudFoundryClient, Resources.getId(resource))
+        return requestSpaceServices(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<ServiceResource, String>() {
 
                 @Override
                 public String apply(ServiceResource resource) {
-                    return Resources.getEntity(resource).getLabel();
+                    return ResourceUtils.getEntity(resource).getLabel();
                 }
 
             })
@@ -223,7 +224,8 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<SpaceResource> requestOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
 
                 @Override
                 public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
@@ -237,11 +239,12 @@ public final class DefaultSpaces implements Spaces {
 
             })
             .single()
-            .otherwise(Exceptions.<SpaceResource>convert("Space %s does not exist", space));
+            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
     }
 
     private static Stream<ApplicationResource> requestSpaceApplications(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
@@ -257,7 +260,8 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<DomainResource> requestSpaceDomains(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpaceDomainsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceDomainsResponse> apply(Integer page) {
@@ -279,7 +283,8 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<SecurityGroupResource> requestSpaceSecurityGroups(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpaceSecurityGroupsResponse>>() {
 
                 @Override
                 public Mono<ListSpaceSecurityGroupsResponse> apply(Integer page) {
@@ -294,7 +299,8 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<ServiceResource> requestSpaceServices(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListSpaceServicesResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpaceServicesResponse>>() {
 
                 @Override
                 public Mono<ListSpaceServicesResponse> apply(Integer page) {
@@ -309,7 +315,8 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Stream<SpaceResource> requestSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
-        return Paginated.requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
 
                 @Override
                 public Mono<ListSpacesResponse> apply(Integer page) {
@@ -328,8 +335,8 @@ public final class DefaultSpaces implements Spaces {
         return SpaceDetail.builder()
             .applications(applications)
             .domains(domains)
-            .id(Resources.getId(resource))
-            .name(Resources.getEntity(resource).getName())
+            .id(ResourceUtils.getId(resource))
+            .name(ResourceUtils.getEntity(resource).getName())
             .organization(organization)
             .securityGroups(securityGroups)
             .services(services)
@@ -338,10 +345,10 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static SpaceQuota toSpaceQuotaDefinition(Resource<SpaceQuotaDefinitionEntity> resource) {
-        SpaceQuotaDefinitionEntity entity = Resources.getEntity(resource);
+        SpaceQuotaDefinitionEntity entity = ResourceUtils.getEntity(resource);
 
         return SpaceQuota.builder()
-            .id(Resources.getId(resource))
+            .id(ResourceUtils.getId(resource))
             .instanceMemoryLimit(entity.getInstanceMemoryLimit())
             .name(entity.getName())
             .organizationId(entity.getOrganizationId())
@@ -354,8 +361,8 @@ public final class DefaultSpaces implements Spaces {
 
     private static SpaceSummary toSpaceSummary(SpaceResource resource) {
         return SpaceSummary.builder()
-            .id(Resources.getId(resource))
-            .name(Resources.getEntity(resource).getName())
+            .id(ResourceUtils.getId(resource))
+            .name(ResourceUtils.getEntity(resource).getName())
             .build();
     }
 

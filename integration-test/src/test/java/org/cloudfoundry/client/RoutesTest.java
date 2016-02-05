@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -39,8 +39,8 @@ import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 
-import static org.cloudfoundry.operations.util.Tuples.consumer;
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class RoutesTest extends AbstractIntegrationTest {
@@ -57,7 +57,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .listApplications(ListRouteApplicationsRequest.builder()
                     .routeId(routeId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -75,7 +75,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .domainId(domainId)
                             .spaceId(spaceId)
                             .build())
-                        .map(Resources::getEntity))
+                        .map(ResourceUtils::getEntity))
             ))
             .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                 .assertThat(consumer(this::assertDomainIdAndSpaceId)));
@@ -90,7 +90,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .owningOrganizationId(organizationId)
                     .wildcard(true)
                     .build()))
-            .map(Resources::getId);
+            .map(ResourceUtils::getId);
     }
 
     @Test
@@ -102,7 +102,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .spaceId(spaceId)
                     .build())
-                .map(Resources::getId)))
+                .map(ResourceUtils::getId)))
             .then(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .routeId(routeId)
@@ -163,7 +163,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                             .domainId(domainId)
                             .spaceId(spaceId)
                             .build())
-                        .map(Resources::getId))
+                        .map(ResourceUtils::getId))
             ))
             .then(function((domainId, spaceId, routeId) -> Mono
                 .when(
@@ -173,7 +173,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .get(GetRouteRequest.builder()
                             .routeId(routeId)
                             .build())
-                        .map(Resources::getEntity))
+                        .map(ResourceUtils::getEntity))
             ))
             .subscribe(this.<Tuple3<String, String, RouteEntity>>testSubscriber()
                 .assertThat(consumer(this::assertDomainIdAndSpaceId)));
@@ -191,7 +191,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .flatMap(response -> this.cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -206,7 +206,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .listApplications(ListRouteApplicationsRequest.builder()
                     .routeId(routeId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -224,7 +224,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build();
 
                 return this.cloudFoundryClient.routes().listApplications(request)
-                    .flatMap(Resources::getResources);
+                    .flatMap(ResourceUtils::getResources);
             })
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -241,7 +241,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .name("test-application-name")
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -258,7 +258,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .organizationId(organizationId)
                     .build())
-                .flatMap(Resources::getResources)))
+                .flatMap(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -275,7 +275,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .spaceId(spaceId)
                     .build())
-                .flatMap(Resources::getResources)))
+                .flatMap(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -300,7 +300,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .domainId(domainId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -319,7 +319,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .host("test-host")
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -338,7 +338,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .organizationId(organizationId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -357,7 +357,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .path("/test-path")
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -379,7 +379,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .listApplications(ListRouteApplicationsRequest.builder()
                     .routeId(routeId)
                     .build())
-                .flatMap(Resources::getResources))
+                .flatMap(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(0));
     }
@@ -393,13 +393,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .domainId(domainId)
                     .spaceId(spaceId)
                     .build())
-                .map(Resources::getId)))
+                .map(ResourceUtils::getId)))
             .then(routeId -> this.cloudFoundryClient.routes()
                 .update(UpdateRouteRequest.builder()
                     .host("test-host")
                     .routeId(routeId)
                     .build())
-                .map(Resources::getEntity))
+                .map(ResourceUtils::getEntity))
             .subscribe(this.<RouteEntity>testSubscriber()
                 .assertThat(entity -> assertEquals("test-host", entity.getHost())));
     }
@@ -427,13 +427,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .name("test-application-name")
                         .spaceId(spaceId)
                         .build())
-                    .map(Resources::getId),
+                    .map(ResourceUtils::getId),
                 this.cloudFoundryClient.routes()
                     .create(CreateRouteRequest.builder()
                         .domainId(domainId)
                         .spaceId(spaceId)
                         .build())
-                    .map(Resources::getId)
+                    .map(ResourceUtils::getId)
             );
     }
 

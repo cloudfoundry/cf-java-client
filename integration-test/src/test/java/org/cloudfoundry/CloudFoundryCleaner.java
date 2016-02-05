@@ -33,8 +33,8 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
@@ -58,13 +58,13 @@ final class CloudFoundryCleaner {
     }
 
     private static Stream<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
-        return Paginated
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
             .filter(predicate)
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .flatMap(applicationId -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -72,13 +72,13 @@ final class CloudFoundryCleaner {
     }
 
     private static Stream<Void> cleanDomains(CloudFoundryClient cloudFoundryClient, Predicate<DomainResource> predicate) {
-        return Paginated
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .page(page)
                     .build()))
             .filter(predicate)
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .flatMap(domainId -> cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
                     .domainId(domainId)
@@ -86,13 +86,13 @@ final class CloudFoundryCleaner {
     }
 
     private static Stream<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
-        return Paginated
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .page(page)
                     .build()))
             .filter(predicate)
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .flatMap(organizationId -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
                     .organizationId(organizationId)
@@ -100,13 +100,13 @@ final class CloudFoundryCleaner {
     }
 
     private static Stream<DeleteRouteResponse> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
-        return Paginated
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
                     .page(page)
                     .build()))
             .filter(predicate)
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .routeId(routeId)
@@ -114,13 +114,13 @@ final class CloudFoundryCleaner {
     }
 
     private static Stream<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {
-        return Paginated
+        return PaginationUtils
             .requestResources(page -> cloudFoundryClient.spaces()
                 .list(ListSpacesRequest.builder()
                     .page(page)
                     .build()))
             .filter(predicate)
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .spaceId(spaceId)

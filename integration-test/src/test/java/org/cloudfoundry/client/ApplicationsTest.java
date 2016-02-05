@@ -44,7 +44,7 @@ import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -66,8 +66,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.operations.util.Tuples.consumer;
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -84,7 +84,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .listRoutes(ListApplicationRoutesRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -98,21 +98,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name("copy-application")
                     .spaceId(spaceId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(sourceId))))
             .then(function((targetId, sourceId) -> this.cloudFoundryClient.applicationsV2()
                 .copy(CopyApplicationRequest.builder()
                     .applicationId(targetId)
                     .sourceApplicationId(sourceId)
                     .build())
-                .map(Resources::getId)))
+                .map(ResourceUtils::getId)))
             .flatMap(applicationCopyId -> Stream
                 .from(this.cloudFoundryClient.applicationsV2()
                     .list(ListApplicationsRequest.builder()
                         .build()))
-                .flatMap(Resources::getResources)
+                .flatMap(ResourceUtils::getResources)
                 .filter(r -> {
-                    String name = Resources.getEntity(r).getName();
+                    String name = ResourceUtils.getEntity(r).getName();
                     return TEST_APPLICATION_NAME.equals(name) || "copy-application".equals(name);
                 }))
             .subscribe(testSubscriber()
@@ -130,7 +130,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .name("test-application-2")
                             .spaceId(spaceId)
                             .build())
-                        .map(Resources::getEntity)
+                        .map(ResourceUtils::getEntity)
                 ))
             .subscribe(this.<Tuple2<String, ApplicationEntity>>testSubscriber()
                 .assertThat(consumer((spaceId, entity) -> {
@@ -151,7 +151,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(TEST_APPLICATION_NAME)
                     .spaceId(spaceId)
                     .build()))
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .as(Promise::from);
     }
 
@@ -254,7 +254,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .get(GetApplicationRequest.builder()
                             .applicationId(applicationId)
                             .build())
-                        .map(Resources::getId)
+                        .map(ResourceUtils::getId)
                 ))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -266,7 +266,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .list(ListApplicationsRequest.builder()
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -278,7 +278,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .list(ListApplicationsRequest.builder()
                     .diego(true)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -290,7 +290,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .list(ListApplicationsRequest.builder()
                     .name(TEST_APPLICATION_NAME)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -303,7 +303,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .list(ListApplicationsRequest.builder()
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -316,7 +316,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .list(ListApplicationsRequest.builder()
                     .spaceId(spaceId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -329,7 +329,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .list(ListApplicationsRequest.builder()
                     .stackId(stackId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -342,7 +342,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .listRoutes(ListApplicationRoutesRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -356,7 +356,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .domainId(routeResponse.getEntity().getDomainId())
                     .build())
-                .map(Resources::getResources)))
+                .map(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -370,7 +370,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .host(routeResponse.getEntity().getHost())
                     .build())
-                .map(Resources::getResources)))
+                .map(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -384,7 +384,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .path(routeResponse.getEntity().getPath())
                     .build())
-                .map(Resources::getResources)))
+                .map(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -398,7 +398,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .port(routeResponse.getEntity().getPort())
                     .build())
-                .map(Resources::getResources)))
+                .map(ResourceUtils::getResources)))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -419,7 +419,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -434,7 +434,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .serviceInstanceId("CREATE ME")
                     .build())
-                .map(Resources::getResources))
+                .map(ResourceUtils::getResources))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -446,7 +446,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .removeRoute(RemoveApplicationRouteRequest.builder()
                     .applicationId(applicationId)
-                    .routeId(Resources.getId(routeResponse))
+                    .routeId(ResourceUtils.getId(routeResponse))
                     .build())))
             .subscribe(testSubscriber());
     }
@@ -466,7 +466,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .restage(RestageApplicationRequest.builder()
                     .applicationId(applicationId)
                     .build())
-                .map(Resources::getId))
+                .map(ResourceUtils::getId))
             .then(this::waitForStaging)
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -518,7 +518,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .name("another-test-application-name")
                     .build())
-                .map(Resources::getId))
+                .map(ResourceUtils::getId))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .get(GetApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -557,7 +557,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .owningOrganizationId(organizationId)
                     .wildcard(true)
                     .build())
-                .map(Resources::getId))
+                .map(ResourceUtils::getId))
             .and(this.spaceId)
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
@@ -581,7 +581,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .applicationId(applicationId)
                 .state("STARTED")
                 .build())
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .then(this::waitForStaging)
             .then(this::waitForStarting);
     }

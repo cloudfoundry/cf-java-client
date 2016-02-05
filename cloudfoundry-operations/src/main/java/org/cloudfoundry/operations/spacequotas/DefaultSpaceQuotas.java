@@ -21,18 +21,18 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.operations.util.Exceptions;
-import org.cloudfoundry.operations.util.Function2;
-import org.cloudfoundry.operations.util.Validators;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.ValidationUtils;
+import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 public final class DefaultSpaceQuotas implements SpaceQuotas {
 
@@ -47,7 +47,7 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
 
     @Override
     public Mono<SpaceQuota> get(GetSpaceQuotaRequest getSpaceQuotaRequest) {
-        return Validators
+        return ValidationUtils
             .validate(getSpaceQuotaRequest)
             .and(this.organizationId)
             .then(function(new Function2<GetSpaceQuotaRequest, String, Mono<SpaceQuotaDefinitionResource>>() {
@@ -95,16 +95,16 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
 
                 @Override
                 public boolean test(SpaceQuotaDefinitionResource resource) {
-                    return name.equals(Resources.getEntity(resource).getName());
+                    return name.equals(ResourceUtils.getEntity(resource).getName());
                 }
 
             })
             .single()
-            .otherwise(Exceptions.<SpaceQuotaDefinitionResource>convert("Space Quota %s does not exist", name));
+            .otherwise(ExceptionUtils.<SpaceQuotaDefinitionResource>convert("Space Quota %s does not exist", name));
     }
 
     private static Stream<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
-        return Paginated
+        return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
 
                 @Override
@@ -120,10 +120,10 @@ public final class DefaultSpaceQuotas implements SpaceQuotas {
     }
 
     private static SpaceQuota toSpaceQuota(SpaceQuotaDefinitionResource resource) {
-        SpaceQuotaDefinitionEntity entity = Resources.getEntity(resource);
+        SpaceQuotaDefinitionEntity entity = ResourceUtils.getEntity(resource);
 
         return SpaceQuota.builder()
-            .id(Resources.getId(resource))
+            .id(ResourceUtils.getId(resource))
             .instanceMemoryLimit(entity.getInstanceMemoryLimit())
             .name(entity.getName())
             .organizationId(entity.getOrganizationId())

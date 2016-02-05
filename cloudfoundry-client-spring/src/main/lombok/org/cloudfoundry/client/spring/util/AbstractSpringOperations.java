@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.util;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -83,7 +84,7 @@ public abstract class AbstractSpringOperations {
 
     protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<SignalEmitter<T>, T> exchange) {
         return Stream
-            .from(Validators
+            .from(ValidationUtils
                 .validate(request)
                 .flatMap(new Function<V, Stream<T>>() {
 

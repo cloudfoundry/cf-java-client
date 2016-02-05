@@ -33,8 +33,8 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 @Configuration
 @EnableAutoConfiguration
@@ -90,7 +90,7 @@ public class IntegrationTestConfiguration {
     @Bean
     Predicate<DomainResource> domainsPredicate(@Value("${test.domain}") String domain) {
         return resource -> {
-            String name = Resources.getEntity(resource).getName();
+            String name = ResourceUtils.getEntity(resource).getName();
             return !name.endsWith(domain);
         };
     }
@@ -116,17 +116,17 @@ public class IntegrationTestConfiguration {
             .flatMap(function((systemOrganizationId2, systemSpaceIds2) -> {
 
                 Predicate<ApplicationResource> applicationPredicate = systemOrganizationId2
-                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds2.contains(Resources.getEntity(r).getSpaceId()))
+                    .map(id -> (Predicate<ApplicationResource>) r -> !systemSpaceIds2.contains(ResourceUtils.getEntity(r).getSpaceId()))
                     .orElse(r -> true);
 
                 Predicate<OrganizationResource> organizationPredicate = systemOrganizationId2
-                    .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id))
+                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id))
                     .orElse(r -> true);
 
                 Predicate<RouteResource> routePredicate = r -> true;
 
                 Predicate<SpaceResource> spacePredicate = systemOrganizationId2
-                    .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id))
+                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id))
                     .orElse(r -> true);
 
                 return CloudFoundryCleaner.clean(cloudFoundryClient, applicationPredicate, domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
@@ -136,7 +136,7 @@ public class IntegrationTestConfiguration {
                 .create(CreateOrganizationRequest.builder()
                     .name(organization)
                     .build()))
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnComplete(() -> this.logger.debug("<< ORGANIZATION >>"))
@@ -154,7 +154,7 @@ public class IntegrationTestConfiguration {
                     .name(space)
                     .organizationId(orgId)
                     .build()))
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> SPACE <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< SPACE >>"))
@@ -166,14 +166,14 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, @Value("${test.stack:cflinuxfs2}") String stack) throws InterruptedException {
-        Mono<String> stackId = Paginated
+        Mono<String> stackId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()
                     .name(stack)
                     .page(page)
                     .build()))
             .single()
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> STACK <<"))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< STACK >>"))
@@ -185,14 +185,14 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<Optional<String>> systemOrganizationId(CloudFoundryClient cloudFoundryClient) {
-        Mono<Optional<String>> systemOrganizationId = Paginated
+        Mono<Optional<String>> systemOrganizationId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.organizations()
                 .list(ListOrganizationsRequest.builder()
                     .name("system")
                     .page(page)
                     .build()))
             .singleOrEmpty()
-            .map(Resources::getId)
+            .map(ResourceUtils::getId)
             .map(Optional::of)
             .otherwiseIfEmpty(Mono.just(Optional.empty()))
             .doOnSubscribe(s -> this.logger.debug(">> SYSTEM ORGANIZATION <<"))
@@ -208,12 +208,12 @@ public class IntegrationTestConfiguration {
     Mono<List<String>> systemSpaceIds(CloudFoundryClient cloudFoundryClient, Mono<Optional<String>> systemOrganizationId) {
         Mono<List<String>> systemSpaceIds = systemOrganizationId
             .then(systemOrganizationId2 -> systemOrganizationId2
-                .map(id -> Paginated
+                .map(id -> PaginationUtils
                     .requestResources(page -> cloudFoundryClient.spaces()
                         .list(ListSpacesRequest.builder()
                             .organizationId(id)
                             .build()))
-                    .map(Resources::getId)
+                    .map(ResourceUtils::getId)
                     .toList())
                 .orElse(Mono.just(Collections.emptyList())));
 
@@ -223,13 +223,13 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, @Value("${test.username}") String user) {  // TODO: Create new user when APIs available
-        Mono<String> userId = Paginated
+        Mono<String> userId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.users()
                 .listUsers(ListUsersRequest.builder()
                     .page(page)
                     .build()))
-            .filter(resource -> user.equals(Resources.getEntity(resource).getUsername()))
-            .map(Resources::getId)
+            .filter(resource -> user.equals(ResourceUtils.getEntity(resource).getUsername()))
+            .map(ResourceUtils::getId)
             .single()
             .doOnSubscribe(s -> this.logger.debug(">> USER <<"))
             .doOnError(Throwable::printStackTrace)

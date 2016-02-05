@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.cloudfoundry.operations.ValidationResult;
+import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.operations.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
+import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateDomainRequestTest {
@@ -28,10 +28,10 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domain("test-domain")
-                .organization("test-organization")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .organization("test-organization")
+            .build()
+            .isValid();
 
         assertEquals(VALID, result.getStatus());
     }
@@ -39,9 +39,9 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValidNoDomain() {
         ValidationResult result = CreateDomainRequest.builder()
-                .organization("test-organization")
-                .build()
-                .isValid();
+            .organization("test-organization")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("domain must be specified", result.getMessages().get(0));
@@ -50,9 +50,9 @@ public final class CreateDomainRequestTest {
     @Test
     public void isValidNoOrganization() {
         ValidationResult result = CreateDomainRequest.builder()
-                .domain("test-domain")
-                .build()
-                .isValid();
+            .domain("test-domain")
+            .build()
+            .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("organization must be specified", result.getMessages().get(0));

@@ -42,15 +42,15 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.operations.RequestValidationException;
-import org.cloudfoundry.operations.util.Dates;
+import org.cloudfoundry.utils.DateUtils;
+import org.cloudfoundry.utils.RequestValidationException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.operations.util.v2.TestObjects.fill;
-import static org.cloudfoundry.operations.util.v2.TestObjects.fillPage;
+import static org.cloudfoundry.utils.test.TestObjects.fill;
+import static org.cloudfoundry.utils.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
@@ -267,12 +267,12 @@ public final class DefaultApplicationsTest {
                     .requestedState("requested-state")
                     .instances(9)
                     .url("route-host.routedomain")
-                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
                     .stack("test-stack")
                     .buildpack("buildpack")
                     .instanceDetail(ApplicationDetail.InstanceDetail.builder()
                         .state("instance-0-state")
-                        .since(Dates.parse("2014-06-19T01:18:37Z"))
+                        .since(DateUtils.parseFromIso8601("2014-06-19T01:18:37Z"))
                         .cpu(1.2)
                         .memoryUsage(1000000L)
                         .diskUsage(2000000L)
@@ -338,7 +338,7 @@ public final class DefaultApplicationsTest {
                     .requestedState("requested-state")
                     .instances(9)
                     .url("route-host.routedomain")
-                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
                     .stack("test-stack")
                     .buildpack("detected-buildpack")
                     .build());
@@ -417,7 +417,7 @@ public final class DefaultApplicationsTest {
                     .requestedState("requested-state")
                     .instances(9)
                     .url("route-host.routedomain")
-                    .lastUploaded(Dates.parse("2015-06-01T14:35:40Z"))
+                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
                     .stack("test-stack")
                     .build());
         }

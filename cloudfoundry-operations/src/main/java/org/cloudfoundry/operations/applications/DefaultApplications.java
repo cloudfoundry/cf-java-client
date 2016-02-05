@@ -39,14 +39,14 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
-import org.cloudfoundry.operations.util.Dates;
-import org.cloudfoundry.operations.util.Exceptions;
-import org.cloudfoundry.operations.util.Function2;
-import org.cloudfoundry.operations.util.Function4;
-import org.cloudfoundry.operations.util.Optional;
-import org.cloudfoundry.operations.util.Validators;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.DateUtils;
+import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.ValidationUtils;
+import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.utils.tuple.Function4;
+import org.cloudfoundry.utils.Optional;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 public final class DefaultApplications implements Applications {
 
@@ -83,7 +83,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .and(this.spaceId)
             .then(determineApplicationAndRoutesToDelete(this.cloudFoundryClient))
@@ -93,7 +93,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .and(this.spaceId)
             .then(requestApplicationResource(this.cloudFoundryClient))
@@ -112,7 +112,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
         return Mono
-            .when(Validators.validate(request), this.spaceId)
+            .when(ValidationUtils.validate(request), this.spaceId)
             .then(getApplicationResourceForRename(this.cloudFoundryClient))
             .then(renameApplication(this.cloudFoundryClient))
             .after();
@@ -121,7 +121,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> scale(final ScaleApplicationRequest request) {
         return Mono
-            .when(Validators.validate(request), this.spaceId)
+            .when(ValidationUtils.validate(request), this.spaceId)
             .then(function(new Function2<ScaleApplicationRequest, String, Mono<Tuple2<ScaleApplicationRequest, AbstractApplicationResource>>>() {
 
                 @Override
@@ -148,7 +148,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> start(StartApplicationRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .map(new Function<StartApplicationRequest, String>() {
 
@@ -166,7 +166,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> stop(StopApplicationRequest request) {
-        return Validators
+        return ValidationUtils
             .validate(request)
             .map(new Function<StopApplicationRequest, String>() {
 
@@ -187,7 +187,7 @@ public final class DefaultApplications implements Applications {
 
             @Override
             public boolean test(AbstractApplicationResource resource) {
-                return !state.equals(Resources.getEntity(resource).getState());
+                return !state.equals(ResourceUtils.getEntity(resource).getState());
             }
 
         };
@@ -205,7 +205,7 @@ public final class DefaultApplications implements Applications {
                             Mono.just(request),
 
                             scaleApplication(cloudFoundryClient,
-                                Resources.getId(applicationResource),
+                                ResourceUtils.getId(applicationResource),
                                 request.getDiskLimit(),
                                 request.getInstances(),
                                 request.getMemoryLimit())
@@ -277,11 +277,11 @@ public final class DefaultApplications implements Applications {
                 String applicationName = deleteApplicationRequest.getName();
                 boolean deleteRoutes = deleteApplicationRequest.getDeleteRoutes();
 
-                return Paginated
+                return PaginationUtils
                     .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, applicationName))
-                    .map(Resources.extractId())
+                    .map(ResourceUtils.extractId())
                     .single()
-                    .otherwise(Exceptions.<String>convert("Application %s does not exist", applicationName))
+                    .otherwise(ExceptionUtils.<String>convert("Application %s does not exist", applicationName))
                     .then(determineRoutesToDelete(cloudFoundryClient, deleteRoutes));
             }
 
@@ -318,8 +318,8 @@ public final class DefaultApplications implements Applications {
 
             @Override
             public Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> apply(AbstractApplicationResource applicationResource) {
-                String applicationId = Resources.getId(applicationResource);
-                String stackId = Resources.getEntity(applicationResource).getStackId();
+                String applicationId = ResourceUtils.getId(applicationResource);
+                String stackId = ResourceUtils.getEntity(applicationResource).getStackId();
 
                 return Mono.when(requestApplicationStats(cloudFoundryClient, applicationId), requestApplicationSummary(cloudFoundryClient, applicationId), requestStack(cloudFoundryClient, stackId),
                     requestApplicationInstances(cloudFoundryClient, applicationId));
@@ -349,7 +349,7 @@ public final class DefaultApplications implements Applications {
             @Override
             public Mono<String> apply(String applicationName, String spaceId) {
 
-                return Paginated
+                return PaginationUtils
                     .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, applicationName))
                     .single()
                     .map(new Function<ApplicationResource, AbstractApplicationResource>() {
@@ -358,9 +358,9 @@ public final class DefaultApplications implements Applications {
                             return x;
                         }
                     })
-                    .otherwise(Exceptions.<AbstractApplicationResource>convert("Application %s does not exist", applicationName))
+                    .otherwise(ExceptionUtils.<AbstractApplicationResource>convert("Application %s does not exist", applicationName))
                     .where(predicate)
-                    .map(Resources.extractId());
+                    .map(ResourceUtils.extractId());
             }
 
         });
@@ -373,7 +373,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<AbstractApplicationResource> getSpaceApplication(final CloudFoundryClient cloudFoundryClient, final String spaceId, final String name) {
-        return Paginated
+        return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListSpaceApplicationsResponse>>() {
                 @Override
                 public Mono<ListSpaceApplicationsResponse> apply(Integer page) {
@@ -393,7 +393,7 @@ public final class DefaultApplications implements Applications {
                     return x;
                 }
             })
-            .otherwise(Exceptions.<AbstractApplicationResource>convert("Application %s does not exist", name));
+            .otherwise(ExceptionUtils.<AbstractApplicationResource>convert("Application %s does not exist", name));
     }
 
     private static Function<Tuple2<RenameApplicationRequest, AbstractApplicationResource>, Mono<ApplicationEntity>> renameApplication(final CloudFoundryClient cloudFoundryClient) {
@@ -401,7 +401,7 @@ public final class DefaultApplications implements Applications {
 
             @Override
             public Mono<ApplicationEntity> apply(RenameApplicationRequest request, AbstractApplicationResource applicationResource) {
-                return renameApplication(cloudFoundryClient, Resources.getId(applicationResource), request.getNewName());
+                return renameApplication(cloudFoundryClient, ResourceUtils.getId(applicationResource), request.getNewName());
             }
         });
     }
@@ -416,7 +416,7 @@ public final class DefaultApplications implements Applications {
             .map(new Function<UpdateApplicationResponse, ApplicationEntity>() {
                 @Override
                 public ApplicationEntity apply(UpdateApplicationResponse resource) {
-                    return Resources.getEntity(resource);
+                    return ResourceUtils.getEntity(resource);
                 }
             });
     }
@@ -434,7 +434,7 @@ public final class DefaultApplications implements Applications {
 
             @Override
             public Mono<AbstractApplicationResource> apply(GetApplicationRequest getApplicationRequest, String spaceId) {
-                return Paginated
+                return PaginationUtils
                     .requestResources(requestListApplicationsPage(cloudFoundryClient, spaceId, getApplicationRequest.getName()))
                     .single()
                     .map(new Function<ApplicationResource, AbstractApplicationResource>() {
@@ -521,11 +521,11 @@ public final class DefaultApplications implements Applications {
     private static Mono<AbstractApplicationResource> restartApplicationIfNecessary(final CloudFoundryClient cloudFoundryClient, final ScaleApplicationRequest request, AbstractApplicationResource
         applicationResource) {
         if (scaleRestartRequired(request, applicationResource)) {
-            return stopApplication(cloudFoundryClient).apply(Resources.getId(applicationResource))
+            return stopApplication(cloudFoundryClient).apply(ResourceUtils.getId(applicationResource))
                 .then(new Function<AbstractApplicationResource, Mono<? extends AbstractApplicationResource>>() {
                     @Override
                     public Mono<? extends AbstractApplicationResource> apply(AbstractApplicationResource applicationResource) {
-                        return startApplication(cloudFoundryClient).apply(Resources.getId(applicationResource));
+                        return startApplication(cloudFoundryClient).apply(ResourceUtils.getId(applicationResource));
                     }
                 });
         } else {
@@ -558,7 +558,7 @@ public final class DefaultApplications implements Applications {
 
     private static boolean scaleRestartRequired(ScaleApplicationRequest request, AbstractApplicationResource applicationResource) {
         return (request.getDiskLimit() != null || request.getMemoryLimit() != null)
-            && STARTED_STATE.equals(Resources.getEntity(applicationResource).getState());
+            && STARTED_STATE.equals(ResourceUtils.getEntity(applicationResource).getState());
     }
 
     private static Function<String, Mono<AbstractApplicationResource>> startApplication(final CloudFoundryClient cloudFoundryClient) {
@@ -653,7 +653,7 @@ public final class DefaultApplications implements Applications {
             return null;
         }
 
-        return Dates.parse(date);
+        return DateUtils.parseFromIso8601(date);
     }
 
     private static Date toDate(Double date) {

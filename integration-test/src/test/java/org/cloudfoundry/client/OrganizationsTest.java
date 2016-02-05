@@ -58,8 +58,8 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -67,7 +67,7 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
@@ -83,7 +83,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .auditorId(userId)
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -97,7 +97,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .username(this.userName)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -112,7 +112,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .billingManagerId(userId)
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -126,7 +126,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .username(this.userName)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -141,7 +141,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .managerId(userId)
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -155,7 +155,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .username(this.userName)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -171,7 +171,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .privateDomainId(privateDomainId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -186,7 +186,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -200,7 +200,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .username(this.userName)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -212,7 +212,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .create(CreateOrganizationRequest.builder()
                 .name("test-organization")
                 .build())
-            .map(Resources::getEntity)
+            .map(ResourceUtils::getEntity)
             .subscribe(this.<OrganizationEntity>testSubscriber()
                 .assertThat(entity -> assertEquals("test-organization", entity.getName())));
     }
@@ -223,7 +223,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .create(CreateOrganizationRequest.builder()
                 .name("test-organization")
                 .build())
-            .map(Resources::getId);
+            .map(ResourceUtils::getId);
     }
 
     @Test
@@ -243,7 +243,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .get(GetOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .build())
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -276,7 +276,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void getUserRoles() {
         this.organizationId
-            .flatMap(organizationId -> Paginated
+            .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .getUserRoles(GetOrganizationUserRolesRequest.builder()
                         .organizationId(organizationId)
@@ -289,12 +289,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         this.organizationId
-            .flatMap(organizationId -> Paginated
+            .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .list(ListOrganizationsRequest.builder()
                         .page(page)
                         .build()))
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .filter(id -> id.equals(organizationId)))
             .subscribe(this.testSubscriber()
                 .assertCount(1));
@@ -305,14 +305,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         Mono
             .when(this.organizationId, this.userId)
             .then(function((organizationId, userId) -> associateAuditor(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> Paginated
+            .then(function((organizationId, userId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listAuditors(ListOrganizationAuditorsRequest.builder()
                         .page(page)
                         .organizationId(organizationId)
                         .build()))
                 .single()
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(userId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -323,14 +323,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         Mono
             .when(this.organizationId, this.userId)
             .then(function((organizationId, userId) -> associateBillingManager(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> Paginated
+            .then(function((organizationId, userId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
                         .page(page)
                         .organizationId(organizationId)
                         .build()))
                 .single()
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(userId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -341,14 +341,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         Mono
             .when(this.organizationId, this.userId)
             .then(function((organizationId, userId) -> associateManager(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> Paginated
+            .then(function((organizationId, userId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listManagers(ListOrganizationManagersRequest.builder()
                         .page(page)
                         .organizationId(organizationId)
                         .build()))
                 .single()
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(userId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -359,14 +359,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         Mono
             .when(super.organizationId, this.organizationId)
             .then(function((defaultOrganizationId, organizationId) -> associatePrivateDomain(this.cloudFoundryClient, defaultOrganizationId, organizationId)))
-            .then(function((organizationId, privateDomainId) -> Paginated
+            .then(function((organizationId, privateDomainId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
                         .page(page)
                         .organizationId(organizationId)
                         .build()))
                 .single()
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(privateDomainId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -376,7 +376,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void listServices() {
         this.organizationId
-            .flatMap(organizationId -> Paginated
+            .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listServices(ListOrganizationServicesRequest.builder()
                         .organizationId(organizationId)
@@ -389,7 +389,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void listSpaceQuotaDefinitions() {
         this.organizationId
-            .flatMap(organizationId -> Paginated
+            .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                         .organizationId(organizationId)
@@ -408,7 +408,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .build())
                 .map(r -> organizationId))
-            .flatMap(organizationId -> Paginated
+            .flatMap(organizationId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listSpaces(ListOrganizationSpacesRequest.builder()
                         .organizationId(organizationId)
@@ -423,14 +423,14 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         Mono
             .when(this.organizationId, this.userId)
             .then(function((organizationId, userId) -> associateUser(this.cloudFoundryClient, organizationId, userId)))
-            .then(function((organizationId, userId) -> Paginated
+            .then(function((organizationId, userId) -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.organizations()
                     .listUsers(ListOrganizationUsersRequest.builder()
                         .page(page)
                         .organizationId(organizationId)
                         .build()))
                 .single()
-                .map(Resources::getId)
+                .map(ResourceUtils::getId)
                 .and(Mono.just(userId))))
             .subscribe(this.<Tuple2<String, String>>testSubscriber()
                 .assertThat(this::assertTupleEquality));
@@ -573,7 +573,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .name("new-test-organization")
                     .build())
-                .map(Resources::getEntity)
+                .map(ResourceUtils::getEntity)
                 .map(OrganizationEntity::getName))
             .subscribe(this.testSubscriber()
                 .assertEquals("new-test-organization"));
@@ -632,7 +632,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .owningOrganizationId(organizationId)
                 .wildcard(false)
                 .build())
-            .map(Resources::getId);
+            .map(ResourceUtils::getId);
     }
 
 }

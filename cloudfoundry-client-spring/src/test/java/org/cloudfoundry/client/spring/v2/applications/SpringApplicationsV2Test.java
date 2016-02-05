@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.spring.v2.applications;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.spring.util.StringMap;
+import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;

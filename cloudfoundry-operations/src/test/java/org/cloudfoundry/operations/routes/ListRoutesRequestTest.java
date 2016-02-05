@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.cloudfoundry.operations.ValidationResult;
+import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.operations.ValidationResult.Status.VALID;
+import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class ListRoutesRequestTest {

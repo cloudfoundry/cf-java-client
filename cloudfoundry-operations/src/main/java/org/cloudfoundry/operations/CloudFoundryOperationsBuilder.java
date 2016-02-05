@@ -22,9 +22,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.operations.util.Exceptions;
-import org.cloudfoundry.operations.util.v2.Paginated;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.PaginationUtils;
+import org.cloudfoundry.utils.ResourceUtils;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.rx.Promise;
@@ -99,11 +99,11 @@ public final class CloudFoundryOperationsBuilder {
         }
 
         Mono<String> organizationId = Promise
-                .from(Paginated
+                .from(PaginationUtils
                         .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
                         .single()
-                        .map(Resources.extractId())
-                        .otherwise(Exceptions.<String>convert("Organization %s does not exist", organization)));
+                        .map(ResourceUtils.extractId())
+                        .otherwise(ExceptionUtils.<String>convert("Organization %s does not exist", organization)));
 
         organizationId.get();
         return organizationId;
@@ -119,8 +119,8 @@ public final class CloudFoundryOperationsBuilder {
                         .from(organizationId
                                 .flatMap(requestResources(cloudFoundryClient, space)))
                         .single()                                                            // TODO: Flux.single() Flux.singleOrEmpty()
-                        .map(Resources.extractId())
-                        .otherwise(Exceptions.<String>convert("Space %s does not exist", space)));
+                        .map(ResourceUtils.extractId())
+                        .otherwise(ExceptionUtils.<String>convert("Space %s does not exist", space)));
 
         spaceId.get();
         return spaceId;
@@ -146,7 +146,7 @@ public final class CloudFoundryOperationsBuilder {
 
             @Override
             public Stream<SpaceResource> apply(String organizationId) {
-                return Paginated.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
+                return PaginationUtils.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
             }
 
         };

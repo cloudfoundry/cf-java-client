@@ -23,7 +23,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.util.v2.Resources;
+import org.cloudfoundry.utils.ResourceUtils;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.cloudfoundry.operations.util.Tuples.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -102,17 +102,17 @@ public abstract class AbstractIntegrationTest {
             .when(this.systemOrganizationId, this.systemSpaceIds, this.organizationId, this.spaceId)
             .flatMap(function((systemOrganizationId, systemSpaceIds, organizationId, spaceId) -> {
 
-                Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(Resources.getEntity(r).getSpaceId());
+                Predicate<ApplicationResource> applicationPredicate = r -> !systemSpaceIds.contains(ResourceUtils.getEntity(r).getSpaceId());
 
                 Predicate<OrganizationResource> organizationPredicate = systemOrganizationId
-                    .map(id -> (Predicate<OrganizationResource>) r -> !Resources.getId(r).equals(id) && !organizationId.equals(Resources.getId(r)))
-                    .orElse(r -> !organizationId.equals(Resources.getId(r)));
+                    .map(id -> (Predicate<OrganizationResource>) r -> !ResourceUtils.getId(r).equals(id) && !organizationId.equals(ResourceUtils.getId(r)))
+                    .orElse(r -> !organizationId.equals(ResourceUtils.getId(r)));
 
                 Predicate<RouteResource> routePredicate = r -> true;
 
                 Predicate<SpaceResource> spacePredicate = systemOrganizationId
-                    .map(id -> (Predicate<SpaceResource>) r -> !Resources.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(Resources.getId(r)))
-                    .orElse(r -> !spaceId.equals(Resources.getId(r)));
+                    .map(id -> (Predicate<SpaceResource>) r -> !ResourceUtils.getEntity(r).getOrganizationId().equals(id) && !spaceId.equals(ResourceUtils.getId(r)))
+                    .orElse(r -> !spaceId.equals(ResourceUtils.getId(r)));
 
                 return CloudFoundryCleaner.clean(this.cloudFoundryClient, applicationPredicate, this.domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
             }))
