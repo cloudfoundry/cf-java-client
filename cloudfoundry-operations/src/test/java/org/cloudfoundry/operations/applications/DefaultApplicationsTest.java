@@ -965,6 +965,7 @@ public final class DefaultApplicationsTest {
         protected Publisher<Void> invoke() {
             ScaleApplicationRequest request = ScaleApplicationRequest.builder()
                 .name("test-app-name")
+                .instances(2)
                 .build();
 
             return this.applications.scale(request);
