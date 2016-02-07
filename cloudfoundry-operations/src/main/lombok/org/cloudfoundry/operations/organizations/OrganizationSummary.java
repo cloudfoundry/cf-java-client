@@ -23,7 +23,7 @@ import lombok.Data;
  * A Cloud Foundry Organization
  */
 @Data
-public final class Organization {
+public final class OrganizationSummary {
 
     /**
      * The id
@@ -42,7 +42,7 @@ public final class Organization {
     private final String name;
 
     @Builder
-    private Organization(String id, String name) {
+    private OrganizationSummary(String id, String name) {
         this.id = id;
         this.name = name;
     }

@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitio
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
+import org.cloudfoundry.utils.ExceptionUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.cloudfoundry.utils.ValidationUtils;
@@ -41,6 +42,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
+import reactor.fn.tuple.Tuple4;
 import reactor.rx.Stream;
 
 import java.util.List;
@@ -56,98 +58,64 @@ public final class DefaultOrganizations implements Organizations {
     }
 
     @Override
-    public Mono<OrganizationInfo> info(OrganizationInfoRequest organizationInfoRequest) {
+    public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
+
         return ValidationUtils
-            .validate(organizationInfoRequest)
+            .validate(request)
             .then(new Function<OrganizationInfoRequest, Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>>>() {
 
                 @Override
-                public Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>> apply(final OrganizationInfoRequest organizationInfoRequest) {
-                    return addOrganizationResource(DefaultOrganizations.this.cloudFoundryClient, organizationInfoRequest);
+                public Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>> apply(OrganizationInfoRequest request) {
+                    return getOrganization(DefaultOrganizations.this.cloudFoundryClient, request.getName())
+                        .and(Mono.just(request));
                 }
 
             })
-            .then(getAuxiliaryContent(this.cloudFoundryClient));
+            .then(function(new Function2<OrganizationResource, OrganizationInfoRequest, Mono<OrganizationDetail>>() {
+
+                @Override
+                public Mono<OrganizationDetail> apply(final OrganizationResource organizationResource, final OrganizationInfoRequest organizationInfoRequest) {
+                    return getAuxiliaryContent(DefaultOrganizations.this.cloudFoundryClient, organizationResource)
+                        .map(function(new Function4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>, OrganizationDetail>() {
+
+                            @Override
+                            public OrganizationDetail apply(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces) {
+                                return toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, organizationInfoRequest);
+                            }
+
+                        }));
+                }
+            }));
     }
 
     @Override
-    public Publisher<Organization> list() {
+    public Publisher<OrganizationSummary> list() {
         return requestOrganizations(this.cloudFoundryClient)
-            .map(new Function<OrganizationResource, Organization>() {
+            .map(new Function<OrganizationResource, OrganizationSummary>() {
 
                 @Override
-                public Organization apply(OrganizationResource resource) {
-                    return toOrganization(resource);
+                public OrganizationSummary apply(OrganizationResource resource) {
+                    return toOrganizationSummary(resource);
                 }
 
             });
     }
 
-    private static Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>> addOrganizationResource(final CloudFoundryClient cloudFoundryClient,
-                                                                                                       final OrganizationInfoRequest organizationInfoRequest) {
-        return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
+    private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {
+        String organizationId = ResourceUtils.getId(organizationResource);
 
-                @Override
-                public Mono<ListOrganizationsResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations()
-                        .list(ListOrganizationsRequest.builder()
-                            .name(organizationInfoRequest.getName())
-                            .page(page)
-                            .build());
-                }
-
-            })
-            .single()
-            .and(Mono.just(organizationInfoRequest));
+        return Mono
+            .when(
+                getDomainNames(cloudFoundryClient, organizationId),
+                getOrganizationQuota(cloudFoundryClient, organizationResource),
+                getSpaceQuotas(cloudFoundryClient, organizationId),
+                getSpaceNames(cloudFoundryClient, organizationId)
+            );
     }
 
-    private static Function<Tuple2<OrganizationResource, OrganizationInfoRequest>, Mono<OrganizationInfo>> getAuxiliaryContent(final CloudFoundryClient cloudFoundryClient) {
-        return function(new Function2<OrganizationResource, OrganizationInfoRequest, Mono<OrganizationInfo>>() {
-
-            @Override
-            public Mono<OrganizationInfo> apply(final OrganizationResource organizationResource, final OrganizationInfoRequest organizationInfoRequest) {
-                return Mono
-                    .when(
-                        getDomainNames(cloudFoundryClient, organizationResource),
-                        getOrganizationQuota(cloudFoundryClient, organizationResource),
-                        getSpaceQuotas(cloudFoundryClient, organizationResource),
-                        getSpaces(cloudFoundryClient, organizationResource)
-                    )
-                    .map(function(new Function4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>, OrganizationInfo>() {
-
-                        @Override
-                        public OrganizationInfo apply(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces) {
-                            return OrganizationInfo.builder()
-                                .domains(domains)
-                                .id(ResourceUtils.getId(organizationResource))
-                                .name(organizationInfoRequest.getName())
-                                .quota(organizationQuota)
-                                .spacesQuotas(spacesQuotas)
-                                .spaces(spaces)
-                                .build();
-                        }
-
-                    }));
-            }
-        });
-
-    }
-
-    private static Mono<List<String>> getDomainNames(final CloudFoundryClient cloudFoundryClient, final OrganizationResource organizationResource) {
-        return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationDomainsResponse>>() {
-
-                @Override
-                public Mono<ListOrganizationDomainsResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations()
-                        .listDomains(ListOrganizationDomainsRequest.builder()
-                            .page(page)
-                            .organizationId(ResourceUtils.getId(organizationResource))
-                            .build());
-                }
-
-            }).map(new Function<DomainResource, String>() {
+    private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestDomains(cloudFoundryClient, organizationId)
+            .map(new Function<DomainResource, String>() {
 
                 @Override
                 public String apply(DomainResource resource) {
@@ -158,78 +126,22 @@ public final class DefaultOrganizations implements Organizations {
             .toList();
     }
 
-    private static Mono<OrganizationQuota> getOrganizationQuota(final CloudFoundryClient cloudFoundryClient, final OrganizationResource organizationResource) {
-        return cloudFoundryClient.organizationQuotaDefinitions()
-            .get(GetOrganizationQuotaDefinitionRequest.builder()
-                .quotaDefinitionId(ResourceUtils.getEntity(organizationResource).getQuotaDefinitionId())
-                .build())
+    private static Mono<OrganizationQuota> getOrganizationQuota(final CloudFoundryClient cloudFoundryClient, final OrganizationResource resource) {
+        return requestOrganizationQuotaDefinition(cloudFoundryClient, ResourceUtils.getEntity(resource).getQuotaDefinitionId())
             .map(new Function<GetOrganizationQuotaDefinitionResponse, OrganizationQuota>() {
 
                 @Override
                 public OrganizationQuota apply(GetOrganizationQuotaDefinitionResponse response) {
-                    return OrganizationQuota.builder()
-                        .organizationId(ResourceUtils.getId(organizationResource))
-                        .name(ResourceUtils.getEntity(response).getName())
-                        .totalMemoryLimit(ResourceUtils.getEntity(response).getMemoryLimit())
-                        .instanceMemoryLimit(ResourceUtils.getEntity(response).getInstanceMemoryLimit())
-                        .totalRoutes(ResourceUtils.getEntity(response).getTotalRoutes())
-                        .totalServiceInstances(ResourceUtils.getEntity(response).getTotalServices())
-                        .paidServicePlans(ResourceUtils.getEntity(response).getNonBasicServicesAllowed())
-                        .build();
+                    return toOrganizationQuota(response, resource);
                 }
 
             });
 
     }
 
-    private static Mono<List<SpaceQuota>> getSpaceQuotas(final CloudFoundryClient cloudFoundryClient, final OrganizationResource organizationResource) {
-        return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
-
-                @Override
-                public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations()
-                        .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-                            .page(page)
-                            .organizationId(ResourceUtils.getId(organizationResource))
-                            .build()
-                        );
-                }
-
-            }).map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
-
-                @Override
-                public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
-                    return SpaceQuota.builder()
-                        .organizationId(ResourceUtils.getEntity(resource).getOrganizationId())
-                        .name(ResourceUtils.getEntity(resource).getName())
-                        .totalMemoryLimit(ResourceUtils.getEntity(resource).getMemoryLimit())
-                        .instanceMemoryLimit(ResourceUtils.getEntity(resource).getInstanceMemoryLimit())
-                        .totalRoutes(ResourceUtils.getEntity(resource).getTotalRoutes())
-                        .totalServiceInstances(ResourceUtils.getEntity(resource).getTotalServices())
-                        .paidServicePlans(ResourceUtils.getEntity(resource).getNonBasicServicesAllowed())
-                        .build();
-                }
-
-            })
-            .toList();
-    }
-
-    private static Mono<List<String>> getSpaces(final CloudFoundryClient cloudFoundryClient, final OrganizationResource organizationResource) {
-        return PaginationUtils
-            .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
-
-                @Override
-                public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
-                    return cloudFoundryClient.organizations()
-                        .listSpaces(ListOrganizationSpacesRequest.builder()
-                            .page(page)
-                            .organizationId(ResourceUtils.getId(organizationResource))
-                            .build()
-                        );
-                }
-
-            }).map(new Function<SpaceResource, String>() {
+    private static Mono<List<String>> getSpaceNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestSpaces(cloudFoundryClient, organizationId)
+            .map(new Function<SpaceResource, String>() {
 
                 @Override
                 public String apply(SpaceResource resource) {
@@ -238,6 +150,58 @@ public final class DefaultOrganizations implements Organizations {
 
             })
             .toList();
+    }
+
+    private static Mono<List<SpaceQuota>> getSpaceQuotas(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
+            .map(new Function<SpaceQuotaDefinitionResource, SpaceQuota>() {
+
+                @Override
+                public SpaceQuota apply(SpaceQuotaDefinitionResource resource) {
+                    return toSpaceQuota(resource);
+                }
+
+            })
+            .toList();
+    }
+
+    private static Stream<DomainResource> requestDomains(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationDomainsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationDomainsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .listDomains(ListOrganizationDomainsRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build());
+                }
+
+            });
+    }
+
+    private static Mono<GetOrganizationQuotaDefinitionResponse> requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .get(GetOrganizationQuotaDefinitionRequest.builder()
+                .quotaDefinitionId(quotaDefinitionId)
+                .build());
+    }
+
+    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organizationName) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .list(ListOrganizationsRequest.builder()
+                            .name(organizationName)
+                            .page(page)
+                            .build());
+                }
+
+            });
     }
 
     private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient) {
@@ -255,10 +219,89 @@ public final class DefaultOrganizations implements Organizations {
             });
     }
 
-    private static Organization toOrganization(OrganizationResource resource) {
-        return Organization.builder()
+    private static Stream<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationSpaceQuotaDefinitionsResponse> apply(Integer page) {
+
+                    return cloudFoundryClient.organizations()
+                        .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()
+                        );
+                }
+
+            });
+    }
+
+    private static Stream<SpaceResource> requestSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
+
+                @Override
+                public Mono<ListOrganizationSpacesResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .listSpaces(ListOrganizationSpacesRequest.builder()
+                            .page(page)
+                            .organizationId(organizationId)
+                            .build()
+                        );
+                }
+
+            });
+    }
+
+    private static OrganizationQuota toOrganizationQuota(GetOrganizationQuotaDefinitionResponse response, OrganizationResource resource) {
+        return OrganizationQuota.builder()
+            .id(ResourceUtils.getId(response))
+            .organizationId(ResourceUtils.getId(resource))
+            .name(ResourceUtils.getEntity(response).getName())
+            .totalMemoryLimit(ResourceUtils.getEntity(response).getMemoryLimit())
+            .instanceMemoryLimit(ResourceUtils.getEntity(response).getInstanceMemoryLimit())
+            .totalRoutes(ResourceUtils.getEntity(response).getTotalRoutes())
+            .totalServiceInstances(ResourceUtils.getEntity(response).getTotalServices())
+            .paidServicePlans(ResourceUtils.getEntity(response).getNonBasicServicesAllowed())
+            .build();
+    }
+
+    private static OrganizationSummary toOrganizationSummary(OrganizationResource resource) {
+        return OrganizationSummary.builder()
             .id(ResourceUtils.getId(resource))
             .name(ResourceUtils.getEntity(resource).getName())
+            .build();
+    }
+
+    private static SpaceQuota toSpaceQuota(SpaceQuotaDefinitionResource resource) {
+        return SpaceQuota.builder()
+            .id(ResourceUtils.getId(resource))
+            .organizationId(ResourceUtils.getEntity(resource).getOrganizationId())
+            .name(ResourceUtils.getEntity(resource).getName())
+            .totalMemoryLimit(ResourceUtils.getEntity(resource).getMemoryLimit())
+            .instanceMemoryLimit(ResourceUtils.getEntity(resource).getInstanceMemoryLimit())
+            .totalRoutes(ResourceUtils.getEntity(resource).getTotalRoutes())
+            .totalServiceInstances(ResourceUtils.getEntity(resource).getTotalServices())
+            .paidServicePlans(ResourceUtils.getEntity(resource).getNonBasicServicesAllowed())
+            .build();
+    }
+
+    private Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
+        return requestOrganizations(cloudFoundryClient, organization)
+            .single()
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organizations %s does not exist", organization));
+    }
+
+    private OrganizationDetail toOrganizationDetail(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces,
+                                                    OrganizationResource organizationResource, OrganizationInfoRequest organizationInfoRequest) {
+        return OrganizationDetail.builder()
+            .domains(domains)
+            .id(ResourceUtils.getId(organizationResource))
+            .name(organizationInfoRequest.getName())
+            .quota(organizationQuota)
+            .spacesQuotas(spacesQuotas)
+            .spaces(spaces)
             .build();
     }
 

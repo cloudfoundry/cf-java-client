@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
@@ -46,150 +46,139 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationsTest {
 
-    public static final class Info extends AbstractOperationsApiTest<OrganizationInfo> {
+    private static void requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listDomains(fillPage(ListOrganizationDomainsRequest.builder())
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationDomainsResponse.builder())
+                    .resource(fill(DomainResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
+        when(cloudFoundryClient.organizationQuotaDefinitions()
+            .get(GetOrganizationQuotaDefinitionRequest.builder()
+                .quotaDefinitionId(quotaDefinitionId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetOrganizationQuotaDefinitionResponse.builder())
+                    .entity(fill(OrganizationQuotaDefinitionEntity.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder())
+                .name(organizationName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .entity(fill(OrganizationEntity.builder(), "organization-entity-")
+                            .build())
+                        .build())
+                    .build()));
+
+    }
+
+    private static void requestOrganizations(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.organizations()
+            .list(fillPage(ListOrganizationsRequest.builder())
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                    .resource(fill(SpaceQuotaDefinitionResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                    .resource(fill(SpaceResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    public static final class Info extends AbstractOperationsApiTest<OrganizationDetail> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
-            when(cloudFoundryClient.organizations()
-                .list(fillPage(ListOrganizationsRequest.builder())
-                    .name("test-organization-name")
-                    .page(1)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationsResponse.builder())
-                        .resource(fill(OrganizationResource.builder())
-                            .entity(OrganizationEntity.builder()
-                                .quotaDefinitionId("test-quota-definition-id")
-                                .build())
-                            .metadata(Resource.Metadata.builder()
-                                .id("test-organization-id")
-                                .build())
-                            .build())
-                        .totalPages(1)
-                        .build()));
-
-            when(cloudFoundryClient.organizations()
-                .listDomains(fillPage(ListOrganizationDomainsRequest.builder())
-                    .organizationId("test-organization-id")
-                    .page(1)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationDomainsResponse.builder())
-                        .resource(fill(DomainResource.builder()).build())
-                        .totalPages(1)
-                        .build()));
-
-            when(cloudFoundryClient.organizationQuotaDefinitions()
-                .get(GetOrganizationQuotaDefinitionRequest.builder()
-                    .quotaDefinitionId("test-quota-definition-id")
-                    .build()))
-                .thenReturn(Mono
-                    .just(GetOrganizationQuotaDefinitionResponse.builder()
-                        .entity(fill(OrganizationQuotaDefinitionEntity.builder())
-                            .build())
-                        .build()));
-
-            when(cloudFoundryClient.organizations()
-                .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                    .organizationId("test-organization-id")
-                    .page(1)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
-                        .resource(fill(SpaceQuotaDefinitionResource.builder()).build())
-                        .totalPages(1)
-                        .build()));
-
-            when(cloudFoundryClient.organizations()
-                .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
-                    .organizationId("test-organization-id")
-                    .page(1)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationSpacesResponse.builder())
-                        .resource(fill(SpaceResource.builder()).build())
-                        .totalPages(1)
-                        .build()));
+            requestOrganizations(this.cloudFoundryClient, "test-organization-name");
+            requestDomains(this.cloudFoundryClient, "test-organization-id");
+            requestOrganizationQuotaDefinition(this.cloudFoundryClient, "test-organization-entity-quotaDefinitionId");
+            requestSpaceQuotaDefinitions(this.cloudFoundryClient, "test-organization-id");
+            requestSpaces(this.cloudFoundryClient, "test-organization-id");
         }
 
         @Override
-        protected void assertions(TestSubscriber<OrganizationInfo> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<OrganizationDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(OrganizationInfo.builder()
+                .assertEquals(fill(OrganizationDetail.builder())
                     .domain("test-name")
                     .id("test-organization-id")
                     .name("test-organization-name")
-                    .quota(OrganizationQuota.builder()
-                        .instanceMemoryLimit(1)
-                        .name("test-name")
+                    .quota(fill(OrganizationQuota.builder())
                         .organizationId("test-organization-id")
-                        .paidServicePlans(true)
-                        .totalMemoryLimit(1)
-                        .totalRoutes(1)
-                        .totalServiceInstances(1)
-                        .build())
-                    .spacesQuota(SpaceQuota.builder()
-                        .instanceMemoryLimit(1)
-                        .name("test-name")
-                        .organizationId("test-organizationId")
-                        .paidServicePlans(true)
-                        .totalMemoryLimit(1)
-                        .totalRoutes(1)
-                        .totalServiceInstances(1)
                         .build())
                     .space("test-name")
+                    .spacesQuota(fill(SpaceQuota.builder())
+                        .build())
                     .build());
         }
 
         @Override
-        protected Publisher<OrganizationInfo> invoke() {
-            OrganizationInfoRequest request = OrganizationInfoRequest.builder()
-                .name("test-organization-name")
-                .build();
-            return this.organizations.info(request);
+        protected Publisher<OrganizationDetail> invoke() {
+            return this.organizations
+                .get(OrganizationInfoRequest.builder()
+                    .name("test-organization-name")
+                    .build());
         }
 
     }
 
-    public static final class List extends AbstractOperationsApiTest<Organization> {
+    public static final class List extends AbstractOperationsApiTest<OrganizationSummary> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
 
         @Before
         public void setUp() throws Exception {
-            when(cloudFoundryClient.organizations()
-                .list(fillPage(ListOrganizationsRequest.builder())
-                    .page(1)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationsResponse.builder())
-                        .resource(fill(OrganizationResource.builder(), "organization1-").build())
-                        .totalPages(2)
-                        .build()));
-
-            when(cloudFoundryClient.organizations()
-                .list(fillPage(ListOrganizationsRequest.builder())
-                    .page(2)
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationsResponse.builder())
-                        .resource(fill(OrganizationResource.builder(), "organization2-").build())
-                        .totalPages(2)
-                        .build()));
+            requestOrganizations(this.cloudFoundryClient);
         }
 
         @Override
-        protected void assertions(TestSubscriber<Organization> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<OrganizationSummary> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(fill(Organization.builder(), "organization1-").build())
-                .assertEquals(fill(Organization.builder(), "organization2-").build());
+                .assertEquals(fill(OrganizationSummary.builder(), "organization-")
+                    .build());
         }
 
         @Override
-        protected Publisher<Organization> invoke() {
-            return this.organizations.list();
+        protected Publisher<OrganizationSummary> invoke() {
+            return this.organizations
+                .list();
         }
 
     }

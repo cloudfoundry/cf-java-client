@@ -29,13 +29,13 @@ public interface Organizations {
      *
      * @return the organizations
      */
-    Publisher<Organization> list();
+    Publisher<OrganizationSummary> list();
 
     /**
      * Get an Organizations Information
      *
      * @return the organizations info
      */
-    Mono<OrganizationInfo> info(OrganizationInfoRequest request);
+    Mono<OrganizationDetail> get(OrganizationInfoRequest request);
 
 }

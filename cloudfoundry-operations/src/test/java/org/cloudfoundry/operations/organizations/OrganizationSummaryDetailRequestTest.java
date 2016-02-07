@@ -23,7 +23,7 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class OrganizationInfoRequestTest {
+public final class OrganizationSummaryDetailRequestTest {
 
     @Test
     public void isValid() {

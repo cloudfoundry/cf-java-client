@@ -27,7 +27,7 @@ import java.util.List;
  * A Cloud Foundry Organization
  */
 @Data
-public final class OrganizationInfo {
+public final class OrganizationDetail {
 
     /**
      * The domains bound to this organization.
@@ -62,14 +62,6 @@ public final class OrganizationInfo {
     private final OrganizationQuota quota;
 
     /**
-     * The space quota of the organizations quota
-     *
-     * @param spaceQuota the space quota
-     * @return the space quota
-     */
-    private final List<SpaceQuota> spacesQuotas;
-
-    /**
      * The spaces in this organization.
      *
      * @param spaces the organizations spaces
@@ -77,13 +69,21 @@ public final class OrganizationInfo {
      */
     private final List<String> spaces;
 
+    /**
+     * The space quota of the organizations quota
+     *
+     * @param spaceQuota the space quota
+     * @return the space quota
+     */
+    private final List<SpaceQuota> spacesQuotas;
+
     @Builder
-    private OrganizationInfo(@Singular List<String> domains, 
-                             String id, 
-                             String name, 
-                             OrganizationQuota quota,
-                             @Singular List<SpaceQuota> spacesQuotas,
-                             @Singular List<String> spaces) {
+    private OrganizationDetail(@Singular List<String> domains,
+                               String id,
+                               String name,
+                               OrganizationQuota quota,
+                               @Singular List<SpaceQuota> spacesQuotas,
+                               @Singular List<String> spaces) {
         this.domains = domains;
         this.id = id;
         this.name = name;
