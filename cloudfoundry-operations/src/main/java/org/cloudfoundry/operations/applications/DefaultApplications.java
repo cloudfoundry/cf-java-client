@@ -569,16 +569,18 @@ public final class DefaultApplications implements Applications {
                                                          GetStackResponse getStackResponse, ApplicationInstancesResponse applicationInstancesResponse) {
 
         return ApplicationDetail.builder()
-            .id(summaryApplicationResponse.getId())
-            .diskQuota(summaryApplicationResponse.getDiskQuota())
-            .memoryLimit(summaryApplicationResponse.getMemory())
-            .requestedState(summaryApplicationResponse.getState())
-            .instances(summaryApplicationResponse.getInstances())
-            .urls(toUrls(summaryApplicationResponse.getRoutes()))
-            .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
-            .stack(getStackResponse.getEntity().getName())
             .buildpack(getBuildpack(summaryApplicationResponse))
+            .diskQuota(summaryApplicationResponse.getDiskQuota())
+            .id(summaryApplicationResponse.getId())
             .instanceDetails(toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse))
+            .instances(summaryApplicationResponse.getInstances())
+            .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
+            .memoryLimit(summaryApplicationResponse.getMemory())
+            .name(summaryApplicationResponse.getName())
+            .requestedState(summaryApplicationResponse.getState())
+            .runningInstances(summaryApplicationResponse.getRunningInstances())
+            .stack(getStackResponse.getEntity().getName())
+            .urls(toUrls(summaryApplicationResponse.getRoutes()))
             .build();
     }
 

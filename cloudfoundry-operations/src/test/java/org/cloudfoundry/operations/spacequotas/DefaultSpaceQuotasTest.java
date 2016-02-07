@@ -36,33 +36,22 @@ public final class DefaultSpaceQuotasTest {
         when(cloudFoundryClient.organizations()
             .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
-                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
-                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition1-").build())
-                    .totalPages(2)
-                    .build()));
-
-        when(cloudFoundryClient.organizations()
-            .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
-                .organizationId(organizationId)
-                .page(2)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
-                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "spaceQuotaDefinition2-").build())
-                    .totalPages(2)
+                    .resource(fill(SpaceQuotaDefinitionResource.builder(), "space-quota-definition-")
+                        .build())
                     .build()));
     }
 
-    private static void requestSpaceQuotaDefinitionsNoResults(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static void requestSpaceQuotaDefinitionsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
             .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
                 .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder()).build()));
+                .just(fillPage(ListOrganizationSpaceQuotaDefinitionsResponse.builder())
+                    .build()));
     }
 
     public static final class Get extends AbstractOperationsApiTest<SpaceQuota> {
@@ -77,13 +66,16 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition1-").build());
+                .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
+                    .build());
         }
 
         @Override
         protected Mono<SpaceQuota> invoke() {
             return this.spaceQuotas
-                .get(fill(GetSpaceQuotaRequest.builder(), "spaceQuotaDefinition1-").build());
+                .get(GetSpaceQuotaRequest.builder()
+                    .name("test-space-quota-definition-name")
+                    .build());
         }
 
     }
@@ -101,7 +93,9 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected Mono<SpaceQuota> invoke() {
             return this.spaceQuotas
-                .get(fill(GetSpaceQuotaRequest.builder()).build());
+                .get(GetSpaceQuotaRequest.builder()
+                    .name("test-space-quota-definition-name")
+                    .build());
         }
 
     }
@@ -112,7 +106,7 @@ public final class DefaultSpaceQuotasTest {
 
         @Before
         public void setUp() throws Exception {
-            requestSpaceQuotaDefinitionsNoResults(cloudFoundryClient, TEST_ORGANIZATION_ID);
+            requestSpaceQuotaDefinitionsEmpty(cloudFoundryClient, TEST_ORGANIZATION_ID);
         }
 
         @Override
@@ -124,7 +118,9 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected Mono<SpaceQuota> invoke() {
             return this.spaceQuotas
-                .get(fill(GetSpaceQuotaRequest.builder(), "does-not-exist").build());
+                .get(GetSpaceQuotaRequest.builder()
+                    .name("test-space-quota-definition-name")
+                    .build());
         }
 
     }
@@ -141,13 +137,14 @@ public final class DefaultSpaceQuotasTest {
         @Override
         protected void assertions(TestSubscriber<SpaceQuota> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition1-").build())
-                .assertEquals(fill(SpaceQuota.builder(), "spaceQuotaDefinition2-").build());
+                .assertEquals(fill(SpaceQuota.builder(), "space-quota-definition-")
+                    .build());
         }
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.list();
+            return this.spaceQuotas
+                .list();
         }
 
     }
@@ -164,7 +161,8 @@ public final class DefaultSpaceQuotasTest {
 
         @Override
         protected Publisher<SpaceQuota> invoke() {
-            return this.spaceQuotas.list();
+            return this.spaceQuotas
+                .list();
         }
 
     }

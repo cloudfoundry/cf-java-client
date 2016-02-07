@@ -46,6 +46,8 @@ import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
+
 import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.cloudfoundry.utils.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
@@ -58,10 +60,8 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(ApplicationInstancesResponse.builder()
-                    .instance("instance-0", ApplicationInstanceInfo.builder()
-                        .state("instance-0-state")
-                        .since(1403140717.984577)
+                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                    .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
                         .build())
                     .build()));
     }
@@ -73,16 +73,10 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(ApplicationStatisticsResponse.builder()
-                    .instance("instance-0", ApplicationStatisticsResponse.InstanceStats.builder()
-                        .statistics(ApplicationStatisticsResponse.InstanceStats.Statistics.builder()
-                            .uri("test-stats-uri")
-                            .usage(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder()
-                                .cpu(1.2)
-                                .memory(1_000_000L)
-                                .disk(2_000_000L)
+                    .instance("instance-0", fill(ApplicationStatisticsResponse.InstanceStats.builder(), "instance-statistics-")
+                        .statistics(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.builder(), "statistics-")
+                            .usage(fill(ApplicationStatisticsResponse.InstanceStats.Statistics.Usage.builder(), "usage-")
                                 .build())
-                            .memoryQuota(3_000_000L)
-                            .diskQuota(4_000_000L)
                             .build())
                         .build())
                     .build()));
@@ -94,14 +88,12 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(SummaryApplicationResponse.builder())
-                    .id("test-application-id")
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .route(fill(Route.builder(), "route-")
-                        .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                            .name("routedomain")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
                             .build())
                         .build())
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
 
@@ -111,15 +103,13 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(SummaryApplicationResponse.builder())
-                    .id("test-application-id")
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .route(fill(Route.builder(), "route-")
-                        .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                            .name("routedomain")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
                             .build())
                         .build())
                     .buildpack(null)
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
 
@@ -129,16 +119,14 @@ public final class DefaultApplicationsTest {
                 .applicationId(applicationId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(SummaryApplicationResponse.builder())
-                    .id("test-application-id")
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .route(fill(Route.builder(), "route-")
-                        .domain(org.cloudfoundry.client.v2.domains.Domain.builder()
-                            .name("routedomain")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
                             .build())
                         .build())
                     .buildpack(null)
                     .detectedBuildpack(null)
-                    .packageUpdatedAt("2015-06-01T14:35:40Z")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
 
@@ -180,7 +168,7 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
-                        .entity(fill(ApplicationEntity.builder())
+                        .entity(fill(ApplicationEntity.builder(), "application-entity-")
                             .state("STARTED")
                             .build())
                         .build())
@@ -198,7 +186,7 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
-                        .entity(fill(ApplicationEntity.builder())
+                        .entity(fill(ApplicationEntity.builder(), "application-entity-")
                             .state("STOPPED")
                             .build())
                         .build())
@@ -207,7 +195,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestDeleteApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
-            .delete(fill(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder())
+            .delete(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build())).
             thenReturn(Mono.<Void>empty());
@@ -228,29 +216,8 @@ public final class DefaultApplicationsTest {
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
-                .just(GetSpaceSummaryResponse.builder()
-                    .id(spaceId)
-                    .application(SpaceApplicationSummary.builder()
-                        .spaceId(spaceId)
-                        .diskQuota(1073741824)
-                        .id("test-id-1")
-                        .instances(2)
-                        .memory(536870912)
-                        .name("test-name-1")
-                        .state("RUNNING")
-                        .runningInstances(2)
-                        .url("foo.com")
-                        .build())
-                    .application(SpaceApplicationSummary.builder()
-                        .spaceId(spaceId)
-                        .diskQuota(1073741824)
-                        .id("test-id-2")
-                        .instances(2)
-                        .memory(536870912)
-                        .name("test-name-2")
-                        .state("RUNNING")
-                        .runningInstances(2)
-                        .url("bar.com")
+                .just(fill(GetSpaceSummaryResponse.builder(), "space-summary-")
+                    .application(fill(SpaceApplicationSummary.builder(), "application-summary-")
                         .build())
                     .build()));
     }
@@ -261,9 +228,8 @@ public final class DefaultApplicationsTest {
                 .stackId(stackId)
                 .build()))
             .thenReturn(Mono
-                .just(GetStackResponse.builder()
-                    .entity(StackEntity.builder()
-                        .name("test-stack")
+                .just(fill(GetStackResponse.builder())
+                    .entity(fill(StackEntity.builder(), "stack-entity-")
                         .build())
                     .build()));
     }
@@ -275,9 +241,8 @@ public final class DefaultApplicationsTest {
                 .name(name)
                 .build()))
             .thenReturn(Mono
-                .just(UpdateApplicationResponse.builder()
-                    .entity(fill(ApplicationEntity.builder())
-                        .name(name)
+                .just(fill(UpdateApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder(), "application-entity-")
                         .build())
                     .build()));
     }
@@ -291,11 +256,8 @@ public final class DefaultApplicationsTest {
                 .memory(memory)
                 .build()))
             .thenReturn(Mono
-                .just(UpdateApplicationResponse.builder()
+                .just(fill(UpdateApplicationResponse.builder())
                     .entity(fill(ApplicationEntity.builder())
-                        .diskQuota(disk)
-                        .instances(instances)
-                        .memory(memory)
                         .build())
                     .build()));
     }
@@ -329,7 +291,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .delete(fill(DeleteApplicationRequest.builder())
                     .build());
@@ -353,7 +315,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .delete(fill(DeleteApplicationRequest.builder())
                     .deleteRoutes(false)
@@ -377,30 +339,23 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(ApplicationDetail.builder()
-                    .id("test-application-id")
-                    .diskQuota(1)
-                    .memoryLimit(1)
-                    .requestedState("test-state")
-                    .instances(1)
-                    .url("test-route-host.routedomain")
-                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
-                    .stack("test-stack")
-                    .buildpack("test-buildpack")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
-                        .state("instance-0-state")
-                        .since(DateUtils.parseFromIso8601("2014-06-19T01:18:37Z"))
-                        .cpu(1.2)
-                        .memoryUsage(1_000_000L)
-                        .diskUsage(2_000_000L)
-                        .memoryQuota(3_000_000L)
-                        .diskQuota(4_000_000L)
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-buildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
                         .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
                     .build());
         }
 
         @Override
-        protected Publisher<ApplicationDetail> invoke() {
+        protected Mono<ApplicationDetail> invoke() {
             return this.applications
                 .get(GetApplicationRequest.builder()
                     .name("test-app")
@@ -425,30 +380,23 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(ApplicationDetail.builder()
-                    .id("test-application-id")
-                    .diskQuota(1)
-                    .memoryLimit(1)
-                    .requestedState("test-state")
-                    .instances(1)
-                    .url("test-route-host.routedomain")
-                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
-                    .stack("test-stack")
-                    .buildpack("test-detectedBuildpack")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
-                        .state("instance-0-state")
-                        .since(DateUtils.parseFromIso8601("2014-06-19T01:18:37Z"))
-                        .cpu(1.2)
-                        .memoryUsage(1_000_000L)
-                        .diskUsage(2_000_000L)
-                        .memoryQuota(3_000_000L)
-                        .diskQuota(4_000_000L)
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack("test-application-summary-detectedBuildpack")
+                    .id("test-application-summary-id")
+                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
                         .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
                     .build());
         }
 
         @Override
-        protected Publisher<ApplicationDetail> invoke() {
+        protected Mono<ApplicationDetail> invoke() {
             return this.applications
                 .get(GetApplicationRequest.builder()
                     .name("test-app")
@@ -473,29 +421,23 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(ApplicationDetail.builder()
-                    .id("test-application-id")
-                    .diskQuota(1)
-                    .memoryLimit(1)
-                    .requestedState("test-state")
-                    .instances(1)
-                    .url("test-route-host.routedomain")
-                    .lastUploaded(DateUtils.parseFromIso8601("2015-06-01T14:35:40Z"))
-                    .stack("test-stack")
-                    .instanceDetail(ApplicationDetail.InstanceDetail.builder()
-                        .state("instance-0-state")
-                        .since(DateUtils.parseFromIso8601("2014-06-19T01:18:37Z"))
-                        .cpu(1.2)
-                        .memoryUsage(1_000_000L)
-                        .diskUsage(2_000_000L)
-                        .memoryQuota(3_000_000L)
-                        .diskQuota(4_000_000L)
+                .assertEquals(fill(ApplicationDetail.builder())
+                    .buildpack(null)
+                    .id("test-application-summary-id")
+                    .instanceDetail(fill(ApplicationDetail.InstanceDetail.builder())
+                        .since(new Date(1000))
+                        .state("test-application-instance-info-state")
                         .build())
+                    .lastUploaded(new Date(0))
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
+                    .stack("test-stack-entity-name")
+                    .url("test-route-host.test-domain-name")
                     .build());
         }
 
         @Override
-        protected Publisher<ApplicationDetail> invoke() {
+        protected Mono<ApplicationDetail> invoke() {
             return this.applications
                 .get(GetApplicationRequest.builder()
                     .name("test-app")
@@ -516,25 +458,10 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<ApplicationSummary> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(ApplicationSummary.builder()
-                    .diskQuota(1073741824)
-                    .id("test-id-1")
-                    .instances(2)
-                    .memoryLimit(536870912)
-                    .name("test-name-1")
-                    .requestedState("RUNNING")
-                    .runningInstances(2)
-                    .url("foo.com")
-                    .build())
-                .assertEquals(ApplicationSummary.builder()
-                    .diskQuota(1073741824)
-                    .id("test-id-2")
-                    .instances(2)
-                    .memoryLimit(536870912)
-                    .name("test-name-2")
-                    .requestedState("RUNNING")
-                    .runningInstances(2)
-                    .url("bar.com")
+                .assertEquals(fill(ApplicationSummary.builder())
+                    .id("test-application-summary-id")
+                    .name("test-application-summary-name")
+                    .requestedState("test-application-summary-state")
                     .build());
         }
 
@@ -562,7 +489,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .rename(RenameApplicationRequest.builder()
                     .name("test-app-name")
@@ -587,7 +514,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .rename(RenameApplicationRequest.builder()
                     .name("test-app-name")
@@ -612,7 +539,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
@@ -640,7 +567,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
@@ -666,7 +593,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
@@ -691,7 +618,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
@@ -715,7 +642,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
@@ -739,7 +666,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
@@ -761,7 +688,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
@@ -784,7 +711,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
@@ -807,7 +734,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());
@@ -830,7 +757,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());
@@ -852,7 +779,7 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
+        protected Mono<Void> invoke() {
             return this.applications
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());

@@ -52,22 +52,14 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
 
-    private static void globalRequests(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String space) {
-        requestOrganization(cloudFoundryClient, organizationId);
-        requestOrganizationSpace(cloudFoundryClient, organizationId, space);
-        requestSpaceApplications(cloudFoundryClient, spaceId);
-        requestSpaceDomains(cloudFoundryClient, spaceId);
-        requestSpaceSecurityGroups(cloudFoundryClient, spaceId);
-        requestSpaceServices(cloudFoundryClient, spaceId);
-    }
-
     private static void requestOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
-            .get(fill(GetOrganizationRequest.builder())
-                .organizationId("test-space-organizationId")
+            .get(GetOrganizationRequest.builder()
+                .organizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(GetOrganizationResponse.builder(), "organization-").build()));
+                .just(fill(GetOrganizationResponse.builder(), "organization-")
+                    .build()));
     }
 
     private static void requestOrganizationSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -78,19 +70,21 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "space-").build())
+                    .resource(fill(SpaceResource.builder(), "space-")
+                        .build())
                     .build()));
     }
 
     private static void requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder(), "spaceApplications-")
+            .listApplications(fillPage(ListSpaceApplicationsRequest.builder(), "application-")
                 .diego(null)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "spaceApplication-").build())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                        .build())
                     .build()));
     }
 
@@ -101,7 +95,8 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceDomainsResponse.builder())
-                    .resource(fill(DomainResource.builder(), "spaceDomain-").build())
+                    .resource(fill(DomainResource.builder(), "domain-")
+                        .build())
                     .build()));
     }
 
@@ -111,7 +106,8 @@ public final class DefaultSpacesTest {
                 .spaceQuotaDefinitionId(spaceQuotaDefinitionId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(GetSpaceQuotaDefinitionResponse.builder(), "spaceQuota-").build()));
+                .just(fill(GetSpaceQuotaDefinitionResponse.builder(), "space-quota-definition-")
+                    .build()));
 
     }
 
@@ -122,7 +118,8 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceSecurityGroupsResponse.builder())
-                    .resource(fill(SecurityGroupResource.builder(), "securityGroup-").build())
+                    .resource(fill(SecurityGroupResource.builder(), "security-group-")
+                        .build())
                     .build()));
     }
 
@@ -133,31 +130,20 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceServicesResponse.builder())
-                    .resource(fill(ServiceResource.builder(), "service-").build())
+                    .resource(fill(ServiceResource.builder(), "service-")
+                        .build())
                     .build()));
     }
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.spaces()
-            .list(ListSpacesRequest.builder()
+            .list(fillPage(ListSpacesRequest.builder())
                 .organizationId(organizationId)
-                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "space1-").build())
-                    .totalPages(2)
-                    .build()));
-
-        when(cloudFoundryClient.spaces()
-            .list(ListSpacesRequest.builder()
-                .organizationId(organizationId)
-                .page(2)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "space2-").build())
-                    .totalPages(2)
+                    .resource(fill(SpaceResource.builder(), "space-")
+                        .build())
                     .build()));
     }
 
@@ -167,29 +153,39 @@ public final class DefaultSpacesTest {
 
         @Before
         public void setUp() throws Exception {
-            globalRequests(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_ID, TEST_SPACE_NAME);
+            requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
+            requestOrganizationSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
+            requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
             requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
         }
 
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(SpaceDetail.builder()
+                .assertEquals(fill(SpaceDetail.builder())
+                    .application("test-application-name")
+                    .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
                     .name(TEST_SPACE_NAME)
-                    .application("test-spaceApplication-name")
-                    .domain("test-spaceDomain-name")
                     .organization("test-organization-name")
-                    .securityGroup("test-securityGroup-name")
+                    .securityGroup("test-security-group-name")
                     .service("test-service-label")
-                    .spaceQuota(Optional.of(fill(SpaceQuota.builder(), "spaceQuota-").build()))
+                    .spaceQuota(Optional
+                        .of(fill(SpaceQuota.builder(), "space-quota-definition-")
+                            .build()))
                     .build());
         }
 
         @Override
         protected Publisher<SpaceDetail> invoke() {
             return this.spaces
-                .get(fill(GetSpaceRequest.builder(), "space-").build());
+                .get(GetSpaceRequest.builder()
+                    .name("test-space-name")
+                    .securityGroupRules(true)
+                    .build());
         }
 
     }
@@ -207,7 +203,8 @@ public final class DefaultSpacesTest {
         @Override
         protected Publisher<SpaceDetail> invoke() {
             return this.spaces
-                .get(fill(GetSpaceRequest.builder()).build());
+                .get(fill(GetSpaceRequest.builder())
+                    .build());
         }
 
     }
@@ -218,19 +215,24 @@ public final class DefaultSpacesTest {
 
         @Before
         public void setUp() throws Exception {
-            globalRequests(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_ID, TEST_SPACE_NAME);
+            requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
+            requestOrganizationSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
+            requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
         }
 
         @Override
         protected void assertions(TestSubscriber<SpaceDetail> testSubscriber) throws Exception {
             testSubscriber
                 .assertEquals(fill(SpaceDetail.builder())
+                    .application("test-application-name")
+                    .domain("test-domain-name")
                     .id(TEST_SPACE_ID)
                     .name(TEST_SPACE_NAME)
-                    .application("test-spaceApplication-name")
-                    .domain("test-spaceDomain-name")
                     .organization("test-organization-name")
-                    .securityGroup("test-securityGroup-name")
+                    .securityGroup("test-security-group-name")
                     .service("test-service-label")
                     .spaceQuota(Optional.<SpaceQuota>empty())
                     .build());
@@ -258,13 +260,14 @@ public final class DefaultSpacesTest {
         @Override
         protected void assertions(TestSubscriber<SpaceSummary> testSubscriber) throws Exception {
             testSubscriber
-                .assertEquals(fill(SpaceSummary.builder(), "space1-").build())
-                .assertEquals(fill(SpaceSummary.builder(), "space2-").build());
+                .assertEquals(fill(SpaceSummary.builder(), "space-")
+                    .build());
         }
 
         @Override
         protected Publisher<SpaceSummary> invoke() {
-            return this.spaces.list();
+            return this.spaces
+                .list();
         }
 
     }
@@ -281,7 +284,8 @@ public final class DefaultSpacesTest {
 
         @Override
         protected Publisher<SpaceSummary> invoke() {
-            return this.spaces.list();
+            return this.spaces
+                .list();
         }
 
     }

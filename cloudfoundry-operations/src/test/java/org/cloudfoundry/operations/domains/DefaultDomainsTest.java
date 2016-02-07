@@ -25,7 +25,6 @@ import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.utils.test.TestObjects.fill;
@@ -41,31 +40,29 @@ public final class DefaultDomainsTest {
                 .owningOrganizationId(organizationId)
                 .build()))
             .thenReturn(Mono
-                .just(CreatePrivateDomainResponse.builder().build()));
+                .just(fill(CreatePrivateDomainResponse.builder(), "private-domain-")
+                    .build()));
     }
 
     private static void requestOrganizations(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
             .list(fillPage(ListOrganizationsRequest.builder())
                 .name(organization)
-                .page(1)
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationsResponse.builder())
-                    .resource(fill(OrganizationResource.builder(), "organization-").build())
-                    .totalPages(1)
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .build())
                     .build()));
     }
 
-    private static void requestOrganizationsNoResults(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static void requestOrganizationsEmpty(CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient.organizations()
             .list(fillPage(ListOrganizationsRequest.builder())
                 .name(organization)
-                .page(1)
                 .build()))
             .thenReturn(Mono
-                .just(fillPage(ListOrganizationsResponse.builder())
-                    .totalPages(1)
+                .just(fillPage(ListOrganizationsResponse.builder(), "organization-")
                     .build()));
     }
 
@@ -85,13 +82,12 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
-            CreateDomainRequest request = CreateDomainRequest.builder()
-                .domain("test-domain")
-                .organization("test-organization")
-                .build();
-
-            return this.domains.create(request);
+        protected Mono<Void> invoke() {
+            return this.domains
+                .create(CreateDomainRequest.builder()
+                    .domain("test-domain")
+                    .organization("test-organization")
+                    .build());
         }
 
     }
@@ -102,7 +98,7 @@ public final class DefaultDomainsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestOrganizationsNoResults(this.cloudFoundryClient, "test-organization");
+            requestOrganizationsEmpty(this.cloudFoundryClient, "test-organization");
         }
 
         @Override
@@ -112,13 +108,12 @@ public final class DefaultDomainsTest {
         }
 
         @Override
-        protected Publisher<Void> invoke() {
-            CreateDomainRequest request = CreateDomainRequest.builder()
-                .domain("test-domain")
-                .organization("test-organization")
-                .build();
-
-            return this.domains.create(request);
+        protected Mono<Void> invoke() {
+            return this.domains
+                .create(CreateDomainRequest.builder()
+                    .domain("test-domain")
+                    .organization("test-organization")
+                    .build());
         }
 
     }
