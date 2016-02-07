@@ -47,7 +47,7 @@ public final class DateUtils {
     }
 
     /**
-     * Parses a double representing milliseconds from the epoch to a {@link Date} object
+     * Parses a double representing seconds from the epoch to a {@link Date} object
      *
      * @param d the double to parse
      * @return the parsed {@link Date}

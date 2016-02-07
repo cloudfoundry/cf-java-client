@@ -26,7 +26,7 @@ import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysRequest;
 import org.cloudfoundry.client.v2.servicekeys.ListServiceKeysResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyResource;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -82,7 +82,7 @@ public final class SpringServiceKeysTest {
         }
 
         @Override
-        protected Publisher<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
+        protected Mono<CreateServiceKeyResponse> invoke(CreateServiceKeyRequest request) {
             return this.serviceKeys.create(request);
         }
     }
@@ -116,7 +116,7 @@ public final class SpringServiceKeysTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteServiceKeyRequest request) {
+        protected Mono<Void> invoke(DeleteServiceKeyRequest request) {
             return this.serviceKeys.delete(request);
         }
     }
@@ -163,7 +163,7 @@ public final class SpringServiceKeysTest {
         }
 
         @Override
-        protected Publisher<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
+        protected Mono<GetServiceKeyResponse> invoke(GetServiceKeyRequest request) {
             return this.serviceKeys.get(request);
         }
     }
@@ -215,7 +215,7 @@ public final class SpringServiceKeysTest {
         }
 
         @Override
-        protected Publisher<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
+        protected Mono<ListServiceKeysResponse> invoke(ListServiceKeysRequest request) {
             return this.serviceKeys.list(request);
         }
     }

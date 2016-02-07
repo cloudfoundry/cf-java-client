@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.Optional;
 import org.cloudfoundry.utils.OptionalUtils;
 import org.cloudfoundry.utils.PaginationUtils;
@@ -53,6 +54,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
+import reactor.fn.tuple.Tuple6;
 import reactor.rx.Stream;
 
 import java.util.List;
@@ -84,7 +86,22 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             }))
-            .then(getAuxiliaryContent(this.cloudFoundryClient));
+            .then(function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
+
+                @Override
+                public Mono<SpaceDetail> apply(final SpaceResource resource, GetSpaceRequest request) {
+                    return getAuxiliaryContent(DefaultSpaces.this.cloudFoundryClient, resource, request)
+                        .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
+
+                            @Override
+                            public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota>
+                                spaceQuota) {
+                                return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
+                            }
+
+                        }));
+                }
+            }));
     }
 
     @Override
@@ -121,31 +138,17 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
-    private static Function<Tuple2<SpaceResource, GetSpaceRequest>, Mono<SpaceDetail>> getAuxiliaryContent(final CloudFoundryClient cloudFoundryClient) {
-        return function(new Function2<SpaceResource, GetSpaceRequest, Mono<SpaceDetail>>() {
-
-            @Override
-            public Mono<SpaceDetail> apply(final SpaceResource resource, GetSpaceRequest request) {
-                return Mono
-                    .when(
-                        getApplicationNames(cloudFoundryClient, resource),
-                        getDomainNames(cloudFoundryClient, resource),
-                        getOrganizationName(cloudFoundryClient, resource),
-                        getSecurityGroupNames(cloudFoundryClient, resource),
-                        getServiceNames(cloudFoundryClient, resource),
-                        getOptionalSpaceQuotaDefinition(cloudFoundryClient, request, resource)
-                    )
-                    .map(function(new Function6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>, SpaceDetail>() {
-
-                        @Override
-                        public SpaceDetail apply(List<String> applications, List<String> domains, String organization, List<String> securityGroups, List<String> services, Optional<SpaceQuota>
-                            spaceQuota) {
-                            return toSpaceDetail(applications, domains, organization, resource, securityGroups, services, spaceQuota);
-                        }
-
-                    }));
-            }
-        });
+    private static Mono<Tuple6<List<String>, List<String>, String, List<String>, List<String>, Optional<SpaceQuota>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient,
+                                                                                                                                          SpaceResource resource, GetSpaceRequest request) {
+        return Mono
+            .when(
+                getApplicationNames(cloudFoundryClient, resource),
+                getDomainNames(cloudFoundryClient, resource),
+                getOrganizationName(cloudFoundryClient, resource),
+                getSecurityGroupNames(cloudFoundryClient, resource),
+                getServiceNames(cloudFoundryClient, resource),
+                getOptionalSpaceQuotaDefinition(cloudFoundryClient, request, resource)
+            );
     }
 
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {
@@ -161,12 +164,18 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
-    private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(CloudFoundryClient cloudFoundryClient, GetSpaceRequest getSpaceRequest, SpaceResource spaceResource) {
-        if (!getSpaceRequest.getSecurityGroupRules()) {
-            return Mono.just(Optional.<SpaceQuota>empty());
-        }
+    private static Mono<Optional<SpaceQuota>> getOptionalSpaceQuotaDefinition(final CloudFoundryClient cloudFoundryClient, GetSpaceRequest getSpaceRequest, final SpaceResource spaceResource) {
+        return Mono
+            .just(getSpaceRequest.getSecurityGroupRules())
+            .where(OperationUtils.identity())
+            .then(new Function<Boolean, Mono<GetSpaceQuotaDefinitionResponse>>() {
 
-        return requestSpaceQuotaDefinition(cloudFoundryClient, ResourceUtils.getEntity(spaceResource).getSpaceQuotaDefinitionId())
+                @Override
+                public Mono<GetSpaceQuotaDefinitionResponse> apply(Boolean b) {
+                    return requestSpaceQuotaDefinition(cloudFoundryClient, ResourceUtils.getEntity(spaceResource).getSpaceQuotaDefinitionId());
+                }
+
+            })
             .map(new Function<GetSpaceQuotaDefinitionResponse, SpaceQuota>() {
 
                 @Override
@@ -175,7 +184,8 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             })
-            .map(OptionalUtils.<SpaceQuota>toOptional());
+            .map(OptionalUtils.<SpaceQuota>toOptional())
+            .defaultIfEmpty(Optional.<SpaceQuota>empty());
     }
 
     private static Mono<String> getOrganizationName(CloudFoundryClient cloudFoundryClient, SpaceResource resource) {

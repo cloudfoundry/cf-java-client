@@ -29,7 +29,6 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
@@ -72,7 +71,7 @@ public final class SpringServicePlansTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteServicePlanRequest request) {
+        protected Mono<Void> invoke(DeleteServicePlanRequest request) {
             return this.servicePlans.delete(request);
         }
     }
@@ -125,7 +124,7 @@ public final class SpringServicePlansTest {
         }
 
         @Override
-        protected Publisher<GetServicePlanResponse> invoke(GetServicePlanRequest request) {
+        protected Mono<GetServicePlanResponse> invoke(GetServicePlanRequest request) {
             return this.servicePlans.get(request);
         }
     }
@@ -183,7 +182,7 @@ public final class SpringServicePlansTest {
         }
 
         @Override
-        protected Publisher<ListServicePlansResponse> invoke(ListServicePlansRequest request) {
+        protected Mono<ListServicePlansResponse> invoke(ListServicePlansRequest request) {
             return this.servicePlans.list(request);
         }
     }

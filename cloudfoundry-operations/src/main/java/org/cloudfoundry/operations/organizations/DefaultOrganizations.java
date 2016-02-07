@@ -63,11 +63,11 @@ public final class DefaultOrganizations implements Organizations {
 
                 @Override
                 public Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>> apply(final OrganizationInfoRequest organizationInfoRequest) {
-                    return addOrganizationResource(cloudFoundryClient, organizationInfoRequest);
+                    return addOrganizationResource(DefaultOrganizations.this.cloudFoundryClient, organizationInfoRequest);
                 }
 
             })
-            .then(getAuxiliaryContent(cloudFoundryClient));
+            .then(getAuxiliaryContent(this.cloudFoundryClient));
     }
 
     @Override
@@ -107,12 +107,13 @@ public final class DefaultOrganizations implements Organizations {
 
             @Override
             public Mono<OrganizationInfo> apply(final OrganizationResource organizationResource, final OrganizationInfoRequest organizationInfoRequest) {
-                return Mono.when(
-                    getDomainNames(cloudFoundryClient, organizationResource),
-                    getOrganizationQuota(cloudFoundryClient, organizationResource),
-                    getSpaceQuotas(cloudFoundryClient, organizationResource),
-                    getSpaces(cloudFoundryClient, organizationResource)
-                )
+                return Mono
+                    .when(
+                        getDomainNames(cloudFoundryClient, organizationResource),
+                        getOrganizationQuota(cloudFoundryClient, organizationResource),
+                        getSpaceQuotas(cloudFoundryClient, organizationResource),
+                        getSpaces(cloudFoundryClient, organizationResource)
+                    )
                     .map(function(new Function4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>, OrganizationInfo>() {
 
                         @Override

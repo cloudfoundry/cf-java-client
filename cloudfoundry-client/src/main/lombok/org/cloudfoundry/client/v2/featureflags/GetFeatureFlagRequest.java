@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 @Data
 public final class GetFeatureFlagRequest implements Validatable {
 
+    private static final Pattern ALPHAS_AND_UNDERS = Pattern.compile("[a-z_]*");
+
     /**
      * The name of the feature flag
      *
@@ -54,13 +56,11 @@ public final class GetFeatureFlagRequest implements Validatable {
         } else if (!validName(this.name)) {
             builder.message("name must consist only of alphabetic characters and underscores");
         }
-        
+
         return builder.build();
     }
 
-    private static Pattern alphasAndUnders = Pattern.compile("[a-z_]*");
-    
     private static boolean validName(String name) {
-        return alphasAndUnders.matcher(name).matches();
+        return ALPHAS_AND_UNDERS.matcher(name).matches();
     }
 }

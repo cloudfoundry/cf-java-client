@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityE
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityResource;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.UpdateServicePlanVisibilityResponse;
-import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -87,7 +87,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Publisher<CreateServicePlanVisibilityResponse> invoke(CreateServicePlanVisibilityRequest request) {
+        protected Mono<CreateServicePlanVisibilityResponse> invoke(CreateServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.create(request);
         }
     }
@@ -122,7 +122,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Publisher<Void> invoke(DeleteServicePlanVisibilityRequest request) {
+        protected Mono<Void> invoke(DeleteServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.delete(request);
         }
     }
@@ -169,7 +169,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Publisher<GetServicePlanVisibilityResponse> invoke(GetServicePlanVisibilityRequest request) {
+        protected Mono<GetServicePlanVisibilityResponse> invoke(GetServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.get(request);
         }
     }
@@ -221,7 +221,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Publisher<ListServicePlanVisibilitiesResponse> invoke(ListServicePlanVisibilitiesRequest request) {
+        protected Mono<ListServicePlanVisibilitiesResponse> invoke(ListServicePlanVisibilitiesRequest request) {
             return this.servicePlanVisibilities.list(request);
         }
     }
@@ -272,7 +272,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Publisher<UpdateServicePlanVisibilityResponse> invoke(UpdateServicePlanVisibilityRequest request) {
+        protected Mono<UpdateServicePlanVisibilityResponse> invoke(UpdateServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.update(request);
         }
     }
