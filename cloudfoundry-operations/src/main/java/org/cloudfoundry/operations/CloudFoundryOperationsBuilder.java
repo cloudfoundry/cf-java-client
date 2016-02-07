@@ -23,11 +23,11 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
-import reactor.rx.Promise;
 import reactor.rx.Stream;
 
 /**
@@ -98,12 +98,12 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No organization targeted"));
         }
 
-        Mono<String> organizationId = Promise
-                .from(PaginationUtils
-                        .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
-                        .single()
-                        .map(ResourceUtils.extractId())
-                        .otherwise(ExceptionUtils.<String>convert("Organization %s does not exist", organization)));
+        Mono<String> organizationId = PaginationUtils
+            .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
+            .single()
+            .map(ResourceUtils.extractId())
+            .otherwise(ExceptionUtils.<String>convert("Organization %s does not exist", organization))
+            .as(OperationUtils.<String>promise());
 
         organizationId.get();
         return organizationId;
@@ -114,13 +114,13 @@ public final class CloudFoundryOperationsBuilder {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
 
-        Mono<String> spaceId = Promise
-                .from(Stream
-                        .from(organizationId
-                                .flatMap(requestResources(cloudFoundryClient, space)))
-                        .single()                                                            // TODO: Flux.single() Flux.singleOrEmpty()
-                        .map(ResourceUtils.extractId())
-                        .otherwise(ExceptionUtils.<String>convert("Space %s does not exist", space)));
+        Mono<String> spaceId = organizationId
+            .flatMap(requestResources(cloudFoundryClient, space))
+            .as(OperationUtils.<SpaceResource>stream())
+            .single()                                                            // TODO: Flux.single() Flux.singleOrEmpty()
+            .map(ResourceUtils.extractId())
+            .otherwise(ExceptionUtils.<String>convert("Space %s does not exist", space))
+            .as(OperationUtils.<String>promise());
 
         spaceId.get();
         return spaceId;
@@ -132,9 +132,9 @@ public final class CloudFoundryOperationsBuilder {
             @Override
             public Mono<ListOrganizationsResponse> apply(Integer page) {
                 ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                        .name(organization)
-                        .page(page)
-                        .build();
+                    .name(organization)
+                    .page(page)
+                    .build();
 
                 return cloudFoundryClient.organizations().list(request);
             }
@@ -158,10 +158,10 @@ public final class CloudFoundryOperationsBuilder {
             @Override
             public Mono<ListSpacesResponse> apply(Integer page) {
                 ListSpacesRequest request = ListSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .name(space)
-                        .page(page)
-                        .build();
+                    .organizationId(organizationId)
+                    .name(space)
+                    .page(page)
+                    .build();
 
                 return cloudFoundryClient.spaces().list(request);
             }

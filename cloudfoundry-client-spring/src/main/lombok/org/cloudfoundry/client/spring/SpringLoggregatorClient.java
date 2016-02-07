@@ -27,9 +27,10 @@ import org.cloudfoundry.client.loggregator.StreamLogsRequest;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHandler;
 import org.cloudfoundry.client.spring.loggregator.ReactiveEndpoint;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.utils.ValidationUtils;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
+import org.cloudfoundry.utils.OperationUtils;
+import org.cloudfoundry.utils.ValidationUtils;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
@@ -127,10 +128,6 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
         });
     }
 
-    private static SchedulerGroup getSchedulerGroup(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getSchedulerGroup();
-    }
-
     private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.getRestOperations();
     }
@@ -160,11 +157,14 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
     }
 
+    private static SchedulerGroup getSchedulerGroup(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getSchedulerGroup();
+    }
+
     @SuppressWarnings("unchecked")
     private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
-        return Stream
-            .from(ValidationUtils
-                .validate(request))
+        return ValidationUtils
+            .validate(request)
             .flatMap(new Function<V, Stream<T>>() {
 
                 @Override
@@ -184,7 +184,8 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
                         });
                 }
 
-            });
+            })
+            .as(OperationUtils.<T>stream());
     }
 
     private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {

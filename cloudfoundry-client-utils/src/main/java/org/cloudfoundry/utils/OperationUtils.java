@@ -19,6 +19,7 @@ package org.cloudfoundry.utils;
 import org.reactivestreams.Publisher;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
+import reactor.rx.Promise;
 import reactor.rx.Stream;
 
 /**
@@ -78,6 +79,21 @@ public final class OperationUtils {
                 return !predicate.test(t);
             }
 
+        };
+    }
+
+    /**
+     * Converts a {@link Publisher} into a {@link Promise}
+     *
+     * @param <T> the type published
+     * @return the promise
+     */
+    public static <T> Function<Publisher<T>, Promise<T>> promise() {
+        return new Function<Publisher<T>, Promise<T>>() {
+            @Override
+            public Promise<T> apply(Publisher<T> publisher) {
+                return Promise.from(publisher);
+            }
         };
     }
 

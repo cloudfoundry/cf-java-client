@@ -38,9 +38,10 @@ public final class PaginationUtils {
      * @return a stream of <code>U</code> objects.
      */
     public static <U extends PaginatedResponse<?>> Stream<U> requestPages(final Function<Integer, Mono<U>> pageSupplier) {
-        return Stream
-                .from(pageSupplier.apply(1))
-                .flatMap(requestAdditionalPages(pageSupplier));
+        return pageSupplier
+            .apply(1)
+            .flatMap(requestAdditionalPages(pageSupplier))
+            .as(OperationUtils.<U>stream());
     }
 
     /**
@@ -53,7 +54,7 @@ public final class PaginationUtils {
      */
     public static <R extends Resource<?>, U extends PaginatedResponse<R>> Stream<R> requestResources(final Function<Integer, Mono<U>> pageSupplier) {
         return requestPages(pageSupplier)
-                .flatMap(ResourceUtils.<R, U>extractResources());
+            .flatMap(ResourceUtils.<R, U>extractResources());
     }
 
     private static <U extends PaginatedResponse<?>> Function<U, Stream<U>> requestAdditionalPages(final Function<Integer, Mono<U>> pageSupplier) {
@@ -67,9 +68,9 @@ public final class PaginationUtils {
                 }
 
                 return Stream
-                        .range(2, totalPages - 1)
-                        .flatMap(requestPage(pageSupplier))
-                        .startWith(response);
+                    .range(2, totalPages - 1)
+                    .flatMap(requestPage(pageSupplier))
+                    .startWith(response);
             }
 
         };

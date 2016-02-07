@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring.util;
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
+import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,34 +84,34 @@ public abstract class AbstractSpringOperations {
     }
 
     protected final <T, V extends Validatable> Stream<T> exchange(V request, final Function<SignalEmitter<T>, T> exchange) {
-        return Stream
-            .from(ValidationUtils
-                .validate(request)
-                .flatMap(new Function<V, Stream<T>>() {
+        return ValidationUtils
+            .validate(request)
+            .flatMap(new Function<V, Stream<T>>() {
 
-                    @Override
-                    public Stream<T> apply(V request) {
-                        return Stream
-                            .yield(new Consumer<SignalEmitter<T>>() {
+                @Override
+                public Stream<T> apply(V request) {
+                    return Stream
+                        .yield(new Consumer<SignalEmitter<T>>() {
 
-                                @Override
-                                public void accept(SignalEmitter<T> signalEmitter) {
-                                    try {
-                                        T result = exchange.apply(signalEmitter);
-                                        if (result != null) {
-                                            signalEmitter.onNext(result);
-                                        }
-
-                                        signalEmitter.onComplete();
-                                    } catch (HttpStatusCodeException e) {
-                                        signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
+                            @Override
+                            public void accept(SignalEmitter<T> signalEmitter) {
+                                try {
+                                    T result = exchange.apply(signalEmitter);
+                                    if (result != null) {
+                                        signalEmitter.onNext(result);
                                     }
+
+                                    signalEmitter.onComplete();
+                                } catch (HttpStatusCodeException e) {
+                                    signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
                                 }
+                            }
 
-                            });
-                    }
+                        });
+                }
 
-                }))
+            })
+            .as(OperationUtils.<T>stream())
             .publishOn(this.schedulerGroup)
             .onBackpressureBlock();
     }
