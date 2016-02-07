@@ -16,8 +16,38 @@
 
 package org.cloudfoundry.client.spring.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.util.UriComponentsBuilder;
 
-public final class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor{
+import java.io.IOException;
+import java.net.URI;
+
+public final class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.request");
+
+    @Override
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug(toString(request));
+        }
+
+        return execution.execute(request, body);
+    }
+
+    private static String toString(HttpRequest request) {
+        return String.format("%-6s %s", request.getMethod(), trimUri(request.getURI()));
+    }
+
+    private static URI trimUri(URI uri) {
+        return UriComponentsBuilder.fromUri(uri)
+            .scheme(null).host(null).port(null)
+            .build().encode().toUri();
+    }
 
 }
