@@ -26,6 +26,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
+import org.cloudfoundry.client.spring.util.LoggingClientHttpRequestInterceptor;
 import org.cloudfoundry.client.spring.util.SslCertificateTruster;
 import org.cloudfoundry.client.spring.v2.applications.SpringApplicationsV2;
 import org.cloudfoundry.client.spring.v2.domains.SpringDomains;
@@ -415,6 +416,9 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+
+        restTemplate.getInterceptors().add(new LoggingClientHttpRequestInterceptor());
+
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
 
         for (HttpMessageConverter<?> messageConverter : messageConverters) {

@@ -51,7 +51,7 @@ import static org.junit.Assert.assertEquals;
 @SpringApplicationConfiguration(classes = IntegrationTestConfiguration.class)
 public abstract class AbstractIntegrationTest {
 
-    private final Logger logger = LoggerFactory.getLogger("test");
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Rule
     public final TestName testName = new TestName();

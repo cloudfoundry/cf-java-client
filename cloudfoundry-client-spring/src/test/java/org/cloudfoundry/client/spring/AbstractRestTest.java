@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring;
 import lombok.Getter;
 import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
+import org.cloudfoundry.client.spring.util.LoggingClientHttpRequestInterceptor;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -57,6 +58,10 @@ public abstract class AbstractRestTest {
     protected static final SchedulerGroup PROCESSOR_GROUP = SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
 
     protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
+
+    {
+        this.restTemplate.getInterceptors().add(new LoggingClientHttpRequestInterceptor());
+    }
 
     protected final URI root = UriComponentsBuilder.newInstance()
         .scheme("https").host("api.run.pivotal.io")

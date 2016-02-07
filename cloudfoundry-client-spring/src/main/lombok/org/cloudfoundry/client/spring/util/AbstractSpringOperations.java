@@ -21,8 +21,6 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.spring.v2.CloudFoundryExceptionBuilder;
 import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.ValidationUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.client.ClientHttpResponse;
@@ -52,8 +50,6 @@ public abstract class AbstractSpringOperations {
 
     private static final int BYTE_ARRAY_BUFFER_LENGTH = 8192;
 
-    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client-spring");
-
     protected final RestOperations restOperations;
 
     protected final URI root;
@@ -75,7 +71,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("DELETE {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, DELETE, uri), responseType).getBody();
             }
 
@@ -125,7 +120,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("GET    {}", uri);
                 return AbstractSpringOperations.this.restOperations.getForObject(uri, responseType);
             }
 
@@ -142,7 +136,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("GET    {}", uri);
                 return AbstractSpringOperations.this.restOperations.execute(uri, HttpMethod.GET, null, new ResponseExtractor<byte[]>() {
 
                     @Override
@@ -175,7 +168,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("PATCH  {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(request, PATCH, uri), responseType).getBody();
             }
 
@@ -203,7 +195,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("POST   {}", uri);
                 return AbstractSpringOperations.this.restOperations.postForObject(uri, bodySupplier.get(), responseType);
             }
 
@@ -231,7 +222,6 @@ public abstract class AbstractSpringOperations {
                 builderCallback.accept(builder);
                 URI uri = builder.build().encode().toUri();
 
-                AbstractSpringOperations.this.logger.debug("PUT    {}", uri);
                 return AbstractSpringOperations.this.restOperations.exchange(new RequestEntity<>(bodySupplier.get(), null, PUT, uri), responseType).getBody();
             }
 

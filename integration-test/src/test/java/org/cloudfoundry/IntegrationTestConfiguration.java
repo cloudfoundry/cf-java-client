@@ -58,7 +58,7 @@ import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 @EnableAutoConfiguration
 public class IntegrationTestConfiguration {
 
-    private final Logger logger = LoggerFactory.getLogger("test");
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.test");
 
     @Bean
     SpringCloudFoundryClient cloudFoundryClient(@Value("${test.host}") String host,

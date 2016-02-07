@@ -136,7 +136,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
                 Long startTime = tuple.t1;
                 Long finishTime = tuple.t2;
 
-                Logger logger = LoggerFactory.getLogger(String.format("performance.%s", name.get()));
+                Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.performance.%s", name.get()));
                 if (logger.isDebugEnabled()) {
                     logger.debug("{} ms", finishTime - startTime);
                 }
@@ -155,7 +155,7 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
             @Override
             public void accept(Subscription subscription) {
-                Logger logger = LoggerFactory.getLogger(String.format("scan.%s", name.get()));
+                Logger logger = LoggerFactory.getLogger(String.format("cloudfoundry-client.scan.%s", name.get()));
 
                 if (logger.isDebugEnabled()) {
                     logger.debug(ReactiveStateUtils.scan(subscription).toString());

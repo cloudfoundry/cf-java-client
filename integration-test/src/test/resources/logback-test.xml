@@ -19,15 +19,15 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date{mm:ss.SSS} %-28thread %-26logger %msg%n</pattern>
+            <pattern>%-28thread %-31logger %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="cloudfoundry-client-spring" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
-    <logger name="performance" level="${PERFORMANCE_LOGGING_LEVEL:-INFO}"/>
-    <logger name="scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.performance" level="${PERFORMANCE_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.request" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.scan" level="${SCAN_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.test" level="${TEST_LOGGING_LEVEL:-INFO}"/>
     <logger name="stream" level="INFO"/>
-    <logger name="test" level="${TEST_LOGGING_LEVEL:-INFO}"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
