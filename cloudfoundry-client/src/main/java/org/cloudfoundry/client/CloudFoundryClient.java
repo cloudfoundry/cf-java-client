@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
+import org.cloudfoundry.client.v2.services.Services;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -110,6 +111,13 @@ public interface CloudFoundryClient {
     Jobs jobs();
 
     /**
+     * Main entry point to the Cloud Foundry Quota Definitions Client API
+     *
+     * @return the Cloud Foundry Quota Definitions Client API
+     */
+    OrganizationQuotaDefinitions organizationQuotaDefinitions();
+
+    /**
      * Main entry point to the Cloud Foundry Organizations Client API
      *
      * @return the Cloud Foundry Organizations Client API
@@ -136,13 +144,6 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Processes Client API
      */
     Processes processes();
-
-    /**
-     * Main entry point to the Cloud Foundry Quota Definitions Client API
-     *
-     * @return the Cloud Foundry Quota Definitions Client API
-     */
-    OrganizationQuotaDefinitions organizationQuotaDefinitions();
 
     /**
      * Main entry point to the Cloud Foundry Routes Client API
@@ -192,6 +193,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Service Plans Client API
      */
     ServicePlans servicePlans();
+
+    /**
+     * Main entry point to the Cloud Foundry Services Client API
+     *
+     * @return the Cloud Foundry Services Client API
+     */
+    Services services();
 
     /**
      * Main entry point to the Cloud Foundry Shared Domains Client API
