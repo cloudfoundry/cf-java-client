@@ -60,9 +60,9 @@ import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -168,6 +168,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final Tasks tasks;
 
+    private final String username;
+
     private final Users users;
 
     @Builder
@@ -234,6 +236,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
         this.tasks = new SpringTasks(this.restOperations, root, this.schedulerGroup);
         this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
+        this.username = username;
     }
 
     SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
@@ -266,6 +269,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.stacks = new SpringStacks(this.restOperations, root, this.schedulerGroup);
         this.tasks = new SpringTasks(this.restOperations, root, this.schedulerGroup);
         this.users = new SpringUsers(this.restOperations, root, this.schedulerGroup);
+        this.username = null;
     }
 
     @Override
@@ -296,6 +300,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public FeatureFlags featureFlags() {
         return this.featureFlags;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
     }
 
     @Override
