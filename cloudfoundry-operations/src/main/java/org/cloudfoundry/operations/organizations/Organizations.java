@@ -25,17 +25,17 @@ import reactor.core.publisher.Mono;
 public interface Organizations {
 
     /**
-     * Lists the organizations
-     *
-     * @return the organizations
-     */
-    Publisher<OrganizationSummary> list();
-
-    /**
      * Get an Organizations Information
      *
      * @return the organizations info
      */
     Mono<OrganizationDetail> get(OrganizationInfoRequest request);
+
+    /**
+     * Lists the organizations
+     *
+     * @return the organizations
+     */
+    Publisher<OrganizationSummary> list();
 
 }

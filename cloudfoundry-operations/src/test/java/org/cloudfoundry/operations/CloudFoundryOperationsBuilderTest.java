@@ -42,140 +42,140 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
     @Test
     public void buildWithClient() {
         this.builder
-                .cloudFoundryClient(this.cloudFoundryClient)
-                .build();
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void buildWithInvalidOrganization() {
         ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                .name("test-organization")
-                .page(1)
-                .build();
+            .name("test-organization")
+            .page(1)
+            .build();
 
         ListOrganizationsResponse response = ListOrganizationsResponse.builder()
-                .totalPages(1)
-                .build();
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Mono.just(response));
 
         this.builder
-                .cloudFoundryClient(this.cloudFoundryClient)
-                .target("test-organization")
-                .build();
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .target("test-organization")
+            .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void buildWithInvalidSpace() {
         ListOrganizationsRequest orgRequest = ListOrganizationsRequest.builder()
-                .name("test-organization")
-                .page(1)
-                .build();
+            .name("test-organization")
+            .page(1)
+            .build();
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
-                .resource(OrganizationResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-organization-id")
-                                .build())
-                        .entity(OrganizationEntity.builder()
-                                .name("test-name")
-                                .build())
-                        .build())
-                .totalPages(1)
-                .build();
+            .resource(OrganizationResource.builder()
+                .metadata(Metadata.builder()
+                    .id("test-organization-id")
+                    .build())
+                .entity(OrganizationEntity.builder()
+                    .name("test-name")
+                    .build())
+                .build())
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Mono.just(orgResponse));
 
         ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
-                .organizationId("test-organization-id")
-                .name("test-space")
-                .page(1)
-                .build();
+            .organizationId("test-organization-id")
+            .name("test-space")
+            .page(1)
+            .build();
 
         ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
-                .totalPages(1)
-                .build();
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Mono.just(spaceResponse));
 
         this.builder
-                .cloudFoundryClient(this.cloudFoundryClient)
-                .target("test-organization", "test-space")
-                .build();
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .target("test-organization", "test-space")
+            .build();
     }
 
     @Test
     public void buildWithOrganization() {
         ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                .name("test-organization")
-                .page(1)
-                .build();
+            .name("test-organization")
+            .page(1)
+            .build();
 
         ListOrganizationsResponse response = ListOrganizationsResponse.builder()
-                .resource(OrganizationResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-organization-id")
-                                .build())
-                        .entity(OrganizationEntity.builder()
-                                .name("test-name")
-                                .build())
-                        .build())
-                .totalPages(1)
-                .build();
+            .resource(OrganizationResource.builder()
+                .metadata(Metadata.builder()
+                    .id("test-organization-id")
+                    .build())
+                .entity(OrganizationEntity.builder()
+                    .name("test-name")
+                    .build())
+                .build())
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.organizations().list(request)).thenReturn(Mono.just(response));
 
         this.builder
-                .cloudFoundryClient(this.cloudFoundryClient)
-                .target("test-organization")
-                .build();
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .target("test-organization")
+            .build();
     }
 
     @Test
     public void buildWithSpace() {
         ListOrganizationsRequest orgRequest = ListOrganizationsRequest.builder()
-                .name("test-organization")
-                .page(1)
-                .build();
+            .name("test-organization")
+            .page(1)
+            .build();
 
         ListOrganizationsResponse orgResponse = ListOrganizationsResponse.builder()
-                .resource(OrganizationResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-organization-id")
-                                .build())
-                        .entity(OrganizationEntity.builder()
-                                .name("test-name")
-                                .build())
-                        .build())
-                .totalPages(1)
-                .build();
+            .resource(OrganizationResource.builder()
+                .metadata(Metadata.builder()
+                    .id("test-organization-id")
+                    .build())
+                .entity(OrganizationEntity.builder()
+                    .name("test-name")
+                    .build())
+                .build())
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.organizations().list(orgRequest)).thenReturn(Mono.just(orgResponse));
 
         ListSpacesRequest spaceRequest = ListSpacesRequest.builder()
-                .organizationId("test-organization-id")
-                .name("test-space")
-                .page(1)
-                .build();
+            .organizationId("test-organization-id")
+            .name("test-space")
+            .page(1)
+            .build();
 
         ListSpacesResponse spaceResponse = ListSpacesResponse.builder()
-                .resource(SpaceResource.builder()
-                        .metadata(Metadata.builder()
-                                .id("test-space-id")
-                                .build())
-                        .entity(SpaceEntity.builder()
-                                .name("test-name")
-                                .build())
-                        .build())
-                .totalPages(1)
-                .build();
+            .resource(SpaceResource.builder()
+                .metadata(Metadata.builder()
+                    .id("test-space-id")
+                    .build())
+                .entity(SpaceEntity.builder()
+                    .name("test-name")
+                    .build())
+                .build())
+            .totalPages(1)
+            .build();
 
         when(this.cloudFoundryClient.spaces().list(spaceRequest)).thenReturn(Mono.just(spaceResponse));
 
         this.builder
-                .cloudFoundryClient(this.cloudFoundryClient)
-                .target("test-organization", "test-space")
-                .build();
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .target("test-organization", "test-space")
+            .build();
     }
 
 }

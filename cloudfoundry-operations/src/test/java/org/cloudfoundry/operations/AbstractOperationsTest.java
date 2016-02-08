@@ -56,9 +56,9 @@ public abstract class AbstractOperationsTest {
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
 
-    protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
-    
     protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
+
+    protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
 
     protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
 

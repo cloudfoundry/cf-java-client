@@ -44,7 +44,7 @@ public interface CloudFoundryOperations {
      * Main entry point to the Cloud Foundry Domains Operations API
      *
      * @return the Cloud Foundry Domains Operations API
-     */    
+     */
     Domains domains();
 
     /**

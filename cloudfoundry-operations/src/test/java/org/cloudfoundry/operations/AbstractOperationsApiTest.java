@@ -33,7 +33,7 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
     @Test
     public final void test() throws Exception {
         TestSubscriber<T> testSubscriber = new TestSubscriber<T>()
-                .setScanningLoggerName(getScanningLoggerName());
+            .setScanningLoggerName(getScanningLoggerName());
 
         assertions(testSubscriber);
 
@@ -44,10 +44,10 @@ public abstract class AbstractOperationsApiTest<T> extends AbstractOperationsTes
 
     protected abstract void assertions(TestSubscriber<T> testSubscriber) throws Exception;
 
-    protected abstract Publisher<T> invoke();
-
     protected void extraVerifications() throws Exception {
     }
+
+    protected abstract Publisher<T> invoke();
 
     private Supplier<String> getScanningLoggerName() {
         return new Supplier<String>() {
