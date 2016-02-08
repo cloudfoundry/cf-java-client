@@ -969,37 +969,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .assertThat(this::assertTupleEquality));
     }
 
-    @Ignore("TODO: See https://github.com/cloudfoundry/cloud_controller_ng/issues/525")
-    @Test
-    public void listRoutesFilterByOrganizationId() {
-        this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createSpaceIdWithDomain(this.cloudFoundryClient, organizationId)
-                ))
-            .then(function((organizationId, spaceId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    Mono.just(spaceId),
-                    createRouteId(this.cloudFoundryClient, spaceId)
-                )))
-            .flatMap(function((organizationId, spaceId, routeId) -> Mono
-                .when(
-                    Mono.just(routeId),
-                    PaginationUtils
-                        .requestResources(page -> this.cloudFoundryClient.spaces()
-                            .listRoutes(ListSpaceRoutesRequest.builder()
-                                .spaceId(spaceId)
-                                .organizationId(organizationId)
-                                .build()))
-                        .map(ResourceUtils::getId)
-                        .single()
-                )))
-            .subscribe(this.<Tuple2<String, String>>testSubscriber()
-                .assertThat(this::assertTupleEquality));
-    }
-
     @Test
     public void listRoutesFilterByPath() {
         this.organizationId
