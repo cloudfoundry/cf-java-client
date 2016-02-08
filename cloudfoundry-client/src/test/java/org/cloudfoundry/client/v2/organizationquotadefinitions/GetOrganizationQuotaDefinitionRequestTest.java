@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.quotadefinitions;
+package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public final class GetOrganizationQuotaDefinitionRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetOrganizationQuotaDefinitionRequest.builder()
-            .quotaDefinitionId("test-quota-definition-id")
+            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
             .build()
             .isValid();
 
@@ -42,7 +42,7 @@ public final class GetOrganizationQuotaDefinitionRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("quota definition id must be specified", result.getMessages().get(0));
+        assertEquals("organization quota definition id must be specified", result.getMessages().get(0));
     }
 
 }

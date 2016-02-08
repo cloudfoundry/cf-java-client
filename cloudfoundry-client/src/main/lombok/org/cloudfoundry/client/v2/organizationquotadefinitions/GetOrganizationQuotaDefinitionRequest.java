@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.quotadefinitions;
+package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
@@ -32,23 +32,23 @@ public final class GetOrganizationQuotaDefinitionRequest implements Validatable 
     /**
      * The quota definition id
      *
-     * @param quotaDefinitionId the quota definition id
+     * @param organizationQuotaDefinitionId the quota definition id
      * @return the quota definition id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String quotaDefinitionId;
+    private final String organizationQuotaDefinitionId;
 
     @Builder
-    GetOrganizationQuotaDefinitionRequest(String quotaDefinitionId) {
-        this.quotaDefinitionId = quotaDefinitionId;
+    GetOrganizationQuotaDefinitionRequest(String organizationQuotaDefinitionId) {
+        this.organizationQuotaDefinitionId = organizationQuotaDefinitionId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.quotaDefinitionId == null) {
-            builder.message("quota definition id must be specified");
+        if (this.organizationQuotaDefinitionId == null) {
+            builder.message("organization quota definition id must be specified");
         }
 
         return builder.build();

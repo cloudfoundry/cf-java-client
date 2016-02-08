@@ -28,9 +28,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v2.quotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
@@ -61,7 +61,7 @@ public final class DefaultOrganizationsTest {
     private static void requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
         when(cloudFoundryClient.organizationQuotaDefinitions()
             .get(GetOrganizationQuotaDefinitionRequest.builder()
-                .quotaDefinitionId(quotaDefinitionId)
+                .organizationQuotaDefinitionId(quotaDefinitionId)
                 .build()))
             .thenReturn(Mono
                 .just(fill(GetOrganizationQuotaDefinitionResponse.builder())

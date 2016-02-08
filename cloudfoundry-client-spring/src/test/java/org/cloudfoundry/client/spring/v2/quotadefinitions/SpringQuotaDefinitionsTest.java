@@ -17,9 +17,9 @@
 package org.cloudfoundry.client.spring.v2.quotadefinitions;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v2.quotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v2.quotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -71,7 +71,7 @@ public final class SpringQuotaDefinitionsTest {
         @Override
         protected GetOrganizationQuotaDefinitionRequest getValidRequest() throws Exception {
             return GetOrganizationQuotaDefinitionRequest.builder()
-                .quotaDefinitionId("test-quota-definition-id")
+                .organizationQuotaDefinitionId("test-quota-definition-id")
                 .build();
         }
 
