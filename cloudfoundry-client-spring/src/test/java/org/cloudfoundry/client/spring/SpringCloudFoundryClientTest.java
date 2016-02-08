@@ -217,4 +217,18 @@ public final class SpringCloudFoundryClientTest extends AbstractRestTest {
         assertNotNull(this.client.tasks());
     }
 
+    @Test
+    public void username() throws Exception {
+        mockRequest(new RequestContext()
+            .method(GET).path("/info")
+            .status(OK)
+            .responsePayload("info_GET_response.json"));
+
+        SpringCloudFoundryClient client = new SpringCloudFoundryClient("api.run.pivotal.io", false, "test-client-id", "test-client-secret", "test-username", "test-password", this.restTemplate,
+            this.sslCertificateTruster, this.deserializationProblemHandlers);
+
+        assertEquals("test-username", client.getUsername());
+        verify();
+    }
+
 }

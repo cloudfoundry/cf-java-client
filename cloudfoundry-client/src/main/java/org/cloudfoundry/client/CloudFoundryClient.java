@@ -22,9 +22,9 @@ import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.info.Info;
 import org.cloudfoundry.client.v2.job.Jobs;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -96,6 +96,13 @@ public interface CloudFoundryClient {
     FeatureFlags featureFlags();
 
     /**
+     * Returns the authenticated username in use by the client
+     *
+     * @return a username
+     */
+    String getUsername();
+
+    /**
      * Main entry point to the Cloud Foundry Info Client API
      *
      * @return the Cloud Foundry Info Client API
@@ -108,6 +115,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Job Client API
      */
     Jobs jobs();
+
+    /**
+     * Main entry point to the Cloud Foundry Quota Definitions Client API
+     *
+     * @return the Cloud Foundry Quota Definitions Client API
+     */
+    OrganizationQuotaDefinitions organizationQuotaDefinitions();
 
     /**
      * Main entry point to the Cloud Foundry Organizations Client API
@@ -136,13 +150,6 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Processes Client API
      */
     Processes processes();
-
-    /**
-     * Main entry point to the Cloud Foundry Quota Definitions Client API
-     *
-     * @return the Cloud Foundry Quota Definitions Client API
-     */
-    OrganizationQuotaDefinitions organizationQuotaDefinitions();
 
     /**
      * Main entry point to the Cloud Foundry Routes Client API
