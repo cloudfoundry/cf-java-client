@@ -31,6 +31,28 @@ public final class OperationUtils {
     }
 
     /**
+     * A predicate that produces the logical AND of its parameter predicates.
+     *
+     * <p>The predicates are tested in order and the first <b>{@code false}</b> result terminates the test. This is analogous to {@code &&}. </p>
+     *
+     * @param predicates the predicates to logically AND
+     * @param <T>        the type of the test item
+     * @return the logical AND predicate
+     */
+    public static <T> Predicate<T> and(final Predicate<T>... predicates) {
+        return new Predicate<T>() {
+
+            @Override
+            public boolean test(T t) {
+                for (Predicate<T> predicate : predicates) {
+                    if (!predicate.test(t)) return false;
+                }
+                return true;
+            }
+        };
+    }
+
+    /**
      * Casts an item from one type to another
      *
      * @param <IN>  the source type
@@ -65,11 +87,11 @@ public final class OperationUtils {
     }
 
     /**
-     * A predicate that reverses the result of a delegate predicate
+     * A predicate that negates the result of a delegate predicate
      *
      * @param predicate the delegate predicate
      * @param <T>       the type of the test item
-     * @return the reversing predicate
+     * @return the negating predicate
      */
     public static <T> Predicate<T> not(final Predicate<T> predicate) {
         return new Predicate<T>() {
@@ -79,6 +101,28 @@ public final class OperationUtils {
                 return !predicate.test(t);
             }
 
+        };
+    }
+
+    /**
+     * A predicate that produces the logical OR of its parameter predicates.
+     *
+     * <p>The predicates are tested in order and the first <b>{@code true}</b> result terminates the test. This is analogous to {@code ||}. </p>
+     *
+     * @param predicates the predicates to logically OR
+     * @param <T>        the type of the test item
+     * @return the logical OR predicate
+     */
+    public static <T> Predicate<T> or(final Predicate<T>... predicates) {
+        return new Predicate<T>() {
+
+            @Override
+            public boolean test(T t) {
+                for (Predicate<T> predicate : predicates) {
+                    if (predicate.test(t)) return true;
+                }
+                return false;
+            }
         };
     }
 
