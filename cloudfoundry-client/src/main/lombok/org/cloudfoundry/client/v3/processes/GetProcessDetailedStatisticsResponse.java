@@ -49,17 +49,17 @@ public final class GetProcessDetailedStatisticsResponse extends PaginatedRespons
     public static final class Resource extends AbstractProcessDetailedStatistics {
 
         @Builder
-        Resource(@JsonProperty("disk_quota") long diskQuota,
-                 @JsonProperty("fds_quota") long fdsQuota,
+        Resource(@JsonProperty("disk_quota") Long diskQuota,
+                 @JsonProperty("fds_quota") Integer fdsQuota,
                  @JsonProperty("host") String host,
-                 @JsonProperty("index") int index,
-                 @JsonProperty("mem_quota") long memQuota,
-                 @JsonProperty("port") int port,
+                 @JsonProperty("index") Integer index,
+                 @JsonProperty("mem_quota") Long memoryQuota,
+                 @JsonProperty("port") Integer port,
                  @JsonProperty("state") String state,
                  @JsonProperty("type") String type,
-                 @JsonProperty("uptime") long uptime,
+                 @JsonProperty("uptime") Long uptime,
                  @JsonProperty("usage") ProcessUsage usage) {
-            super(index, memQuota, diskQuota, fdsQuota, usage, port, uptime, host, type, state);
+            super(diskQuota, fdsQuota, host, index, memoryQuota, port, state, type, uptime, usage);
         }
 
     }
