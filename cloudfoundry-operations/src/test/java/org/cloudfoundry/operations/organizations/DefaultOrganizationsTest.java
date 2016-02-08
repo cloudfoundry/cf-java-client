@@ -18,9 +18,18 @@ package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -57,6 +66,30 @@ public final class DefaultOrganizationsTest {
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationDomainsResponse.builder())
                     .resource(fill(DomainResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestFeatureFlagsGet(CloudFoundryClient cloudFoundryClient, boolean enabled) {
+        when(cloudFoundryClient.featureFlags()
+            .get(GetFeatureFlagRequest.builder()
+                .name("set_roles_by_username")
+                .build()))
+            .thenReturn(Mono.just(GetFeatureFlagResponse.builder()
+                .enabled(enabled)
+                .build()));
+    }
+
+    private static void requestListOrganizationQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
+        when(cloudFoundryClient.organizationQuotaDefinitions()
+            .list(fillPage(ListOrganizationQuotaDefinitionsRequest.builder())
+                .name(organizationQuotaName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
+                    .resource(fill(ListOrganizationQuotaDefinitionsResponse.ListOrganizationQuotaDefinitionsResource.builder(), "organization-quota-definition-")
+                        .entity(fill(OrganizationQuotaDefinitionEntity.builder(), "organization-quota-definition-entity-")
+                            .build())
                         .build())
                     .build()));
     }
@@ -99,6 +132,35 @@ public final class DefaultOrganizationsTest {
                     .build()));
     }
 
+    private static void requestOrganizationsAssociateManagerByUsername(CloudFoundryClient cloudFoundryClient, String username) {
+        when(cloudFoundryClient.organizations()
+            .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
+                .organizationId("test-id")
+                .username(username)
+                .build()))
+            .thenReturn(Mono.just(fill(AssociateOrganizationManagerByUsernameResponse.builder()).build()));
+    }
+
+    private static void requestOrganizationsAssociateUserByUsername(CloudFoundryClient cloudFoundryClient, String username) {
+        when(cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId("test-id")
+                .username(username)
+                .build()))
+            .thenReturn(Mono.just(fill(AssociateOrganizationUserByUsernameResponse.builder()).build()));
+    }
+
+    private static void requestOrganizationsCreate(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId) {
+        when(cloudFoundryClient.organizations()
+            .create(org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest.builder()
+                .name("test-org")
+                .quotaDefinitionId(organizationQuotaDefinitionId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateOrganizationResponse.builder())
+                    .build()));
+    }
+
     private static void requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
             .listSpaceQuotaDefinitions(fillPage(ListOrganizationSpaceQuotaDefinitionsRequest.builder())
@@ -133,9 +195,109 @@ public final class DefaultOrganizationsTest {
                 .<UpdateOrganizationResponse>empty());
     }
 
+    public static final class Create extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationsCreate(this.cloudFoundryClient, null);
+            requestFeatureFlagsGet(this.cloudFoundryClient, true);
+            requestOrganizationsAssociateManagerByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+            requestOrganizationsAssociateUserByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.create(CreateOrganizationRequest.builder()
+                .organizationName("test-org")
+                .build());
+        }
+
+    }
+
+    public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+
+        @Before
+        public void setUp() throws Exception {
+            requestFeatureFlagsGet(this.cloudFoundryClient, true);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber.assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.create(CreateOrganizationRequest.builder()
+                .build());
+        }
+
+    }
+
+    public static final class CreateSetRolesByUsernameDisabled extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationsCreate(this.cloudFoundryClient, null);
+            requestFeatureFlagsGet(this.cloudFoundryClient, false);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.create(CreateOrganizationRequest.builder()
+                .organizationName("test-org")
+                .build());
+        }
+
+    }
+
+    public static final class CreateWithQuota extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+
+        @Before
+        public void setUp() throws Exception {
+            requestListOrganizationQuotaDefinitions(this.cloudFoundryClient, "test-org-quota");
+            requestOrganizationsCreate(this.cloudFoundryClient, "test-organization-quota-definition-id");
+            requestFeatureFlagsGet(this.cloudFoundryClient, true);
+            requestOrganizationsAssociateManagerByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+            requestOrganizationsAssociateUserByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations.create(CreateOrganizationRequest.builder()
+                .organizationName("test-org")
+                .quotaDefinitionName("test-org-quota")
+                .build());
+        }
+
+    }
+
     public static final class Info extends AbstractOperationsApiTest<OrganizationDetail> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
 
         @Before
         public void setUp() throws Exception {
@@ -174,7 +336,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class List extends AbstractOperationsApiTest<OrganizationSummary> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
 
         @Before
         public void setUp() throws Exception {
@@ -198,7 +360,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
 
         @Before
         public void setUp() throws Exception {
@@ -222,7 +384,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {

@@ -25,7 +25,14 @@ import reactor.core.publisher.Mono;
 public interface Organizations {
 
     /**
-     * Get an Organizations Information
+     * Creates a new organization.
+     * 
+     * @param request the create organization request
+     */
+    Mono<Void> create(CreateOrganizationRequest request);
+
+    /**
+     * Gets an Organization's Information
      *
      * @param request the organization info request
      * @return the organizations info
@@ -40,7 +47,7 @@ public interface Organizations {
     Publisher<OrganizationSummary> list();
 
     /**
-     * Rename a specific organization
+     * Renames a specific organization
      *
      * @param request the rename organization request
      * @return completion indicator
