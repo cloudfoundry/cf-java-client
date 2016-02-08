@@ -31,7 +31,6 @@ import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -70,7 +69,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
     }
 
     @Override
-    public Publisher<GetProcessDetailedStatisticsResponse> detailedStatistics(final GetProcessDetailedStatisticsRequest request) {
+    public Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(final GetProcessDetailedStatisticsRequest request) {
         return get(request, GetProcessDetailedStatisticsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

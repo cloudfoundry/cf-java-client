@@ -24,12 +24,12 @@ import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -177,7 +177,7 @@ public final class SpringProcessesTest {
                     .state("RUNNING")
                     .type("web")
                     .uptime(1)
-                    .usage(GetProcessDetailedStatisticsResponse.Usage.builder()
+                    .usage(ProcessUsage.builder()
                         .cpu(80.0)
                         .disk(1024L)
                         .memory(128L)
@@ -195,8 +195,8 @@ public final class SpringProcessesTest {
         }
 
         @Override
-        protected Publisher<GetProcessDetailedStatisticsResponse> invoke(GetProcessDetailedStatisticsRequest request) {
-            return this.processes.detailedStatistics(request);
+        protected Mono<GetProcessDetailedStatisticsResponse> invoke(GetProcessDetailedStatisticsRequest request) {
+            return this.processes.getDetailedStatistics(request);
         }
 
     }

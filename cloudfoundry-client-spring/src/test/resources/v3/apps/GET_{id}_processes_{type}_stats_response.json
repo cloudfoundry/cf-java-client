@@ -1,0 +1,32 @@
+{
+  "resources": [
+    {
+      "type": "web",
+      "index": 0,
+      "state": "RUNNING",
+      "usage": {
+        "time": "2016-01-26 22:20:33 UTC",
+        "cpu": 80,
+        "mem": 128,
+        "disk": 1024
+      },
+      "host": "toast",
+      "port": 8080,
+      "uptime": 1,
+      "mem_quota": 1073741824,
+      "disk_quota": 1073741824,
+      "fds_quota": 16384
+    }
+  ],
+  "pagination": {
+    "total_results": 1,
+    "first": {
+      "href": "/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats"
+    },
+    "last": {
+      "href": "/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats"
+    },
+    "next": null,
+    "previous": null
+  }
+}
