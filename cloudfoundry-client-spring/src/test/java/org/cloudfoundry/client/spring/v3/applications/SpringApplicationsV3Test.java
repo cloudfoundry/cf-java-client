@@ -507,7 +507,7 @@ public final class SpringApplicationsV3Test {
         @Override
         protected GetApplicationStatisticsRequest getValidRequest() throws Exception {
             return GetApplicationStatisticsRequest.builder()
-                .id("test-id")
+                .applicationId("test-id")
                 .build();
         }
 

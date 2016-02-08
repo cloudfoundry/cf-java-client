@@ -75,6 +75,7 @@ public final class SpringProcesses extends AbstractSpringOperations implements P
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v3", "processes", request.getProcessId(), "stats");
+                QueryBuilder.augment(builder, request);
             }
 
         });

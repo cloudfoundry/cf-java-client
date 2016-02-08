@@ -28,7 +28,7 @@ public final class GetApplicationStatisticsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetApplicationStatisticsRequest.builder()
-                .id("test-id")
+                .applicationId("test-id")
                 .build()
                 .isValid();
 
@@ -42,7 +42,7 @@ public final class GetApplicationStatisticsRequestTest {
                 .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("id must be specified", result.getMessages().get(0));
+        assertEquals("application id must be specified", result.getMessages().get(0));
     }
 
 }
