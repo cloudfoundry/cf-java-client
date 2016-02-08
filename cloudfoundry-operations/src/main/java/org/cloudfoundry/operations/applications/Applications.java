@@ -56,6 +56,14 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> rename(RenameApplicationRequest request);
+    
+    /**
+     * Restarts a specific application
+     *
+     * @param request the restart application request
+     * @return a completion indicator
+     */
+    Mono<Void> restart(RestartApplicationRequest request);
 
     /**
      * Scales a specific application

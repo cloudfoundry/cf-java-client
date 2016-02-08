@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -157,7 +158,7 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestApplicationsStarted(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private static void requestApplicationsSpecificState(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String stateReturned) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
                 .spaceId(spaceId)
@@ -169,25 +170,7 @@ public final class DefaultApplicationsTest {
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
                         .entity(fill(ApplicationEntity.builder(), "application-entity-")
-                            .state("STARTED")
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestApplicationsStopped(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listApplications(fillPage(ListSpaceApplicationsRequest.builder())
-                .spaceId(spaceId)
-                .diego(null)
-                .name(application)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                        .entity(fill(ApplicationEntity.builder(), "application-entity-")
-                            .state("STOPPED")
+                            .state(stateReturned)
                             .build())
                         .build())
                     .build()));
@@ -269,7 +252,13 @@ public final class DefaultApplicationsTest {
                 .state(state)
                 .build()))
             .thenReturn(Mono
-                .just(fill(UpdateApplicationResponse.builder())
+                .just(UpdateApplicationResponse.builder()
+                    .metadata(fill(Resource.Metadata.builder())
+                        .id(applicationId)
+                        .build())
+                    .entity(fill(ApplicationEntity.builder())
+                        .state(state)
+                        .build())
                     .build()));
     }
 
@@ -523,13 +512,111 @@ public final class DefaultApplicationsTest {
         }
     }
 
+    public static final class RestartNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-non-existent-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-non-existent-app-name")
+                    .build());
+        }
+    }
+
+    public static final class RestartNotStartedAndNotStopped extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class RestartStarted extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class RestartStopped extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
     public static final class ScaleDiskAndInstancesNotStarted extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStopped(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
             requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2, 2, null);
         }
 
@@ -555,7 +642,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStarted(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
             requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2, 2, null);
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -679,7 +766,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStarted(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
         }
 
         @Override
@@ -701,7 +788,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStopped(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         }
 
@@ -747,7 +834,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStarted(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         }
 
@@ -770,7 +857,7 @@ public final class DefaultApplicationsTest {
 
         @Before
         public void setUp() throws Exception {
-            requestApplicationsStopped(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         }
 
         @Override
