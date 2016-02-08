@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "guid": "58eb36ad-0636-428b-b4ed-afc14e48d926",
+    "url": "/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926",
+    "created_at": "2015-07-27T22:43:35Z",
+    "updated_at": null
+  },
+  "entity": {
+    "label": "label-86",
+    "provider": null,
+    "url": null,
+    "description": "desc-219",
+    "long_description": null,
+    "version": null,
+    "info_url": null,
+    "active": true,
+    "bindable": true,
+    "unique_id": "8fbdd3bc-3eee-4b03-97a3-57929484649b",
+    "extra": null,
+    "tags": [
+
+    ],
+    "requires": [
+
+    ],
+    "documentation_url": null,
+    "service_broker_guid": "fe6e3f23-7b92-4855-aaa7-56f515d678c5",
+    "plan_updateable": false,
+    "service_plans_url": "/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926/service_plans"
+  }
+}
