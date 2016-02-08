@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.quotadefinitions;
+package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
