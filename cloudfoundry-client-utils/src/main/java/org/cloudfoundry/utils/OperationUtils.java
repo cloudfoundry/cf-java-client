@@ -39,6 +39,7 @@ public final class OperationUtils {
      * @param <T>        the type of the test item
      * @return the logical AND predicate
      */
+    @SafeVarargs
     public static <T> Predicate<T> and(final Predicate<T>... predicates) {
         return new Predicate<T>() {
 
@@ -113,6 +114,7 @@ public final class OperationUtils {
      * @param <T>        the type of the test item
      * @return the logical OR predicate
      */
+    @SafeVarargs
     public static <T> Predicate<T> or(final Predicate<T>... predicates) {
         return new Predicate<T>() {
 
