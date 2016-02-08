@@ -27,12 +27,12 @@ import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
-import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import reactor.fn.Predicate;
@@ -99,7 +99,7 @@ final class CloudFoundryCleaner {
                     .build()));
     }
 
-    private static Stream<DeleteRouteResponse> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
+    private static Stream<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
         return PaginationUtils
             .requestResources(page -> cloudFoundryClient.routes()
                 .list(ListRoutesRequest.builder()
@@ -110,7 +110,9 @@ final class CloudFoundryCleaner {
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .routeId(routeId)
-                    .build()));   // TODO: Wait for jobs to complete before progressing
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Stream<Void> cleanSpaces(CloudFoundryClient cloudFoundryClient, Predicate<SpaceResource> predicate) {

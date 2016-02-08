@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
@@ -44,6 +45,7 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.utils.DateUtils;
 import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.Optional;
 import org.cloudfoundry.utils.OptionalUtils;
@@ -441,7 +443,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Void> apply(String routeId) {
-                    return requestDeleteRoute(cloudFoundryClient, routeId);
+                    return deleteRoute(cloudFoundryClient, routeId);
                 }
 
             })
@@ -663,12 +665,25 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<Void> requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
+    private static Mono<Void> deleteRoute(final CloudFoundryClient cloudFoundryClient, String routeId) {
+        return requestDeleteRoute(cloudFoundryClient, routeId)
+            .map(ResourceUtils.extractId())
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String jobId) {
+                    return JobUtils.waitForCompletion(cloudFoundryClient, jobId);
+                }
+
+            });
+    }
+
+    private static Mono<DeleteRouteResponse> requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         return cloudFoundryClient.routes()
             .delete(DeleteRouteRequest.builder()
+                .async(true)
                 .routeId(routeId)
-                .build())
-            .after();
+                .build());
     }
 
     private static Mono<GetSpaceSummaryResponse> requestSpaceSummary(CloudFoundryClient cloudFoundryClient, String spaceId) {

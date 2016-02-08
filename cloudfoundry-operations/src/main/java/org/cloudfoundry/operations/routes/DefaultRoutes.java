@@ -162,21 +162,12 @@ public final class DefaultRoutes implements Routes {
                 }
 
             }))
-            .then(new Function<String, Mono<DeleteRouteResponse>>() {
-
-                @Override
-                public Mono<DeleteRouteResponse> apply(String routeId) {
-                    return requestDeleteRoute(DefaultRoutes.this.cloudFoundryClient, routeId);
-                }
-            })
-            .map(ResourceUtils.extractId())
             .then(new Function<String, Mono<Void>>() {
 
                 @Override
-                public Mono<Void> apply(String jobId) {
-                    return JobUtils.waitForCompletion(DefaultRoutes.this.cloudFoundryClient, jobId);
+                public Mono<Void> apply(String routeId) {
+                    return deleteRoute(DefaultRoutes.this.cloudFoundryClient, routeId);
                 }
-
             });
     }
 
@@ -210,11 +201,11 @@ public final class DefaultRoutes implements Routes {
                 }
 
             }))
-            .flatMap(function(new Function2<List<ApplicationResource>, String, Mono<DeleteRouteResponse>>() {
+            .flatMap(function(new Function2<List<ApplicationResource>, String, Mono<Void>>() {
 
                 @Override
-                public Mono<DeleteRouteResponse> apply(List<ApplicationResource> applicationResources, String routeId) {
-                    return requestDeleteRoute(DefaultRoutes.this.cloudFoundryClient, routeId);
+                public Mono<Void> apply(List<ApplicationResource> applicationResources, String routeId) {
+                    return deleteRoute(DefaultRoutes.this.cloudFoundryClient, routeId);
                 }
 
             }))
@@ -333,6 +324,19 @@ public final class DefaultRoutes implements Routes {
 
             })
             .map(ResourceUtils.extractId());
+    }
+
+    private static Mono<Void> deleteRoute(final CloudFoundryClient cloudFoundryClient, String routeId) {
+        return requestDeleteRoute(cloudFoundryClient, routeId)
+            .map(ResourceUtils.extractId())
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String jobId) {
+                    return JobUtils.waitForCompletion(cloudFoundryClient, jobId);
+                }
+
+            });
     }
 
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -538,6 +542,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<DeleteRouteResponse> requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         return cloudFoundryClient.routes()
             .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
+                .async(true)
                 .routeId(routeId)
                 .build());
     }

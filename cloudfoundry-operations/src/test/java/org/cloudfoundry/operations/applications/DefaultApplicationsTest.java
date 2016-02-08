@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
@@ -34,7 +35,9 @@ import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.events.ListEventsResponse;
-import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v2.job.GetJobRequest;
+import org.cloudfoundry.client.v2.job.GetJobResponse;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -52,8 +55,12 @@ import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.fn.Supplier;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.cloudfoundry.utils.test.TestObjects.fillPage;
@@ -228,11 +235,75 @@ public final class DefaultApplicationsTest {
 
     private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
-            .delete(fill(DeleteRouteRequest.builder())
-                .async(null)
+            .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
+                .async(true)
                 .routeId(routeId)
                 .build()))
-            .thenReturn(Mono.<DeleteRouteResponse>empty());
+            .thenReturn(Mono
+                .just(fill(DeleteRouteResponse.builder())
+                    .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                    .build())
+                                .status("failed")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
+
+    private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("finished")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
     }
 
     private static void requestSpaceSummary(CloudFoundryClient cloudFoundryClient, String spaceId) {
@@ -314,11 +385,39 @@ public final class DefaultApplicationsTest {
             requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
             requestDeleteApplication(this.cloudFoundryClient, "test-application-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .delete(fill(DeleteApplicationRequest.builder())
+                    .build());
+        }
+    }
+
+    public static final class DeleteAndDeleteRoutesFailure extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+            requestDeleteApplication(this.cloudFoundryClient, "test-application-id");
+            requestJobFailure(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(CloudFoundryException.class);
         }
 
         @Override
