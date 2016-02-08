@@ -44,6 +44,7 @@ import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
+import org.cloudfoundry.utils.DelayUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -608,11 +609,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getEntity().getPackageState())
             .where("STAGED"::equals)
-            .as(Stream::from)                                   // TODO: Remove once Mono.repeatWhen()
-            .repeatWhen(volumes -> volumes
-                .takeWhile(count -> count == 0)
-                .flatMap(count -> Mono.delay(2, SECONDS)))
-            .single()                                           // TODO: Remove once Mono.repeatWhen()
+            .as(Stream::from)                                               // TODO: Remove once Mono.repeatWhen()
+            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
+            .single()                                                       // TODO: Remove once Mono.repeatWhen()
             .map(state -> applicationId);
     }
 
@@ -624,9 +623,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(response -> Stream.fromIterable(response.values()))
             .as(Stream::from)
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
-            .repeatWhen(volumes -> volumes
-                .takeWhile(count -> count == 0)
-                .flatMap(count -> Mono.delay(2, SECONDS)))
+            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
             .single()
             .map(info -> applicationId);
     }
