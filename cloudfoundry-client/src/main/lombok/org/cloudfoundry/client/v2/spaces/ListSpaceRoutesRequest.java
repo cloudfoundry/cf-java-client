@@ -57,15 +57,6 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
     private final List<String> hosts;
 
     /**
-     * The organization ids
-     *
-     * @param organizationIds the organization ids
-     * @return the organization ids
-     */
-    @Getter(onMethod = @__(@InFilterParameter("organization_guid")))
-    private final List<String> organizationIds;
-
-    /**
      * The paths
      *
      * @param paths the paths
@@ -87,13 +78,11 @@ public final class ListSpaceRoutesRequest extends PaginatedRequest implements Va
     ListSpaceRoutesRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
                            @Singular List<String> domainIds,
                            @Singular List<String> hosts,
-                           @Singular List<String> organizationIds,
                            @Singular List<String> paths,
                            String spaceId) {
         super(orderDirection, page, resultsPerPage);
         this.domainIds = domainIds;
         this.hosts = hosts;
-        this.organizationIds = organizationIds;
         this.paths = paths;
         this.spaceId = spaceId;
     }
