@@ -17,17 +17,16 @@
 package org.cloudfoundry.client.spring.loggregator;
 
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.http.MockHttpInputMessage;
-import reactor.rx.Stream;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -54,19 +53,15 @@ public final class LoggregatorMessageHttpMessageConverterTest {
         MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
-        TestSubscriber<LoggregatorMessage> testSubscriber = new TestSubscriber<>();
+        List<LoggregatorMessage> messages = this.messageConverter.readInternal(null, inputMessage);
 
-        this.messageConverter.readInternal(null, inputMessage)
-            .subscribe(testSubscriber
-                .assertCount(14));
-
-        testSubscriber.verify(5, SECONDS);
+        assertEquals(14, messages.size());
     }
 
     @Test
     public void supports() {
         assertFalse(this.messageConverter.supports(Map.class));
-        assertTrue(this.messageConverter.supports(Stream.class));
+        assertTrue(this.messageConverter.supports(List.class));
     }
 
     @Test(expected = UnsupportedOperationException.class)

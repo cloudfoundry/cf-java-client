@@ -26,11 +26,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.util.TypeUtils;
 import reactor.fn.Function;
-import reactor.rx.Stream;
 
 import java.io.IOException;
+import java.util.List;
 
-public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<Stream<LoggregatorMessage>> {
+public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LoggregatorMessage>> {
 
     public LoggregatorMessageHttpMessageConverter() {
         super(MediaType.parseMediaType("multipart/x-protobuf"));
@@ -42,19 +42,23 @@ public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMe
     }
 
     @Override
-    protected Stream<LoggregatorMessage> readInternal(Class<? extends Stream<LoggregatorMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
+    protected List<LoggregatorMessage> readInternal(Class<? extends List<LoggregatorMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
-        return Multipart.from(inputMessage.getBody(), boundary)
-            .map(toLoggregatorMessage());
+
+        return Multipart
+            .from(inputMessage.getBody(), boundary)
+            .map(toLoggregatorMessage())
+            .toList()
+            .get();
     }
 
     @Override
     protected boolean supports(Class<?> clazz) {
-        return TypeUtils.isAssignable(Stream.class, clazz);
+        return TypeUtils.isAssignable(List.class, clazz);
     }
 
     @Override
-    protected void writeInternal(Stream<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
+    protected void writeInternal(List<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
         throw new UnsupportedOperationException();
     }
 

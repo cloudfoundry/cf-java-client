@@ -20,53 +20,35 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
 import org.cloudfoundry.client.LoggregatorClient;
-import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
 import org.cloudfoundry.client.loggregator.StreamLogsRequest;
-import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHandler;
-import org.cloudfoundry.client.spring.loggregator.ReactiveEndpoint;
-import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.loggregator.SpringRecent;
+import org.cloudfoundry.client.spring.loggregator.SpringStream;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.cloudfoundry.utils.OperationUtils;
-import org.cloudfoundry.utils.ValidationUtils;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.core.subscriber.SubscriberWithContext;
-import reactor.fn.BiConsumer;
-import reactor.fn.Consumer;
+import reactor.core.util.PlatformDependent;
 import reactor.fn.Function;
-import reactor.rx.Stream;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The Spring-based implementation of {@link LoggregatorClient}
  */
 @ToString(callSuper = true)
-public final class SpringLoggregatorClient extends AbstractSpringOperations implements LoggregatorClient {
+public final class SpringLoggregatorClient implements LoggregatorClient {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final SpringRecent recent;
 
-    private final ClientEndpointConfig clientEndpointConfig;
-
-    private final URI root;
-
-    private final WebSocketContainer webSocketContainer;
+    private final SpringStream stream;
 
     @Builder
     SpringLoggregatorClient(@NonNull SpringCloudFoundryClient cloudFoundryClient) {
@@ -74,58 +56,37 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
-        super(getRestOperations(cloudFoundryClient), getRoot(cloudFoundryClient), getSchedulerGroup(cloudFoundryClient));
+        SchedulerGroup schedulerGroup = createSchedulerGroup();
 
-        this.clientEndpointConfig = getClientEndpointConfig(cloudFoundryClient);
-        this.root = UriComponentsBuilder.fromUri(super.root).scheme("wss").build().toUri();
-        this.webSocketContainer = webSocketContainer;
+        URI cloudFoundryRoot = getRoot(cloudFoundryClient);
+        URI loggregatorRoot = UriComponentsBuilder.fromUri(cloudFoundryRoot).scheme("wss").build().toUri();
+
+        this.recent = new SpringRecent(getRestOperations(cloudFoundryClient), cloudFoundryRoot, schedulerGroup);
+        this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggregatorRoot, schedulerGroup, webSocketContainer);
     }
 
     SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
-        super(restOperations, root, schedulerGroup);
-        this.clientEndpointConfig = clientEndpointConfig;
-        this.root = root;
-        this.webSocketContainer = webSocketContainer;
+        this.recent = new SpringRecent(restOperations, root, schedulerGroup);
+        this.stream = new SpringStream(clientEndpointConfig, root, schedulerGroup, webSocketContainer);
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Publisher<LoggregatorMessage> recent(final RecentLogsRequest request) {
-        return get(request, Stream.class, new Consumer<UriComponentsBuilder>() {
-
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("recent").queryParam("app", request.getApplicationId());
-            }
-
-        })
-            .flatMap(new Function<Stream, Stream<LoggregatorMessage>>() {
-
-                @Override
-                public Stream<LoggregatorMessage> apply(Stream stream) {
-                    return stream;
-                }
-
-            });
+    public Publisher<LoggregatorMessage> recent(RecentLogsRequest request) {
+        return this.recent.recent(request);
     }
 
     @Override
-    public Publisher<LoggregatorMessage> stream(final StreamLogsRequest request) {
-        return ws(request, new Consumer<UriComponentsBuilder>() {
+    public Publisher<LoggregatorMessage> stream(StreamLogsRequest request) {
+        return this.stream.stream(request);
+    }
 
-            @Override
-            public void accept(UriComponentsBuilder builder) {
-                builder.path("tail/").queryParam("app", request.getApplicationId());
-            }
+    private static SchedulerGroup createSchedulerGroup() {
+        return SchedulerGroup.io("loggregator-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+    }
 
-        }, new Function<Subscriber<LoggregatorMessage>, MessageHandler>() {
-
-            @Override
-            public MessageHandler apply(Subscriber<LoggregatorMessage> subscriber) {
-                return new LoggregatorMessageHandler(subscriber);
-            }
-
-        });
+    private static ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
+        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
+        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
     }
 
     private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
@@ -133,10 +94,7 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
     }
 
     private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
-        GetInfoRequest request = GetInfoRequest.builder()
-            .build();
-
-        return cloudFoundryClient.info().get(request)
+        return requestInfo(cloudFoundryClient)
             .map(new Function<GetInfoResponse, String>() {
 
                 @Override
@@ -154,81 +112,12 @@ public final class SpringLoggregatorClient extends AbstractSpringOperations impl
 
             })
             .get();
-
     }
 
-    private static SchedulerGroup getSchedulerGroup(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getSchedulerGroup();
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T, V extends Validatable> Stream<T> exchange(V request, final Consumer<Subscriber<T>> exchange) {
-        return ValidationUtils
-            .validate(request)
-            .flatMap(new Function<V, Stream<T>>() {
-
-                @Override
-                public Stream<T> apply(V request) {
-                    return Stream
-                        .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
-
-                            @Override
-                            public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
-                                if (n != Long.MAX_VALUE) {
-                                    subscriber.onError(new IllegalArgumentException("Publisher doesn't support back pressure"));
-                                }
-
-                                exchange.accept(subscriber);
-                            }
-
-                        });
-                }
-
-            })
-            .as(OperationUtils.<T>stream());
-    }
-
-    private ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
-        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
-        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
-    }
-
-    private <T> Stream<T> ws(Validatable request, final Consumer<UriComponentsBuilder> builderCallback, final Function<Subscriber<T>, MessageHandler> messageHandlerCreator) {
-        final AtomicReference<Session> session = new AtomicReference<>();
-
-        return exchange(request, new Consumer<Subscriber<T>>() {
-
-            @Override
-            public void accept(Subscriber<T> subscriber) {
-                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(SpringLoggregatorClient.this.root);
-                builderCallback.accept(builder);
-                URI uri = builder.build().toUri();
-
-                MessageHandler messageHandler = messageHandlerCreator.apply(subscriber);
-                ReactiveEndpoint<T> endpoint = new ReactiveEndpoint<>(messageHandler, subscriber);
-
-                try {
-                    SpringLoggregatorClient.this.logger.debug("WS {}", uri);
-                    session.set(SpringLoggregatorClient.this.webSocketContainer.connectToServer(endpoint, SpringLoggregatorClient.this.clientEndpointConfig, uri));
-                } catch (DeploymentException | IOException e) {
-                    subscriber.onError(e);
-                }
-            }
-
-        }).doOnCancel(new Runnable() {
-
-            @Override
-            public void run() {
-                if (session.get() != null) {
-                    try {
-                        session.get().close();
-                    } catch (IOException e) {
-                        SpringLoggregatorClient.this.logger.warn("Failure closing session", e);
-                    }
-                }
-            }
-
-        });
+    private static Mono<GetInfoResponse> requestInfo(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.info()
+            .get(GetInfoRequest.builder()
+                .build());
     }
 
 }
