@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.processes;
+package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -23,25 +23,27 @@ import lombok.EqualsAndHashCode;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.cloudfoundry.client.v3.processes.AbstractProcessDetailedStatistics;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 
 import java.util.List;
 
 /**
- * The response payload for the Get Detailed Stats for a Process operation
+ * The response payload for the Get Detailed Stats for an Application's Process operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class GetProcessDetailedStatisticsResponse extends PaginatedResponse<GetProcessDetailedStatisticsResponse.Resource> {
+public final class GetApplicationProcessDetailedStatisticsResponse extends PaginatedResponse<GetApplicationProcessDetailedStatisticsResponse.Resource> {
 
     @Builder
-    GetProcessDetailedStatisticsResponse(@JsonProperty("pagination") Pagination pagination,
-                                         @JsonProperty("resources") @Singular List<Resource> resources) {
+    GetApplicationProcessDetailedStatisticsResponse(@JsonProperty("pagination") Pagination pagination,
+                                                    @JsonProperty("resources") @Singular List<Resource> resources) {
         super(pagination, resources);
     }
 
     /**
-     * The Resource response payload for the Get Detailed Stats for a Process operation
+     * The Resource response payload for the Get Detailed Stats for an Application's Process operation
      */
     @Data
     @EqualsAndHashCode(callSuper = true)

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,7 +37,7 @@ public interface Processes {
      * @param request the Get Detailed Stats for a Process request
      * @return the response from the Get Detailed Stats for a Process request
      */
-    Publisher<GetProcessDetailedStatisticsResponse> detailedStatistics(GetProcessDetailedStatisticsRequest request);
+    Mono<GetProcessDetailedStatisticsResponse> getDetailedStatistics(GetProcessDetailedStatisticsRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/processes_%28experimental%29/list_all_processes.html">List Process</a> request

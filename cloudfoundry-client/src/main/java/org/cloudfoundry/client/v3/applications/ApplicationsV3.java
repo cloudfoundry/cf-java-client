@@ -72,6 +72,14 @@ public interface ApplicationsV3 {
     Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/230/apps_(experimental)/get_detailed_stats_for_an_app's_process.html">Get Detailed Stats for an Application's Process</a> request
+     *
+     * @param request the Get Detailed Stats for an Application's Process request
+     * @return the response from the Get Detailed Stats for an Application's Process request
+     */
+    Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(GetApplicationProcessDetailedStatisticsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List Applications</a> request
      *
      * @param request the List Applications request

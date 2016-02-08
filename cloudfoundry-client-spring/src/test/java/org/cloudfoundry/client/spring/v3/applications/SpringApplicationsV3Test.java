@@ -17,6 +17,9 @@
 package org.cloudfoundry.client.spring.v3.applications;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessDetailedStatisticsResponse;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Link;
@@ -65,6 +68,69 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringApplicationsV3Test {
+
+    public static final class GetApplicationProcessDetailedStatistics extends AbstractApiTest<GetApplicationProcessDetailedStatisticsRequest, GetApplicationProcessDetailedStatisticsResponse> {
+
+        private final SpringApplicationsV3 applications = new SpringApplicationsV3(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsRequest getInvalidRequest() {
+            return GetApplicationProcessDetailedStatisticsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("v3/apps/test-id/processes/test-type/stats")
+                .status(OK)
+                .responsePayload("v3/apps/GET_{id}_processes_{type}_stats_response.json");
+        }
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsResponse getResponse() {
+            return GetApplicationProcessDetailedStatisticsResponse.builder()
+                .pagination(Pagination.builder()
+                    .first(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
+                        .build())
+                    .last(Link.builder().href("/v3/apps/guid-ee511630-0f3a-4397-b072-b27c9ada901c/processes/web/stats")
+                        .build())
+                    .totalResults(1)
+                    .build())
+                .resource(GetApplicationProcessDetailedStatisticsResponse.Resource.builder()
+                    .diskQuota(1073741824)
+                    .fdsQuota(16384)
+                    .host("toast")
+                    .index(0)
+                    .memQuota(1073741824)
+                    .port(8080)
+                    .state("RUNNING")
+                    .type("web")
+                    .uptime(1)
+                    .usage(ProcessUsage.builder()
+                        .cpu(80.0)
+                        .disk(1024L)
+                        .memory(128L)
+                        .time("2016-01-26 22:20:33 UTC")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetApplicationProcessDetailedStatisticsRequest getValidRequest() throws Exception {
+            return GetApplicationProcessDetailedStatisticsRequest.builder()
+                .applicationId("test-id")
+                .type("test-type")
+                .build();
+        }
+
+        @Override
+        protected Mono<GetApplicationProcessDetailedStatisticsResponse> invoke(GetApplicationProcessDetailedStatisticsRequest request) {
+            return this.applications.getProcessDetailedStatistics(request);
+        }
+
+    }
 
     public static final class AssignDroplet extends AbstractApiTest<AssignApplicationDropletRequest, AssignApplicationDropletResponse> {
 
