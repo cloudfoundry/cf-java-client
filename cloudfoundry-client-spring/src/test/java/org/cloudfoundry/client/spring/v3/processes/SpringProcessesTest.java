@@ -18,15 +18,18 @@ package org.cloudfoundry.client.spring.v3.processes;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessDetailedStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
 import org.cloudfoundry.client.v3.processes.GetProcessResponse;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
+import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v3.PaginatedResponse.Pagination;
@@ -132,6 +135,68 @@ public final class SpringProcessesTest {
         @Override
         protected Mono<GetProcessResponse> invoke(GetProcessRequest request) {
             return this.processes.get(request);
+        }
+
+    }
+
+    public static final class GetDetailedProcessStatistics extends AbstractApiTest<GetProcessDetailedStatisticsRequest, GetProcessDetailedStatisticsResponse> {
+
+        private final SpringProcesses processes = new SpringProcesses(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetProcessDetailedStatisticsRequest getInvalidRequest() {
+            return GetProcessDetailedStatisticsRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("v3/processes/test-id/stats")
+                .status(OK)
+                .responsePayload("v3/processes/GET_{id}_stats_response.json");
+        }
+
+        @Override
+        protected GetProcessDetailedStatisticsResponse getResponse() {
+            return GetProcessDetailedStatisticsResponse.builder()
+                .pagination(Pagination.builder()
+                    .first(Link.builder().href("/v3/processes/8480ec7f-b06c-4df7-92c1-11afc823f967/stats")
+                        .build())
+                    .last(Link.builder().href("/v3/processes/8480ec7f-b06c-4df7-92c1-11afc823f967/stats")
+                        .build())
+                    .totalResults(1)
+                    .build())
+                .resource(GetProcessDetailedStatisticsResponse.Resource.builder()
+                    .diskQuota(1073741824)
+                    .fdsQuota(16384)
+                    .host("toast")
+                    .index(0)
+                    .memQuota(1073741824)
+                    .port(8080)
+                    .state("RUNNING")
+                    .type("web")
+                    .uptime(1)
+                    .usage(GetProcessDetailedStatisticsResponse.Usage.builder()
+                        .cpu(80.0)
+                        .disk(1024L)
+                        .memory(128L)
+                        .time("2016-01-26 22:20:11 UTC")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected GetProcessDetailedStatisticsRequest getValidRequest() throws Exception {
+            return GetProcessDetailedStatisticsRequest.builder()
+                .processId("test-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<GetProcessDetailedStatisticsResponse> invoke(GetProcessDetailedStatisticsRequest request) {
+            return this.processes.detailedStatistics(request);
         }
 
     }
