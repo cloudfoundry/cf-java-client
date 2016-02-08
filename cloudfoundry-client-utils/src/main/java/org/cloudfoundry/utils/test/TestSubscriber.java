@@ -29,6 +29,8 @@ import reactor.fn.Supplier;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
@@ -81,7 +83,10 @@ public final class TestSubscriber<T> implements Subscriber<T> {
 
             @Override
             public void accept(Throwable actual) {
-                Assert.assertEquals(String.format("Unexpected error %s", actual), expected, actual.getClass());
+                StringWriter writer = new StringWriter();
+                actual.printStackTrace(new PrintWriter(writer));
+
+                Assert.assertEquals(String.format("Unexpected error %s", writer.toString()), expected, actual.getClass());
             }
 
         };

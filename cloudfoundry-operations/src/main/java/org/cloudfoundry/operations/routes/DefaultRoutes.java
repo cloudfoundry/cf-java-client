@@ -29,7 +29,6 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
-import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
@@ -50,6 +49,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.routes.ListRoutesRequest.Level;
 import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
@@ -138,6 +138,46 @@ public final class DefaultRoutes implements Routes {
 
             }))
             .after();
+    }
+
+    @Override
+    public Mono<Void> delete(DeleteRouteRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .and(this.organizationId)
+            .then(function(new Function2<DeleteRouteRequest, String, Mono<Tuple2<String, DeleteRouteRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<String, DeleteRouteRequest>> apply(DeleteRouteRequest request, String organizationId) {
+                    return getDomainId(DefaultRoutes.this.cloudFoundryClient, organizationId, request.getDomain())
+                        .and(Mono.just(request));
+                }
+
+            }))
+            .then(function(new Function2<String, DeleteRouteRequest, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(String domainId, DeleteRouteRequest request) {
+                    return getRouteId(DefaultRoutes.this.cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath());
+                }
+
+            }))
+            .then(new Function<String, Mono<DeleteRouteResponse>>() {
+
+                @Override
+                public Mono<DeleteRouteResponse> apply(String routeId) {
+                    return requestDeleteRoute(DefaultRoutes.this.cloudFoundryClient, routeId);
+                }
+            })
+            .map(ResourceUtils.extractId())
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String jobId) {
+                    return JobUtils.waitForCompletion(DefaultRoutes.this.cloudFoundryClient, jobId);
+                }
+
+            });
     }
 
     @Override
@@ -255,7 +295,7 @@ public final class DefaultRoutes implements Routes {
 
                                     @Override
                                     public Mono<String> apply(String domainId) {
-                                        return getRouteId(DefaultRoutes.this.cloudFoundryClient, unmapRouteRequest.getHost(), unmapRouteRequest.getDomain(), domainId);
+                                        return getRouteId(DefaultRoutes.this.cloudFoundryClient, unmapRouteRequest.getHost(), unmapRouteRequest.getDomain(), domainId, unmapRouteRequest.getPath());
                                     }
 
                                 })
@@ -366,14 +406,14 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils.extractId());
     }
 
-    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId) {
-        return requestRoutes(cloudFoundryClient, domainId, host)
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
+        return requestRoutes(cloudFoundryClient, domainId, host, path)
             .single()
             .otherwise(ExceptionUtils.<RouteResource>convert("Route %s.%s does not exist", host, domain));
     }
 
-    private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId) {
-        return getRoute(cloudFoundryClient, host, domain, domainId)
+    private static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String host, String domain, String domainId, String path) {
+        return getRoute(cloudFoundryClient, host, domain, domainId, path)
             .map(ResourceUtils.extractId());
     }
 
@@ -497,7 +537,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<DeleteRouteResponse> requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         return cloudFoundryClient.routes()
-            .delete(DeleteRouteRequest.builder()
+            .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
                 .routeId(routeId)
                 .build());
     }
@@ -559,7 +599,7 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Stream<RouteResource> requestRoutes(final CloudFoundryClient cloudFoundryClient, final String domainId, final String host) {
+    private static Stream<RouteResource> requestRoutes(final CloudFoundryClient cloudFoundryClient, final String domainId, final String host, final String path) {
         return PaginationUtils.
             requestResources(new Function<Integer, Mono<ListRoutesResponse>>() {
 
@@ -568,9 +608,10 @@ public final class DefaultRoutes implements Routes {
 
                     return cloudFoundryClient.routes()
                         .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                            .domainId(domainId)
                             .host(host)
                             .page(page)
-                            .domainId(domainId)
+                            .path(path)
                             .build());
                 }
 
