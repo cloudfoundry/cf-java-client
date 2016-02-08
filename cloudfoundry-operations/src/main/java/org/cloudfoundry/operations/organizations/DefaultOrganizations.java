@@ -111,8 +111,7 @@ public final class DefaultOrganizations implements Organizations {
 
                 @Override
                 public Mono<Tuple2<String, RenameOrganizationRequest>> apply(RenameOrganizationRequest renameOrganizationRequest) {
-                    return getOrganization(cloudFoundryClient, request.getName())
-                        .map(ResourceUtils.extractId())
+                    return getOrganizationId(DefaultOrganizations.this.cloudFoundryClient, request.getName())
                         .and(Mono.just(request));
                 }
 
@@ -121,7 +120,7 @@ public final class DefaultOrganizations implements Organizations {
 
                 @Override
                 public Mono<Void> apply(String organizationId, RenameOrganizationRequest request) {
-                    return requestRenameOrganization(cloudFoundryClient, organizationId, request.getNewName())
+                    return requestUpdateOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId, request.getNewName())
                         .after();
                 }
 
@@ -151,6 +150,17 @@ public final class DefaultOrganizations implements Organizations {
 
             })
             .toList();
+    }
+
+    private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
+        return requestOrganizations(cloudFoundryClient, organization)
+            .single()
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+    }
+
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+        return getOrganization(cloudFoundryClient, organization)
+            .map(ResourceUtils.extractId());
     }
 
     private static Mono<OrganizationQuota> getOrganizationQuota(final CloudFoundryClient cloudFoundryClient, final OrganizationResource resource) {
@@ -246,14 +256,6 @@ public final class DefaultOrganizations implements Organizations {
             });
     }
 
-    private static Mono<UpdateOrganizationResponse> requestRenameOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String newName) {
-        return cloudFoundryClient.organizations()
-            .update(UpdateOrganizationRequest.builder()
-                .organizationId(organizationId)
-                .name(newName)
-                .build());
-    }
-
     private static Stream<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationSpaceQuotaDefinitionsResponse>>() {
@@ -289,6 +291,26 @@ public final class DefaultOrganizations implements Organizations {
             });
     }
 
+    private static Mono<UpdateOrganizationResponse> requestUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String newName) {
+        return cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .name(newName)
+                .build());
+    }
+
+    private static OrganizationDetail toOrganizationDetail(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces,
+                                                           OrganizationResource organizationResource, OrganizationInfoRequest organizationInfoRequest) {
+        return OrganizationDetail.builder()
+            .domains(domains)
+            .id(ResourceUtils.getId(organizationResource))
+            .name(organizationInfoRequest.getName())
+            .quota(organizationQuota)
+            .spacesQuotas(spacesQuotas)
+            .spaces(spaces)
+            .build();
+    }
+
     private static OrganizationQuota toOrganizationQuota(GetOrganizationQuotaDefinitionResponse response, OrganizationResource resource) {
         return OrganizationQuota.builder()
             .id(ResourceUtils.getId(response))
@@ -319,24 +341,6 @@ public final class DefaultOrganizations implements Organizations {
             .totalRoutes(ResourceUtils.getEntity(resource).getTotalRoutes())
             .totalServiceInstances(ResourceUtils.getEntity(resource).getTotalServices())
             .paidServicePlans(ResourceUtils.getEntity(resource).getNonBasicServicesAllowed())
-            .build();
-    }
-
-    private Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
-        return requestOrganizations(cloudFoundryClient, organization)
-            .single()
-            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
-    }
-
-    private OrganizationDetail toOrganizationDetail(List<String> domains, OrganizationQuota organizationQuota, List<SpaceQuota> spacesQuotas, List<String> spaces,
-                                                    OrganizationResource organizationResource, OrganizationInfoRequest organizationInfoRequest) {
-        return OrganizationDetail.builder()
-            .domains(domains)
-            .id(ResourceUtils.getId(organizationResource))
-            .name(organizationInfoRequest.getName())
-            .quota(organizationQuota)
-            .spacesQuotas(spacesQuotas)
-            .spaces(spaces)
             .build();
     }
 

@@ -123,6 +123,16 @@ public final class DefaultOrganizationsTest {
                     .build()));
     }
 
+    private static void requestUpdateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String newName) {
+        when(cloudFoundryClient.organizations()
+            .update(UpdateOrganizationRequest.builder()
+                .name("test-rename-newName")
+                .organizationId("test-organization-id")
+                .build()))
+            .thenReturn(Mono
+                .<UpdateOrganizationResponse>empty());
+    }
+
     public static final class Info extends AbstractOperationsApiTest<OrganizationDetail> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient);
@@ -192,22 +202,8 @@ public final class DefaultOrganizationsTest {
 
         @Before
         public void setUp() throws Exception {
-            when(this.cloudFoundryClient.organizations()
-                .list(fillPage(ListOrganizationsRequest.builder())
-                    .name("test-rename-name")
-                    .build()))
-                .thenReturn(Mono
-                    .just(fillPage(ListOrganizationsResponse.builder())
-                        .resource(fill(OrganizationResource.builder(), "organization-").build())
-                        .build()));
-
-            when(this.cloudFoundryClient.organizations()
-                .update(UpdateOrganizationRequest.builder()
-                    .name("test-rename-newName")
-                    .organizationId("test-organization-id")
-                    .build()))
-                .thenReturn(Mono
-                    .<UpdateOrganizationResponse>empty());
+            requestOrganizations(this.cloudFoundryClient, "test-rename-name");
+            requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-rename-new-name");
         }
 
         @Override
@@ -217,8 +213,9 @@ public final class DefaultOrganizationsTest {
 
         @Override
         protected Publisher<Void> invoke() {
-            return this.organizations.rename(fill(RenameOrganizationRequest.builder(), "rename-")
-                .build());
+            return this.organizations.
+                rename(fill(RenameOrganizationRequest.builder(), "rename-")
+                    .build());
         }
 
     }
@@ -234,9 +231,10 @@ public final class DefaultOrganizationsTest {
 
         @Override
         protected Publisher<Void> invoke() {
-            return this.organizations.rename(RenameOrganizationRequest.builder()
-                .name("test-organisation")
-                .build());
+            return this.organizations
+                .rename(RenameOrganizationRequest.builder()
+                    .name("test-organisation")
+                    .build());
         }
 
     }
