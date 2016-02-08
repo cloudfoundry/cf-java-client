@@ -38,4 +38,11 @@ public interface Organizations {
      */
     Publisher<OrganizationSummary> list();
 
+    /**
+     * Rename a specific organization
+     *
+     * @param request the rename organization request
+     */
+    Mono<Void> rename(RenameOrganizationRequest request);
+
 }
