@@ -86,7 +86,7 @@ public interface ApplicationsV3 {
      * @param request the Get Detailed Stats for an Application request
      * @return the response from the Get Detailed Stats for an Application request
      */
-    Publisher<GetApplicationStatisticsResponse> getStatistics(GetApplicationStatisticsRequest request);
+    Mono<GetApplicationStatisticsResponse> getStatistics(GetApplicationStatisticsRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List Applications</a> request
