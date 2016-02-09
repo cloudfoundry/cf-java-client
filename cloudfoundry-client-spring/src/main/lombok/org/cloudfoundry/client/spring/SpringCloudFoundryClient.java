@@ -95,6 +95,7 @@ import org.springframework.security.oauth2.client.token.DefaultAccessTokenReques
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
@@ -143,6 +144,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     private final Processes processes;
 
     private final OAuth2RestOperations restOperations;
+
+    private final URI root;
 
     private final Routes routes;
 
@@ -199,79 +202,74 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         LOGGER.debug("Cloud Foundry Credentials: {} / {}", username, password);
         LOGGER.debug("OAuth2 Credentials: {} / {}", clientId, clientSecret);
 
-        if (skipSslValidation != null && skipSslValidation) {
-            try {
-                sslCertificateTruster.trust(host, 443, 5, SECONDS);
-            } catch (GeneralSecurityException | IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        trustHost(host, skipSslValidation, sslCertificateTruster);
 
-        URI root = getRoot(host);
+        this.root = getRoot(host);
 
-        this.restOperations = createRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers);
+        this.restOperations = createRestOperations(clientId, clientSecret, host, username, password, bootstrapRestOperations, deserializationProblemHandlers, skipSslValidation, sslCertificateTruster);
         SchedulerGroup schedulerGroup = createSchedulerGroup();
 
-        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, schedulerGroup);
-        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, schedulerGroup);
-        this.domains = new SpringDomains(this.restOperations, root, schedulerGroup);
-        this.droplets = new SpringDroplets(this.restOperations, root, schedulerGroup);
-        this.events = new SpringEvents(this.restOperations, root, schedulerGroup);
-        this.featureFlags = new SpringFeatureFlags(this.restOperations, root, schedulerGroup);
-        this.info = new SpringInfo(this.restOperations, root, schedulerGroup);
-        this.jobs = new SpringJobs(this.restOperations, root, schedulerGroup);
-        this.organizations = new SpringOrganizations(this.restOperations, root, schedulerGroup);
-        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, root, schedulerGroup);
-        this.packages = new SpringPackages(this.restOperations, root, schedulerGroup);
-        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, schedulerGroup);
-        this.processes = new SpringProcesses(this.restOperations, root, schedulerGroup);
-        this.routes = new SpringRoutes(this.restOperations, root, schedulerGroup);
-        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, schedulerGroup);
-        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, schedulerGroup);
-        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, schedulerGroup);
-        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, schedulerGroup);
-        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, schedulerGroup);
-        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, schedulerGroup);
-        this.servicePlans = new SpringServicePlans(this.restOperations, root, schedulerGroup);
-        this.services = new SpringServices(this.restOperations, root, schedulerGroup);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, schedulerGroup);
-        this.spaces = new SpringSpaces(this.restOperations, root, schedulerGroup);
-        this.stacks = new SpringStacks(this.restOperations, root, schedulerGroup);
-        this.tasks = new SpringTasks(this.restOperations, root, schedulerGroup);
-        this.users = new SpringUsers(this.restOperations, root, schedulerGroup);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, this.root, schedulerGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, this.root, schedulerGroup);
+        this.domains = new SpringDomains(this.restOperations, this.root, schedulerGroup);
+        this.droplets = new SpringDroplets(this.restOperations, this.root, schedulerGroup);
+        this.events = new SpringEvents(this.restOperations, this.root, schedulerGroup);
+        this.featureFlags = new SpringFeatureFlags(this.restOperations, this.root, schedulerGroup);
+        this.info = new SpringInfo(this.restOperations, this.root, schedulerGroup);
+        this.jobs = new SpringJobs(this.restOperations, this.root, schedulerGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, this.root, schedulerGroup);
+        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, this.root, schedulerGroup);
+        this.packages = new SpringPackages(this.restOperations, this.root, schedulerGroup);
+        this.privateDomains = new SpringPrivateDomains(this.restOperations, this.root, schedulerGroup);
+        this.processes = new SpringProcesses(this.restOperations, this.root, schedulerGroup);
+        this.routes = new SpringRoutes(this.restOperations, this.root, schedulerGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, this.root, schedulerGroup);
+        this.serviceBindings = new SpringServiceBindings(this.restOperations, this.root, schedulerGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, this.root, schedulerGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, this.root, schedulerGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, this.root, schedulerGroup);
+        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, this.root, schedulerGroup);
+        this.servicePlans = new SpringServicePlans(this.restOperations, this.root, schedulerGroup);
+        this.services = new SpringServices(this.restOperations, this.root, schedulerGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, this.root, schedulerGroup);
+        this.spaces = new SpringSpaces(this.restOperations, this.root, schedulerGroup);
+        this.stacks = new SpringStacks(this.restOperations, this.root, schedulerGroup);
+        this.tasks = new SpringTasks(this.restOperations, this.root, schedulerGroup);
+        this.users = new SpringUsers(this.restOperations, this.root, schedulerGroup);
         this.username = username;
     }
 
     SpringCloudFoundryClient(OAuth2RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.restOperations = restOperations;
+        this.root = root;
 
-        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, root, schedulerGroup);
-        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, root, schedulerGroup);
-        this.domains = new SpringDomains(this.restOperations, root, schedulerGroup);
-        this.droplets = new SpringDroplets(this.restOperations, root, schedulerGroup);
-        this.events = new SpringEvents(this.restOperations, root, schedulerGroup);
-        this.featureFlags = new SpringFeatureFlags(this.restOperations, root, schedulerGroup);
-        this.info = new SpringInfo(this.restOperations, root, schedulerGroup);
-        this.jobs = new SpringJobs(this.restOperations, root, schedulerGroup);
-        this.organizations = new SpringOrganizations(this.restOperations, root, schedulerGroup);
-        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, root, schedulerGroup);
-        this.packages = new SpringPackages(this.restOperations, root, schedulerGroup);
-        this.privateDomains = new SpringPrivateDomains(this.restOperations, root, schedulerGroup);
-        this.processes = new SpringProcesses(this.restOperations, root, schedulerGroup);
-        this.routes = new SpringRoutes(this.restOperations, root, schedulerGroup);
-        this.sharedDomains = new SpringSharedDomains(this.restOperations, root, schedulerGroup);
-        this.serviceBindings = new SpringServiceBindings(this.restOperations, root, schedulerGroup);
-        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, root, schedulerGroup);
-        this.serviceInstances = new SpringServiceInstances(this.restOperations, root, schedulerGroup);
-        this.serviceKeys = new SpringServiceKeys(this.restOperations, root, schedulerGroup);
-        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, root, schedulerGroup);
-        this.servicePlans = new SpringServicePlans(this.restOperations, root, schedulerGroup);
-        this.services = new SpringServices(this.restOperations, root, schedulerGroup);
-        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, root, schedulerGroup);
-        this.spaces = new SpringSpaces(this.restOperations, root, schedulerGroup);
-        this.stacks = new SpringStacks(this.restOperations, root, schedulerGroup);
-        this.tasks = new SpringTasks(this.restOperations, root, schedulerGroup);
-        this.users = new SpringUsers(this.restOperations, root, schedulerGroup);
+        this.applicationsV2 = new SpringApplicationsV2(this.restOperations, this.root, schedulerGroup);
+        this.applicationsV3 = new SpringApplicationsV3(this.restOperations, this.root, schedulerGroup);
+        this.domains = new SpringDomains(this.restOperations, this.root, schedulerGroup);
+        this.droplets = new SpringDroplets(this.restOperations, this.root, schedulerGroup);
+        this.events = new SpringEvents(this.restOperations, this.root, schedulerGroup);
+        this.featureFlags = new SpringFeatureFlags(this.restOperations, this.root, schedulerGroup);
+        this.info = new SpringInfo(this.restOperations, this.root, schedulerGroup);
+        this.jobs = new SpringJobs(this.restOperations, this.root, schedulerGroup);
+        this.organizations = new SpringOrganizations(this.restOperations, this.root, schedulerGroup);
+        this.organizationQuotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restOperations, this.root, schedulerGroup);
+        this.packages = new SpringPackages(this.restOperations, this.root, schedulerGroup);
+        this.privateDomains = new SpringPrivateDomains(this.restOperations, this.root, schedulerGroup);
+        this.processes = new SpringProcesses(this.restOperations, this.root, schedulerGroup);
+        this.routes = new SpringRoutes(this.restOperations, this.root, schedulerGroup);
+        this.sharedDomains = new SpringSharedDomains(this.restOperations, this.root, schedulerGroup);
+        this.serviceBindings = new SpringServiceBindings(this.restOperations, this.root, schedulerGroup);
+        this.serviceBrokers = new SpringServiceBrokers(this.restOperations, this.root, schedulerGroup);
+        this.serviceInstances = new SpringServiceInstances(this.restOperations, this.root, schedulerGroup);
+        this.serviceKeys = new SpringServiceKeys(this.restOperations, this.root, schedulerGroup);
+        this.servicePlanVisibilities = new SpringServicePlanVisibilities(this.restOperations, this.root, schedulerGroup);
+        this.servicePlans = new SpringServicePlans(this.restOperations, this.root, schedulerGroup);
+        this.services = new SpringServices(this.restOperations, this.root, schedulerGroup);
+        this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(this.restOperations, this.root, schedulerGroup);
+        this.spaces = new SpringSpaces(this.restOperations, this.root, schedulerGroup);
+        this.stacks = new SpringStacks(this.restOperations, this.root, schedulerGroup);
+        this.tasks = new SpringTasks(this.restOperations, this.root, schedulerGroup);
+        this.users = new SpringUsers(this.restOperations, this.root, schedulerGroup);
         this.username = null;
     }
 
@@ -423,9 +421,16 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         return this.restOperations;
     }
 
+    URI getRoot() {
+        return this.root;
+    }
+
     private static OAuth2RestOperations createRestOperations(String clientId, String clientSecret, String host, String username, String password, RestOperations bootstrapRestOperations,
-                                                             List<DeserializationProblemHandler> deserializationProblemHandlers) {
-        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId, clientSecret, host, username, password, bootstrapRestOperations);
+                                                             List<DeserializationProblemHandler> deserializationProblemHandlers, Boolean skipSslValidation,
+                                                             SslCertificateTruster sslCertificateTruster) {
+        OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails = getOAuth2ProtectedResourceDetails(clientId, clientSecret, host, username, password, bootstrapRestOperations,
+            skipSslValidation, sslCertificateTruster);
+
         OAuth2ClientContext oAuth2ClientContext = getOAuth2ClientContext();
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
@@ -458,28 +463,32 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     @SuppressWarnings("unchecked")
-    private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations) {
+    private static String getAccessTokenUri(String host, RestOperations bootstrapRestOperations, Boolean skipSslValidation, SslCertificateTruster sslCertificateTruster) {
         String infoUri = UriComponentsBuilder.newInstance()
             .scheme("https").host(host).pathSegment("info")
             .build().toUriString();
 
         Map<String, String> results = bootstrapRestOperations.getForObject(infoUri, Map.class);
 
-        return UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString(results.get("token_endpoint"))
             .pathSegment("oauth", "token")
-            .build().toUriString();
+            .build();
+
+        trustHost(uriComponents.getHost(), skipSslValidation, sslCertificateTruster);
+
+        return uriComponents.toUriString();
     }
 
     private static OAuth2ClientContext getOAuth2ClientContext() {
         return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
     }
 
-    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(String clientId, String clientSecret, String host, String username, String password, RestOperations
-        bootstrapRestOperations) {
+    private static OAuth2ProtectedResourceDetails getOAuth2ProtectedResourceDetails(String clientId, String clientSecret, String host, String username, String password,
+                                                                                    RestOperations bootstrapRestOperations, Boolean skipSslValidation, SslCertificateTruster sslCertificateTruster) {
         ResourceOwnerPasswordResourceDetails details = new ResourceOwnerPasswordResourceDetails();
         details.setClientId(clientId != null ? clientId : "cf");
         details.setClientSecret(clientSecret != null ? clientSecret : "");
-        details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations));
+        details.setAccessTokenUri(getAccessTokenUri(host, bootstrapRestOperations, skipSslValidation, sslCertificateTruster));
         details.setUsername(username);
         details.setPassword(password);
 
@@ -488,6 +497,16 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private static URI getRoot(String host) {
         return UriComponentsBuilder.newInstance().scheme("https").host(host).build().toUri();
+    }
+
+    private static void trustHost(String host, Boolean skipSslValidation, SslCertificateTruster sslCertificateTruster) {
+        if (skipSslValidation != null && skipSslValidation) {
+            try {
+                sslCertificateTruster.trust(host, 443, 5, SECONDS);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

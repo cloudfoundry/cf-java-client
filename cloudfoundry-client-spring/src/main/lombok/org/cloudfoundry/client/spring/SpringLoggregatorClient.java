@@ -19,6 +19,7 @@ package org.cloudfoundry.client.spring;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.LoggregatorClient;
 import org.cloudfoundry.client.loggregator.LoggregatorMessage;
 import org.cloudfoundry.client.loggregator.RecentLogsRequest;
@@ -29,7 +30,6 @@ import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
@@ -58,11 +58,11 @@ public final class SpringLoggregatorClient implements LoggregatorClient {
     SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
         SchedulerGroup schedulerGroup = createSchedulerGroup();
 
-        URI cloudFoundryRoot = getRoot(cloudFoundryClient);
-        URI loggregatorRoot = UriComponentsBuilder.fromUri(cloudFoundryRoot).scheme("wss").build().toUri();
-
+        URI cloudFoundryRoot = getCloudFoundryRoot(cloudFoundryClient);
         this.recent = new SpringRecent(getRestOperations(cloudFoundryClient), cloudFoundryRoot, schedulerGroup);
-        this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggregatorRoot, schedulerGroup, webSocketContainer);
+
+        URI loggingRoot = getLoggingRoot(cloudFoundryClient);
+        this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggingRoot, schedulerGroup, webSocketContainer);
     }
 
     SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
@@ -89,32 +89,36 @@ public final class SpringLoggregatorClient implements LoggregatorClient {
         return ClientEndpointConfig.Builder.create().configurator(configurator).build();
     }
 
-    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getRestOperations();
+    private static URI getCloudFoundryRoot(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getRoot();
     }
 
-    private static URI getRoot(SpringCloudFoundryClient cloudFoundryClient) {
+    private static URI getLoggingRoot(CloudFoundryClient cloudFoundryClient) {
         return requestInfo(cloudFoundryClient)
             .map(new Function<GetInfoResponse, String>() {
 
                 @Override
-                public String apply(GetInfoResponse getInfoResponse) {
-                    return getInfoResponse.getLoggingEndpoint();
+                public String apply(GetInfoResponse response) {
+                    return response.getLoggingEndpoint();
                 }
 
             })
             .map(new Function<String, URI>() {
 
                 @Override
-                public URI apply(String loggingEndpoint) {
-                    return UriComponentsBuilder.fromUriString(loggingEndpoint).scheme("https").build().toUri();
+                public URI apply(String uri) {
+                    return URI.create(uri);
                 }
 
             })
             .get();
     }
 
-    private static Mono<GetInfoResponse> requestInfo(SpringCloudFoundryClient cloudFoundryClient) {
+    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.getRestOperations();
+    }
+
+    private static Mono<GetInfoResponse> requestInfo(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient.info()
             .get(GetInfoRequest.builder()
                 .build());
