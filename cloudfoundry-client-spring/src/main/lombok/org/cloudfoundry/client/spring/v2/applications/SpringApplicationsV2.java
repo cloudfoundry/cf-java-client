@@ -56,7 +56,11 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.reactivestreams.Publisher;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
@@ -67,6 +71,7 @@ import reactor.fn.Consumer;
 import reactor.fn.Supplier;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * The Spring-based implementation of {@link ApplicationsV2}
@@ -326,11 +331,8 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
                 @Override
                 public MultiValueMap<String, Object> get() {
                     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-                    if (request.getAsync() != null) {
-                        body.add("async", request.getAsync());
-                    }
-                    body.add("resources", request.getResources());
-                    body.add("application", new FileSystemResource(request.getApplication()));
+                    body.add("resources", getResourcesPart(request));
+                    body.add("application", getApplicationPart(request));
                     return body;
                 }
 
@@ -339,10 +341,31 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
                 @Override
                 public void accept(UriComponentsBuilder builder) {
                     builder.pathSegment("v2", "apps", request.getApplicationId(), "bits");
+                    QueryBuilder.augment(builder, request);
                 }
 
             }
         );
+    }
+
+    private static HttpEntity<Resource> getApplicationPart(UploadApplicationRequest request) {
+        Resource body = new InputStreamResource(request.getApplication());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("application", "application.zip");
+        headers.setContentType(MediaType.parseMediaType("application/zip"));
+
+        return new HttpEntity<>(body, headers);
+    }
+
+    private static HttpEntity<List<UploadApplicationRequest.Resource>> getResourcesPart(UploadApplicationRequest request) {
+        List<UploadApplicationRequest.Resource> body = request.getResources();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("resources", null);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity<>(body, headers);
     }
 
 }

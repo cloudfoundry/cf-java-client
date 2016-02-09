@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v3.packages;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
@@ -30,7 +30,7 @@ public final class UploadPackageRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = UploadPackageRequest.builder()
-            .file(new File(""))
+            .bits(new ByteArrayInputStream(new byte[0]))
             .packageId("test-package-id")
             .build()
             .isValid();
@@ -46,13 +46,13 @@ public final class UploadPackageRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("file must be specified", result.getMessages().get(0));
+        assertEquals("bits must be specified", result.getMessages().get(0));
     }
 
     @Test
     public void isValidNoId() {
         ValidationResult result = UploadPackageRequest.builder()
-            .file(new File(""))
+            .bits(new ByteArrayInputStream(new byte[0]))
             .build()
             .isValid();
 

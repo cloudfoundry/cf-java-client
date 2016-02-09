@@ -81,7 +81,7 @@ public final class SpringLoggregatorClient implements LoggregatorClient {
     }
 
     private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("loggregator-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+        return SchedulerGroup.io("loggregator", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
     }
 
     private static ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {

@@ -36,7 +36,7 @@ import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.reactivestreams.Publisher;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -151,11 +151,11 @@ public final class SpringPackages extends AbstractSpringOperations implements Pa
 
     @Override
     public Mono<UploadPackageResponse> upload(final UploadPackageRequest request) {
-        return postWithBody(request, new Supplier<MultiValueMap<String, FileSystemResource>>() {
+        return postWithBody(request, new Supplier<MultiValueMap<String, InputStreamResource>>() {
 
             @Override
-            public MultiValueMap<String, FileSystemResource> get() {
-                return CollectionUtils.singletonMultiValueMap("bits", new FileSystemResource(request.getFile()));
+            public MultiValueMap<String, InputStreamResource> get() {
+                return CollectionUtils.singletonMultiValueMap("bits", new InputStreamResource(request.getBits()));
             }
 
         }, UploadPackageResponse.class, new Consumer<UriComponentsBuilder>() {

@@ -454,7 +454,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     }
 
     private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("cloud-foundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+        return SchedulerGroup.io("cloud-foundry", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
     }
 
     @SuppressWarnings("unchecked")

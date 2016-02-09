@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.utils.DelayUtils;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -593,13 +594,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private Mono<String> uploadApplication(String applicationId) {
-        return this.cloudFoundryClient.applicationsV2()
-            .upload(UploadApplicationRequest.builder()
-                .application(new File("./src/test/resources/testApplication.zip"))
-                .async(false)
-                .applicationId(applicationId)
-                .build())
-            .map(response -> applicationId);
+        try {
+            return this.cloudFoundryClient.applicationsV2()
+                .upload(UploadApplicationRequest.builder()
+                    .application(new ClassPathResource("testApplication.zip").getInputStream())
+                    .async(true)
+                    .applicationId(applicationId)
+                    .build())
+                .map(ResourceUtils::getId)
+                .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .as(Stream::from)
+                .after(() -> Mono.just(applicationId))
+                .single();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Mono<String> waitForStaging(String applicationId) {
