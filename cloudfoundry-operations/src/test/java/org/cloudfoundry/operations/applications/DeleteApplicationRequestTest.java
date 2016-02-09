@@ -21,14 +21,25 @@ import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
 public final class DeleteApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = fill(DeleteApplicationRequest.builder())
+        ValidationResult result = DeleteApplicationRequest.builder()
+            .name("test-name")
+            .deleteRoutes(true)
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void isValidNoDeleteRoutes() {
+        ValidationResult result = DeleteApplicationRequest.builder()
+            .name("test-name")
             .build()
             .isValid();
 

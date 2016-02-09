@@ -21,14 +21,14 @@ import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
 public final class RestartApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = fill(RestartApplicationRequest.builder())
+        ValidationResult result = RestartApplicationRequest.builder()
+            .name("test-name")
             .build()
             .isValid();
 

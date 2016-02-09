@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
@@ -29,6 +30,10 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.events.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.v2.events.ListEventsRequest;
+import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
@@ -42,6 +47,7 @@ import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.utils.DateUtils;
+import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
@@ -54,6 +60,43 @@ import static org.cloudfoundry.utils.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
+
+    private static void requestApplicationEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
+        final ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
+
+        for (EventEntity entity : entities) {
+            responseBuilder.resource(EventResource.builder()
+                .metadata(Resource.Metadata.builder().id("test-event-id").build())
+                .entity(entity)
+                .build());
+        }
+
+        when(cloudFoundryClient.events()
+            .list(ListEventsRequest.builder()
+                .actee(applicationId)
+                .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                .resultsPerPage(50)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(responseBuilder
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestApplicationEventsEmpty(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.events()
+            .list(ListEventsRequest.builder()
+                .actee(applicationId)
+                .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                .resultsPerPage(50)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListEventsResponse.builder())
+                    .totalPages(1)
+                    .build()));
+    }
 
     private static void requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
@@ -140,8 +183,7 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                        .build())
+                    .resource(fill(ApplicationResource.builder(), "application-").build())
                     .totalPages(1)
                     .build()));
     }
@@ -392,6 +434,197 @@ public final class DefaultApplicationsTest {
                     .build());
         }
 
+    }
+
+    public static final class GetEvents extends AbstractOperationsApiTest<ApplicationEvent> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEvents(this.cloudFoundryClient,
+                "test-application-id",
+                fill(EventEntity.builder(), "event-")
+                    .timestamp("2016-02-08T15:45:59Z")
+                    .metadata("request", StringMap.builder()
+                        .entry("instances", 1)
+                        .entry("memory", 2)
+                        .entry("environment_json", "test-data")
+                        .entry("state", "test-state")
+                        .build())
+                    .build());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(ApplicationEvent.builder()
+                    .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
+                    .event("test-event-type")
+                    .actor("test-event-actorName")
+                    .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationEvent> invoke() {
+            return this.applications
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+    }
+
+    public static final class GetEventsBadTimeSparseMetadata extends AbstractOperationsApiTest<ApplicationEvent> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEvents(this.cloudFoundryClient,
+                "test-application-id",
+                fill(EventEntity.builder(), "event-")
+                    .timestamp("BAD-TIMESTAMP")
+                    .metadata("request", StringMap.builder()
+                        .entry("memory", 2)
+                        .entry("environment_json", "test-data")
+                        .entry("state", "test-state")
+                        .build())
+                    .build());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(ApplicationEvent.builder()
+                    .description("memory: 2, state: test-state, environment_json: test-data")
+                    .event("test-event-type")
+                    .actor("test-event-actorName")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationEvent> invoke() {
+            return this.applications
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+    }
+
+    public static final class GetEventsFoundZero extends AbstractOperationsApiTest<ApplicationEvent> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEventsEmpty(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+            // expect successful empty result
+        }
+
+        @Override
+        protected Publisher<ApplicationEvent> invoke() {
+            return this.applications
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+    }
+
+    public static final class GetEventsLimitZero extends AbstractOperationsApiTest<ApplicationEvent> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEvents(this.cloudFoundryClient,
+                "test-application-id",
+                fill(EventEntity.builder(), "event-")
+                    .timestamp("2016-02-08T15:45:59Z")
+                    .metadata("request", StringMap.builder()
+                        .entry("instances", 1)
+                        .entry("memory", 2)
+                        .entry("environment_json", "test-data")
+                        .entry("state", "test-state")
+                        .build())
+                    .build());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+            // expect successful empty result
+        }
+
+        @Override
+        protected Publisher<ApplicationEvent> invoke() {
+            return this.applications
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name("test-app")
+                    .maxNumberOfEvents(0)
+                    .build());
+        }
+    }
+
+    public static final class GetEventsTwo extends AbstractOperationsApiTest<ApplicationEvent> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEvents(this.cloudFoundryClient,
+                "test-application-id",
+                fill(EventEntity.builder(), "event-")
+                    .timestamp("2016-02-08T15:45:59Z")
+                    .metadata("request", StringMap.builder()
+                        .entry("instances", 1)
+                        .entry("memory", 2)
+                        .entry("environment_json", "test-data")
+                        .entry("state", "test-state")
+                        .build())
+                    .build(),
+                fill(EventEntity.builder(), "event-")
+                    .timestamp("2016-02-08T15:49:07Z")
+                    .metadata("request", StringMap.builder()
+                        .entry("state", "test-state-two")
+                        .build())
+                    .build()
+            );
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEvent> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(ApplicationEvent.builder()
+                    .description("instances: 1, memory: 2, state: test-state, environment_json: test-data")
+                    .event("test-event-type")
+                    .actor("test-event-actorName")
+                    .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
+                    .build())
+                .assertEquals(ApplicationEvent.builder()
+                    .description("state: test-state-two")
+                    .event("test-event-type")
+                    .actor("test-event-actorName")
+                    .time(DateUtils.parseFromIso8601("2016-02-08T15:49:07Z"))
+                    .build())
+            ;
+        }
+
+        @Override
+        protected Publisher<ApplicationEvent> invoke() {
+            return this.applications
+                .getEvents(GetApplicationEventsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
     }
 
     public static final class GetNoBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
