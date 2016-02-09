@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
 import lombok.ToString;
 import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.StreamLogsRequest;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.StreamLogsRequest;
 import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.ValidationUtils;
 import org.reactivestreams.Subscriber;
@@ -62,7 +62,7 @@ public final class SpringStream {
         this.webSocketContainer = webSocketContainer;
     }
 
-    public Stream<LoggregatorMessage> stream(final StreamLogsRequest request) {
+    public Stream<LogMessage> stream(final StreamLogsRequest request) {
         return ws(request, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -70,10 +70,10 @@ public final class SpringStream {
                 builder.path("tail/").queryParam("app", request.getApplicationId());
             }
 
-        }, new Function<Subscriber<LoggregatorMessage>, MessageHandler>() {
+        }, new Function<Subscriber<LogMessage>, MessageHandler>() {
 
             @Override
-            public MessageHandler apply(Subscriber<LoggregatorMessage> subscriber) {
+            public MessageHandler apply(Subscriber<LogMessage> subscriber) {
                 return new LoggregatorMessageHandler(subscriber);
             }
 

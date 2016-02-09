@@ -1,6 +1,6 @@
 package logmessage;
 
-option java_package = "org.cloudfoundry.client.loggregator";
+option java_package = "org.cloudfoundry.client.logging";
 option java_outer_classname = "LoggregatorProtocolBuffers";
 
 message LogMessage {

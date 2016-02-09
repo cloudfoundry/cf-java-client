@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
+import org.cloudfoundry.client.logging.LogMessage;
 import org.cloudfoundry.client.spring.util.Multipart;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -30,7 +29,7 @@ import reactor.fn.Function;
 import java.io.IOException;
 import java.util.List;
 
-public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LoggregatorMessage>> {
+public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMessageConverter<List<LogMessage>> {
 
     public LoggregatorMessageHttpMessageConverter() {
         super(MediaType.parseMediaType("multipart/x-protobuf"));
@@ -42,7 +41,7 @@ public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMe
     }
 
     @Override
-    protected List<LoggregatorMessage> readInternal(Class<? extends List<LoggregatorMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
+    protected List<LogMessage> readInternal(Class<? extends List<LogMessage>> clazz, HttpInputMessage inputMessage) throws IOException {
         String boundary = inputMessage.getHeaders().getContentType().getParameter("boundary");
 
         return Multipart
@@ -58,18 +57,18 @@ public final class LoggregatorMessageHttpMessageConverter extends AbstractHttpMe
     }
 
     @Override
-    protected void writeInternal(List<LoggregatorMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
+    protected void writeInternal(List<LogMessage> loggregatorMessage, HttpOutputMessage outputMessage) {
         throw new UnsupportedOperationException();
     }
 
-    private static Function<byte[], LoggregatorMessage> toLoggregatorMessage() {
-        return new Function<byte[], LoggregatorMessage>() {
+    private static Function<byte[], LogMessage> toLoggregatorMessage() {
+        return new Function<byte[], LogMessage>() {
 
             @Override
-            public LoggregatorMessage apply(byte[] part) {
+            public LogMessage apply(byte[] part) {
                 try {
-                    LogMessage logMessage = LogMessage.parseFrom(part);
-                    return LoggregatorMessage.from(logMessage);
+                    org.cloudfoundry.client.logging.LoggregatorProtocolBuffers.LogMessage logMessage = org.cloudfoundry.client.logging.LoggregatorProtocolBuffers.LogMessage.parseFrom(part);
+                    return LogMessage.from(logMessage);
                 } catch (InvalidProtocolBufferException e) {
                     throw new RuntimeException(e);
                 }

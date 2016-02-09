@@ -16,29 +16,22 @@
 
 package org.cloudfoundry.client;
 
-/**
- * An exception indicating that Loggregator has experienced a problem
- */
-public final class LoggregatorException extends RuntimeException {
+import org.junit.Test;
 
-    private static final long serialVersionUID = 6197301178034905524L;
+import static org.junit.Assert.assertEquals;
 
-    /**
-     * Creates a new instance
-     *
-     * @param message the message
-     */
-    public LoggregatorException(String message) {
-        super(message);
+public final class LoggingExceptionTest {
+
+    @Test
+    public void cause() {
+        Exception cause = new Exception();
+        assertEquals(cause, new LoggingException(cause).getCause());
     }
 
-    /**
-     * Creates a new instance
-     *
-     * @param cause the cause
-     */
-    public LoggregatorException(Throwable cause) {
-        super(cause);
+    @Test
+    public void message() {
+        String message = "test-message";
+        assertEquals(message, new LoggingException(message).getMessage());
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.loggregator;
+package org.cloudfoundry.client.logging;
 
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +22,10 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the Recent Logs operation
+ * The request payload for the Stream Logs operation
  */
 @Data
-public final class RecentLogsRequest implements Validatable {
+public final class StreamLogsRequest implements Validatable {
 
     /**
      * The application id
@@ -36,7 +36,7 @@ public final class RecentLogsRequest implements Validatable {
     private final String applicationId;
 
     @Builder
-    RecentLogsRequest(String applicationId) {
+    StreamLogsRequest(String applicationId) {
         this.applicationId = applicationId;
     }
 

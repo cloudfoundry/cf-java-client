@@ -20,12 +20,12 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggregatorClient;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.RecentLogsRequest;
-import org.cloudfoundry.client.loggregator.StreamLogsRequest;
-import org.cloudfoundry.client.spring.loggregator.SpringRecent;
-import org.cloudfoundry.client.spring.loggregator.SpringStream;
+import org.cloudfoundry.client.LoggingClient;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.RecentLogsRequest;
+import org.cloudfoundry.client.logging.StreamLogsRequest;
+import org.cloudfoundry.client.spring.logging.SpringRecent;
+import org.cloudfoundry.client.spring.logging.SpringStream;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
@@ -41,21 +41,21 @@ import javax.websocket.WebSocketContainer;
 import java.net.URI;
 
 /**
- * The Spring-based implementation of {@link LoggregatorClient}
+ * The Spring-based implementation of {@link LoggingClient}
  */
 @ToString(callSuper = true)
-public final class SpringLoggregatorClient implements LoggregatorClient {
+public final class SpringLoggingClient implements LoggingClient {
 
     private final SpringRecent recent;
 
     private final SpringStream stream;
 
     @Builder
-    SpringLoggregatorClient(@NonNull SpringCloudFoundryClient cloudFoundryClient) {
+    SpringLoggingClient(@NonNull SpringCloudFoundryClient cloudFoundryClient) {
         this(cloudFoundryClient, ContainerProvider.getWebSocketContainer());
     }
 
-    SpringLoggregatorClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
+    SpringLoggingClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
         SchedulerGroup schedulerGroup = createSchedulerGroup();
 
         URI cloudFoundryRoot = getCloudFoundryRoot(cloudFoundryClient);
@@ -65,23 +65,23 @@ public final class SpringLoggregatorClient implements LoggregatorClient {
         this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggingRoot, schedulerGroup, webSocketContainer);
     }
 
-    SpringLoggregatorClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
+    SpringLoggingClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
         this.recent = new SpringRecent(restOperations, root, schedulerGroup);
         this.stream = new SpringStream(clientEndpointConfig, root, schedulerGroup, webSocketContainer);
     }
 
     @Override
-    public Publisher<LoggregatorMessage> recent(RecentLogsRequest request) {
+    public Publisher<LogMessage> recent(RecentLogsRequest request) {
         return this.recent.recent(request);
     }
 
     @Override
-    public Publisher<LoggregatorMessage> stream(StreamLogsRequest request) {
+    public Publisher<LogMessage> stream(StreamLogsRequest request) {
         return this.stream.stream(request);
     }
 
     private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("loggregator", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+        return SchedulerGroup.io("logging", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
     }
 
     private static ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {

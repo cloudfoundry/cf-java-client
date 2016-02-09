@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.loggregator;
+package org.cloudfoundry.client.logging;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class RecentLogsRequestTest {
+public final class StreamLogsRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = RecentLogsRequest.builder()
+        ValidationResult result = StreamLogsRequest.builder()
             .applicationId("test-application-id")
             .build()
             .isValid();
@@ -37,7 +37,7 @@ public final class RecentLogsRequestTest {
 
     @Test
     public void isValidNoId() {
-        ValidationResult result = RecentLogsRequest.builder()
+        ValidationResult result = StreamLogsRequest.builder()
             .build()
             .isValid();
 
