@@ -18,9 +18,11 @@ package org.cloudfoundry.client.spring.v2.serviceplanvisibilities;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
@@ -36,6 +38,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -92,7 +95,41 @@ public final class SpringServicePlanVisibilitiesTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteServicePlanVisibilityRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
+
+        private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServicePlanVisibilityRequest getInvalidRequest() {
+            return DeleteServicePlanVisibilityRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteServicePlanVisibilityResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServicePlanVisibilityRequest getValidRequest() throws Exception {
+            return DeleteServicePlanVisibilityRequest.builder()
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteServicePlanVisibilityResponse> invoke(DeleteServicePlanVisibilityRequest request) {
+            return this.servicePlanVisibilities.delete(request);
+        }
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteServicePlanVisibilityRequest, DeleteServicePlanVisibilityResponse> {
 
         private final ServicePlanVisibilities servicePlanVisibilities = new SpringServicePlanVisibilities(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -105,12 +142,23 @@ public final class SpringServicePlanVisibilitiesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("/v2/service_plan_visibilities/test-service-plan-visibility-id?async=true")
-                .status(NO_CONTENT);
+                .status(ACCEPTED)
+                .responsePayload("v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected DeleteServicePlanVisibilityResponse getResponse() {
+            return DeleteServicePlanVisibilityResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
         }
 
         @Override
@@ -122,7 +170,7 @@ public final class SpringServicePlanVisibilitiesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteServicePlanVisibilityRequest request) {
+        protected Mono<DeleteServicePlanVisibilityResponse> invoke(DeleteServicePlanVisibilityRequest request) {
             return this.servicePlanVisibilities.delete(request);
         }
     }

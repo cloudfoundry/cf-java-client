@@ -23,6 +23,7 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.GetServicePlanVisibilityResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
@@ -62,8 +63,8 @@ public final class SpringServicePlanVisibilities extends AbstractSpringOperation
     }
 
     @Override
-    public Mono<Void> delete(final DeleteServicePlanVisibilityRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<DeleteServicePlanVisibilityResponse> delete(final DeleteServicePlanVisibilityRequest request) {
+        return delete(request, DeleteServicePlanVisibilityResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

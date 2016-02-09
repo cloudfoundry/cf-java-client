@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring.v2.spaces;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
@@ -26,6 +25,7 @@ import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -52,6 +52,7 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -96,6 +97,7 @@ import org.cloudfoundry.client.v2.spaces.UserSpaceRoleEntity;
 import org.cloudfoundry.client.v2.spaces.UserSpaceRoleResource;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.utils.StringMap;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -106,6 +108,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -595,7 +598,43 @@ public final class SpringSpacesTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteSpaceRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
+
+        private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteSpaceRequest getInvalidRequest() {
+            return DeleteSpaceRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("v2/spaces/test-space-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteSpaceResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteSpaceRequest getValidRequest() throws Exception {
+            return DeleteSpaceRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteSpaceResponse> invoke(DeleteSpaceRequest request) {
+            return this.spaces.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteSpaceRequest, DeleteSpaceResponse> {
 
         private final SpringSpaces spaces = new SpringSpaces(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -609,12 +648,23 @@ public final class SpringSpacesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("v2/spaces/test-space-id?async=true")
-                .status(NO_CONTENT);
+                .status(ACCEPTED)
+                .responsePayload("v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected DeleteSpaceResponse getResponse() {
+            return DeleteSpaceResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
         }
 
         @Override
@@ -626,7 +676,7 @@ public final class SpringSpacesTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteSpaceRequest request) {
+        protected Mono<DeleteSpaceResponse> invoke(DeleteSpaceRequest request) {
             return this.spaces.delete(request);
         }
 

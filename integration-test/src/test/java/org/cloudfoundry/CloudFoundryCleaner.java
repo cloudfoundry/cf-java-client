@@ -132,7 +132,9 @@ final class CloudFoundryCleaner {
                 .delete(DeleteSpaceRequest.builder()
                     .async(true)
                     .spaceId(spaceId)
-                    .build()));
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
 }
