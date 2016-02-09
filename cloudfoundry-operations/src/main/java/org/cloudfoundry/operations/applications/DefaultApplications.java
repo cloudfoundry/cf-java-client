@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -28,6 +29,10 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.events.EventEntity;
+import org.cloudfoundry.client.v2.events.EventResource;
+import org.cloudfoundry.client.v2.events.ListEventsRequest;
+import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -61,15 +66,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.cloudfoundry.utils.DateUtils.parseFromIso8601;
 import static org.cloudfoundry.utils.OperationUtils.not;
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.cloudfoundry.utils.tuple.TupleUtils.predicate;
 
 public final class DefaultApplications implements Applications {
 
-    public static final String STARTED_STATE = "STARTED";
+    private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
 
-    public static final String STOPPED_STATE = "STOPPED";
+    private static final String STARTED_STATE = "STARTED";
+
+    private static final String STOPPED_STATE = "STOPPED";
 
     private final CloudFoundryClient cloudFoundryClient;
 
@@ -89,7 +97,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple2<Optional<List<Route>>, String>> apply(DeleteApplicationRequest request, String spaceId) {
-                    return getRoutesAndApplicationId(DefaultApplications.this.cloudFoundryClient, request, spaceId);
+                    return getRoutesAndApplicationId(cloudFoundryClient, request, spaceId);
                 }
 
             }))
@@ -97,7 +105,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(Optional<List<Route>> routes, final String applicationId) {
-                    return deleteRoutes(DefaultApplications.this.cloudFoundryClient, routes)
+                    return deleteRoutes(cloudFoundryClient, routes)
                         .after(new Supplier<Mono<String>>() {
 
                             @Override
@@ -113,7 +121,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Void> apply(String applicationId) {
-                    return requestDeleteApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
+                    return requestDeleteApplication(cloudFoundryClient, applicationId);
                 }
 
             });
@@ -128,7 +136,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(GetApplicationRequest request, String spaceId) {
-                    return getApplication(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId);
+                    return getApplication(cloudFoundryClient, request.getName(), spaceId);
                 }
 
             }))
@@ -136,7 +144,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> apply(AbstractApplicationResource applicationResource) {
-                    return getAuxiliaryContent(DefaultApplications.this.cloudFoundryClient, applicationResource);
+                    return getAuxiliaryContent(cloudFoundryClient, applicationResource);
                 }
 
             })
@@ -152,13 +160,44 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Publisher<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId)
+            .then(function(new Function2<GetApplicationEventsRequest, String, Mono<Tuple2<GetApplicationEventsRequest, String>>>() {
+                @Override
+                public Mono<Tuple2<GetApplicationEventsRequest, String>> apply(GetApplicationEventsRequest request, String spaceId) {
+                    return Mono.when(Mono.just(applyEventsDefaults(request)), Mono.just(spaceId));
+                }
+            }))
+            .then(function(new Function2<GetApplicationEventsRequest, String, Mono<Tuple2<GetApplicationEventsRequest, String>>>() {
+
+                @Override
+                public Mono<Tuple2<GetApplicationEventsRequest, String>> apply(GetApplicationEventsRequest request, String spaceId) {
+                    return Mono.when(Mono.just(request), getApplicationId(cloudFoundryClient, request.getName(), spaceId));
+                }
+            }))
+            .flatMap(function(new Function2<GetApplicationEventsRequest, String, Stream<EventResource>>() {
+                @Override
+                public Stream<EventResource> apply(GetApplicationEventsRequest request, final String applicationId) {
+                    return getEventResources(applicationId, cloudFoundryClient).take(request.getMaxNumberOfEvents());
+                }
+            }))
+            .map(new Function<EventResource, ApplicationEvent>() {
+                @Override
+                public ApplicationEvent apply(EventResource resource) {
+                    return convertToApplicationEvent(resource);
+                }
+            });
+    }
+
+    @Override
     public Publisher<ApplicationSummary> list() {
         return this.spaceId
             .then(new Function<String, Mono<GetSpaceSummaryResponse>>() {
 
                 @Override
                 public Mono<GetSpaceSummaryResponse> apply(String spaceId) {
-                    return requestSpaceSummary(DefaultApplications.this.cloudFoundryClient, spaceId);
+                    return requestSpaceSummary(cloudFoundryClient, spaceId);
                 }
 
             })
@@ -188,7 +227,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple2<String, RenameApplicationRequest>> apply(RenameApplicationRequest request, String spaceId) {
-                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId)
+                    return getApplicationId(cloudFoundryClient, request.getName(), spaceId)
                         .and(Mono.just(request));
                 }
             }))
@@ -196,7 +235,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<UpdateApplicationResponse> apply(String applicationId, RenameApplicationRequest request) {
-                    return requestUpdateApplicationRename(DefaultApplications.this.cloudFoundryClient, applicationId, request.getNewName());
+                    return requestUpdateApplicationRename(cloudFoundryClient, applicationId, request.getNewName());
                 }
 
             }))
@@ -304,7 +343,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(String application, String spaceId) {
-                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, application, spaceId, not(isIn(STARTED_STATE)));
+                    return getApplicationIdWhere(cloudFoundryClient, application, spaceId, not(isIn(STARTED_STATE)));
                 }
 
             }))
@@ -312,7 +351,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(String applicationId) {
-                    return startApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
+                    return startApplication(cloudFoundryClient, applicationId);
                 }
 
             })
@@ -336,7 +375,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(String application, String spaceId) {
-                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, application, spaceId, not(isIn(STOPPED_STATE)));
+                    return getApplicationIdWhere(cloudFoundryClient, application, spaceId, not(isIn(STOPPED_STATE)));
                 }
 
             }))
@@ -344,15 +383,39 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(String applicationId) {
-                    return stopApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
+                    return stopApplication(cloudFoundryClient, applicationId);
                 }
 
             })
             .after();
     }
 
+    private static GetApplicationEventsRequest applyEventsDefaults(GetApplicationEventsRequest request) {
+        return (request.getMaxNumberOfEvents() != null) ? request :
+            GetApplicationEventsRequest.builder()
+                .name(request.getName())
+                .maxNumberOfEvents(MAX_NUMBER_OF_RECENT_EVENTS)
+                .build();
+    }
+
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
         return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
+    }
+
+    private static ApplicationEvent convertToApplicationEvent(EventResource resource) {
+        EventEntity entity = resource.getEntity();
+        Date timestamp = null;
+        try {
+            timestamp = parseFromIso8601(entity.getTimestamp());
+        } catch (IllegalArgumentException iae) {
+            // do not set time
+        }
+        return ApplicationEvent.builder()
+            .actor(entity.getActorName())
+            .description(eventDescription(getMetadataRequest(entity), "instances", "memory", "state", "environment_json"))
+            .event(entity.getType())
+            .time(timestamp)
+            .build();
     }
 
     private static Mono<Void> deleteRoutes(final CloudFoundryClient cloudFoundryClient, Optional<List<Route>> routes) {
@@ -383,6 +446,22 @@ public final class DefaultApplications implements Applications {
 
             })
             .after();
+    }
+
+    private static String eventDescription(Map<String, Object> request, String... entryNames) {
+        if (request == null) return "";
+        boolean first = true;
+        StringBuilder sb = new StringBuilder();
+        for (String entryName : entryNames) {
+            Object value = request.get(entryName);
+            if (value == null) continue;
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(entryName).append(": ").append(String.valueOf(value));
+        }
+        return sb.toString();
     }
 
     private static Stream<SpaceApplicationSummary> extractApplications(GetSpaceSummaryResponse getSpaceSummaryResponse) {
@@ -427,6 +506,26 @@ public final class DefaultApplications implements Applications {
             .orElse(response.getDetectedBuildpack());
     }
 
+    private static Stream<EventResource> getEventResources(final String applicationId, final CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.requestResources(new Function<Integer, Mono<ListEventsResponse>>() {
+            @Override
+            public Mono<ListEventsResponse> apply(Integer page) {
+                return cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .actee(applicationId)
+                        .orderDirection(PaginatedRequest.OrderDirection.DESC)
+                        .resultsPerPage(50)
+                        .page(page)
+                        .build());
+            }
+        });
+    }
+
+    private static Map<String, Object> getMetadataRequest(EventEntity entity) {
+        Map<String, Object> metadataMap = safeCastToMap(entity.getMetadatas());
+        return (metadataMap == null) ? null : safeCastToMap(metadataMap.get("request"));
+    }
+
     private static Mono<Optional<List<Route>>> getOptionalRoutes(final CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, final String applicationId) {
         return Mono
             .just(deleteRoutes)
@@ -468,7 +567,7 @@ public final class DefaultApplications implements Applications {
 
             });
     }
-    
+
     /**
      * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
      *
@@ -635,6 +734,14 @@ public final class DefaultApplications implements Applications {
             });
     }
 
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> safeCastToMap(Object request) {
+        if (request instanceof Map)
+            return (Map<String, Object>) request;
+        else
+            return null;
+    }
+
     private static Mono<AbstractApplicationResource> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE);
     }
@@ -676,7 +783,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Date toDate(String date) {
-        return date == null ? null : DateUtils.parseFromIso8601(date);
+        return date == null ? null : parseFromIso8601(date);
     }
 
     private static Date toDate(Double date) {

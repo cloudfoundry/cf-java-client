@@ -23,11 +23,11 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class StopApplicationRequestTest {
+public final class GetApplicationRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = StopApplicationRequest.builder()
+        ValidationResult result = GetApplicationRequest.builder()
             .name("test-name")
             .build()
             .isValid();
@@ -37,7 +37,7 @@ public final class StopApplicationRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = StopApplicationRequest.builder()
+        ValidationResult result = GetApplicationRequest.builder()
             .build()
             .isValid();
 

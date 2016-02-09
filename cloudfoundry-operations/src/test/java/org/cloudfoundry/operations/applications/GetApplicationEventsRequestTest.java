@@ -23,11 +23,34 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class StopApplicationRequestTest {
+public final class GetApplicationEventsRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = StopApplicationRequest.builder()
+        ValidationResult result = GetApplicationEventsRequest.builder()
+            .name("test-name")
+            .maxNumberOfEvents(20)
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
+    }
+
+    @Test
+    public void isValidNegative() {
+        ValidationResult result = GetApplicationEventsRequest.builder()
+            .name("test-name")
+            .maxNumberOfEvents(-1)
+            .build()
+            .isValid();
+
+        assertEquals(INVALID, result.getStatus());
+        assertEquals("maximum number of events must not be negative", result.getMessages().get(0));
+    }
+
+    @Test
+    public void isValidNoMaxNumberOfEvents() {
+        ValidationResult result = GetApplicationEventsRequest.builder()
             .name("test-name")
             .build()
             .isValid();
@@ -37,7 +60,8 @@ public final class StopApplicationRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = StopApplicationRequest.builder()
+        ValidationResult result = GetApplicationEventsRequest.builder()
+            .maxNumberOfEvents(1)
             .build()
             .isValid();
 

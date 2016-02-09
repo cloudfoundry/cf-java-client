@@ -43,6 +43,14 @@ public interface Applications {
     Mono<ApplicationDetail> get(GetApplicationRequest request);
 
     /**
+     * Gets recent events of an application.
+     *
+     * @param request the get application events request
+     * @return the events
+     */
+    Publisher<ApplicationEvent> getEvents(GetApplicationEventsRequest request);
+
+    /**
      * Lists the applications
      *
      * @return the applications
@@ -56,7 +64,7 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> rename(RenameApplicationRequest request);
-    
+
     /**
      * Restarts a specific application
      *

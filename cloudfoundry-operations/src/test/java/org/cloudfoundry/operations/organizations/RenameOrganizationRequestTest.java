@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
@@ -46,8 +45,8 @@ public final class RenameOrganizationRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
     }
-    
-  @Test
+
+    @Test
     public void isValidNoNewName() {
         ValidationResult result = RenameOrganizationRequest.builder()
             .name("name")
