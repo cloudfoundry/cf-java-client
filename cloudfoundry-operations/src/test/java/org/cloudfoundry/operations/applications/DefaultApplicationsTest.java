@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
+import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
@@ -72,6 +74,35 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
 
+    private static void requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetApplicationResponse>>() {
+
+                    private final Queue<GetApplicationResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetApplicationResponse.builder(), "job-")
+                            .entity(fill(ApplicationEntity.builder())
+                                .packageState("STAGING")
+                                .build())
+                            .build(),
+                        fill(GetApplicationResponse.builder(), "job-")
+                            .entity(fill(ApplicationEntity.builder())
+                                .packageState("STAGED")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetApplicationResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
+
     private static void requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .environment(ApplicationEnvironmentRequest.builder()
@@ -110,6 +141,19 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestApplicationFailing(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder())
+                        .packageState("FAILED")
+                        .build())
+                    .build()));
+    }
+
     private static void requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .instances(ApplicationInstancesRequest.builder()
@@ -118,6 +162,48 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
                     .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationInstancesFailingPartial(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                    .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .state("RUNNING")
+                        .build())
+                    .instance("instance-1", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .state("FLAPPING")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationInstancesFailingTotal(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                    .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .state("FLAPPING")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationInstancesRunning(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ApplicationInstancesResponse.builder(), "application-instances-")
+                    .instance("instance-0", fill(ApplicationInstanceInfo.builder(), "application-instance-info-")
+                        .state("RUNNING")
                         .build())
                     .build()));
     }
@@ -316,6 +402,16 @@ public final class DefaultApplicationsTest {
                     }
 
                 }));
+    }
+
+    private static void requestRestage(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .restage(org.cloudfoundry.client.v2.applications.RestageApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(RestageApplicationResponse.builder(), "application-")
+                    .build()));
     }
 
     private static void requestSpaceSummary(CloudFoundryClient cloudFoundryClient, String spaceId) {
@@ -571,53 +667,6 @@ public final class DefaultApplicationsTest {
     }
 
     public static final class EnableSshNoApp extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber
-                .assertError(IllegalArgumentException.class);
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.applications
-                .enableSsh(EnableApplicationSshRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-    }
-
-    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
-
-        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
-            testSubscriber.assertEquals(true);
-        }
-
-        @Override
-        protected Mono<Boolean> invoke() {
-            return this.applications
-                .sshEnabled(ApplicationSshEnabledRequest.builder()
-                    .name("test-app-name")
-                    .build());
-        }
-    }
-
-    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
 
@@ -1094,6 +1143,193 @@ public final class DefaultApplicationsTest {
         }
     }
 
+    public static final class Restage extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestage(this.cloudFoundryClient, "test-application-id");
+            requestApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(fill(RestageApplicationRequest.builder())
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RestageInvalidApplication extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(fill(RestageApplicationRequest.builder())
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RestageStagingFailure extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestage(this.cloudFoundryClient, "test-application-id");
+            requestApplicationFailing(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(fill(RestageApplicationRequest.builder())
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RestageStartingFailurePartial extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestage(this.cloudFoundryClient, "test-application-id");
+            requestApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(fill(RestageApplicationRequest.builder())
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RestageStartingFailureTotal extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestRestage(this.cloudFoundryClient, "test-application-id");
+            requestApplication(this.cloudFoundryClient, "test-application-id");
+            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restage(fill(RestageApplicationRequest.builder())
+                    .name("test-application-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RestartFailurePartial extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class RestartFailureTotal extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restart(RestartApplicationRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
     public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -1152,6 +1388,7 @@ public final class DefaultApplicationsTest {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
         }
 
         @Override
@@ -1177,6 +1414,7 @@ public final class DefaultApplicationsTest {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
         }
 
         @Override
@@ -1201,6 +1439,7 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
         }
 
         @Override
@@ -1399,6 +1638,102 @@ public final class DefaultApplicationsTest {
         }
     }
 
+    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(true);
+        }
+
+        @Override
+        protected Mono<Boolean> invoke() {
+            return this.applications
+                .sshEnabled(ApplicationSshEnabledRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class StartApplicationFailurePartial extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .start(fill(StartApplicationRequest.builder(), "application-")
+                    .build());
+        }
+    }
+
+    public static final class StartApplicationFailureTotal extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+            requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .start(fill(StartApplicationRequest.builder(), "application-")
+                    .build());
+        }
+    }
+
     public static final class StartInvalidApplication extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -1452,6 +1787,7 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplicationsSpecificState(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
             requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+            requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
         }
 
         @Override

@@ -27,6 +27,22 @@ public final class ResourceUtils {
     }
 
     /**
+     * Returns a function to extract the entity of a resource
+     *
+     * @return a function to extract the entity of a resource
+     */
+    public static <R extends Resource<T>, T> Function<R, T> extractEntity() {
+        return new Function<R, T>() {
+
+            @Override
+            public T apply(R resource) {
+                return getEntity(resource);
+            }
+
+        };
+    }
+
+    /**
      * Returns a function to extract the id of a resource
      *
      * @return the function to extract the id of a resource
