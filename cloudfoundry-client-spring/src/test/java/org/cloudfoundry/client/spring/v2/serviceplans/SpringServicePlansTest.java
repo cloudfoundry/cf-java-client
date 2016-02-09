@@ -29,12 +29,16 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRe
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
+import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesRequest;
+import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -294,6 +298,47 @@ public final class SpringServicePlansTest {
         @Override
         protected Mono<ListServicePlanServiceInstancesResponse> invoke(ListServicePlanServiceInstancesRequest request) {
             return this.servicePlans.listServiceInstances(request);
+        }
+
+    }
+
+    public static final class MigrateServiceInstances extends AbstractApiTest<MigrateServiceInstancesRequest, MigrateServiceInstancesResponse> {
+
+        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected MigrateServiceInstancesRequest getInvalidRequest() {
+            return MigrateServiceInstancesRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(PUT)
+                .path("v2/service_plans/ed66be44-0c9d-40f9-93b9-4e9c062a345c/service_instances")
+                .requestPayload("v2/service_plans/PUT_{id}_service_instances_request.json")
+                .status(OK)
+                .responsePayload("v2/service_plans/PUT_{id}_service_instances_response.json");
+        }
+
+        @Override
+        protected MigrateServiceInstancesResponse getResponse() {
+            return MigrateServiceInstancesResponse.builder()
+                .resourcesChanged(1)
+                .build();
+        }
+
+        @Override
+        protected MigrateServiceInstancesRequest getValidRequest() throws Exception {
+            return MigrateServiceInstancesRequest.builder()
+                .currentServicePlanId("ed66be44-0c9d-40f9-93b9-4e9c062a345c")
+                .destinationServicePlanId("8234565b-70d1-41cc-ac11-783694c35d15")
+                .build();
+        }
+
+        @Override
+        protected Publisher<MigrateServiceInstancesResponse> invoke(MigrateServiceInstancesRequest request) {
+            return this.servicePlans.migrateServiceInstances(request);
         }
 
     }

@@ -29,6 +29,8 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRe
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
+import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesRequest;
+import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -104,4 +106,15 @@ public final class SpringServicePlans extends AbstractSpringOperations implement
         });
     }
 
+    @Override
+    public Mono<MigrateServiceInstancesResponse> migrateServiceInstances(final MigrateServiceInstancesRequest request) {
+        return put(request, MigrateServiceInstancesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_plans", request.getCurrentServicePlanId(), "service_instances");
+            }
+
+        });
+    }
 }
