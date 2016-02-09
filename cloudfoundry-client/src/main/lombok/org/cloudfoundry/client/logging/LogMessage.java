@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.loggregator;
+package org.cloudfoundry.client.logging;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
 
 import java.util.Date;
 import java.util.List;
@@ -27,10 +26,10 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
- * Base class for Loggregator messages
+ * Base class for log messages
  */
 @Data
-public final class LoggregatorMessage {
+public final class LogMessage {
 
     private final String applicationId;
 
@@ -47,13 +46,13 @@ public final class LoggregatorMessage {
     private final Date timestamp;
 
     @Builder
-    LoggregatorMessage(String applicationId,
-                       @Singular List<String> drainUrls,
-                       String message,
-                       MessageType messageType,
-                       String sourceId,
-                       String sourceName,
-                       Date timestamp) {
+    LogMessage(String applicationId,
+               @Singular List<String> drainUrls,
+               String message,
+               MessageType messageType,
+               String sourceId,
+               String sourceName,
+               Date timestamp) {
         this.applicationId = applicationId;
         this.drainUrls = drainUrls;
         this.message = message;
@@ -69,8 +68,8 @@ public final class LoggregatorMessage {
      * @param logMessage the protobuf implementation
      * @return a new instance
      */
-    public static LoggregatorMessage from(LogMessage logMessage) {
-        return LoggregatorMessage.builder()
+    public static LogMessage from(LoggregatorProtocolBuffers.LogMessage logMessage) {
+        return LogMessage.builder()
             .applicationId(logMessage.getAppId())
             .drainUrls(logMessage.getDrainUrlsList())
             .message(logMessage.getMessage().toStringUtf8())

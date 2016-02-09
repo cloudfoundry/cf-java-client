@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
-import org.cloudfoundry.client.LoggregatorException;
+import org.cloudfoundry.client.LoggingException;
 import org.reactivestreams.Subscriber;
 
 import javax.websocket.CloseReason;
@@ -50,13 +50,13 @@ public final class ReactiveEndpoint<T> extends Endpoint {
         if (CloseReason.CloseCodes.NORMAL_CLOSURE == closeReason.getCloseCode() || CloseReason.CloseCodes.GOING_AWAY == closeReason.getCloseCode()) {
             this.subscriber.onComplete();
         } else {
-            this.subscriber.onError(new LoggregatorException(closeReason.getReasonPhrase()));
+            this.subscriber.onError(new LoggingException(closeReason.getReasonPhrase()));
         }
     }
 
     @Override
     public void onError(Session session, Throwable throwable) {
-        this.subscriber.onError(new LoggregatorException(throwable));
+        this.subscriber.onError(new LoggingException(throwable));
     }
 
     @Override

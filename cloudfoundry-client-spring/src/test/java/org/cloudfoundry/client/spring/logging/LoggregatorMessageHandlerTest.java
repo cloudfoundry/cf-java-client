@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.LoggregatorProtocolBuffers;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Test;
 
@@ -27,11 +27,11 @@ import java.util.Date;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.client.loggregator.LoggregatorMessage.MessageType.ERR;
+import static org.cloudfoundry.client.logging.LogMessage.MessageType.ERR;
 
 public final class LoggregatorMessageHandlerTest {
 
-    private final TestSubscriber<LoggregatorMessage> testSubscriber = new TestSubscriber<>();
+    private final TestSubscriber<LogMessage> testSubscriber = new TestSubscriber<>();
 
     private final LoggregatorMessageHandler messageHandler = new LoggregatorMessageHandler(this.testSubscriber);
 
@@ -53,7 +53,7 @@ public final class LoggregatorMessageHandlerTest {
 
         this.testSubscriber.onComplete();
         this.testSubscriber
-            .assertEquals(LoggregatorMessage.builder()
+            .assertEquals(LogMessage.builder()
                 .applicationId("test-app-id")
                 .drainUrl("test-drain-url")
                 .message("test-message")

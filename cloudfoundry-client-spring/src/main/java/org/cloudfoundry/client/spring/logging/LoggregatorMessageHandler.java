@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
+import org.cloudfoundry.client.logging.LogMessage;
 import org.reactivestreams.Subscriber;
 
 import javax.websocket.MessageHandler;
 
-import static org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
 
 public final class LoggregatorMessageHandler implements MessageHandler.Whole<byte[]> {
 
-    private final Subscriber<LoggregatorMessage> subscriber;
+    private final Subscriber<org.cloudfoundry.client.logging.LogMessage> subscriber;
 
-    public LoggregatorMessageHandler(Subscriber<LoggregatorMessage> subscriber) {
+    public LoggregatorMessageHandler(Subscriber<org.cloudfoundry.client.logging.LogMessage> subscriber) {
         this.subscriber = subscriber;
     }
 
     @Override
     public void onMessage(byte[] message) {
         try {
-            LogMessage logMessage = LogMessage.parseFrom(message);
-            LoggregatorMessage loggregatorMessage = LoggregatorMessage.from(logMessage);
+            org.cloudfoundry.client.logging.LoggregatorProtocolBuffers.LogMessage logMessage = org.cloudfoundry.client.logging.LoggregatorProtocolBuffers.LogMessage.parseFrom(message);
+            LogMessage loggregatorMessage = LogMessage.from(logMessage);
 
             this.subscriber.onNext(loggregatorMessage);
         } catch (InvalidProtocolBufferException e) {

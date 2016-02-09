@@ -19,7 +19,7 @@ package org.cloudfoundry;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringLoggregatorClient;
+import org.cloudfoundry.client.spring.SpringLoggingClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -101,8 +101,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    SpringLoggregatorClient loggregatorClient(SpringCloudFoundryClient cloudFoundryClient) {
-        return SpringLoggregatorClient.builder()
+    SpringLoggingClient loggingClient(SpringCloudFoundryClient cloudFoundryClient) {
+        return SpringLoggingClient.builder()
             .cloudFoundryClient(cloudFoundryClient)
             .build();
     }

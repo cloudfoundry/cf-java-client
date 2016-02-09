@@ -16,15 +16,15 @@
 
 package org.cloudfoundry.client;
 
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.RecentLogsRequest;
-import org.cloudfoundry.client.loggregator.StreamLogsRequest;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.RecentLogsRequest;
+import org.cloudfoundry.client.logging.StreamLogsRequest;
 import org.reactivestreams.Publisher;
 
 /**
- * Main entry point to the Loggregator Client API
+ * Main entry point to the Logging Client API
  */
-public interface LoggregatorClient {
+public interface LoggingClient {
 
     /**
      * Makes the Recent Logs request
@@ -32,7 +32,7 @@ public interface LoggregatorClient {
      * @param request the Recent Logs request
      * @return the response from the Recent Logs request
      */
-    Publisher<LoggregatorMessage> recent(RecentLogsRequest request);
+    Publisher<LogMessage> recent(RecentLogsRequest request);
 
     /**
      * Makes the Stream Logs request
@@ -40,6 +40,6 @@ public interface LoggregatorClient {
      * @param request the Stream Logs request
      * @return the response from the Stream Logs request
      */
-    Publisher<LoggregatorMessage> stream(StreamLogsRequest request);
+    Publisher<LogMessage> stream(StreamLogsRequest request);
 
 }

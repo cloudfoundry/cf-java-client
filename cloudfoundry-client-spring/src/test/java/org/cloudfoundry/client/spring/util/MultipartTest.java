@@ -25,7 +25,7 @@ import reactor.fn.Function;
 import java.io.IOException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.client.loggregator.LoggregatorProtocolBuffers.LogMessage;
+import static org.cloudfoundry.client.logging.LoggregatorProtocolBuffers.LogMessage;
 
 public final class MultipartTest {
 

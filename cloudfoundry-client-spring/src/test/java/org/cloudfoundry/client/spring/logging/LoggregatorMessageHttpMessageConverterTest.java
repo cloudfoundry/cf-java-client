@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
+import org.cloudfoundry.client.logging.LogMessage;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -53,7 +53,7 @@ public final class LoggregatorMessageHttpMessageConverterTest {
         MockHttpInputMessage inputMessage = new MockHttpInputMessage(new ClassPathResource("loggregator_response.bin").getInputStream());
         inputMessage.getHeaders().setContentType(MEDIA_TYPE);
 
-        List<LoggregatorMessage> messages = this.messageConverter.readInternal(null, inputMessage);
+        List<LogMessage> messages = this.messageConverter.readInternal(null, inputMessage);
 
         assertEquals(14, messages.size());
     }

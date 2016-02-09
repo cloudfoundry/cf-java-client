@@ -23,7 +23,7 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.ToString;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
+import org.cloudfoundry.client.spring.logging.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.CertificateCollectingSslCertificateTruster;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.LoggingClientHttpRequestInterceptor;

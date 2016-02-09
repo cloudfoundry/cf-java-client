@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
 import lombok.ToString;
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.RecentLogsRequest;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.RecentLogsRequest;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
@@ -32,7 +32,7 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * The Spring-based implementation of the Loggregator recent API
+ * The Spring-based implementation of the logging recent API
  */
 @ToString(callSuper = true)
 public final class SpringRecent extends AbstractSpringOperations {
@@ -49,7 +49,7 @@ public final class SpringRecent extends AbstractSpringOperations {
     }
 
     @SuppressWarnings("rawtypes")
-    public Publisher<LoggregatorMessage> recent(final RecentLogsRequest request) {
+    public Publisher<LogMessage> recent(final RecentLogsRequest request) {
         return get(request, List.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
@@ -58,11 +58,11 @@ public final class SpringRecent extends AbstractSpringOperations {
             }
 
         })
-            .flatMap(new Function<List, Stream<LoggregatorMessage>>() {
+            .flatMap(new Function<List, Stream<LogMessage>>() {
 
                 @Override
                 @SuppressWarnings("unchecked")
-                public Stream<LoggregatorMessage> apply(List messages) {
+                public Stream<LogMessage> apply(List messages) {
                     return Stream.fromIterable(messages);
                 }
 

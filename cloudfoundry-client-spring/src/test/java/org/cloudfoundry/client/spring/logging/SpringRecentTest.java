@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.loggregator;
+package org.cloudfoundry.client.spring.logging;
 
-import org.cloudfoundry.client.loggregator.LoggregatorMessage;
-import org.cloudfoundry.client.loggregator.RecentLogsRequest;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.RecentLogsRequest;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.reactivestreams.Publisher;
@@ -28,14 +28,14 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringRecentTest {
 
-    public static final class Recent extends AbstractApiTest<RecentLogsRequest, LoggregatorMessage> {
+    public static final class Recent extends AbstractApiTest<RecentLogsRequest, LogMessage> {
 
         private static final MediaType MEDIA_TYPE = MediaType.parseMediaType("multipart/x-protobuf; boundary=90ad9060c87222ee30ddcffe751393a7c5734c48e070a623121abf82eb3c");
 
         private final SpringRecent recent = new SpringRecent(this.restTemplate, this.root, PROCESSOR_GROUP);
 
         @Override
-        protected void assertions(TestSubscriber<LoggregatorMessage> testSubscriber, LoggregatorMessage expected) {
+        protected void assertions(TestSubscriber<LogMessage> testSubscriber, LogMessage expected) {
             testSubscriber
                 .assertCount(14);
         }
@@ -55,7 +55,7 @@ public final class SpringRecentTest {
         }
 
         @Override
-        protected LoggregatorMessage getResponse() {
+        protected LogMessage getResponse() {
             return null;
         }
 
@@ -67,7 +67,7 @@ public final class SpringRecentTest {
         }
 
         @Override
-        protected Publisher<LoggregatorMessage> invoke(RecentLogsRequest request) {
+        protected Publisher<LogMessage> invoke(RecentLogsRequest request) {
             return this.recent.recent(request);
         }
 

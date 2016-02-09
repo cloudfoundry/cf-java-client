@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.spring;
 
 import lombok.Getter;
-import org.cloudfoundry.client.spring.loggregator.LoggregatorMessageHttpMessageConverter;
+import org.cloudfoundry.client.spring.logging.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
 import org.cloudfoundry.client.spring.util.LoggingClientHttpRequestInterceptor;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
