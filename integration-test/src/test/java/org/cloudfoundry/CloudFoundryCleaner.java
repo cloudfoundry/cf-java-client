@@ -100,7 +100,9 @@ final class CloudFoundryCleaner {
                 .delete(DeleteOrganizationRequest.builder()
                     .async(true)
                     .organizationId(organizationId)
-                    .build()));
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Stream<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, Predicate<RouteResource> predicate) {
