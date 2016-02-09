@@ -26,7 +26,7 @@ import lombok.Singular;
 import java.util.List;
 
 /**
- * The entity response payload for Service Instances
+ * The entity response payload for Services
  */
 @Data
 public final class ServiceEntity {

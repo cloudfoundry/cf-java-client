@@ -20,21 +20,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.PaginatedResponse;
+
+import java.util.List;
 
 /**
- * The resource response payload for Services
+ * The response payload for the List Services operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ServiceResource extends Resource<ServiceEntity> {
+public final class ListServicesResponse extends PaginatedResponse<ServiceResource> {
 
     @Builder
-    ServiceResource(@JsonProperty("entity") ServiceEntity entity,
-                    @JsonProperty("metadata") Metadata metadata) {
-        super(entity, metadata);
+    ListServicesResponse(@JsonProperty("next_url") String nextUrl,
+                         @JsonProperty("prev_url") String previousUrl,
+                         @JsonProperty("resources") @Singular List<ServiceResource> resources,
+                         @JsonProperty("total_pages") Integer totalPages,
+                         @JsonProperty("total_results") Integer totalResults) {
+        super(nextUrl, previousUrl, resources, totalPages, totalResults);
     }
 
 }
