@@ -54,7 +54,7 @@ public final class DeleteRouteRequest implements Validatable {
     private final String path;
 
     @Builder
-    DeleteRouteRequest(String domain, String host, String path) {
+    public DeleteRouteRequest(String domain, String host, String path) {
         this.domain = domain;
         this.host = host;
         this.path = path;

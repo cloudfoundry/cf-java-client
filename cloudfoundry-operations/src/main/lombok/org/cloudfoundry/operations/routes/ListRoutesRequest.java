@@ -36,7 +36,7 @@ public final class ListRoutesRequest implements Validatable {
     private final Level level;
 
     @Builder
-    ListRoutesRequest(Level level) {
+    public ListRoutesRequest(Level level) {
         this.level = level;
     }
 
