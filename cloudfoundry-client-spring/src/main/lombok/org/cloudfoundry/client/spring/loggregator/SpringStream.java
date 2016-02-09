@@ -99,7 +99,7 @@ public final class SpringStream {
                 @Override
                 public Stream<T> apply(V request) {
                     return Stream
-                        .createWith(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
+                        .generate(new BiConsumer<Long, SubscriberWithContext<T, Void>>() {
 
                             @Override
                             public void accept(Long n, SubscriberWithContext<T, Void> subscriber) {
