@@ -62,7 +62,7 @@ public final class MapRouteRequest implements Validatable {
     private final String path;
 
     @Builder
-    public MapRouteRequest(String applicationName, String domain, String host, String path) {
+    MapRouteRequest(String applicationName, String domain, String host, String path) {
         this.applicationName = applicationName;
         this.domain = domain;
         this.host = host;
