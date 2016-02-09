@@ -110,7 +110,7 @@ public interface Organizations {
      * @param request the Delete a Particular Organization request
      * @return the response from the Delete a Particular Organization request
      */
-    Mono<Void> delete(DeleteOrganizationRequest request);
+    Mono<DeleteOrganizationResponse> delete(DeleteOrganizationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/organizations/retrieve_a_particular_organization.html">Retrieve a Particular Organization</a> request

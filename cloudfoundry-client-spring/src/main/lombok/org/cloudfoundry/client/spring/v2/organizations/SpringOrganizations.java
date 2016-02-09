@@ -41,6 +41,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRespons
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
@@ -229,8 +230,8 @@ public final class SpringOrganizations extends AbstractSpringOperations implemen
     }
 
     @Override
-    public Mono<Void> delete(final DeleteOrganizationRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<DeleteOrganizationResponse> delete(final DeleteOrganizationRequest request) {
+        return delete(request, DeleteOrganizationResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

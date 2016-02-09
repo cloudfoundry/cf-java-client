@@ -37,7 +37,7 @@ public interface ServicePlanVisibilities {
      * @param request the Delete Service Plan Visibility request
      * @return the response from the Delete Service Plan Visibility request
      */
-    Mono<Void> delete(DeleteServicePlanVisibilityRequest request);
+    Mono<DeleteServicePlanVisibilityResponse> delete(DeleteServicePlanVisibilityRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plan_visibilities/retrieve_a_particular_service_plan_visibility.html">Retrieve a Particular Service Plan Visibility</a> request

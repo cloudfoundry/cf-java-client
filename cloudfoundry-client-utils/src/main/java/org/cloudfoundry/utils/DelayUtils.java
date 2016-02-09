@@ -132,7 +132,7 @@ public final class DelayUtils {
 
                 @Override
                 public void accept(Subscription subscription) {
-                    LOGGER.debug("Delaying {} {}", duration, timeUnit);
+                    LOGGER.debug("Delaying {} {}", duration, timeUnit.toString().toLowerCase());
                 }
 
             });

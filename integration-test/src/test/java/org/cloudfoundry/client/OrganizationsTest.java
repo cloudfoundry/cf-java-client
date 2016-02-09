@@ -58,6 +58,7 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Before;
@@ -233,6 +234,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .delete(DeleteOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
             .subscribe(this.testSubscriber());
     }
 

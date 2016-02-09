@@ -27,7 +27,7 @@ public interface ServicePlans {
      * @param request the Delete Service Plan request
      * @return the response from the Delete Service Plan request
      */
-    Mono<Void> delete(DeleteServicePlanRequest request);
+    Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_plans/retrieve_a_particular_service_plan.html">Retrieve a Particular Service Plan</a> request

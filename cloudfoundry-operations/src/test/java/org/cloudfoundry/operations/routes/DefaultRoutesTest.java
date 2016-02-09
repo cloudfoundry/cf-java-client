@@ -147,6 +147,7 @@ public final class DefaultRoutesTest {
     private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient.routes()
             .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
+                .async(true)
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono
@@ -810,11 +811,38 @@ public final class DefaultRoutesTest {
             requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
             requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
             requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.routes
+                .deleteOrphanedRoutes();
+        }
+
+    }
+
+    public static final class DeleteOrphanedRoutesNoAssociatedApplicationsFailure extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
+            requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
+            requestJobFailure(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(CloudFoundryException.class);
         }
 
         @Override

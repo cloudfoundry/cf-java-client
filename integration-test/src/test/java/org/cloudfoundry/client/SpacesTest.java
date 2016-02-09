@@ -70,6 +70,7 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.utils.DateUtils;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Before;
@@ -242,11 +243,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void delete() {
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId))
-            .as(thenCompleteKeep(spaceId -> this.cloudFoundryClient.spaces()
+            .flatMap(spaceId -> this.cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .spaceId(spaceId)
-                    .async(false)
-                    .build())))
+                    .async(true)
+                    .build())
+                .map(ResourceUtils::getId)
+                .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .as(Stream::from)
+                .after(() -> Mono.just(spaceId))
+            )
             .flatMap(spaceId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.spaces()
                     .list(ListSpacesRequest.builder()
@@ -1466,28 +1472,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     private static Predicate<SpaceResource> hasOrganizationId(String organizationId) {
         return spaceResource -> ResourceUtils.getEntity(spaceResource).getOrganizationId().equals(organizationId);
-    }
-
-    /**
-     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
-     *
-     * <p> The Mono produced expects a single element from the source, and calls the thenFunction with it.  Signals the original input element after the resulting {@code Mono<OUT>} <b>completes</b>.
-     * </p>
-     *
-     * <p> <b>Summary:</b> does an {@code .after} on the new Mono which keeps the input to pass on unchanged. </p>
-     *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(thenCompleteKeep(in -> funcOf(in)))} </p>
-     *
-     * @param thenFunction from source input element to some {@code Mono<OUT>}
-     * @param <IN>         the source element type
-     * @param <OUT>        the element type of the Mono produced by {@code thenFunction}
-     * @return a Mono transformer
-     */
-    private static <IN, OUT> Function<Mono<IN>, Mono<IN>> thenCompleteKeep(Function<IN, Mono<OUT>> thenFunction) {
-        return source -> source
-            .then(in -> thenFunction
-                .apply(in)
-                .after(() -> Mono.just(in)));
     }
 
     /**

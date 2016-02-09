@@ -37,6 +37,7 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceSecurityGroupResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
@@ -197,8 +198,8 @@ public final class SpringSpaces extends AbstractSpringOperations implements Spac
     }
 
     @Override
-    public Mono<Void> delete(final DeleteSpaceRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<DeleteSpaceResponse> delete(final DeleteSpaceRequest request) {
+        return delete(request, DeleteSpaceResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {

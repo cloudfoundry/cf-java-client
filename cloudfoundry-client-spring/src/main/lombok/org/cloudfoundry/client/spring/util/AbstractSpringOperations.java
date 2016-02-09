@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.subscriber.SignalEmitter;
+import reactor.core.util.Exceptions;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.fn.Supplier;
@@ -99,6 +100,9 @@ public abstract class AbstractSpringOperations {
                                     signalEmitter.onComplete();
                                 } catch (HttpStatusCodeException e) {
                                     signalEmitter.onError(CloudFoundryExceptionBuilder.build(e));
+                                } catch (Throwable t) {
+                                    Exceptions.throwIfFatal(t);
+                                    signalEmitter.onError(t);
                                 }
                             }
 

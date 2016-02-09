@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.spring.v2.organizations;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
@@ -40,6 +42,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRespons
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationInstanceUsageResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationMemoryUsageRequest;
@@ -103,6 +106,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -715,7 +719,43 @@ public final class SpringOrganizationsTest {
 
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteOrganizationRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
+
+        private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteOrganizationRequest getInvalidRequest() {
+            return DeleteOrganizationRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("v2/organizations/test-organization-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteOrganizationResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteOrganizationRequest getValidRequest() throws Exception {
+            return DeleteOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteOrganizationResponse> invoke(DeleteOrganizationRequest request) {
+            return this.organizations.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteOrganizationRequest, DeleteOrganizationResponse> {
 
         private final SpringOrganizations organizations = new SpringOrganizations(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -729,12 +769,23 @@ public final class SpringOrganizationsTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(DELETE).path("v2/organizations/test-organization-id?async=true")
-                .status(NO_CONTENT);
+                .status(ACCEPTED)
+                .responsePayload("v2/routes/DELETE_{id}_async_response.json");
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected DeleteOrganizationResponse getResponse() {
+            return DeleteOrganizationResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
         }
 
         @Override
@@ -746,9 +797,10 @@ public final class SpringOrganizationsTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteOrganizationRequest request) {
+        protected Mono<DeleteOrganizationResponse> invoke(DeleteOrganizationRequest request) {
             return this.organizations.delete(request);
         }
+
     }
 
     public static final class Get extends AbstractApiTest<GetOrganizationRequest, GetOrganizationResponse> {

@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v2.applications;
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 
 import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
@@ -27,10 +27,12 @@ import static org.junit.Assert.assertEquals;
 
 public final class UploadApplicationRequestTest {
 
+    private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
+
     @Test
     public void isValid() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .applicationId("test-application-id")
             .resource(UploadApplicationRequest.Resource.builder()
                 .hash("test-hash")
@@ -62,7 +64,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .resource(UploadApplicationRequest.Resource.builder()
                 .hash("test-hash")
                 .path("test-path")
@@ -78,7 +80,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourceHash() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .applicationId("test-application-id")
             .resource(UploadApplicationRequest.Resource.builder()
                 .path("test-path")
@@ -94,7 +96,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourcePath() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .applicationId("test-application-id")
             .resource(UploadApplicationRequest.Resource.builder()
                 .hash("test-hash")
@@ -110,7 +112,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResourceSize() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .applicationId("test-application-id")
             .resource(UploadApplicationRequest.Resource.builder()
                 .hash("test-hash")
@@ -126,7 +128,7 @@ public final class UploadApplicationRequestTest {
     @Test
     public void isValidNoResources() {
         ValidationResult result = UploadApplicationRequest.builder()
-            .application(new File("test-file"))
+            .application(EMPTY_STREAM)
             .applicationId("test-application-id")
             .build()
             .isValid();

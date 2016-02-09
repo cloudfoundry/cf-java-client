@@ -39,7 +39,7 @@ public interface Domains {
      * @param request the Delete a Particular Domain request
      * @return the response from the Delete a Particular Domain request
      */
-    Mono<Void> delete(DeleteDomainRequest request);
+    Mono<DeleteDomainResponse> delete(DeleteDomainRequest request);
 
     /**
      * Makes the deprecated <a href="http://apidocs.cloudfoundry.org/214/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">Get Domain</a> request

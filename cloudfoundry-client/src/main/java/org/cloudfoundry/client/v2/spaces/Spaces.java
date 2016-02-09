@@ -93,7 +93,7 @@ public interface Spaces {
      * @param request the Delete a Space request
      * @return the response from the Delete a Space request
      */
-    Mono<Void> delete(DeleteSpaceRequest request);
+    Mono<DeleteSpaceResponse> delete(DeleteSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/spaces/retrieve_a_particular_space.html">Get Space</a> request

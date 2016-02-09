@@ -22,10 +22,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
+import org.cloudfoundry.client.QueryParameter;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public final class UploadApplicationRequest implements Validatable {
      * @return the application bits file
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final File application;
+    private final InputStream application;
 
     /**
      * The application id
@@ -58,7 +59,7 @@ public final class UploadApplicationRequest implements Validatable {
      * @param async whether to persist in a separate job
      * @return whether to persist in a separate job
      */
-    @Getter(onMethod = @__(@JsonIgnore))
+    @Getter(onMethod = @__(@QueryParameter("async")))
     private final Boolean async;
 
     /**
@@ -71,7 +72,7 @@ public final class UploadApplicationRequest implements Validatable {
     private final List<Resource> resources;
 
     @Builder
-    UploadApplicationRequest(File application,
+    UploadApplicationRequest(InputStream application,
                              String applicationId,
                              Boolean async,
                              @Singular List<Resource> resources) {

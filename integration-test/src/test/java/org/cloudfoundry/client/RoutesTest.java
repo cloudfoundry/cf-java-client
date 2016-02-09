@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -105,8 +106,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)))
             .then(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
+                    .async(true)
                     .routeId(routeId)
                     .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
             .subscribe(testSubscriber());
     }
 

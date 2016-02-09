@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -56,8 +57,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .then(this::createDomainId)
             .then(domainId -> this.cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
+                    .async(true)
                     .domainId(domainId)
                     .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
             .subscribe(testSubscriber());
     }
 
