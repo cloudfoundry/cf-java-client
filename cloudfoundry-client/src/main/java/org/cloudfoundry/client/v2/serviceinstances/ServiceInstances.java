@@ -57,6 +57,14 @@ public interface ServiceInstances {
     Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/retrieving_permissions_on_a_service_instance.html">Retrieving permissions on a Service Instance</a> request
+     *
+     * @param request the Get Permissions request
+     * @return the response from the Get Permissions request
+     */
+    Mono<GetServiceInstancePermissionsResponse> getPermissions(GetServiceInstancePermissionsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_instances/list_all_service_instances.html">List Service Instances</a> request
      *
      * @param request the List Service Instances request
