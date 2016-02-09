@@ -36,13 +36,19 @@ public final class ListRoutesRequest implements Validatable {
     private final Level level;
 
     @Builder
-    public ListRoutesRequest(Level level) {
+    ListRoutesRequest(Level level) {
         this.level = level;
     }
 
     @Override
     public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.level == null) {
+            builder.message("level must be specified");
+        }
+
+        return builder.build();
     }
 
     public enum Level {
