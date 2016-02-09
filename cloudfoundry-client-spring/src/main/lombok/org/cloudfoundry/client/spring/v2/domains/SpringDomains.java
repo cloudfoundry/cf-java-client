@@ -23,6 +23,7 @@ import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
+import org.cloudfoundry.client.v2.domains.DeleteDomainResponse;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
 import org.cloudfoundry.client.v2.domains.GetDomainResponse;
@@ -68,12 +69,13 @@ public final class SpringDomains extends AbstractSpringOperations implements Dom
     }
 
     @Override
-    public Mono<Void> delete(final DeleteDomainRequest request) {
-        return delete(request, Void.class, new Consumer<UriComponentsBuilder>() {
+    public Mono<DeleteDomainResponse> delete(final DeleteDomainRequest request) {
+        return delete(request, DeleteDomainResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "domains", request.getDomainId());
+                QueryBuilder.augment(builder, request);
             }
 
         });

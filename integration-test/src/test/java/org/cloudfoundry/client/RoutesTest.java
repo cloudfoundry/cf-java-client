@@ -106,6 +106,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getId)))
             .then(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
+                    .async(true)
                     .routeId(routeId)
                     .build()))
             .map(ResourceUtils::getId)

@@ -17,9 +17,11 @@
 package org.cloudfoundry.client.spring.v2.domains;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
+import org.cloudfoundry.client.v2.domains.DeleteDomainResponse;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.domains.GetDomainRequest;
@@ -28,6 +30,7 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainSpacesResponse;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsResponse;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import reactor.core.publisher.Mono;
@@ -38,6 +41,7 @@ import static org.cloudfoundry.client.v2.Resource.Metadata;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -95,7 +99,7 @@ public final class SpringDomainsTest {
         }
     }
 
-    public static final class Delete extends AbstractApiTest<DeleteDomainRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteDomainRequest, DeleteDomainResponse> {
 
         private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -113,7 +117,7 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Void getResponse() {
+        protected DeleteDomainResponse getResponse() {
             return null;
         }
 
@@ -125,7 +129,54 @@ public final class SpringDomainsTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteDomainRequest request) {
+        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
+            return this.domains.delete(request);
+        }
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteDomainRequest, DeleteDomainResponse> {
+
+        private final SpringDomains domains = new SpringDomains(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteDomainRequest getInvalidRequest() {
+            return DeleteDomainRequest.builder()
+                .build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("v2/domains/test-domain-id?async=true")
+                .status(ACCEPTED)
+                .responsePayload("v2/domains/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeleteDomainResponse getResponse() {
+            return DeleteDomainResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteDomainRequest getValidRequest() throws Exception {
+            return DeleteDomainRequest.builder()
+                .async(true)
+                .domainId("test-domain-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteDomainResponse> invoke(DeleteDomainRequest request) {
             return this.domains.delete(request);
         }
     }

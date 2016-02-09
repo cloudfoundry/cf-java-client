@@ -81,8 +81,11 @@ final class CloudFoundryCleaner {
             .map(ResourceUtils::getId)
             .flatMap(domainId -> cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
+                    .async(true)
                     .domainId(domainId)
-                    .build()));
+                    .build()))
+            .map(ResourceUtils::getId)
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId));
     }
 
     private static Stream<Void> cleanOrganizations(CloudFoundryClient cloudFoundryClient, Predicate<OrganizationResource> predicate) {
@@ -95,6 +98,7 @@ final class CloudFoundryCleaner {
             .map(ResourceUtils::getId)
             .flatMap(organizationId -> cloudFoundryClient.organizations()
                 .delete(DeleteOrganizationRequest.builder()
+                    .async(true)
                     .organizationId(organizationId)
                     .build()));
     }
@@ -109,6 +113,7 @@ final class CloudFoundryCleaner {
             .map(ResourceUtils::getId)
             .flatMap(routeId -> cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
+                    .async(true)
                     .routeId(routeId)
                     .build()))
             .map(ResourceUtils::getId)
@@ -125,6 +130,7 @@ final class CloudFoundryCleaner {
             .map(ResourceUtils::getId)
             .flatMap(spaceId -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
+                    .async(true)
                     .spaceId(spaceId)
                     .build()));
     }
