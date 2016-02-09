@@ -18,9 +18,11 @@ package org.cloudfoundry.client.spring.v2.serviceplans;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanRequest;
+import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRequest;
@@ -33,13 +35,50 @@ import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringServicePlansTest {
 
-    public static final class Delete extends AbstractApiTest<DeleteServicePlanRequest, Void> {
+    public static final class Delete extends AbstractApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
+
+        private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServicePlanRequest getInvalidRequest() {
+            return DeleteServicePlanRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE)
+                .path("v2/service_plans/test-service-plan-id")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteServicePlanResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServicePlanRequest getValidRequest() throws Exception {
+            return DeleteServicePlanRequest.builder()
+                .servicePlanId("test-service-plan-id")
+                .build();
+
+        }
+
+        @Override
+        protected Mono<DeleteServicePlanResponse> invoke(DeleteServicePlanRequest request) {
+            return this.servicePlans.delete(request);
+        }
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteServicePlanRequest, DeleteServicePlanResponse> {
 
         private final SpringServicePlans servicePlans = new SpringServicePlans(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -53,12 +92,23 @@ public final class SpringServicePlansTest {
             return new RequestContext()
                 .method(DELETE)
                 .path("v2/service_plans/test-service-plan-id?async=true")
-                .status(NO_CONTENT);
+                .status(ACCEPTED)
+                .responsePayload("v2/service_plans/DELETE_{id}_async_response.json");
         }
 
         @Override
-        protected Void getResponse() {
-            return null;
+        protected DeleteServicePlanResponse getResponse() {
+            return DeleteServicePlanResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
         }
 
         @Override
@@ -71,7 +121,7 @@ public final class SpringServicePlansTest {
         }
 
         @Override
-        protected Mono<Void> invoke(DeleteServicePlanRequest request) {
+        protected Mono<DeleteServicePlanResponse> invoke(DeleteServicePlanRequest request) {
             return this.servicePlans.delete(request);
         }
     }
