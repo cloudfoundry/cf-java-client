@@ -21,10 +21,12 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.fn.Consumer;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
+import reactor.fn.tuple.Tuple;
 import reactor.rx.Stream;
 
 import java.util.concurrent.TimeUnit;
@@ -52,16 +54,8 @@ public final class DelayUtils {
 
             @Override
             public Publisher<?> apply(Stream<Long> count) {
-                return count
-                    .takeWhile(new Predicate<Long>() {
-
-                        @Override
-                        public boolean test(Long count) {
-                            return count == 0;
-                        }
-
-                    })
-                    .zipWith(getRetryCounter(maxRetries))
+                return Flux
+                    .zip(Tuple.<Long, Integer>fn2(), 1, getTest(count), getRetryCounter(maxRetries))  // TODO: Convert to Stream.zip once prefetch option is available
                     .flatMap(function(new Function2<Long, Integer, Publisher<?>>() {
 
                         @Override
@@ -140,9 +134,20 @@ public final class DelayUtils {
 
     static Stream<Integer> getRetryCounter(int maxRetries) {
         return Stream
-            .range(0, maxRetries);
-//            .concatWith(Mono.<Integer>error(new IllegalStateException("Exceeded maximum number of retries"))) // TODO: Add back once capacity is honored
-//            .capacity(1);
+            .range(0, maxRetries)
+            .concatWith(Stream.<Integer>error(new IllegalStateException("Exceeded maximum number of retries"), true));
+    }
+
+    private static Stream<Long> getTest(Stream<Long> count) {
+        return count
+            .takeWhile(new Predicate<Long>() {
+
+                @Override
+                public boolean test(Long count) {
+                    return count == 0;
+                }
+
+            });
     }
 
 }
