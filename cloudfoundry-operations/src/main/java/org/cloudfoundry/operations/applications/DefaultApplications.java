@@ -213,14 +213,7 @@ public final class DefaultApplications implements Applications {
     public Publisher<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
         return Mono
             .when(
-                ValidationUtils
-                    .validate(request)
-                    .then(new Function<GetApplicationEventsRequest, Mono<GetApplicationEventsRequest>>() {
-                        @Override
-                        public Mono<GetApplicationEventsRequest> apply(GetApplicationEventsRequest request) {
-                            return Mono.just(applyEventsDefaults(request));
-                        }
-                    }),
+                ValidationUtils.validate(request),
                 this.spaceId
             )
             .then(function(new Function2<GetApplicationEventsRequest, String, Mono<Tuple2<GetApplicationEventsRequest, String>>>() {
@@ -229,18 +222,26 @@ public final class DefaultApplications implements Applications {
                 public Mono<Tuple2<GetApplicationEventsRequest, String>> apply(GetApplicationEventsRequest request, String spaceId) {
                     return Mono.when(Mono.just(request), getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId));
                 }
+
             }))
             .flatMap(function(new Function2<GetApplicationEventsRequest, String, Stream<EventResource>>() {
+
                 @Override
                 public Stream<EventResource> apply(GetApplicationEventsRequest request, final String applicationId) {
-                    return getEventResources(applicationId, DefaultApplications.this.cloudFoundryClient).take(request.getMaxNumberOfEvents());
+                    return getEventResources(applicationId, DefaultApplications.this.cloudFoundryClient);
+
                 }
+
             }))
+            .as(OperationUtils.<EventResource>stream())
+            .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))
             .map(new Function<EventResource, ApplicationEvent>() {
+
                 @Override
                 public ApplicationEvent apply(EventResource resource) {
                     return convertToApplicationEvent(resource);
                 }
+
             });
     }
 
@@ -477,14 +478,6 @@ public final class DefaultApplications implements Applications {
 
             })
             .after();
-    }
-
-    private static GetApplicationEventsRequest applyEventsDefaults(GetApplicationEventsRequest request) {
-        return (request.getMaxNumberOfEvents() != null) ? request :
-            GetApplicationEventsRequest.builder()
-                .name(request.getName())
-                .maxNumberOfEvents(MAX_NUMBER_OF_RECENT_EVENTS)
-                .build();
     }
 
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
