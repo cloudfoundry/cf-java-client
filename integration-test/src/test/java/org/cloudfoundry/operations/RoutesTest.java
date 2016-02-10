@@ -23,6 +23,7 @@ import org.cloudfoundry.operations.routes.CreateRouteRequest;
 import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
+import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -51,14 +52,14 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.route = this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(TEST_DOMAIN_NAME)
-                .organization(organizationName)
+                .organization(this.organizationName)
                 .build())
             .after(() -> this.cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .space(spaceName)
+                    .space(this.spaceName)
                     .build()));
     }
 
@@ -105,14 +106,14 @@ public final class RoutesTest extends AbstractIntegrationTest {
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(TEST_INVALID_DOMAIN_NAME)
-                .organization(organizationName)
+                .organization(this.organizationName)
                 .build())
             .after(() -> this.cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(TEST_INVALID_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .space(spaceName)
+                    .space(this.spaceName)
                     .build()))
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
@@ -172,9 +173,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
                     .build())))
-            .where(returnedRoute -> TEST_DOMAIN_NAME.equals(returnedRoute.getDomain()) &&
-                TEST_HOST.equals(returnedRoute.getHost()) &&
-                TEST_PATH.equals(returnedRoute.getPath()))
+            .where(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -186,9 +185,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
                     .build())))
-            .where(returnedRoute -> TEST_DOMAIN_NAME.equals(returnedRoute.getDomain()) &&
-                TEST_HOST.equals(returnedRoute.getHost()) &&
-                TEST_PATH.equals(returnedRoute.getPath()))
+            .where(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -221,6 +218,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .build()))
             .subscribe(testSubscriber()
                 .assertCount(1));
+    }
+
+    private static boolean routeMatches(Route returnedRoute, String domainName, String host, String path) {
+        return domainName.equals(returnedRoute.getDomain()) && host.equals(returnedRoute.getHost()) && path.equals(returnedRoute.getPath());
     }
 
 }
