@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
 import reactor.core.util.PlatformDependent;
@@ -57,11 +58,8 @@ public final class SpringLoggingClient implements LoggingClient {
 
     SpringLoggingClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
         SchedulerGroup schedulerGroup = createSchedulerGroup();
-
-        URI cloudFoundryRoot = getCloudFoundryRoot(cloudFoundryClient);
-        this.recent = new SpringRecent(getRestOperations(cloudFoundryClient), cloudFoundryRoot, schedulerGroup);
-
         URI loggingRoot = getLoggingRoot(cloudFoundryClient);
+        this.recent = new SpringRecent(getRestOperations(cloudFoundryClient), convertLoggingRoot(loggingRoot), schedulerGroup);
         this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggingRoot, schedulerGroup, webSocketContainer);
     }
 
@@ -112,6 +110,10 @@ public final class SpringLoggingClient implements LoggingClient {
 
             })
             .get();
+    }
+
+    private static URI convertLoggingRoot(URI loggingEndpoint){
+        return UriComponentsBuilder.fromUriString(loggingEndpoint.toString()).scheme("https").build().toUri();
     }
 
     private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
