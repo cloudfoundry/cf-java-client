@@ -306,7 +306,7 @@ public final class SpringApplicationsV2 extends AbstractSpringOperations impleme
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances", request.getIndex());
+                builder.pathSegment("v2", "apps", request.getApplicationId(), "instances", String.valueOf(request.getIndex()));
             }
 
         });

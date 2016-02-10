@@ -356,6 +356,32 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .and(this.spaceId)
+            .then(function(new Function2<RestartApplicationInstanceRequest, String, Mono<Tuple3<String, String, Integer>>>() {
+
+                @Override
+                public Mono<Tuple3<String, String, Integer>> apply(RestartApplicationInstanceRequest request, String spaceId) {
+                    return Mono.when(
+                        Mono.just(spaceId),
+                        getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId),
+                        Mono.just(request.getInstanceIndex()));
+                }
+
+            }))
+            .then(function(new Function3<String, String, Integer, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String spaceId, String applicationId, Integer instanceIndex) {
+                    return requestTerminateApplicationInstance(DefaultApplications.this.cloudFoundryClient, applicationId, instanceIndex);
+                }
+
+            }));
+    }
+
+    @Override
     public Mono<Void> scale(final ScaleApplicationRequest request) {
         return Mono
             .when(
@@ -781,6 +807,14 @@ public final class DefaultApplications implements Applications {
         return cloudFoundryClient.stacks()
             .get(GetStackRequest.builder()
                 .stackId(stackId)
+                .build());
+    }
+
+    private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
+        return cloudFoundryClient.applicationsV2()
+            .terminateInstance(org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest.builder()
+                .applicationId(applicationId)
+                .index(instanceIndex)
                 .build());
     }
 

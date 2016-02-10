@@ -507,7 +507,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .terminateInstance(TerminateApplicationInstanceRequest.builder()
                     .applicationId(applicationId)
-                    .index("0")
+                    .index(0)
                     .build()))
             .subscribe(testSubscriber());
     }

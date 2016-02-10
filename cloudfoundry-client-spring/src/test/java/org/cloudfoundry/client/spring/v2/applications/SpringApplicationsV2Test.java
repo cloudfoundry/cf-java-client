@@ -1117,7 +1117,7 @@ public final class SpringApplicationsV2Test {
         @Override
         protected RequestContext getRequestContext() {
             return new RequestContext()
-                .method(DELETE).path("/v2/apps/test-application-id/instances/test-index")
+                .method(DELETE).path("/v2/apps/test-application-id/instances/0")
                 .status(NO_CONTENT);
         }
 
@@ -1130,7 +1130,7 @@ public final class SpringApplicationsV2Test {
         protected TerminateApplicationInstanceRequest getValidRequest() throws Exception {
             return TerminateApplicationInstanceRequest.builder()
                 .applicationId("test-application-id")
-                .index("test-index")
+                .index(0)
                 .build();
         }
 

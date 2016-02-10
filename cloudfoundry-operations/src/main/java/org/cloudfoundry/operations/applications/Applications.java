@@ -74,6 +74,14 @@ public interface Applications {
     Mono<Void> rename(RenameApplicationRequest request);
 
     /**
+     * Restart a specific application instance
+     *
+     * @param request the restart application instance request
+     * @return a completion indicator
+     */
+    Mono<Void> restartInstance(RestartApplicationInstanceRequest request);
+
+    /**
      * Restarts a specific application
      *
      * @param request the restart application request

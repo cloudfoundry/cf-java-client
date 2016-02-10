@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.ValidationResult;
 import org.junit.Test;
@@ -23,13 +23,13 @@ import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.client.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class TerminateApplicationInstanceRequestTest {
+public final class RestartApplicationInstanceRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index(0)
+        ValidationResult result = RestartApplicationInstanceRequest.builder()
+            .instanceIndex(0)
+            .name("test-name")
             .build()
             .isValid();
 
@@ -37,25 +37,25 @@ public final class TerminateApplicationInstanceRequestTest {
     }
 
     @Test
-    public void isValidNoId() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .index(0)
+    public void isValidNoName() {
+        ValidationResult result = RestartApplicationInstanceRequest.builder()
+            .instanceIndex(0)
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("application id must be specified", result.getMessages().get(0));
+        assertEquals("name must be specified", result.getMessages().get(0));
     }
 
     @Test
-    public void isValidNoIndex() {
-        ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
+    public void isValidNoInstanceIndex() {
+        ValidationResult result = RestartApplicationInstanceRequest.builder()
+            .name("test-name")
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("index must be specified", result.getMessages().get(0));
+        assertEquals("instance index must be specified", result.getMessages().get(0));
     }
 
 }
