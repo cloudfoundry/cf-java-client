@@ -105,7 +105,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple2<Optional<List<Route>>, String>> apply(DeleteApplicationRequest request, String spaceId) {
-                    return getRoutesAndApplicationId(cloudFoundryClient, request, spaceId);
+                    return getRoutesAndApplicationId(DefaultApplications.this.cloudFoundryClient, request, spaceId);
                 }
 
             }))
@@ -113,7 +113,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(Optional<List<Route>> routes, final String applicationId) {
-                    return deleteRoutes(cloudFoundryClient, routes)
+                    return deleteRoutes(DefaultApplications.this.cloudFoundryClient, routes)
                         .after(new Supplier<Mono<String>>() {
 
                             @Override
@@ -129,7 +129,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Void> apply(String applicationId) {
-                    return requestDeleteApplication(cloudFoundryClient, applicationId);
+                    return requestDeleteApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
                 }
 
             });
@@ -155,7 +155,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(String application, String spaceId) {
-                    return getApplication(cloudFoundryClient, application, spaceId);
+                    return getApplication(DefaultApplications.this.cloudFoundryClient, application, spaceId);
                 }
 
             }))
@@ -163,7 +163,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple4<ApplicationStatisticsResponse, SummaryApplicationResponse, GetStackResponse, ApplicationInstancesResponse>> apply(AbstractApplicationResource applicationResource) {
-                    return getAuxiliaryContent(cloudFoundryClient, applicationResource);
+                    return getAuxiliaryContent(DefaultApplications.this.cloudFoundryClient, applicationResource);
                 }
 
             })
@@ -198,13 +198,13 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(String application, String spaceId) {
-                    return getApplicationId(cloudFoundryClient, application, spaceId);
+                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, application, spaceId);
                 }
             }))
             .then(new Function<String, Mono<? extends ApplicationEnvironments>>() {
                 @Override
                 public Mono<? extends ApplicationEnvironments> apply(String applicationId) {
-                    return getApplicationEnvironment(cloudFoundryClient, applicationId);
+                    return getApplicationEnvironment(DefaultApplications.this.cloudFoundryClient, applicationId);
                 }
             });
     }
@@ -227,13 +227,13 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple2<GetApplicationEventsRequest, String>> apply(GetApplicationEventsRequest request, String spaceId) {
-                    return Mono.when(Mono.just(request), getApplicationId(cloudFoundryClient, request.getName(), spaceId));
+                    return Mono.when(Mono.just(request), getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId));
                 }
             }))
             .flatMap(function(new Function2<GetApplicationEventsRequest, String, Stream<EventResource>>() {
                 @Override
                 public Stream<EventResource> apply(GetApplicationEventsRequest request, final String applicationId) {
-                    return getEventResources(applicationId, cloudFoundryClient).take(request.getMaxNumberOfEvents());
+                    return getEventResources(applicationId, DefaultApplications.this.cloudFoundryClient).take(request.getMaxNumberOfEvents());
                 }
             }))
             .map(new Function<EventResource, ApplicationEvent>() {
@@ -251,7 +251,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<GetSpaceSummaryResponse> apply(String spaceId) {
-                    return requestSpaceSummary(cloudFoundryClient, spaceId);
+                    return requestSpaceSummary(DefaultApplications.this.cloudFoundryClient, spaceId);
                 }
 
             })
@@ -284,7 +284,7 @@ public final class DefaultApplications implements Applications {
                         .when(
                             Mono.just(request.getName()),
                             Mono.just(request.getNewName()),
-                            spaceId
+                            DefaultApplications.this.spaceId
                         );
                 }
             })
@@ -294,7 +294,7 @@ public final class DefaultApplications implements Applications {
                 public Mono<Tuple2<String, String>> apply(String application, String newName, String spaceId) {
                     return Mono
                         .when(
-                            getApplicationId(cloudFoundryClient, application, spaceId),
+                            getApplicationId(DefaultApplications.this.cloudFoundryClient, application, spaceId),
                             Mono.just(newName)
                         );
                 }
@@ -303,7 +303,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<UpdateApplicationResponse> apply(String applicationId, String newName) {
-                    return requestUpdateApplicationRename(cloudFoundryClient, applicationId, newName);
+                    return requestUpdateApplicationRename(DefaultApplications.this.cloudFoundryClient, applicationId, newName);
                 }
 
             }))
@@ -329,7 +329,7 @@ public final class DefaultApplications implements Applications {
             .then(function(new Function2<String, String, Mono<AbstractApplicationResource>>() {
                 @Override
                 public Mono<AbstractApplicationResource> apply(String application, String spaceId) {
-                    return getApplication(cloudFoundryClient, application, spaceId);
+                    return getApplication(DefaultApplications.this.cloudFoundryClient, application, spaceId);
                 }
             }))
             .then(new Function<AbstractApplicationResource, Mono<AbstractApplicationResource>>() {
@@ -339,14 +339,14 @@ public final class DefaultApplications implements Applications {
                         .as(ifThen(not(isIn(STOPPED_STATE)), new Function<AbstractApplicationResource, Mono<AbstractApplicationResource>>() {
                             @Override
                             public Mono<AbstractApplicationResource> apply(AbstractApplicationResource resource) {
-                                return stopApplication(cloudFoundryClient, ResourceUtils.getId(resource));
+                                return stopApplication(DefaultApplications.this.cloudFoundryClient, ResourceUtils.getId(resource));
                             }
                         }))
                         .then(new Function<AbstractApplicationResource, Mono<AbstractApplicationResource>>() {
 
                             @Override
                             public Mono<AbstractApplicationResource> apply(AbstractApplicationResource resource) {
-                                return startApplication(cloudFoundryClient, ResourceUtils.getId(resource));
+                                return startApplication(DefaultApplications.this.cloudFoundryClient, ResourceUtils.getId(resource));
                             }
                         });
                 }
@@ -376,7 +376,7 @@ public final class DefaultApplications implements Applications {
                     return Mono
                         .when(
                             Mono.just(request),
-                            getApplicationId(cloudFoundryClient, request.getName(), spaceId)
+                            getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId)
                         );
                 }
             }))
@@ -402,7 +402,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(ScaleApplicationRequest request, AbstractApplicationResource resource) {
-                    return restartApplication(cloudFoundryClient, resource);
+                    return restartApplication(DefaultApplications.this.cloudFoundryClient, resource);
                 }
 
             }))
@@ -437,7 +437,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(String applicationId) {
-                    return startApplication(cloudFoundryClient, applicationId);
+                    return startApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
                 }
 
             })
@@ -464,7 +464,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(String application, String spaceId) {
-                    return getApplicationIdWhere(cloudFoundryClient, application, spaceId, not(isIn(STOPPED_STATE)));
+                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, application, spaceId, not(isIn(STOPPED_STATE)));
                 }
 
             }))
@@ -472,7 +472,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<AbstractApplicationResource> apply(String applicationId) {
-                    return stopApplication(cloudFoundryClient, applicationId);
+                    return stopApplication(DefaultApplications.this.cloudFoundryClient, applicationId);
                 }
 
             })
@@ -703,6 +703,7 @@ public final class DefaultApplications implements Applications {
      */
     private static <IN> Function<Mono<IN>, Mono<IN>> ifThen(final Predicate<IN> predicate, final Function<IN, Mono<IN>> thenFunction) {
         return new Function<Mono<IN>, Mono<IN>>() {
+
             @Override
             public Mono<IN> apply(Mono<IN> source) {
                 return source
@@ -713,6 +714,7 @@ public final class DefaultApplications implements Applications {
                         }
                     });
             }
+
         };
     }
 
@@ -768,12 +770,7 @@ public final class DefaultApplications implements Applications {
                 }
 
             })
-            .map(new Function<ApplicationResource, AbstractApplicationResource>() {
-                @Override
-                public AbstractApplicationResource apply(ApplicationResource x) {
-                    return x;
-                }
-            });
+            .map(OperationUtils.<ApplicationResource, AbstractApplicationResource>cast());
     }
 
     private static Mono<Void> requestDeleteApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -805,7 +802,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, final String name) {
+    private static Mono<UpdateApplicationResponse> requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
@@ -821,12 +818,8 @@ public final class DefaultApplications implements Applications {
                 .instances(instances)
                 .memory(memory)
                 .build())
-            .map(new Function<UpdateApplicationResponse, AbstractApplicationResource>() {
-                @Override
-                public AbstractApplicationResource apply(UpdateApplicationResponse x) {
-                    return x;
-                }
-            });
+            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast())
+            ;
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
@@ -835,12 +828,7 @@ public final class DefaultApplications implements Applications {
                 .applicationId(applicationId)
                 .state(state)
                 .build())
-            .map(new Function<UpdateApplicationResponse, AbstractApplicationResource>() {
-                @Override
-                public AbstractApplicationResource apply(UpdateApplicationResponse x) {
-                    return x;
-                }
-            });
+            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
     }
 
     private static Mono<AbstractApplicationResource> restartApplication(final CloudFoundryClient cloudFoundryClient, final AbstractApplicationResource resource) {
