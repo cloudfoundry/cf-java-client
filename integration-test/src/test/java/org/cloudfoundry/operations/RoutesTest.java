@@ -172,6 +172,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
                     .build())))
+            .where(returnedRoute -> TEST_DOMAIN_NAME.equals(returnedRoute.getDomain()) &&
+                TEST_HOST.equals(returnedRoute.getHost()) &&
+                TEST_PATH.equals(returnedRoute.getPath()))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -183,6 +186,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
                     .build())))
+            .where(returnedRoute -> TEST_DOMAIN_NAME.equals(returnedRoute.getDomain()) &&
+                TEST_HOST.equals(returnedRoute.getHost()) &&
+                TEST_PATH.equals(returnedRoute.getPath()))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
