@@ -33,7 +33,6 @@ import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceplans.MigrateServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.DELETE;
@@ -337,7 +336,7 @@ public final class SpringServicePlansTest {
         }
 
         @Override
-        protected Publisher<MigrateServiceInstancesResponse> invoke(MigrateServiceInstancesRequest request) {
+        protected Mono<MigrateServiceInstancesResponse> invoke(MigrateServiceInstancesRequest request) {
             return this.servicePlans.migrateServiceInstances(request);
         }
 
