@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRes
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
@@ -36,6 +38,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -277,6 +280,45 @@ public final class SpringServiceInstancesTest {
         }
 
     }
+
+    public static final class GetPermissions extends AbstractApiTest<GetServiceInstancePermissionsRequest, GetServiceInstancePermissionsResponse> {
+
+        private final SpringServiceInstances serviceInstances = new SpringServiceInstances(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected GetServiceInstancePermissionsRequest getInvalidRequest() {
+            return GetServiceInstancePermissionsRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/service_instances/test-service-instance-id/permissions")
+                .status(OK)
+                .responsePayload("v2/service_instances/GET_{id}_permissions_response.json");
+        }
+
+        @Override
+        protected GetServiceInstancePermissionsResponse getResponse() {
+            return GetServiceInstancePermissionsResponse.builder()
+                .manage(true)
+                .build();
+        }
+
+        @Override
+        protected GetServiceInstancePermissionsRequest getValidRequest() throws Exception {
+            return GetServiceInstancePermissionsRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .build();
+        }
+
+        @Override
+        protected Publisher<GetServiceInstancePermissionsResponse> invoke(GetServiceInstancePermissionsRequest request) {
+            return this.serviceInstances.getPermissions(request);
+        }
+        
+    }
+
 
     public static final class List extends AbstractApiTest<ListServiceInstancesRequest, ListServiceInstancesResponse> {
 
