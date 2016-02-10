@@ -18,8 +18,12 @@ package org.cloudfoundry.client.spring.v2.services;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.Services;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -54,6 +58,20 @@ public final class SpringServices extends AbstractSpringOperations implements Se
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "services", request.getServiceId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<ListServicesResponse> list(final ListServicesRequest request) {
+        return get(request, ListServicesResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "services");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
             }
 
         });

@@ -20,7 +20,10 @@ import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -78,6 +81,63 @@ public final class SpringServicesTest {
         @Override
         protected Mono<GetServiceResponse> invoke(GetServiceRequest request) {
             return this.services.get(request);
+        }
+
+    }
+
+    public static final class List extends AbstractApiTest<ListServicesRequest, ListServicesResponse> {
+
+        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServicesRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/services?q=label%20IN%20test-label&page=-1")
+                .status(OK)
+                .responsePayload("v2/services/GET_response.json");
+        }
+
+        @Override
+        protected ListServicesResponse getResponse() {
+            return ListServicesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServiceResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .id("69b84c38-e786-4270-9cca-59d02a700798")
+                        .url("/v2/services/69b84c38-e786-4270-9cca-59d02a700798")
+                        .createdAt("2015-07-27T22:43:35Z")
+                        .build())
+                    .entity(ServiceEntity.builder()
+                        .label("label-87")
+                        .description("desc-220")
+                        .active(true)
+                        .bindable(true)
+                        .uniqueId("e46b095e-aa85-4ffb-98d9-0bc94b84d45c")
+                        .serviceBrokerId("5c323c18-e26c-45ff-a4f9-6a8916912a22")
+                        .planUpdateable(false)
+                        .servicePlansUrl("/v2/services/69b84c38-e786-4270-9cca-59d02a700798/service_plans")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServicesRequest getValidRequest() throws Exception {
+            return ListServicesRequest.builder()
+                .label("test-label")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListServicesResponse> invoke(ListServicesRequest request) {
+            return this.services.list(request);
         }
 
     }

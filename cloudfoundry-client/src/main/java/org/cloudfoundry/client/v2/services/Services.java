@@ -31,4 +31,12 @@ public interface Services {
      */
     Mono<GetServiceResponse> get(GetServiceRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/services/list_all_services.html">List Services</a> request
+     *
+     * @param request the List Services request
+     * @return the response from the List Services request
+     */
+    Mono<ListServicesResponse> list(ListServicesRequest request);
+
 }
