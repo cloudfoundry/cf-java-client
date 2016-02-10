@@ -43,6 +43,16 @@ public interface Applications {
     Mono<ApplicationDetail> get(GetApplicationRequest request);
 
     /**
+     * Deletes a specific application and, optionally, all routes mapped to the application.
+     *
+     * Warning: deleting routes mapped to the application deletes them even if they are mapped to other applications.
+     *
+     * @param request the delete application request
+     * @return a completion indicator
+     */
+    Mono<ApplicationEnvironments> getEnvironments(GetApplicationEnvironmentsRequest request);
+
+    /**
      * Gets recent events of an application.
      *
      * @param request the get application events request
