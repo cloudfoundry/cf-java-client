@@ -25,8 +25,7 @@ public final class ListServicesRequestTest {
 
     @Test
     public void isValid() {
-        assertEquals(ValidationResult.Status.VALID,
-            ListServicesRequest.builder().build().isValid().getStatus());
+        assertEquals(ValidationResult.Status.VALID, ListServicesRequest.builder().build().isValid().getStatus());
     }
 
 }

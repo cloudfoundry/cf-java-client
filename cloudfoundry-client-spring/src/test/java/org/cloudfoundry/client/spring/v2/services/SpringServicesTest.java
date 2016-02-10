@@ -24,7 +24,6 @@ import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -137,7 +136,7 @@ public final class SpringServicesTest {
         }
 
         @Override
-        protected Publisher<ListServicesResponse> invoke(ListServicesRequest request) {
+        protected Mono<ListServicesResponse> invoke(ListServicesRequest request) {
             return this.services.list(request);
         }
 
