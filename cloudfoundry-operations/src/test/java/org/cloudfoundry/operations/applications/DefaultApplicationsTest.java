@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
@@ -68,6 +70,21 @@ import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
 
+    private static void requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .environment(ApplicationEnvironmentRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(ApplicationEnvironmentResponse.builder()
+                    .runningEnvironmentJson("running-env-name", "running-env-value")
+                    .applicationEnvironmentJson("application-env-name", "application-env-value")
+                    .stagingEnvironmentJson("staging-env-name", "staging-env-value")
+                    .environmentJson("env-name", "env-value")
+                    .systemEnvironmentJson("system-env-name", "system-env-value")
+                    .build()));
+    }
+
     private static void requestApplicationEvents(CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
         final ListEventsResponse.ListEventsResponseBuilder responseBuilder = fillPage(ListEventsResponse.builder());
 
@@ -87,20 +104,6 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(responseBuilder
-                    .totalPages(1)
-                    .build()));
-    }
-
-    private static void requestApplicationEventsEmpty(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient.events()
-            .list(ListEventsRequest.builder()
-                .actee(applicationId)
-                .orderDirection(PaginatedRequest.OrderDirection.DESC)
-                .resultsPerPage(50)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fillPage(ListEventsResponse.builder())
                     .totalPages(1)
                     .build()));
     }
@@ -535,6 +538,60 @@ public final class DefaultApplicationsTest {
 
     }
 
+    public static final class GetEnvironments extends AbstractOperationsApiTest<ApplicationEnvironments> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationEnvironment(this.cloudFoundryClient, "test-application-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(ApplicationEnvironments.builder()
+                    .running(StringMap.builder().entry("running-env-name", "running-env-value").build())
+                    .staging(StringMap.builder().entry("staging-env-name", "staging-env-value").build())
+                    .systemProvided(StringMap.builder().entry("system-env-name", "system-env-value").build())
+                    .userProvided(StringMap.builder().entry("env-name", "env-value").build())
+                    .build());
+        }
+
+        @Override
+        protected Publisher<ApplicationEnvironments> invoke() {
+            return this.applications
+                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+    }
+
+    public static final class GetEnvironmentsNoApp extends AbstractOperationsApiTest<ApplicationEnvironments> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<ApplicationEnvironments> invoke() {
+            return this.applications
+                .getEnvironments(GetApplicationEnvironmentsRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+    }
+
     public static final class GetEvents extends AbstractOperationsApiTest<ApplicationEvent> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
@@ -620,7 +677,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
-            requestApplicationEventsEmpty(this.cloudFoundryClient, "test-application-id");
+            requestApplicationEvents(this.cloudFoundryClient, "test-application-id");
         }
 
         @Override
