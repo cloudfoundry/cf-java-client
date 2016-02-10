@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
+import reactor.rx.Stream;
 
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.SPACE;
@@ -169,11 +170,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void listWithOrganizationLevel() {
         this.route
-            .after(() -> Mono.from(cloudFoundryOperations.routes()
+            .as(Stream::from)
+            .after(() -> this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
-                    .build())))
-            .where(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
+                    .build()))
+            .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -181,11 +183,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void listWithSpaceLevel() {
         this.route
-            .after(() -> Mono.from(cloudFoundryOperations.routes()
+            .as(Stream::from)
+            .after(() -> this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
-                    .build())))
-            .where(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
+                    .build()))
+            .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
