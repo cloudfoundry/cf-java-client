@@ -38,7 +38,6 @@ import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -313,10 +312,10 @@ public final class SpringServiceInstancesTest {
         }
 
         @Override
-        protected Publisher<GetServiceInstancePermissionsResponse> invoke(GetServiceInstancePermissionsRequest request) {
+        protected Mono<GetServiceInstancePermissionsResponse> invoke(GetServiceInstancePermissionsRequest request) {
             return this.serviceInstances.getPermissions(request);
         }
-        
+
     }
 
 

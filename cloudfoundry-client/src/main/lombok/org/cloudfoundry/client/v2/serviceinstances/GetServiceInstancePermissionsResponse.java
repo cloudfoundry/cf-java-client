@@ -42,5 +42,5 @@ public final class GetServiceInstancePermissionsResponse {
     GetServiceInstancePermissionsResponse(@JsonProperty("manage") Boolean manage) {
         this.manage = manage;
     }
-    
+
 }
