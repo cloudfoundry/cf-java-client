@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRes
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
@@ -103,6 +105,18 @@ public final class SpringServiceInstances extends AbstractSpringOperations imple
             @Override
             public void accept(UriComponentsBuilder builder) {
                 builder.pathSegment("v2", "service_instances", request.getServiceInstanceId());
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<GetServiceInstancePermissionsResponse> getPermissions(final GetServiceInstancePermissionsRequest request) {
+        return get(request, GetServiceInstancePermissionsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "permissions");
             }
 
         });
