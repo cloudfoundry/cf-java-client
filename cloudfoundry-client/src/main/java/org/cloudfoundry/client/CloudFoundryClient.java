@@ -52,7 +52,7 @@ public interface CloudFoundryClient {
     /**
      * The currently supported Cloud Controller API version
      */
-    String SUPPORTED_API_VERSION = "2.47.0";
+    String SUPPORTED_API_VERSION = "2.48.0";
 
     /**
      * Main entry point to the Cloud Foundry Applications V2 Client API
