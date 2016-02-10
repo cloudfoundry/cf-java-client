@@ -180,32 +180,32 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationEnvironments> getEnvironments(GetApplicationEnvironmentsRequest request) {
-        return Mono
-            .when(
-                ValidationUtils
-                    .validate(request)
-                    .map(new Function<GetApplicationEnvironmentsRequest, String>() {
-
-                        @Override
-                        public String apply(GetApplicationEnvironmentsRequest request) {
-                            return request.getName();
-                        }
-
-                    }),
-                this.spaceId
-            )
-            .then(function(new Function2<String, String, Mono<String>>() {
+        return ValidationUtils
+            .validate(request)
+            .and(this.spaceId)
+            .then(function(new Function2<GetApplicationEnvironmentsRequest, String, Mono<String>>() {
 
                 @Override
-                public Mono<String> apply(String application, String spaceId) {
-                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, application, spaceId);
+                public Mono<String> apply(GetApplicationEnvironmentsRequest request, String spaceId) {
+                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId);
                 }
+
             }))
-            .then(new Function<String, Mono<? extends ApplicationEnvironments>>() {
+            .then(new Function<String, Mono<ApplicationEnvironmentResponse>>() {
+
                 @Override
-                public Mono<? extends ApplicationEnvironments> apply(String applicationId) {
-                    return getApplicationEnvironment(DefaultApplications.this.cloudFoundryClient, applicationId);
+                public Mono<ApplicationEnvironmentResponse> apply(String applicationId) {
+                    return requestApplicationEnvironment(DefaultApplications.this.cloudFoundryClient, applicationId);
                 }
+
+            })
+            .map(new Function<ApplicationEnvironmentResponse, ApplicationEnvironments>() {
+
+                @Override
+                public ApplicationEnvironments apply(ApplicationEnvironmentResponse response) {
+                    return toApplicationEnvironments(response);
+                }
+
             });
     }
 
@@ -569,24 +569,6 @@ public final class DefaultApplications implements Applications {
             .otherwise(ExceptionUtils.<AbstractApplicationResource>convert("Application %s does not exist", application));
     }
 
-    private static Mono<ApplicationEnvironments> getApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .environment(ApplicationEnvironmentRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .map(new Function<ApplicationEnvironmentResponse, ApplicationEnvironments>() {
-                @Override
-                public ApplicationEnvironments apply(ApplicationEnvironmentResponse response) {
-                    return ApplicationEnvironments.builder()
-                        .running(response.getRunningEnvironmentJsons())
-                        .staging(response.getStagingEnvironmentJsons())
-                        .systemProvided(response.getSystemEnvironmentJsons())
-                        .userProvided(response.getEnvironmentJsons())
-                        .build();
-                }
-            });
-    }
-
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return getApplication(cloudFoundryClient, application, spaceId)
             .map(ResourceUtils.extractId());
@@ -725,6 +707,13 @@ public final class DefaultApplications implements Applications {
     private static boolean isRestartRequired(ScaleApplicationRequest request, AbstractApplicationResource applicationResource) {
         return (request.getDiskLimit() != null || request.getMemoryLimit() != null)
             && STARTED_STATE.equals(ResourceUtils.getEntity(applicationResource).getState());
+    }
+
+    private static Mono<ApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
+            .environment(ApplicationEnvironmentRequest.builder()
+                .applicationId(applicationId)
+                .build());
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -867,6 +856,15 @@ public final class DefaultApplications implements Applications {
             .runningInstances(summaryApplicationResponse.getRunningInstances())
             .stack(getStackResponse.getEntity().getName())
             .urls(toUrls(summaryApplicationResponse.getRoutes()))
+            .build();
+    }
+
+    private static ApplicationEnvironments toApplicationEnvironments(ApplicationEnvironmentResponse response) {
+        return ApplicationEnvironments.builder()
+            .running(response.getRunningEnvironmentJsons())
+            .staging(response.getStagingEnvironmentJsons())
+            .systemProvided(response.getSystemEnvironmentJsons())
+            .userProvided(response.getEnvironmentJsons())
             .build();
     }
 

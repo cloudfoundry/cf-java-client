@@ -552,10 +552,18 @@ public final class DefaultApplicationsTest {
         protected void assertions(TestSubscriber<ApplicationEnvironments> testSubscriber) throws Exception {
             testSubscriber
                 .assertEquals(ApplicationEnvironments.builder()
-                    .running(StringMap.builder().entry("running-env-name", "running-env-value").build())
-                    .staging(StringMap.builder().entry("staging-env-name", "staging-env-value").build())
-                    .systemProvided(StringMap.builder().entry("system-env-name", "system-env-value").build())
-                    .userProvided(StringMap.builder().entry("env-name", "env-value").build())
+                    .running(StringMap.builder()
+                        .entry("running-env-name", "running-env-value")
+                        .build())
+                    .staging(StringMap.builder()
+                        .entry("staging-env-name", "staging-env-value")
+                        .build())
+                    .systemProvided(StringMap.builder()
+                        .entry("system-env-name", "system-env-value")
+                        .build())
+                    .userProvided(StringMap.builder()
+                        .entry("env-name", "env-value")
+                        .build())
                     .build());
         }
 
