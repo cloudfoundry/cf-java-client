@@ -230,13 +230,12 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Stream<EventResource> apply(GetApplicationEventsRequest request, final String applicationId) {
-                    return getEventResources(applicationId, DefaultApplications.this.cloudFoundryClient);
+                    return getEventResources(applicationId, DefaultApplications.this.cloudFoundryClient)
+                        .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS));
 
                 }
 
             }))
-            .as(OperationUtils.<EventResource>stream())
-            .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))
             .map(new Function<EventResource, ApplicationEvent>() {
 
                 @Override

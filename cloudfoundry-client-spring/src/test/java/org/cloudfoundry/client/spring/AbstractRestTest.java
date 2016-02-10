@@ -18,16 +18,15 @@ package org.cloudfoundry.client.spring;
 
 import lombok.Getter;
 import org.cloudfoundry.client.spring.logging.LoggregatorMessageHttpMessageConverter;
-import org.cloudfoundry.client.spring.util.FallbackHttpMessageConverter;
-import org.cloudfoundry.client.spring.util.LoggingClientHttpRequestInterceptor;
+import org.cloudfoundry.client.spring.util.SchedulerGroupBuilder;
+import org.cloudfoundry.client.spring.util.network.FallbackHttpMessageConverter;
+import org.cloudfoundry.client.spring.util.network.RestTemplateBuilder;
 import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
@@ -39,13 +38,11 @@ import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.core.util.PlatformDependent;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -55,33 +52,25 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public abstract class AbstractRestTest {
 
-    protected static final SchedulerGroup PROCESSOR_GROUP = SchedulerGroup.io("cloudfoundry-client-spring", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+    protected static final SchedulerGroup PROCESSOR_GROUP = new SchedulerGroupBuilder()
+        .name("test")
+        .autoShutdown(false)
+        .build();
 
-    protected final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new ClientCredentialsResourceDetails(), new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")));
+    protected final OAuth2RestTemplate restTemplate = new RestTemplateBuilder()
+        .clientContext(new DefaultOAuth2ClientContext(new DefaultOAuth2AccessToken("test-access-token")))
+        .protectedResourceDetails(new ClientCredentialsResourceDetails())
+        .messageConverter(new LoggregatorMessageHttpMessageConverter())
+        .messageConverter(new FallbackHttpMessageConverter())
+        .problemHandler(new FailingDeserializationProblemHandler())
+        .build();
 
-    {
-        this.restTemplate.getInterceptors().add(new LoggingClientHttpRequestInterceptor());
-    }
 
     protected final URI root = UriComponentsBuilder.newInstance()
         .scheme("https").host("api.run.pivotal.io")
         .build().toUri();
 
     private final MockRestServiceServer mockServer = MockRestServiceServer.createServer(this.restTemplate);
-
-    {
-        List<HttpMessageConverter<?>> messageConverters = this.restTemplate.getMessageConverters();
-        for (HttpMessageConverter<?> messageConverter : messageConverters) {
-            if (messageConverter instanceof MappingJackson2HttpMessageConverter) {
-                ((MappingJackson2HttpMessageConverter) messageConverter).getObjectMapper()
-                    .setSerializationInclusion(NON_NULL)
-                    .addHandler(new FailingDeserializationProblemHandler());
-            }
-        }
-
-        messageConverters.add(new LoggregatorMessageHttpMessageConverter());
-        messageConverters.add(new FallbackHttpMessageConverter());
-    }
 
     protected final void mockRequest(RequestContext requestContext) {
         HttpMethod method = requestContext.getMethod();

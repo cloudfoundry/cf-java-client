@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.client.spring.util.network;
 
 import org.junit.Test;
 import org.springframework.mock.http.MockHttpOutputMessage;

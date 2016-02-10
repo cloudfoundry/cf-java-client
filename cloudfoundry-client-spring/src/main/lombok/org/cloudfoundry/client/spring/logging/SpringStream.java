@@ -55,7 +55,7 @@ public final class SpringStream {
 
     private final WebSocketContainer webSocketContainer;
 
-    public SpringStream(ClientEndpointConfig clientEndpointConfig, URI root, SchedulerGroup schedulerGroup, WebSocketContainer webSocketContainer) {
+    public SpringStream(WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig, URI root, SchedulerGroup schedulerGroup) {
         this.clientEndpointConfig = clientEndpointConfig;
         this.root = root;
         this.schedulerGroup = schedulerGroup;
