@@ -65,7 +65,9 @@ public final class DefaultOrganizationsTest {
                 .organizationId("test-id")
                 .username(username)
                 .build()))
-            .thenReturn(Mono.just(fill(AssociateOrganizationManagerByUsernameResponse.builder()).build()));
+            .thenReturn(Mono
+                .just(fill(AssociateOrganizationManagerByUsernameResponse.builder())
+                    .build()));
     }
 
     private static void requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String username) {
@@ -74,7 +76,9 @@ public final class DefaultOrganizationsTest {
                 .organizationId("test-id")
                 .username(username)
                 .build()))
-            .thenReturn(Mono.just(fill(AssociateOrganizationUserByUsernameResponse.builder()).build()));
+            .thenReturn(Mono
+                .just(fill(AssociateOrganizationUserByUsernameResponse.builder())
+                    .build()));
     }
 
     private static void requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organization, String organizationQuotaDefinitionId) {
