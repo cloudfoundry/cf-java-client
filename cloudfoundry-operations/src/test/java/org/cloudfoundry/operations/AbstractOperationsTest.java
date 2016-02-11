@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
+import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.job.Jobs;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
@@ -56,6 +57,8 @@ public abstract class AbstractOperationsTest {
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
 
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
+    
+    protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
 
@@ -82,6 +85,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
+        when(this.cloudFoundryClient.featureFlags()).thenReturn(this.featureFlags);
         when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
         when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
