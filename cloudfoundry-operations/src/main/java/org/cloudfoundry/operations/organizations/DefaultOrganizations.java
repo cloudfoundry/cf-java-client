@@ -24,10 +24,12 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQu
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -44,51 +46,69 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.utils.ExceptionUtils;
 import org.cloudfoundry.utils.Optional;
-import org.cloudfoundry.utils.OptionalUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
 import org.cloudfoundry.utils.ValidationUtils;
 import org.cloudfoundry.utils.tuple.Function2;
 import org.cloudfoundry.utils.tuple.Function3;
 import org.cloudfoundry.utils.tuple.Function4;
+import org.cloudfoundry.utils.tuple.Predicate3;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
+import reactor.fn.tuple.Tuple3;
 import reactor.fn.tuple.Tuple4;
 import reactor.rx.Stream;
 
 import java.util.List;
 
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.utils.tuple.TupleUtils.predicate;
 
 public final class DefaultOrganizations implements Organizations {
 
     public static final String SET_ROLES_BY_USERNAME_FEATURE_FLAG = "set_roles_by_username";
 
-    private final Mono<String> clientusername;
-
     private final CloudFoundryClient cloudFoundryClient;
 
-    public DefaultOrganizations(CloudFoundryClient cloudFoundryClient, Mono<String> clientUsername) {
+    private final Mono<String> username;
+
+    public DefaultOrganizations(CloudFoundryClient cloudFoundryClient, Mono<String> username) {
         this.cloudFoundryClient = cloudFoundryClient;
-        this.clientusername = clientUsername;
+        this.username = username;
     }
 
     @Override
     public Mono<Void> create(CreateOrganizationRequest request) {
         return Mono
-            .when(createOrganization(cloudFoundryClient, ValidationUtils.validate(request)),
-                requestGetFeatureFlag(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
-                this.clientusername)
+            .when(ValidationUtils.validate(request), this.username)
+            .then(function(new Function2<CreateOrganizationRequest, String, Mono<Tuple3<String, Boolean, String>>>() {
+
+                @Override
+                public Mono<Tuple3<String, Boolean, String>> apply(CreateOrganizationRequest request, String username) {
+                    return Mono
+                        .when(
+                            createOrganization(DefaultOrganizations.this.cloudFoundryClient, request),
+                            getFeatureFlagEnabled(DefaultOrganizations.this.cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
+                            Mono.just(username)
+                        );
+                }
+
+            }))
+            .where(predicate(new Predicate3<String, Boolean, String>() {
+
+                @Override
+                public boolean test(String organizationId, Boolean setRolesByUsernameEnabled, String username) {
+                    return setRolesByUsernameEnabled;
+                }
+
+            }))
             .then(function(new Function3<String, Boolean, String, Mono<Void>>() {
 
                 @Override
-                public Mono<Void> apply(final String organizationId, Boolean setRolesByUsernameEnabled, final String clientUsername) {
-                    if (setRolesByUsernameEnabled) {
-                        return setOrganizationManager(cloudFoundryClient, organizationId, clientUsername);
-                    }
-                    return Mono.empty();
+                public Mono<Void> apply(final String organizationId, Boolean setRolesByUsernameEnabled, final String username) {
+                    return setOrganizationManager(DefaultOrganizations.this.cloudFoundryClient, organizationId, username);
                 }
 
             }));
@@ -96,7 +116,6 @@ public final class DefaultOrganizations implements Organizations {
 
     @Override
     public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
-
         return ValidationUtils
             .validate(request)
             .then(new Function<OrganizationInfoRequest, Mono<Tuple2<OrganizationResource, OrganizationInfoRequest>>>() {
@@ -162,28 +181,35 @@ public final class DefaultOrganizations implements Organizations {
             }));
     }
 
-    private static Mono<String> createOrganization(final CloudFoundryClient cloudFoundryClient, Mono<CreateOrganizationRequest> validatedRequest) {
-        return validatedRequest
-            .then(new Function<CreateOrganizationRequest, Mono<Tuple2<Optional<String>, CreateOrganizationRequest>>>() {
+    private static Mono<String> createOrganization(final CloudFoundryClient cloudFoundryClient, final CreateOrganizationRequest request) {
+        return Optional                                                                         // TODO: Remove once Mono.justOrEmpty()
+            .ofNullable(request.getQuotaDefinitionName())
+            .map(new Function<String, Mono<String>>() {
 
                 @Override
-                public Mono<Tuple2<Optional<String>, CreateOrganizationRequest>> apply(CreateOrganizationRequest createOrganizationRequest) {
-                    final String quotaDefinitionName = createOrganizationRequest.getQuotaDefinitionName();
-
-                    return (quotaDefinitionName == null ? Mono.just(Optional.<String>empty()) : requestOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName)
-                        .map(OptionalUtils.<String>toOptional()))
-                        .and(Mono.just(createOrganizationRequest));
+                public Mono<String> apply(String quotaDefinitionName) {
+                    return Mono.just(quotaDefinitionName);
                 }
 
             })
-            .then(function(new Function2<Optional<String>, CreateOrganizationRequest, Mono<String>>() {
+            .orElse(Mono.<String>empty())
+            .then(new Function<String, Mono<String>>() {
 
                 @Override
-                public Mono<String> apply(Optional<String> optionalQuotaDefinitionId, CreateOrganizationRequest request) {
-                    return requestCreateOrganization(cloudFoundryClient, request.getOrganizationName(), optionalQuotaDefinitionId);
+                public Mono<String> apply(String quotaDefinitionName) {
+                    return getOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName);
                 }
 
-            }));
+            })
+            .then(new Function<String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(String organizationQuotaDefinitionId) {
+                    return getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), organizationQuotaDefinitionId);
+                }
+
+            })
+            .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {
@@ -198,6 +224,11 @@ public final class DefaultOrganizations implements Organizations {
             );
     }
 
+    private static Mono<String> getCreateOrganizationId(CloudFoundryClient cloudFoundryClient, String organization, String quotaDefinitionId) {
+        return requestCreateOrganization(cloudFoundryClient, organization, quotaDefinitionId)
+            .map(ResourceUtils.extractId());
+    }
+
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestDomains(cloudFoundryClient, organizationId)
             .map(new Function<DomainResource, String>() {
@@ -209,6 +240,18 @@ public final class DefaultOrganizations implements Organizations {
 
             })
             .toList();
+    }
+
+    private static Mono<Boolean> getFeatureFlagEnabled(CloudFoundryClient cloudFoundryClient, String featureFlag) {
+        return requestGetFeatureFlag(cloudFoundryClient, featureFlag)
+            .map(new Function<GetFeatureFlagResponse, Boolean>() {
+
+                @Override
+                public Boolean apply(GetFeatureFlagResponse response) {
+                    return response.getEnabled();
+                }
+
+            });
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -233,6 +276,17 @@ public final class DefaultOrganizations implements Organizations {
 
             });
 
+    }
+
+    private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
+        return requestOrganizationQuotaDefinitions(cloudFoundryClient, quotaDefinitionName)
+            .single()
+            .otherwise(ExceptionUtils.<OrganizationQuotaDefinitionResource>convert("Organization quota %s does not exist", quotaDefinitionName));
+    }
+
+    private static Mono<String> getOrganizationQuotaDefinitionId(final CloudFoundryClient cloudFoundryClient, final String quotaDefinitionName) {
+        return getOrganizationQuotaDefinition(cloudFoundryClient, quotaDefinitionName)
+            .map(ResourceUtils.extractId());
     }
 
     private static Mono<List<String>> getSpaceNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
@@ -277,18 +331,13 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<String> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName, Optional<String> optionalQuotaDefinitionId) {
-        org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest.CreateOrganizationRequestBuilder requestBuilder = org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest
-            .builder()
-            .name(organizationName);
-
-        if (optionalQuotaDefinitionId.isPresent()) {
-            requestBuilder.quotaDefinitionId(optionalQuotaDefinitionId.get());
-        }
-
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organization, String quotaDefinitionId) {
         return cloudFoundryClient.organizations()
-            .create(requestBuilder.build())
-            .map(ResourceUtils.extractId());
+            .create(org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest
+                .builder()
+                .name(organization)
+                .quotaDefinitionId(quotaDefinitionId)
+                .build());
     }
 
     private static Stream<DomainResource> requestDomains(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
@@ -307,19 +356,11 @@ public final class DefaultOrganizations implements Organizations {
             });
     }
 
-    private static Mono<Boolean> requestGetFeatureFlag(CloudFoundryClient cloudFoundryClient, String featureFlag) {
+    private static Mono<GetFeatureFlagResponse> requestGetFeatureFlag(CloudFoundryClient cloudFoundryClient, String featureFlag) {
         return cloudFoundryClient.featureFlags()
             .get(GetFeatureFlagRequest.builder()
                 .name(featureFlag)
-                .build())
-            .map(new Function<GetFeatureFlagResponse, Boolean>() {
-
-                @Override
-                public Boolean apply(GetFeatureFlagResponse response) {
-                    return response.getEnabled();
-                }
-
-            });
+                .build());
     }
 
     private static Mono<GetOrganizationQuotaDefinitionResponse> requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
@@ -329,27 +370,20 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<String> requestOrganizationQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
+    private static Stream<OrganizationQuotaDefinitionResource> requestOrganizationQuotaDefinitions(final CloudFoundryClient cloudFoundryClient, final String organizationQuotaDefinition) {
         return PaginationUtils
-            .requestResources(requestOrganizationQuotaDefinitionPage(cloudFoundryClient, quotaDefinitionName))
-            .single()
-            .map(ResourceUtils.extractId())
-            .otherwise(ExceptionUtils.<String>convert("Organization quota %s does not exist", quotaDefinitionName));
-    }
+            .requestResources(new Function<Integer, Mono<ListOrganizationQuotaDefinitionsResponse>>() {
 
-    private static Function<Integer, Mono<ListOrganizationQuotaDefinitionsResponse>> requestOrganizationQuotaDefinitionPage(final CloudFoundryClient cloudFoundryClient,
-                                                                                                                            final String quotaDefinitionName) {
-        return new Function<Integer, Mono<ListOrganizationQuotaDefinitionsResponse>>() {
+                @Override
+                public Mono<ListOrganizationQuotaDefinitionsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizationQuotaDefinitions()
+                        .list(ListOrganizationQuotaDefinitionsRequest.builder()
+                            .name(organizationQuotaDefinition)
+                            .page(page)
+                            .build());
+                }
 
-            @Override
-            public Mono<ListOrganizationQuotaDefinitionsResponse> apply(Integer page) {
-                return cloudFoundryClient.organizationQuotaDefinitions().list(ListOrganizationQuotaDefinitionsRequest.builder()
-                    .name(quotaDefinitionName)
-                    .page(page)
-                    .build());
-            }
-
-        };
+            });
     }
 
     private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organizationName) {
@@ -426,10 +460,12 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<Void> setOrganizationManager(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String managerUsername) {
+    private static Mono<Void> setOrganizationManager(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String username) {
         return Mono
-            .when(requestAssociateOrganizationManagerByUsername(cloudFoundryClient, organizationId, managerUsername),
-                requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, managerUsername))
+            .when(
+                requestAssociateOrganizationManagerByUsername(cloudFoundryClient, organizationId, username),
+                requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
+            )
             .after();
     }
 
