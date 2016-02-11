@@ -18,6 +18,9 @@ package org.cloudfoundry.client.spring.v2.services;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.services.DeleteServiceRequest;
+import org.cloudfoundry.client.v2.services.DeleteServiceResponse;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
@@ -26,11 +29,97 @@ import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringServicesTest {
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceRequest, DeleteServiceResponse> {
+
+        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceRequest getInvalidRequest() {
+            return DeleteServiceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/services/test-service-id?purge=true")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected DeleteServiceResponse getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceRequest getValidRequest() throws Exception {
+            return DeleteServiceRequest.builder()
+                .purge(true)
+                .serviceId("test-service-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteServiceResponse> invoke(DeleteServiceRequest request) {
+            return this.services.delete(request);
+        }
+
+    }
+
+    public static final class DeleteAsync extends AbstractApiTest<DeleteServiceRequest, DeleteServiceResponse> {
+
+        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceRequest getInvalidRequest() {
+            return DeleteServiceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/services/test-service-id?async=true")
+                .status(ACCEPTED)
+                .responsePayload("v2/services/DELETE_{id}_async_response.json");
+        }
+
+        @Override
+        protected DeleteServiceResponse getResponse() {
+            return DeleteServiceResponse.builder()
+                .metadata(Resource.Metadata.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected DeleteServiceRequest getValidRequest() throws Exception {
+            return DeleteServiceRequest.builder()
+                .async(true)
+                .serviceId("test-service-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<DeleteServiceResponse> invoke(DeleteServiceRequest request) {
+            return this.services.delete(request);
+        }
+
+    }
 
     public static final class Get extends AbstractApiTest<GetServiceRequest, GetServiceResponse> {
 
