@@ -74,14 +74,6 @@ public interface Applications {
     Mono<Void> rename(RenameApplicationRequest request);
 
     /**
-     * Restart a specific application instance
-     *
-     * @param request the restart application instance request
-     * @return a completion indicator
-     */
-    Mono<Void> restartInstance(RestartApplicationInstanceRequest request);
-
-    /**
      * Restarts a specific application
      *
      * @param request the restart application request
@@ -90,20 +82,12 @@ public interface Applications {
     Mono<Void> restart(RestartApplicationRequest request);
 
     /**
-     * Set an environment variable of an application
-     * 
-     * @param request the set environment variable request
+     * Restart a specific application instance
+     *
+     * @param request the restart application instance request
      * @return a completion indicator
      */
-    Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
-    
-    /**
-     * Unset an environment variable of an application
-     * 
-     * @param request the unset environment variable request
-     * @return a completion indicator
-     */
-    Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request);
+    Mono<Void> restartInstance(RestartApplicationInstanceRequest request);
 
     /**
      * Scales a specific application
@@ -112,6 +96,14 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> scale(ScaleApplicationRequest request);
+
+    /**
+     * Set an environment variable of an application
+     *
+     * @param request the set environment variable request
+     * @return a completion indicator
+     */
+    Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
 
     /**
      * Starts a specific application or, if the application is already started, simply returns.
@@ -128,4 +120,12 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> stop(StopApplicationRequest request);
+
+    /**
+     * Unset an environment variable of an application
+     *
+     * @param request the unset environment variable request
+     * @return a completion indicator
+     */
+    Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request);
 }
