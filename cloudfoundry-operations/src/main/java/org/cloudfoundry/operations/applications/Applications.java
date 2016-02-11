@@ -96,6 +96,14 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
+    
+    /**
+     * Unset an environment variable of an application
+     * 
+     * @param request the unset environment variable request
+     * @return a completion indicator
+     */
+    Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request);
 
     /**
      * Scales a specific application

@@ -1377,4 +1377,54 @@ public final class DefaultApplicationsTest {
         }
     }
 
+    public static final class UnsetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", StringMap.builder().build());
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name("test-app")
+                    .variableName("test-var")
+                    .build());
+        }
+    }
+
+    public static final class UnsetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest.builder()
+                    .name("test-app")
+                    .variableName("test-var")
+                    .build());
+        }
+    }
+
 }
