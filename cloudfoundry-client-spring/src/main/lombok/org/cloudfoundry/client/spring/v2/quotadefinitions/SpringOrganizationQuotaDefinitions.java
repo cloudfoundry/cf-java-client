@@ -64,7 +64,7 @@ public final class SpringOrganizationQuotaDefinitions extends AbstractSpringOper
     }
 
     @Override
-    public Publisher<ListOrganizationQuotaDefinitionsResponse> list(final ListOrganizationQuotaDefinitionsRequest request) {
+    public Mono<ListOrganizationQuotaDefinitionsResponse> list(final ListOrganizationQuotaDefinitionsRequest request) {
         return get(request, ListOrganizationQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

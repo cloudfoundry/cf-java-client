@@ -39,6 +39,6 @@ public interface OrganizationQuotaDefinitions {
      * @param request the List all Organization Quota Definitions request
      * @return the response from the List all Organization Quota Definitions request
      */
-    Publisher<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request);
+    Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request);
 
 }
