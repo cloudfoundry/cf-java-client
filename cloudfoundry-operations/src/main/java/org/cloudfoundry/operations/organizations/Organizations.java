@@ -27,6 +27,7 @@ public interface Organizations {
     /**
      * Get an Organizations Information
      *
+     * @param request the organization info request
      * @return the organizations info
      */
     Mono<OrganizationDetail> get(OrganizationInfoRequest request);
@@ -42,6 +43,7 @@ public interface Organizations {
      * Rename a specific organization
      *
      * @param request the rename organization request
+     * @return completion indicator
      */
     Mono<Void> rename(RenameOrganizationRequest request);
 
