@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,5 +32,13 @@ public interface OrganizationQuotaDefinitions {
      * @return the response from the Retrieve a Particular Organization Quota Definition request
      */
     Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/230/organization_quota_definitions/list_all_organization_quota_definitions.html">List all Organization Quota Definitions</a> request
+     *
+     * @param request the List all Organization Quota Definitions request
+     * @return the response from the List all Organization Quota Definitions request
+     */
+    Publisher<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request);
 
 }

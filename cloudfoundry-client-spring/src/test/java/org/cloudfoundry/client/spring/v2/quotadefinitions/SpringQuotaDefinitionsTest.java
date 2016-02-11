@@ -19,7 +19,10 @@ package org.cloudfoundry.client.spring.v2.quotadefinitions;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static org.cloudfoundry.client.v2.Resource.Metadata;
@@ -78,6 +81,63 @@ public final class SpringQuotaDefinitionsTest {
         @Override
         protected Mono<GetOrganizationQuotaDefinitionResponse> invoke(GetOrganizationQuotaDefinitionRequest request) {
             return this.quotaDefinitions.get(request);
+        }
+
+    }
+
+    public static final class ListOrganizationQuotaDefinitions extends AbstractApiTest<ListOrganizationQuotaDefinitionsRequest, ListOrganizationQuotaDefinitionsResponse> {
+
+        private final SpringOrganizationQuotaDefinitions quotaDefinitions = new SpringOrganizationQuotaDefinitions(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListOrganizationQuotaDefinitionsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("v2/quota_definitions?page=-1")
+                .status(OK)
+                .responsePayload("v2/quota_definitions/GET_response.json");
+        }
+
+        @Override
+        protected ListOrganizationQuotaDefinitionsResponse getResponse() {
+            return ListOrganizationQuotaDefinitionsResponse.builder()
+                .totalPages(1)
+                .totalResults(1)
+                .resource(ListOrganizationQuotaDefinitionsResponse.ListOrganizationQuotaDefinitionsResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
+                        .url("/v2/quota_definitions/9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
+                        .createdAt("2016-01-26T22:20:04Z")
+                        .build())
+                    .entity(OrganizationQuotaDefinitionEntity.builder()
+                        .applicationInstanceLimit(-1)
+                        .instanceMemoryLimit(-1)
+                        .memoryLimit(10240)
+                        .name("default")
+                        .nonBasicServicesAllowed(true)
+                        .totalPrivateDomains(-1)
+                        .totalRoutes(1000)
+                        .totalServices(100)
+                        .trialDbAllowed(false)
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListOrganizationQuotaDefinitionsRequest getValidRequest() throws Exception {
+            return ListOrganizationQuotaDefinitionsRequest.builder()
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Publisher<ListOrganizationQuotaDefinitionsResponse> invoke(ListOrganizationQuotaDefinitionsRequest request) {
+            return this.quotaDefinitions.list(request);
         }
 
     }
