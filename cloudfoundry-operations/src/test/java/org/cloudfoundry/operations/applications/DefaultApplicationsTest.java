@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.events.EventEntity;
@@ -343,7 +344,7 @@ public final class DefaultApplicationsTest {
 
     private static void requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
         when(cloudFoundryClient.applicationsV2()
-            .terminateInstance(org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest.builder()
+            .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
                 .index(instanceIndex)
                 .build())).

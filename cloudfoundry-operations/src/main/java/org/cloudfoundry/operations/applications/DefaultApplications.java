@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationRequest;
 import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
+import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.events.EventEntity;
@@ -361,21 +362,22 @@ public final class DefaultApplications implements Applications {
         return ValidationUtils
             .validate(request)
             .and(this.spaceId)
-            .then(function(new Function2<RestartApplicationInstanceRequest, String, Mono<Tuple3<String, String, Integer>>>() {
+            .then(function(new Function2<RestartApplicationInstanceRequest, String, Mono<Tuple2<String, Integer>>>() {
 
                 @Override
-                public Mono<Tuple3<String, String, Integer>> apply(RestartApplicationInstanceRequest request, String spaceId) {
-                    return Mono.when(
-                        Mono.just(spaceId),
-                        getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId),
-                        Mono.just(request.getInstanceIndex()));
+                public Mono<Tuple2<String, Integer>> apply(RestartApplicationInstanceRequest request, String spaceId) {
+                    return Mono
+                        .when(
+                            getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId),
+                            Mono.just(request.getInstanceIndex())
+                        );
                 }
 
             }))
-            .then(function(new Function3<String, String, Integer, Mono<Void>>() {
+            .then(function(new Function2<String, Integer, Mono<Void>>() {
 
                 @Override
-                public Mono<Void> apply(String spaceId, String applicationId, Integer instanceIndex) {
+                public Mono<Void> apply(String applicationId, Integer instanceIndex) {
                     return requestTerminateApplicationInstance(DefaultApplications.this.cloudFoundryClient, applicationId, instanceIndex);
                 }
 
@@ -881,7 +883,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
         return cloudFoundryClient.applicationsV2()
-            .terminateInstance(org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest.builder()
+            .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
                 .index(instanceIndex)
                 .build());
@@ -911,8 +913,7 @@ public final class DefaultApplications implements Applications {
                 .instances(instances)
                 .memory(memory)
                 .build())
-            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast())
-            ;
+            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
