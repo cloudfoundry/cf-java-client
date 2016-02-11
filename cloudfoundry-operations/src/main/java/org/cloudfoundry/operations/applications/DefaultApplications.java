@@ -437,6 +437,32 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
+        return Mono
+            .when(
+                ValidationUtils.validate(request),
+                this.spaceId
+            )
+            .then(function(new Function2<SetEnvironmentVariableApplicationRequest, String, Mono<Tuple2<SetEnvironmentVariableApplicationRequest, String>>>() {
+
+                @Override
+                public Mono<Tuple2<SetEnvironmentVariableApplicationRequest, String>> apply(SetEnvironmentVariableApplicationRequest request, String spaceId) {
+                    return Mono.when(Mono.just(request), getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId));
+                }
+
+            }))
+            .then(function(new Function2<SetEnvironmentVariableApplicationRequest, String, Mono<UpdateApplicationResponse>>() {
+
+                @Override
+                public Mono<UpdateApplicationResponse> apply(SetEnvironmentVariableApplicationRequest request, String applicationId) {
+                    return requestUpdateApplicationEnvironment(DefaultApplications.this.cloudFoundryClient, applicationId, request.getVariableName(), request.getVariableValue());
+                }
+
+            }))
+            .after();
+    }
+
+    @Override
     public Mono<Void> start(StartApplicationRequest request) {
         return Mono
             .when(
@@ -815,6 +841,14 @@ public final class DefaultApplications implements Applications {
             .terminateInstance(org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
                 .index(instanceIndex)
+                .build());
+    }
+
+    private static Mono<UpdateApplicationResponse> requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, String variableName, String variableValue) {
+        return cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .environmentJson(variableName, variableValue)
                 .build());
     }
 

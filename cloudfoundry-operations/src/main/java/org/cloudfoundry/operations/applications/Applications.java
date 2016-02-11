@@ -90,6 +90,14 @@ public interface Applications {
     Mono<Void> restart(RestartApplicationRequest request);
 
     /**
+     * Set an environment variable of an application
+     * 
+     * @param request the set environment variable request
+     * @return a completion indicator
+     */
+    Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
+
+    /**
      * Scales a specific application
      *
      * @param request the scale application request
