@@ -568,7 +568,10 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Map<String, Object> addToEnvironment(Map<String, Object> environment, String variableName, Object variableValue) {
-        return StringMap.builder().entries(environment).entry(variableName, variableValue).build();
+        return StringMap.builder()
+            .entries(environment)
+            .entry(variableName, variableValue)
+            .build();
     }
 
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
@@ -805,9 +808,9 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Map<String, Object> removeFromEnvironment(Map<String, Object> environment, String variableName) {
-        Map<String, Object> stringMap = new HashMap<String, Object>(environment);
-        stringMap.remove(variableName);
-        return StringMap.builder().entries(stringMap).build();
+        Map<String, Object> modified = new HashMap<String, Object>(environment);
+        modified.remove(variableName);
+        return modified;
     }
 
     private static Mono<ApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
