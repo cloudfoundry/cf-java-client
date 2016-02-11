@@ -56,9 +56,7 @@ public final class ListOrganizationQuotaDefinitionsRequest extends PaginatedRequ
 
     @Override
     public ValidationResult isValid() {
-        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
-
-        return builder.build();
+        return ValidationResult.builder().build();
     }
 
 }

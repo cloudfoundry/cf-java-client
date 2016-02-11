@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**

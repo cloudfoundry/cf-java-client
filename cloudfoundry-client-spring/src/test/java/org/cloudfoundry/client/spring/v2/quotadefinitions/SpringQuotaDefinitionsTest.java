@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQu
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -107,7 +108,7 @@ public final class SpringQuotaDefinitionsTest {
             return ListOrganizationQuotaDefinitionsResponse.builder()
                 .totalPages(1)
                 .totalResults(1)
-                .resource(ListOrganizationQuotaDefinitionsResponse.ListOrganizationQuotaDefinitionsResource.builder()
+                .resource(OrganizationQuotaDefinitionResource.builder()
                     .metadata(Metadata.builder()
                         .id("9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
                         .url("/v2/quota_definitions/9a76e262-9dc1-4316-87ad-a8b3bfbb11d4")
