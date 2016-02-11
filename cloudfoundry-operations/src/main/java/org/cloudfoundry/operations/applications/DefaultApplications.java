@@ -450,7 +450,11 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<Tuple2<SetEnvironmentVariableApplicationRequest, AbstractApplicationResource>> apply(SetEnvironmentVariableApplicationRequest request, String spaceId) {
-                    return Mono.when(Mono.just(request), getApplication(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId));
+                    return Mono
+                        .when(
+                            Mono.just(request),
+                            getApplication(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId)
+                        );
                 }
 
             }))
