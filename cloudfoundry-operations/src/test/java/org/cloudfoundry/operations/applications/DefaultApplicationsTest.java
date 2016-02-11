@@ -62,6 +62,7 @@ import reactor.fn.Supplier;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 import static org.cloudfoundry.utils.test.TestObjects.fill;
@@ -193,7 +194,14 @@ public final class DefaultApplicationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-").build())
+                    .resource(ApplicationResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id("test-application-id")
+                            .build())
+                        .entity(fill(ApplicationEntity.builder(), "application-")
+                            .environmentJson("test-var", "test-value")
+                            .build())
+                        .build())
                     .totalPages(1)
                     .build()));
     }
@@ -342,11 +350,11 @@ public final class DefaultApplicationsTest {
             thenReturn(Mono.<Void>empty());
     }
 
-    private static void requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, String variableName, String variableValue) {
+    private static void requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .environmentJson(variableName, variableValue)
+                .environmentJsons(environment)
                 .build()))
             .thenReturn(Mono.just(fill(UpdateApplicationResponse.builder()).build()));
     }
@@ -1185,7 +1193,10 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
-            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", "test-var-name", "test-var-value");
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", StringMap.builder()
+                .entry("test-var", "test-value")
+                .entry("test-var-name", "test-var-value")
+                .build());
         }
 
         @Override
