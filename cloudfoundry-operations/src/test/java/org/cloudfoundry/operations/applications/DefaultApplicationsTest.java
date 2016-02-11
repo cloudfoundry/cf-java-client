@@ -333,6 +333,15 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
+        when(cloudFoundryClient.applicationsV2()
+            .terminateInstance(org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest.builder()
+                .applicationId(applicationId)
+                .index(instanceIndex)
+                .build())).
+            thenReturn(Mono.<Void>empty());
+    }
+
     private static void requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -905,6 +914,32 @@ public final class DefaultApplicationsTest {
                 .rename(RenameApplicationRequest.builder()
                     .name("test-app-name")
                     .newName("test-new-app-name")
+                    .build());
+        }
+    }
+
+
+    public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-application-id", 0);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .restartInstance(RestartApplicationInstanceRequest.builder()
+                    .name("test-application-name")
+                    .instanceIndex(0)
                     .build());
         }
     }
