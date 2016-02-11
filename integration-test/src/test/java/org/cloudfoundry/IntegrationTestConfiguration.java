@@ -65,14 +65,14 @@ public class IntegrationTestConfiguration {
                                                 @Value("${test.username}") String username,
                                                 @Value("${test.password}") String password,
                                                 @Value("${test.skipSslValidation:false}") Boolean skipSslValidation,
-                                                List<DeserializationProblemHandler> deserializationProblemHandlers) {
+                                                List<DeserializationProblemHandler> problemHandlers) {
 
         return SpringCloudFoundryClient.builder()
             .host(host)
             .username(username)
             .password(password)
             .skipSslValidation(skipSslValidation)
-            .deserializationProblemHandlers(deserializationProblemHandlers)
+            .problemHandlers(problemHandlers)
             .build();
     }
 

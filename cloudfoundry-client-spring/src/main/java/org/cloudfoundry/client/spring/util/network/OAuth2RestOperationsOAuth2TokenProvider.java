@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.client.spring.util.network;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 
-final class ExplicitHostnameVerifier implements HostnameVerifier {
+public final class OAuth2RestOperationsOAuth2TokenProvider implements OAuth2TokenProvider {
 
-    private final String hostname;
+    private final OAuth2RestOperations restOperations;
 
-    ExplicitHostnameVerifier(String hostname) {
-        this.hostname = hostname;
+    public OAuth2RestOperationsOAuth2TokenProvider(OAuth2RestOperations restOperations) {
+        this.restOperations = restOperations;
     }
 
     @Override
-    public boolean verify(String candidate, SSLSession sslSession) {
-        return this.hostname.equals(candidate);
+    public String getToken() {
+        return this.restOperations.getAccessToken().getValue();
     }
 
 }

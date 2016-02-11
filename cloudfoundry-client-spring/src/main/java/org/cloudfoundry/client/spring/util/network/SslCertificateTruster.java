@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.client.spring.util.network;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +31,6 @@ public interface SslCertificateTruster {
      * @param timeout  the maximum time to wait
      * @param timeUnit the time unit of the {@code timeout} argument
      */
-    void trust(String host, int port, int timeout, TimeUnit timeUnit) throws GeneralSecurityException, IOException;
+    void trust(String host, int port, int timeout, TimeUnit timeUnit);
 
 }

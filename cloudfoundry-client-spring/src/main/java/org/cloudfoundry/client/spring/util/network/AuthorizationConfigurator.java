@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring;
+package org.cloudfoundry.client.spring.util.network;
 
 import javax.websocket.ClientEndpointConfig;
 import java.util.Collections;
@@ -24,17 +24,17 @@ import java.util.Map;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.oauth2.common.OAuth2AccessToken.BEARER_TYPE;
 
-final class AuthorizationConfigurator extends ClientEndpointConfig.Configurator {
+public final class AuthorizationConfigurator extends ClientEndpointConfig.Configurator {
 
-    private final SpringCloudFoundryClient cloudFoundryClient;
+    private final OAuth2TokenProvider tokenProvider;
 
-    AuthorizationConfigurator(SpringCloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = cloudFoundryClient;
+    public AuthorizationConfigurator(OAuth2TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
     public void beforeRequest(Map<String, List<String>> headers) {
-        String authorizationHeader = String.format("%s %s", BEARER_TYPE, this.cloudFoundryClient.getAccessToken());
+        String authorizationHeader = String.format("%s %s", BEARER_TYPE, this.tokenProvider.getToken());
         headers.put(AUTHORIZATION, Collections.singletonList(authorizationHeader));
     }
 

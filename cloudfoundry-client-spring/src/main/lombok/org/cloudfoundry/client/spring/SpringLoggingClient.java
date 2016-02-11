@@ -24,22 +24,32 @@ import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.client.logging.LogMessage;
 import org.cloudfoundry.client.logging.RecentLogsRequest;
 import org.cloudfoundry.client.logging.StreamLogsRequest;
+import org.cloudfoundry.client.spring.logging.LoggregatorMessageHttpMessageConverter;
 import org.cloudfoundry.client.spring.logging.SpringRecent;
 import org.cloudfoundry.client.spring.logging.SpringStream;
+import org.cloudfoundry.client.spring.util.SchedulerGroupBuilder;
+import org.cloudfoundry.client.spring.util.network.AuthorizationConfigurator;
+import org.cloudfoundry.client.spring.util.network.ConnectionContext;
+import org.cloudfoundry.client.spring.util.network.FallbackHttpMessageConverter;
+import org.cloudfoundry.client.spring.util.network.OAuth2RestOperationsOAuth2TokenProvider;
+import org.cloudfoundry.client.spring.util.network.RestTemplateBuilder;
+import org.cloudfoundry.client.spring.util.network.SslCertificateTruster;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.reactivestreams.Publisher;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SchedulerGroup;
-import reactor.core.util.PlatformDependent;
 import reactor.fn.Function;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * The Spring-based implementation of {@link LoggingClient}
@@ -53,19 +63,25 @@ public final class SpringLoggingClient implements LoggingClient {
 
     @Builder
     SpringLoggingClient(@NonNull SpringCloudFoundryClient cloudFoundryClient) {
-        this(cloudFoundryClient, ContainerProvider.getWebSocketContainer());
+        this(cloudFoundryClient.getConnectionContext(), getRestOperations(cloudFoundryClient.getConnectionContext()), ContainerProvider.getWebSocketContainer(), getSchedulerGroup());
     }
 
-    SpringLoggingClient(SpringCloudFoundryClient cloudFoundryClient, WebSocketContainer webSocketContainer) {
-        SchedulerGroup schedulerGroup = createSchedulerGroup();
-        URI loggingRoot = getLoggingRoot(cloudFoundryClient);
-        this.recent = new SpringRecent(getRestOperations(cloudFoundryClient), convertLoggingRoot(loggingRoot), schedulerGroup);
-        this.stream = new SpringStream(getClientEndpointConfig(cloudFoundryClient), loggingRoot, schedulerGroup, webSocketContainer);
+    SpringLoggingClient(RestOperations restOperations, URI recentRoot, URI streamRoot, WebSocketContainer webSocketContainer, ClientEndpointConfig clientEndpointConfig,
+                        SchedulerGroup schedulerGroup) {
+
+        this.recent = new SpringRecent(restOperations, recentRoot, schedulerGroup);
+        this.stream = new SpringStream(webSocketContainer, clientEndpointConfig, streamRoot, schedulerGroup);
     }
 
-    SpringLoggingClient(ClientEndpointConfig clientEndpointConfig, WebSocketContainer webSocketContainer, RestOperations restOperations, URI root, SchedulerGroup schedulerGroup) {
-        this.recent = new SpringRecent(restOperations, root, schedulerGroup);
-        this.stream = new SpringStream(clientEndpointConfig, root, schedulerGroup, webSocketContainer);
+    // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
+    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, WebSocketContainer webSocketContainer, SchedulerGroup schedulerGroup) {
+        this(connectionContext, restOperations, getLoggingEndpoint(connectionContext.getCloudFoundryClient()), webSocketContainer, schedulerGroup);
+    }
+
+    // Let's take a moment to reflect on the fact that this bridge constructor is needed to counter a useless compiler constraint
+    private SpringLoggingClient(ConnectionContext connectionContext, OAuth2RestOperations restOperations, URI loggingEndpoint, WebSocketContainer webSocketContainer, SchedulerGroup schedulerGroup) {
+        this(restOperations, getRecentRoot(loggingEndpoint, connectionContext.getSslCertificateTruster()),
+            getStreamRoot(loggingEndpoint, connectionContext.getSslCertificateTruster()), webSocketContainer, getClientEndpointConfig(restOperations), schedulerGroup);
     }
 
     @Override
@@ -78,20 +94,14 @@ public final class SpringLoggingClient implements LoggingClient {
         return this.stream.stream(request);
     }
 
-    private static SchedulerGroup createSchedulerGroup() {
-        return SchedulerGroup.io("logging", PlatformDependent.MEDIUM_BUFFER_SIZE, SchedulerGroup.DEFAULT_POOL_SIZE, false);
+    private static ClientEndpointConfig getClientEndpointConfig(OAuth2RestOperations restOperations) {
+        return ClientEndpointConfig.Builder
+            .create()
+            .configurator(new AuthorizationConfigurator(new OAuth2RestOperationsOAuth2TokenProvider(restOperations)))
+            .build();
     }
 
-    private static ClientEndpointConfig getClientEndpointConfig(SpringCloudFoundryClient cloudFoundryClient) {
-        ClientEndpointConfig.Configurator configurator = new AuthorizationConfigurator(cloudFoundryClient);
-        return ClientEndpointConfig.Builder.create().configurator(configurator).build();
-    }
-
-    private static URI getCloudFoundryRoot(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getRoot();
-    }
-
-    private static URI getLoggingRoot(CloudFoundryClient cloudFoundryClient) {
+    private static URI getLoggingEndpoint(CloudFoundryClient cloudFoundryClient) {
         return requestInfo(cloudFoundryClient)
             .map(new Function<GetInfoResponse, String>() {
 
@@ -109,15 +119,39 @@ public final class SpringLoggingClient implements LoggingClient {
                 }
 
             })
-            .get();
+            .get(5, SECONDS);
     }
 
-    private static URI convertLoggingRoot(URI loggingEndpoint){
-        return UriComponentsBuilder.fromUriString(loggingEndpoint.toString()).scheme("https").build().toUri();
+    private static URI getRecentRoot(URI loggingEndpoint, SslCertificateTruster sslCertificateTruster) {
+        URI uri = UriComponentsBuilder.fromUri(loggingEndpoint)
+            .scheme("https")
+            .build().toUri();
+
+        sslCertificateTruster.trust(uri.getHost(), uri.getPort(), 5, SECONDS);
+        return uri;
     }
 
-    private static RestOperations getRestOperations(SpringCloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.getRestOperations();
+    private static OAuth2RestOperations getRestOperations(ConnectionContext connectionContext) {
+        return new RestTemplateBuilder()
+            .clientContext(connectionContext.getClientContext())
+            .protectedResourceDetails(connectionContext.getProtectedResourceDetails())
+            .hostnameVerifier(connectionContext.getHostnameVerifier())
+            .sslContext(connectionContext.getSslContext())
+            .messageConverter(new LoggregatorMessageHttpMessageConverter())
+            .messageConverter(new FallbackHttpMessageConverter())
+            .build();
+    }
+
+    private static SchedulerGroup getSchedulerGroup() {
+        return new SchedulerGroupBuilder()
+            .name("logging")
+            .autoShutdown(false)
+            .build();
+    }
+
+    private static URI getStreamRoot(URI loggingEndpoint, SslCertificateTruster sslCertificateTruster) {
+        sslCertificateTruster.trust(loggingEndpoint.getHost(), loggingEndpoint.getPort(), 5, SECONDS);
+        return loggingEndpoint;
     }
 
     private static Mono<GetInfoResponse> requestInfo(CloudFoundryClient cloudFoundryClient) {

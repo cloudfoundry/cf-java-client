@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.spring.util;
+package org.cloudfoundry.client.spring.util.network;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;

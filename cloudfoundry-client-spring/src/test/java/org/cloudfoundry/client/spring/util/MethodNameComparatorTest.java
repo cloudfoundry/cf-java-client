@@ -18,17 +18,31 @@ package org.cloudfoundry.client.spring.util;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
+import java.lang.reflect.Method;
+
 import static org.junit.Assert.assertTrue;
 
-public final class ExplicitHostnameVerifierTest {
 
-    private final ExplicitHostnameVerifier hostnameVerifier = new ExplicitHostnameVerifier("test-host");
+public final class MethodNameComparatorTest {
+
+    private final MethodNameComparator comparator = MethodNameComparator.INSTANCE;
 
     @Test
-    public void verify() {
-        assertTrue(this.hostnameVerifier.verify("test-host", null));
-        assertFalse(this.hostnameVerifier.verify("another-test-host", null));
+    public void test() throws NoSuchMethodException {
+        Method alpha = this.getClass().getDeclaredMethod("alpha");
+        Method bravo = this.getClass().getDeclaredMethod("bravo");
+
+        assertTrue(this.comparator.compare(alpha, bravo) < 0);
+        assertTrue(this.comparator.compare(bravo, alpha) > 0);
+        assertTrue(this.comparator.compare(alpha, alpha) == 0);
+    }
+
+    private void alpha() {
+        // test fixture
+    }
+
+    private void bravo() {
+        // text fixture
     }
 
 }
