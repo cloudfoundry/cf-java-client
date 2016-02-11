@@ -342,6 +342,15 @@ public final class DefaultApplicationsTest {
             thenReturn(Mono.<Void>empty());
     }
 
+    private static void requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, String variableName, String variableValue) {
+        when(cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .environmentJson(variableName, variableValue)
+                .build()))
+            .thenReturn(Mono.just(fill(UpdateApplicationResponse.builder()).build()));
+    }
+
     private static void requestUpdateApplicationRename(CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -1165,6 +1174,58 @@ public final class DefaultApplicationsTest {
             return this.applications
                 .scale(ScaleApplicationRequest.builder()
                     .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class SetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestUpdateApplicationEnvironment(this.cloudFoundryClient, "test-application-id", "test-var-name", "test-var-value");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Nothing returned on success
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name("test-app")
+                    .variableName("test-var-name")
+                    .variableValue("test-var-value")
+                    .build());
+        }
+    }
+
+    public static final class SetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
+                    .name("test-app")
+                    .variableName("test-var-name")
+                    .variableValue("test-var-value")
                     .build());
         }
     }
