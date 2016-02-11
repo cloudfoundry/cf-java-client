@@ -24,11 +24,13 @@ import lombok.experimental.Accessors;
 import org.cloudfoundry.utils.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import reactor.fn.Consumer;
@@ -126,10 +128,19 @@ public final class RestTemplateBuilder {
             });
     }
 
-    private static void setRequestFactory(RestTemplate restTemplate, HostnameVerifier hostnameVerifier, SSLContext sslContext) {
+    private static void setRequestFactory(OAuth2RestTemplate restTemplate, HostnameVerifier hostnameVerifier, SSLContext sslContext) {
         if (hostnameVerifier != null && sslContext != null) {
-            restTemplate.setRequestFactory(new CustomSslSimpleClientHttpRequestFactory(hostnameVerifier, sslContext));
+            CustomSslSimpleClientHttpRequestFactory requestFactory = new CustomSslSimpleClientHttpRequestFactory(hostnameVerifier, sslContext);
+
+            restTemplate.setRequestFactory(requestFactory);
+            restTemplate.setAccessTokenProvider(getAccessTokenProvider(requestFactory));
         }
+    }
+
+    private static ResourceOwnerPasswordAccessTokenProvider getAccessTokenProvider(ClientHttpRequestFactory requestFactory) {
+        ResourceOwnerPasswordAccessTokenProvider accessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+        accessTokenProvider.setRequestFactory(requestFactory);
+        return accessTokenProvider;
     }
 
 }
