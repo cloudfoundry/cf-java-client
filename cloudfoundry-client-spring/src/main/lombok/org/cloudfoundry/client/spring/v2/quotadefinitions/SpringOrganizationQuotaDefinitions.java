@@ -18,9 +18,14 @@ package org.cloudfoundry.client.spring.v2.quotadefinitions;
 
 import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.client.spring.util.QueryBuilder;
+import org.cloudfoundry.client.spring.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
+import org.reactivestreams.Publisher;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -57,5 +62,20 @@ public final class SpringOrganizationQuotaDefinitions extends AbstractSpringOper
 
         });
     }
+
+    @Override
+    public Publisher<ListOrganizationQuotaDefinitionsResponse> list(final ListOrganizationQuotaDefinitionsRequest request) {
+        return get(request, ListOrganizationQuotaDefinitionsResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "quota_definitions");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
 
 }

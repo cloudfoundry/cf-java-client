@@ -1,0 +1,27 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "9a76e262-9dc1-4316-87ad-a8b3bfbb11d4",
+        "url": "/v2/quota_definitions/9a76e262-9dc1-4316-87ad-a8b3bfbb11d4",
+        "created_at": "2016-01-26T22:20:04Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "default",
+        "non_basic_services_allowed": true,
+        "total_services": 100,
+        "total_routes": 1000,
+        "total_private_domains": -1,
+        "memory_limit": 10240,
+        "trial_db_allowed": false,
+        "instance_memory_limit": -1,
+        "app_instance_limit": -1
+      }
+    }
+  ]
+}
