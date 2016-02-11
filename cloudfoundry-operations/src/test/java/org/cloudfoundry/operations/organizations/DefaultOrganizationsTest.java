@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQu
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
@@ -87,7 +88,7 @@ public final class DefaultOrganizationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListOrganizationQuotaDefinitionsResponse.builder())
-                    .resource(fill(ListOrganizationQuotaDefinitionsResponse.ListOrganizationQuotaDefinitionsResource.builder(), "organization-quota-definition-")
+                    .resource(fill(OrganizationQuotaDefinitionResource.builder(), "organization-quota-definition-")
                         .entity(fill(OrganizationQuotaDefinitionEntity.builder(), "organization-quota-definition-entity-")
                             .build())
                         .build())
