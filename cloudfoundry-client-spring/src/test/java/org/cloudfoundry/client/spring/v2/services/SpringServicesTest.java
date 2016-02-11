@@ -18,19 +18,60 @@ package org.cloudfoundry.client.spring.v2.services;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.services.DeleteServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 public final class SpringServicesTest {
+
+    public static final class Delete extends AbstractApiTest<DeleteServiceRequest, Void> {
+
+        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected DeleteServiceRequest getInvalidRequest() {
+            return DeleteServiceRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(DELETE).path("/v2/services/test-service-id?async=true&purge=true")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected DeleteServiceRequest getValidRequest() throws Exception {
+            return DeleteServiceRequest.builder()
+                .async(true)
+                .purge(true)
+                .serviceId("test-service-id")
+                .build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(DeleteServiceRequest request) {
+            return this.services.delete(request);
+        }
+
+    }
 
     public static final class Get extends AbstractApiTest<GetServiceRequest, GetServiceResponse> {
 
