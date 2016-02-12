@@ -19,10 +19,14 @@ package org.cloudfoundry.client.spring.v2.services;
 import org.cloudfoundry.client.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.job.JobEntity;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.services.DeleteServiceRequest;
 import org.cloudfoundry.client.v2.services.DeleteServiceResponse;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
+import org.cloudfoundry.client.v2.services.ListServiceServicePlansRequest;
+import org.cloudfoundry.client.v2.services.ListServiceServicePlansResponse;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -229,6 +233,63 @@ public final class SpringServicesTest {
             return this.services.list(request);
         }
 
+    }
+
+    public static final class ListServicePlans extends AbstractApiTest<ListServiceServicePlansRequest, ListServiceServicePlansResponse> {
+
+        private final SpringServices services = new SpringServices(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected ListServiceServicePlansRequest getInvalidRequest() {
+            return ListServiceServicePlansRequest.builder().build();
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(GET).path("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
+                .status(OK)
+                .responsePayload("v2/services/GET_{id}_service_plans_response.json");
+        }
+
+        @Override
+        protected ListServiceServicePlansResponse getResponse() {
+            return ListServiceServicePlansResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(ServicePlanResource.builder()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:35Z")
+                        .id("51067400-d79f-4ca5-9400-1f36f5dd09e7")
+                        .url("/v2/service_plans/51067400-d79f-4ca5-9400-1f36f5dd09e7")
+                        .build())
+                    .entity(ServicePlanEntity.builder()
+                        .name("name-2409")
+                        .free(false)
+                        .description("desc-218")
+                        .serviceId("f1b0edbe-fac4-4512-9071-8b26045413bb")
+                        .uniqueId("48fb5a34-1c14-4da5-944e-a14fa1ba5325")
+                        .visible(true)
+                        .active(true)
+                        .serviceUrl("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb")
+                        .serviceInstancesUrl("/v2/service_plans/51067400-d79f-4ca5-9400-1f36f5dd09e7/service_instances")
+                        .build())
+                    .build())
+                .build();
+        }
+
+        @Override
+        protected ListServiceServicePlansRequest getValidRequest() throws Exception {
+            return ListServiceServicePlansRequest.builder()
+                .serviceId("f1b0edbe-fac4-4512-9071-8b26045413bb")
+                .page(-1)
+                .build();
+        }
+
+        @Override
+        protected Mono<ListServiceServicePlansResponse> invoke(ListServiceServicePlansRequest request) {
+            return this.services.listServicePlans(request);
+        }
     }
 
 }
