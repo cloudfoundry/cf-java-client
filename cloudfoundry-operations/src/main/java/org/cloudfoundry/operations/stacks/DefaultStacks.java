@@ -45,7 +45,7 @@ public final class DefaultStacks implements Stacks {
 
                 @Override
                 public Mono<StackResource> apply(GetStackRequest getStackRequest) {
-                    return requestStackByName(DefaultStacks.this.cloudFoundryClient, getStackRequest.getName());
+                    return getStack(DefaultStacks.this.cloudFoundryClient, getStackRequest.getName());
                 }
 
             })
@@ -72,7 +72,13 @@ public final class DefaultStacks implements Stacks {
             });
     }
 
-    private static Mono<StackResource> requestStackByName(final CloudFoundryClient cloudFoundryClient, final String stackName) {
+    private static Mono<StackResource> getStack(final CloudFoundryClient cloudFoundryClient, final String stack) {
+        return requestStack(cloudFoundryClient, stack)
+            .single()
+            .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stack));
+    }
+
+    private static Stream<StackResource> requestStack(final CloudFoundryClient cloudFoundryClient, final String stack) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListStacksResponse>>() {
 
@@ -80,14 +86,12 @@ public final class DefaultStacks implements Stacks {
                 public Mono<ListStacksResponse> apply(Integer page) {
                     return cloudFoundryClient.stacks().list(
                         ListStacksRequest.builder()
-                            .name(stackName)
+                            .name(stack)
                             .page(page)
                             .build());
                 }
 
-            })
-            .single()
-            .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stackName));
+            });
     }
 
     private static Stream<StackResource> requestStacks(final CloudFoundryClient cloudFoundryClient) {

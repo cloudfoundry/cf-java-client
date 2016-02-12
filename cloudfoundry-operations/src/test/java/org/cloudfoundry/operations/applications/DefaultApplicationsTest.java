@@ -936,7 +936,6 @@ public final class DefaultApplicationsTest {
         }
     }
 
-
     public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
