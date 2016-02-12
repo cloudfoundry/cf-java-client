@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.serviceplans;
+package org.cloudfoundry.client.v2.services;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,12 +31,12 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import java.util.List;
 
 /**
- * The request payload for the List Service Plans operation
+ * The request payload for the List all Service Plans for the Service operation
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public final class ListServicePlansRequest extends PaginatedRequest implements Validatable {
+public final class ListServiceServicePlansRequest extends PaginatedRequest implements Validatable {
 
     /**
      * The active flag
@@ -56,13 +57,13 @@ public final class ListServicePlansRequest extends PaginatedRequest implements V
     private final List<String> serviceBrokerIds;
 
     /**
-     * The service ids
+     * The service id
      *
-     * @param serviceIds the service ids
-     * @return the service ids
+     * @param serviceId the service id
+     * @return the service id
      */
-    @Getter(onMethod = @__(@InFilterParameter("service_guid")))
-    private final List<String> serviceIds;
+    @Getter(onMethod = @__(@JsonIgnore))
+    private final String serviceId;
 
     /**
      * The service instance ids
@@ -74,21 +75,27 @@ public final class ListServicePlansRequest extends PaginatedRequest implements V
     private final List<String> serviceInstanceIds;
 
     @Builder
-    ListServicePlansRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                            Boolean active,
-                            @Singular List<String> serviceBrokerIds,
-                            @Singular List<String> serviceIds,
-                            @Singular List<String> serviceInstanceIds) {
+    ListServiceServicePlansRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
+                                   Boolean active,
+                                   @Singular List<String> serviceBrokerIds,
+                                   String serviceId,
+                                   @Singular List<String> serviceInstanceIds) {
         super(orderDirection, page, resultsPerPage);
         this.active = active;
         this.serviceBrokerIds = serviceBrokerIds;
-        this.serviceIds = serviceIds;
+        this.serviceId = serviceId;
         this.serviceInstanceIds = serviceInstanceIds;
     }
 
     @Override
     public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+        ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
+
+        if (this.serviceId == null) {
+            builder.message("service id must be specified");
+        }
+
+        return builder.build();
     }
 
 }
