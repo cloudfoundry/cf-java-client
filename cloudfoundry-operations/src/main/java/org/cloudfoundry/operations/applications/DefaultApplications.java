@@ -362,22 +362,22 @@ public final class DefaultApplications implements Applications {
         return ValidationUtils
             .validate(request)
             .and(this.spaceId)
-            .then(function(new Function2<RestartApplicationInstanceRequest, String, Mono<Tuple2<String, Integer>>>() {
+            .then(function(new Function2<RestartApplicationInstanceRequest, String, Mono<Tuple2<String, String>>>() {
 
                 @Override
-                public Mono<Tuple2<String, Integer>> apply(RestartApplicationInstanceRequest request, String spaceId) {
+                public Mono<Tuple2<String, String>> apply(RestartApplicationInstanceRequest request, String spaceId) {
                     return Mono
                         .when(
                             getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId),
-                            Mono.just(request.getInstanceIndex())
+                            Mono.just(String.valueOf(request.getInstanceIndex()))
                         );
                 }
 
             }))
-            .then(function(new Function2<String, Integer, Mono<Void>>() {
+            .then(function(new Function2<String, String, Mono<Void>>() {
 
                 @Override
-                public Mono<Void> apply(String applicationId, Integer instanceIndex) {
+                public Mono<Void> apply(String applicationId, String instanceIndex) {
                     return requestTerminateApplicationInstance(DefaultApplications.this.cloudFoundryClient, applicationId, instanceIndex);
                 }
 
@@ -888,7 +888,7 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
+    private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         return cloudFoundryClient.applicationsV2()
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)

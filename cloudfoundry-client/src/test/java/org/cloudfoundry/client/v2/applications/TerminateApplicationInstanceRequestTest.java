@@ -29,7 +29,7 @@ public final class TerminateApplicationInstanceRequestTest {
     public void isValid() {
         ValidationResult result = TerminateApplicationInstanceRequest.builder()
             .applicationId("test-application-id")
-            .index(0)
+            .index("0")
             .build()
             .isValid();
 
@@ -39,7 +39,7 @@ public final class TerminateApplicationInstanceRequestTest {
     @Test
     public void isValidNoId() {
         ValidationResult result = TerminateApplicationInstanceRequest.builder()
-            .index(0)
+            .index("0")
             .build()
             .isValid();
 

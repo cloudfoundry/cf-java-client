@@ -342,7 +342,7 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
-    private static void requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, Integer instanceIndex) {
+    private static void requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         when(cloudFoundryClient.applicationsV2()
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
@@ -944,7 +944,7 @@ public final class DefaultApplicationsTest {
         @Before
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-application-id", 0);
+            requestTerminateApplicationInstance(this.cloudFoundryClient, "test-application-id", "0");
         }
 
         @Override
