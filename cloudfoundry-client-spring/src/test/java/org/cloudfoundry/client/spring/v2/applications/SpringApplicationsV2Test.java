@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.spring.v2.applications;
 
 import org.cloudfoundry.client.spring.AbstractApiTest;
-import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -65,6 +64,7 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
+import org.cloudfoundry.utils.StringMap;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
@@ -1130,7 +1130,7 @@ public final class SpringApplicationsV2Test {
         protected TerminateApplicationInstanceRequest getValidRequest() throws Exception {
             return TerminateApplicationInstanceRequest.builder()
                 .applicationId("test-application-id")
-                .index(0)
+                .index("0")
                 .build();
         }
 
