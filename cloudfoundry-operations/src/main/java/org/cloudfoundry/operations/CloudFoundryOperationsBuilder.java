@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
@@ -93,80 +94,83 @@ public final class CloudFoundryOperationsBuilder {
         return this;
     }
 
-    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
+    private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
+        return requestOrganizations(cloudFoundryClient, organization)
+            .single()
+            .otherwise(ExceptionUtils.<OrganizationResource>convert("Organization %s does not exist", organization));
+    }
+
+    private static Mono<String> getOrganizationId(final CloudFoundryClient cloudFoundryClient, final String organization) {
         if (organization == null) {
             return Mono.error(new IllegalStateException("No organization targeted"));
         }
 
-        Mono<String> organizationId = PaginationUtils
-            .requestResources(requestOrganizationPage(cloudFoundryClient, organization))
-            .single()
+        Mono<String> organizationId = getOrganization(cloudFoundryClient, organization)
             .map(ResourceUtils.extractId())
-            .otherwise(ExceptionUtils.<String>convert("Organization %s does not exist", organization))
             .as(OperationUtils.<String>promise());
 
         organizationId.get();
         return organizationId;
     }
 
-    private static Mono<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String space) {
+    private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+        return requestSpaces(cloudFoundryClient, organizationId, space)
+            .single()
+            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+    }
+
+    private static Mono<String> getSpaceId(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, final String space) {
         if (space == null) {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
 
         Mono<String> spaceId = organizationId
-            .flatMap(requestResources(cloudFoundryClient, space))
-            .as(OperationUtils.<SpaceResource>stream())
-            .single()                                                            // TODO: Flux.single() Flux.singleOrEmpty()
+            .then(new Function<String, Mono<SpaceResource>>() {
+
+                @Override
+                public Mono<SpaceResource> apply(String organizationId) {
+                    return getSpace(cloudFoundryClient, organizationId, space);
+
+                }
+
+            })
             .map(ResourceUtils.extractId())
-            .otherwise(ExceptionUtils.<String>convert("Space %s does not exist", space))
             .as(OperationUtils.<String>promise());
 
         spaceId.get();
         return spaceId;
     }
 
-    private static Function<Integer, Mono<ListOrganizationsResponse>> requestOrganizationPage(final CloudFoundryClient cloudFoundryClient, final String organization) {
-        return new Function<Integer, Mono<ListOrganizationsResponse>>() {
+    private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organization) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListOrganizationsResponse>>() {
 
-            @Override
-            public Mono<ListOrganizationsResponse> apply(Integer page) {
-                ListOrganizationsRequest request = ListOrganizationsRequest.builder()
-                    .name(organization)
-                    .page(page)
-                    .build();
-
-                return cloudFoundryClient.organizations().list(request);
-            }
-        };
+                @Override
+                public Mono<ListOrganizationsResponse> apply(Integer page) {
+                    return cloudFoundryClient.organizations()
+                        .list(ListOrganizationsRequest.builder()
+                            .name(organization)
+                            .page(page)
+                            .build());
+                }
+            });
     }
 
-    private static Function<String, Stream<SpaceResource>> requestResources(final CloudFoundryClient cloudFoundryClient, final String space) {
-        return new Function<String, Stream<SpaceResource>>() {
+    private static Stream<SpaceResource> requestSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListSpacesResponse>>() {
 
-            @Override
-            public Stream<SpaceResource> apply(String organizationId) {
-                return PaginationUtils.requestResources(requestSpacePage(cloudFoundryClient, organizationId, space));
-            }
+                @Override
+                public Mono<ListSpacesResponse> apply(Integer page) {
+                    return cloudFoundryClient.spaces()
+                        .list(ListSpacesRequest.builder()
+                            .organizationId(organizationId)
+                            .name(space)
+                            .page(page)
+                            .build());
+                }
 
-        };
-    }
-
-    private static Function<Integer, Mono<ListSpacesResponse>> requestSpacePage(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
-        return new Function<Integer, Mono<ListSpacesResponse>>() {
-
-            @Override
-            public Mono<ListSpacesResponse> apply(Integer page) {
-                ListSpacesRequest request = ListSpacesRequest.builder()
-                    .organizationId(organizationId)
-                    .name(space)
-                    .page(page)
-                    .build();
-
-                return cloudFoundryClient.spaces().list(request);
-            }
-
-        };
+            });
     }
 
 }
