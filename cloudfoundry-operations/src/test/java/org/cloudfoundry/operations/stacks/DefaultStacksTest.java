@@ -43,6 +43,43 @@ public final class DefaultStacksTest {
                     .build()));
     }
 
+    private static void requestStacksWithName(CloudFoundryClient cloudFoundryClient, String stackName) {
+        when(cloudFoundryClient.stacks()
+            .list(fillPage(ListStacksRequest.builder())
+                .name(stackName)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListStacksResponse.builder())
+                    .resource(fill(StackResource.builder(), "stack-")
+                        .build())
+                    .build()));
+    }
+
+    public static final class GetStack extends AbstractOperationsApiTest<Stack> {
+
+        private final DefaultStacks stacks = new DefaultStacks(this.cloudFoundryClient);
+
+        @Before
+        public void setUp() throws Exception {
+            requestStacksWithName(this.cloudFoundryClient, "test-stack-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Stack> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(fill(Stack.builder(), "stack-")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<Stack> invoke() {
+            return this.stacks.get(GetStackRequest.builder()
+                .name("test-stack-name")
+                .build());
+        }
+
+    }
+
     public static final class ListStacks extends AbstractOperationsApiTest<Stack> {
 
         private final DefaultStacks stacks = new DefaultStacks(this.cloudFoundryClient);
