@@ -43,10 +43,10 @@ public final class DefaultStacksTest {
                     .build()));
     }
 
-    private static void requestStacksWithName(CloudFoundryClient cloudFoundryClient, String stackName) {
+    private static void requestStacks(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient.stacks()
             .list(fillPage(ListStacksRequest.builder())
-                .name(stackName)
+                .name(name)
                 .build()))
             .thenReturn(Mono
                 .just(fillPage(ListStacksResponse.builder())
@@ -61,7 +61,7 @@ public final class DefaultStacksTest {
 
         @Before
         public void setUp() throws Exception {
-            requestStacksWithName(this.cloudFoundryClient, "test-stack-name");
+            requestStacks(this.cloudFoundryClient, "test-stack-name");
         }
 
         @Override
@@ -73,9 +73,10 @@ public final class DefaultStacksTest {
 
         @Override
         protected Publisher<Stack> invoke() {
-            return this.stacks.get(GetStackRequest.builder()
-                .name("test-stack-name")
-                .build());
+            return this.stacks
+                .get(GetStackRequest.builder()
+                    .name("test-stack-name")
+                    .build());
         }
 
     }
