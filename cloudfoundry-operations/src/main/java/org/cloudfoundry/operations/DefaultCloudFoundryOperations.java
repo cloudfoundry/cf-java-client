@@ -29,6 +29,8 @@ import org.cloudfoundry.operations.spacequotas.DefaultSpaceQuotas;
 import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
 import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
+import org.cloudfoundry.operations.stacks.DefaultStacks;
+import org.cloudfoundry.operations.stacks.Stacks;
 import reactor.core.publisher.Mono;
 
 final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
@@ -45,6 +47,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final Spaces spaces;
 
+    private final DefaultStacks stacks;
+
     DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId) {
         this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
         this.domains = new DefaultDomains(cloudFoundryClient);
@@ -52,6 +56,7 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);
         this.spaceQuotas = new DefaultSpaceQuotas(cloudFoundryClient, organizationId);
         this.spaces = new DefaultSpaces(cloudFoundryClient, organizationId);
+        this.stacks = new DefaultStacks(cloudFoundryClient);
     }
 
     @Override
@@ -82,6 +87,11 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
     @Override
     public Spaces spaces() {
         return this.spaces;
+    }
+
+    @Override
+    public Stacks stacks() {
+        return this.stacks;
     }
 
 }

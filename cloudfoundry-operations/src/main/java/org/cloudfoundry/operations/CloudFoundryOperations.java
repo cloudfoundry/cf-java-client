@@ -22,6 +22,7 @@ import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.Routes;
 import org.cloudfoundry.operations.spacequotas.SpaceQuotas;
 import org.cloudfoundry.operations.spaces.Spaces;
+import org.cloudfoundry.operations.stacks.Stacks;
 
 /**
  * Main entry point to the Cloud Foundry Operations API
@@ -74,5 +75,12 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Spaces Operations API
      */
     Spaces spaces();
+
+    /**
+     * Main entry point to the Cloud Foundry Stacks Operations API
+     *
+     * @return the Cloud Foundry Stacks Operations API
+     */
+    Stacks stacks();
 
 }
