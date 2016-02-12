@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.stacks;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Stacks Operations API
@@ -24,9 +25,16 @@ import org.reactivestreams.Publisher;
 public interface Stacks {
 
     /**
+     * Get a Stack
+     *
+     * @return a {@link Stack}
+     */
+    Mono<Stack> get(GetStackRequest request);
+
+    /**
      * List all Stacks in the system
      *
-     * @return a list of <code>Stacks</code>
+     * @return a list of {@link Stack}s
      */
     Publisher<Stack> list();
 

@@ -20,11 +20,14 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.utils.ExceptionUtils;
 import org.cloudfoundry.utils.PaginationUtils;
 import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.utils.ValidationUtils;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
+import reactor.rx.Stream;
 
 public final class DefaultStacks implements Stacks {
 
@@ -35,7 +38,59 @@ public final class DefaultStacks implements Stacks {
     }
 
     @Override
+    public Mono<Stack> get(GetStackRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .then(new Function<GetStackRequest, Mono<StackResource>>() {
+
+                @Override
+                public Mono<StackResource> apply(GetStackRequest getStackRequest) {
+                    return requestStackByName(DefaultStacks.this.cloudFoundryClient, getStackRequest.getName());
+                }
+
+            })
+            .map(new Function<StackResource, Stack>() {
+
+                @Override
+                public Stack apply(StackResource resource) {
+                    return toStack(resource);
+                }
+
+            });
+    }
+
+    @Override
     public Publisher<Stack> list() {
+        return requestStacks(this.cloudFoundryClient)
+            .map(new Function<StackResource, Stack>() {
+
+                @Override
+                public Stack apply(StackResource resource) {
+                    return toStack(resource);
+                }
+
+            });
+    }
+
+    private static Mono<StackResource> requestStackByName(final CloudFoundryClient cloudFoundryClient, final String stackName) {
+        return PaginationUtils
+            .requestResources(new Function<Integer, Mono<ListStacksResponse>>() {
+
+                @Override
+                public Mono<ListStacksResponse> apply(Integer page) {
+                    return cloudFoundryClient.stacks().list(
+                        ListStacksRequest.builder()
+                            .name(stackName)
+                            .page(page)
+                            .build());
+                }
+
+            })
+            .single()
+            .otherwise(ExceptionUtils.<StackResource>convert("Stack %s does not exist", stackName));
+    }
+
+    private static Stream<StackResource> requestStacks(final CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListStacksResponse>>() {
 
@@ -47,15 +102,14 @@ public final class DefaultStacks implements Stacks {
                             .build());
                 }
 
-            }).map(new Function<StackResource, Stack>() {
-                @Override
-                public Stack apply(StackResource stackResource) {
-                    return Stack.builder()
-                        .description(ResourceUtils.getEntity(stackResource).getDescription())
-                        .name(ResourceUtils.getEntity(stackResource).getName())
-                        .build();
-                }
             });
+    }
+
+    private Stack toStack(StackResource stackResource) {
+        return Stack.builder()
+            .description(ResourceUtils.getEntity(stackResource).getDescription())
+            .name(ResourceUtils.getEntity(stackResource).getName())
+            .build();
     }
 
 }
