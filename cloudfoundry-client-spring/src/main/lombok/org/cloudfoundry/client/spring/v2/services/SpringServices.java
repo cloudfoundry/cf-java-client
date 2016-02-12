@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v2.services.DeleteServiceRequest;
 import org.cloudfoundry.client.v2.services.DeleteServiceResponse;
 import org.cloudfoundry.client.v2.services.GetServiceRequest;
 import org.cloudfoundry.client.v2.services.GetServiceResponse;
+import org.cloudfoundry.client.v2.services.ListServiceServicePlansRequest;
+import org.cloudfoundry.client.v2.services.ListServiceServicePlansResponse;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.Services;
@@ -92,4 +94,17 @@ public final class SpringServices extends AbstractSpringOperations implements Se
         });
     }
 
+    @Override
+    public Mono<ListServiceServicePlansResponse> listServicePlans(final ListServiceServicePlansRequest request) {
+        return get(request, ListServiceServicePlansResponse.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "services", request.getServiceId(), "service_plans");
+                FilterBuilder.augment(builder, request);
+                QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
 }
