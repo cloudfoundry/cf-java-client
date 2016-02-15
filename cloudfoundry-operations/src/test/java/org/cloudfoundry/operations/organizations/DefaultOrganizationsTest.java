@@ -241,11 +241,6 @@ public final class DefaultOrganizationsTest {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
 
-        @Before
-        public void setUp() throws Exception {
-            requestGetFeatureFlagEnabled(this.cloudFoundryClient, "set_roles_by_username");
-        }
-
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber.assertError(RequestValidationException.class);

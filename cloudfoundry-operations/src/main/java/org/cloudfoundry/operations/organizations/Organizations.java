@@ -28,6 +28,7 @@ public interface Organizations {
      * Creates a new organization.
      * 
      * @param request the create organization request
+     * @return completion indicator
      */
     Mono<Void> create(CreateOrganizationRequest request);
 
