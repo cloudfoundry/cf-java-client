@@ -351,6 +351,19 @@ public final class DefaultApplicationsTest {
             thenReturn(Mono.<Void>empty());
     }
 
+    private static void requestUpdateApplicationEnableSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
+        when(cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .enableSsh(enabled)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateApplicationResponse.builder())
+                    .entity(fill(ApplicationEntity.builder(), "application-entity-")
+                        .build())
+                    .build()));
+    }
+
     private static void requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -479,6 +492,55 @@ public final class DefaultApplicationsTest {
             return this.applications
                 .delete(fill(DeleteApplicationRequest.builder())
                     .deleteRoutes(false)
+                    .build());
+        }
+    }
+
+    public static final class EnableSsh extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+            requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", true);
+
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class EnableSshNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name("test-app-name")
                     .build());
         }
     }
