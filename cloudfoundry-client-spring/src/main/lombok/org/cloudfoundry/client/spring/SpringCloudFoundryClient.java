@@ -46,6 +46,7 @@ import org.cloudfoundry.client.spring.v2.servicekeys.SpringServiceKeys;
 import org.cloudfoundry.client.spring.v2.serviceplans.SpringServicePlans;
 import org.cloudfoundry.client.spring.v2.serviceplanvisibilities.SpringServicePlanVisibilities;
 import org.cloudfoundry.client.spring.v2.services.SpringServices;
+import org.cloudfoundry.client.spring.v2.serviceusageevents.SpringServiceUsageEvents;
 import org.cloudfoundry.client.spring.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.client.spring.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.client.spring.v2.spaces.SpringSpaces;
@@ -73,6 +74,7 @@ import org.cloudfoundry.client.v2.servicekeys.ServiceKeys;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlans;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilities;
 import org.cloudfoundry.client.v2.services.Services;
+import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEvents;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -141,6 +143,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final ServicePlans servicePlans;
 
+    private final ServiceUsageEvents serviceUsageEvents;
+
     private final Services services;
 
     private final SharedDomains sharedDomains;
@@ -193,6 +197,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.serviceKeys = new SpringServiceKeys(restOperations, root, schedulerGroup);
         this.servicePlanVisibilities = new SpringServicePlanVisibilities(restOperations, root, schedulerGroup);
         this.servicePlans = new SpringServicePlans(restOperations, root, schedulerGroup);
+        this.serviceUsageEvents = new SpringServiceUsageEvents(restOperations, root, schedulerGroup);
         this.services = new SpringServices(restOperations, root, schedulerGroup);
         this.spaceQuotaDefinitions = new SpringSpaceQuotaDefinitions(restOperations, root, schedulerGroup);
         this.spaces = new SpringSpaces(restOperations, root, schedulerGroup);
@@ -316,6 +321,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public ServicePlans servicePlans() {
         return this.servicePlans;
+    }
+
+    @Override
+    public ServiceUsageEvents serviceUsageEvents() {
+        return this.serviceUsageEvents;
     }
 
     @Override

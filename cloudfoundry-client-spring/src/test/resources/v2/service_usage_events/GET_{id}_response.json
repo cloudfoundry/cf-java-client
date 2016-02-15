@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "9470627d-0488-4d9a-8564-f97571487893",
+    "url": "/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893",
+    "created_at": "2015-07-27T22:43:30Z"
+  },
+  "entity": {
+    "state": "CREATED",
+    "org_guid": "guid-3f19bc03-d183-4189-bdeb-9f33468181da",
+    "space_guid": "guid-d565b0c4-3c38-41dd-a102-1c113c759fbf",
+    "space_name": "name-2160",
+    "service_instance_guid": "guid-4cef8892-46fc-4d70-a5d5-36385989f5df",
+    "service_instance_name": "name-2161",
+    "service_instance_type": "type-4",
+    "service_plan_guid": "guid-f2a17886-488c-4066-9155-a1dbb64adadd",
+    "service_plan_name": "name-2162",
+    "service_guid": "guid-fdff7ee0-cc1b-4bdb-87d6-b0c3b47cb2b2",
+    "service_label": "label-79"
+  }
+}
