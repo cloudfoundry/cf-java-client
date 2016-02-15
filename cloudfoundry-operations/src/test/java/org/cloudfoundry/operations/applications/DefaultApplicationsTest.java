@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v2.job.GetJobResponse;
 import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -59,6 +60,7 @@ import org.cloudfoundry.logging.RecentLogsRequest;
 import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.DateUtils;
+import org.cloudfoundry.util.RequestValidationException;
 import org.cloudfoundry.util.StringMap;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
@@ -77,6 +79,14 @@ import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {
+
+    public static void requestApplicationStack(CloudFoundryClient cloudFoundryClient, String stackId) {
+        when(cloudFoundryClient.stacks()
+            .get(GetStackRequest.builder()
+                .stackId(stackId)
+                .build()))
+            .thenReturn(Mono.just(fill(GetStackResponse.builder(), "stack-").build()));
+    }
 
     private static void requestApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
@@ -236,9 +246,9 @@ public final class DefaultApplicationsTest {
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .route(fill(Route.builder(), "route-")
-                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
-                            .build())
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
                         .build())
+                    .service(fill(ServiceInstance.builder(), "service-instance-").build())
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
@@ -272,6 +282,17 @@ public final class DefaultApplicationsTest {
                         .build())
                     .buildpack(null)
                     .detectedBuildpack(null)
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
+                    .build()));
+    }
+
+    private static void requestApplicationSummaryNoRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .summary(fill(SummaryApplicationRequest.builder())
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
@@ -824,6 +845,98 @@ public final class DefaultApplicationsTest {
         protected Mono<ApplicationDetail> invoke() {
             return this.applications
                 .get(GetApplicationRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetApplicationManifest extends AbstractOperationsApiTest<ApplicationManifest> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+            requestApplicationStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(ApplicationManifest.builder()
+                .buildpack("test-application-summary-buildpack")
+                .command("test-application-summary-command")
+                .diskQuotaMB(1)
+                .domain("test-domain-name")
+                .host("test-route-host")
+                .instances(1)
+                .memoryMB(1)
+                .name("test-application-summary-name")
+                .service("test-service-instance-name")
+                .stack("test-stack-name")
+                .timeout(1)
+                .build());
+        }
+
+        @Override
+        protected Mono<ApplicationManifest> invoke() {
+            return this.applications
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .name("test-app")
+                    .build());
+        }
+
+    }
+
+    public static final class GetApplicationManifestInvalidRequest extends AbstractOperationsApiTest<ApplicationManifest> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+            testSubscriber.
+                assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Mono<ApplicationManifest> invoke() {
+            return this.applications
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .build());
+        }
+
+    }
+
+    public static final class GetApplicationManifestNoRoutes extends AbstractOperationsApiTest<ApplicationManifest> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+            requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-application-id");
+            requestApplicationStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<ApplicationManifest> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(ApplicationManifest.builder()
+                .buildpack("test-application-summary-buildpack")
+                .command("test-application-summary-command")
+                .diskQuotaMB(1)
+                .instances(1)
+                .memoryMB(1)
+                .name("test-application-summary-name")
+                .stack("test-stack-name")
+                .timeout(1)
+                .build());
+        }
+
+        @Override
+        protected Mono<ApplicationManifest> invoke() {
+            return this.applications
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
                     .name("test-app")
                     .build());
         }

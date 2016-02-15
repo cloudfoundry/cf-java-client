@@ -60,6 +60,14 @@ public interface Applications {
     Mono<ApplicationDetail> get(GetApplicationRequest request);
 
     /**
+     * Gets the manifest for a specific application
+     *
+     * @param request the get application manifest request
+     * @return the application manifest
+     */
+    Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request);
+
+    /**
      * Gets the environment variables for an application
      *
      * @param request the get application environments request
