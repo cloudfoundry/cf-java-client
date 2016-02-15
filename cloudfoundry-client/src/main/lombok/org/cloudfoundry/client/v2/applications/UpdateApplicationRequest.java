@@ -31,7 +31,7 @@ import java.util.Map;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
- * The request payload for the v2 Create Application request
+ * The request payload for the v2 Update Application request
  */
 @Data
 public final class UpdateApplicationRequest implements Validatable {
@@ -116,6 +116,15 @@ public final class UpdateApplicationRequest implements Validatable {
      */
     @Getter(onMethod = @__(@JsonProperty("docker_image")))
     private final String dockerImage;
+
+    /**
+     * Enable SSH for the application.
+     *
+     * @param enableSsh for the application
+     * @return application ssh enabled
+     */
+    @Getter(onMethod = @__(@JsonProperty("enable_ssh")))
+    private final Boolean enableSsh;
 
     /**
      * Key/value pairs of all the environment variables to run in your app. Does not include any system or service variables.
@@ -217,6 +226,7 @@ public final class UpdateApplicationRequest implements Validatable {
                              Integer diskQuota,
                              @Singular Map<String, Object> dockerCredentialsJsons,
                              String dockerImage,
+                             Boolean enableSsh,
                              @Singular Map<String, Object> environmentJsons,
                              Integer healthCheckTimeout,
                              String healthCheckType,
@@ -236,6 +246,7 @@ public final class UpdateApplicationRequest implements Validatable {
         this.diskQuota = diskQuota;
         this.dockerCredentialsJsons = dockerCredentialsJsons;
         this.dockerImage = dockerImage;
+        this.enableSsh = enableSsh;
         this.environmentJsons = environmentJsons;
         this.healthCheckTimeout = healthCheckTimeout;
         this.healthCheckType = healthCheckType;

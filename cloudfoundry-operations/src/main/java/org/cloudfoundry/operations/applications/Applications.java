@@ -35,6 +35,14 @@ public interface Applications {
     Mono<Void> delete(DeleteApplicationRequest request);
 
     /**
+     * Enable SSH for a specific application
+     *
+     * @param request the enable application ssh request
+     * @return a completion indicator
+     */
+    Mono<Void> enableSsh(EnableApplicationSshRequest request);
+
+    /**
      * Gets information for a specific application
      *
      * @param request the get application request

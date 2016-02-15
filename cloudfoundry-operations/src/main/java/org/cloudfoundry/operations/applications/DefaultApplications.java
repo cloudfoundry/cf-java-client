@@ -139,6 +139,32 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
+        return Mono
+            .when(
+                ValidationUtils.validate(request),
+                this.spaceId
+            )
+            .then(function(new Function2<EnableApplicationSshRequest, String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(EnableApplicationSshRequest request, String spaceId) {
+                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId, sshEnabled(true));
+                }
+
+            }))
+            .then(new Function<String, Mono<AbstractApplicationResource>>() {
+
+                @Override
+                public Mono<AbstractApplicationResource> apply(String applicationId) {
+                    return requestUpdateApplicationSsh(DefaultApplications.this.cloudFoundryClient, applicationId, true);
+                }
+
+            })
+            .after();
+    }
+
+    @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
         return Mono
             .when(
@@ -808,7 +834,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Map<String, Object> removeFromEnvironment(Map<String, Object> environment, String variableName) {
-        Map<String, Object> modified = new HashMap<String, Object>(environment);
+        Map<String, Object> modified = new HashMap<>(environment);
         modified.remove(variableName);
         return modified;
     }
@@ -923,6 +949,15 @@ public final class DefaultApplications implements Applications {
             .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
     }
 
+    private static Mono<AbstractApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
+        return cloudFoundryClient.applicationsV2()
+            .update(UpdateApplicationRequest.builder()
+                .applicationId(applicationId)
+                .enableSsh(enabled)
+                .build())
+            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
+    }
+
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
         return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
@@ -949,6 +984,17 @@ public final class DefaultApplications implements Applications {
             return (Map<String, Object>) request;
         else
             return null;
+    }
+
+    private static Predicate<AbstractApplicationResource> sshEnabled(final Boolean enabled) {
+        return new Predicate<AbstractApplicationResource>() {
+
+            @Override
+            public boolean test(AbstractApplicationResource resource) {
+                return enabled.equals(ResourceUtils.getEntity(resource).getEnableSsh());
+            }
+
+        };
     }
 
     private static Mono<AbstractApplicationResource> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
