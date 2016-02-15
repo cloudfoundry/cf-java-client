@@ -65,6 +65,7 @@ public final class SpringServiceInstancesTest {
         protected RequestContext getRequestContext() {
             return new RequestContext()
                 .method(PUT).path("v2/service_instances/test-service-instance-id/routes/route-id")
+                .requestPayload("v2/service_instances/PUT_{id}_routes_request.json")
                 .status(CREATED)
                 .responsePayload("v2/service_instances/PUT_{id}_routes_response.json");
         }
@@ -97,6 +98,7 @@ public final class SpringServiceInstancesTest {
             return BindServiceInstanceToRouteRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
                 .routeId("route-id")
+                .parameter("the_service_broker", "wants this object")
                 .build();
         }
 
