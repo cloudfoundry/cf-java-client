@@ -87,6 +87,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static java.time.temporal.ChronoUnit.HOURS;
+import static org.cloudfoundry.utils.OperationUtils.afterComplete;
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
@@ -249,9 +250,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .async(true)
                     .build())
                 .map(ResourceUtils::getId)
-                .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
-                .as(Stream::from)
-                .after(() -> Mono.just(spaceId))
+                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .as(afterComplete(() -> Mono.just(spaceId)))
             )
             .flatMap(spaceId -> PaginationUtils
                 .requestResources(page -> this.cloudFoundryClient.spaces()
@@ -1405,7 +1405,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     // TODO: after: https://www.pivotaltracker.com/story/show/101522686 really create a new user
     private static Mono<String> createUserId(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return associateOrganizationUser(cloudFoundryClient, organizationId, username)
-            .after(() -> PaginationUtils
+            .as(afterComplete(() -> PaginationUtils
                 .requestResources(page -> cloudFoundryClient.users()
                     .listUsers(ListUsersRequest.builder()
                         .organizationId(organizationId)
@@ -1414,7 +1414,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .filter(resource -> ResourceUtils.getEntity(resource).getUsername().equals(username))
                 .single()
                 .map(ResourceUtils::getId)
-            );
+            ));
     }
 
     private static Stream<String> getAuditorNames(CloudFoundryClient cloudFoundryClient, String spaceId) {

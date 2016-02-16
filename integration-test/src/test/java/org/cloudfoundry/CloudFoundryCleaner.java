@@ -38,6 +38,8 @@ import org.cloudfoundry.utils.ResourceUtils;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
+import static org.cloudfoundry.utils.OperationUtils.afterStreamComplete;
+
 final class CloudFoundryCleaner {
 
     private CloudFoundryCleaner() {
@@ -51,10 +53,10 @@ final class CloudFoundryCleaner {
                               Predicate<SpaceResource> spacePredicate) {
 
         return cleanApplications(cloudFoundryClient, applicationPredicate)
-            .after(() -> cleanRoutes(cloudFoundryClient, routePredicate))
-            .after(() -> cleanDomains(cloudFoundryClient, domainPredicate))
-            .after(() -> cleanSpaces(cloudFoundryClient, spacePredicate))
-            .after(() -> cleanOrganizations(cloudFoundryClient, organizationPredicate));
+            .as(afterStreamComplete(() -> cleanRoutes(cloudFoundryClient, routePredicate)))
+            .as(afterStreamComplete(() -> cleanDomains(cloudFoundryClient, domainPredicate)))
+            .as(afterStreamComplete(() -> cleanSpaces(cloudFoundryClient, spacePredicate)))
+            .as(afterStreamComplete(() -> cleanOrganizations(cloudFoundryClient, organizationPredicate)));
     }
 
     private static Stream<Void> cleanApplications(CloudFoundryClient cloudFoundryClient, Predicate<ApplicationResource> predicate) {
