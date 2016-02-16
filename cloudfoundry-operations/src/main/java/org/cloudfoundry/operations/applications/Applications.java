@@ -122,6 +122,14 @@ public interface Applications {
     Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
 
     /**
+     * Check if SSH is enabled for a specific application
+     *
+     * @param request the check application ssh enabled request
+     * @return Boolean is ssh enabled on the application
+     */
+    Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request);
+
+    /**
      * Starts a specific application or, if the application is already started, simply returns.
      *
      * @param request the start application request
