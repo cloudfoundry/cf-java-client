@@ -538,6 +538,7 @@ public final class DefaultApplicationsTest {
                 .delete(fill(DeleteApplicationRequest.builder())
                     .build());
         }
+
     }
 
     public static final class DeleteAndDeleteRoutesFailure extends AbstractOperationsApiTest<Void> {
@@ -565,6 +566,7 @@ public final class DefaultApplicationsTest {
                 .delete(fill(DeleteApplicationRequest.builder())
                     .build());
         }
+
     }
 
     public static final class DeleteAndDoNotDeleteRoutes extends AbstractOperationsApiTest<Void> {
@@ -590,6 +592,7 @@ public final class DefaultApplicationsTest {
                     .deleteRoutes(false)
                     .build());
         }
+
     }
 
     public static final class DisableSsh extends AbstractOperationsApiTest<Void> {
@@ -615,6 +618,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class DisableSshNoApp extends AbstractOperationsApiTest<Void> {
@@ -639,6 +643,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class EnableSsh extends AbstractOperationsApiTest<Void> {
@@ -663,6 +668,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class EnableSshNoApp extends AbstractOperationsApiTest<Void> {
@@ -687,6 +693,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class Get extends AbstractOperationsApiTest<ApplicationDetail> {
@@ -807,6 +814,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetEnvironmentsNoApp extends AbstractOperationsApiTest<ApplicationEnvironments> {
@@ -831,6 +839,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetEvents extends AbstractOperationsApiTest<ApplicationEvent> {
@@ -871,6 +880,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetEventsBadTimeSparseMetadata extends AbstractOperationsApiTest<ApplicationEvent> {
@@ -909,6 +919,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetEventsFoundZero extends AbstractOperationsApiTest<ApplicationEvent> {
@@ -933,6 +944,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetEventsLimitZero extends AbstractOperationsApiTest<ApplicationEvent> {
@@ -968,6 +980,7 @@ public final class DefaultApplicationsTest {
                     .maxNumberOfEvents(0)
                     .build());
         }
+
     }
 
     public static final class GetEventsTwo extends AbstractOperationsApiTest<ApplicationEvent> {
@@ -1022,6 +1035,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app")
                     .build());
         }
+
     }
 
     public static final class GetNoBuildpack extends AbstractOperationsApiTest<ApplicationDetail> {
@@ -1115,6 +1129,7 @@ public final class DefaultApplicationsTest {
                     .newName("test-new-app-name")
                     .build());
         }
+
     }
 
     public static final class RenameNoApp extends AbstractOperationsApiTest<Void> {
@@ -1140,6 +1155,7 @@ public final class DefaultApplicationsTest {
                     .newName("test-new-app-name")
                     .build());
         }
+
     }
 
     public static final class Restage extends AbstractOperationsApiTest<Void> {
@@ -1300,6 +1316,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class RestartFailureTotal extends AbstractOperationsApiTest<Void> {
@@ -1327,6 +1344,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class RestartInstance extends AbstractOperationsApiTest<Void> {
@@ -1352,6 +1370,7 @@ public final class DefaultApplicationsTest {
                     .instanceIndex(0)
                     .build());
         }
+
     }
 
     public static final class RestartNoApp extends AbstractOperationsApiTest<Void> {
@@ -1376,6 +1395,7 @@ public final class DefaultApplicationsTest {
                     .name("test-non-existent-app-name")
                     .build());
         }
+
     }
 
     public static final class RestartNotStartedAndNotStopped extends AbstractOperationsApiTest<Void> {
@@ -1402,6 +1422,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class RestartStarted extends AbstractOperationsApiTest<Void> {
@@ -1428,6 +1449,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class RestartStopped extends AbstractOperationsApiTest<Void> {
@@ -1453,6 +1475,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class ScaleDiskAndInstancesNotStarted extends AbstractOperationsApiTest<Void> {
@@ -1479,6 +1502,7 @@ public final class DefaultApplicationsTest {
                     .diskLimit("2m")
                     .build());
         }
+
     }
 
     public static final class ScaleDiskAndInstancesStarted extends AbstractOperationsApiTest<Void> {
@@ -1507,6 +1531,7 @@ public final class DefaultApplicationsTest {
                     .diskLimit("2m")
                     .build());
         }
+
     }
 
     public static final class ScaleInstances extends AbstractOperationsApiTest<Void> {
@@ -1532,6 +1557,7 @@ public final class DefaultApplicationsTest {
                     .instances(2)
                     .build());
         }
+
     }
 
     public static final class ScaleInstancesNoApp extends AbstractOperationsApiTest<Void> {
@@ -1557,6 +1583,7 @@ public final class DefaultApplicationsTest {
                     .instances(2)
                     .build());
         }
+
     }
 
     public static final class ScaleNoChange extends AbstractOperationsApiTest<Void> {
@@ -1580,6 +1607,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class SetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
@@ -1609,6 +1637,7 @@ public final class DefaultApplicationsTest {
                     .variableValue("test-var-value")
                     .build());
         }
+
     }
 
     public static final class SetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
@@ -1635,6 +1664,7 @@ public final class DefaultApplicationsTest {
                     .variableValue("test-var-value")
                     .build());
         }
+
     }
 
     public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
@@ -1658,6 +1688,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Void> {
@@ -1682,6 +1713,7 @@ public final class DefaultApplicationsTest {
                     .name("test-app-name")
                     .build());
         }
+
     }
 
     public static final class StartApplicationFailurePartial extends AbstractOperationsApiTest<Void> {
@@ -1706,6 +1738,7 @@ public final class DefaultApplicationsTest {
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StartApplicationFailureTotal extends AbstractOperationsApiTest<Void> {
@@ -1731,6 +1764,7 @@ public final class DefaultApplicationsTest {
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StartInvalidApplication extends AbstractOperationsApiTest<Void> {
@@ -1754,6 +1788,7 @@ public final class DefaultApplicationsTest {
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StartStartedApplication extends AbstractOperationsApiTest<Void> {
@@ -1776,6 +1811,7 @@ public final class DefaultApplicationsTest {
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StartStoppedApplication extends AbstractOperationsApiTest<Void> {
@@ -1800,6 +1836,7 @@ public final class DefaultApplicationsTest {
                 .start(fill(StartApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StopInvalidApplication extends AbstractOperationsApiTest<Void> {
@@ -1823,6 +1860,7 @@ public final class DefaultApplicationsTest {
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StopStartedApplication extends AbstractOperationsApiTest<Void> {
@@ -1846,6 +1884,7 @@ public final class DefaultApplicationsTest {
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class StopStoppedApplication extends AbstractOperationsApiTest<Void> {
@@ -1868,6 +1907,7 @@ public final class DefaultApplicationsTest {
                 .stop(fill(StopApplicationRequest.builder(), "application-")
                     .build());
         }
+
     }
 
     public static final class UnsetEnvironmentVariable extends AbstractOperationsApiTest<Void> {
@@ -1893,6 +1933,7 @@ public final class DefaultApplicationsTest {
                     .variableName("test-var")
                     .build());
         }
+
     }
 
     public static final class UnsetEnvironmentVariableNoApp extends AbstractOperationsApiTest<Void> {
@@ -1918,6 +1959,7 @@ public final class DefaultApplicationsTest {
                     .variableName("test-var")
                     .build());
         }
+
     }
 
 }
