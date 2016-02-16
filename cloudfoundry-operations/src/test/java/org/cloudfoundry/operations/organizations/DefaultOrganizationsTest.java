@@ -17,9 +17,14 @@
 package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.job.GetJobRequest;
+import org.cloudfoundry.client.v2.job.GetJobResponse;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
@@ -31,6 +36,7 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUs
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
@@ -52,6 +58,11 @@ import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.fn.Supplier;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.cloudfoundry.util.test.TestObjects.fillPage;
@@ -92,6 +103,27 @@ public final class DefaultOrganizationsTest {
                     .build()));
     }
 
+    private static void requestDeleteOrganizationAsync(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .async(true)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(DeleteOrganizationResponse.builder())
+//                    .entity(fill(JobEntity.builder())
+//                        .build())
+                    .build()));
+    }
+
+    private static void requestDeleteOrganizationSync(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono.<DeleteOrganizationResponse>empty());
+    }
+
     private static void requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
             .listDomains(fillPage(ListOrganizationDomainsRequest.builder())
@@ -122,6 +154,70 @@ public final class DefaultOrganizationsTest {
             .thenReturn(Mono.just(GetFeatureFlagResponse.builder()
                 .enabled(true)
                 .build()));
+    }
+
+    private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        GetJobResponse.builder()
+                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        GetJobResponse.builder()
+                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .entity(fill(JobEntity.builder())
+                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                    .build())
+                                .status("failed")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
+
+    private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        GetJobResponse.builder()
+                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        GetJobResponse.builder()
+                            .metadata(fill(Resource.Metadata.builder()).build())
+                            .entity(fill(JobEntity.builder())
+                                .status("finished")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
     }
 
     private static void requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
@@ -304,6 +400,87 @@ public final class DefaultOrganizationsTest {
                 .organizationName(TEST_ORGANIZATION_NAME)
                 .quotaDefinitionName("test-quota-definition-name")
                 .build());
+        }
+
+    }
+
+    public static final class DeleteNoConfirmation extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizations(this.cloudFoundryClient, "test-organization-name");
+            requestDeleteOrganizationSync(this.cloudFoundryClient, "test-organization-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // onComplete and no onNext
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations
+                .delete(DeleteOrganizationRequest.builder()
+                    .name("test-organization-name")
+                    .noConfirmation(true)
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteWithConfirmation extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizations(this.cloudFoundryClient, "test-organization-name");
+            requestDeleteOrganizationAsync(this.cloudFoundryClient, "test-organization-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // onComplete and no onNext
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations
+                .delete(DeleteOrganizationRequest.builder()
+                    .name("test-organization-name")
+                    .noConfirmation(false)
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteWithConfirmationFails extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizations(this.cloudFoundryClient, "test-organization-name");
+            requestDeleteOrganizationAsync(this.cloudFoundryClient, "test-organization-id");
+            requestJobFailure(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(CloudFoundryException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.organizations
+                .delete(DeleteOrganizationRequest.builder()
+                    .name("test-organization-name")
+                    .noConfirmation(false)
+                    .build());
         }
 
     }

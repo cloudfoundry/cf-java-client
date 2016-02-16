@@ -55,4 +55,12 @@ public interface Organizations {
      */
     Mono<Void> rename(RenameOrganizationRequest request);
 
+    /**
+     * Deletes a specific organization
+     *
+     * @param request the delete organization request
+     * @return completion indicator
+     */
+    Mono<Void> delete(DeleteOrganizationRequest request);
+
 }
