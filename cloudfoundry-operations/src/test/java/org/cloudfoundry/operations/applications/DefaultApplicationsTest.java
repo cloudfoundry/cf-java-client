@@ -649,7 +649,6 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
             requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", true);
-
         }
 
         @Override
