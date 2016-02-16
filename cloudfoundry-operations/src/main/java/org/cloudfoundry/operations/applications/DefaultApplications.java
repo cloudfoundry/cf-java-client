@@ -626,6 +626,27 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
+    /**
+     * Produces a Mono transformer that ignores the source element (if any) and continues with the supplied Mono on complete. On error, the supplier is not called, and the error is propagated.
+     *
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(()->someMono))} </p>
+     *
+     * @param supplier supplies a {@code Mono<OUT>} when called
+     * @param <IN>     the source element type.
+     * @param <OUT>    the element type of the resulting {@code Mono}.
+     * @return a Mono transformer
+     */
+    private static <IN, OUT> Function<Mono<IN>, Mono<OUT>> afterComplete(final Supplier<Mono<OUT>> supplier) {
+        return new Function<Mono<IN>, Mono<OUT>>() {
+
+            @Override
+            public Mono<OUT> apply(Mono<IN> source) {
+                return source.flatMap(null, null, supplier).next();
+            }
+
+        };
+    }
+
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
         return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
     }
