@@ -30,28 +30,28 @@ import org.cloudfoundry.client.ValidationResult;
 public class GetServiceUsageEventsRequest implements Validatable {
 
     /**
-     * The service usage events id
+     * The service usage event id
      *
-     * @param serviceUsageEventsId the service instance id
-     * @return the service usage events id
+     * @param serviceUsageEventId the service usage event id
+     * @return the service usage event id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String serviceUsageEventsId;
+    private final String serviceUsageEventId;
 
     @Builder
-    GetServiceUsageEventsRequest(String serviceUsageEventsId) {
-        this.serviceUsageEventsId = serviceUsageEventsId;
+    GetServiceUsageEventsRequest(String serviceUsageEventId) {
+        this.serviceUsageEventId = serviceUsageEventId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.serviceUsageEventsId == null) {
-            builder.message("service usage events id must be specified");
+        if (this.serviceUsageEventId == null) {
+            builder.message("service usage event id must be specified");
         }
 
         return builder.build();
     }
-    
+
 }

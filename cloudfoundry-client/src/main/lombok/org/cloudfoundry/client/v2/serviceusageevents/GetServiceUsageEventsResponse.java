@@ -33,7 +33,7 @@ public class GetServiceUsageEventsResponse extends Resource<ServiceUsageEventsEn
 
     @Builder
     public GetServiceUsageEventsResponse(@JsonProperty("entity") ServiceUsageEventsEntity entity,
-                              @JsonProperty("metadata") Metadata metadata) {
+                                         @JsonProperty("metadata") Metadata metadata) {
         super(entity, metadata);
     }
 

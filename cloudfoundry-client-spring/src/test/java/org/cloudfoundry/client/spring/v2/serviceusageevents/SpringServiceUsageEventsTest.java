@@ -72,7 +72,7 @@ public final class SpringServiceUsageEventsTest {
         @Override
         protected GetServiceUsageEventsRequest getValidRequest() throws Exception {
             return GetServiceUsageEventsRequest.builder()
-                .serviceUsageEventsId("9470627d-0488-4d9a-8564-f97571487893")
+                .serviceUsageEventId("9470627d-0488-4d9a-8564-f97571487893")
                 .build();
         }
 

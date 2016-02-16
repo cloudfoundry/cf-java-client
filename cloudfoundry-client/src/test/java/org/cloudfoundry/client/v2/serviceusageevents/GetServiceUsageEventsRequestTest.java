@@ -28,7 +28,7 @@ public final class GetServiceUsageEventsRequestTest {
     @Test
     public void isValid() {
         ValidationResult result = GetServiceUsageEventsRequest.builder()
-            .serviceUsageEventsId("test-service-usage-events-id")
+            .serviceUsageEventId("test-service-usage-event-id")
             .build()
             .isValid();
 
@@ -42,7 +42,7 @@ public final class GetServiceUsageEventsRequestTest {
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
-        assertEquals("service usage events id must be specified", result.getMessages().get(0));
+        assertEquals("service usage event id must be specified", result.getMessages().get(0));
     }
-    
+
 }

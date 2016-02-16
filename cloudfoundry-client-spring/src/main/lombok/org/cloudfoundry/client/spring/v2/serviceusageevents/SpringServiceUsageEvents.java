@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.spring.v2.serviceusageevents;
 
+import lombok.ToString;
 import org.cloudfoundry.client.spring.util.AbstractSpringOperations;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
@@ -29,10 +30,10 @@ import reactor.fn.Consumer;
 import java.net.URI;
 
 /**
- * Created by buce8373 on 15/02/2016.
+ * The Spring-based implementation of {@link ServiceUsageEvents}
  */
+@ToString(callSuper = true)
 public final class SpringServiceUsageEvents extends AbstractSpringOperations implements ServiceUsageEvents {
-
 
     /**
      * Creates an instance
@@ -51,7 +52,7 @@ public final class SpringServiceUsageEvents extends AbstractSpringOperations imp
 
             @Override
             public void accept(UriComponentsBuilder builder) {
-                builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventsId());
+                builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId());
             }
 
         });

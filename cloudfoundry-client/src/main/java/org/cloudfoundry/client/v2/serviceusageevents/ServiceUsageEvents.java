@@ -19,6 +19,9 @@ package org.cloudfoundry.client.v2.serviceusageevents;
 
 import reactor.core.publisher.Mono;
 
+/**
+ * Main entry point to the Cloud Foundry Service Usage Events V2 Client API
+ */
 public interface ServiceUsageEvents {
 
     /**
