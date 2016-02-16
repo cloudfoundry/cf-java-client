@@ -523,6 +523,29 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
+        return Mono
+            .when(
+                ValidationUtils.validate(request),
+                this.spaceId
+            )
+            .then(function(new Function2<ApplicationSshEnabledRequest, String, Mono<AbstractApplicationResource>>() {
+
+                @Override
+                public Mono<AbstractApplicationResource> apply(ApplicationSshEnabledRequest request, String spaceId) {
+                    return getApplication(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId);
+                }
+
+            }))
+            .map(new Function<AbstractApplicationResource, Boolean>() {
+                @Override
+                public Boolean apply(AbstractApplicationResource applicationResource) {
+                    return ResourceUtils.getEntity(applicationResource).getEnableSsh();
+                }
+            });
+    }
+
+    @Override
     public Mono<Void> start(StartApplicationRequest request) {
         return Mono
             .when(

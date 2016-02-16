@@ -594,6 +594,53 @@ public final class DefaultApplicationsTest {
         }
     }
 
+    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(true);
+        }
+
+        @Override
+        protected Mono<Boolean> invoke() {
+            return this.applications
+                .sshEnabled(ApplicationSshEnabledRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
+    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+    }
+
     public static final class Get extends AbstractOperationsApiTest<ApplicationDetail> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, Mono.just(TEST_SPACE_ID));
