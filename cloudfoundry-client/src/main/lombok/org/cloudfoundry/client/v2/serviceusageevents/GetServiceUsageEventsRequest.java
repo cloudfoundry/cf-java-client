@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.services;
-
+package org.cloudfoundry.client.v2.serviceusageevents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
@@ -25,31 +24,31 @@ import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
 
 /**
- * The request payload for the Get Service operation
+ * The request payload for the Get Service Usage Events operation
  */
 @Data
-public final class GetServiceRequest implements Validatable {
+public class GetServiceUsageEventsRequest implements Validatable {
 
     /**
-     * The service id
+     * The service usage event id
      *
-     * @param serviceId the service id
-     * @return the service id
+     * @param serviceUsageEventId the service usage event id
+     * @return the service usage event id
      */
     @Getter(onMethod = @__(@JsonIgnore))
-    private final String serviceId;
+    private final String serviceUsageEventId;
 
     @Builder
-    GetServiceRequest(String serviceId) {
-        this.serviceId = serviceId;
+    GetServiceUsageEventsRequest(String serviceUsageEventId) {
+        this.serviceUsageEventId = serviceUsageEventId;
     }
 
     @Override
     public ValidationResult isValid() {
         ValidationResult.ValidationResultBuilder builder = ValidationResult.builder();
 
-        if (this.serviceId == null) {
-            builder.message("service id must be specified");
+        if (this.serviceUsageEventId == null) {
+            builder.message("service usage event id must be specified");
         }
 
         return builder.build();
