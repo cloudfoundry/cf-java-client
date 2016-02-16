@@ -580,10 +580,12 @@ public final class DefaultApplications implements Applications {
 
             }))
             .map(new Function<AbstractApplicationResource, Boolean>() {
+
                 @Override
                 public Boolean apply(AbstractApplicationResource applicationResource) {
                     return ResourceUtils.getEntity(applicationResource).getEnableSsh();
                 }
+
             });
     }
 
