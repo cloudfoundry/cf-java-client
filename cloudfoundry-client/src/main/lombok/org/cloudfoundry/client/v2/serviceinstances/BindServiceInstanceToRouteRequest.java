@@ -18,15 +18,30 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 import org.cloudfoundry.client.Validatable;
 import org.cloudfoundry.client.ValidationResult;
+
+import java.util.Map;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * The request payload to Bind Service Instance To a Route
  */
 public final class BindServiceInstanceToRouteRequest implements Validatable {
+
+    /**
+     * Key/value pairs of all arbitrary parameters to pass along to the service broker
+     *
+     * @return the arbitrary parameters to pass along to the service broker
+     */
+    @Getter(onMethod = @__({@JsonProperty("parameters"), @JsonInclude(NON_EMPTY)}))
+    private final Map<String, Object> parameters;
 
     /**
      * The route id
@@ -47,7 +62,10 @@ public final class BindServiceInstanceToRouteRequest implements Validatable {
     private final String serviceInstanceId;
 
     @Builder
-    BindServiceInstanceToRouteRequest(String routeId, String serviceInstanceId) {
+    BindServiceInstanceToRouteRequest(@Singular Map<String, Object> parameters,
+                                      String routeId,
+                                      String serviceInstanceId) {
+        this.parameters = parameters;
         this.routeId = routeId;
         this.serviceInstanceId = serviceInstanceId;
     }
