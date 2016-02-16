@@ -1163,7 +1163,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .restage(fill(RestageApplicationRequest.builder())
+                .restage(RestageApplicationRequest.builder()
                     .name("test-application-name")
                     .build());
         }
@@ -1188,7 +1188,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .restage(fill(RestageApplicationRequest.builder())
+                .restage(RestageApplicationRequest.builder()
                     .name("test-application-name")
                     .build());
         }
@@ -1209,13 +1209,13 @@ public final class DefaultApplicationsTest {
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
             testSubscriber
-                .assertError(IllegalArgumentException.class);
+                .assertError(IllegalStateException.class);
         }
 
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .restage(fill(RestageApplicationRequest.builder())
+                .restage(RestageApplicationRequest.builder()
                     .name("test-application-name")
                     .build());
         }
@@ -1242,7 +1242,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .restage(fill(RestageApplicationRequest.builder())
+                .restage(RestageApplicationRequest.builder()
                     .name("test-application-name")
                     .build());
         }
@@ -1270,7 +1270,7 @@ public final class DefaultApplicationsTest {
         @Override
         protected Mono<Void> invoke() {
             return this.applications
-                .restage(fill(RestageApplicationRequest.builder())
+                .restage(RestageApplicationRequest.builder()
                     .name("test-application-name")
                     .build());
         }
