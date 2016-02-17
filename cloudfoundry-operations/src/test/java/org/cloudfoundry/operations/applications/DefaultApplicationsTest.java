@@ -649,7 +649,30 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
             requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", false);
+        }
 
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .disableSsh(DisableApplicationSshRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DisableSshAlreadyDisabled extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, false);
         }
 
         @Override
