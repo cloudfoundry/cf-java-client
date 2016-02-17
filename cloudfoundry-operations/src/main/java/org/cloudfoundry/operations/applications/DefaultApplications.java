@@ -161,7 +161,7 @@ public final class DefaultApplications implements Applications {
 
                 @Override
                 public Mono<String> apply(DisableApplicationSshRequest request, String spaceId) {
-                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId, sshEnabled(false));
+                    return getApplicationIdWhere(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId, sshEnabled(true));
                 }
 
             }))
