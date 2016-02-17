@@ -27,6 +27,7 @@ public interface Stacks {
     /**
      * Get a Stack
      *
+     * @param request the get stack request
      * @return a {@link Stack}
      */
     Mono<Stack> get(GetStackRequest request);

@@ -85,6 +85,7 @@ public interface Applications {
     /**
      * List the applications logs
      *
+     * @param request the application logs request
      * @return the applications logs
      */
     Publisher<LogMessage> logs(LogsRequest request);
