@@ -17,6 +17,10 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.LoggingClient;
+import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.client.logging.RecentLogsRequest;
+import org.cloudfoundry.client.logging.StreamLogsRequest;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -95,10 +99,13 @@ public final class DefaultApplications implements Applications {
 
     private final CloudFoundryClient cloudFoundryClient;
 
+    private final LoggingClient loggingClient;
+
     private final Mono<String> spaceId;
 
-    public DefaultApplications(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId) {
+    public DefaultApplications(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
+        this.loggingClient = loggingClient;
         this.spaceId = spaceId;
     }
 
@@ -331,6 +338,49 @@ public final class DefaultApplications implements Applications {
                 }
 
             });
+    }
+
+    @Override
+    public Publisher<LogMessage> logs(LogsRequest request) {
+        return Mono
+            .when(
+                ValidationUtils.validate(request),
+                this.spaceId
+            )
+            .then(function(new Function2<LogsRequest, String, Mono<Tuple2<String, LogsRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<String, LogsRequest>> apply(LogsRequest request, String spaceId) {
+                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId)
+                        .and(Mono.just(request));
+                }
+
+            }))
+            .then(function(new Function2<String, LogsRequest, Mono<Tuple2<String, Boolean>>>() {
+
+                @Override
+                public Mono<Tuple2<String, Boolean>> apply(String applicationId, LogsRequest logsRequest) {
+                    return Mono.when(Mono.just(applicationId),
+                        Mono.just(logsRequest.getRecent() == null || !logsRequest.getRecent()));
+                }
+
+            }))
+            .flatMap(function(new Function2<String, Boolean, Publisher<LogMessage>>() {
+
+                @Override
+                public Publisher<LogMessage> apply(String applicationId, Boolean allLogs) {
+                    if (allLogs) {
+                        return loggingClient.stream(StreamLogsRequest.builder()
+                            .applicationId(applicationId)
+                            .build());
+                    } else {
+                        return loggingClient.recent(RecentLogsRequest.builder()
+                            .applicationId(applicationId)
+                            .build());
+                    }
+                }
+
+            }));
     }
 
     @Override

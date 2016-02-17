@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
@@ -38,6 +39,8 @@ public final class CloudFoundryOperationsBuilder {
 
     private CloudFoundryClient cloudFoundryClient;
 
+    private LoggingClient loggingClient;
+
     private String organization;
 
     private String space;
@@ -56,7 +59,7 @@ public final class CloudFoundryOperationsBuilder {
         Mono<String> organizationId = getOrganizationId(this.cloudFoundryClient, this.organization);
         Mono<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
 
-        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, organizationId, spaceId);
+        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, organizationId, spaceId);
     }
 
     /**
@@ -67,6 +70,18 @@ public final class CloudFoundryOperationsBuilder {
      */
     public CloudFoundryOperationsBuilder cloudFoundryClient(CloudFoundryClient cloudFoundryClient) {
         this.cloudFoundryClient = cloudFoundryClient;
+        return this;
+    }
+
+
+    /**
+     * Configure the {@link LoggingClient} to use
+     *
+     * @param loggingClient the {@link LoggingClient} to use
+     * @return {@code this}
+     */
+    public CloudFoundryOperationsBuilder cloudFoundryClient(LoggingClient loggingClient) {
+        this.loggingClient = loggingClient;
         return this;
     }
 
