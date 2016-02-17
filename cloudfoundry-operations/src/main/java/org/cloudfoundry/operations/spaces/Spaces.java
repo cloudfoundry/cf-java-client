@@ -25,12 +25,20 @@ import reactor.core.publisher.Mono;
 public interface Spaces {
 
     /**
+     * Deletes a specific space.
+     *
+     * @param request the delete space request
+     * @return a completion indicator
+     */
+    Mono<Void> delete(DeleteSpaceRequest request);
+
+    /**
      * Gets space information
      *
-     * @param getSpaceRequest details of space information required
+     * @param request details of space information required
      * @return the space information
      */
-    Mono<SpaceDetail> get(GetSpaceRequest getSpaceRequest);
+    Mono<SpaceDetail> get(GetSpaceRequest request);
 
     /**
      * Lists the spaces
