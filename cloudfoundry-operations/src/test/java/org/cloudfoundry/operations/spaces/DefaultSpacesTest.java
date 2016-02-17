@@ -17,8 +17,12 @@
 package org.cloudfoundry.operations.spaces;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
+import org.cloudfoundry.client.v2.job.GetJobRequest;
+import org.cloudfoundry.client.v2.job.GetJobResponse;
+import org.cloudfoundry.client.v2.job.JobEntity;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -27,6 +31,7 @@ import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
@@ -41,16 +46,95 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.utils.Optional;
+import org.cloudfoundry.utils.RequestValidationException;
 import org.cloudfoundry.utils.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
+import reactor.fn.Supplier;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import static org.cloudfoundry.utils.test.TestObjects.fill;
 import static org.cloudfoundry.utils.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultSpacesTest {
+
+    private static void requestDeleteSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .delete(org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest.builder()
+                .async(true)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(DeleteSpaceResponse.builder())
+                    .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .errorDetails(fill(JobEntity.ErrorDetails.builder(), "error-details-")
+                                    .build())
+                                .status("failed")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
+
+    private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
+        when(cloudFoundryClient.jobs()
+            .get(GetJobRequest.builder()
+                .jobId(jobId)
+                .build()))
+            .thenReturn(Mono
+                .defer(new Supplier<Mono<GetJobResponse>>() {
+
+                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("running")
+                                .build())
+                            .build(),
+                        fill(GetJobResponse.builder(), "job-")
+                            .entity(fill(JobEntity.builder())
+                                .status("finished")
+                                .build())
+                            .build()
+                    ));
+
+                    @Override
+                    public Mono<GetJobResponse> get() {
+                        return Mono.just(responses.poll());
+                    }
+
+                }));
+    }
 
     private static void requestOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
@@ -62,7 +146,7 @@ public final class DefaultSpacesTest {
                     .build()));
     }
 
-    private static void requestOrganizationSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private static void requestOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient.organizations()
             .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
                 .name(space)
@@ -72,6 +156,17 @@ public final class DefaultSpacesTest {
                 .just(fillPage(ListOrganizationSpacesResponse.builder())
                     .resource(fill(SpaceResource.builder(), "space-")
                         .build())
+                    .build()));
+    }
+
+    private static void requestOrganizationSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+                .name(space)
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationSpacesResponse.builder())
                     .build()));
     }
 
@@ -147,6 +242,124 @@ public final class DefaultSpacesTest {
                     .build()));
     }
 
+    public static final class Delete extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+            requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .delete(DeleteSpaceRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+            requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
+            requestJobSuccess(this.cloudFoundryClient, "test-id");
+            requestJobFailure(this.cloudFoundryClient, "test-id");
+        }
+
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(CloudFoundryException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .delete(DeleteSpaceRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteInvalidRequest extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .delete(DeleteSpaceRequest.builder()
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteInvalidSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() {
+            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .delete(DeleteSpaceRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DeleteNoOrganization extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, MISSING_ID);
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .delete(DeleteSpaceRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
@@ -154,7 +367,7 @@ public final class DefaultSpacesTest {
         @Before
         public void setUp() throws Exception {
             requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
-            requestOrganizationSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
             requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
             requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
             requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
@@ -216,7 +429,7 @@ public final class DefaultSpacesTest {
         @Before
         public void setUp() throws Exception {
             requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
-            requestOrganizationSpace(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
             requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
             requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
             requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);

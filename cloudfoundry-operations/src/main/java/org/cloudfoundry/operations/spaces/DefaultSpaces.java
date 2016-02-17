@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
@@ -42,6 +43,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.utils.ExceptionUtils;
+import org.cloudfoundry.utils.JobUtils;
 import org.cloudfoundry.utils.OperationUtils;
 import org.cloudfoundry.utils.Optional;
 import org.cloudfoundry.utils.OptionalUtils;
@@ -73,6 +75,28 @@ public final class DefaultSpaces implements Spaces {
     }
 
     @Override
+    public Mono<Void> delete(DeleteSpaceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId)
+            .then(function(new Function2<DeleteSpaceRequest, String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(DeleteSpaceRequest request, String organizationId) {
+                    return getOrganizationSpaceId(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName());
+                }
+
+            }))
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String spaceId) {
+                    return deleteSpace(DefaultSpaces.this.cloudFoundryClient, spaceId);
+                }
+
+            });
+    }
+
+    @Override
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return ValidationUtils
             .validate(request)
@@ -81,7 +105,7 @@ public final class DefaultSpaces implements Spaces {
 
                 @Override
                 public Mono<Tuple2<SpaceResource, GetSpaceRequest>> apply(GetSpaceRequest request, String organizationId) {
-                    return requestOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName())
+                    return getOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName())
                         .and(Mono.just(request));
                 }
 
@@ -120,6 +144,19 @@ public final class DefaultSpaces implements Spaces {
                 @Override
                 public SpaceSummary apply(SpaceResource resource) {
                     return toSpaceSummary(resource);
+                }
+
+            });
+    }
+
+    private static Mono<Void> deleteSpace(final CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestDeleteSpace(cloudFoundryClient, spaceId)
+            .map(ResourceUtils.extractId())
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String jobId) {
+                    return JobUtils.waitForCompletion(cloudFoundryClient, jobId);
                 }
 
             });
@@ -200,6 +237,17 @@ public final class DefaultSpaces implements Spaces {
             });
     }
 
+    private static Mono<SpaceResource> getOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+        return requestOrganizationSpaces(cloudFoundryClient, organizationId, space)
+            .single()
+            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+    }
+
+    private static Mono<String> getOrganizationSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+        return getOrganizationSpace(cloudFoundryClient, organizationId, space)
+            .map(ResourceUtils.extractId());
+    }
+
     private static Mono<List<String>> getSecurityGroupNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
         return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<SecurityGroupResource, String>() {
@@ -226,6 +274,14 @@ public final class DefaultSpaces implements Spaces {
             .toList();
     }
 
+    private static Mono<DeleteSpaceResponse> requestDeleteSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return cloudFoundryClient.spaces()
+            .delete(org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest.builder()
+                .async(true)
+                .spaceId(spaceId)
+                .build());
+    }
+
     private static Mono<GetOrganizationResponse> requestOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return cloudFoundryClient.organizations()
             .get(GetOrganizationRequest.builder()
@@ -233,7 +289,7 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
-    private static Mono<SpaceResource> requestOrganizationSpace(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
+    private static Stream<SpaceResource> requestOrganizationSpaces(final CloudFoundryClient cloudFoundryClient, final String organizationId, final String space) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListOrganizationSpacesResponse>>() {
 
@@ -247,9 +303,7 @@ public final class DefaultSpaces implements Spaces {
                             .build());
                 }
 
-            })
-            .single()
-            .otherwise(ExceptionUtils.<SpaceResource>convert("Space %s does not exist", space));
+            });
     }
 
     private static Stream<ApplicationResource> requestSpaceApplications(final CloudFoundryClient cloudFoundryClient, final String spaceId) {
