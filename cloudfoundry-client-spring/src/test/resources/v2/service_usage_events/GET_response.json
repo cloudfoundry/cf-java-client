@@ -1,0 +1,28 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "0c9c59b8-3462-4acf-be39-aa987f087146",
+        "url": "/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146",
+        "created_at": "2015-07-27T22:43:30Z"
+      },
+      "entity": {
+        "state": "CREATED",
+        "org_guid": "guid-4dd5a051-3460-4246-a842-1dc2d5983c51",
+        "space_guid": "guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53",
+        "space_name": "name-2154",
+        "service_instance_guid": "guid-15a7c119-838d-4516-acd9-062dec25d934",
+        "service_instance_name": "name-2155",
+        "service_instance_type": "type-2",
+        "service_plan_guid": "guid-eddab64c-7be0-407e-91b0-82a8093cdfc5",
+        "service_plan_name": "name-2156",
+        "service_guid": "guid-d471c693-824c-44a6-b069-a679e323326d",
+        "service_label": "label-77"
+      }
+    }
+  ]
+}
