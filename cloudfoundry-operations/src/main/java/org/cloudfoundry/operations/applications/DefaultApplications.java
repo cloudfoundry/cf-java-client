@@ -1378,9 +1378,7 @@ public final class DefaultApplications implements Applications {
             .as(OperationUtils.<String>stream())
             .reduce("UNKNOWN", collectStates())
             .where(isInstanceComplete())
-            .as(OperationUtils.<String>stream())                                                // TODO: Remove once Mono.repeatWhen()
-            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
-            .single()                                                                      // TODO: Remove once Mono.repeatWhen()
+            .as(OperationUtils.<String>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
             .where(isRunning())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during start", application));
     }
@@ -1396,9 +1394,7 @@ public final class DefaultApplications implements Applications {
 
             })
             .where(isStagingComplete())
-            .as(OperationUtils.<String>stream())                                 // TODO: Remove once Mono.repeatWhen()
-            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
-            .single()                                                       // TODO: Remove once Mono.repeatWhen()
+            .as(OperationUtils.<String>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
             .where(isStaged())
             .otherwiseIfEmpty(ExceptionUtils.<String>illegalState("Application %s failed during staging", application));
     }

@@ -59,9 +59,7 @@ public final class JobUtils {
                 }
 
             })
-            .as(OperationUtils.<JobEntity>stream())                                   // TODO: Remove once Mono.repeatWhen()
-            .repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10))
-            .single()                                                                 // TODO: Remove once Mono.repeatWhen()
+            .as(OperationUtils.<JobEntity>repeatWhen(DelayUtils.exponentialBackOff(1, 10, SECONDS, 10)))  // TODO: Remove once Mono.repeatWhen()
             .where(new Predicate<JobEntity>() {
 
                 @Override

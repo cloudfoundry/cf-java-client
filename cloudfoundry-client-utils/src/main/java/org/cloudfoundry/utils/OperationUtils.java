@@ -17,6 +17,7 @@
 package org.cloudfoundry.utils;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.rx.Promise;
@@ -136,10 +137,32 @@ public final class OperationUtils {
      */
     public static <T> Function<Publisher<T>, Promise<T>> promise() {
         return new Function<Publisher<T>, Promise<T>>() {
+
             @Override
             public Promise<T> apply(Publisher<T> publisher) {
                 return Promise.from(publisher);
             }
+        };
+    }
+
+    /**
+     * Adds the {@code repeatWhen} operator to {@link Mono} until it is added natively
+     *
+     * @param f   the {@code repeatWhen} function
+     * @param <T> the type of the stream
+     * @return the {@code Mono} after it has been waited for
+     */
+    public static <T> Function<Mono<T>, Mono<T>> repeatWhen(final Function<Stream<Long>, ? extends Publisher<?>> f) { // TODO: Remove once Mono.repeatWhen()
+        return new Function<Mono<T>, Mono<T>>() {
+
+            @Override
+            public Mono<T> apply(Mono<T> mono) {
+                return mono
+                    .as(OperationUtils.<T>stream())
+                    .repeatWhen(f)
+                    .single();
+            }
+
         };
     }
 
