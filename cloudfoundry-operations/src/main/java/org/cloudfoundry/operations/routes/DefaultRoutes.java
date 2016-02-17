@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.routes;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
@@ -253,7 +254,7 @@ public final class DefaultRoutes implements Routes {
                 public Mono<Tuple2<String, String>> apply(MapRouteRequest request, String spaceId) {
                     return Mono
                         .when(
-                            createRoute(DefaultRoutes.this.cloudFoundryClient, DefaultRoutes.this.organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
+                            getOrCreateRoute(DefaultRoutes.this.cloudFoundryClient, DefaultRoutes.this.organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
                             getApplicationId(DefaultRoutes.this.cloudFoundryClient, request.getApplicationName(), spaceId)
                         );
                 }
@@ -302,28 +303,6 @@ public final class DefaultRoutes implements Routes {
                 }
 
             }));
-    }
-
-    private static Mono<String> createRoute(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, final String spaceId, final String domain, final String host,
-                                            final String path) {
-        return organizationId
-            .then(new Function<String, Mono<String>>() {
-
-                @Override
-                public Mono<String> apply(String organizationId) {
-                    return getDomainId(cloudFoundryClient, organizationId, domain);
-                }
-
-            })
-            .then(new Function<String, Mono<CreateRouteResponse>>() {
-
-                @Override
-                public Mono<CreateRouteResponse> apply(String domainId) {
-                    return requestCreateRoute(cloudFoundryClient, domainId, host, path, spaceId);
-                }
-
-            })
-            .map(ResourceUtils.extractId());
     }
 
     private static Mono<Void> deleteRoute(final CloudFoundryClient cloudFoundryClient, String routeId) {
@@ -407,6 +386,31 @@ public final class DefaultRoutes implements Routes {
     private static Mono<String> getOptionalDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return getDomains(cloudFoundryClient, organizationId, domain)
             .singleOrEmpty()
+            .map(ResourceUtils.extractId());
+    }
+
+    private static Mono<String> getOrCreateRoute(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, final String spaceId, final String domain, final String host,
+                                                 final String path) {
+        return organizationId
+            .then(new Function<String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(String organizationId) {
+                    return getDomainId(cloudFoundryClient, organizationId, domain);
+                }
+
+            })
+            .then(new Function<String, Mono<Resource<RouteEntity>>>() {
+
+                @Override
+                public Mono<Resource<RouteEntity>> apply(String domainId) {
+                    return requestRoutes(cloudFoundryClient, domainId, host, path)
+                        .singleOrEmpty()
+                        .map(OperationUtils.<RouteResource, Resource<RouteEntity>>cast())
+                        .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, path, spaceId));
+                }
+
+            })
             .map(ResourceUtils.extractId());
     }
 
@@ -610,7 +614,6 @@ public final class DefaultRoutes implements Routes {
 
                 @Override
                 public Mono<ListRoutesResponse> apply(Integer page) {
-
                     return cloudFoundryClient.routes()
                         .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
                             .domainId(domainId)
