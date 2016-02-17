@@ -80,7 +80,7 @@ public final class CloudFoundryOperationsBuilder {
      * @param loggingClient the {@link LoggingClient} to use
      * @return {@code this}
      */
-    public CloudFoundryOperationsBuilder cloudFoundryClient(LoggingClient loggingClient) {
+    public CloudFoundryOperationsBuilder loggingClient(LoggingClient loggingClient) {
         this.loggingClient = loggingClient;
         return this;
     }

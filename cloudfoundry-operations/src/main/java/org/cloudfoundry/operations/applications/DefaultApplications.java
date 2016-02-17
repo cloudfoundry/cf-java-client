@@ -357,28 +357,11 @@ public final class DefaultApplications implements Applications {
                 }
 
             }))
-            .then(function(new Function2<String, LogsRequest, Mono<Tuple2<String, Boolean>>>() {
+            .flatMap(function(new Function2<String, LogsRequest, Publisher<LogMessage>>() {
 
                 @Override
-                public Mono<Tuple2<String, Boolean>> apply(String applicationId, LogsRequest logsRequest) {
-                    return Mono.when(Mono.just(applicationId),
-                        Mono.just(logsRequest.getRecent() == null || !logsRequest.getRecent()));
-                }
-
-            }))
-            .flatMap(function(new Function2<String, Boolean, Publisher<LogMessage>>() {
-
-                @Override
-                public Publisher<LogMessage> apply(String applicationId, Boolean allLogs) {
-                    if (allLogs) {
-                        return loggingClient.stream(StreamLogsRequest.builder()
-                            .applicationId(applicationId)
-                            .build());
-                    } else {
-                        return loggingClient.recent(RecentLogsRequest.builder()
-                            .applicationId(applicationId)
-                            .build());
-                    }
+                public Publisher<LogMessage> apply(final String applicationId, LogsRequest logsRequest) {
+                    return getLogs(DefaultApplications.this.loggingClient, applicationId, logsRequest.getRecent());
                 }
 
             }));
@@ -904,6 +887,34 @@ public final class DefaultApplications implements Applications {
             }
 
         });
+    }
+
+    private static Publisher<LogMessage> getLogs(final LoggingClient loggingClient, final String applicationId, Boolean recent) {
+        return Mono
+            .just(Optional.ofNullable(recent).orElse(false))
+            .where(new Predicate<Boolean>() {
+
+                @Override
+                public boolean test(Boolean recent) {
+                    return recent;
+                }
+
+            })
+            .flatMap(new Function<Boolean, Publisher<LogMessage>>() {
+
+                @Override
+                public Publisher<LogMessage> apply(Boolean recent) {
+                    return loggingClient
+                        .recent(RecentLogsRequest.builder()
+                            .applicationId(applicationId)
+                            .build());
+                }
+
+            })
+            .switchIfEmpty(loggingClient
+                .stream(StreamLogsRequest.builder()
+                    .applicationId(applicationId)
+                    .build()));
     }
 
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {

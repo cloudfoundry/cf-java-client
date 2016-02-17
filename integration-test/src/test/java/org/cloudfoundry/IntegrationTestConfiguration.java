@@ -18,6 +18,7 @@ package org.cloudfoundry;
 
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
 import org.cloudfoundry.client.spring.SpringLoggingClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
@@ -79,10 +80,12 @@ public class IntegrationTestConfiguration {
     @Bean
     @DependsOn({"organizationId", "spaceId"})
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
+                                                  LoggingClient loggingClient,
                                                   @Value("${test.organization}") String organization,
                                                   @Value("${test.space}") String space) {
         return new CloudFoundryOperationsBuilder()
             .cloudFoundryClient(cloudFoundryClient)
+            .loggingClient(loggingClient)
             .target(organization, space)
             .build();
     }
