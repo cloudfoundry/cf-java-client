@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.junit.Test;
 
@@ -30,6 +31,18 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .organization(organizationName)
                 .build())
             .subscribe(testSubscriber());
+    }
+
+    @Test
+    public void createInvalidDomain() {
+        this.cloudFoundryOperations.domains()
+            .create(CreateDomainRequest.builder()
+                .domain("invalid-domain")
+                .organization(this.organizationName)
+                .build())
+            .after()
+            .subscribe(testSubscriber()
+                .assertError(CloudFoundryException.class));
     }
 
 }

@@ -104,21 +104,15 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .assertEquals(true));
     }
 
-    @Ignore("TODO: fix this test in story https://www.pivotaltracker.com/story/show/113929343")
     @Test
-    public void createInvalidDomain() {
-        this.cloudFoundryOperations.domains()
-            .create(CreateDomainRequest.builder()
-                .domain(TEST_INVALID_DOMAIN_NAME)
-                .organization(this.organizationName)
-                .build())
-            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
+    public void createRouteWithNonExistentDomain() {
+        this.cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(TEST_INVALID_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
                     .space(this.spaceName)
-                    .build())))
+                    .build())
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
     }
