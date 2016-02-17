@@ -327,6 +327,28 @@ public final class DefaultApplicationsTest {
                     .build()));
     }
 
+    private static void requestApplicationsWithSsh(CloudFoundryClient cloudFoundryClient, String application, String spaceId, Boolean sshEnabled) {
+        when(cloudFoundryClient.spaces()
+            .listApplications(ListSpaceApplicationsRequest.builder()
+                .name(application)
+                .spaceId(spaceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListSpaceApplicationsResponse.builder())
+                    .resource(ApplicationResource.builder()
+                        .metadata(Resource.Metadata.builder()
+                            .id("test-application-id")
+                            .build())
+                        .entity(fill(ApplicationEntity.builder(), "application-")
+                            .environmentJson("test-var", "test-value")
+                            .enableSsh(sshEnabled)
+                            .build())
+                        .build())
+                    .totalPages(1)
+                    .build()));
+    }
+
     private static void requestDeleteApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .delete(org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder()
@@ -678,6 +700,30 @@ public final class DefaultApplicationsTest {
         public void setUp() throws Exception {
             requestApplications(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
             requestUpdateApplicationEnableSsh(this.cloudFoundryClient, "test-application-id", true);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.applications
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name("test-app-name")
+                    .build());
+        }
+
+    }
+
+    public static final class EnableSshAlreadyEnabled extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, true);
         }
 
         @Override
