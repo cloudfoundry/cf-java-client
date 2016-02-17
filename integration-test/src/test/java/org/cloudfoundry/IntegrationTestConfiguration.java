@@ -215,7 +215,11 @@ public class IntegrationTestConfiguration {
                             .build()))
                     .map(ResourceUtils::getId)
                     .toList())
-                .orElse(Mono.just(Collections.emptyList())));
+                .orElse(Mono.just(Collections.emptyList())))
+            .doOnSubscribe(s -> this.logger.debug(">> SYSTEM SPACES <<"))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< SYSTEM SPACES >>"))
+            .as(Promise::from);
 
         systemSpaceIds.get();
         return systemSpaceIds;
