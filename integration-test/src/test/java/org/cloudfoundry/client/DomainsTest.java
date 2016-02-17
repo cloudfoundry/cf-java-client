@@ -45,16 +45,16 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void create() {
         this.organizationId
-            .then(this::createDomainEntity)
-            .and(this.organizationId)
+            .then(organizationId -> createDomainEntity(this.cloudFoundryClient, organizationId)
+                .and(Mono.just(organizationId)))
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
+                .assertThat(consumer(DomainsTest::assertDomainNameAndOrganizationId)));
     }
 
     @Test
     public void delete() {
         this.organizationId
-            .then(this::createDomainId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId))
             .then(domainId -> this.cloudFoundryClient.domains()
                 .delete(DeleteDomainRequest.builder()
                     .async(true)
@@ -68,7 +68,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void get() {
         this.organizationId
-            .then(this::createDomainId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId))
             .then(domainId -> this.cloudFoundryClient.domains()
                 .get(GetDomainRequest.builder()
                     .domainId(domainId)
@@ -76,13 +76,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity))
             .and(this.organizationId)
             .subscribe(this.<Tuple2<DomainEntity, String>>testSubscriber()
-                .assertThat(consumer(this::assertDomainNameAndOrganizationId)));
+                .assertThat(consumer(DomainsTest::assertDomainNameAndOrganizationId)));
     }
 
     @Test
     public void list() {
         this.organizationId
-            .then(this::createDomain)
+            .then(organizationId -> createDomain(this.cloudFoundryClient, organizationId))
             .flatMap(response -> this.cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .build())
@@ -94,7 +94,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpaces() {
         this.organizationId
-            .then(this::createDomainId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId))
             .flatMap(domainId -> this.cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
@@ -109,7 +109,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByApplicationId() {
         this.organizationId
-            .then(this::createDomainId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId))
             .and(this.spaceId)
             .then(function((domainId, spaceId) -> Mono
                 .when(
@@ -152,7 +152,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByName() {
         this.organizationId
-            .then(this::createDomainId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId))
             .flatMap(domainId -> this.cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
@@ -168,8 +168,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listDomainSpacesFilterByOrganizationId() {
         this.organizationId
-            .then(this::createDomainId)
-            .and(this.organizationId)
+            .then(organizationId -> createDomainId(this.cloudFoundryClient, organizationId)
+                .and(Mono.just(organizationId)))
             .flatMap(function((domainId, organizationId) -> this.cloudFoundryClient.domains()
                 .listSpaces(ListDomainSpacesRequest.builder()
                     .domainId(domainId)
@@ -185,7 +185,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByName() {
         this.organizationId
-            .then(this::createDomain)
+            .then(organizationId -> createDomain(this.cloudFoundryClient, organizationId))
             .flatMap(response -> this.cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .name("test.domain.name")
@@ -198,8 +198,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByOwningOrganizationId() {
         this.organizationId
-            .then(organizationId -> createDomain(organizationId)
-                .then(response -> this.organizationId))
+            .then(organizationId -> createDomain(this.cloudFoundryClient, organizationId)
+                .map(response -> organizationId))
             .flatMap(organizationId -> this.cloudFoundryClient.domains()
                 .list(ListDomainsRequest.builder()
                     .owningOrganizationId(organizationId)
@@ -209,13 +209,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .assertCount(1));
     }
 
-    private void assertDomainNameAndOrganizationId(DomainEntity entity, String organizationId) {
+    private static void assertDomainNameAndOrganizationId(DomainEntity entity, String organizationId) {
         assertEquals("test.domain.name", entity.getName());
         assertEquals(organizationId, entity.getOwningOrganizationId());
     }
 
-    private Mono<CreateDomainResponse> createDomain(String organizationId) {
-        return this.cloudFoundryClient.domains()
+    private static Mono<CreateDomainResponse> createDomain(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return cloudFoundryClient.domains()
             .create(CreateDomainRequest.builder()
                 .name("test.domain.name")
                 .owningOrganizationId(organizationId)
@@ -223,13 +223,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private Mono<DomainEntity> createDomainEntity(String organizationId) {
-        return createDomain(organizationId)
+    private static Mono<DomainEntity> createDomainEntity(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return createDomain(cloudFoundryClient, organizationId)
             .map(ResourceUtils::getEntity);
     }
 
-    private Mono<String> createDomainId(String organizationId) {
-        return createDomain(organizationId)
+    private static Mono<String> createDomainId(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return createDomain(cloudFoundryClient, organizationId)
             .map(ResourceUtils::getId);
     }
 

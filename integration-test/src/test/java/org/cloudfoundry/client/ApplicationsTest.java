@@ -81,7 +81,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void associateRoute() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .then(response -> this.applicationId)
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -171,7 +171,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void download() throws IOException {
         this.applicationId
-            .then(this::uploadApplication)
+            .then(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .download(DownloadApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -195,7 +195,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void downloadDroplet() {
         this.applicationId
-            .then(this::uploadAndStartApplication)
+            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
@@ -339,7 +339,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutes() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .then(response -> this.applicationId)
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -352,7 +352,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByDomainId() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .and(this.applicationId)
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -366,7 +366,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByHost() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .and(this.applicationId)
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -380,7 +380,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByPath() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .and(this.applicationId)
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -394,7 +394,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRoutesFilterByPort() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .and(this.applicationId)
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .listRoutes(ListApplicationRoutesRequest.builder()
@@ -444,7 +444,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void removeRoute() {
-        createApplicationRoute()
+        createApplicationRoute(this.cloudFoundryClient, this.organizationId, this.spaceId, this.applicationId)
             .and(this.applicationId)
             .then(function((routeResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
                 .removeRoute(RemoveApplicationRouteRequest.builder()
@@ -464,13 +464,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void restage() {
         this.applicationId
-            .then(this::uploadAndStartApplication)
+            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .restage(RestageApplicationRequest.builder()
                     .applicationId(applicationId)
                     .build())
                 .map(ResourceUtils::getId))
-            .then(this::waitForStaging)
+            .then(applicationId -> waitForStaging(this.cloudFoundryClient, applicationId))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -478,7 +478,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void statistics() {
         this.applicationId
-            .then(this::uploadAndStartApplication)
+            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .statistics(ApplicationStatisticsRequest.builder()
                     .applicationId(applicationId)
@@ -504,7 +504,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void terminateInstance() {
         this.applicationId
-            .then(this::uploadAndStartApplication)
+            .then(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .terminateInstance(TerminateApplicationInstanceRequest.builder()
                     .applicationId(applicationId)
@@ -534,7 +534,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     public void upload() throws IOException {
         this.applicationId
-            .then(this::uploadApplication)
+            .then(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .download(DownloadApplicationRequest.builder()
                     .applicationId(applicationId)
@@ -552,66 +552,66 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         }
     }
 
-    private Mono<CreateRouteResponse> createApplicationRoute() {
-        return this.organizationId
-            .then(organizationId -> this.cloudFoundryClient.domains()
+    private static Mono<CreateRouteResponse> createApplicationRoute(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId, Mono<String> applicationId) {
+        return organizationId
+            .then(oId -> cloudFoundryClient.domains()
                 .create(CreateDomainRequest.builder()
                     .name("test.domain.name")
-                    .owningOrganizationId(organizationId)
+                    .owningOrganizationId(oId)
                     .wildcard(true)
                     .build())
                 .map(ResourceUtils::getId))
-            .and(this.spaceId)
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .and(spaceId)
+            .then(function((domainId, sId) -> cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .host("test-host")
                     .path("/test-path")
-                    .spaceId(spaceId)
+                    .spaceId(sId)
                     .build())
-                .and(this.applicationId)))
-            .then(function((createRouteResponse, applicationId) -> this.cloudFoundryClient.applicationsV2()
+                .and(applicationId)))
+            .then(function((createRouteResponse, appId) -> cloudFoundryClient.applicationsV2()
                 .associateRoute(AssociateApplicationRouteRequest.builder()
-                    .applicationId(applicationId)
+                    .applicationId(appId)
                     .routeId(createRouteResponse.getMetadata().getId())
                     .build())
                 .map(response -> createRouteResponse)));
     }
 
-    private Mono<String> startApplication(String applicationId) {
-        return this.cloudFoundryClient.applicationsV2()
+    private static Mono<String> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
                 .state("STARTED")
                 .build())
             .map(ResourceUtils::getId)
-            .then(this::waitForStaging)
-            .then(this::waitForStarting);
+            .then(id -> waitForStaging(cloudFoundryClient, id))
+            .then(id -> waitForStarting(cloudFoundryClient, id));
     }
 
-    private Mono<String> uploadAndStartApplication(String applicationId) {
-        return uploadApplication(applicationId)
-            .then(this::startApplication);
+    private static Mono<String> uploadAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return uploadApplication(cloudFoundryClient, applicationId)
+            .then(id -> startApplication(cloudFoundryClient, id));
     }
 
-    private Mono<String> uploadApplication(String applicationId) {
+    private static Mono<String> uploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
         try {
-            return this.cloudFoundryClient.applicationsV2()
+            return cloudFoundryClient.applicationsV2()
                 .upload(UploadApplicationRequest.builder()
                     .application(new ClassPathResource("testApplication.zip").getInputStream())
                     .async(true)
                     .applicationId(applicationId)
                     .build())
                 .map(ResourceUtils::getId)
-                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .then(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, jobId))
                 .as(afterComplete(() -> Mono.just(applicationId)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Mono<String> waitForStaging(String applicationId) {
-        return this.cloudFoundryClient.applicationsV2()
+    private static Mono<String> waitForStaging(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
             .get(GetApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build())
@@ -623,8 +623,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(state -> applicationId);
     }
 
-    private Mono<String> waitForStarting(String applicationId) {
-        return this.cloudFoundryClient.applicationsV2()
+    private static Mono<String> waitForStarting(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
                 .build())

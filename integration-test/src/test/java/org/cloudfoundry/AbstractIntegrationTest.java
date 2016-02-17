@@ -136,7 +136,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> TestSubscriber<T> testSubscriber() {
+    protected final <T> TestSubscriber<T> testSubscriber() {
         return (TestSubscriber<T>) this.testSubscriber;
     }
 
