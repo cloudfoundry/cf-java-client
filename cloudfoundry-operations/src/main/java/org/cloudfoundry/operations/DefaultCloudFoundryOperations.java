@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.applications.DefaultApplications;
 import org.cloudfoundry.operations.domains.DefaultDomains;
@@ -49,8 +50,8 @@ final class DefaultCloudFoundryOperations implements CloudFoundryOperations {
 
     private final DefaultStacks stacks;
 
-    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, Mono<String> spaceId) {
-        this.applications = new DefaultApplications(cloudFoundryClient, spaceId);
+    DefaultCloudFoundryOperations(CloudFoundryClient cloudFoundryClient, LoggingClient loggingClient, Mono<String> organizationId, Mono<String> spaceId) {
+        this.applications = new DefaultApplications(cloudFoundryClient, loggingClient, spaceId);
         this.domains = new DefaultDomains(cloudFoundryClient);
         this.organizations = new DefaultOrganizations(cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
         this.routes = new DefaultRoutes(cloudFoundryClient, organizationId, spaceId);

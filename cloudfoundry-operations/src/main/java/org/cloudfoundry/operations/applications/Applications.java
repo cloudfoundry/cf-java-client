@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
+import org.cloudfoundry.client.logging.LogMessage;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -80,6 +81,13 @@ public interface Applications {
      * @return the applications
      */
     Publisher<ApplicationSummary> list();
+
+    /**
+     * List the applications logs
+     *
+     * @return the applications logs
+     */
+    Publisher<LogMessage> logs(LogsRequest request);
 
     /**
      * Rename a specific application
