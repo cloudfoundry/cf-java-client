@@ -32,4 +32,12 @@ public interface ServiceUsageEvents {
      */
     Mono<GetServiceUsageEventsResponse> get(GetServiceUsageEventsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_usage_events/list_service_usage_events.html">List Service Usage Events</a> request
+     *
+     * @param request the List Service Usage Events request
+     * @return the response from the List Service Usage Events request
+     */
+    Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request);
+
 }
