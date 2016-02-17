@@ -29,6 +29,8 @@ public final class ResourceUtils {
     /**
      * Returns a function to extract the entity of a resource
      *
+     * @param <R> The resource type to extract the entity from
+     * @param <T> The entity type to be extracted
      * @return a function to extract the entity of a resource
      */
     public static <R extends Resource<T>, T> Function<R, T> extractEntity() {
