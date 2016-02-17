@@ -35,7 +35,7 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        getFirstEvent()
+        getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono
                 .when(
                     Mono.just(resource),
@@ -50,7 +50,7 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        listEvents()
+        listEvents(this.cloudFoundryClient)
             .count()
             .subscribe(this.<Long>testSubscriber()
                 .assertThat(count -> assertTrue(count > 0)));
@@ -58,7 +58,7 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByActee() {
-        getFirstEvent()
+        getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono
                 .when(
                     Mono.just(resource),
@@ -75,7 +75,7 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByTimestamp() {
-        getFirstEvent()
+        getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono
                 .when(
                     Mono.just(resource),
@@ -92,7 +92,7 @@ public final class EventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByType() {
-        getFirstEvent()
+        getFirstEvent(this.cloudFoundryClient)
             .then(resource -> Mono
                 .when(
                     Mono.just(resource),
@@ -107,14 +107,14 @@ public final class EventsTest extends AbstractIntegrationTest {
                 .assertThat(this::assertTupleEquality));
     }
 
-    private Mono<EventResource> getFirstEvent() {
-        return listEvents()
+    private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {
+        return listEvents(cloudFoundryClient)
             .next();
     }
 
-    private Stream<EventResource> listEvents() {
+    private static Stream<EventResource> listEvents(CloudFoundryClient cloudFoundryClient) {
         return Stream
-            .from(this.cloudFoundryClient.events()
+            .from(cloudFoundryClient.events()
                 .list(ListEventsRequest.builder()
                     .build()))
             .flatMap(ResourceUtils::getResources);

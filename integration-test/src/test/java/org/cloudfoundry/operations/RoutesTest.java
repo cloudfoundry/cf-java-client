@@ -38,7 +38,7 @@ import static org.cloudfoundry.utils.OperationUtils.afterStreamComplete;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 
-    public static final String TEST_APPLICATION_NAME = "application";
+    private static final String TEST_APPLICATION_NAME = "application";
 
     private static final String TEST_DOMAIN_NAME = "test.domain";
 
