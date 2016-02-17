@@ -46,12 +46,12 @@ import org.springframework.context.annotation.DependsOn;
 import reactor.core.publisher.Mono;
 import reactor.fn.Predicate;
 import reactor.rx.Promise;
-import reactor.rx.Stream;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.cloudfoundry.utils.OperationUtils.afterComplete;
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 
 @Configuration
@@ -131,11 +131,12 @@ public class IntegrationTestConfiguration {
 
                 return CloudFoundryCleaner.clean(cloudFoundryClient, applicationPredicate, domainsPredicate, organizationPredicate, routePredicate, spacePredicate);
             }))
-            .as(Stream::from)
-            .after(() -> cloudFoundryClient.organizations()
+            .as(Mono::from)
+            .as(afterComplete(() -> cloudFoundryClient.organizations()
                 .create(CreateOrganizationRequest.builder()
                     .name(organization)
-                    .build()))
+                    .build())))
+            .flux()
             .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION <<"))
             .doOnError(Throwable::printStackTrace)

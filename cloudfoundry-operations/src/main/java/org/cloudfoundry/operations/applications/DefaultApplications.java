@@ -85,6 +85,7 @@ import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cloudfoundry.utils.DateUtils.parseFromIso8601;
+import static org.cloudfoundry.utils.OperationUtils.afterComplete;
 import static org.cloudfoundry.utils.OperationUtils.not;
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.cloudfoundry.utils.tuple.TupleUtils.predicate;
@@ -129,14 +130,14 @@ public final class DefaultApplications implements Applications {
                 @Override
                 public Mono<String> apply(Optional<List<Route>> routes, final String applicationId) {
                     return deleteRoutes(DefaultApplications.this.cloudFoundryClient, routes)
-                        .after(new Supplier<Mono<String>>() {
+                        .as(afterComplete(new Supplier<Mono<String>>() {
 
                             @Override
                             public Mono<String> get() {
                                 return Mono.just(applicationId);
                             }
 
-                        });
+                        }));
                 }
 
             }))
@@ -1370,6 +1371,7 @@ public final class DefaultApplications implements Applications {
                 }
             })
             .map(new Function<ApplicationInstanceInfo, String>() {
+
                 @Override
                 public String apply(ApplicationInstanceInfo applicationInstanceInfo) {
                     return applicationInstanceInfo.getState();

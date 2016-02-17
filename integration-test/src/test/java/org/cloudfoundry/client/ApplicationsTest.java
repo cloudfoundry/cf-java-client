@@ -68,6 +68,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.cloudfoundry.utils.OperationUtils.afterComplete;
 import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.utils.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
@@ -602,10 +603,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())
                 .map(ResourceUtils::getId)
-                .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
-                .as(Stream::from)
-                .after(() -> Mono.just(applicationId))
-                .single();
+                .then(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobId))
+                .as(afterComplete(() -> Mono.just(applicationId)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

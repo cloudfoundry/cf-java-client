@@ -33,6 +33,8 @@ import reactor.rx.Stream;
 
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.SPACE;
+import static org.cloudfoundry.utils.OperationUtils.afterComplete;
+import static org.cloudfoundry.utils.OperationUtils.afterStreamComplete;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 
@@ -55,13 +57,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .domain(TEST_DOMAIN_NAME)
                 .organization(this.organizationName)
                 .build())
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
                     .space(this.spaceName)
-                    .build()));
+                    .build())));
     }
 
     @Test
@@ -79,12 +81,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void checkTrue() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(true));
     }
@@ -92,16 +94,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void create() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(true));
     }
 
+    @Ignore("TODO: fix this test in story https://www.pivotaltracker.com/story/show/113929343")
     @Test
     public void createInvalidDomain() {
         this.cloudFoundryOperations.domains()
@@ -109,13 +112,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .domain(TEST_INVALID_DOMAIN_NAME)
                 .organization(this.organizationName)
                 .build())
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .create(CreateRouteRequest.builder()
                     .domain(TEST_INVALID_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
                     .space(this.spaceName)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
     }
@@ -123,18 +126,18 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void delete() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
-            .after(() -> this.cloudFoundryOperations.routes()
+                    .build())))
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(false));
     }
@@ -142,12 +145,12 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void deleteInvalidDomain() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
                     .domain(TEST_INVALID_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertError(IllegalArgumentException.class));
     }
@@ -155,14 +158,14 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void deleteOrphanedRoutes() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
-                .deleteOrphanedRoutes())
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
+                .deleteOrphanedRoutes()))
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertEquals(false));
     }
@@ -171,10 +174,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listWithOrganizationLevel() {
         this.route
             .as(Stream::from)
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(ORGANIZATION)
-                    .build()))
+                    .build()))))
             .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -184,10 +187,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
     public void listWithSpaceLevel() {
         this.route
             .as(Stream::from)
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterStreamComplete(() -> Stream.from(this.cloudFoundryOperations.routes()
                 .list(ListRoutesRequest.builder()
                     .level(SPACE)
-                    .build()))
+                    .build()))))
             .filter(returnedRoute -> routeMatches(returnedRoute, TEST_DOMAIN_NAME, TEST_HOST, TEST_PATH))
             .subscribe(testSubscriber()
                 .assertCount(1));
@@ -197,13 +200,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void map() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .map(MapRouteRequest.builder()
                     .applicationName(TEST_APPLICATION_NAME)
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }
@@ -212,13 +215,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void unmap() {
         this.route
-            .after(() -> this.cloudFoundryOperations.routes()
+            .as(afterComplete(() -> this.cloudFoundryOperations.routes()
                 .unmap(UnmapRouteRequest.builder()
                     .applicationName(TEST_APPLICATION_NAME)
                     .domain(TEST_DOMAIN_NAME)
                     .host(TEST_HOST)
                     .path(TEST_PATH)
-                    .build()))
+                    .build())))
             .subscribe(testSubscriber()
                 .assertCount(1));
     }

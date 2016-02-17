@@ -20,6 +20,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
+import reactor.fn.Supplier;
 import reactor.rx.Promise;
 import reactor.rx.Stream;
 
@@ -29,6 +30,62 @@ import reactor.rx.Stream;
 public final class OperationUtils {
 
     private OperationUtils() {
+    }
+
+    /**
+     * Produces a Mono transformer that ignores the source element (if any) and continues with the supplied Mono on complete. On error, the supplier is not called, and the error is propagated.
+     *
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(()->someMono))} </p>
+     *
+     * @param supplier supplies a {@code Mono<OUT>} when called
+     * @param <IN>     the source element type.
+     * @param <OUT>    the element type of the resulting {@code Mono}.
+     * @return a Mono transformer
+     */
+    public static <IN, OUT> Function<Mono<? extends IN>, Mono<OUT>> afterComplete(final Supplier<Mono<OUT>> supplier) {
+        return new Function<Mono<? extends IN>, Mono<OUT>>() {
+
+            @Override
+            public Mono<OUT> apply(Mono<? extends IN> source) {
+                return source.flatMap(new Function<IN, Publisher<? extends OUT>>() {
+
+                    @Override
+                    public Publisher<? extends OUT> apply(IN x) {
+                        return Mono.empty();
+                    }
+
+                }, null, supplier).next();
+            }
+
+        };
+    }
+    
+    /**
+     * Produces a Stream transformer that ignores the source element (if any) and continues with the supplied Stream on complete. On error, the supplier is not called, and the error is propagated.
+     *
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(()->someStream))} </p>
+     *
+     * @param supplier supplies a {@code Stream<OUT>} when called
+     * @param <IN>     the source element type.
+     * @param <OUT>    the element type of the resulting {@code Stream}.
+     * @return a Stream transformer
+     */
+    public static <IN, OUT> Function<Stream<IN>, Stream<OUT>> afterStreamComplete(final Supplier<Stream<OUT>> supplier) {
+        return new Function<Stream<IN>, Stream<OUT>>() {
+
+            @Override
+            public Stream<OUT> apply(Stream<IN> source) {
+                return source.flatMap(new Function<IN, Publisher<? extends OUT>>() {
+
+                    @Override
+                    public Publisher<? extends OUT> apply(IN x) {
+                        return Stream.empty();
+                    }
+
+                }, null, supplier);
+            }
+
+        };
     }
 
     /**
@@ -51,6 +108,7 @@ public final class OperationUtils {
                 }
                 return true;
             }
+
         };
     }
 
@@ -126,6 +184,7 @@ public final class OperationUtils {
                 }
                 return false;
             }
+
         };
     }
 
@@ -142,6 +201,7 @@ public final class OperationUtils {
             public Promise<T> apply(Publisher<T> publisher) {
                 return Promise.from(publisher);
             }
+
         };
     }
 
@@ -182,5 +242,6 @@ public final class OperationUtils {
 
         };
     }
+
 
 }
