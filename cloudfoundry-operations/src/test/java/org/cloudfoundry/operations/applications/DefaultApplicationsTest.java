@@ -1263,8 +1263,9 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
-            testSubscriber.assertEquals(fill(LogMessage.builder(), "log-message-")
-                .build());
+            testSubscriber
+                .assertEquals(fill(LogMessage.builder(), "log-message-")
+                    .build());
         }
 
         @Override
@@ -1291,8 +1292,9 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected void assertions(TestSubscriber<LogMessage> testSubscriber) throws Exception {
-            testSubscriber.assertEquals(fill(LogMessage.builder(), "log-message-")
-                .build());
+            testSubscriber
+                .assertEquals(fill(LogMessage.builder(), "log-message-")
+                    .build());
         }
 
         @Override
@@ -1878,7 +1880,8 @@ public final class DefaultApplicationsTest {
 
         @Override
         protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
-            testSubscriber.assertEquals(true);
+            testSubscriber
+                .assertEquals(true);
         }
 
         @Override

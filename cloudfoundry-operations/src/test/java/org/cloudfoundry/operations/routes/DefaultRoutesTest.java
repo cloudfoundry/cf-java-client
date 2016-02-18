@@ -1414,7 +1414,8 @@ public final class DefaultRoutesTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber.assertError(IllegalArgumentException.class);
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
         }
 
         @Override

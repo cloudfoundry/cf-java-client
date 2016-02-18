@@ -329,7 +329,8 @@ public final class DefaultOrganizationsTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber.assertError(RequestValidationException.class);
+            testSubscriber
+                .assertError(RequestValidationException.class);
         }
 
         @Override
@@ -542,7 +543,8 @@ public final class DefaultOrganizationsTest {
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            testSubscriber.assertError(RequestValidationException.class);
+            testSubscriber
+                .assertError(RequestValidationException.class);
         }
 
         @Override
