@@ -16,24 +16,21 @@
 
 package org.cloudfoundry.client.v2.serviceusageevents;
 
-import lombok.Builder;
-import lombok.Data;
-import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
+import org.junit.Test;
 
-/**
- * The request payload for the Purge and Reseed Service Usage Events operation
- */
-@Data
-public class PurgeAndReseedServiceUsageEventsRequest implements Validatable {
+import static org.cloudfoundry.ValidationResult.Status.VALID;
+import static org.junit.Assert.assertEquals;
 
-    @Builder
-    PurgeAndReseedServiceUsageEventsRequest() {
-    }
+public final class PurgeAndReseedServiceUsageEventsRequestTest {
 
-    @Override
-    public ValidationResult isValid() {
-        return ValidationResult.builder().build();
+    @Test
+    public void isValid() {
+        ValidationResult result = PurgeAndReseedServiceUsageEventsRequest.builder()
+            .build()
+            .isValid();
+
+        assertEquals(VALID, result.getStatus());
     }
 
 }

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.spring.client.v2.serviceusageevents;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
@@ -25,6 +24,7 @@ import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRespo
 import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventsEntity;
+import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -111,25 +111,25 @@ public final class SpringServiceUsageEventsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(ServiceUsageEventResource.builder()
-                        .metadata(Resource.Metadata.builder()
-                            .createdAt("2015-07-27T22:43:30Z")
-                            .id("0c9c59b8-3462-4acf-be39-aa987f087146")
-                            .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")
-                            .build())
-                        .entity(ServiceUsageEventsEntity.builder()
-                            .state("CREATED")
-                            .organizationId("guid-4dd5a051-3460-4246-a842-1dc2d5983c51")
-                            .spaceId("guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53")
-                            .spaceName("name-2154")
-                            .serviceInstanceId("guid-15a7c119-838d-4516-acd9-062dec25d934")
-                            .serviceInstanceName("name-2155")
-                            .serviceInstanceType("type-2")
-                            .servicePlanId("guid-eddab64c-7be0-407e-91b0-82a8093cdfc5")
-                            .servicePlanName("name-2156")
-                            .serviceId("guid-d471c693-824c-44a6-b069-a679e323326d")
-                            .serviceLabel("label-77")
-                            .build())
-                        .build()
+                    .metadata(Resource.Metadata.builder()
+                        .createdAt("2015-07-27T22:43:30Z")
+                        .id("0c9c59b8-3462-4acf-be39-aa987f087146")
+                        .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")
+                        .build())
+                    .entity(ServiceUsageEventsEntity.builder()
+                        .state("CREATED")
+                        .organizationId("guid-4dd5a051-3460-4246-a842-1dc2d5983c51")
+                        .spaceId("guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53")
+                        .spaceName("name-2154")
+                        .serviceInstanceId("guid-15a7c119-838d-4516-acd9-062dec25d934")
+                        .serviceInstanceName("name-2155")
+                        .serviceInstanceType("type-2")
+                        .servicePlanId("guid-eddab64c-7be0-407e-91b0-82a8093cdfc5")
+                        .servicePlanName("name-2156")
+                        .serviceId("guid-d471c693-824c-44a6-b069-a679e323326d")
+                        .serviceLabel("label-77")
+                        .build())
+                    .build()
                 )
                 .build();
         }
