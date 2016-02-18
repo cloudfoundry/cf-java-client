@@ -45,15 +45,4 @@ public final class DeleteOrganizationRequestTest {
         assertEquals("name must be specified", result.getMessages().get(0));
     }
 
-    @Test
-    public void isValidWithNoConfirmation() {
-        ValidationResult result = DeleteOrganizationRequest.builder()
-            .name("test-organization-name")
-            .noConfirmation(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
-    }
-
 }
