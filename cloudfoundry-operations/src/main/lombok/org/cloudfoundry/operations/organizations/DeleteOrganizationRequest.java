@@ -35,18 +35,9 @@ public final class DeleteOrganizationRequest implements Validatable {
      */
     private final String name;
 
-    /**
-     * Whether to wait for confirmation
-     *
-     * @param noConfirmation whether to wait for confirmation
-     * @return whether to wait for confirmation
-     */
-    private final Boolean noConfirmation;
-
     @Builder
-    public DeleteOrganizationRequest(String name, Boolean noConfirmation) {
+    public DeleteOrganizationRequest(String name) {
         this.name = name;
-        this.noConfirmation = noConfirmation;
     }
 
     @Override

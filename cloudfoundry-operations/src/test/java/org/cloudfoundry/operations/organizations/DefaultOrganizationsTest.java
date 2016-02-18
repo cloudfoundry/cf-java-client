@@ -103,7 +103,7 @@ public final class DefaultOrganizationsTest {
                     .build()));
     }
 
-    private static void requestDeleteOrganizationAsync(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static void requestDeleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.organizations()
             .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
                 .organizationId(organizationId)
@@ -111,17 +111,7 @@ public final class DefaultOrganizationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(DeleteOrganizationResponse.builder())
-//                    .entity(fill(JobEntity.builder())
-//                        .build())
                     .build()));
-    }
-
-    private static void requestDeleteOrganizationSync(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
-                .organizationId(organizationId)
-                .build()))
-            .thenReturn(Mono.<DeleteOrganizationResponse>empty());
     }
 
     private static void requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
@@ -404,40 +394,14 @@ public final class DefaultOrganizationsTest {
 
     }
 
-    public static final class DeleteNoConfirmation extends AbstractOperationsApiTest<Void> {
+    public static final class Delete extends AbstractOperationsApiTest<Void> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
             requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-            requestDeleteOrganizationSync(this.cloudFoundryClient, "test-organization-id");
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // onComplete and no onNext
-        }
-
-        @Override
-        protected Publisher<Void> invoke() {
-            return this.organizations
-                .delete(DeleteOrganizationRequest.builder()
-                    .name("test-organization-name")
-                    .noConfirmation(true)
-                    .build());
-        }
-
-    }
-
-    public static final class DeleteWithConfirmation extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
-
-        @Before
-        public void setUp() throws Exception {
-            requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-            requestDeleteOrganizationAsync(this.cloudFoundryClient, "test-organization-id");
+            requestDeleteOrganization(this.cloudFoundryClient, "test-organization-id");
             requestJobSuccess(this.cloudFoundryClient, "test-id");
         }
 
@@ -451,20 +415,19 @@ public final class DefaultOrganizationsTest {
             return this.organizations
                 .delete(DeleteOrganizationRequest.builder()
                     .name("test-organization-name")
-                    .noConfirmation(false)
                     .build());
         }
 
     }
 
-    public static final class DeleteWithConfirmationFails extends AbstractOperationsApiTest<Void> {
+    public static final class DeleteFailure extends AbstractOperationsApiTest<Void> {
 
         private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
             requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-            requestDeleteOrganizationAsync(this.cloudFoundryClient, "test-organization-id");
+            requestDeleteOrganization(this.cloudFoundryClient, "test-organization-id");
             requestJobFailure(this.cloudFoundryClient, "test-id");
         }
 
@@ -479,7 +442,6 @@ public final class DefaultOrganizationsTest {
             return this.organizations
                 .delete(DeleteOrganizationRequest.builder()
                     .name("test-organization-name")
-                    .noConfirmation(false)
                     .build());
         }
 

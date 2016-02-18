@@ -46,6 +46,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.Optional;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -64,7 +65,6 @@ import reactor.rx.Stream;
 
 import java.util.List;
 
-import static org.cloudfoundry.util.JobUtils.waitForCompletion;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -128,20 +128,13 @@ public final class DefaultOrganizations implements Organizations {
                 }
 
             })
-            .then(function(new Function2<DeleteOrganizationRequest, String, Mono<String>>() {
+            .then(function(new Function2<DeleteOrganizationRequest, String, Mono<Void>>() {
 
                 @Override
-                public Mono<String> apply(DeleteOrganizationRequest request, String organizationId) {
-                    return deleteOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId, request.getNoConfirmation());
+                public Mono<Void> apply(DeleteOrganizationRequest request, String organizationId) {
+                    return deleteOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId);
                 }
-            }))
-            .then(new Function<String, Mono<Void>>() {
-
-                @Override
-                public Mono<Void> apply(String jobId) {
-                    return waitForCompletion(DefaultOrganizations.this.cloudFoundryClient, jobId);
-                }
-            });
+            }));
     }
 
     @Override
@@ -242,8 +235,17 @@ public final class DefaultOrganizations implements Organizations {
             .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
-    private static Mono<String> deleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, Boolean noConfirmation) {
-        return requestDeleteOrganization(cloudFoundryClient, organizationId, !Optional.ofNullable(noConfirmation).orElse(false) ? true : null);
+    private static Mono<Void> deleteOrganization(final CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestDeleteOrganization(cloudFoundryClient, organizationId)
+            .map(ResourceUtils.extractId())
+            .then(new Function<String, Mono<Void>>() {
+
+                @Override
+                public Mono<Void> apply(String jobId) {
+                    return JobUtils.waitForCompletion(cloudFoundryClient, jobId);
+                }
+
+            });
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {
@@ -374,13 +376,12 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<String> requestDeleteOrganization(final CloudFoundryClient cloudFoundryClient, final String organizationId, Boolean async) {
+    private static Mono<DeleteOrganizationResponse> requestDeleteOrganization(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return cloudFoundryClient.organizations()
             .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
                 .organizationId(organizationId)
-                .async(async)
-                .build())
-            .map(ResourceUtils.<DeleteOrganizationResponse, String>extractId());
+                .async(true)
+                .build());
     }
 
     private static Stream<DomainResource> requestDomains(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
