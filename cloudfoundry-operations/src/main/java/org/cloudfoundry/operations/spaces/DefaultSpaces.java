@@ -41,6 +41,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
@@ -147,6 +149,31 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             });
+    }
+
+    @Override
+    public Mono<Void> rename(RenameSpaceRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId)
+            .then(function(new Function2<RenameSpaceRequest, String, Mono<Tuple2<String, RenameSpaceRequest>>>() {
+
+                @Override
+                public Mono<Tuple2<String, RenameSpaceRequest>> apply(RenameSpaceRequest request, String organizationId) {
+                    return getOrganizationSpaceId(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName())
+                        .and(Mono.just(request));
+                }
+
+            }))
+            .then(function(new Function2<String, RenameSpaceRequest, Mono<UpdateSpaceResponse>>() {
+
+                @Override
+                public Mono<UpdateSpaceResponse> apply(String spaceId, RenameSpaceRequest request) {
+                    return requestUpdateSpace(DefaultSpaces.this.cloudFoundryClient, spaceId, request.getNewName());
+                }
+
+            }))
+            .after();
+
     }
 
     private static Mono<Void> deleteSpace(final CloudFoundryClient cloudFoundryClient, String spaceId) {
@@ -392,6 +419,14 @@ public final class DefaultSpaces implements Spaces {
                 }
 
             });
+    }
+
+    private static Mono<UpdateSpaceResponse> requestUpdateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String newName) {
+        return cloudFoundryClient.spaces()
+            .update(UpdateSpaceRequest.builder()
+                .name(newName)
+                .spaceId(spaceId)
+                .build());
     }
 
     private static SpaceDetail toSpaceDetail(List<String> applications, List<String> domains, String organization, SpaceResource resource, List<String> securityGroups, List<String> services,
