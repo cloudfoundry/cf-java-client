@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.organizations;
+package org.cloudfoundry.operations.spaces;
 
 import lombok.Builder;
 import lombok.Data;
@@ -22,31 +22,16 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request options for the Delete Organization Operation
+ * The request options for the allow space ssh operation
  */
 @Data
-public final class DeleteOrganizationRequest implements Validatable {
+public final class AllowSpaceSshRequest implements Validatable {
 
-    /**
-     * The name of the organization
-     *
-     * @param name the name
-     * @return the name
-     */
     private final String name;
 
-    /**
-     * Whether to wait for confirmation
-     *
-     * @param noConfirmation whether to wait for confirmation
-     * @return whether to wait for confirmation
-     */
-    private final Boolean noConfirmation;
-
     @Builder
-    public DeleteOrganizationRequest(String name, Boolean noConfirmation) {
+    AllowSpaceSshRequest(String name) {
         this.name = name;
-        this.noConfirmation = noConfirmation;
     }
 
     @Override

@@ -120,21 +120,21 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<Void> delete(DeleteOrganizationRequest request) {
         return ValidationUtils
             .validate(request)
-            .then(new Function<DeleteOrganizationRequest, Mono<String>>() {
+            .then(new Function<DeleteOrganizationRequest, Mono<Tuple2<DeleteOrganizationRequest, String>>>() {
 
                 @Override
-                public Mono<String> apply(DeleteOrganizationRequest request) {
-                    return getOrganizationId(DefaultOrganizations.this.cloudFoundryClient, request.getName());
+                public Mono<Tuple2<DeleteOrganizationRequest, String>> apply(DeleteOrganizationRequest request) {
+                    return Mono.when(Mono.just(request), getOrganizationId(DefaultOrganizations.this.cloudFoundryClient, request.getName()));
                 }
 
             })
-            .then(new Function<String, Mono<String>>() {
+            .then(function(new Function2<DeleteOrganizationRequest, String, Mono<String>>() {
 
                 @Override
-                public Mono<String> apply(String organizationId) {
-                    return deleteOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId);
+                public Mono<String> apply(DeleteOrganizationRequest request, String organizationId) {
+                    return deleteOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId, request.getNoConfirmation());
                 }
-            })
+            }))
             .then(new Function<String, Mono<Void>>() {
 
                 @Override
@@ -242,8 +242,8 @@ public final class DefaultOrganizations implements Organizations {
             .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
-    private static Mono<String> deleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return requestDeleteOrganization(cloudFoundryClient, organizationId);
+    private static Mono<String> deleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, Boolean noConfirmation) {
+        return requestDeleteOrganization(cloudFoundryClient, organizationId, !Optional.ofNullable(noConfirmation).orElse(false) ? true : null);
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {
@@ -374,11 +374,11 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Mono<String> requestDeleteOrganization(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+    private static Mono<String> requestDeleteOrganization(final CloudFoundryClient cloudFoundryClient, final String organizationId, Boolean async) {
         return cloudFoundryClient.organizations()
             .delete(org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest.builder()
                 .organizationId(organizationId)
-                .async(true)
+                .async(async)
                 .build())
             .map(ResourceUtils.<DeleteOrganizationResponse, String>extractId());
     }

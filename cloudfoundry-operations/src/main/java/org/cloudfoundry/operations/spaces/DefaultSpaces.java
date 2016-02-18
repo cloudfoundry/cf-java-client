@@ -57,6 +57,7 @@ import org.cloudfoundry.util.tuple.Function6;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
+import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple6;
 import reactor.rx.Stream;
@@ -74,6 +75,29 @@ public final class DefaultSpaces implements Spaces {
     public DefaultSpaces(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.organizationId = organizationId;
+    }
+
+    @Override
+    public Mono<Void> allowSsh(AllowSpaceSshRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId)
+            .then(function(new Function2<AllowSpaceSshRequest, String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(AllowSpaceSshRequest request, String organizationId) {
+                    return getOrganizationSpaceIdWhere(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName(), sshEnabled(false));
+                }
+
+            }))
+            .then(new Function<String, Mono<UpdateSpaceResponse>>() {
+
+                @Override
+                public Mono<UpdateSpaceResponse> apply(String spaceId) {
+                    return requestUpdateSpaceSsh(DefaultSpaces.this.cloudFoundryClient, spaceId, true);
+                }
+
+            })
+            .after();
     }
 
     @Override
@@ -297,6 +321,12 @@ public final class DefaultSpaces implements Spaces {
             .map(ResourceUtils.extractId());
     }
 
+    private static Mono<String> getOrganizationSpaceIdWhere(CloudFoundryClient cloudFoundryClient, String organizationId, String space, Predicate<SpaceResource> predicate) {
+        return getOrganizationSpace(cloudFoundryClient, organizationId, space)
+            .where(predicate)
+            .map(ResourceUtils.extractId());
+    }
+
     private static Mono<List<String>> getSecurityGroupNames(final CloudFoundryClient cloudFoundryClient, final SpaceResource resource) {
         return requestSpaceSecurityGroups(cloudFoundryClient, ResourceUtils.getId(resource))
             .map(new Function<SecurityGroupResource, String>() {
@@ -449,6 +479,25 @@ public final class DefaultSpaces implements Spaces {
                 .name(newName)
                 .spaceId(spaceId)
                 .build());
+    }
+
+    private static Mono<UpdateSpaceResponse> requestUpdateSpaceSsh(CloudFoundryClient cloudFoundryClient, String spaceId, Boolean allowed) {
+        return cloudFoundryClient.spaces()
+            .update(UpdateSpaceRequest.builder()
+                .allowSsh(allowed)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Predicate<SpaceResource> sshEnabled(final Boolean enabled) {
+        return new Predicate<SpaceResource>() {
+
+            @Override
+            public boolean test(SpaceResource resource) {
+                return enabled.equals(ResourceUtils.getEntity(resource).getAllowSsh());
+            }
+
+        };
     }
 
     private static SpaceDetail toSpaceDetail(List<String> applications, List<String> domains, String organization, SpaceResource resource, List<String> securityGroups, List<String> services,
