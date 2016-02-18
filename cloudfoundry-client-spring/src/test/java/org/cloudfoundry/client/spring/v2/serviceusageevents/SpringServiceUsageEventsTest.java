@@ -22,11 +22,14 @@ import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsReques
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
+import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventsEntity;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringServiceUsageEventsTest {
@@ -108,25 +111,25 @@ public final class SpringServiceUsageEventsTest {
                 .totalPages(1)
                 .totalResults(1)
                 .resource(ServiceUsageEventResource.builder()
-                    .metadata(Resource.Metadata.builder()
-                        .createdAt("2015-07-27T22:43:30Z")
-                        .id("0c9c59b8-3462-4acf-be39-aa987f087146")
-                        .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")
-                        .build())
-                    .entity(ServiceUsageEventsEntity.builder()
-                        .state("CREATED")
-                        .organizationId("guid-4dd5a051-3460-4246-a842-1dc2d5983c51")
-                        .spaceId("guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53")
-                        .spaceName("name-2154")
-                        .serviceInstanceId("guid-15a7c119-838d-4516-acd9-062dec25d934")
-                        .serviceInstanceName("name-2155")
-                        .serviceInstanceType("type-2")
-                        .servicePlanId("guid-eddab64c-7be0-407e-91b0-82a8093cdfc5")
-                        .servicePlanName("name-2156")
-                        .serviceId("guid-d471c693-824c-44a6-b069-a679e323326d")
-                        .serviceLabel("label-77")
-                        .build())
-                    .build()
+                        .metadata(Resource.Metadata.builder()
+                            .createdAt("2015-07-27T22:43:30Z")
+                            .id("0c9c59b8-3462-4acf-be39-aa987f087146")
+                            .url("/v2/service_usage_events/0c9c59b8-3462-4acf-be39-aa987f087146")
+                            .build())
+                        .entity(ServiceUsageEventsEntity.builder()
+                            .state("CREATED")
+                            .organizationId("guid-4dd5a051-3460-4246-a842-1dc2d5983c51")
+                            .spaceId("guid-76bd662b-fd5b-4b5c-a393-d65e67f99d53")
+                            .spaceName("name-2154")
+                            .serviceInstanceId("guid-15a7c119-838d-4516-acd9-062dec25d934")
+                            .serviceInstanceName("name-2155")
+                            .serviceInstanceType("type-2")
+                            .servicePlanId("guid-eddab64c-7be0-407e-91b0-82a8093cdfc5")
+                            .servicePlanName("name-2156")
+                            .serviceId("guid-d471c693-824c-44a6-b069-a679e323326d")
+                            .serviceLabel("label-77")
+                            .build())
+                        .build()
                 )
                 .build();
         }
@@ -142,6 +145,38 @@ public final class SpringServiceUsageEventsTest {
         @Override
         protected Mono<ListServiceUsageEventsResponse> invoke(ListServiceUsageEventsRequest request) {
             return this.serviceUsageEvents.list(request);
+        }
+    }
+
+    public static final class PurgeAndReseed extends AbstractApiTest<PurgeAndReseedServiceUsageEventsRequest, Void> {
+
+        private final SpringServiceUsageEvents serviceUsageEvents = new SpringServiceUsageEvents(this.restTemplate, this.root, PROCESSOR_GROUP);
+
+        @Override
+        protected PurgeAndReseedServiceUsageEventsRequest getInvalidRequest() {
+            return null;
+        }
+
+        @Override
+        protected RequestContext getRequestContext() {
+            return new RequestContext()
+                .method(POST).path("/v2/service_usage_events/destructively_purge_all_and_reseed_existing_instances")
+                .status(NO_CONTENT);
+        }
+
+        @Override
+        protected Void getResponse() {
+            return null;
+        }
+
+        @Override
+        protected PurgeAndReseedServiceUsageEventsRequest getValidRequest() throws Exception {
+            return PurgeAndReseedServiceUsageEventsRequest.builder().build();
+        }
+
+        @Override
+        protected Mono<Void> invoke(PurgeAndReseedServiceUsageEventsRequest request) {
+            return this.serviceUsageEvents.purgeAndReseed(request);
         }
     }
 

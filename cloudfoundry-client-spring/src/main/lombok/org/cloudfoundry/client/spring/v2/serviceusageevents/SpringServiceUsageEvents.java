@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsReques
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
+import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEvents;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -71,6 +72,18 @@ public final class SpringServiceUsageEvents extends AbstractSpringOperations imp
                 builder.pathSegment("v2", "service_usage_events");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<Void> purgeAndReseed(final PurgeAndReseedServiceUsageEventsRequest request) {
+        return post(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances");
             }
 
         });
