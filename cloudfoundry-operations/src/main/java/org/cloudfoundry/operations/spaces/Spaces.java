@@ -47,4 +47,12 @@ public interface Spaces {
      */
     Publisher<SpaceSummary> list();
 
+    /**
+     * Renames a specific space
+     *
+     * @param request the rename space request
+     * @return completion indicator
+     */
+    Mono<Void> rename(RenameSpaceRequest request);
+
 }

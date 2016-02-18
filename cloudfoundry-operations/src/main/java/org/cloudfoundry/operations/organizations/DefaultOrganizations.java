@@ -194,21 +194,21 @@ public final class DefaultOrganizations implements Organizations {
             .then(new Function<RenameOrganizationRequest, Mono<Tuple2<String, RenameOrganizationRequest>>>() {
 
                 @Override
-                public Mono<Tuple2<String, RenameOrganizationRequest>> apply(RenameOrganizationRequest renameOrganizationRequest) {
+                public Mono<Tuple2<String, RenameOrganizationRequest>> apply(RenameOrganizationRequest request) {
                     return getOrganizationId(DefaultOrganizations.this.cloudFoundryClient, request.getName())
                         .and(Mono.just(request));
                 }
 
             })
-            .then(function(new Function2<String, RenameOrganizationRequest, Mono<Void>>() {
+            .then(function(new Function2<String, RenameOrganizationRequest, Mono<UpdateOrganizationResponse>>() {
 
                 @Override
-                public Mono<Void> apply(String organizationId, RenameOrganizationRequest request) {
-                    return requestUpdateOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId, request.getNewName())
-                        .after();
+                public Mono<UpdateOrganizationResponse> apply(String organizationId, RenameOrganizationRequest request) {
+                    return requestUpdateOrganization(DefaultOrganizations.this.cloudFoundryClient, organizationId, request.getNewName());
                 }
 
-            }));
+            }))
+            .after();
     }
 
     private static Mono<String> createOrganization(final CloudFoundryClient cloudFoundryClient, final CreateOrganizationRequest request) {

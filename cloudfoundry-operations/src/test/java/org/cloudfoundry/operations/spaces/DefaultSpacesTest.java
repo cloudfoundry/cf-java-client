@@ -43,6 +43,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
 import org.cloudfoundry.util.Optional;
@@ -240,6 +242,16 @@ public final class DefaultSpacesTest {
                     .resource(fill(SpaceResource.builder(), "space-")
                         .build())
                     .build()));
+    }
+
+    private static void requestUpdateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String newName) {
+        when(cloudFoundryClient.spaces()
+            .update(UpdateSpaceRequest.builder()
+                .name(newName)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .<UpdateSpaceResponse>empty());
     }
 
     public static final class Delete extends AbstractOperationsApiTest<Void> {
@@ -503,4 +515,47 @@ public final class DefaultSpacesTest {
 
     }
 
+    public static final class Rename extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+            requestUpdateSpace(this.cloudFoundryClient, "test-space-id", "test-new-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.spaces
+                .rename(RenameSpaceRequest.builder()
+                    .name("test-space-name")
+                    .newName("test-new-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber.assertError(RequestValidationException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.spaces
+                .rename(RenameSpaceRequest.builder()
+                    .build());
+        }
+
+    }
 }
