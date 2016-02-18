@@ -559,7 +559,7 @@ public final class DefaultSpacesTest {
 
     }
 
-    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
+    public static final class SshAllowed extends AbstractOperationsApiTest<Boolean> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
@@ -576,14 +576,14 @@ public final class DefaultSpacesTest {
         @Override
         protected Mono<Boolean> invoke() {
             return this.spaces
-                .sshEnabled(SpaceSshEnabledRequest.builder()
+                .sshAllowed(SpaceSshAllowedRequest.builder()
                     .name("test-space-name")
                     .build());
         }
 
     }
 
-    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Boolean> {
+    public static final class SshAllowedNoSpace extends AbstractOperationsApiTest<Boolean> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
@@ -601,7 +601,7 @@ public final class DefaultSpacesTest {
         @Override
         protected Mono<Boolean> invoke() {
             return this.spaces
-                .sshEnabled(SpaceSshEnabledRequest.builder()
+                .sshAllowed(SpaceSshAllowedRequest.builder()
                     .name("test-space-name")
                     .build());
         }

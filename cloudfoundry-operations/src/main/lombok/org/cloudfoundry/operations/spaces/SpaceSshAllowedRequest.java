@@ -25,12 +25,12 @@ import org.cloudfoundry.ValidationResult;
  * The request options for the check space ssh enabled operation
  */
 @Data
-public final class SpaceSshEnabledRequest implements Validatable {
+public final class SpaceSshAllowedRequest implements Validatable {
 
     private final String name;
 
     @Builder
-    SpaceSshEnabledRequest(String name) {
+    SpaceSshAllowedRequest(String name) {
         this.name = name;
     }
 
