@@ -43,6 +43,8 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
     public void buildWithClient() {
         this.builder
             .cloudFoundryClient(this.cloudFoundryClient)
+            .loggingClient(this.loggingClient)
+            .uaaClient(this.uaaClient)
             .build();
     }
 
@@ -127,6 +129,8 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
         this.builder
             .cloudFoundryClient(this.cloudFoundryClient)
+            .loggingClient(this.loggingClient)
+            .uaaClient(this.uaaClient)
             .target("test-organization")
             .build();
     }
@@ -174,6 +178,9 @@ public final class CloudFoundryOperationsBuilderTest extends AbstractOperationsT
 
         this.builder
             .cloudFoundryClient(this.cloudFoundryClient)
+            .cloudFoundryClient(this.cloudFoundryClient)
+            .loggingClient(this.loggingClient)
+            .uaaClient(this.uaaClient)
             .target("test-organization", "test-space")
             .build();
     }
