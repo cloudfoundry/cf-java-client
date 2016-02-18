@@ -29,8 +29,8 @@
         <version>2.0.0.BUILD-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cloudfoundry-client-utils</artifactId>
-    <name>Cloud Foundry Java Client Utilities</name>
+    <artifactId>cloudfoundry-util</artifactId>
+    <name>Cloud Foundry Java Utilities</name>
     <packaging>jar</packaging>
 
     <dependencies>
