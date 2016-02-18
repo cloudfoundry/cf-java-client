@@ -176,6 +176,28 @@ public final class DefaultSpaces implements Spaces {
 
     }
 
+    @Override
+    public Mono<Boolean> sshEnabled(SpaceSshEnabledRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId)
+            .then(function(new Function2<SpaceSshEnabledRequest, String, Mono<SpaceResource>>() {
+
+                @Override
+                public Mono<SpaceResource> apply(SpaceSshEnabledRequest request, String organizationId) {
+                    return getOrganizationSpace(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName());
+                }
+
+            }))
+            .map(new Function<SpaceResource, Boolean>() {
+
+                @Override
+                public Boolean apply(SpaceResource resource) {
+                    return ResourceUtils.getEntity(resource).getAllowSsh();
+                }
+
+            });
+    }
+
     private static Mono<Void> deleteSpace(final CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestDeleteSpace(cloudFoundryClient, spaceId)
             .map(ResourceUtils.extractId())

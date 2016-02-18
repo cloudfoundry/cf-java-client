@@ -55,4 +55,12 @@ public interface Spaces {
      */
     Mono<Void> rename(RenameSpaceRequest request);
 
+    /**
+     * Check if SSH is enabled for a specific space
+     *
+     * @param request the check space ssh enabled request
+     * @return Boolean is ssh enabled on the space
+     */
+    Mono<Boolean> sshEnabled(SpaceSshEnabledRequest request);
+
 }

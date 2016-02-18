@@ -558,4 +558,54 @@ public final class DefaultSpacesTest {
         }
 
     }
+
+    public static final class SshEnabled extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber.assertEquals(true);
+        }
+
+        @Override
+        protected Mono<Boolean> invoke() {
+            return this.spaces
+                .sshEnabled(SpaceSshEnabledRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Boolean> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Boolean> invoke() {
+            return this.spaces
+                .sshEnabled(SpaceSshEnabledRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
 }

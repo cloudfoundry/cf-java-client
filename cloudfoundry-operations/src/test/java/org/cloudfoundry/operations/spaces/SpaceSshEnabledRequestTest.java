@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.operations.spaces;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,11 +23,11 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class ApplicationSshEnabledTest {
+public final class SpaceSshEnabledRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = ApplicationSshEnabledRequest.builder()
+        ValidationResult result = SpaceSshEnabledRequest.builder()
             .name("test-name")
             .build()
             .isValid();
@@ -37,7 +37,7 @@ public final class ApplicationSshEnabledTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = ApplicationSshEnabledRequest.builder()
+        ValidationResult result = SpaceSshEnabledRequest.builder()
             .build()
             .isValid();
 
