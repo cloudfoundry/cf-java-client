@@ -22,22 +22,31 @@ import org.cloudfoundry.Validatable;
 import org.cloudfoundry.ValidationResult;
 
 /**
- * The request options for the Organization Information Operation
+ * The request options for the Delete Organization Operation
  */
 @Data
-public final class OrganizationInfoRequest implements Validatable {
+public final class DeleteOrganizationRequest implements Validatable {
 
     /**
-     * The name of the organization to get information about
+     * The name of the organization
      *
      * @param name the name
      * @return the name
      */
     private final String name;
 
+    /**
+     * Whether to wait for confirmation
+     *
+     * @param noConfirmation whether to wait for confirmation
+     * @return whether to wait for confirmation
+     */
+    private final Boolean noConfirmation;
+
     @Builder
-    public OrganizationInfoRequest(String name) {
+    public DeleteOrganizationRequest(String name, Boolean noConfirmation) {
         this.name = name;
+        this.noConfirmation = noConfirmation;
     }
 
     @Override
