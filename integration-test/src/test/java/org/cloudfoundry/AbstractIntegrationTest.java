@@ -22,7 +22,9 @@ import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.After;
@@ -70,6 +72,9 @@ public abstract class AbstractIntegrationTest {
     protected Predicate<DomainResource> domainsPredicate;
 
     @Autowired
+    protected LoggingClient loggingClient;
+
+    @Autowired
     protected Mono<String> organizationId;
 
     @Value("${test.organization}")
@@ -89,6 +94,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected Mono<List<String>> systemSpaceIds;
+
+    @Autowired
+    protected UaaClient uaaClient;
 
     @Autowired
     protected Mono<String> userId;
