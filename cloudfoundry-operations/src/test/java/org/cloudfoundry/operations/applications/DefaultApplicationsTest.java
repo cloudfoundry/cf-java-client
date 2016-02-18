@@ -17,10 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.logging.LoggingClient;
-import org.cloudfoundry.logging.LogMessage;
-import org.cloudfoundry.logging.RecentLogsRequest;
-import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.Resource;
@@ -57,6 +53,10 @@ import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
+import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.logging.RecentLogsRequest;
+import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.StringMap;
@@ -1891,7 +1891,7 @@ public final class DefaultApplicationsTest {
 
     }
 
-    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Void> {
+    public static final class SshEnabledNoApp extends AbstractOperationsApiTest<Boolean> {
 
         private final DefaultApplications applications = new DefaultApplications(this.cloudFoundryClient, this.loggingClient, Mono.just(TEST_SPACE_ID));
 
@@ -1901,15 +1901,15 @@ public final class DefaultApplicationsTest {
         }
 
         @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+        protected void assertions(TestSubscriber<Boolean> testSubscriber) throws Exception {
             testSubscriber
                 .assertError(IllegalArgumentException.class);
         }
 
         @Override
-        protected Mono<Void> invoke() {
+        protected Mono<Boolean> invoke() {
             return this.applications
-                .enableSsh(EnableApplicationSshRequest.builder()
+                .sshEnabled(ApplicationSshEnabledRequest.builder()
                     .name("test-app-name")
                     .build());
         }
