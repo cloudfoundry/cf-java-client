@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.organizations;
+package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
@@ -23,12 +23,12 @@ import static org.cloudfoundry.ValidationResult.Status.INVALID;
 import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
-public final class DeleteOrganizationRequestTest {
+public final class EnableApplicationSshRequestTest {
 
     @Test
     public void isValid() {
-        ValidationResult result = DeleteOrganizationRequest.builder()
-            .name("test-organization-name")
+        ValidationResult result = EnableApplicationSshRequest.builder()
+            .name("test-name")
             .build()
             .isValid();
 
@@ -37,23 +37,12 @@ public final class DeleteOrganizationRequestTest {
 
     @Test
     public void isValidNoName() {
-        ValidationResult result = DeleteOrganizationRequest.builder()
+        ValidationResult result = EnableApplicationSshRequest.builder()
             .build()
             .isValid();
 
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
-    }
-
-    @Test
-    public void isValidWithNoConfirmation() {
-        ValidationResult result = DeleteOrganizationRequest.builder()
-            .name("test-organization-name")
-            .noConfirmation(true)
-            .build()
-            .isValid();
-
-        assertEquals(VALID, result.getStatus());
     }
 
 }

@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
@@ -172,6 +173,22 @@ public final class DefaultSpacesTest {
                     .build()));
     }
 
+    private static void requestOrganizationSpacesWithSsh(CloudFoundryClient cloudFoundryClient, String organizationId, String space, Boolean allowSsh) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(fillPage(ListOrganizationSpacesRequest.builder())
+                .name(space)
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListOrganizationSpacesResponse.builder())
+                    .resource(fill(SpaceResource.builder(), "space-")
+                        .entity(fill(SpaceEntity.builder(), "space-entity-")
+                            .allowSsh(allowSsh)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(fillPage(ListSpaceApplicationsRequest.builder(), "application-")
@@ -252,6 +269,93 @@ public final class DefaultSpacesTest {
                 .build()))
             .thenReturn(Mono
                 .<UpdateSpaceResponse>empty());
+    }
+
+    private static void requestUpdateSpaceSsh(CloudFoundryClient cloudFoundryClient, String spaceId, Boolean allowed) {
+        when(cloudFoundryClient.spaces()
+            .update(UpdateSpaceRequest.builder()
+                .allowSsh(allowed)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateSpaceResponse.builder())
+                    .entity(fill(SpaceEntity.builder(), "space-entity-")
+                        .build())
+                    .build()));
+    }
+
+    public static final class AllowSsh extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+            requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", true);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .allowSsh(AllowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class AllowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", true);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .allowSsh(AllowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class AllowSshNoSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .allowSsh(AllowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
     }
 
     public static final class Delete extends AbstractOperationsApiTest<Void> {

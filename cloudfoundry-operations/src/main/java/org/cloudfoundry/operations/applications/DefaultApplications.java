@@ -180,10 +180,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
         return Mono
-            .when(
-                ValidationUtils.validate(request),
-                this.spaceId
-            )
+            .when(ValidationUtils.validate(request), this.spaceId)
             .then(function(new Function2<EnableApplicationSshRequest, String, Mono<String>>() {
 
                 @Override

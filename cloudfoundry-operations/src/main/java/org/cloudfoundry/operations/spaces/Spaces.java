@@ -25,6 +25,14 @@ import reactor.core.publisher.Mono;
 public interface Spaces {
 
     /**
+     * Allow SSH for a specific space
+     *
+     * @param request the enable space ssh request
+     * @return a completion indicator
+     */
+    Mono<Void> allowSsh(AllowSpaceSshRequest request);
+
+    /**
      * Deletes a specific space.
      *
      * @param request the delete space request
