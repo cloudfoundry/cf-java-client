@@ -476,6 +476,80 @@ public final class DefaultSpacesTest {
 
     }
 
+    public static final class DisallowSsh extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+            requestUpdateSpaceSsh(this.cloudFoundryClient, "test-space-id", false);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .disallowSsh(DisallowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DisallowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesWithSsh(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", false);
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .disallowSsh(DisallowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
+    public static final class DisallowSshNoSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.spaces
+                .disallowSsh(DisallowSpaceSshRequest.builder()
+                    .name("test-space-name")
+                    .build());
+        }
+
+    }
+
     public static final class Get extends AbstractOperationsApiTest<SpaceDetail> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
