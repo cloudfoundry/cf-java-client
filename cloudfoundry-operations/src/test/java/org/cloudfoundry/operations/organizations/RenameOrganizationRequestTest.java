@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
-import static org.cloudfoundry.utils.test.TestObjects.fill;
+import static org.cloudfoundry.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
+import static org.cloudfoundry.util.test.TestObjects.fill;
 import static org.junit.Assert.assertEquals;
 
 public final class RenameOrganizationRequestTest {

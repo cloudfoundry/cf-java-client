@@ -18,9 +18,6 @@ package org.cloudfoundry;
 
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggingClient;
-import org.cloudfoundry.client.spring.SpringCloudFoundryClient;
-import org.cloudfoundry.client.spring.SpringLoggingClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -32,11 +29,16 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.logging.LoggingClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.test.FailingDeserializationProblemHandler;
+import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
+import org.cloudfoundry.spring.logging.SpringLoggingClient;
+import org.cloudfoundry.spring.uaa.SpringUaaClient;
+import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.test.FailingDeserializationProblemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,8 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.cloudfoundry.utils.OperationUtils.afterComplete;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.OperationUtils.afterComplete;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @Configuration
 @EnableAutoConfiguration
@@ -81,11 +83,13 @@ public class IntegrationTestConfiguration {
     @DependsOn({"organizationId", "spaceId"})
     CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
                                                   LoggingClient loggingClient,
+                                                  UaaClient uaaClient,
                                                   @Value("${test.organization}") String organization,
                                                   @Value("${test.space}") String space) {
         return new CloudFoundryOperationsBuilder()
             .cloudFoundryClient(cloudFoundryClient)
             .loggingClient(loggingClient)
+            .uaaClient(uaaClient)
             .target(organization, space)
             .build();
     }
@@ -227,6 +231,13 @@ public class IntegrationTestConfiguration {
 
         systemSpaceIds.get();
         return systemSpaceIds;
+    }
+
+    @Bean
+    SpringUaaClient uaaClient(SpringCloudFoundryClient cloudFoundryClient) {
+        return SpringUaaClient.builder()
+            .cloudFoundryClient(cloudFoundryClient)
+            .build();
     }
 
     @Bean

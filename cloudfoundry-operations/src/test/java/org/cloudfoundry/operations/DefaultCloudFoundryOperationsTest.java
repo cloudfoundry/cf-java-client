@@ -17,12 +17,13 @@
 package org.cloudfoundry.operations;
 
 import org.junit.Test;
+import reactor.core.publisher.Mono;
 
 import static org.junit.Assert.assertNotNull;
 
 public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, MISSING_ID, MISSING_ID);
+    private final DefaultCloudFoundryOperations operations = new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, MISSING_ID, MISSING_ID, Mono.just(TEST_USERNAME));
 
     @Test
     public void applications() {

@@ -21,13 +21,13 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.GetEventResponse;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

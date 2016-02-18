@@ -21,13 +21,13 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.utils.test.TestObjects.fill;
-import static org.cloudfoundry.utils.test.TestObjects.fillPage;
+import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultStacksTest {

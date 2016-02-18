@@ -69,10 +69,10 @@ import org.cloudfoundry.client.v2.spaces.UserSpaceRoleEntity;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserEntity;
-import org.cloudfoundry.utils.DateUtils;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.DateUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -87,8 +87,8 @@ import java.util.Collections;
 import java.util.Date;
 
 import static java.time.temporal.ChronoUnit.HOURS;
-import static org.cloudfoundry.utils.OperationUtils.afterComplete;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.OperationUtils.afterComplete;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class SpacesTest extends AbstractIntegrationTest {

@@ -27,8 +27,8 @@ import org.cloudfoundry.client.v2.domains.ListDomainSpacesRequest;
 import org.cloudfoundry.client.v2.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,8 +36,8 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class DomainsTest extends AbstractIntegrationTest {

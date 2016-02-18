@@ -18,8 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import lombok.Builder;
 import lombok.Data;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * The request options for the start application operation

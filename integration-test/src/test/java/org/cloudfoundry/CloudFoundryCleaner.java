@@ -32,13 +32,13 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.utils.OperationUtils.afterStreamComplete;
+import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 
 final class CloudFoundryCleaner {
 

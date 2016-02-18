@@ -16,13 +16,11 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.cloudfoundry.client.ValidationResult;
-import org.cloudfoundry.client.v2.organizations.*;
-import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class CreateOrganizationRequestTest {
@@ -36,7 +34,7 @@ public final class CreateOrganizationRequestTest {
 
         assertEquals(VALID, result.getStatus());
     }
-    
+
     @Test
     public void isValidNoOrganization() {
         ValidationResult result = CreateOrganizationRequest.builder()

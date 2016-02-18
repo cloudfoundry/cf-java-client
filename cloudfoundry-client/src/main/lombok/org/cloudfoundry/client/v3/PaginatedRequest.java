@@ -18,8 +18,8 @@ package org.cloudfoundry.client.v3;
 
 import lombok.Data;
 import lombok.Getter;
-import org.cloudfoundry.client.QueryParameter;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * Base class for requests that are paginated

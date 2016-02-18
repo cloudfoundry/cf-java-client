@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class SetEnvironmentVariableApplicationRequestTest {
@@ -48,7 +48,7 @@ public final class SetEnvironmentVariableApplicationRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("name must be specified", result.getMessages().get(0));
     }
-    
+
     @Test
     public void isValidNoVariableName() {
         ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()
@@ -60,7 +60,7 @@ public final class SetEnvironmentVariableApplicationRequestTest {
         assertEquals(INVALID, result.getStatus());
         assertEquals("variable name must be specified", result.getMessages().get(0));
     }
-    
+
     @Test
     public void isValidNoVariableValue() {
         ValidationResult result = SetEnvironmentVariableApplicationRequest.builder()

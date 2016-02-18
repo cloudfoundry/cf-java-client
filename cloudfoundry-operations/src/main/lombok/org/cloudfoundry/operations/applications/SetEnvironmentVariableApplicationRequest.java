@@ -18,8 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import lombok.Builder;
 import lombok.Data;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * The request options for the set environment variable of an application operation
@@ -29,7 +29,7 @@ public final class SetEnvironmentVariableApplicationRequest implements Validatab
 
     /**
      * The application name
-     * 
+     *
      * @param name the application name
      * @return the application name
      */
@@ -37,7 +37,7 @@ public final class SetEnvironmentVariableApplicationRequest implements Validatab
 
     /**
      * The variable name
-     * 
+     *
      * @param variableName the variable name
      * @return the variable name
      */
@@ -45,7 +45,7 @@ public final class SetEnvironmentVariableApplicationRequest implements Validatab
 
     /**
      * The variable value
-     * 
+     *
      * @param variableValue the variable value
      * @return the variable value
      */

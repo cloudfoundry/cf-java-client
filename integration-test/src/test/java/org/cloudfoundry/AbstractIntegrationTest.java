@@ -23,8 +23,8 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)

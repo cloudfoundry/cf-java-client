@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v2;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.Getter;
-import org.cloudfoundry.client.QueryParameter;
+import org.cloudfoundry.QueryParameter;
 
 /**
  * Base class for requests that are paginated

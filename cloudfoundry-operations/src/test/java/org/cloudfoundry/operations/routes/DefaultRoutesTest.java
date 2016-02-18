@@ -53,8 +53,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.utils.RequestValidationException;
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.RequestValidationException;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -64,8 +64,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import static org.cloudfoundry.utils.test.TestObjects.fill;
-import static org.cloudfoundry.utils.test.TestObjects.fillPage;
+import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultRoutesTest {

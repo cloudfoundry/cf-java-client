@@ -20,8 +20,8 @@ package org.cloudfoundry.client.v2.servicekeys;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 public final class DeleteServiceKeyRequest implements Validatable {
 

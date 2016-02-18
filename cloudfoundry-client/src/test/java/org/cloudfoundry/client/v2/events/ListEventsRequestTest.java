@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

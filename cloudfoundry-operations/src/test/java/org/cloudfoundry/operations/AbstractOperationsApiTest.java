@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations;
 
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;

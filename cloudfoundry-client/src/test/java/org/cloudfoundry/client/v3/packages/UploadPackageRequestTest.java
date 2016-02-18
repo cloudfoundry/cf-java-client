@@ -16,13 +16,13 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import static org.cloudfoundry.client.ValidationResult.Status.INVALID;
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.ValidationResult.Status.INVALID;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class UploadPackageRequestTest {
