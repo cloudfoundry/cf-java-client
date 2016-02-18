@@ -56,11 +56,11 @@ public interface Spaces {
     Mono<Void> rename(RenameSpaceRequest request);
 
     /**
-     * Check if SSH is enabled for a specific space
+     * Check if SSH is allowed for a specific space
      *
-     * @param request the check space ssh enabled request
-     * @return Boolean is ssh enabled on the space
+     * @param request the check space ssh allowed request
+     * @return Boolean is ssh allowed on the space
      */
-    Mono<Boolean> sshEnabled(SpaceSshEnabledRequest request);
+    Mono<Boolean> sshAllowed(SpaceSshAllowedRequest request);
 
 }
