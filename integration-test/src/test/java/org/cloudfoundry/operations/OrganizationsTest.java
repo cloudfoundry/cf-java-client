@@ -17,11 +17,28 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.util.OperationUtils;
 import org.junit.Test;
 import reactor.rx.Stream;
 
 
 public final class OrganizationsTest extends AbstractIntegrationTest {
+
+    @Test
+    public void create() {
+        this.cloudFoundryOperations.organizations()
+            .create(CreateOrganizationRequest.builder()
+                .organizationName("test-organization-name")
+                .build())
+            .as(Stream::from)
+            .as(OperationUtils.afterStreamComplete(() -> Stream
+                .from(this.cloudFoundryOperations.organizations()
+                    .list())))
+            .filter(organizationSummary -> "test-organization-name".equals(organizationSummary.getName()))
+            .subscribe(testSubscriber()
+                .assertCount(1));
+    }
 
     @Test
     public void list() {
