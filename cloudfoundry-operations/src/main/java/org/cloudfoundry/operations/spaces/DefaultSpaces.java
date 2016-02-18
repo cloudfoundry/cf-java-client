@@ -123,6 +123,29 @@ public final class DefaultSpaces implements Spaces {
     }
 
     @Override
+    public Mono<Void> disallowSsh(DisallowSpaceSshRequest request) {
+        return Mono
+            .when(ValidationUtils.validate(request), this.organizationId)
+            .then(function(new Function2<DisallowSpaceSshRequest, String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(DisallowSpaceSshRequest request, String organizationId) {
+                    return getOrganizationSpaceIdWhere(DefaultSpaces.this.cloudFoundryClient, organizationId, request.getName(), sshEnabled(true));
+                }
+
+            }))
+            .then(new Function<String, Mono<UpdateSpaceResponse>>() {
+
+                @Override
+                public Mono<UpdateSpaceResponse> apply(String spaceId) {
+                    return requestUpdateSpaceSsh(DefaultSpaces.this.cloudFoundryClient, spaceId, false);
+                }
+
+            })
+            .after();
+    }
+
+    @Override
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return ValidationUtils
             .validate(request)

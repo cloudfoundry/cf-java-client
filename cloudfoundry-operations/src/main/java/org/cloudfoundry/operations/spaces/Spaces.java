@@ -27,7 +27,7 @@ public interface Spaces {
     /**
      * Allow SSH for a specific space
      *
-     * @param request the enable space ssh request
+     * @param request the allow space ssh request
      * @return a completion indicator
      */
     Mono<Void> allowSsh(AllowSpaceSshRequest request);
@@ -39,6 +39,14 @@ public interface Spaces {
      * @return a completion indicator
      */
     Mono<Void> delete(DeleteSpaceRequest request);
+
+    /**
+     * Disallow SSH for a specific space
+     *
+     * @param request the disallow space ssh request
+     * @return a completion indicator
+     */
+    Mono<Void> disallowSsh(DisallowSpaceSshRequest request);
 
     /**
      * Gets space information
