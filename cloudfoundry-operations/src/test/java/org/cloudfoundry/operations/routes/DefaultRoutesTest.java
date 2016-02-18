@@ -240,6 +240,16 @@ public final class DefaultRoutesTest {
                     .build()));
     }
 
+    private static void requestOrganizationsRoutesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.routes()
+            .list(fillPage(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder())
+                .organizationId(organizationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fillPage(ListRoutesResponse.builder())
+                    .build()));
+    }
+
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         when(cloudFoundryClient.organizations()
             .listPrivateDomains(fillPage(ListOrganizationPrivateDomainsRequest.builder())
@@ -935,7 +945,45 @@ public final class DefaultRoutesTest {
 
     }
 
-    public static final class ListCurrentOrganization extends AbstractOperationsApiTest<Route> {
+    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+
+        @Override
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Route> invoke() {
+            return this.routes
+                .list(ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .build());
+        }
+    }
+
+    public static final class ListCurrentOrganizationNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+
+        @Override
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalStateException.class);
+        }
+
+        @Override
+        protected Publisher<Route> invoke() {
+            return this.routes
+                .list(ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.ORGANIZATION)
+                    .build());
+        }
+    }
+
+    public static final class ListCurrentOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
 
@@ -969,21 +1017,28 @@ public final class DefaultRoutesTest {
         }
     }
 
-    public static final class ListCurrentOrganizationNoOrganization extends AbstractOperationsApiTest<Route> {
+    public static final class ListCurrentOrganizationNoSpaceNoRoutes extends AbstractOperationsApiTest<Route> {
 
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), MISSING_ID);
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationsRoutesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+            requestDomain(this.cloudFoundryClient, "test-route-entity-domainId");
+            requestSpace(this.cloudFoundryClient, "test-route-entity-spaceId");
+            requestApplications(this.cloudFoundryClient, "test-id");
+        }
 
         @Override
         protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
-            testSubscriber
-                .assertError(IllegalStateException.class);
+            // onComplete and not onNext
         }
 
         @Override
         protected Publisher<Route> invoke() {
             return this.routes
                 .list(ListRoutesRequest.builder()
-                    .level(ListRoutesRequest.Level.SPACE)
+                    .level(ListRoutesRequest.Level.ORGANIZATION)
                     .build());
         }
     }
@@ -1023,6 +1078,40 @@ public final class DefaultRoutesTest {
     }
 
     public static final class ListCurrentSpaceNoOrganization extends AbstractOperationsApiTest<Route> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
+            requestDomain(this.cloudFoundryClient, "test-route-domainId");
+            requestSpace(this.cloudFoundryClient, "test-route-spaceId");
+            requestApplications(this.cloudFoundryClient, "test-route-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Route> testSubscriber) throws Exception {
+            testSubscriber
+                .assertEquals(fill(Route.builder())
+                    .application("test-application-name")
+                    .domain("test-domain-name")
+                    .host("test-route-host")
+                    .path("test-route-path")
+                    .routeId("test-route-id")
+                    .space("test-space-entity-name")
+                    .build());
+        }
+
+        @Override
+        protected Publisher<Route> invoke() {
+            return this.routes
+                .list(ListRoutesRequest.builder()
+                    .level(ListRoutesRequest.Level.SPACE)
+                    .build());
+        }
+    }
+
+    public static final class ListCurrentSpaceNoOrganizationNoSpace extends AbstractOperationsApiTest<Route> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, MISSING_ID, MISSING_ID);
 

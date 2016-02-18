@@ -62,7 +62,6 @@ import org.cloudfoundry.util.tuple.Predicate2;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
-import reactor.fn.Predicate;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 import reactor.fn.tuple.Tuple4;
@@ -221,7 +220,7 @@ public final class DefaultRoutes implements Routes {
 
                 @Override
                 public Stream<RouteResource> apply(ListRoutesRequest request) {
-                    return getRoutes(DefaultRoutes.this.cloudFoundryClient, DefaultRoutes.this.organizationId, DefaultRoutes.this.spaceId, request.getLevel());
+                    return getRoutes(DefaultRoutes.this.cloudFoundryClient, request, DefaultRoutes.this.organizationId, DefaultRoutes.this.spaceId);
                 }
 
             })
@@ -415,36 +414,21 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils.extractId());
     }
 
-    private static Stream<RouteResource> getRoutes(final CloudFoundryClient cloudFoundryClient, final Mono<String> organizationId, final Mono<String> spaceId, Level level) {
-        return Mono
-            .just(level)
-            .where(new Predicate<Level>() {
+    private static Stream<RouteResource> getRoutes(final CloudFoundryClient cloudFoundryClient, ListRoutesRequest request, Mono<String> organizationId, Mono<String> spaceId) {
+        if (Level.ORGANIZATION == request.getLevel()) {
+            return organizationId
+                .as(OperationUtils.<String>stream())
+                .flatMap(new Function<String, Stream<RouteResource>>() {
 
-                @Override
-                public boolean test(Level level) {
-                    return Level.ORGANIZATION == level;
-                }
+                    @Override
+                    public Stream<RouteResource> apply(String organizationId) {
+                        return requestOrganizationRoutes(cloudFoundryClient, organizationId);
+                    }
 
-            })
-            .as(OperationUtils.<Level>stream())
-            .flatMap(new Function<Level, Stream<RouteResource>>() {
-
-                @Override
-                public Stream<RouteResource> apply(Level level) {
-                    return organizationId
-                        .flatMap(new Function<String, Stream<RouteResource>>() {
-
-                            @Override
-                            public Stream<RouteResource> apply(String organizationId) {
-                                return requestOrganizationsRoutes(cloudFoundryClient, organizationId);
-                            }
-
-                        })
-                        .as(OperationUtils.<RouteResource>stream());
-                }
-
-            })
-            .switchIfEmpty(spaceId
+                });
+        } else {
+            return spaceId
+                .as(OperationUtils.<String>stream())
                 .flatMap(new Function<String, Stream<RouteResource>>() {
 
                     @Override
@@ -452,7 +436,8 @@ public final class DefaultRoutes implements Routes {
                         return requestSpaceRoutes(cloudFoundryClient, spaceId);
                     }
 
-                }));
+                });
+        }
     }
 
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -548,7 +533,7 @@ public final class DefaultRoutes implements Routes {
                 .build());
     }
 
-    private static Stream<RouteResource> requestOrganizationsRoutes(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
+    private static Stream<RouteResource> requestOrganizationRoutes(final CloudFoundryClient cloudFoundryClient, final String organizationId) {
         return PaginationUtils
             .requestResources(new Function<Integer, Mono<ListRoutesResponse>>() {
 
