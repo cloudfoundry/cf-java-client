@@ -40,4 +40,12 @@ public interface ServiceUsageEvents {
      */
     Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/214/service_usage_events/purge_and_reseed_service_usage_events.html">Purge and Reseed Service Usage Events</a> request
+     *
+     * @param request the Purge and Reseed Service Usage Events
+     * @return the response from the Purge and Reseed Service Usage Events request
+     */
+    Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request);
+
 }

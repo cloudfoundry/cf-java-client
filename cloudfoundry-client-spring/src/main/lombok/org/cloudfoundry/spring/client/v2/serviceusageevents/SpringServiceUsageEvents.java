@@ -17,14 +17,15 @@
 package org.cloudfoundry.spring.client.v2.serviceusageevents;
 
 import lombok.ToString;
-import org.cloudfoundry.spring.util.AbstractSpringOperations;
-import org.cloudfoundry.spring.util.QueryBuilder;
-import org.cloudfoundry.spring.client.v2.FilterBuilder;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventsResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsResponse;
+import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEvents;
+import org.cloudfoundry.spring.client.v2.FilterBuilder;
+import org.cloudfoundry.spring.util.AbstractSpringOperations;
+import org.cloudfoundry.spring.util.QueryBuilder;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -71,6 +72,18 @@ public final class SpringServiceUsageEvents extends AbstractSpringOperations imp
                 builder.pathSegment("v2", "service_usage_events");
                 FilterBuilder.augment(builder, request);
                 QueryBuilder.augment(builder, request);
+            }
+
+        });
+    }
+
+    @Override
+    public Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request) {
+        return post(request, Void.class, new Consumer<UriComponentsBuilder>() {
+
+            @Override
+            public void accept(UriComponentsBuilder builder) {
+                builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances");
             }
 
         });
