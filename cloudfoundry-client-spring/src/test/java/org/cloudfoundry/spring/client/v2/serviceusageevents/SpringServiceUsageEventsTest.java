@@ -137,7 +137,7 @@ public final class SpringServiceUsageEventsTest {
         @Override
         protected ListServiceUsageEventsRequest getValidRequest() throws Exception {
             return ListServiceUsageEventsRequest.builder()
-                .afterId("e5defac2-4ae1-44ac-a3d0-1684ae657453")
+                .afterServiceUsageEventId("e5defac2-4ae1-44ac-a3d0-1684ae657453")
                 .page(-1)
                 .build();
         }
