@@ -20,7 +20,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the Cloud Foundry Organizations Operations API
+ * Main entry point to the Cloud Foundry Organizations operations API
  */
 public interface Organizations {
 
