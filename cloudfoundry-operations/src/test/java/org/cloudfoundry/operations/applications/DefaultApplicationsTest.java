@@ -17,10 +17,10 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggingClient;
-import org.cloudfoundry.client.logging.LogMessage;
-import org.cloudfoundry.client.logging.RecentLogsRequest;
-import org.cloudfoundry.client.logging.StreamLogsRequest;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.logging.RecentLogsRequest;
+import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.client.v2.CloudFoundryException;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.Resource;
@@ -58,9 +58,9 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
-import org.cloudfoundry.utils.DateUtils;
-import org.cloudfoundry.utils.StringMap;
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.DateUtils;
+import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -72,8 +72,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import static org.cloudfoundry.utils.test.TestObjects.fill;
-import static org.cloudfoundry.utils.test.TestObjects.fillPage;
+import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultApplicationsTest {

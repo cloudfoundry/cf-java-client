@@ -48,6 +48,7 @@
 
     <properties>
         <java-semver.version>0.9.0</java-semver.version>
+        <jjwt.version>0.6.0</jjwt.version>
         <lombok.version>1.16.6</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>2.6.1</protobuf.version>
@@ -60,6 +61,11 @@
                 <groupId>com.github.zafarkhaja</groupId>
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -58,9 +58,9 @@ import org.cloudfoundry.client.v2.organizations.SummaryOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.SummaryOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -68,7 +68,7 @@ import reactor.core.publisher.Mono;
 import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class OrganizationsTest extends AbstractIntegrationTest {

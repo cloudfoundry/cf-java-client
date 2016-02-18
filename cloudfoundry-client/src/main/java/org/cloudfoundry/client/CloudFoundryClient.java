@@ -44,6 +44,7 @@ import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Client API
@@ -98,11 +99,11 @@ public interface CloudFoundryClient {
     FeatureFlags featureFlags();
 
     /**
-     * Returns the authenticated username in use by the client
+     * Returns the current OAuth2 access token
      *
-     * @return a username
+     * @return the current OAuth2 access token
      */
-    String getUsername();
+    Mono<String> getAccessToken();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API

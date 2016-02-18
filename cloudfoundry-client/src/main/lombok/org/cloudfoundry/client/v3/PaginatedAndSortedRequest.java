@@ -20,8 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.cloudfoundry.client.QueryParameter;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * Base class for requests that are paginated and sorted

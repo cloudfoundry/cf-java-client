@@ -42,16 +42,16 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.OperationUtils;
-import org.cloudfoundry.utils.Optional;
-import org.cloudfoundry.utils.OptionalUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.ValidationUtils;
-import org.cloudfoundry.utils.tuple.Function2;
-import org.cloudfoundry.utils.tuple.Function6;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.OperationUtils;
+import org.cloudfoundry.util.Optional;
+import org.cloudfoundry.util.OptionalUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
+import org.cloudfoundry.util.tuple.Function2;
+import org.cloudfoundry.util.tuple.Function6;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
@@ -61,7 +61,7 @@ import reactor.rx.Stream;
 
 import java.util.List;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaces implements Spaces {
 

@@ -44,15 +44,15 @@ import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.Optional;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.ValidationUtils;
-import org.cloudfoundry.utils.tuple.Function2;
-import org.cloudfoundry.utils.tuple.Function3;
-import org.cloudfoundry.utils.tuple.Function4;
-import org.cloudfoundry.utils.tuple.Predicate3;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.Optional;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
+import org.cloudfoundry.util.tuple.Function2;
+import org.cloudfoundry.util.tuple.Function3;
+import org.cloudfoundry.util.tuple.Function4;
+import org.cloudfoundry.util.tuple.Predicate3;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
@@ -63,8 +63,8 @@ import reactor.rx.Stream;
 
 import java.util.List;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
-import static org.cloudfoundry.utils.tuple.TupleUtils.predicate;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultOrganizations implements Organizations {
 

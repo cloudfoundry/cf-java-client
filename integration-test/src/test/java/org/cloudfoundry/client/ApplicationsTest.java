@@ -44,9 +44,9 @@ import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
-import org.cloudfoundry.utils.DelayUtils;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.DelayUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -68,9 +68,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipFile;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.utils.OperationUtils.afterComplete;
-import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.OperationUtils.afterComplete;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {

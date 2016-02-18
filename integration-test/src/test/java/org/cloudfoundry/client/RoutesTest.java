@@ -29,8 +29,8 @@ import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -40,8 +40,8 @@ import reactor.fn.tuple.Tuple;
 import reactor.fn.tuple.Tuple2;
 import reactor.fn.tuple.Tuple3;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.consumer;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.junit.Assert.assertEquals;
 
 public final class RoutesTest extends AbstractIntegrationTest {

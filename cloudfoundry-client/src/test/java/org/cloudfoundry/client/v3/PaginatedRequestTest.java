@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import lombok.Builder;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.ValidationResult;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

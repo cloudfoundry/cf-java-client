@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.events.Events;
@@ -32,6 +31,9 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.users.Users;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.accesstokenadministration.AccessTokenAdministration;
 import org.junit.Before;
 import reactor.core.publisher.Mono;
 
@@ -51,19 +53,23 @@ public abstract class AbstractOperationsTest {
 
     protected static final String TEST_SPACE_NAME = "test-space-name";
 
+    protected static final String TEST_USERNAME = "test-username";
+
+    protected final AccessTokenAdministration accessTokenAdministration = mock(AccessTokenAdministration.class, RETURNS_SMART_NULLS);
+
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 
     protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
-    
-    protected final LoggingClient loggingClient = mock(LoggingClient.class, RETURNS_SMART_NULLS);
 
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
 
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
-    
+
     protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
+
+    protected final LoggingClient loggingClient = mock(LoggingClient.class, RETURNS_SMART_NULLS);
 
     protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
@@ -80,6 +86,8 @@ public abstract class AbstractOperationsTest {
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
+
+    protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
     protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
@@ -99,6 +107,8 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
         when(this.cloudFoundryClient.users()).thenReturn(this.users);
+
+        when(this.uaaClient.accessTokenAdministration()).thenReturn(this.accessTokenAdministration);
     }
 
 }

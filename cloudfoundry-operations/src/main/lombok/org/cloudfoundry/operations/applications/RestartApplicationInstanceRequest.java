@@ -18,8 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import lombok.Builder;
 import lombok.Data;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * The request options for the restart application instance operation
@@ -28,7 +28,7 @@ import org.cloudfoundry.client.ValidationResult;
 public final class RestartApplicationInstanceRequest implements Validatable {
 
     private final String name;
-    
+
     private final Integer instanceIndex;
 
     @Builder
@@ -44,7 +44,7 @@ public final class RestartApplicationInstanceRequest implements Validatable {
         if (this.instanceIndex == null) {
             builder.message("instance index must be specified");
         }
-        
+
         if (this.name == null) {
             builder.message("name must be specified");
         }

@@ -4,7 +4,7 @@
     <module name="cloudfoundry-client-spring" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="PACKAGE_NAME" value="org.cloudfoundry.client.spring" />
+    <option name="PACKAGE_NAME" value="org.cloudfoundry.spring" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />

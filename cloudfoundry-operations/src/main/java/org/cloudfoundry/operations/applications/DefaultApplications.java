@@ -17,10 +17,10 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggingClient;
-import org.cloudfoundry.client.logging.LogMessage;
-import org.cloudfoundry.client.logging.RecentLogsRequest;
-import org.cloudfoundry.client.logging.StreamLogsRequest;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.logging.RecentLogsRequest;
+import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -52,21 +52,21 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
-import org.cloudfoundry.utils.DateUtils;
-import org.cloudfoundry.utils.DelayUtils;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.JobUtils;
-import org.cloudfoundry.utils.OperationUtils;
-import org.cloudfoundry.utils.Optional;
-import org.cloudfoundry.utils.OptionalUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.StringMap;
-import org.cloudfoundry.utils.ValidationUtils;
-import org.cloudfoundry.utils.tuple.Function2;
-import org.cloudfoundry.utils.tuple.Function3;
-import org.cloudfoundry.utils.tuple.Function4;
-import org.cloudfoundry.utils.tuple.Predicate2;
+import org.cloudfoundry.util.DateUtils;
+import org.cloudfoundry.util.DelayUtils;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.OperationUtils;
+import org.cloudfoundry.util.Optional;
+import org.cloudfoundry.util.OptionalUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.StringMap;
+import org.cloudfoundry.util.ValidationUtils;
+import org.cloudfoundry.util.tuple.Function2;
+import org.cloudfoundry.util.tuple.Function3;
+import org.cloudfoundry.util.tuple.Function4;
+import org.cloudfoundry.util.tuple.Predicate2;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.BiFunction;
@@ -84,11 +84,11 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cloudfoundry.utils.DateUtils.parseFromIso8601;
-import static org.cloudfoundry.utils.OperationUtils.afterComplete;
-import static org.cloudfoundry.utils.OperationUtils.not;
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
-import static org.cloudfoundry.utils.tuple.TupleUtils.predicate;
+import static org.cloudfoundry.util.DateUtils.parseFromIso8601;
+import static org.cloudfoundry.util.OperationUtils.afterComplete;
+import static org.cloudfoundry.util.OperationUtils.not;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultApplications implements Applications {
 

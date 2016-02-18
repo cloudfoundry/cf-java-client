@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import org.junit.Test;
 
-import static org.cloudfoundry.client.ValidationResult.Status.VALID;
+import static org.cloudfoundry.ValidationResult.Status.VALID;
 import static org.junit.Assert.assertEquals;
 
 public final class ListApplicationsRequestTest {

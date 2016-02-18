@@ -21,8 +21,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 /**
  * The request payload for the Associate Route with the Application operation

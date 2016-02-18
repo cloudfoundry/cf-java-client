@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 import org.cloudfoundry.client.v2.InFilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 
@@ -46,7 +46,7 @@ public final class ListOrganizationDomainsRequest extends PaginatedRequest imple
      */
     @Getter(onMethod = @__(@InFilterParameter("name")))
     private final List<String> names;
-    
+
     /**
      * The owning organization ids
      *

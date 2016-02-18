@@ -17,17 +17,18 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.LoggingClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.OperationUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.OperationUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.rx.Stream;
@@ -45,6 +46,8 @@ public final class CloudFoundryOperationsBuilder {
 
     private String space;
 
+    private UaaClient uaaClient;
+
     /**
      * Builds a new instance of the default implementation of the {@link CloudFoundryOperations} using the information provided.
      *
@@ -58,8 +61,9 @@ public final class CloudFoundryOperationsBuilder {
 
         Mono<String> organizationId = getOrganizationId(this.cloudFoundryClient, this.organization);
         Mono<String> spaceId = getSpaceId(this.cloudFoundryClient, organizationId, this.space);
+        Mono<String> username = getUsername(this.cloudFoundryClient, this.uaaClient);
 
-        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, organizationId, spaceId);
+        return new DefaultCloudFoundryOperations(this.cloudFoundryClient, this.loggingClient, organizationId, spaceId, username);
     }
 
     /**
@@ -72,7 +76,6 @@ public final class CloudFoundryOperationsBuilder {
         this.cloudFoundryClient = cloudFoundryClient;
         return this;
     }
-
 
     /**
      * Configure the {@link LoggingClient} to use
@@ -106,6 +109,17 @@ public final class CloudFoundryOperationsBuilder {
      */
     public CloudFoundryOperationsBuilder target(String organization) {
         this.organization = organization;
+        return this;
+    }
+
+    /**
+     * Configure the {@link UaaClient} to use
+     *
+     * @param uaaClient the {@link UaaClient} to use
+     * @return {@code this}
+     */
+    public CloudFoundryOperationsBuilder uaaClient(UaaClient uaaClient) {
+        this.uaaClient = uaaClient;
         return this;
     }
 
@@ -154,6 +168,13 @@ public final class CloudFoundryOperationsBuilder {
 
         spaceId.get();
         return spaceId;
+    }
+
+    private static Mono<String> getUsername(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
+        return new UsernameBuilder()
+            .cloudFoundryClient(cloudFoundryClient)
+            .uaaClient(uaaClient)
+            .build();
     }
 
     private static Stream<OrganizationResource> requestOrganizations(final CloudFoundryClient cloudFoundryClient, final String organization) {

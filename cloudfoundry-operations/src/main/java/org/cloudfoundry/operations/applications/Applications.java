@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.client.logging.LogMessage;
+import org.cloudfoundry.logging.LogMessage;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 

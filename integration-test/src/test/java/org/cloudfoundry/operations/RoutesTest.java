@@ -33,8 +33,8 @@ import reactor.rx.Stream;
 
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.ListRoutesRequest.Level.SPACE;
-import static org.cloudfoundry.utils.OperationUtils.afterComplete;
-import static org.cloudfoundry.utils.OperationUtils.afterStreamComplete;
+import static org.cloudfoundry.util.OperationUtils.afterComplete;
+import static org.cloudfoundry.util.OperationUtils.afterStreamComplete;
 
 public final class RoutesTest extends AbstractIntegrationTest {
 

@@ -47,14 +47,14 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsApiTest;
 import org.cloudfoundry.operations.spacequotas.SpaceQuota;
-import org.cloudfoundry.utils.RequestValidationException;
-import org.cloudfoundry.utils.test.TestSubscriber;
+import org.cloudfoundry.util.RequestValidationException;
+import org.cloudfoundry.util.test.TestSubscriber;
 import org.junit.Before;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import static org.cloudfoundry.utils.test.TestObjects.fill;
-import static org.cloudfoundry.utils.test.TestObjects.fillPage;
+import static org.cloudfoundry.util.test.TestObjects.fill;
+import static org.cloudfoundry.util.test.TestObjects.fillPage;
 import static org.mockito.Mockito.when;
 
 public final class DefaultOrganizationsTest {
@@ -212,14 +212,14 @@ public final class DefaultOrganizationsTest {
 
     public static final class Create extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
             requestCreateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_NAME, null);
             requestGetFeatureFlagEnabled(this.cloudFoundryClient, "set_roles_by_username");
-            requestAssociateOrganizationManagerByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
-            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+            requestAssociateOrganizationManagerByUsername(this.cloudFoundryClient, TEST_USERNAME);
+            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_USERNAME);
         }
 
         @Override
@@ -239,7 +239,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class CreateInvalid extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
@@ -257,7 +257,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class CreateSetRolesByUsernameDisabled extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -282,15 +282,15 @@ public final class DefaultOrganizationsTest {
 
     public static final class CreateWithQuota extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
             requestOrganizationQuotaDefinitions(this.cloudFoundryClient, "test-quota-definition-name");
             requestCreateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_NAME, "test-organization-quota-definition-id");
             requestGetFeatureFlagEnabled(this.cloudFoundryClient, "set_roles_by_username");
-            requestAssociateOrganizationManagerByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
-            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, this.cloudFoundryClient.getUsername());
+            requestAssociateOrganizationManagerByUsername(this.cloudFoundryClient, TEST_USERNAME);
+            requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, TEST_USERNAME);
         }
 
         @Override
@@ -310,7 +310,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Info extends AbstractOperationsApiTest<OrganizationDetail> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -349,7 +349,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class List extends AbstractOperationsApiTest<OrganizationSummary> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -373,7 +373,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class Rename extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Before
         public void setUp() throws Exception {
@@ -399,7 +399,7 @@ public final class DefaultOrganizationsTest {
 
     public static final class RenameInvalid extends AbstractOperationsApiTest<Void> {
 
-        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(this.cloudFoundryClient.getUsername()));
+        private final DefaultOrganizations organizations = new DefaultOrganizations(this.cloudFoundryClient, Mono.just(TEST_USERNAME));
 
         @Override
         protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {

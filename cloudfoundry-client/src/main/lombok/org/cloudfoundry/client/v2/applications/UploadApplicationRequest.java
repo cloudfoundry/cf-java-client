@@ -22,9 +22,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Singular;
-import org.cloudfoundry.client.QueryParameter;
-import org.cloudfoundry.client.Validatable;
-import org.cloudfoundry.client.ValidationResult;
+import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.Validatable;
+import org.cloudfoundry.ValidationResult;
 
 import java.io.InputStream;
 import java.util.List;

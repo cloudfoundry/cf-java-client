@@ -21,18 +21,18 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.ValidationUtils;
-import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
+import org.cloudfoundry.util.tuple.Function2;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.Predicate;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultSpaceQuotas implements SpaceQuotas {
 

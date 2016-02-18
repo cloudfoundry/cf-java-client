@@ -22,17 +22,17 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
-import org.cloudfoundry.utils.ExceptionUtils;
-import org.cloudfoundry.utils.PaginationUtils;
-import org.cloudfoundry.utils.ResourceUtils;
-import org.cloudfoundry.utils.ValidationUtils;
-import org.cloudfoundry.utils.tuple.Function2;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import org.cloudfoundry.util.ValidationUtils;
+import org.cloudfoundry.util.tuple.Function2;
 import reactor.core.publisher.Mono;
 import reactor.fn.Function;
 import reactor.fn.tuple.Tuple2;
 import reactor.rx.Stream;
 
-import static org.cloudfoundry.utils.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultDomains implements Domains {
 
