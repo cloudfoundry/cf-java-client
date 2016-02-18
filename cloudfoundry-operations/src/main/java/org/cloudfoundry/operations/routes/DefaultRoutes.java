@@ -245,16 +245,15 @@ public final class DefaultRoutes implements Routes {
 
     @Override
     public Mono<Void> map(MapRouteRequest request) {
-        return ValidationUtils
-            .validate(request)
-            .and(this.spaceId)
-            .then(function(new Function2<MapRouteRequest, String, Mono<Tuple2<String, String>>>() {
+        return Mono
+            .when(ValidationUtils.validate(request), this.spaceId, this.organizationId)
+            .then(function(new Function3<MapRouteRequest, String, String, Mono<Tuple2<String, String>>>() {
 
                 @Override
-                public Mono<Tuple2<String, String>> apply(MapRouteRequest request, String spaceId) {
+                public Mono<Tuple2<String, String>> apply(MapRouteRequest request, String spaceId, String organizationId) {
                     return Mono
                         .when(
-                            getOrCreateRoute(DefaultRoutes.this.cloudFoundryClient, DefaultRoutes.this.organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
+                            getOrCreateRoute(DefaultRoutes.this.cloudFoundryClient, organizationId, spaceId, request.getDomain(), request.getHost(), request.getPath()),
                             getApplicationId(DefaultRoutes.this.cloudFoundryClient, request.getApplicationName(), spaceId)
                         );
                 }
@@ -389,17 +388,8 @@ public final class DefaultRoutes implements Routes {
             .map(ResourceUtils.extractId());
     }
 
-    private static Mono<String> getOrCreateRoute(final CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, final String spaceId, final String domain, final String host,
-                                                 final String path) {
-        return organizationId
-            .then(new Function<String, Mono<String>>() {
-
-                @Override
-                public Mono<String> apply(String organizationId) {
-                    return getDomainId(cloudFoundryClient, organizationId, domain);
-                }
-
-            })
+    private static Mono<String> getOrCreateRoute(final CloudFoundryClient cloudFoundryClient, String organizationId, final String spaceId, String domain, final String host, final String path) {
+        return getDomainId(cloudFoundryClient, organizationId, domain)
             .then(new Function<String, Mono<Resource<RouteEntity>>>() {
 
                 @Override

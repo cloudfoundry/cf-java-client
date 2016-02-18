@@ -1060,6 +1060,35 @@ public final class DefaultRoutesTest {
         }
     }
 
+    public static final class MapRouteExists extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+            requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path");
+            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            // Expects onComplete() with no onNext()
+        }
+
+        @Override
+        protected Mono<Void> invoke() {
+            return this.routes
+                .map(MapRouteRequest.builder()
+                    .applicationName("test-application-name")
+                    .domain("test-domain")
+                    .host("test-host")
+                    .path("test-path")
+                    .build());
+        }
+    }
+
     public static final class MapRouteInvalidApplicationName extends AbstractOperationsApiTest<Void> {
 
         private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
@@ -1178,35 +1207,6 @@ public final class DefaultRoutesTest {
             requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
             requestRoutesEmpty(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path");
             requestCreateRoute(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", TEST_SPACE_ID);
-            requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        }
-
-        @Override
-        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
-            // Expects onComplete() with no onNext()
-        }
-
-        @Override
-        protected Mono<Void> invoke() {
-            return this.routes
-                .map(MapRouteRequest.builder()
-                    .applicationName("test-application-name")
-                    .domain("test-domain")
-                    .host("test-host")
-                    .path("test-path")
-                    .build());
-        }
-    }
-
-    public static final class MapRouteExists extends AbstractOperationsApiTest<Void> {
-
-        private final DefaultRoutes routes = new DefaultRoutes(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-
-        @Before
-        public void setUp() throws Exception {
-            requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-            requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-            requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path");
             requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         }
 
