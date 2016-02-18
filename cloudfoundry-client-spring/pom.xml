@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>org.cloudfoundry</groupId>
-            <artifactId>cloudfoundry-client-utils</artifactId>
+            <artifactId>cloudfoundry-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -12,7 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client-spring" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.5" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.6.5" level="project" />
@@ -26,7 +25,7 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:8.0.30" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.6.1" level="project" />
-    <orderEntry type="module" module-name="cloudfoundry-client-utils" />
+    <orderEntry type="module" module-name="cloudfoundry-util" />
     <orderEntry type="library" name="Maven: org.atteo:evo-inflector:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.13" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.13" level="project" />
