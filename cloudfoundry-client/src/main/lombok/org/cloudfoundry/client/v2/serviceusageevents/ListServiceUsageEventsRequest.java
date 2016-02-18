@@ -39,13 +39,13 @@ import java.util.List;
 public final class ListServiceUsageEventsRequest extends PaginatedRequest implements Validatable {
 
     /**
-     * The after id: Restrict results to Service Usage Events after the one with the given id
+     * The after service usage event id: Restrict results to Service Usage Events after the one with the given id
      *
-     * @param afterId the after id
-     * @return the after id
+     * @param afterServiceUsageEventId the after service usage event id
+     * @return the after service usage event id
      */
     @Getter(onMethod = @__(@QueryParameter("after_guid")))
-    private final String afterId;
+    private final String afterServiceUsageEventId;
 
     /**
      * The service ids
@@ -68,11 +68,11 @@ public final class ListServiceUsageEventsRequest extends PaginatedRequest implem
 
     @Builder
     ListServiceUsageEventsRequest(OrderDirection orderDirection, Integer page, Integer resultsPerPage,
-                                  String afterId,
+                                  String afterServiceUsageEventId,
                                   @Singular List<String> serviceIds,
                                   @Singular List<String> serviceInstanceTypes) {
         super(orderDirection, page, resultsPerPage);
-        this.afterId = afterId;
+        this.afterServiceUsageEventId = afterServiceUsageEventId;
         this.serviceIds = serviceIds;
         this.serviceInstanceTypes = serviceInstanceTypes;
     }
