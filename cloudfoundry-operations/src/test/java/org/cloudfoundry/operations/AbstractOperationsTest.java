@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuota
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
 import org.cloudfoundry.client.v2.routes.Routes;
+import org.cloudfoundry.client.v2.servicebindings.ServiceBindings;
+import org.cloudfoundry.client.v2.services.Services;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
@@ -84,6 +86,10 @@ public abstract class AbstractOperationsTest {
     protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
+    
+    protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
+    
+    protected final ServiceBindings serviceBindings = mock(ServiceBindings.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
 
@@ -102,6 +108,8 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
+        when(this.cloudFoundryClient.serviceBindings()).thenReturn(this.serviceBindings);
+        when(this.cloudFoundryClient.services()).thenReturn(this.services);
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
