@@ -34,11 +34,14 @@ import java.util.concurrent.TimeUnit;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 /**
- * A utility class for delay strategies
+ * Utilities for delaying progress
  */
 public final class DelayUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.delay");
+
+    private DelayUtils() {
+    }
 
     /**
      * Implements an exponential backoff delay
@@ -112,12 +115,12 @@ public final class DelayUtils {
         };
     }
 
-    static long calculateDuration(long minDuration, long maxDuration, Integer retryCount) {
+    private static long calculateDuration(long minDuration, long maxDuration, Integer retryCount) {
         long candidateDuration = minDuration * (long) Math.pow(2, retryCount);
         return Math.min(candidateDuration, maxDuration);
     }
 
-    static Publisher<?> getDelay(long minDuration, long maxDuration, final TimeUnit timeUnit, Integer retryCount) {
+    private static Publisher<?> getDelay(long minDuration, long maxDuration, final TimeUnit timeUnit, Integer retryCount) {
         final long duration = calculateDuration(minDuration, maxDuration, retryCount);
 
         return Mono
@@ -132,7 +135,7 @@ public final class DelayUtils {
             });
     }
 
-    static Stream<Integer> getRetryCounter(int maxRetries) {
+    private static Stream<Integer> getRetryCounter(int maxRetries) {
         return Stream
             .range(0, maxRetries)
             .concatWith(Stream.<Integer>error(new IllegalStateException("Exceeded maximum number of retries"), true));
