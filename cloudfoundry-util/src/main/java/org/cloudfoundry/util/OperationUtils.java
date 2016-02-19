@@ -25,7 +25,7 @@ import reactor.rx.Promise;
 import reactor.rx.Stream;
 
 /**
- * A utility class with operators that do not exist
+ * Utilities with operations that do not (yet) exist
  */
 public final class OperationUtils {
 
@@ -35,7 +35,7 @@ public final class OperationUtils {
     /**
      * Produces a Mono transformer that ignores the source element (if any) and continues with the supplied Mono on complete. On error, the supplier is not called, and the error is propagated.
      *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(()->someMono))} </p>
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(() -> someMono))} </p>
      *
      * @param supplier supplies a {@code Mono<OUT>} when called
      * @param <IN>     the source element type.
@@ -63,7 +63,7 @@ public final class OperationUtils {
     /**
      * Produces a Stream transformer that ignores the source element (if any) and continues with the supplied Stream on complete. On error, the supplier is not called, and the error is propagated.
      *
-     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(()->someStream))} </p>
+     * <p> <b>Usage:</b> Can be used inline thus: {@code .as(afterComplete(() -> someStream))} </p>
      *
      * @param supplier supplies a {@code Stream<OUT>} when called
      * @param <IN>     the source element type.

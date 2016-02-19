@@ -96,7 +96,7 @@
                     <configuration>
                         <links>
                             <link>http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/</link>
-                            <link>http://next.projectreactor.io/core/docs/api/</link>
+                            <link>http://projectreactor.io/core/docs/api/</link>
                         </links>
                         <quiet>true</quiet>
                     </configuration>
