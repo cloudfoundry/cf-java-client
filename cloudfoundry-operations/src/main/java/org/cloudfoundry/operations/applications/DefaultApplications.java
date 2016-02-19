@@ -79,6 +79,7 @@ import reactor.fn.tuple.Tuple3;
 import reactor.fn.tuple.Tuple4;
 import reactor.rx.Stream;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -268,18 +269,18 @@ public final class DefaultApplications implements Applications {
             .then(new Function<SummaryApplicationResponse, Mono<Tuple2<SummaryApplicationResponse, String>>>() {
 
                 @Override
-                public Mono<Tuple2<SummaryApplicationResponse, String>> apply(SummaryApplicationResponse summaryApplicationResponse) {
+                public Mono<Tuple2<SummaryApplicationResponse, String>> apply(SummaryApplicationResponse response) {
                     return Mono
-                        .just(summaryApplicationResponse)
-                        .and(requestStackName(cloudFoundryClient, summaryApplicationResponse.getStackId()));
+                        .just(response)
+                        .and(getStackName(DefaultApplications.this.cloudFoundryClient, response.getStackId()));
                 }
 
             })
             .then(function(new Function2<SummaryApplicationResponse, String, Mono<ApplicationManifest>>() {
 
                 @Override
-                public Mono<ApplicationManifest> apply(SummaryApplicationResponse summaryApplicationResponse, String stackName) {
-                    return toApplicationManifest(summaryApplicationResponse, stackName);
+                public Mono<ApplicationManifest> apply(SummaryApplicationResponse response, String stackName) {
+                    return toApplicationManifest(response, stackName);
                 }
 
             }));
@@ -953,9 +954,15 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {
-        Map<String, Object> metadataMap = safeCastToMap(entity.getMetadatas());
-        return (metadataMap == null) ? null : safeCastToMap(metadataMap.get("request"));
+        Map<String, Object> metadata = Optional
+            .ofNullable(entity.getMetadatas())
+            .orElse(Collections.<String, Object>emptyMap());
+
+        return Optional
+            .ofNullable((Map<String, Object>) metadata.get("request"))
+            .orElse(Collections.<String, Object>emptyMap());
     }
 
     private static Mono<Optional<List<Route>>> getOptionalRoutes(final CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, final String applicationId) {
@@ -995,6 +1002,18 @@ public final class DefaultApplications implements Applications {
                 public Mono<Tuple2<Optional<List<Route>>, String>> apply(final String applicationId) {
                     return getOptionalRoutes(cloudFoundryClient, deleteApplicationRequest.getDeleteRoutes(), applicationId)
                         .and(Mono.just(applicationId));
+                }
+
+            });
+    }
+
+    private static Mono<String> getStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
+        return requestStack(cloudFoundryClient, stackId)
+            .map(new Function<GetStackResponse, String>() {
+
+                @Override
+                public String apply(GetStackResponse getStackResponse) {
+                    return getStackResponse.getEntity().getName();
                 }
 
             });
@@ -1187,18 +1206,6 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<String> requestStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
-        return requestStack(cloudFoundryClient, stackId)
-            .map(new Function<GetStackResponse, String>() {
-
-                @Override
-                public String apply(GetStackResponse getStackResponse) {
-                    return getStackResponse.getEntity().getName();
-                }
-
-            });
-    }
-
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         return cloudFoundryClient.applicationsV2()
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
@@ -1284,14 +1291,6 @@ public final class DefaultApplications implements Applications {
             });
     }
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> safeCastToMap(Object request) {
-        if (request instanceof Map)
-            return (Map<String, Object>) request;
-        else
-            return null;
-    }
-
     private static Predicate<AbstractApplicationResource> sshEnabled(final Boolean enabled) {
         return new Predicate<AbstractApplicationResource>() {
 
@@ -1347,31 +1346,32 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static Mono<ApplicationManifest> toApplicationManifest(SummaryApplicationResponse summaryApplicationResponse, String stackName) {
+    private static Mono<ApplicationManifest> toApplicationManifest(SummaryApplicationResponse response, String stackName) {
         ApplicationManifest.ApplicationManifestBuilder manifestBuilder = ApplicationManifest.builder()
-            .buildpack(summaryApplicationResponse.getBuildpack())
-            .command(summaryApplicationResponse.getCommand())
-            .diskQuotaMB(summaryApplicationResponse.getDiskQuota())
-            .envs(summaryApplicationResponse.getEnvironmentJsons())
-            .instances(summaryApplicationResponse.getInstances())
-            .memoryMB(summaryApplicationResponse.getMemory())
-            .name(summaryApplicationResponse.getName())
+            .buildpack(response.getBuildpack())
+            .command(response.getCommand())
+            .disk(response.getDiskQuota())
+            .environmentVariables(response.getEnvironmentJsons())
+            .instances(response.getInstances())
+            .memory(response.getMemory())
+            .name(response.getName())
             .stack(stackName)
-            .timeout(summaryApplicationResponse.getHealthCheckTimeout());
+            .timeout(response.getHealthCheckTimeout());
 
-        for (Route route : summaryApplicationResponse.getRoutes()) {
+        for (Route route : response.getRoutes()) {
             manifestBuilder
                 .domain(route.getDomain().getName())
                 .host((route.getHost()));
         }
 
-        for (ServiceInstance service : summaryApplicationResponse.getServices()) {
+        for (ServiceInstance service : response.getServices()) {
             manifestBuilder
                 .service(service.getName());
         }
 
-        return Mono.just(manifestBuilder
-            .build());
+        return Mono
+            .just(manifestBuilder
+                .build());
     }
 
     private static ApplicationSummary toApplicationSummary(SpaceApplicationSummary spaceApplicationSummary) {
