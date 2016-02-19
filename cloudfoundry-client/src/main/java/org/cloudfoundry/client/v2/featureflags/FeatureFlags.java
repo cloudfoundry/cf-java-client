@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface FeatureFlags {
 
     /**
-     * Makes one of the Get feature flags requests. See <a href="http://apidocs.cloudfoundry.org/230">API</a> under Feature Flags.
+     * Makes one of the Get feature flags requests. See <a href="http://apidocs.cloudfoundry.org/latest-release">API</a> under Feature Flags.
      *
      * @param request the get feature flag request
      * @return the response from the get feature flag request

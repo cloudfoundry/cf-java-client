@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ApplicationsV3 {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/assigning_a_droplet_as_a_an_apps_current_droplet.html">Assign Application Droplet</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/assigning_a_droplet_as_a_an_apps_current_droplet.html">Assign Application Droplet</a> request
      *
      * @param request the Assign Application Droplet request
      * @return the response from the Assign Application Droplet request
@@ -33,7 +32,7 @@ public interface ApplicationsV3 {
     Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/create_an_app.html">Create Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/create_an_app.html">Create Application</a> request
      *
      * @param request the Create Application request
      * @return the response from the Create Application request
@@ -41,7 +40,7 @@ public interface ApplicationsV3 {
     Mono<CreateApplicationResponse> create(CreateApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/delete_an_app.html">Delete Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/delete_an_app.html">Delete Application</a> request
      *
      * @param request the Delete Application request
      * @return the response from the Delete Application request
@@ -49,7 +48,7 @@ public interface ApplicationsV3 {
     Mono<Void> delete(DeleteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/215/apps_(experimental)/get_an_app.html">Get Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/get_an_app.html">Get Application</a> request
      *
      * @param request the Get Application request
      * @return the response from the Get Application request
@@ -57,7 +56,7 @@ public interface ApplicationsV3 {
     Mono<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/get_the_env_for_an_app.html">Get Application Environment</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/get_the_env_for_an_app.html">Get Application Environment</a> request
      *
      * @param request the Get Application Environment request
      * @return the response from the Get Application Environment request
@@ -65,7 +64,7 @@ public interface ApplicationsV3 {
     Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/get_a_process_from_an_app.html">Get Application Process</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/get_a_process_from_an_app.html">Get Application Process</a> request
      *
      * @param request the Get Application Process request
      * @return the response from the Get Application Process request
@@ -73,7 +72,7 @@ public interface ApplicationsV3 {
     Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/230/apps_(experimental)/get_detailed_stats_for_an_app's_process.html">Get Detailed Stats for an Application's Process</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/get_detailed_stats_for_an_app's_process.html">Get Detailed Stats for an Application's Process</a> request
      *
      * @param request the Get Detailed Stats for an Application's Process request
      * @return the response from the Get Detailed Stats for an Application's Process request
@@ -81,7 +80,7 @@ public interface ApplicationsV3 {
     Mono<GetApplicationProcessDetailedStatisticsResponse> getProcessDetailedStatistics(GetApplicationProcessDetailedStatisticsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/230/apps_(experimental)/get_detailed_stats_for_an_app.html">Get Detailed Stats for an Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/get_detailed_stats_for_an_app.html">Get Detailed Stats for an Application</a> request
      *
      * @param request the Get Detailed Stats for an Application request
      * @return the response from the Get Detailed Stats for an Application request
@@ -89,7 +88,7 @@ public interface ApplicationsV3 {
     Mono<GetApplicationStatisticsResponse> getStatistics(GetApplicationStatisticsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_all_apps.html">List Applications</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/list_all_apps.html">List Applications</a> request
      *
      * @param request the List Applications request
      * @return the response from the List Applications request
@@ -97,7 +96,7 @@ public interface ApplicationsV3 {
     Mono<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/215/app_droplets_(experimental)/list_droplets.html">List Application Droplets</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_droplets_(experimental)/list_droplets.html">List Application Droplets</a> request
      *
      * @param request the List Application Droplets request
      * @return the response from the List Application Droplets request
@@ -105,7 +104,7 @@ public interface ApplicationsV3 {
     Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_associated_packages.html">List Application Packages</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/list_associated_packages.html">List Application Packages</a> request
      *
      * @param request the List Application Packages request
      * @return the response from the List Application Packages request
@@ -113,7 +112,7 @@ public interface ApplicationsV3 {
     Mono<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/list_associated_processes.html">List Application Processes</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/list_associated_processes.html">List Application Processes</a> request
      *
      * @param request the List Application Processes request
      * @return the response from the List Application Processes request
@@ -121,7 +120,7 @@ public interface ApplicationsV3 {
     Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/scaling_a_process_from_its_app.html">Scale Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/scaling_a_process_from_its_app.html">Scale Application</a> request
      *
      * @param request the Scale Application request
      * @return the response from the Scale Application request
@@ -129,7 +128,7 @@ public interface ApplicationsV3 {
     Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/starting_an_app.html">Start Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/starting_an_app.html">Start Application</a> request
      *
      * @param request the Start Application request
      * @return the response from the Start Application request
@@ -137,7 +136,7 @@ public interface ApplicationsV3 {
     Mono<StartApplicationResponse> start(StartApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/stopping_an_app.html">Stop Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/stopping_an_app.html">Stop Application</a> request
      *
      * @param request the Stop Application request
      * @return the response from the Stop Application request
@@ -145,7 +144,7 @@ public interface ApplicationsV3 {
     Mono<StopApplicationResponse> stop(StopApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/terminating_a_process_instance_from_its_app.html">Delete Application Process</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/terminating_a_process_instance_from_its_app.html">Delete Application Process</a> request
      *
      * @param request the Delete Application Process Instance request
      * @return the response from the Delete Application Process Instance request
@@ -153,7 +152,7 @@ public interface ApplicationsV3 {
     Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/apps_(experimental)/updating_an_app.html">Update Application</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps_(experimental)/updating_an_app.html">Update Application</a> request
      *
      * @param request the Update Application request
      * @return the response from the Update Application request

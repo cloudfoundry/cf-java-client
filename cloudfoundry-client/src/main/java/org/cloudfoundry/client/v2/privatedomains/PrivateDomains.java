@@ -24,8 +24,8 @@ import reactor.core.publisher.Mono;
 public interface PrivateDomains {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/private_domains/create_a_private_domain_owned_by_the_given_organization.html">Create a Private Domain owned by the given Organization</a>
-     * request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/create_a_private_domain_owned_by_the_given_organization.html">Create a Private Domain owned by the given
+     * Organization</a> request
      *
      * @param request the Create a Private Domain request
      * @return the response from the Create a Private Domain request
