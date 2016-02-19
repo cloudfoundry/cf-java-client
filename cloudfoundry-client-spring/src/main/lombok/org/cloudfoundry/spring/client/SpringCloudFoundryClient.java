@@ -44,6 +44,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -72,6 +73,7 @@ import org.cloudfoundry.spring.client.v2.shareddomains.SpringSharedDomains;
 import org.cloudfoundry.spring.client.v2.spacequotadefinitions.SpringSpaceQuotaDefinitions;
 import org.cloudfoundry.spring.client.v2.spaces.SpringSpaces;
 import org.cloudfoundry.spring.client.v2.stacks.SpringStacks;
+import org.cloudfoundry.spring.client.v2.userprovidedserviceinstances.SpringUserProvidedServiceInstances;
 import org.cloudfoundry.spring.client.v2.users.SpringUsers;
 import org.cloudfoundry.spring.client.v3.applications.SpringApplicationsV3;
 import org.cloudfoundry.spring.client.v3.droplets.SpringDroplets;
@@ -163,6 +165,8 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
 
     private final OAuth2TokenProvider tokenProvider;
 
+    private final UserProvidedServiceInstances userProvidedServiceInstances;
+
     private final Users users;
 
     @Builder
@@ -207,6 +211,7 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
         this.spaces = new SpringSpaces(restOperations, root, schedulerGroup);
         this.stacks = new SpringStacks(restOperations, root, schedulerGroup);
         this.tasks = new SpringTasks(restOperations, root, schedulerGroup);
+        this.userProvidedServiceInstances = new SpringUserProvidedServiceInstances(restOperations, root, schedulerGroup);
         this.users = new SpringUsers(restOperations, root, schedulerGroup);
 
         this.connectionContext = connectionContext.toBuilder()
@@ -373,6 +378,11 @@ public final class SpringCloudFoundryClient implements CloudFoundryClient {
     @Override
     public Tasks tasks() {
         return tasks;
+    }
+
+    @Override
+    public UserProvidedServiceInstances userProvidedServiceInstances() {
+        return this.userProvidedServiceInstances;
     }
 
     @Override

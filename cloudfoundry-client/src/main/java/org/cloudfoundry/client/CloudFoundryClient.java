@@ -38,6 +38,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -251,6 +252,13 @@ public interface CloudFoundryClient {
      * @return the Cloud Foundry Tasks Client API
      */
     Tasks tasks();
+
+    /**
+     * Main entry point to the Cloud Foundry User Provided Service Instances Client API
+     *
+     * @return the Cloud Foundry User Provided Service Instances Client API
+     */
+    UserProvidedServiceInstances userProvidedServiceInstances();
 
     /**
      * Main entry point to the Cloud Foundry Users Client API

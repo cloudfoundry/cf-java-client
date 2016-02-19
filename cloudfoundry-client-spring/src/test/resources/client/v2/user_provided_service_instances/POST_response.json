@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "guid": "34d5500e-712d-49ef-8bbe-c9ac349532da",
+    "url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da",
+    "created_at": "2015-07-27T22:43:35Z",
+    "updated_at": null
+  },
+  "entity": {
+    "name": "my-user-provided-instance",
+    "credentials": {
+      "somekey": "somevalue"
+    },
+    "space_guid": "0d45d43f-7d50-43c6-9981-b32ce8d5a373",
+    "type": "user_provided_service_instance",
+    "syslog_drain_url": "syslog://example.com",
+    "space_url": "/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373",
+    "service_bindings_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings"
+  }
+}
