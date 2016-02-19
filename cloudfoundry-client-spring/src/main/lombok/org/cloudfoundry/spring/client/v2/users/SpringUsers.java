@@ -49,7 +49,7 @@ public final class SpringUsers extends AbstractSpringOperations implements Users
     }
 
     @Override
-    public Mono<ListUsersResponse> listUsers(final ListUsersRequest request) {
+    public Mono<ListUsersResponse> list(final ListUsersRequest request) {
         return get(request, ListUsersResponse.class, new Consumer<UriComponentsBuilder>() {
 
             @Override

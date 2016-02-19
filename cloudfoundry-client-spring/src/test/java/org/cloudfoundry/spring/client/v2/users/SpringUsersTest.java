@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.spring.client.v2.users;
 
-import org.cloudfoundry.spring.AbstractApiTest;
 import org.cloudfoundry.client.v2.Resource.Metadata;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.spring.AbstractApiTest;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -29,7 +29,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 public final class SpringUsersTest {
 
-    public static final class ListUsers extends AbstractApiTest<ListUsersRequest, ListUsersResponse> {
+    public static final class List extends AbstractApiTest<ListUsersRequest, ListUsersResponse> {
 
         private final SpringUsers users = new SpringUsers(this.restTemplate, this.root, PROCESSOR_GROUP);
 
@@ -102,7 +102,7 @@ public final class SpringUsersTest {
 
         @Override
         protected Mono<ListUsersResponse> invoke(ListUsersRequest request) {
-            return this.users.listUsers(request);
+            return this.users.list(request);
         }
 
     }

@@ -26,6 +26,6 @@ public interface Users {
      * @param request the List all Users request
      * @return the response from the List all Users request
      */
-    Mono<ListUsersResponse> listUsers(ListUsersRequest request);
+    Mono<ListUsersResponse> list(ListUsersRequest request);
 
 }

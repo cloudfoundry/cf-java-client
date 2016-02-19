@@ -1407,7 +1407,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return associateOrganizationUser(cloudFoundryClient, organizationId, username)
             .as(afterComplete(() -> PaginationUtils
                 .requestResources(page -> cloudFoundryClient.users()
-                    .listUsers(ListUsersRequest.builder()
+                    .list(ListUsersRequest.builder()
                         .organizationId(organizationId)
                         .page(page)
                         .build()))

@@ -244,7 +244,7 @@ public class IntegrationTestConfiguration {
     Mono<String> userId(CloudFoundryClient cloudFoundryClient, @Value("${test.username}") String user) {  // TODO: Create new user when APIs available
         Mono<String> userId = PaginationUtils
             .requestResources(page -> cloudFoundryClient.users()
-                .listUsers(ListUsersRequest.builder()
+                .list(ListUsersRequest.builder()
                     .page(page)
                     .build()))
             .filter(resource -> user.equals(ResourceUtils.getEntity(resource).getUsername()))
