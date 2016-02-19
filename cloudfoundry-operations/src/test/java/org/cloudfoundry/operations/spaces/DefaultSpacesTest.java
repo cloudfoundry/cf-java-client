@@ -738,6 +738,32 @@ public final class DefaultSpacesTest {
 
     }
 
+    public static final class RenameNoSpace extends AbstractOperationsApiTest<Void> {
+
+        private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
+
+        @Before
+        public void setUp() throws Exception {
+            requestOrganizationSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
+        }
+
+        @Override
+        protected void assertions(TestSubscriber<Void> testSubscriber) throws Exception {
+            testSubscriber
+                .assertError(IllegalArgumentException.class);
+        }
+
+        @Override
+        protected Publisher<Void> invoke() {
+            return this.spaces
+                .rename(RenameSpaceRequest.builder()
+                    .name("test-space-name")
+                    .newName("test-new-space-name")
+                    .build());
+        }
+
+    }
+
     public static final class SshAllowed extends AbstractOperationsApiTest<Boolean> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
