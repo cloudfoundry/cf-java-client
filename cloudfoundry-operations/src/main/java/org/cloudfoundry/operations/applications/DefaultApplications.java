@@ -17,10 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.logging.LoggingClient;
-import org.cloudfoundry.logging.LogMessage;
-import org.cloudfoundry.logging.RecentLogsRequest;
-import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -45,6 +41,7 @@ import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.Route;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
 import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -52,6 +49,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
+import org.cloudfoundry.logging.LogMessage;
+import org.cloudfoundry.logging.LoggingClient;
+import org.cloudfoundry.logging.RecentLogsRequest;
+import org.cloudfoundry.logging.StreamLogsRequest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -238,6 +239,47 @@ public final class DefaultApplications implements Applications {
                 public ApplicationDetail apply(ApplicationStatisticsResponse applicationStatisticsResponse, SummaryApplicationResponse summaryApplicationResponse, GetStackResponse getStackResponse,
                                                ApplicationInstancesResponse applicationInstancesResponse) {
                     return toApplicationDetail(applicationStatisticsResponse, summaryApplicationResponse, getStackResponse, applicationInstancesResponse);
+                }
+
+            }));
+    }
+
+    @Override
+    public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
+        return ValidationUtils
+            .validate(request)
+            .and(this.spaceId)
+            .then(function(new Function2<GetApplicationManifestRequest, String, Mono<String>>() {
+
+                @Override
+                public Mono<String> apply(GetApplicationManifestRequest request, String spaceId) {
+                    return getApplicationId(DefaultApplications.this.cloudFoundryClient, request.getName(), spaceId);
+                }
+
+            }))
+            .then(new Function<String, Mono<SummaryApplicationResponse>>() {
+
+                @Override
+                public Mono<SummaryApplicationResponse> apply(String applicationId) {
+                    return requestApplicationSummary(DefaultApplications.this.cloudFoundryClient, applicationId);
+                }
+
+            })
+            .then(new Function<SummaryApplicationResponse, Mono<Tuple2<SummaryApplicationResponse, String>>>() {
+
+                @Override
+                public Mono<Tuple2<SummaryApplicationResponse, String>> apply(SummaryApplicationResponse summaryApplicationResponse) {
+                    return Mono
+                        .just(summaryApplicationResponse)
+                        .and(requestStackName(cloudFoundryClient, summaryApplicationResponse.getStackId()));
+                }
+
+            })
+            .then(function(new Function2<SummaryApplicationResponse, String, Mono<ApplicationManifest>>() {
+
+                @Override
+                public Mono<ApplicationManifest> apply(SummaryApplicationResponse summaryApplicationResponse, String stackName) {
+                    return toApplicationManifest(summaryApplicationResponse, stackName);
                 }
 
             }));
@@ -1145,6 +1187,18 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
+    private static Mono<String> requestStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
+        return requestStack(cloudFoundryClient, stackId)
+            .map(new Function<GetStackResponse, String>() {
+
+                @Override
+                public String apply(GetStackResponse getStackResponse) {
+                    return getStackResponse.getEntity().getName();
+                }
+
+            });
+    }
+
     private static Mono<Void> requestTerminateApplicationInstance(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         return cloudFoundryClient.applicationsV2()
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
@@ -1291,6 +1345,33 @@ public final class DefaultApplications implements Applications {
             .systemProvided(response.getSystemEnvironmentJsons())
             .userProvided(response.getEnvironmentJsons())
             .build();
+    }
+
+    private static Mono<ApplicationManifest> toApplicationManifest(SummaryApplicationResponse summaryApplicationResponse, String stackName) {
+        ApplicationManifest.ApplicationManifestBuilder manifestBuilder = ApplicationManifest.builder()
+            .buildpack(summaryApplicationResponse.getBuildpack())
+            .command(summaryApplicationResponse.getCommand())
+            .diskQuotaMB(summaryApplicationResponse.getDiskQuota())
+            .envs(summaryApplicationResponse.getEnvironmentJsons())
+            .instances(summaryApplicationResponse.getInstances())
+            .memoryMB(summaryApplicationResponse.getMemory())
+            .name(summaryApplicationResponse.getName())
+            .stack(stackName)
+            .timeout(summaryApplicationResponse.getHealthCheckTimeout());
+
+        for (Route route : summaryApplicationResponse.getRoutes()) {
+            manifestBuilder
+                .domain(route.getDomain().getName())
+                .host((route.getHost()));
+        }
+
+        for (ServiceInstance service : summaryApplicationResponse.getServices()) {
+            manifestBuilder
+                .service(service.getName());
+        }
+
+        return Mono.just(manifestBuilder
+            .build());
     }
 
     private static ApplicationSummary toApplicationSummary(SpaceApplicationSummary spaceApplicationSummary) {
