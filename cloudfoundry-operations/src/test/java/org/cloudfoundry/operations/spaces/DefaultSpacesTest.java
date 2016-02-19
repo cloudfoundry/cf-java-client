@@ -501,7 +501,7 @@ public final class DefaultSpacesTest {
 
     }
 
-    public static final class DisallowSshAlreadyAllowed extends AbstractOperationsApiTest<Void> {
+    public static final class DisallowSshAlreadyDisallowed extends AbstractOperationsApiTest<Void> {
 
         private final DefaultSpaces spaces = new DefaultSpaces(this.cloudFoundryClient, Mono.just(TEST_ORGANIZATION_ID));
 
