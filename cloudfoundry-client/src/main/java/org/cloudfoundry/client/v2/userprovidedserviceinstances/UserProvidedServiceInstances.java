@@ -24,7 +24,8 @@ import reactor.core.publisher.Mono;
 public interface UserProvidedServiceInstances {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/214/user_provided_service_instances/creating_a_user_provided_service_instance.html">Create User Provided Service Instance</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/creating_a_user_provided_service_instance.html">Create User Provided Service Instance</a>
+     * request
      *
      * @param request the Create User Provided Service Instance request
      * @return the response from the Create User Provided Service Instance request

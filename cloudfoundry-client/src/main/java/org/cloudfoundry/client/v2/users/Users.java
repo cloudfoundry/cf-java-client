@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/227/users/list_all_users.html">List all Users</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_users.html">List all Users</a> request
      *
      * @param request the List all Users request
      * @return the response from the List all Users request

@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface SharedDomains {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/226/shared_domains/list_all_shared_domains.html">List all Shared Domains</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/shared_domains/list_all_shared_domains.html">List all Shared Domains</a> request
      *
      * @param request the List all Shared Domains request
      * @return the response from the List all Shared Domains request
