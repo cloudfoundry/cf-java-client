@@ -3,5 +3,5 @@
 set -e
 
 pushd cf-java-client
-  ./mvnw -P integration-test test
+  ./mvnw -q -P integration-test test
 popd

@@ -3,5 +3,5 @@
 set -e
 
 pushd cf-java-client
-  ./mvnw package
+  ./mvnw -q package
 popd
